@@ -20,6 +20,7 @@ group 'com.jetbrains'
 version '0.1-SNAPSHOT'
 
 intellij {
+    // TODO: proper PyCharm version support    
     version '2018.3.2'
     // version 'IC-183.4588.61'
     // version 'LATEST-EAP-SNAPSHOT'
@@ -50,12 +51,10 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib"
-//    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-//    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+//    compile "org.jetbrains.kotlin:kotlin-reflect"
 //    compile 'org.jetbrains.kotlinx:kotlinx-support-jdk8:0.1'
     compile 'log4j:log4j:1.2.17'
 
     testCompile 'junit:junit:4.12'
     testCompile "org.jetbrains.kotlin:kotlin-test"
-//    testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
 }
