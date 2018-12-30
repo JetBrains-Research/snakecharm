@@ -1,0 +1,34 @@
+<idea-plugin>
+  <id>com.jetbrains.snakemake</id>
+  <name>Snakemake support</name>
+  <vendor email="roman.chernyatchik@jetbrains.com"
+          url="https://research.jetbrains.org/groups/biolabs">
+    JetBrains Research
+  </vendor>
+
+  <description><![CDATA[
+    Enter short description for your plugin here.<br>
+    <em>most HTML tags may be used</em>
+    ]]></description>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  
+  <!-- PyCharm / Python plugin dependency -->
+  <depends>com.intellij.modules.python</depends>
+  
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+  </extensions>
+
+  <!--<extensions defaultExtensionNs="Pythonid">-->
+   <!--<runConfigurationExtension implementation="com.foo.bar.SomeExtension"/>-->
+  <!--</extensions>-->
+
+  <actions>
+    <group id="MyPlugin.SampleMenu" text="Greeting" description="Greeting menu">
+      <add-to-group group-id="MainMenu" anchor="last"/>
+      <action id="Myplugin.Textboxes" class="com.jetbrains.snakemake.HelloAction" text="Hello" description="Says hello"/>
+    </group>
+  </actions>
+</idea-plugin>

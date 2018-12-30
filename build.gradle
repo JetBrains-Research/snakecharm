@@ -1,0 +1,64 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    // This plugin allows you to build plugins for IntelliJ platform using specific
+    // IntelliJ SDK and bundled plugins.
+    id 'org.jetbrains.intellij' version '0.4.1'
+
+    // Kotlin
+    id "org.jetbrains.kotlin.jvm" version "1.3.11"
+}
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+
+group 'com.jetbrains'
+version '0.1-SNAPSHOT'
+
+intellij {
+    version '2018.3.2'
+    // version 'IC-183.4588.61'
+    // version 'LATEST-EAP-SNAPSHOT'
+    // type 'IC' : default choice, no special prefix for PyCharm
+
+    updateSinceUntilBuild false
+    
+    downloadSources false
+//    localPath '/Users/romeo/Library/Application Support/JetBrains/Toolbox/apps/IDEA-C/ch-0/183.4886.12/IntelliJ IDEA CE.app'
+    alternativeIdePath '/Users/romeo/Library/Application Support/JetBrains/Toolbox/apps/PyCharm-P/ch-0/183.4588.64/PyCharm 2018.3 EAP.app'
+//    alternativeIdePath '~/Library/Application Support/JetBrains/Toolbox/apps/PyCharm-P/ch-0/183.4588.64/PyCharm 2018.3 EAP.app'
+//    alternativeIdePath '~/Applications/JetBrains Toolbox/PyCharm Professional.app'
+}
+
+patchPluginXml {
+    changeNotes """
+      Initial version: no changes.<br>
+      <em>most HTML tags may be used</em>"""
+    // sinceBuild ""
+    // untilBuild ""
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = sourceCompatibility
+compileKotlin { kotlinOptions.jvmTarget = sourceCompatibility }
+compileTestKotlin { kotlinOptions.jvmTarget = sourceCompatibility }
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib"
+//    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+//    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+//    compile 'org.jetbrains.kotlinx:kotlinx-support-jdk8:0.1'
+    compile 'log4j:log4j:1.2.17'
+
+    testCompile 'junit:junit:4.12'
+    testCompile "org.jetbrains.kotlin:kotlin-test"
+//    testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+}
