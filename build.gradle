@@ -28,10 +28,7 @@ intellij {
     updateSinceUntilBuild false
     
     downloadSources false
-//    localPath '/Users/romeo/Library/Application Support/JetBrains/Toolbox/apps/IDEA-C/ch-0/183.4886.12/IntelliJ IDEA CE.app'
-    alternativeIdePath '/Users/romeo/Library/Application Support/JetBrains/Toolbox/apps/PyCharm-P/ch-0/183.4588.64/PyCharm 2018.3 EAP.app'
-//    alternativeIdePath '~/Library/Application Support/JetBrains/Toolbox/apps/PyCharm-P/ch-0/183.4588.64/PyCharm 2018.3 EAP.app'
-//    alternativeIdePath '~/Applications/JetBrains Toolbox/PyCharm Professional.app'
+    // alternativeIdePath '..../PyCharm 2018.3 EAP.app'
 }
 
 patchPluginXml {
