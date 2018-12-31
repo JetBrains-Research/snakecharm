@@ -16,20 +16,35 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'kotlin'
 
+def hasPyCharm = project.hasProperty('pycharmPath')
+def hasPythonPlugin = project.hasProperty('pythonPlugin')
+
 group 'com.jetbrains'
 version '0.1-SNAPSHOT'
 
 intellij {
-    // TODO: proper PyCharm version support    
-    version '2018.3.2'
-    // version 'IC-183.4588.61'
-    // version 'LATEST-EAP-SNAPSHOT'
-    // type 'IC' : default choice, no special prefix for PyCharm
-
-    updateSinceUntilBuild false
+    pluginName 'intellij-snakemake'
+    version ideaVersion
     
-    downloadSources false
-    // alternativeIdePath '..../PyCharm 2018.3 EAP.app'
+    updateSinceUntilBuild false
+
+    plugins = []
+    if (hasPyCharm) {
+            alternativeIdePath pycharmPath
+        }
+        else if (hasPythonPlugin) {
+            plugins += [pythonPlugin]
+        }
+        else {
+            throw new StopActionException("Define either pycharmPath or pythonPlugin in your gradle.properties")
+        }
+
+    downloadSources Boolean.valueOf(downloadIdeaSources)
+
+    publishPlugin {
+        username publishUsername
+        password publishPassword
+    }
 }
 
 patchPluginXml {
