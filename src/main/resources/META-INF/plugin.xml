@@ -29,9 +29,10 @@
     />
   </extensions>
 
-  <!--<extensions defaultExtensionNs="Pythonid">-->
+  <extensions defaultExtensionNs="Pythonid">
+    <dialectsTokenSetContributor implementation="com.jetbrains.snakemake.lang.SnakemakeTokenSetContributor"/>
    <!--<runConfigurationExtension implementation="com.foo.bar.SomeExtension"/>-->
-  <!--</extensions>-->
+  </extensions>
 
   <actions>
     <group id="MyPlugin.SampleMenu" text="Greeting" description="Greeting menu">

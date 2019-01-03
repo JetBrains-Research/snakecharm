@@ -1,0 +1,26 @@
+SnakemakeFile: RuleUnexpKeyword.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    PsiElement(Py:IDENTIFIER)('booo')
+    PsiElement(Py:COLON)(':')
+    PsiErrorElement:Unexpected keyword booo in rule definition
+      <empty list>
+  PsiWhiteSpace(' ')
+  PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')
+  PsiErrorElement:Statement expected, found Py:DEDENT
+    <empty list>
+  PsiWhiteSpace('\n\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    SMKRuleParameterList
+      PsiElement(Py:IDENTIFIER)('input')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')

@@ -1,0 +1,41 @@
+SnakemakeFile: PythonCode.smk
+  PyFunction('foo')
+    PsiElement(Py:DEF_KEYWORD)('def')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PyParameterList
+      PsiElement(Py:LPAR)('(')
+      PsiElement(Py:RPAR)(')')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n   ')
+    PyStatementList
+      PyPassStatement
+        PsiElement(Py:PASS_KEYWORD)('pass')
+  PsiWhiteSpace('\n\n')
+  PyFunction('boo')
+    PsiElement(Py:DEF_KEYWORD)('def')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('boo')
+    PyParameterList
+      PsiElement(Py:LPAR)('(')
+      PyNamedParameter('arg1')
+        PsiElement(Py:IDENTIFIER)('arg1')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace(' ')
+      PyNamedParameter('arg2')
+        PsiElement(Py:IDENTIFIER)('arg2')
+      PsiElement(Py:RPAR)(')')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n   ')
+    PyStatementList
+      PyPassStatement
+        PsiElement(Py:PASS_KEYWORD)('pass')
+  PsiWhiteSpace('\n\n')
+  PyAssignmentStatement
+    PyTargetExpression: TRACK
+      PsiElement(Py:IDENTIFIER)('TRACK')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:EQ)('=')
+    PsiWhiteSpace(' ')
+    PyStringLiteralExpression: 
+      PsiElement(Py:SINGLE_QUOTED_STRING)(''hg19.gtf'')

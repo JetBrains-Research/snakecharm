@@ -1,0 +1,11 @@
+SnakemakeFile: RuleNoName.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    SMKRuleParameterList
+      PsiElement(Py:IDENTIFIER)('input')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')
