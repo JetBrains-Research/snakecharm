@@ -10,14 +10,16 @@ SnakemakeFile: RuleParams.smk
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
       PyArgumentList
-        PsiElement(Py:SINGLE_QUOTED_STRING)(''iiii'')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)(''iiii'')
     PsiWhiteSpace('\n    ')
     SMKRuleParameterListStatement
       PsiElement(Py:IDENTIFIER)('output')
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
       PyArgumentList
-        PsiElement(Py:SINGLE_QUOTED_STRING)(''ooooo'')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)(''ooooo'')
   PsiWhiteSpace('\n\n')
   SMKRule
     PsiElement(Py:RULE_KEYWORD)('rule')
@@ -30,4 +32,5 @@ SnakemakeFile: RuleParams.smk
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
       PyArgumentList
-        PsiElement(Py:SINGLE_QUOTED_STRING)(''ddd'')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)(''ddd'')

@@ -1,4 +1,4 @@
-SnakemakeFile: RuleParamsListArgs.smk
+SnakemakeFile: RuleParamsListKeywordArgs.smk
   SMKRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
@@ -10,13 +10,19 @@ SnakemakeFile: RuleParamsListArgs.smk
       PsiElement(Py:COLON)(':')
       PyArgumentList
         PsiWhiteSpace('\n        ')
-        PyStringLiteralExpression: 
-          PsiElement(Py:SINGLE_QUOTED_STRING)('"foo"')
+        PyKeywordArgumentImpl: input
+          PsiElement(Py:IDENTIFIER)('input')
+          PsiElement(Py:EQ)('=')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"in.bam"')
     PsiWhiteSpace('\n    ')
     SMKRuleParameterListStatement
       PsiElement(Py:IDENTIFIER)('output')
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
       PyArgumentList
-        PyStringLiteralExpression: 
-          PsiElement(Py:SINGLE_QUOTED_STRING)('"boo"')
+        PyKeywordArgumentImpl: output
+          PsiElement(Py:IDENTIFIER)('output')
+          PsiElement(Py:EQ)('=')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"in.bam"')

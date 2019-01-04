@@ -23,4 +23,5 @@ SnakemakeFile: RuleUnexpKeyword.smk
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
       PyArgumentList
-        PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')

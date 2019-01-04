@@ -10,17 +10,21 @@ SnakemakeFile: RuleParamsListArgsMultiple.smk
       PsiElement(Py:COLON)(':')
       PyArgumentList
         PsiWhiteSpace('\n        ')
-        PsiElement(Py:SINGLE_QUOTED_STRING)('"foo1"')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"foo1"')
         PsiElement(Py:COMMA)(',')
         PsiWhiteSpace('\n        ')
-        PsiElement(Py:SINGLE_QUOTED_STRING)('"foo2"')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"foo2"')
     PsiWhiteSpace('\n    ')
     SMKRuleParameterListStatement
       PsiElement(Py:IDENTIFIER)('output')
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
       PyArgumentList
-        PsiElement(Py:SINGLE_QUOTED_STRING)('"boo1"')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"boo1"')
         PsiElement(Py:COMMA)(',')
         PsiWhiteSpace(' ')
-        PsiElement(Py:SINGLE_QUOTED_STRING)('"boo2"')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"boo2"')

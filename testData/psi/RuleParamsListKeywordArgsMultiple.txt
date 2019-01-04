@@ -1,0 +1,44 @@
+SnakemakeFile: RuleParamsListKeywordArgsMultiple.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('samtools_sort')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('input')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiWhiteSpace('\n        ')
+        PyKeywordArgumentImpl: int1
+          PsiElement(Py:IDENTIFIER)('int1')
+          PsiElement(Py:EQ)('=')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"i1.bam"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n        ')
+        PyKeywordArgumentImpl: int2
+          PsiElement(Py:IDENTIFIER)('int2')
+          PsiElement(Py:EQ)('=')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"i2.bam"')
+    PsiWhiteSpace('\n    ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('output')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiWhiteSpace('\n        ')
+        PyKeywordArgumentImpl: out1
+          PsiElement(Py:IDENTIFIER)('out1')
+          PsiElement(Py:EQ)('=')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"out1.bam"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace(' ')
+        PyKeywordArgumentImpl: out2
+          PsiElement(Py:IDENTIFIER)('out2')
+          PsiElement(Py:EQ)('=')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"out2.bam"')
+        PsiErrorElement:Dedent expected
+          <empty list>
