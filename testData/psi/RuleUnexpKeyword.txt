@@ -18,7 +18,7 @@ SnakemakeFile: RuleUnexpKeyword.smk
     PsiElement(Py:IDENTIFIER)('all')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('\n    ')
-    SMKRuleParameterList
+    SMKRuleParameterListStatement
       PsiElement(Py:IDENTIFIER)('input')
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')

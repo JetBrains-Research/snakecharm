@@ -1,8 +1,6 @@
 package com.jetbrains.snakemake.lang.parser
 
 import com.intellij.lang.PsiBuilder
-import com.jetbrains.python.parsing.ExpressionParsing
-import com.jetbrains.python.parsing.FunctionParsing
 import com.jetbrains.python.parsing.ParsingContext
 import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.python.psi.LanguageLevel
@@ -17,9 +15,8 @@ class SnakemakeParserContext(
         futureFlag: StatementParsing.FUTURE?
 ): ParsingContext(builder, languageLevel, futureFlag) {
 
-    // See CythonParsingContext
-
     private val stmtParser = SnakemakeStatementParsing(this, futureFlag)
+    private val exprParser = SnakemakeExpressionParsing(this)
 
     override fun getScope(): SnakemakeParsingScope {
         val scope = super.getScope()
@@ -29,13 +26,12 @@ class SnakemakeParserContext(
 
     override fun getStatementParser() = stmtParser
 
-    override fun getExpressionParser(): ExpressionParsing {
-        return super.getExpressionParser()
-    }
+    override fun getExpressionParser() = exprParser
 
-    override fun getFunctionParser(): FunctionParsing {
-        return super.getFunctionParser()
-    }
+//    override fun getFunctionParser(): FunctionParsing {
+//        // TODO: cleanup
+//        return super.getFunctionParser()
+//    }
 
     override fun emptyParsingScope() = SnakemakeParsingScope()
 }

@@ -2,9 +2,7 @@ package com.jetbrains.snakemake.lang.parser
 
 import com.intellij.lang.PsiBuilder
 import com.jetbrains.python.PyBundle
-import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
-import com.jetbrains.python.parsing.FunctionParsing
 import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.snakemake.lang.psi.elementTypes.SnakemakeElementTypes
 
@@ -19,7 +17,7 @@ class SnakemakeStatementParsing(
 
     override fun getParsingContext() = myContext as SnakemakeParserContext
 
-    // TODO
+    // TODO cleanup
 //    override fun getReferenceType(): IElementType {
 //            return CythonElementTypes.REFERENCE_EXPRESSION
 //        }
@@ -27,32 +25,33 @@ class SnakemakeStatementParsing(
     override fun parseStatement() {
         // super.parseStatement()
 
-        // TODO:
+        // TODO cleanup:
 //        val context = parsingContext
 //        val scope = context.scope as SnakemakeParsingScope
 //        var isRule = scope.isRule
-        val builder = myContext.builder
+        //builder.setDebugMode(true)
+
         var marker: PsiBuilder.Marker? = null
 //
         if (atToken(SnakemakeTokenTypes.RULE_KEYWORD)) run {
 //            isRule = true
-            marker = builder.mark()
+            marker = myBuilder.mark()
             nextToken()
 
             // rule name
-            if (builder.tokenType == PyTokenTypes.IDENTIFIER) {
+            if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER) {
                 nextToken()
             }
             checkMatches(PyTokenTypes.COLON, "Identifier or ':' expected") // bundle
             checkEndOfStatement()
             checkMatches(PyTokenTypes.INDENT, "Indent expected...") // bundle
             while (!myBuilder.eof() && myBuilder.tokenType !== PyTokenTypes.DEDENT) {
-                if (!parseRuleParameter(builder)) {
+                if (!parseRuleParameter(myBuilder)) {
                     break
                 }
             }
-            marker!!.done(SnakemakeElementTypes.RULE)
-            nextToken()
+            marker!!.done(SnakemakeElementTypes.RULE_DECLARATION)
+             nextToken()
 
         } else {
             super.parseStatement()
@@ -73,25 +72,21 @@ class SnakemakeStatementParsing(
 
         var result = false
         if (keyword == "input" || keyword == "output") {
-            //TODO: parse arg list
-            //no: expressionParser.parseArgumentList()
-            val argList = builder.mark()
-            nextToken()
-            argList.done(PyElementTypes.ARGUMENT_LIST)
-
-            ruleParam.done(SnakemakeElementTypes.RULE_PARAMETER_LIST)
-            result = true
+            result = parsingContext.expressionParser.parseRuleParamArgumentList()
+            ruleParam.done(SnakemakeElementTypes.RULE_PARAMETER_LIST_STATEMENT)
         } else {
             // error
             myBuilder.error("Unexpected keyword $keyword in rule definition") // bundle
 
+            //TODO advance until eof or STATEMENT_END?
+            // checkEndOfStatement()
             ruleParam.drop()
         }
-        checkEndOfStatement()
         return result
     }
 
-    override fun getFunctionParser(): FunctionParsing {
-        return super.getFunctionParser()
-    }
+    // TODO: cleanup
+//    override fun getFunctionParser(): FunctionParsing {
+//        return super.getFunctionParser()
+//    }
 }

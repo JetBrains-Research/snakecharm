@@ -1,9 +1,8 @@
-SnakemakeFile: Rule.smk
+SnakemakeFile: RuleInvalid1.smk
   SMKRule
     PsiElement(Py:RULE_KEYWORD)('rule')
-    PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('all')
-    PsiElement(Py:COLON)(':')
+    PsiErrorElement:Identifier or ':' expected
+      <empty list>
     PsiWhiteSpace('\n    ')
     SMKRuleParameterListStatement
       PsiElement(Py:IDENTIFIER)('input')

@@ -3,7 +3,7 @@ SnakemakeFile: RuleNoName.smk
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('\n    ')
-    SMKRuleParameterList
+    SMKRuleParameterListStatement
       PsiElement(Py:IDENTIFIER)('input')
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
