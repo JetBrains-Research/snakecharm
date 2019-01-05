@@ -5,7 +5,7 @@ import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.ExpressionParsing
 import com.jetbrains.python.parsing.Parsing
-import com.jetbrains.snakemake.lang.psi.SMKRuleParameterListStatement
+import com.jetbrains.snakemake.lang.psi.SMKRule
 
 /**
  * @author Roman.Chernyatchik
@@ -127,7 +127,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext): ExpressionPar
             //    e.g if current rule param was a single line with hanging comma
 
             val identifier = myBuilder.tokenText
-            if (identifier in SMKRuleParameterListStatement.KEYWORDS) {
+            if (identifier in SMKRule.PARAMS_KEYWORDS) {
                 // exclude this token from 'current' args list subtree
                 return true
             }

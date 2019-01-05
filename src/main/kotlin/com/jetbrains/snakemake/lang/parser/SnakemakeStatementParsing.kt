@@ -5,6 +5,7 @@ import com.jetbrains.python.PyBundle
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.snakemake.lang.psi.SMKRuleParameterListStatement
+import com.jetbrains.snakemake.lang.psi.SMKRuleRunParameter
 import com.jetbrains.snakemake.lang.psi.elementTypes.SnakemakeElementTypes
 
 /**
@@ -71,7 +72,11 @@ class SnakemakeStatementParsing(
         if (keyword in SMKRuleParameterListStatement.KEYWORDS) {
             result = parsingContext.expressionParser.parseRuleParamArgumentList()
             ruleParam.done(SnakemakeElementTypes.RULE_PARAMETER_LIST_STATEMENT)
-        } else {
+        } else if (keyword in SMKRuleRunParameter.KEYWORDS) {
+            statementParser.parseSuite()
+            ruleParam.done(SnakemakeElementTypes.RULE_RUN_STATEMENT)
+        }
+        else {
             // error
             myBuilder.error("Unexpected keyword $keyword in rule definition") // bundle
 

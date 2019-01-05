@@ -114,6 +114,14 @@ class SnakemakeParsingTest : ParsingTestCase(
     fun testRuleParamsListKeywordArgsMultiple() {
         doTest()
     }
+
+    fun testRuleRun() {
+        doTest()
+    }
+
+    fun testRuleRunPythonBlock() {
+        doTest()
+    }
     //
     //
     //
