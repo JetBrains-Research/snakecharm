@@ -87,7 +87,15 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testRuleParamsListArgsHangingComma() {
+        doTest()
+    }
+
     fun testRuleParamsListArgsMultiple() {
+        doTest()
+    }
+
+    fun testRuleParamsListArgsIndents() {
         doTest()
     }
 

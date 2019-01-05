@@ -9,11 +9,11 @@ SnakemakeFile: RuleParamsListArgsMultiple.smk
       PsiElement(Py:IDENTIFIER)('input')
       PsiElement(Py:COLON)(':')
       PyArgumentList
-        PsiWhiteSpace('\n        ')
+        PsiWhiteSpace('\n         ')
         PyStringLiteralExpression: 
           PsiElement(Py:SINGLE_QUOTED_STRING)('"foo1"')
         PsiElement(Py:COMMA)(',')
-        PsiWhiteSpace('\n        ')
+        PsiWhiteSpace('\n         ')
         PyStringLiteralExpression: 
           PsiElement(Py:SINGLE_QUOTED_STRING)('"foo2"')
     PsiWhiteSpace('\n    ')
@@ -28,3 +28,36 @@ SnakemakeFile: RuleParamsListArgsMultiple.smk
         PsiWhiteSpace(' ')
         PyStringLiteralExpression: 
           PsiElement(Py:SINGLE_QUOTED_STRING)('"boo2"')
+    PsiWhiteSpace('\n    ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('output')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"doo1"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n       ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"doo2"')
+    PsiWhiteSpace('\n    ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('output')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo1"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n           ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo2"')
+        PsiElement(Py:COMMA)(',')
+    PsiWhiteSpace('\n    ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('output')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"zzzzzz"')

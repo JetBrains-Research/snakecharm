@@ -23,19 +23,15 @@ class SnakemakeStatementParsing(
 //        }
 
     override fun parseStatement() {
-        // super.parseStatement()
-
         // TODO cleanup:
 //        val context = parsingContext
 //        val scope = context.scope as SnakemakeParsingScope
 //        var isRule = scope.isRule
-        //builder.setDebugMode(true)
+        // myBuilder.setDebugMode(true)
 
-        var marker: PsiBuilder.Marker? = null
-//
-        if (atToken(SnakemakeTokenTypes.RULE_KEYWORD)) run {
+        if (atToken(SnakemakeTokenTypes.RULE_KEYWORD)) {
 //            isRule = true
-            marker = myBuilder.mark()
+            val ruleMarker: PsiBuilder.Marker = myBuilder.mark()
             nextToken()
 
             // rule name
@@ -50,7 +46,7 @@ class SnakemakeStatementParsing(
                     break
                 }
             }
-            marker!!.done(SnakemakeElementTypes.RULE_DECLARATION)
+            ruleMarker.done(SnakemakeElementTypes.RULE_DECLARATION)
              nextToken()
 
         } else {

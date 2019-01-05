@@ -1,0 +1,70 @@
+SnakemakeFile: RuleParamsListArgsIndents.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('samtools_sort')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('output')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo1"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n           ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo2"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n              ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo3"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n                  ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo4"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n           ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo5"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n             ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo6"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n           ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo7"')
+    PsiWhiteSpace('\n\n    ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('input')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"foo1"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n      ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"foo2"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n        ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"foo3"')
+    PsiWhiteSpace('\n\n    ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('input')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"boo1"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n      ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"boo2"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n        ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"boo3"')

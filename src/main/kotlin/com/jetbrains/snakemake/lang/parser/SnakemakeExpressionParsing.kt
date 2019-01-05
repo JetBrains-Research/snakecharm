@@ -24,21 +24,56 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext): ExpressionPar
                 return false
             }
         }
+        var indents = if (argsOnNextLine) 1 else 0
         var argNumber = 0
         while (!myBuilder.eof() && myBuilder.tokenType !== PyTokenTypes.STATEMENT_BREAK) {
             argNumber++
 
             // comma if several args:
             if (argNumber > 1) {
-                if (matchToken(PyTokenTypes.COMMA)) {
-                    // if args on next line, not on this:
-                    if (myBuilder.tokenType == PyTokenTypes.STATEMENT_BREAK) {
+                if (myBuilder.tokenType === PyTokenTypes.COMMA) {
+                    nextToken()
+                    val commaMarker = myBuilder.mark()
+
+                    // skip indents, dedents while matched
+                    var tt = myBuilder.tokenType
+                    while (!myBuilder.eof()) {
+                        if (tt == PyTokenTypes.INDENT) {
+                            indents++
+                        } else if (tt == PyTokenTypes.DEDENT) {
+                            indents--
+                            if (indents == 0) {
+                                break
+                            }
+                        } else if (tt !== PyTokenTypes.STATEMENT_BREAK) {
+                            break
+                        }
                         nextToken()
+                        tt = myBuilder.tokenType
                     }
-                    // TODO: cleanup
-                    //  if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
-                    //      break
-                    //  }
+
+                    tt = myBuilder.tokenType
+                    if (tt == PyTokenTypes.IDENTIFIER) {
+                        // check if next token is rule parameter identifier
+
+                        val identifier = myBuilder.tokenText
+                        if (identifier in setOf("output", "input")) {
+                            // exclude this token from 'current' args list subtree
+                            commaMarker.rollbackTo()
+                            break
+                        }
+                    } else if (tt == PyTokenTypes.DEDENT && indents == 0) {
+                        // hanging 'comma', next statement is another rule param block
+                        // TODO!!!!!!!!!!!!!
+                        indents++
+                        commaMarker.rollbackTo()
+                        break
+                    }
+                    commaMarker.drop()
+                    
+                    if (myBuilder.eof()) {
+                        break
+                    }
                 } else {
                     myBuilder.error(message("PARSE.expected.comma.or.rpar"))
                     break
@@ -76,8 +111,14 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext): ExpressionPar
             }
         }
         nextToken()
-        if (argsOnNextLine) {
-            checkMatches(PyTokenTypes.DEDENT, "Dedent expected")
+
+        // Eat all matching dedents
+        while (!myBuilder.eof() && indents > 0) {
+            if (checkMatches(PyTokenTypes.DEDENT, "Dedent expected")) { // bundle
+                indents--
+            } else {
+                break
+            }
         }
         argList.done(PyElementTypes.ARGUMENT_LIST)
 

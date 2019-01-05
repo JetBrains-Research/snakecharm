@@ -4,3 +4,5 @@ rule samtools_sort:
         int2="i2.bam"
     output:
         out1="out1.bam", out2="out2.bam"
+    output: out1="out1.bam",
+        out2="out2.bam"
