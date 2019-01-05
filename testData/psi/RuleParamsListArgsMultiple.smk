@@ -5,6 +5,4 @@ rule samtools_sort:
     output: "boo1", "boo2"
     output: "doo1",
        "doo2"
-    output: "zoo1",
-           "zoo2",
     output: "zzzzzz"

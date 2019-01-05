@@ -33,40 +33,40 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext): ExpressionPar
             if (argNumber > 1) {
                 if (matchToken(PyTokenTypes.COMMA)) {
                     val commaMarker = myBuilder.mark()
+                    val commMarkerIndents = indents
 
-                    // skip indents, dedents while matched
-                    var tt = myBuilder.tokenType
-                    while (!myBuilder.eof()) {
-                        if (tt == PyTokenTypes.INDENT) {
+                    // skip indents/dedents:
+                    if (matchToken(PyTokenTypes.STATEMENT_BREAK)) {
+                        // skip indents
+                        if (matchToken(PyTokenTypes.INDENT)) {
                             indents++
-                        } else if (tt == PyTokenTypes.DEDENT) {
-                            indents--
-                            if (indents == 0) {
-                                break
+                        } else {
+                            // skip dedents while matched, we could have several dedent tokens in a raw
+                            // skip dedent while inside current block (indents > 1)
+                            while (!myBuilder.eof() && myBuilder.tokenType == PyTokenTypes.DEDENT && indents > 1) {
+                                indents--
+                                nextToken()
                             }
-                        } else if (tt !== PyTokenTypes.STATEMENT_BREAK) {
-                            break
                         }
-                        nextToken()
-                        tt = myBuilder.tokenType
                     }
 
-                    tt = myBuilder.tokenType
-                    if (tt == PyTokenTypes.IDENTIFIER) {
+                    // Case: hanging 'comma', next statement is another rule param block
+                    if (myBuilder.tokenType == PyTokenTypes.DEDENT) {
+                        indents = commMarkerIndents
+                        commaMarker.rollbackTo()
+                        break
+                    } else if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER) {
                         // check if next token is rule parameter identifier
+                        // this case is when we don't have dedent token:
+                        //    e.g if current rule param was a single line with hanging comma
 
                         val identifier = myBuilder.tokenText
                         if (identifier in setOf("output", "input")) {
                             // exclude this token from 'current' args list subtree
                             commaMarker.rollbackTo()
+                            indents = commMarkerIndents
                             break
                         }
-                    } else if (tt == PyTokenTypes.DEDENT && indents == 0) {
-                        // hanging 'comma', next statement is another rule param block
-                        // TODO!!!!!!!!!!!!!
-                        indents++
-                        commaMarker.rollbackTo()
-                        break
                     }
                     commaMarker.drop()
                     

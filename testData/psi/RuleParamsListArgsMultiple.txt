@@ -47,17 +47,4 @@ SnakemakeFile: RuleParamsListArgsMultiple.smk
       PsiWhiteSpace(' ')
       PyArgumentList
         PyStringLiteralExpression: 
-          PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo1"')
-        PsiElement(Py:COMMA)(',')
-        PsiWhiteSpace('\n           ')
-        PyStringLiteralExpression: 
-          PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo2"')
-        PsiElement(Py:COMMA)(',')
-    PsiWhiteSpace('\n    ')
-    SMKRuleParameterListStatement
-      PsiElement(Py:IDENTIFIER)('output')
-      PsiElement(Py:COLON)(':')
-      PsiWhiteSpace(' ')
-      PyArgumentList
-        PyStringLiteralExpression: 
           PsiElement(Py:SINGLE_QUOTED_STRING)('"zzzzzz"')
