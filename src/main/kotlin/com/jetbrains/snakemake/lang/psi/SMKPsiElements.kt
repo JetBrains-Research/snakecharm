@@ -20,7 +20,7 @@ class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyState
     companion object {
         val KEYWORDS = setOf(
                 "output", "input", "params", "log", "resources",
-                "benchmark", "version", "message", "shell", "threads",
+                "benchmark", "version", "message", "shell", "threads", "singularity",
                 "priority", "benchmark", "wildcard_constraints", "group", "shadow",
                 "conda", // >= 4.8
                 "script", "wrapper", "cwl"

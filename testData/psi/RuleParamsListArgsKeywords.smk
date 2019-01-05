@@ -20,6 +20,9 @@ rule foo1:
   group: "mygroup"
   shadow: "shallow"
 
+  singularity:
+        "docker://continuumio/miniconda3:4.4.10"
+
   wildcard_constraints:
           dataset="\d+"
   shell:

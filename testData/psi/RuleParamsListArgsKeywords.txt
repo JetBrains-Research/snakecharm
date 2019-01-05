@@ -123,6 +123,14 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PsiElement(Py:SINGLE_QUOTED_STRING)('"shallow"')
     PsiWhiteSpace('\n\n  ')
     SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('singularity')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiWhiteSpace('\n        ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"docker://continuumio/miniconda3:4.4.10"')
+    PsiWhiteSpace('\n\n  ')
+    SMKRuleParameterListStatement
       PsiElement(Py:IDENTIFIER)('wildcard_constraints')
       PsiElement(Py:COLON)(':')
       PyArgumentList
