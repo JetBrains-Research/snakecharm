@@ -69,20 +69,26 @@ class SnakemakeStatementParsing(
         checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
 
         var result = false
-        if (keyword in SMKRuleParameterListStatement.KEYWORDS) {
-            result = parsingContext.expressionParser.parseRuleParamArgumentList()
-            ruleParam.done(SnakemakeElementTypes.RULE_PARAMETER_LIST_STATEMENT)
-        } else if (keyword in SMKRuleRunParameter.KEYWORDS) {
-            statementParser.parseSuite()
-            ruleParam.done(SnakemakeElementTypes.RULE_RUN_STATEMENT)
-        }
-        else {
-            // error
-            myBuilder.error("Unexpected keyword $keyword in rule definition") // bundle
 
-            //TODO advance until eof or STATEMENT_END?
-            // checkEndOfStatement()
-            ruleParam.drop()
+        when (keyword) {
+            in SMKRuleParameterListStatement.KEYWORDS -> {
+                // TODO: probably do this behaviour by default and use inspection error
+                // instead of parsing errors..
+                result = parsingContext.expressionParser.parseRuleParamArgumentList()
+                ruleParam.done(SnakemakeElementTypes.RULE_PARAMETER_LIST_STATEMENT)
+            }
+            in SMKRuleRunParameter.KEYWORDS -> {
+                statementParser.parseSuite()
+                ruleParam.done(SnakemakeElementTypes.RULE_RUN_STATEMENT)
+            }
+            else -> {
+                // error
+                myBuilder.error("Unexpected keyword $keyword in rule definition") // bundle
+
+                //TODO advance until eof or STATEMENT_END?
+                // checkEndOfStatement()
+                ruleParam.drop()
+            }
         }
         return result
     }
