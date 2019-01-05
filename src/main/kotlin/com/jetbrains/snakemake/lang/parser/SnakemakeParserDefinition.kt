@@ -3,6 +3,7 @@ package com.jetbrains.snakemake.lang.parser
 import com.intellij.lang.PsiParser
 import com.intellij.openapi.project.Project
 import com.intellij.psi.FileViewProvider
+import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PythonParserDefinition
 import com.jetbrains.snakemake.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakemake.lang.psi.SnakemakeFile

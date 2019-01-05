@@ -10,4 +10,14 @@ import com.jetbrains.python.psi.impl.PyElementImpl
  */
 class SMKRule(node: ASTNode): PyElementImpl(node) //TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SMKRule>
 
-class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyStatement  // PyNamedElementContainer
+class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyStatement  { // PyNamedElementContainer
+    companion object {
+        val KEYWORDS = setOf(
+                "output", "input", "params", "log", "resources",
+                "benchmark", "version", "message", "shell", "threads",
+                "priority", "benchmark", "wildcard_constraints", "group", "shadow",
+                "conda", // >= 4.8
+                "script", "wrapper", "cwl"
+        )
+    }
+}

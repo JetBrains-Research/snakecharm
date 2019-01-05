@@ -1,0 +1,184 @@
+SnakemakeFile: RuleParamsListArgsKeywords.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo1')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('input')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"iii"')
+    PsiWhiteSpace('\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('output')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"ooo"')
+    PsiWhiteSpace('\n\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('params')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"ppp"')
+    PsiWhiteSpace('\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('log')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"logs/abc.log"')
+    PsiWhiteSpace('\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('resources')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiWhiteSpace('\n      ')
+        PyKeywordArgumentImpl: mem_mb
+          PsiElement(Py:IDENTIFIER)('mem_mb')
+          PsiElement(Py:EQ)('=')
+          PyNumericLiteralExpression
+            PsiElement(Py:INTEGER_LITERAL)('100')
+    PsiWhiteSpace('\n\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('threads')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyNumericLiteralExpression
+          PsiElement(Py:INTEGER_LITERAL)('50')
+    PsiWhiteSpace('\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('priority')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyNumericLiteralExpression
+          PsiElement(Py:INTEGER_LITERAL)('50')
+    PsiWhiteSpace('\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('version')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"1.0"')
+    PsiWhiteSpace('\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('message')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"Executing somecommand with {threads} threads on the following files {input}."')
+    PsiWhiteSpace('\n\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('conda')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiWhiteSpace('\n        ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"envs/ggplot.yaml"')
+    PsiWhiteSpace('\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('benchmark')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiWhiteSpace('\n         ')
+        PyCallExpression: repeat
+          PyReferenceExpression: repeat
+            PsiElement(Py:IDENTIFIER)('repeat')
+          PyArgumentList
+            PsiElement(Py:LPAR)('(')
+            PyStringLiteralExpression: 
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"benchmarks/somecommand/{sample}.tsv"')
+            PsiElement(Py:COMMA)(',')
+            PsiWhiteSpace(' ')
+            PyNumericLiteralExpression
+              PsiElement(Py:INTEGER_LITERAL)('3')
+            PsiElement(Py:RPAR)(')')
+    PsiWhiteSpace('\n\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('group')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"mygroup"')
+    PsiWhiteSpace('\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('shadow')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"shallow"')
+    PsiWhiteSpace('\n\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('wildcard_constraints')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiWhiteSpace('\n          ')
+        PyKeywordArgumentImpl: dataset
+          PsiElement(Py:IDENTIFIER)('dataset')
+          PsiElement(Py:EQ)('=')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"\d+"')
+    PsiWhiteSpace('\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('shell')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiWhiteSpace('\n          ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"somecommand --group {wildcards.group}  < {input}  > {output}"')
+  PsiWhiteSpace('\n\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo2')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('wrapper')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiWhiteSpace('\n      ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"0.15.3/bio/bwa/mem"')
+  PsiWhiteSpace('\n\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo3')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('script')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiWhiteSpace('\n      ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"path/to/script.py"')
+  PsiWhiteSpace('\n\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo4')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n  ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('cwl')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiWhiteSpace('\n        ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"https://github.com/common-workflow-language/workflows/blob/fb406c95/tools/samtools-sort.cwl"')

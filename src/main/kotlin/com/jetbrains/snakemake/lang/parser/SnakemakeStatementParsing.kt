@@ -4,6 +4,7 @@ import com.intellij.lang.PsiBuilder
 import com.jetbrains.python.PyBundle
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.StatementParsing
+import com.jetbrains.snakemake.lang.psi.SMKRuleParameterListStatement
 import com.jetbrains.snakemake.lang.psi.elementTypes.SnakemakeElementTypes
 
 /**
@@ -67,7 +68,7 @@ class SnakemakeStatementParsing(
         checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
 
         var result = false
-        if (keyword == "input" || keyword == "output") {
+        if (keyword in SMKRuleParameterListStatement.KEYWORDS) {
             result = parsingContext.expressionParser.parseRuleParamArgumentList()
             ruleParam.done(SnakemakeElementTypes.RULE_PARAMETER_LIST_STATEMENT)
         } else {
