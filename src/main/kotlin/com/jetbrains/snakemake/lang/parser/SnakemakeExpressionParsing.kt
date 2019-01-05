@@ -51,24 +51,13 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext): ExpressionPar
                     }
 
                     // Case: hanging 'comma', next statement is another rule param block
-                    if (myBuilder.tokenType == PyTokenTypes.DEDENT) {
+                    if (checkHangingCommaInArgsList()) {
                         indents = commMarkerIndents
                         commaMarker.rollbackTo()
                         break
-                    } else if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER) {
-                        // check if next token is rule parameter identifier
-                        // this case is when we don't have dedent token:
-                        //    e.g if current rule param was a single line with hanging comma
-
-                        val identifier = myBuilder.tokenText
-                        if (identifier in setOf("output", "input")) {
-                            // exclude this token from 'current' args list subtree
-                            commaMarker.rollbackTo()
-                            indents = commMarkerIndents
-                            break
-                        }
+                    } else {
+                        commaMarker.drop()
                     }
-                    commaMarker.drop()
                     
                     if (myBuilder.eof()) {
                         break
@@ -122,6 +111,28 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext): ExpressionPar
         argList.done(PyElementTypes.ARGUMENT_LIST)
 
         return true
+    }
+
+    private fun checkHangingCommaInArgsList(): Boolean {
+        // Case: hanging 'comma', next statement is another rule param block
+
+        if (myBuilder.tokenType == PyTokenTypes.DEDENT) {
+            return true
+        }
+
+        if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER) {
+            // check if next token is rule parameter identifier
+            // this case is when we don't have dedent token:
+            //    e.g if current rule param was a single line with hanging comma
+
+            val identifier = myBuilder.tokenText
+            if (identifier in setOf("output", "input")) {
+                // exclude this token from 'current' args list subtree
+                return true
+            }
+        }
+
+        return false
     }
 
 }
