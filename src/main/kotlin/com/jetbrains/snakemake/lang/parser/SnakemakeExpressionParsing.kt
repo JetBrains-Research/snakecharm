@@ -31,8 +31,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext): ExpressionPar
 
             // comma if several args:
             if (argNumber > 1) {
-                if (myBuilder.tokenType === PyTokenTypes.COMMA) {
-                    nextToken()
+                if (matchToken(PyTokenTypes.COMMA)) {
                     val commaMarker = myBuilder.mark()
 
                     // skip indents, dedents while matched
