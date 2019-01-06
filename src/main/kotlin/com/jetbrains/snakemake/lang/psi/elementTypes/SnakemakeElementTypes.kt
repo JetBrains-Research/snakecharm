@@ -1,10 +1,7 @@
 package com.jetbrains.snakemake.lang.psi.elementTypes
 
 import com.jetbrains.python.psi.PyElementType
-import com.jetbrains.snakemake.lang.psi.SMKCheckPoint
-import com.jetbrains.snakemake.lang.psi.SMKRule
-import com.jetbrains.snakemake.lang.psi.SMKRuleParameterListStatement
-import com.jetbrains.snakemake.lang.psi.SMKRuleRunParameter
+import com.jetbrains.snakemake.lang.psi.*
 
 /**
  * @author Roman.Chernyatchik
@@ -22,5 +19,10 @@ object SnakemakeElementTypes {
     val RULE_RUN_STATEMENT = PyElementType(
             "SMK_RULE_RUN_STATEMENT",
             SMKRuleRunParameter::class.java
+    )
+
+    val WORKFLOW_PYTHON_BLOCK_PARAMETER = PyElementType(
+            "SMK_WORKFLOW_PYTHON_BLOCK_PARAMETER",
+            SMKWorkflowPythonBlockParameter::class.java
     )
 }

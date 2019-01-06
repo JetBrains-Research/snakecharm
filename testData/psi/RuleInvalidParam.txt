@@ -1,0 +1,60 @@
+SnakemakeFile: RuleInvalidParam.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('input')
+      PsiErrorElement:':' expected
+        <empty list>
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)(''foo1'')
+  PsiWhiteSpace('\n\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    PsiErrorElement:Rule parameter name is expected
+      <empty list>
+    PsiElement(Py:SINGLE_QUOTED_STRING)(''input'')
+  PsiElement(Py:COLON)(':')
+  PsiWhiteSpace(' ')
+  PyExpressionStatement
+    PyStringLiteralExpression: 
+      PsiElement(Py:SINGLE_QUOTED_STRING)(''foo2'')
+  PsiErrorElement:Statement expected, found Py:DEDENT
+    <empty list>
+  PsiWhiteSpace('\n\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all3')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('input')
+      PsiErrorElement:':' expected
+        <empty list>
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyReferenceExpression: foo3
+          PsiElement(Py:IDENTIFIER)('foo3')
+  PsiWhiteSpace('\n\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all4')
+    PsiElement(Py:COLON)(':')
+    PsiErrorElement:Rule parameter name is expected
+      <empty list>
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SINGLE_QUOTED_STRING)(''input'')
+  PsiElement(Py:COLON)(':')
+  PsiErrorElement:Statement expected, found Py:COLON
+    <empty list>
+  PsiWhiteSpace(' ')
+  PyExpressionStatement
+    PyReferenceExpression: foo4
+      PsiElement(Py:IDENTIFIER)('foo4')

@@ -40,3 +40,10 @@ class SMKRuleRunParameter(node: ASTNode): PyElementImpl(node), PyStatementListCo
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
+
+class SMKWorkflowPythonBlockParameter(node: ASTNode): PyElementImpl(node), PyStatementListContainer  { // PyNamedElementContainer
+
+    override fun getStatementList(): PyStatementList {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+}

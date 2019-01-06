@@ -1,4 +1,4 @@
-SnakemakeFile: RuleInvalid1.smk
+SnakemakeFile: RuleInvalid.smk
   SMKRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiErrorElement:Identifier or ':' expected

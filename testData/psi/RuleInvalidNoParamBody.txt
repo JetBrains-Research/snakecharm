@@ -1,0 +1,20 @@
+SnakemakeFile: RuleInvalidNoParamBody.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('input')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiErrorElement:Indent expected...
+          <empty list>
+  PsiWhiteSpace('\n    ')
+  PsiElement(Py:IDENTIFIER)('output')
+  PsiElement(Py:COLON)(':')
+  PsiErrorElement:Statement expected, found Py:COLON
+    <empty list>
+  PsiWhiteSpace(' ')
+  PyExpressionStatement
+    PyStringLiteralExpression: 
+      PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')

@@ -1,0 +1,36 @@
+SnakemakeFile: RuleInvalidNoBreak.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all1')
+    PsiElement(Py:COLON)(':')
+    PsiErrorElement:End of statement expected
+      <empty list>
+    PsiWhiteSpace(' ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('input')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)(''foo1'')
+    PsiErrorElement:Rule parameter name is expected
+      <empty list>
+    PsiWhiteSpace('\n')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+  PsiWhiteSpace(' ')
+  PsiElement(Py:IDENTIFIER)('all2')
+  PsiElement(Py:COLON)(':')
+  PsiErrorElement:Statement expected, found Py:COLON
+    <empty list>
+  PsiWhiteSpace('\n    ')
+  PsiErrorElement:Unexpected indent
+    <empty list>
+  PyTypeDeclarationStatement
+    PyTargetExpression: input
+      PsiElement(Py:IDENTIFIER)('input')
+    PyAnnotation
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyStringLiteralExpression: 
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''foo2'')

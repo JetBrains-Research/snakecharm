@@ -1,0 +1,104 @@
+SnakemakeFile: WorkflowPythonCodeBlockKeywords.smk
+  SMKWorkflowPythonBlockParameter
+    PsiElement(Py:WORKFLOW_ONSTART)('onstart')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    PyStatementList
+      PyExpressionStatement
+        PyCallExpression: foo
+          PyReferenceExpression: foo
+            PsiElement(Py:IDENTIFIER)('foo')
+          PyArgumentList
+            PsiElement(Py:LPAR)('(')
+            PyStringLiteralExpression: 
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"Workflow started, no error"')
+            PsiElement(Py:RPAR)(')')
+  PsiWhiteSpace('\n\n')
+  SMKWorkflowPythonBlockParameter
+    PsiElement(Py:WORKFLOW_ONSUCCESS)('onsuccess')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    PyStatementList
+      PyExpressionStatement
+        PyCallExpression: foo
+          PyReferenceExpression: foo
+            PsiElement(Py:IDENTIFIER)('foo')
+          PyArgumentList
+            PsiElement(Py:LPAR)('(')
+            PyStringLiteralExpression: 
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"Workflow finished, no error"')
+            PsiElement(Py:RPAR)(')')
+  PsiWhiteSpace('\n\n')
+  SMKWorkflowPythonBlockParameter
+    PsiElement(Py:WORKFLOW_ONERROR)('onerror')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    PyStatementList
+      PyExpressionStatement
+        PyCallExpression: foo
+          PyReferenceExpression: foo
+            PsiElement(Py:IDENTIFIER)('foo')
+          PyArgumentList
+            PsiElement(Py:LPAR)('(')
+            PyStringLiteralExpression: 
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"An error occurred"')
+            PsiElement(Py:RPAR)(')')
+      PsiWhiteSpace('\n    ')
+      PyExpressionStatement
+        PyCallExpression: shell
+          PyReferenceExpression: shell
+            PsiElement(Py:IDENTIFIER)('shell')
+          PyArgumentList
+            PsiElement(Py:LPAR)('(')
+            PyStringLiteralExpression: 
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"mail -s \"an error occurred\" youremail@provider.com < {log}"')
+            PsiElement(Py:RPAR)(')')
+  PsiWhiteSpace('\n\n')
+  SMKWorkflowPythonBlockParameter
+    PsiElement(Py:WORKFLOW_ONSTART)('onstart')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('  ')
+    PyStatementList
+      PyExpressionStatement
+        PyCallExpression: foo
+          PyReferenceExpression: foo
+            PsiElement(Py:IDENTIFIER)('foo')
+          PyArgumentList
+            PsiElement(Py:LPAR)('(')
+            PyStringLiteralExpression: 
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"Workflow started, no error"')
+            PsiElement(Py:RPAR)(')')
+      PsiElement(Py:SEMICOLON)(';')
+      PsiWhiteSpace(' ')
+      PyExpressionStatement
+        PyCallExpression: boo
+          PyReferenceExpression: boo
+            PsiElement(Py:IDENTIFIER)('boo')
+          PyArgumentList
+            PsiElement(Py:LPAR)('(')
+            PsiElement(Py:RPAR)(')')
+  PsiWhiteSpace('\n\n\n')
+  PyFunction('boo')
+    PsiElement(Py:DEF_KEYWORD)('def')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('boo')
+    PyParameterList
+      PsiElement(Py:LPAR)('(')
+      PsiElement(Py:RPAR)(')')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n  ')
+    PyStatementList
+      SMKWorkflowPythonBlockParameter
+        PsiElement(Py:WORKFLOW_ONSUCCESS)('onsuccess')
+        PsiElement(Py:COLON)(':')
+        PsiWhiteSpace('\n      ')
+        PyStatementList
+          PyExpressionStatement
+            PyCallExpression: foo
+              PyReferenceExpression: foo
+                PsiElement(Py:IDENTIFIER)('foo')
+              PyArgumentList
+                PsiElement(Py:LPAR)('(')
+                PyStringLiteralExpression: 
+                  PsiElement(Py:SINGLE_QUOTED_STRING)('"AAAA"')
+                PsiElement(Py:RPAR)(')')

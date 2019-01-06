@@ -31,44 +31,90 @@ class SnakemakeStatementParsing(
 //        var isRule = scope.isRule
         // myBuilder.setDebugMode(true)
 
-        val atRuleToken = atToken(SnakemakeTokenTypes.RULE_KEYWORD)
-        if (atRuleToken || atToken(SnakemakeTokenTypes.CHECKPOINT_KEYWORD)) {
-//            isRule = true
-            val ruleMarker: PsiBuilder.Marker = myBuilder.mark()
-            nextToken()
-
-            // rule name
-            if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER) {
+        val tt = myBuilder.tokenType
+        if (!SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.contains(tt)) {
+            super.parseStatement()
+            return
+        }
+        when {
+            tt === SnakemakeTokenTypes.RULE_KEYWORD -> parseRuleDeclaration(true)
+            tt === SnakemakeTokenTypes.CHECKPOINT_KEYWORD -> parseRuleDeclaration(false)
+            tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATORS -> {
+                // TODO: parse ..
                 nextToken()
             }
-            checkMatches(PyTokenTypes.COLON, "Identifier or ':' expected") // bundle
-            checkEndOfStatement()
+            tt === SnakemakeTokenTypes.WORKFLOW_LOCALRULES -> {
+                // TODO parse local rules
+                nextToken()
+            }
+            tt === SnakemakeTokenTypes.WORKFLOW_RULEORDER  -> {
+                // TODO parse rule order
+                nextToken()
+            }
+            tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER -> {
+                val decoratorMarker = myBuilder.mark()
+                nextToken()
+                checkMatches(PyTokenTypes.COLON, "Identifier or ':' expected") // bundle
+                parseSuite()
+                decoratorMarker.done(SnakemakeElementTypes.WORKFLOW_PYTHON_BLOCK_PARAMETER)
+            }
+            else -> {
+                myBuilder.error("Unexpected token type: $tt with text: '${myBuilder.tokenText}'") // bundle
+                // XXX: let's do not throw exception here parsing error is better noticeable than bg exception + doesn't
+                // XXX: break PSI dramatically. But it is like assertion here.
+
+                // fail safe:
+                super.parseStatement()
+            }
+        }
+    }
+
+    private fun parseRuleDeclaration(atRuleToken: Boolean) {
+        //            isRule = true
+        val ruleMarker: PsiBuilder.Marker = myBuilder.mark()
+        nextToken()
+
+        // rule name
+        if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER) {
+            nextToken()
+        }
+        checkMatches(PyTokenTypes.COLON, "Identifier or ':' expected") // bundle
+        val multiline = atToken(PyTokenTypes.STATEMENT_BREAK)
+        if (!multiline) {
+            parseRuleParameter()
+        } else {
+            nextToken()
             checkMatches(PyTokenTypes.INDENT, "Indent expected...") // bundle
-            while (!myBuilder.eof() && myBuilder.tokenType !== PyTokenTypes.DEDENT) {
-                if (!parseRuleParameter(myBuilder)) {
+            while (myBuilder.tokenType !== PyTokenTypes.DEDENT) {
+                if (!parseRuleParameter()) {
                     break
                 }
             }
-            ruleMarker.done(when {
-                atRuleToken -> SnakemakeElementTypes.RULE_DECLARATION
-                else -> SnakemakeElementTypes.CHECKPOINT_DECLARATION
-            })
-            nextToken()
-
-        } else {
-            super.parseStatement()
         }
-
+        ruleMarker.done(when {
+            atRuleToken -> SnakemakeElementTypes.RULE_DECLARATION
+            else -> SnakemakeElementTypes.CHECKPOINT_DECLARATION
+        })
+        if (multiline) {
+            nextToken()
+        }
     }
 
-    private fun parseRuleParameter(builder: PsiBuilder): Boolean {
-        val keyword = builder.tokenText
-        val ruleParam = builder.mark()
+    private fun parseRuleParameter(): Boolean {
+        if (myBuilder.eof()) {
+            return false
+        }
 
-        if (!checkMatches(PyTokenTypes.IDENTIFIER, IDENTIFIER_EXPECTED)) {
+        val keyword = myBuilder.tokenText
+        val ruleParam = myBuilder.mark()
+
+        if (!SnakemakeTokenTypes.RULE_PARAM_IDENTIFIER_LIKE.contains(myBuilder.tokenType)) {
+            myBuilder.error("Rule parameter is expected") // bundle
+            nextToken()
             ruleParam.drop()
             return false
         }
+        nextToken()
 
         checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
 

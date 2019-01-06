@@ -1,0 +1,24 @@
+SnakemakeFile: RuleInPythonBlock.smk
+  PyFunction('foo')
+    PsiElement(Py:DEF_KEYWORD)('def')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PyParameterList
+      PsiElement(Py:LPAR)('(')
+      PsiElement(Py:RPAR)(')')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n  ')
+    PyStatementList
+      SMKRule
+        PsiElement(Py:RULE_KEYWORD)('rule')
+        PsiWhiteSpace(' ')
+        PsiElement(Py:IDENTIFIER)('aa')
+        PsiElement(Py:COLON)(':')
+        PsiWhiteSpace('\n    ')
+        SMKRuleParameterListStatement
+          PsiElement(Py:IDENTIFIER)('output')
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyArgumentList
+            PyStringLiteralExpression: 
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"bb"')

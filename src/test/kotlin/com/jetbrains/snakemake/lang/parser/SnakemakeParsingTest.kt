@@ -18,6 +18,8 @@ import java.nio.file.Path
 /**
  * @author Roman.Chernyatchik
  * @date 2018-12-31
+ *
+ * TODO: collect tests automatically from folder
  */
 class SnakemakeParsingTest : ParsingTestCase(
         "psi", "smk", SnakemakeParserDefinition(), PythonParserDefinition()
@@ -63,6 +65,10 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testRuleInPythonBlock() {
+        doTest()
+    }
+
     fun testCheckpoint() {
         doTest()
     }
@@ -75,11 +81,32 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testRuleMultipleSingleLine() {
+        doTest()
+    }
+
     fun testRuleParams() {
         doTest()
     }
 
-    fun testRuleInvalid1() {
+    fun testRuleInvalid() {
+        doTest()
+    }
+
+
+    fun testRuleInvalidNoParamBody() {
+        doTest()
+    }
+
+    fun testRuleInvalidNoParamBodyEof() {
+        doTest()
+    }
+
+    fun testRuleInvalidParam() {
+        doTest()
+    }
+
+    fun testRuleMultipleSingleLineNoBreak() {
         doTest()
     }
 
@@ -126,21 +153,28 @@ class SnakemakeParsingTest : ParsingTestCase(
     fun testRuleRunPythonBlock() {
         doTest()
     }
-    //
-    //
-    //
-    //
 
-//    fun testFoo() {
-//        TODO dooo
-//        doTest()
-//    }
+    fun testWorkflowParamsListArgsKeywords() {
+        doTest()
+    }
+
+    fun testWorkflowPythonCodeBlockKeywords() {
+        doTest()
+    }
+
+    fun testWorkflowRuleReorder() {
+        doTest()
+    }
+
+    fun testWorkflowLocalrules() {
+        doTest()
+    }
 
     /**
      * Test with latest versions of Python 2 and Python 3.
      */
     private fun doTest() {
-//        doTest(LanguageLevel.fromPythonVersion("2"))
+        doTest(LanguageLevel.fromPythonVersion("2"))
         doTest(LanguageLevel.fromPythonVersion("3"))
     }
 
