@@ -5,6 +5,7 @@ import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.ExpressionParsing
 import com.jetbrains.python.parsing.Parsing
+import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakemake.lang.psi.SMKRule
 
 /**
@@ -137,29 +138,34 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         return false
     }
 
-    fun parseRulesList() {
+    fun parseRulesList(
+            separatorToken: PyElementType,
+            separatorMissingMsg: String,
+            ruleMissingMsg: String
+    ): Boolean {
         val argList = myBuilder.mark()
 
+        var result = true
         var argsNumber = 0
         while (!myBuilder.eof() && !atToken(PyTokenTypes.STATEMENT_BREAK)) {
             argsNumber++
             if (argsNumber > 1) {
-                if (!checkMatches(PyTokenTypes.COMMA, "',' expected")) { // bundle
+                if (!checkMatches(separatorToken, separatorMissingMsg)) { // bundle
+                    result = false
                     nextToken()
                 }
                 if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
                     break
                 }
             }
-            if (!checkMatches(
-                            PyTokenTypes.IDENTIFIER,
-                            // bundle
-                            "Expected a rule name that shall not be executed by the cluster command."
-                    )) {
+            if (!checkMatches(PyTokenTypes.IDENTIFIER, ruleMissingMsg)) {
+                result = false
                 nextToken()
             }
         }
 
         argList.done(PyElementTypes.ARGUMENT_LIST)
+
+        return result
     }
 }

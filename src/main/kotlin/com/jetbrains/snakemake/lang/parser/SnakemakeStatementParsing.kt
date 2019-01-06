@@ -52,14 +52,35 @@ class SnakemakeStatementParsing(
                 nextToken()
                 checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))
 
-                parsingContext.expressionParser.parseRulesList()
+                val res = parsingContext.expressionParser.parseRulesList(
+                        PyTokenTypes.COMMA,
+                        "',' expected",
+                        "Expected a rule name identifier." // bundle
+                )
+                if (!res) {
+                    myBuilder.error("Expected a comma separated list of rules that shall not be" +
+                            " executed by the cluster command.") // bundle
+                }
 
                 nextToken()
                 workflowParam.done(SnakemakeElementTypes.WORKFLOW_LOCALRULES_STATEMENT)
             }
             tt === SnakemakeTokenTypes.WORKFLOW_RULEORDER  -> {
-                // TODO parse rule order
+                val workflowParam = myBuilder.mark()
                 nextToken()
+                checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))
+
+                val res = parsingContext.expressionParser.parseRulesList(
+                        PyTokenTypes.GT,
+                        "'>' expected",
+                        "Expected a rule name identifier" // bundle
+                )
+                if (!res) {
+                    myBuilder.error("Expected a descending order of rule names, e.g. rule1 > rule2 > rule3 ...") // bundle
+                }
+
+                nextToken()
+                workflowParam.done(SnakemakeElementTypes.WORKFLOW_RULESREORDER_STATEMENT)
             }
             tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER -> {
                 val decoratorMarker = myBuilder.mark()

@@ -30,4 +30,9 @@ object SnakemakeElementTypes {
             "SMK_WORKFLOW_PYTHON_BLOCK_PARAMETER",
             SMKWorkflowLocalRulesStatement::class.java
     )
+
+    val WORKFLOW_RULESREORDER_STATEMENT = PyElementType(
+            "SMK_WORKFLOW_RULESREORDER_STATEMENT",
+            SMKWorkflowRulesReorderStatement::class.java
+    )
 }

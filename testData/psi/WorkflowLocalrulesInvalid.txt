@@ -4,12 +4,14 @@ SnakemakeFile: WorkflowLocalrulesInvalid.smk
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyArgumentList
-      PsiErrorElement:Expected a rule name that shall not be executed by the cluster command.
+      PsiErrorElement:Expected a rule name identifier.
         <empty list>
       PsiElement(Py:SINGLE_QUOTED_STRING)(''foo1'')
       PsiElement(Py:COMMA)(',')
       PsiWhiteSpace(' ')
       PsiElement(Py:IDENTIFIER)('foo2')
+    PsiErrorElement:Expected a comma separated list of rules that shall not be executed by the cluster command.
+      <empty list>
   PsiWhiteSpace('\n\n')
   SMKWorkflowLocalRulesStatement
     PsiElement(Py:WORKFLOW_LOCALRULES)('localrules')
@@ -21,6 +23,8 @@ SnakemakeFile: WorkflowLocalrulesInvalid.smk
         <empty list>
       PsiWhiteSpace(' ')
       PsiElement(Py:IDENTIFIER)('foo4')
+    PsiErrorElement:Expected a comma separated list of rules that shall not be executed by the cluster command.
+      <empty list>
   PsiWhiteSpace('\n\n')
   SMKWorkflowLocalRulesStatement
     PsiElement(Py:WORKFLOW_LOCALRULES)('localrules')

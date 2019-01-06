@@ -49,3 +49,5 @@ class SMKWorkflowPythonBlockParameter(node: ASTNode): PyElementImpl(node), PySta
 }
 
 class SMKWorkflowLocalRulesStatement(node: ASTNode): PyElementImpl(node)
+
+class SMKWorkflowRulesReorderStatement(node: ASTNode): PyElementImpl(node)

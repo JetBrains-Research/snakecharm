@@ -1,0 +1,35 @@
+SnakemakeFile: WorkflowRuleReorderHangingSeparator.smk
+  SMKWorkflowRulesReorderStatement
+    PsiElement(Py:WORKFLOW_RULEORDER)('ruleorder')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyArgumentList
+      PsiElement(Py:IDENTIFIER)('rule1')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+  PsiWhiteSpace('\n\n')
+  SMKWorkflowRulesReorderStatement
+    PsiElement(Py:WORKFLOW_RULEORDER)('ruleorder')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyArgumentList
+      PsiElement(Py:IDENTIFIER)('rule1')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:IDENTIFIER)('rule2')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+  PsiWhiteSpace('\n\n')
+  SMKWorkflowRulesReorderStatement
+    PsiElement(Py:WORKFLOW_RULEORDER)('ruleorder')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyArgumentList
+      PsiElement(Py:IDENTIFIER)('rule1')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:IDENTIFIER)('rule2')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
