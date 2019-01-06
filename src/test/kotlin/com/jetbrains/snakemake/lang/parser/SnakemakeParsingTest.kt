@@ -63,6 +63,10 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testCheckpoint() {
+        doTest()
+    }
+
     fun testRuleNoName() {
         doTest()
     }

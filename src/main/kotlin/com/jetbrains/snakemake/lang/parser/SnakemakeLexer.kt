@@ -13,6 +13,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
     companion object {
         val KEYWORDS = ImmutableMap.Builder<String, PyElementType>()
                 .put(SnakemakeNames.RULE_KEYWORD, SnakemakeTokenTypes.RULE_KEYWORD)
+                .put(SnakemakeNames.CHECKPOINT_KEYWORD, SnakemakeTokenTypes.CHECKPOINT_KEYWORD)
                 .build()!!
     }
 

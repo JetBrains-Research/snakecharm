@@ -10,11 +10,13 @@ import com.jetbrains.python.psi.impl.PyElementImpl
  * @author Roman.Chernyatchik
  * @date 2018-12-31
  */
-class SMKRule(node: ASTNode): PyElementImpl(node) { //TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SMKRule>
+open class SMKRule(node: ASTNode): PyElementImpl(node) { //TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SMKRule>
     companion object {
         val PARAMS_KEYWORDS = SMKRuleParameterListStatement.KEYWORDS + SMKRuleRunParameter.KEYWORDS
     }
 }
+
+class SMKCheckPoint(node: ASTNode): SMKRule(node)
 
 class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyStatement  { // PyNamedElementContainer
     companion object {

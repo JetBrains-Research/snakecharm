@@ -1,0 +1,34 @@
+SnakemakeFile: Checkpoint.smk
+  PsiComment(Py:END_OF_LINE_COMMENT)('# the checkpoint that shall trigger re-evaluation of the DAG')
+  PsiWhiteSpace('\n')
+  SMKCheckPoint
+    PsiElement(Py:CHECKPOINT_KEYWORD)('checkpoint')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('somestep')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('input')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiWhiteSpace('\n        ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"samples/{sample}.txt"')
+    PsiWhiteSpace('\n    ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('output')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiWhiteSpace('\n        ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"somestep/{sample}.txt"')
+    PsiWhiteSpace('\n    ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('shell')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiWhiteSpace('\n        ')
+        PsiComment(Py:END_OF_LINE_COMMENT)('# simulate some output vale')
+        PsiWhiteSpace('\n        ')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"echo {wildcards.sample} > somestep/{wildcards.sample}.txt"')

@@ -8,5 +8,6 @@ import com.jetbrains.python.psi.PyElementType
  */
 object SnakemakeTokenTypes {
     val RULE_KEYWORD = PyElementType("RULE_KEYWORD") // rule
+    val CHECKPOINT_KEYWORD = PyElementType("CHECKPOINT_KEYWORD") // rule
 
 }

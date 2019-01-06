@@ -5,5 +5,6 @@ package com.jetbrains.snakemake.lang
  * @date 2018-12-31
  */
 object SnakemakeNames {
-    val RULE_KEYWORD = "rule"
+    const val RULE_KEYWORD = "rule"
+    const val CHECKPOINT_KEYWORD = "checkpoint"
 }

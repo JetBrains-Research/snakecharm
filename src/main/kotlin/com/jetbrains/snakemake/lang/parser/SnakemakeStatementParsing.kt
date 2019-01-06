@@ -31,7 +31,8 @@ class SnakemakeStatementParsing(
 //        var isRule = scope.isRule
         // myBuilder.setDebugMode(true)
 
-        if (atToken(SnakemakeTokenTypes.RULE_KEYWORD)) {
+        val atRuleToken = atToken(SnakemakeTokenTypes.RULE_KEYWORD)
+        if (atRuleToken || atToken(SnakemakeTokenTypes.CHECKPOINT_KEYWORD)) {
 //            isRule = true
             val ruleMarker: PsiBuilder.Marker = myBuilder.mark()
             nextToken()
@@ -48,8 +49,11 @@ class SnakemakeStatementParsing(
                     break
                 }
             }
-            ruleMarker.done(SnakemakeElementTypes.RULE_DECLARATION)
-             nextToken()
+            ruleMarker.done(when {
+                atRuleToken -> SnakemakeElementTypes.RULE_DECLARATION
+                else -> SnakemakeElementTypes.CHECKPOINT_DECLARATION
+            })
+            nextToken()
 
         } else {
             super.parseStatement()
