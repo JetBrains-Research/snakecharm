@@ -1,5 +1,6 @@
 package com.jetbrains.snakemake
 
+import com.intellij.openapi.fileTypes.ExactFileNameMatcher
 import com.intellij.openapi.fileTypes.FileTypeConsumer
 import com.intellij.openapi.fileTypes.FileTypeFactory
 
@@ -10,5 +11,9 @@ import com.intellij.openapi.fileTypes.FileTypeFactory
 class SnakemakeFileTypeFactory: FileTypeFactory() {
     override fun createFileTypes(fileTypeConsumer: FileTypeConsumer) {
         fileTypeConsumer.consume(SnakemakeFileType)
+        fileTypeConsumer.consume(
+                SnakemakeFileType,
+                ExactFileNameMatcher("Snakefile", true)
+        )
     }
 }
