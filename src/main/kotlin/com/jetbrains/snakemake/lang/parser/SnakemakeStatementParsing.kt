@@ -2,6 +2,7 @@ package com.jetbrains.snakemake.lang.parser
 
 import com.intellij.lang.PsiBuilder
 import com.jetbrains.python.PyBundle
+import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.snakemake.lang.psi.SMKRuleParameterListStatement
@@ -40,8 +41,11 @@ class SnakemakeStatementParsing(
             tt === SnakemakeTokenTypes.RULE_KEYWORD -> parseRuleDeclaration(true)
             tt === SnakemakeTokenTypes.CHECKPOINT_KEYWORD -> parseRuleDeclaration(false)
             tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATORS -> {
-                // TODO: parse ..
+                val workflowParam = myBuilder.mark()
                 nextToken()
+                checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))
+                parsingContext.expressionParser.parseRuleParamArgumentList()
+                workflowParam.done(SnakemakeElementTypes.WORKFLOW_PYTHON_BLOCK_PARAMETER)
             }
             tt === SnakemakeTokenTypes.WORKFLOW_LOCALRULES -> {
                 // TODO parse local rules
@@ -54,7 +58,7 @@ class SnakemakeStatementParsing(
             tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER -> {
                 val decoratorMarker = myBuilder.mark()
                 nextToken()
-                checkMatches(PyTokenTypes.COLON, "Identifier or ':' expected") // bundle
+                checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))
                 parseSuite()
                 decoratorMarker.done(SnakemakeElementTypes.WORKFLOW_PYTHON_BLOCK_PARAMETER)
             }
@@ -75,7 +79,7 @@ class SnakemakeStatementParsing(
         nextToken()
 
         // rule name
-        if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER) {
+        if (atToken(PyTokenTypes.IDENTIFIER)) {
             nextToken()
         }
         checkMatches(PyTokenTypes.COLON, "Rule name identifier or ':' expected") // bundle
@@ -85,7 +89,7 @@ class SnakemakeStatementParsing(
         } else {
             nextToken()
             checkMatches(PyTokenTypes.INDENT, "Indent expected...") // bundle
-            while (myBuilder.tokenType !== PyTokenTypes.DEDENT) {
+            while (!atToken(PyTokenTypes.DEDENT)) {
                 if (!parseRuleParameter()) {
                     break
                 }

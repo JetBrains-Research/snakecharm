@@ -11,7 +11,7 @@ SnakemakeFile: RuleParamsListArgsStringMultiline.smk
         PyArgumentList
           PsiElement(Py:LPAR)('(')
           PsiWhiteSpace('\n    ')
-          PyStringLiteralExpression:
+          PyStringLiteralExpression: 
             PsiElement(Py:SINGLE_QUOTED_STRING)('"{dataset}/inputfile"')
             PsiWhiteSpace('\n    ')
             PsiElement(Py:SINGLE_QUOTED_STRING)('"fff"')

@@ -27,7 +27,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext): ExpressionPar
         }
         var indents = if (argsOnNextLine) 1 else 0
         var argNumber = 0
-        while (!myBuilder.eof() && myBuilder.tokenType !== PyTokenTypes.STATEMENT_BREAK) {
+        while (!myBuilder.eof() && !atToken(PyTokenTypes.STATEMENT_BREAK)) {
             argNumber++
 
             // comma if several args:
@@ -44,7 +44,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext): ExpressionPar
                         } else {
                             // skip dedents while matched, we could have several dedent tokens in a raw
                             // skip dedent while inside current block (indents > 1)
-                            while (!myBuilder.eof() && myBuilder.tokenType == PyTokenTypes.DEDENT && indents > 1) {
+                            while (!myBuilder.eof() && atToken(PyTokenTypes.DEDENT) && indents > 1) {
                                 indents--
                                 nextToken()
                             }
@@ -117,11 +117,12 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext): ExpressionPar
     private fun checkHangingCommaInArgsList(): Boolean {
         // Case: hanging 'comma', next statement is another rule param block
 
-        if (myBuilder.tokenType == PyTokenTypes.DEDENT) {
+        val tt = myBuilder.tokenType
+        if (tt === PyTokenTypes.DEDENT) {
             return true
         }
 
-        if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER) {
+        if (tt === PyTokenTypes.IDENTIFIER) {
             // check if next token is rule parameter identifier
             // this case is when we don't have dedent token:
             //    e.g if current rule param was a single line with hanging comma
