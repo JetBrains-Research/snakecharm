@@ -170,6 +170,14 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testWorkflowLocalrulesInvalid() {
+        doTest()
+    }
+
+    fun testWorkflowLocalrulesHangingComma() {
+        doTest()
+    }
+
     /**
      * Test with latest versions of Python 2 and Python 3.
      */

@@ -11,7 +11,7 @@ import com.jetbrains.snakemake.lang.psi.SMKRule
  * @author Roman.Chernyatchik
  * @date 2019-01-04
  */
-class SnakemakeExpressionParsing(context: SnakemakeParserContext): ExpressionParsing(context) {
+class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionParsing(context) {
     override fun getParsingContext() = myContext as SnakemakeParserContext
 
     fun parseRuleParamArgumentList(): Boolean {
@@ -59,7 +59,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext): ExpressionPar
                     } else {
                         commaMarker.drop()
                     }
-                    
+
                     if (myBuilder.eof()) {
                         break
                     }
@@ -137,4 +137,29 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext): ExpressionPar
         return false
     }
 
+    fun parseRulesList() {
+        val argList = myBuilder.mark()
+
+        var argsNumber = 0
+        while (!myBuilder.eof() && !atToken(PyTokenTypes.STATEMENT_BREAK)) {
+            argsNumber++
+            if (argsNumber > 1) {
+                if (!checkMatches(PyTokenTypes.COMMA, "',' expected")) { // bundle
+                    nextToken()
+                }
+                if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
+                    break
+                }
+            }
+            if (!checkMatches(
+                            PyTokenTypes.IDENTIFIER,
+                            // bundle
+                            "Expected a rule name that shall not be executed by the cluster command."
+                    )) {
+                nextToken()
+            }
+        }
+
+        argList.done(PyElementTypes.ARGUMENT_LIST)
+    }
 }

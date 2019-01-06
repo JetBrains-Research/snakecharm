@@ -25,4 +25,9 @@ object SnakemakeElementTypes {
             "SMK_WORKFLOW_PYTHON_BLOCK_PARAMETER",
             SMKWorkflowPythonBlockParameter::class.java
     )
+
+    val WORKFLOW_LOCALRULES_STATEMENT = PyElementType(
+            "SMK_WORKFLOW_PYTHON_BLOCK_PARAMETER",
+            SMKWorkflowLocalRulesStatement::class.java
+    )
 }

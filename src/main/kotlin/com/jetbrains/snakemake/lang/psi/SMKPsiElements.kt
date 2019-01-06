@@ -47,3 +47,5 @@ class SMKWorkflowPythonBlockParameter(node: ASTNode): PyElementImpl(node), PySta
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
+
+class SMKWorkflowLocalRulesStatement(node: ASTNode): PyElementImpl(node)
