@@ -16,7 +16,7 @@ SnakemakeFile: RuleInvalidParam.smk
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('\n    ')
-    PsiErrorElement:Rule parameter name is expected
+    PsiErrorElement:Rule parameter identifier is expected
       <empty list>
     PsiElement(Py:SINGLE_QUOTED_STRING)(''input'')
   PsiElement(Py:COLON)(':')
@@ -47,7 +47,7 @@ SnakemakeFile: RuleInvalidParam.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all4')
     PsiElement(Py:COLON)(':')
-    PsiErrorElement:Rule parameter name is expected
+    PsiErrorElement:Rule parameter identifier is expected
       <empty list>
     PsiWhiteSpace(' ')
     PsiElement(Py:SINGLE_QUOTED_STRING)(''input'')

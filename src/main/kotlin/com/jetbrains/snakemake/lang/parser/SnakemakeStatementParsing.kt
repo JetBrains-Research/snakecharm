@@ -78,7 +78,7 @@ class SnakemakeStatementParsing(
         if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER) {
             nextToken()
         }
-        checkMatches(PyTokenTypes.COLON, "Identifier or ':' expected") // bundle
+        checkMatches(PyTokenTypes.COLON, "Rule name identifier or ':' expected") // bundle
         val multiline = atToken(PyTokenTypes.STATEMENT_BREAK)
         if (!multiline) {
             parseRuleParameter()
@@ -109,7 +109,7 @@ class SnakemakeStatementParsing(
         val ruleParam = myBuilder.mark()
 
         if (!SnakemakeTokenTypes.RULE_PARAM_IDENTIFIER_LIKE.contains(myBuilder.tokenType)) {
-            myBuilder.error("Rule parameter is expected") // bundle
+            myBuilder.error("Rule parameter identifier is expected") // bundle
             nextToken()
             ruleParam.drop()
             return false
