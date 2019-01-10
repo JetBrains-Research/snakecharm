@@ -152,13 +152,13 @@ class SnakemakeStatementParsing(
         var result = false
 
         when (keyword) {
-            in SMKRuleParameterListStatement.KEYWORDS -> {
+            in SMKRuleParameterListStatement.PARAMS_NAMES -> {
                 // TODO: probably do this behaviour by default and use inspection error
                 // instead of parsing errors..
                 result = parsingContext.expressionParser.parseRuleParamArgumentList()
                 ruleParam.done(SnakemakeElementTypes.RULE_PARAMETER_LIST_STATEMENT)
             }
-            in SMKRuleRunParameter.KEYWORDS -> {
+            SMKRuleRunParameter.PARAM_NAME -> {
                 statementParser.parseSuite()
                 ruleParam.done(SnakemakeElementTypes.RULE_RUN_STATEMENT)
             }

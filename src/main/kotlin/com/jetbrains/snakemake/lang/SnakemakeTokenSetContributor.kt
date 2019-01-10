@@ -20,9 +20,13 @@ class SnakemakeTokenSetContributor : PythonDialectsTokenSetContributorBase() {
 //        return super.getExpressionTokens()
 //    }
 
-    override fun getKeywordTokens() = TokenSet.create(
-            SnakemakeTokenTypes.RULE_KEYWORD,
-            SnakemakeTokenTypes.CHECKPOINT_KEYWORD
+    override fun getKeywordTokens() = TokenSet.orSet(
+            SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS,
+
+            TokenSet.create(
+                    SnakemakeTokenTypes.RULE_KEYWORD,
+                    SnakemakeTokenTypes.CHECKPOINT_KEYWORD
+            )
     )
 
     //       @NotNull

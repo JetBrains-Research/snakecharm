@@ -27,11 +27,14 @@
         language="Snakemake"
         implementationClass="com.jetbrains.snakemake.lang.parser.SnakemakeParserDefinition"
     />
+    <!--<colorSettingsPage implementation="com.jetbrains.snakemake.lang.highlighter.SnakemakeColorsPage"/>-->
+    <lang.syntaxHighlighterFactory language="Snakemake" implementationClass="com.jetbrains.snakemake.lang.highlighter.SnakemakeSyntaxHighlighterFactory"/>
+    <!--<annotator language="Snakemake" implementationClass="com.jetbrains.snakemake.lang.highlighter.SnakemakeDumbAwareAnnotator"/>-->
+    <annotator language="Python" implementationClass="com.jetbrains.snakemake.lang.highlighter.SnakemakeDumbAwareAnnotator"/>
   </extensions>
 
   <extensions defaultExtensionNs="Pythonid">
     <dialectsTokenSetContributor implementation="com.jetbrains.snakemake.lang.SnakemakeTokenSetContributor"/>
-   <!--<runConfigurationExtension implementation="com.foo.bar.SomeExtension"/>-->
   </extensions>
 
   <actions>
