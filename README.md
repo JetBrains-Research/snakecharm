@@ -8,6 +8,7 @@ At the moment plugin is an early alpha version and will be improved in future an
 Features available in `*.smk` and `Snakefile` files:
 * Python code syntax highlighting in `*.smk` and `Snakefile` files
 * Snakemake specific syntax highligting
+* Limited resolve and code completion for python code
 
 # Installation
 
