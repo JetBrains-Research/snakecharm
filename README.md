@@ -11,6 +11,8 @@ Features available in `*.smk` and `Snakefile` files:
 
 # Installation
 
+At the moment the plugin is available for PyCharm 2018.3.x or for IntelliJ Platform 183 build
+
 * If you've already configured custom file type for `Snakefile` or `*.smk` files please delete it (or change file masks to smth else). Otherwise your custom file type will replace SnakeCharm support in snakemake files.
 * Download plugin bundle (*.jar) file or compile plugin from sources using `intellij:buildPlugin` gradle task.
 * Open `PyCharm` (or other `IntelliJ Platfrom` based IDE with `Python Community Edition` plugin installed)
