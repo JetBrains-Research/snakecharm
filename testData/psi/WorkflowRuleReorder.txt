@@ -1,13 +1,13 @@
 SnakemakeFile: WorkflowRuleReorder.smk
   SMKWorkflowRulesReorderStatement
-    PsiElement(Py:WORKFLOW_RULEORDER)('ruleorder')
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyArgumentList
       PsiElement(Py:IDENTIFIER)('rule1')
   PsiWhiteSpace('\n\n')
   SMKWorkflowRulesReorderStatement
-    PsiElement(Py:WORKFLOW_RULEORDER)('ruleorder')
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyArgumentList
@@ -32,7 +32,7 @@ SnakemakeFile: WorkflowRuleReorder.smk
     PsiWhiteSpace('\n  ')
     PyStatementList
       SMKWorkflowRulesReorderStatement
-        PsiElement(Py:WORKFLOW_RULEORDER)('ruleorder')
+        PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
         PsiElement(Py:COLON)(':')
         PsiWhiteSpace(' ')
         PyArgumentList

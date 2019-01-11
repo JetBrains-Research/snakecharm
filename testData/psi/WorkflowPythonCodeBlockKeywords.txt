@@ -1,6 +1,6 @@
 SnakemakeFile: WorkflowPythonCodeBlockKeywords.smk
   SMKWorkflowPythonBlockParameter
-    PsiElement(Py:WORKFLOW_ONSTART)('onstart')
+    PsiElement(Py:WORKFLOW_ONSTART_KEYWORD)('onstart')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('\n    ')
     PyStatementList
@@ -15,7 +15,7 @@ SnakemakeFile: WorkflowPythonCodeBlockKeywords.smk
             PsiElement(Py:RPAR)(')')
   PsiWhiteSpace('\n\n')
   SMKWorkflowPythonBlockParameter
-    PsiElement(Py:WORKFLOW_ONSUCCESS)('onsuccess')
+    PsiElement(Py:WORKFLOW_ONSUCCESS_KEYWORD)('onsuccess')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('\n    ')
     PyStatementList
@@ -30,7 +30,7 @@ SnakemakeFile: WorkflowPythonCodeBlockKeywords.smk
             PsiElement(Py:RPAR)(')')
   PsiWhiteSpace('\n\n')
   SMKWorkflowPythonBlockParameter
-    PsiElement(Py:WORKFLOW_ONERROR)('onerror')
+    PsiElement(Py:WORKFLOW_ONERROR_KEYWORD)('onerror')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('\n    ')
     PyStatementList
@@ -55,7 +55,7 @@ SnakemakeFile: WorkflowPythonCodeBlockKeywords.smk
             PsiElement(Py:RPAR)(')')
   PsiWhiteSpace('\n\n')
   SMKWorkflowPythonBlockParameter
-    PsiElement(Py:WORKFLOW_ONSTART)('onstart')
+    PsiElement(Py:WORKFLOW_ONSTART_KEYWORD)('onstart')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('  ')
     PyStatementList
@@ -89,7 +89,7 @@ SnakemakeFile: WorkflowPythonCodeBlockKeywords.smk
     PsiWhiteSpace('\n  ')
     PyStatementList
       SMKWorkflowPythonBlockParameter
-        PsiElement(Py:WORKFLOW_ONSUCCESS)('onsuccess')
+        PsiElement(Py:WORKFLOW_ONSUCCESS_KEYWORD)('onsuccess')
         PsiElement(Py:COLON)(':')
         PsiWhiteSpace('\n      ')
         PyStatementList

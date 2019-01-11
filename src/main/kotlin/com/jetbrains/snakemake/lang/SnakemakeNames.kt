@@ -8,18 +8,18 @@ object SnakemakeNames {
     const val RULE_KEYWORD = "rule"
     const val CHECKPOINT_KEYWORD = "checkpoint"
 
-    const val WORKFLOW_CONFIGFILE = "configfile"
-    const val WORKFLOW_REPORT = "report"
-    const val WORKFLOW_WILDCARD_CONSTRAINTS = "wildcard_constraints"
-    const val WORKFLOW_SINGULARITY = "singularity"
-    const val WORKFLOW_INCLUDE = "include"
-    const val WORKFLOW_WORKDIR = "workdir"
+    const val WORKFLOW_CONFIGFILE_KEYWORD = "configfile"
+    const val WORKFLOW_REPORT_KEYWORD = "report"
+    const val WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD = "wildcard_constraints"
+    const val WORKFLOW_SINGULARITY_KEYWORD = "singularity"
+    const val WORKFLOW_INCLUDE_KEYWORD = "include"
+    const val WORKFLOW_WORKDIR_KEYWORD = "workdir"
 
-    const val WORKFLOW_LOCALRULES = "localrules"
+    const val WORKFLOW_LOCALRULES_KEYWORD = "localrules"
 
-    const val WORKFLOW_RULEORDER = "ruleorder"
+    const val WORKFLOW_RULEORDER_KEYWORD = "ruleorder"
 
-    const val WORKFLOW_ONSUCCESS = "onsuccess"
-    const val WORKFLOW_ONERROR = "onerror"
-    const val WORKFLOW_ONSTART = "onstart"
+    const val WORKFLOW_ONSUCCESS_KEYWORD = "onsuccess"
+    const val WORKFLOW_ONERROR_KEYWORD = "onerror"
+    const val WORKFLOW_ONSTART_KEYWORD = "onstart"
 }

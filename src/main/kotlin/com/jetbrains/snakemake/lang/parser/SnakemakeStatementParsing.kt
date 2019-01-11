@@ -47,7 +47,7 @@ class SnakemakeStatementParsing(
                 parsingContext.expressionParser.parseRuleParamArgumentList()
                 workflowParam.done(SnakemakeElementTypes.WORKFLOW_PYTHON_BLOCK_PARAMETER)
             }
-            tt === SnakemakeTokenTypes.WORKFLOW_LOCALRULES -> {
+            tt === SnakemakeTokenTypes.WORKFLOW_LOCALRULES_KEYWORD -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
                 checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))
@@ -65,7 +65,7 @@ class SnakemakeStatementParsing(
                 nextToken()
                 workflowParam.done(SnakemakeElementTypes.WORKFLOW_LOCALRULES_STATEMENT)
             }
-            tt === SnakemakeTokenTypes.WORKFLOW_RULEORDER  -> {
+            tt === SnakemakeTokenTypes.WORKFLOW_RULEORDER_KEYWORD  -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
                 checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))

@@ -1,6 +1,6 @@
 SnakemakeFile: WorkflowLocalrulesInvalid.smk
   SMKWorkflowLocalRulesStatement
-    PsiElement(Py:WORKFLOW_LOCALRULES)('localrules')
+    PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyArgumentList
@@ -14,7 +14,7 @@ SnakemakeFile: WorkflowLocalrulesInvalid.smk
       <empty list>
   PsiWhiteSpace('\n\n')
   SMKWorkflowLocalRulesStatement
-    PsiElement(Py:WORKFLOW_LOCALRULES)('localrules')
+    PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyArgumentList
@@ -27,7 +27,7 @@ SnakemakeFile: WorkflowLocalrulesInvalid.smk
       <empty list>
   PsiWhiteSpace('\n\n')
   SMKWorkflowLocalRulesStatement
-    PsiElement(Py:WORKFLOW_LOCALRULES)('localrules')
+    PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
     PsiElement(Py:COLON)(':')
     PyArgumentList
       <empty list>
@@ -45,7 +45,7 @@ SnakemakeFile: WorkflowLocalrulesInvalid.smk
     <empty list>
   PsiWhiteSpace('\n\n')
   SMKWorkflowLocalRulesStatement
-    PsiElement(Py:WORKFLOW_LOCALRULES)('localrules')
+    PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyArgumentList
