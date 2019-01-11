@@ -23,7 +23,7 @@ group 'com.jetbrains'
 version '0.1-SNAPSHOT'
 
 intellij {
-    pluginName 'intellij-snakemake'
+    pluginName 'snakecharm'
     version ideaVersion
     
     updateSinceUntilBuild false

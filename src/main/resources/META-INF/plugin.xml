@@ -1,13 +1,13 @@
 <idea-plugin>
-  <id>com.jetbrains.snakemake</id>
-  <name>SnakemakeSupport</name>
+  <id>com.jetbrains.snakecharm</id>
+  <name>SnakeCharm</name>
   <vendor email="roman.chernyatchik@jetbrains.com"
           url="https://research.jetbrains.org/groups/biolabs">
     JetBrains Research
   </vendor>
 
   <description><![CDATA[
-    Snakemake language support.<br>
+    Adds Snakemake language support.<br>
     Snakemake is a language for workflow management, see
     <a href="https://snakemake.readthedocs.io/en/stable/">Snakemake Home Page</a>
     ]]></description>
@@ -36,11 +36,4 @@
   <extensions defaultExtensionNs="Pythonid">
     <dialectsTokenSetContributor implementation="com.jetbrains.snakemake.lang.SnakemakeTokenSetContributor"/>
   </extensions>
-
-  <actions>
-    <group id="MyPlugin.SampleMenu" text="Greeting" description="Greeting menu">
-      <add-to-group group-id="MainMenu" anchor="last"/>
-      <action id="Myplugin.Textboxes" class="com.jetbrains.snakemake.HelloAction" text="Hello" description="Says hello"/>
-    </group>
-  </actions>
 </idea-plugin>
