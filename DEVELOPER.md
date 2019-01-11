@@ -1,4 +1,4 @@
-Useful Resources for IntelliJ Plugin Development:
+# Useful Resources for IntelliJ Plugin Development:
 
 * Using Kotlin + Gradle
 https://kotlinlang.org/docs/reference/using-gradle.html
@@ -12,3 +12,6 @@ https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started.html
 * Custom Language Support plugins
 https://www.jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/prerequisites.html
 
+# Snakemake Resources:
+
+Workflows examples: https://github.com/snakemake-workflows/docs
