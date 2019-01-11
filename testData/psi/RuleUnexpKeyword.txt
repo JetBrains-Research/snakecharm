@@ -5,7 +5,7 @@ SnakemakeFile: RuleUnexpKeyword.smk
     PsiWhiteSpace('\n    ')
     PsiElement(Py:IDENTIFIER)('booo')
     PsiElement(Py:COLON)(':')
-    PsiErrorElement:Unexpected keyword booo in rule definition
+    PsiErrorElement:Unexpected rule parameter 'booo'
       <empty list>
   PsiWhiteSpace(' ')
   PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')

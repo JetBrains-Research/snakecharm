@@ -164,7 +164,7 @@ class SnakemakeStatementParsing(
             }
             else -> {
                 // error
-                myBuilder.error("Unexpected keyword $keyword in rule definition") // bundle
+                myBuilder.error("Unexpected rule parameter '$keyword'") // bundle
 
                 //TODO advance until eof or STATEMENT_END?
                 // checkEndOfStatement()
