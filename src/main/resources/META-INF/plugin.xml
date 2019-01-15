@@ -22,18 +22,18 @@
   <!--<idea-version since-build="183.0" until-build="183.*"/>-->
   
   <extensions defaultExtensionNs="com.intellij">
-    <fileTypeFactory implementation="com.jetbrains.snakemake.SnakemakeFileTypeFactory"/>
+    <fileTypeFactory implementation="com.jetbrains.snakecharm.SnakemakeFileTypeFactory"/>
     <lang.parserDefinition
         language="Snakemake"
-        implementationClass="com.jetbrains.snakemake.lang.parser.SnakemakeParserDefinition"
+        implementationClass="com.jetbrains.snakecharm.lang.parser.SnakemakeParserDefinition"
     />
     <!--<colorSettingsPage implementation="com.jetbrains.snakemake.lang.highlighter.SnakemakeColorsPage"/>-->
-    <lang.syntaxHighlighterFactory language="Snakemake" implementationClass="com.jetbrains.snakemake.lang.highlighter.SnakemakeSyntaxHighlighterFactory"/>
+    <lang.syntaxHighlighterFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterFactory"/>
     <!--<annotator language="Snakemake" implementationClass="com.jetbrains.snakemake.lang.highlighter.SnakemakeDumbAwareAnnotator"/>-->
-    <annotator language="Python" implementationClass="com.jetbrains.snakemake.lang.highlighter.SnakemakeDumbAwareAnnotator"/>
+    <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeDumbAwareAnnotator"/>
   </extensions>
 
   <extensions defaultExtensionNs="Pythonid">
-    <dialectsTokenSetContributor implementation="com.jetbrains.snakemake.lang.SnakemakeTokenSetContributor"/>
+    <dialectsTokenSetContributor implementation="com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor"/>
   </extensions>
 </idea-plugin>
