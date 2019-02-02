@@ -3,7 +3,7 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
-Version 0.8.3
+Version 0.2
 -------------
 
 Released on <unreleased>
