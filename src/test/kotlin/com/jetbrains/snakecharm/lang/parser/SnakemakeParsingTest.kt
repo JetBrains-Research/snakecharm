@@ -158,6 +158,10 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testWorkflowParamsListArgsKeywordsInRule() {
+        doTest()
+    }
+
     fun testWorkflowPythonCodeBlockKeywords() {
         doTest()
     }

@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.parser
 
 import com.intellij.lang.PsiBuilder
+import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyBundle
 import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyTokenTypes
@@ -33,7 +34,7 @@ class SnakemakeStatementParsing(
         // myBuilder.setDebugMode(true)
 
         val tt = myBuilder.tokenType
-        if (!SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.contains(tt)) {
+        if (tt !in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
             super.parseStatement()
             return
         }
@@ -45,7 +46,7 @@ class SnakemakeStatementParsing(
                 nextToken()
                 checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))
                 parsingContext.expressionParser.parseRuleParamArgumentList()
-                workflowParam.done(SnakemakeElementTypes.WORKFLOW_PYTHON_BLOCK_PARAMETER)
+                workflowParam.done(SnakemakeElementTypes.WORKFLOW_PARAMETER_LIST_STATEMENT)
             }
             tt === SnakemakeTokenTypes.WORKFLOW_LOCALRULES_KEYWORD -> {
                 val workflowParam = myBuilder.mark()
@@ -101,7 +102,10 @@ class SnakemakeStatementParsing(
     }
 
     private fun parseRuleDeclaration(atRuleToken: Boolean) {
-        //            isRule = true
+        val context = parsingContext
+        val scope = context.scope
+        context.pushScope(scope.withRule(true))
+
         val ruleMarker: PsiBuilder.Marker = myBuilder.mark()
         nextToken()
 
@@ -129,6 +133,7 @@ class SnakemakeStatementParsing(
         if (multiline) {
             nextToken()
         }
+        context.popScope()
     }
 
     private fun parseRuleParameter(): Boolean {
@@ -174,6 +179,21 @@ class SnakemakeStatementParsing(
         return result
     }
 
+    override fun filter(
+            source: IElementType,
+            start: Int, end: Int,
+            text: CharSequence,
+            checkLanguageLevel: Boolean
+    ): IElementType {
+        if (source in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS_IN_RULE) {
+            val scope = myContext.scope as SnakemakeParsingScope
+            return when {
+                scope.inRule -> PyTokenTypes.IDENTIFIER
+                else -> source
+            }
+        }
+        return super.filter(source, start, end, text, checkLanguageLevel)
+    }
     // TODO: cleanup
 //    override fun getFunctionParser(): FunctionParsing {
 //        return super.getFunctionParser()

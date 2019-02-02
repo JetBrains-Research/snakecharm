@@ -1,9 +1,7 @@
 package com.jetbrains.snakecharm.lang.validation
 
 import com.jetbrains.python.validation.PyAnnotator
-import com.jetbrains.snakecharm.lang.psi.SMKRule
-import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
-import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
+import com.jetbrains.snakecharm.lang.psi.*
 
 /**
  * @author Roman.Chernyatchik
@@ -19,6 +17,14 @@ abstract class SnakemakeAnnotator: PyAnnotator() {
     }
 
     open fun visitSMKRuleRunParameter(st: SMKRuleRunParameter) {
+        super.visitPyStatementList(st.statementList)
+    }
+
+    open fun visitSMKWorkflowParameterListStatement(st: SMKWorkflowParameterListStatement) {
+        super.visitPyStatement(st)
+    }
+
+    open fun visitSMKWorkflowPythonBlockParameter(st: SMKWorkflowPythonBlockParameter) {
         super.visitPyStatementList(st.statementList)
     }
 }

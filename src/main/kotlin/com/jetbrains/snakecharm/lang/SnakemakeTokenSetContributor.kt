@@ -12,7 +12,8 @@ import com.jetbrains.snakecharm.lang.psi.elementTypes.SnakemakeElementTypes
 class SnakemakeTokenSetContributor : PythonDialectsTokenSetContributorBase() {
     override fun getStatementTokens() = TokenSet.create(
             SnakemakeElementTypes.RULE_DECLARATION,
-            SnakemakeElementTypes.RULE_PARAMETER_LIST_STATEMENT
+            SnakemakeElementTypes.RULE_PARAMETER_LIST_STATEMENT,
+            SnakemakeElementTypes.WORKFLOW_PARAMETER_LIST_STATEMENT
     )
 
 //    override fun getExpressionTokens(): TokenSet {
@@ -21,11 +22,11 @@ class SnakemakeTokenSetContributor : PythonDialectsTokenSetContributorBase() {
 //    }
 
     override fun getKeywordTokens() = TokenSet.orSet(
-            SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS,
+            SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER,
 
             TokenSet.create(
-                    SnakemakeTokenTypes.RULE_KEYWORD,
-                    SnakemakeTokenTypes.CHECKPOINT_KEYWORD
+                    SnakemakeTokenTypes.RULE_KEYWORD, SnakemakeTokenTypes.CHECKPOINT_KEYWORD,
+                    SnakemakeTokenTypes.WORKFLOW_LOCALRULES_KEYWORD, SnakemakeTokenTypes.WORKFLOW_RULEORDER_KEYWORD
             )
     )
 

@@ -16,18 +16,6 @@ open class SMKRule(node: ASTNode): PyElementImpl(node), PsiNamedElement { //TODO
 
     companion object {
         val PARAMS_KEYWORDS = SMKRuleParameterListStatement.PARAMS_NAMES + SMKRuleRunParameter.PARAM_NAME
-
-        fun getIdentifierNode(node: ASTNode): ASTNode? {
-            var id = node.findChildByType(PyTokenTypes.IDENTIFIER)
-            if (id == null) {
-                val error = node.findChildByType(TokenType.ERROR_ELEMENT)
-                if (error != null) {
-                    // TODO: do we need this? it is like in PyFunction
-                    id = error.findChildByType(PythonDialectsTokenSetProvider.INSTANCE.keywordTokens)
-                }
-            }
-            return id
-        }
     }
 
     override fun getName(): String? {
@@ -57,4 +45,16 @@ open class SMKRule(node: ASTNode): PyElementImpl(node), PsiNamedElement { //TODO
             super.acceptPyVisitor(pyVisitor)
         }
     }
+}
+
+fun getIdentifierNode(node: ASTNode): ASTNode? {
+    var id = node.findChildByType(PyTokenTypes.IDENTIFIER)
+    if (id == null) {
+        val error = node.findChildByType(TokenType.ERROR_ELEMENT)
+        if (error != null) {
+            // TODO: do we need this? it is like in PyFunction
+            id = error.findChildByType(PythonDialectsTokenSetProvider.INSTANCE.keywordTokens)
+        }
+    }
+    return id
 }

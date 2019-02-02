@@ -59,6 +59,47 @@ class SnakemakeLexerTest : PyLexerTestCase() {
                 "Py:AT")
     }
 
+    fun testToplevelKeywordsOnTopLevel() {
+        doTest("""
+            |wildcard_constraints:
+            |    foo = ".*"
+            |report: "foo.rst"
+            |""".trimMargin().trimStart(),
+                "Py:WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD", "Py:COLON",
+                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+                "Py:INDENT", "Py:IDENTIFIER", "Py:SPACE", "Py:EQ", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
+                "Py:WORKFLOW_REPORT_KEYWORD", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+                "Py:STATEMENT_BREAK")
+    }
+    fun testToplevelKeywordsInRule() {
+        doTest("""
+            |rule all:
+            |    wildcard_constraints:
+            |       boo = ".*"
+            |    input:
+            |       report("foo")
+            |    singularity:
+            |       "docker://continuumio/miniconda3:4.4.10"
+            |""".trimMargin().trimStart(),
+                "Py:RULE_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+                "Py:INDENT", "Py:WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD", "Py:COLON",
+                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+                "Py:INDENT", "Py:IDENTIFIER", "Py:SPACE", "Py:EQ", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
+                "Py:IDENTIFIER", "Py:COLON",
+                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+                "Py:INDENT", "Py:WORKFLOW_REPORT_KEYWORD", "Py:LPAR", "Py:SINGLE_QUOTED_STRING", "Py:RPAR",
+                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
+                "Py:WORKFLOW_SINGULARITY_KEYWORD", "Py:COLON",
+                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+                "Py:INDENT", "Py:SINGLE_QUOTED_STRING",
+                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:DEDENT", "Py:LINE_BREAK",
+                "Py:STATEMENT_BREAK")
+    }
+
 
     /*
 

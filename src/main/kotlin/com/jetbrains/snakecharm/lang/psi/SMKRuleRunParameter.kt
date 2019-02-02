@@ -16,7 +16,7 @@ class SMKRuleRunParameter(node: ASTNode): PyElementImpl(node), PyStatementListCo
     override fun getStatementList(): PyStatementList =
             childToPsi(PyElementTypes.STATEMENT_LIST) ?: error("Statement list missing for workflow parameter $text")
 
-    fun getNameNode() = SMKRule.getIdentifierNode(node)
+    fun getNameNode() = getIdentifierNode(node)
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
             if (pyVisitor is SnakemakeAnnotator) {

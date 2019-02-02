@@ -2,9 +2,7 @@ package com.jetbrains.snakecharm.lang.highlighter
 
 import com.jetbrains.python.highlighting.PyHighlighter
 import com.jetbrains.python.highlighting.PyHighlighter.PY_FUNC_DEFINITION
-import com.jetbrains.snakecharm.lang.psi.SMKRule
-import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
-import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
+import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 
 object SnakemakeSyntaxAnnotator: SnakemakeAnnotator() {
@@ -26,6 +24,20 @@ object SnakemakeSyntaxAnnotator: SnakemakeAnnotator() {
         val nameNode = st.getNameNode()
         if (nameNode != null) {
             addHighlightingAnnotation(nameNode, PyHighlighter.PY_PREDEFINED_DEFINITION)
+        }
+    }
+
+    override fun visitSMKWorkflowPythonBlockParameter(st: SMKWorkflowPythonBlockParameter) {
+        val nameNode = st.getNameNode()
+        if (nameNode != null) {
+            addHighlightingAnnotation(nameNode, PyHighlighter.PY_KEYWORD)
+        }
+    }
+
+    override fun visitSMKWorkflowParameterListStatement(st: SMKWorkflowParameterListStatement) {
+        val nameNode = st.getNameNode()
+        if (nameNode != null) {
+            addHighlightingAnnotation(nameNode, PyHighlighter.PY_KEYWORD)
         }
     }
 }

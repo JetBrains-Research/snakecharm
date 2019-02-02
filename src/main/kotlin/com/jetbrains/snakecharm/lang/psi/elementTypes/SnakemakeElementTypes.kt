@@ -16,6 +16,11 @@ object SnakemakeElementTypes {
             SMKRuleParameterListStatement::class.java
     )
 
+    val WORKFLOW_PARAMETER_LIST_STATEMENT = PyElementType(
+            "SMK_WORKFLOW_PARAMETER_LIST_STATEMENT",
+            SMKWorkflowParameterListStatement::class.java
+    )
+
     val RULE_RUN_STATEMENT = PyElementType(
             "SMK_RULE_RUN_STATEMENT",
             SMKRuleRunParameter::class.java

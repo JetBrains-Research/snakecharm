@@ -1,12 +1,9 @@
 package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.ASTNode
-import com.intellij.psi.TokenType
-import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStatement
 import com.jetbrains.python.psi.impl.PyElementImpl
-import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
 import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 
 class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyStatement { // PyNamedElementContainer
@@ -28,16 +25,5 @@ class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyState
         }
     }
 
-    fun getNameNode(): ASTNode? {
-        var id = node.findChildByType(SnakemakeTokenTypes.RULE_PARAM_IDENTIFIER_LIKE)
-        if (id == null) {
-            val error = node.findChildByType(TokenType.ERROR_ELEMENT)
-            if (error != null) {
-                // TODO: do we need this? it is like in PyFunction
-                id = error.findChildByType(PythonDialectsTokenSetProvider.INSTANCE.keywordTokens)
-            }
-        }
-        return id
-    }
-
+    fun getNameNode() = getIdentifierNode(node)
 }
