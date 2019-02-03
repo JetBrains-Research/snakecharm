@@ -38,18 +38,6 @@ object SnakemakeTokenTypes {
             WORKFLOW_ONSUCCESS_KEYWORD, WORKFLOW_ONERROR_KEYWORD, WORKFLOW_ONSTART_KEYWORD
     )
 
-    val WORKFLOW_TOPLEVEL_DECORATORS_IN_RULE = TokenSet.create(
-            // Not sure that it should be all WORKFLOW_TOPLEVEL_DECORATORS, let's add tokens
-            // here on request
-
-            // as methods
-            WORKFLOW_REPORT_KEYWORD,
-
-            // in rules as section
-            WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD,
-            WORKFLOW_SINGULARITY_KEYWORD
-    )
-
     val WORKFLOW_TOPLEVEL_DECORATORS = TokenSet.orSet(
             WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATORS,
             WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER,

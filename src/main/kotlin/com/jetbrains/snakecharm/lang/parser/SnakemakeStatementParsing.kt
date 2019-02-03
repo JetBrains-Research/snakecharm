@@ -27,14 +27,13 @@ class SnakemakeStatementParsing(
 //        }
 
     override fun parseStatement() {
-        // TODO cleanup:
-//        val context = parsingContext
-//        val scope = context.scope as SnakemakeParsingScope
-//        var isRule = scope.isRule
+        val context = parsingContext
+        val scope = context.scope
+
         // myBuilder.setDebugMode(true)
 
         val tt = myBuilder.tokenType
-        if (tt !in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
+        if (tt !in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS || scope.inParamArgsList) {
             super.parseStatement()
             return
         }
@@ -104,7 +103,7 @@ class SnakemakeStatementParsing(
     private fun parseRuleDeclaration(atRuleToken: Boolean) {
         val context = parsingContext
         val scope = context.scope
-        context.pushScope(scope.withRule(true))
+        context.pushScope(scope.withRule())
 
         val ruleMarker: PsiBuilder.Marker = myBuilder.mark()
         nextToken()
@@ -130,10 +129,10 @@ class SnakemakeStatementParsing(
             atRuleToken -> SnakemakeElementTypes.RULE_DECLARATION
             else -> SnakemakeElementTypes.CHECKPOINT_DECLARATION
         })
+        context.popScope()
         if (multiline) {
             nextToken()
         }
-        context.popScope()
     }
 
     private fun parseRuleParameter(): Boolean {
@@ -185,10 +184,12 @@ class SnakemakeStatementParsing(
             text: CharSequence,
             checkLanguageLevel: Boolean
     ): IElementType {
-        if (source in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS_IN_RULE) {
+        if (source in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
             val scope = myContext.scope as SnakemakeParsingScope
             return when {
-                scope.inRule -> PyTokenTypes.IDENTIFIER
+                scope.inRule -> {
+                    PyTokenTypes.IDENTIFIER
+                }
                 else -> source
             }
         }

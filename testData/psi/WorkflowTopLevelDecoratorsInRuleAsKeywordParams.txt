@@ -1,0 +1,118 @@
+SnakemakeFile: WorkflowTopLevelDecoratorsInRuleAsKeywordParams.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('aaa')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('output')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyArgumentList
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"foo"')
+    PsiWhiteSpace('\n    ')
+    SMKRuleParameterListStatement
+      PsiElement(Py:IDENTIFIER)('params')
+      PsiElement(Py:COLON)(':')
+      PyArgumentList
+        PsiWhiteSpace('\n        ')
+        PyKeywordArgumentImpl: configfile
+          PsiElement(Py:IDENTIFIER)('configfile')
+          PsiWhiteSpace(' ')
+          PsiElement(Py:EQ)('=')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"foo4"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n        ')
+        PyKeywordArgumentImpl: report
+          PsiElement(Py:IDENTIFIER)('report')
+          PsiWhiteSpace(' ')
+          PsiElement(Py:EQ)('=')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"foo1"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n        ')
+        PyKeywordArgumentImpl: singularity
+          PsiElement(Py:IDENTIFIER)('singularity')
+          PsiWhiteSpace(' ')
+          PsiElement(Py:EQ)('=')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"foo2"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n        ')
+        PyKeywordArgumentImpl: include
+          PsiElement(Py:IDENTIFIER)('include')
+          PsiWhiteSpace(' ')
+          PsiElement(Py:EQ)('=')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"foo5"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n        ')
+        PyKeywordArgumentImpl: workdir
+          PsiElement(Py:IDENTIFIER)('workdir')
+          PsiWhiteSpace(' ')
+          PsiElement(Py:EQ)('=')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"foo6"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n        ')
+        PyKeywordArgumentImpl: wildcard_constraints
+          PsiElement(Py:IDENTIFIER)('wildcard_constraints')
+          PsiWhiteSpace(' ')
+          PsiElement(Py:EQ)('=')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"foo7"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n        ')
+        PyKeywordArgumentImpl: onstart
+          PsiElement(Py:IDENTIFIER)('onstart')
+          PsiWhiteSpace(' ')
+          PsiElement(Py:EQ)('=')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"foo8"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n        ')
+        PyKeywordArgumentImpl: onsuccess
+          PsiElement(Py:IDENTIFIER)('onsuccess')
+          PsiWhiteSpace(' ')
+          PsiElement(Py:EQ)('=')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"foo9"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n        ')
+        PyKeywordArgumentImpl: onerror
+          PsiElement(Py:IDENTIFIER)('onerror')
+          PsiWhiteSpace(' ')
+          PsiElement(Py:EQ)('=')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"foo10"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n        ')
+        PyKeywordArgumentImpl: localrules
+          PsiElement(Py:IDENTIFIER)('localrules')
+          PsiWhiteSpace(' ')
+          PsiElement(Py:EQ)('=')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"foo10"')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace('\n        ')
+        PyKeywordArgumentImpl: ruleorder
+          PsiElement(Py:IDENTIFIER)('ruleorder')
+          PsiWhiteSpace(' ')
+          PsiElement(Py:EQ)('=')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"foo10"')
+        PsiElement(Py:COMMA)(',')

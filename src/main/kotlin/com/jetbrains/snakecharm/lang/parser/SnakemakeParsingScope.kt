@@ -10,17 +10,28 @@ class SnakemakeParsingScope : ParsingScope() {
     var inRule: Boolean = false
         private set
 
+    // In rule or workflow params args list
+    var inParamArgsList: Boolean = false
+        private set
+
     override fun createInstance() = SnakemakeParsingScope()
 
-    fun withRule(flag: Boolean): SnakemakeParsingScope {
+    fun withRule(): SnakemakeParsingScope {
         val result = copy()
-        result.inRule = flag
+        result.inRule = true
+        return result
+    }
+
+    fun withParamsArgsList(): SnakemakeParsingScope {
+        val result = copy()
+        result.inParamArgsList = true
         return result
     }
 
     override fun copy(): SnakemakeParsingScope {
         val copy = super.copy() as SnakemakeParsingScope
         copy.inRule = inRule
+        copy.inParamArgsList = inParamArgsList
         return copy
     }
 }

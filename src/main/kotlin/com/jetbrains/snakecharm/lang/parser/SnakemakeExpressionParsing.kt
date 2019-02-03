@@ -6,7 +6,6 @@ import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.ExpressionParsing
 import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.psi.PyElementType
-import com.jetbrains.snakecharm.lang.psi.SMKRule
 
 /**
  * @author Roman.Chernyatchik
@@ -16,6 +15,15 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
     override fun getParsingContext() = myContext as SnakemakeParserContext
 
     fun parseRuleParamArgumentList(): Boolean {
+        val context = myContext
+        val scope = context.scope as SnakemakeParsingScope
+        myContext.pushScope(scope.withParamsArgsList())
+        val result = doParseRuleParamArgumentList()
+        context.popScope()
+        return result
+    }
+
+    private fun doParseRuleParamArgumentList(): Boolean {
         val argList = myBuilder.mark()
 
         val argsOnNextLine = myBuilder.tokenType === PyTokenTypes.STATEMENT_BREAK
@@ -53,7 +61,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                     }
 
                     // Case: hanging 'comma', next statement is another rule param block
-                    if (checkHangingCommaInArgsList()) {
+                    if (myBuilder.tokenType === PyTokenTypes.DEDENT) {
                         indents = commMarkerIndents
                         commaMarker.rollbackTo()
                         break
@@ -103,7 +111,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         nextToken()
 
         // Eat all matching dedents
-        while (!myBuilder.eof() && indents > 0) {
+        while (indents > 0 && !myBuilder.eof()) {
             if (checkMatches(PyTokenTypes.DEDENT, "Dedent expected")) { // bundle
                 indents--
             } else {
@@ -113,29 +121,6 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         argList.done(PyElementTypes.ARGUMENT_LIST)
 
         return true
-    }
-
-    private fun checkHangingCommaInArgsList(): Boolean {
-        // Case: hanging 'comma', next statement is another rule param block
-
-        val tt = myBuilder.tokenType
-        if (tt === PyTokenTypes.DEDENT) {
-            return true
-        }
-
-        if (tt === PyTokenTypes.IDENTIFIER) {
-            // check if next token is rule parameter identifier
-            // this case is when we don't have dedent token:
-            //    e.g if current rule param was a single line with hanging comma
-
-            val identifier = myBuilder.tokenText
-            if (identifier in SMKRule.PARAMS_KEYWORDS) {
-                // exclude this token from 'current' args list subtree
-                return true
-            }
-        }
-
-        return false
     }
 
     fun parseRulesList(

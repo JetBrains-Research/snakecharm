@@ -162,6 +162,10 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testWorkflowTopLevelDecoratorsInRuleAsKeywordParams() {
+        doTest()
+    }
+
     fun testWorkflowPythonCodeBlockKeywords() {
         doTest()
     }
