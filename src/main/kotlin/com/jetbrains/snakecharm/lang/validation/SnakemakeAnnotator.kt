@@ -27,5 +27,15 @@ abstract class SnakemakeAnnotator: PyAnnotator() {
     open fun visitSMKWorkflowPythonBlockParameter(st: SMKWorkflowPythonBlockParameter) {
         super.visitPyStatementList(st.statementList)
     }
+
+    open fun visitSMKWorkflowRulesReorderStatement(st: SMKWorkflowRulesReorderStatement) {
+        super.visitPyStatement(st)
+    }
+
+    open fun visitSMKWorkflowLocalRulesStatement(st: SMKWorkflowLocalRulesStatement) {
+        super.visitPyStatement(st)
+    }
+
+
 }
 

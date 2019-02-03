@@ -22,11 +22,10 @@ class SnakemakeTokenSetContributor : PythonDialectsTokenSetContributorBase() {
 //    }
 
     override fun getKeywordTokens() = TokenSet.orSet(
-            SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER,
-
             TokenSet.create(
-                    SnakemakeTokenTypes.RULE_KEYWORD, SnakemakeTokenTypes.CHECKPOINT_KEYWORD,
-                    SnakemakeTokenTypes.WORKFLOW_LOCALRULES_KEYWORD, SnakemakeTokenTypes.WORKFLOW_RULEORDER_KEYWORD
+                    SnakemakeTokenTypes.RULE_KEYWORD, SnakemakeTokenTypes.CHECKPOINT_KEYWORD
+                    // other keywords not here due to highlighting issues in context where they
+                    // aren't keywords any more
             )
     )
 

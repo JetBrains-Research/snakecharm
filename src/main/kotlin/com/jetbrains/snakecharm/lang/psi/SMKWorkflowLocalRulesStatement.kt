@@ -7,18 +7,14 @@ import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
 import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 
-/**
- * @author Roman.Chernyatchik
- * @date 2019-02-03
- */
-class SMKWorkflowParameterListStatement(node: ASTNode) : PyElementImpl(node), PyStatement { // PyNamedElementContainer
+class SMKWorkflowLocalRulesStatement(node: ASTNode): PyElementImpl(node), PyStatement {
+    fun getKeywordNode() = node.findChildByType(SnakemakeTokenTypes.WORKFLOW_LOCALRULES_KEYWORD)
+
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
         if (pyVisitor is SnakemakeAnnotator) {
-            pyVisitor.visitSMKWorkflowParameterListStatement(this)
+            pyVisitor.visitSMKWorkflowLocalRulesStatement(this)
         } else {
             super.acceptPyVisitor(pyVisitor)
         }
     }
-
-    fun getKeywordNode() = node.findChildByType(SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
 }

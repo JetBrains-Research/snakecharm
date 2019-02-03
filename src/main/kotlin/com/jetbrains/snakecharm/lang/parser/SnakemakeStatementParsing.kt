@@ -35,12 +35,13 @@ class SnakemakeStatementParsing(
         val tt = myBuilder.tokenType
         if (tt !in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS || scope.inParamArgsList) {
             super.parseStatement()
+            // TODO: context?
             return
         }
         when {
             tt === SnakemakeTokenTypes.RULE_KEYWORD -> parseRuleDeclaration(true)
             tt === SnakemakeTokenTypes.CHECKPOINT_KEYWORD -> parseRuleDeclaration(false)
-            tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATORS -> {
+            tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
                 checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))
@@ -82,7 +83,7 @@ class SnakemakeStatementParsing(
                 nextToken()
                 workflowParam.done(SnakemakeElementTypes.WORKFLOW_RULESREORDER_STATEMENT)
             }
-            tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER -> {
+            tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS -> {
                 val decoratorMarker = myBuilder.mark()
                 nextToken()
                 checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))

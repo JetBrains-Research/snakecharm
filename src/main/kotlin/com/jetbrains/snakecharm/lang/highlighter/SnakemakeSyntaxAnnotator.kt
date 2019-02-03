@@ -28,16 +28,30 @@ object SnakemakeSyntaxAnnotator: SnakemakeAnnotator() {
     }
 
     override fun visitSMKWorkflowPythonBlockParameter(st: SMKWorkflowPythonBlockParameter) {
-        val nameNode = st.getNameNode()
-        if (nameNode != null) {
-            addHighlightingAnnotation(nameNode, PyHighlighter.PY_KEYWORD)
+        val keywordNode = st.getKeywordNode()
+        if (keywordNode != null) {
+            addHighlightingAnnotation(keywordNode, PyHighlighter.PY_KEYWORD)
         }
     }
 
     override fun visitSMKWorkflowParameterListStatement(st: SMKWorkflowParameterListStatement) {
-        val nameNode = st.getNameNode()
-        if (nameNode != null) {
-            addHighlightingAnnotation(nameNode, PyHighlighter.PY_KEYWORD)
+        val keywordNode = st.getKeywordNode()
+        if (keywordNode != null) {
+            addHighlightingAnnotation(keywordNode, PyHighlighter.PY_KEYWORD)
+        }
+    }
+
+    override fun visitSMKWorkflowLocalRulesStatement(st: SMKWorkflowLocalRulesStatement) {
+        val keywordNode = st.getKeywordNode()
+        if (keywordNode != null) {
+            addHighlightingAnnotation(keywordNode, PyHighlighter.PY_KEYWORD)
+        }
+    }
+
+    override fun visitSMKWorkflowRulesReorderStatement(st: SMKWorkflowRulesReorderStatement) {
+        val keywordNode = st.getKeywordNode()
+        if (keywordNode != null) {
+            addHighlightingAnnotation(keywordNode, PyHighlighter.PY_KEYWORD)
         }
     }
 }
