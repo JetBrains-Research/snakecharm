@@ -4,19 +4,20 @@ SnakemakeFile: RuleParamsListArgs.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('samtools_sort')
     PsiElement(Py:COLON)(':')
-    PsiWhiteSpace('\n    ')
-    SMKRuleParameterListStatement
-      PsiElement(Py:IDENTIFIER)('input')
-      PsiElement(Py:COLON)(':')
-      PyArgumentList
-        PsiWhiteSpace('\n        ')
-        PyStringLiteralExpression: 
-          PsiElement(Py:SINGLE_QUOTED_STRING)('"foo"')
-    PsiWhiteSpace('\n    ')
-    SMKRuleParameterListStatement
-      PsiElement(Py:IDENTIFIER)('output')
-      PsiElement(Py:COLON)(':')
-      PsiWhiteSpace(' ')
-      PyArgumentList
-        PyStringLiteralExpression: 
-          PsiElement(Py:SINGLE_QUOTED_STRING)('"boo"')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"foo"')
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"boo"')

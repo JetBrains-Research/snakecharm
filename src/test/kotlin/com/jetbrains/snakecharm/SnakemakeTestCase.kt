@@ -1,6 +1,5 @@
 package com.jetbrains.snakecharm
 
-import com.intellij.openapi.application.ex.PathManagerEx
 import com.intellij.openapi.roots.impl.FilePropertyPusher
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.UsefulTestCase
@@ -35,7 +34,7 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
         )
         fixture!!.setUp()
 
-        fixture!!.testDataPath = PathManagerEx.getTestDataPath()
+        fixture!!.testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
         PythonDialectsTokenSetProvider.reset()
     }
 
@@ -46,8 +45,9 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
             fixture!!.tearDown()
             fixture = null
             FilePropertyPusher.EP_NAME.findExtensionOrFail(PythonLanguageLevelPusher::class.java).flushLanguageLevelCache()
-        } catch (e: Throwable) {
-            addSuppressedException(e)
+        // TODO: this will be available in 2018.3 eap
+        // } catch (e: Throwable) {
+        //     addSuppressedException(e)
         } finally {
             super.tearDown()
             UsefulTestCase.clearFields(this)

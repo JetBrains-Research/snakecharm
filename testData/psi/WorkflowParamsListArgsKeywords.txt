@@ -1,48 +1,48 @@
 SnakemakeFile: WorkflowParamsListArgsKeywords.smk
   SMKWorkflowParameterListStatement
     PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
-    PsiElement(Py:COLON)(':')
-    PsiWhiteSpace(' ')
     PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
       PyStringLiteralExpression: 
         PsiElement(Py:SINGLE_QUOTED_STRING)('"config.yaml"')
   PsiWhiteSpace('\n')
   SMKWorkflowParameterListStatement
     PsiElement(Py:WORKFLOW_REPORT_KEYWORD)('report')
-    PsiElement(Py:COLON)(':')
-    PsiWhiteSpace(' ')
     PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
       PyStringLiteralExpression: 
         PsiElement(Py:SINGLE_QUOTED_STRING)('"report/workflow.rst"')
   PsiWhiteSpace('\n')
   SMKWorkflowParameterListStatement
     PsiElement(Py:WORKFLOW_SINGULARITY_KEYWORD)('singularity')
-    PsiElement(Py:COLON)(':')
-    PsiWhiteSpace(' ')
     PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
       PyStringLiteralExpression: 
         PsiElement(Py:SINGLE_QUOTED_STRING)('"docker://continuumio/miniconda3:4.4.10"')
   PsiWhiteSpace('\n')
   SMKWorkflowParameterListStatement
     PsiElement(Py:WORKFLOW_INCLUDE_KEYWORD)('include')
-    PsiElement(Py:COLON)(':')
     PyArgumentList
+      PsiElement(Py:COLON)(':')
       PsiWhiteSpace('\n    ')
       PyStringLiteralExpression: 
         PsiElement(Py:SINGLE_QUOTED_STRING)(''tex.smrules'')
   PsiWhiteSpace('\n')
   SMKWorkflowParameterListStatement
     PsiElement(Py:WORKFLOW_WORKDIR_KEYWORD)('workdir')
-    PsiElement(Py:COLON)(':')
-    PsiWhiteSpace(' ')
     PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
       PyStringLiteralExpression: 
         PsiElement(Py:SINGLE_QUOTED_STRING)('"path/to/workdir"')
   PsiWhiteSpace('\n')
   SMKWorkflowParameterListStatement
     PsiElement(Py:WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD)('wildcard_constraints')
-    PsiElement(Py:COLON)(':')
     PyArgumentList
+      PsiElement(Py:COLON)(':')
       PsiWhiteSpace('\n    ')
       PyKeywordArgumentImpl: dataset
         PsiElement(Py:IDENTIFIER)('dataset')
@@ -62,16 +62,16 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
     PyStatementList
       SMKWorkflowParameterListStatement
         PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
-        PsiElement(Py:COLON)(':')
-        PsiWhiteSpace(' ')
         PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
           PyStringLiteralExpression: 
             PsiElement(Py:SINGLE_QUOTED_STRING)('"config.yaml"')
       PsiWhiteSpace('\n    ')
       SMKWorkflowParameterListStatement
         PsiElement(Py:WORKFLOW_INCLUDE_KEYWORD)('include')
-        PsiElement(Py:COLON)(':')
-        PsiWhiteSpace(' ')
         PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
           PyStringLiteralExpression: 
             PsiElement(Py:SINGLE_QUOTED_STRING)('"path/to/other.snakefile"')

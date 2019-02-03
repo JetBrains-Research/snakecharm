@@ -4,25 +4,26 @@ SnakemakeFile: RuleParamsListKeywordArgs.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('samtools_sort')
     PsiElement(Py:COLON)(':')
-    PsiWhiteSpace('\n    ')
-    SMKRuleParameterListStatement
-      PsiElement(Py:IDENTIFIER)('input')
-      PsiElement(Py:COLON)(':')
-      PyArgumentList
-        PsiWhiteSpace('\n        ')
-        PyKeywordArgumentImpl: input
-          PsiElement(Py:IDENTIFIER)('input')
-          PsiElement(Py:EQ)('=')
-          PyStringLiteralExpression: 
-            PsiElement(Py:SINGLE_QUOTED_STRING)('"in.bam"')
-    PsiWhiteSpace('\n    ')
-    SMKRuleParameterListStatement
-      PsiElement(Py:IDENTIFIER)('output')
-      PsiElement(Py:COLON)(':')
-      PsiWhiteSpace(' ')
-      PyArgumentList
-        PyKeywordArgumentImpl: output
-          PsiElement(Py:IDENTIFIER)('output')
-          PsiElement(Py:EQ)('=')
-          PyStringLiteralExpression: 
-            PsiElement(Py:SINGLE_QUOTED_STRING)('"in.bam"')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PyKeywordArgumentImpl: input
+            PsiElement(Py:IDENTIFIER)('input')
+            PsiElement(Py:EQ)('=')
+            PyStringLiteralExpression: 
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"in.bam"')
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyKeywordArgumentImpl: output
+            PsiElement(Py:IDENTIFIER)('output')
+            PsiElement(Py:EQ)('=')
+            PyStringLiteralExpression: 
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"in.bam"')

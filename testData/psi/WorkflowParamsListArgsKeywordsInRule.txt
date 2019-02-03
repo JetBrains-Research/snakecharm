@@ -2,36 +2,37 @@ SnakemakeFile: WorkflowParamsListArgsKeywordsInRule.smk
   SMKRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiElement(Py:COLON)(':')
-    PsiWhiteSpace('\n    ')
-    SMKRuleParameterListStatement
-      PsiElement(Py:IDENTIFIER)('output')
-      PsiElement(Py:COLON)(':')
-      PsiWhiteSpace(' ')
-      PyArgumentList
-        PyCallExpression: report
-          PyReferenceExpression: report
-            PsiElement(Py:IDENTIFIER)('report')
-          PyArgumentList
-            PsiElement(Py:LPAR)('(')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: report
+            PyReferenceExpression: report
+              PsiElement(Py:IDENTIFIER)('report')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyStringLiteralExpression: 
+                PsiElement(Py:SINGLE_QUOTED_STRING)('"report/workflow.rst"')
+              PsiElement(Py:RPAR)(')')
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('wildcard_constraints')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PyKeywordArgumentImpl: dataset
+            PsiElement(Py:IDENTIFIER)('dataset')
+            PsiElement(Py:EQ)('=')
             PyStringLiteralExpression: 
-              PsiElement(Py:SINGLE_QUOTED_STRING)('"report/workflow.rst"')
-            PsiElement(Py:RPAR)(')')
-    PsiWhiteSpace('\n    ')
-    SMKRuleParameterListStatement
-      PsiElement(Py:IDENTIFIER)('wildcard_constraints')
-      PsiElement(Py:COLON)(':')
-      PyArgumentList
-        PsiWhiteSpace('\n        ')
-        PyKeywordArgumentImpl: dataset
-          PsiElement(Py:IDENTIFIER)('dataset')
-          PsiElement(Py:EQ)('=')
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"\d+"')
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('singularity')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n          ')
           PyStringLiteralExpression: 
-            PsiElement(Py:SINGLE_QUOTED_STRING)('"\d+"')
-    PsiWhiteSpace('\n    ')
-    SMKRuleParameterListStatement
-      PsiElement(Py:IDENTIFIER)('singularity')
-      PsiElement(Py:COLON)(':')
-      PyArgumentList
-        PsiWhiteSpace('\n          ')
-        PyStringLiteralExpression: 
-          PsiElement(Py:SINGLE_QUOTED_STRING)('"docker://continuumio/miniconda3:4.4.10"')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"docker://continuumio/miniconda3:4.4.10"')

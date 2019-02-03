@@ -3,11 +3,12 @@ SnakemakeFile: RuleInvalid.smk
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiErrorElement:Rule name identifier or ':' expected
       <empty list>
-    PsiWhiteSpace('\n    ')
-    SMKRuleParameterListStatement
-      PsiElement(Py:IDENTIFIER)('input')
-      PsiElement(Py:COLON)(':')
-      PsiWhiteSpace(' ')
-      PyArgumentList
-        PyStringLiteralExpression: 
-          PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')

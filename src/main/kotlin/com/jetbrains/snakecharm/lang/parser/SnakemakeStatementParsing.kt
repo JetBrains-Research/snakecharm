@@ -4,6 +4,7 @@ import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyBundle
 import com.jetbrains.python.PyBundle.message
+import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
@@ -44,7 +45,6 @@ class SnakemakeStatementParsing(
             tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
-                checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))
                 parsingContext.expressionParser.parseRuleParamArgumentList()
                 workflowParam.done(SnakemakeElementTypes.WORKFLOW_PARAMETER_LIST_STATEMENT)
             }
@@ -114,6 +114,8 @@ class SnakemakeStatementParsing(
             nextToken()
         }
         checkMatches(PyTokenTypes.COLON, "Rule name identifier or ':' expected") // bundle
+
+        val ruleStatements = myBuilder.mark()
         val multiline = atToken(PyTokenTypes.STATEMENT_BREAK)
         if (!multiline) {
             parseRuleParameter()
@@ -126,6 +128,7 @@ class SnakemakeStatementParsing(
                 }
             }
         }
+        ruleStatements.done(PyElementTypes.STATEMENT_LIST)
         ruleMarker.done(when {
             atRuleToken -> SnakemakeElementTypes.RULE_DECLARATION
             else -> SnakemakeElementTypes.CHECKPOINT_DECLARATION
@@ -152,8 +155,6 @@ class SnakemakeStatementParsing(
         }
         nextToken()
 
-        checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
-
         var result = false
 
         when (keyword) {
@@ -164,6 +165,7 @@ class SnakemakeStatementParsing(
                 ruleParam.done(SnakemakeElementTypes.RULE_PARAMETER_LIST_STATEMENT)
             }
             SMKRuleRunParameter.PARAM_NAME -> {
+                checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
                 statementParser.parseSuite()
                 ruleParam.done(SnakemakeElementTypes.RULE_RUN_STATEMENT)
             }

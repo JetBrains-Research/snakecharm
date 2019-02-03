@@ -4,19 +4,19 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.TokenType
+import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.psi.PyElementVisitor
+import com.jetbrains.python.psi.PyStatementList
+import com.jetbrains.python.psi.PyStatementListContainer
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 
-open class SMKRule(node: ASTNode): PyElementImpl(node), PsiNamedElement { //TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SMKRule>
-    // SnakemeakeNamedElement, SnakemakeScopeOwner
-
-    companion object {
-        val PARAMS_KEYWORDS = SMKRuleParameterListStatement.PARAMS_NAMES + SMKRuleRunParameter.PARAM_NAME
-    }
+open class SMKRule(node: ASTNode): PyElementImpl(node), PyStatementListContainer, PsiNamedElement {
+    //TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SMKRule>
+    // SnakemakeNamedElement, SnakemakeScopeOwner
 
     override fun getName(): String? {
 //        val stub = stub
@@ -45,6 +45,8 @@ open class SMKRule(node: ASTNode): PyElementImpl(node), PsiNamedElement { //TODO
             super.acceptPyVisitor(pyVisitor)
         }
     }
+
+    override fun getStatementList() = childToPsiNotNull<PyStatementList>(PyElementTypes.STATEMENT_LIST)
 }
 
 fun getIdentifierNode(node: ASTNode): ASTNode? {

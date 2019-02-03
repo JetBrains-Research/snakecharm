@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.lang.parser
 
+import com.jetbrains.python.PyBundle
 import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
@@ -24,7 +25,16 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
     }
 
     private fun doParseRuleParamArgumentList(): Boolean {
+        // let's make ':' part of arg list, similar as '(', ')' are parts of arg list
+        // helps with formatting, e.g. enter handler
+        val hasColon = myBuilder.tokenType == PyTokenTypes.COLON
+        if (!hasColon) {
+            myBuilder.error(PyBundle.message("PARSE.expected.colon"))
+        }
         val argList = myBuilder.mark()
+        if (hasColon) {
+            myBuilder.advanceLexer()
+        }
 
         val argsOnNextLine = myBuilder.tokenType === PyTokenTypes.STATEMENT_BREAK
         if (argsOnNextLine) {

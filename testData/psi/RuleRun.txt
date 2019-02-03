@@ -4,35 +4,37 @@ SnakemakeFile: RuleRun.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('compose_merge')
     PsiElement(Py:COLON)(':')
-    PsiWhiteSpace('\n    ')
-    SMKRuleRunParameter
-      PsiElement(Py:IDENTIFIER)('run')
-      PsiElement(Py:COLON)(':')
-      PsiWhiteSpace(' ')
-      PyStatementList
-        PyExpressionStatement
-          PyReferenceExpression: foo
-            PsiElement(Py:IDENTIFIER)('foo')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SMKRuleRunParameter
+        PsiElement(Py:IDENTIFIER)('run')
+        PsiElement(Py:COLON)(':')
+        PsiWhiteSpace(' ')
+        PyStatementList
+          PyExpressionStatement
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
   PsiWhiteSpace('\n\n')
   SMKRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('compose_merge')
     PsiElement(Py:COLON)(':')
-    PsiWhiteSpace('\n    ')
-    SMKRuleRunParameter
-      PsiElement(Py:IDENTIFIER)('run')
-      PsiElement(Py:COLON)(':')
-      PsiWhiteSpace('\n        ')
-      PyStatementList
-        PyExpressionStatement
-          PyReferenceExpression: foo
-            PsiElement(Py:IDENTIFIER)('foo')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SMKRuleRunParameter
+        PsiElement(Py:IDENTIFIER)('run')
+        PsiElement(Py:COLON)(':')
         PsiWhiteSpace('\n        ')
-        PyExpressionStatement
-          PyCallExpression: boo
-            PyReferenceExpression: boo
-              PsiElement(Py:IDENTIFIER)('boo')
-            PyArgumentList
-              PsiElement(Py:LPAR)('(')
-              PsiElement(Py:RPAR)(')')
+        PyStatementList
+          PyExpressionStatement
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
+          PsiWhiteSpace('\n        ')
+          PyExpressionStatement
+            PyCallExpression: boo
+              PyReferenceExpression: boo
+                PsiElement(Py:IDENTIFIER)('boo')
+              PyArgumentList
+                PsiElement(Py:LPAR)('(')
+                PsiElement(Py:RPAR)(')')

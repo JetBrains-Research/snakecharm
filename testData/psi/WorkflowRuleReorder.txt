@@ -21,6 +21,10 @@ SnakemakeFile: WorkflowRuleReorder.smk
       PsiWhiteSpace(' ')
       PsiElement(Py:IDENTIFIER)('rule3')
   PsiWhiteSpace('\n\n')
+  SMKWorkflowRulesReorderStatement
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PsiElement(Py:COLON)(':')
+
   PyFunction('foo')
     PsiElement(Py:DEF_KEYWORD)('def')
     PsiWhiteSpace(' ')

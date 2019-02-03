@@ -14,11 +14,12 @@ SnakemakeFile: RuleInPythonBlock.smk
         PsiWhiteSpace(' ')
         PsiElement(Py:IDENTIFIER)('aa')
         PsiElement(Py:COLON)(':')
-        PsiWhiteSpace('\n    ')
-        SMKRuleParameterListStatement
-          PsiElement(Py:IDENTIFIER)('output')
-          PsiElement(Py:COLON)(':')
-          PsiWhiteSpace(' ')
-          PyArgumentList
-            PyStringLiteralExpression: 
-              PsiElement(Py:SINGLE_QUOTED_STRING)('"bb"')
+        PyStatementList
+          PsiWhiteSpace('\n    ')
+          SMKRuleParameterListStatement
+            PsiElement(Py:IDENTIFIER)('output')
+            PyArgumentList
+              PsiElement(Py:COLON)(':')
+              PsiWhiteSpace(' ')
+              PyStringLiteralExpression: 
+                PsiElement(Py:SINGLE_QUOTED_STRING)('"bb"')
