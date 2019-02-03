@@ -188,9 +188,7 @@ class SnakemakeStatementParsing(
         if (source in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
             val scope = myContext.scope as SnakemakeParsingScope
             return when {
-                scope.inRule -> {
-                    PyTokenTypes.IDENTIFIER
-                }
+                scope.inRule -> PyTokenTypes.IDENTIFIER
                 else -> source
             }
         }
