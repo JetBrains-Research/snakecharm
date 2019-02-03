@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.lang.parser
 
 import com.intellij.psi.tree.TokenSet
-import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyElementType
 
 /**
@@ -45,8 +44,4 @@ object SnakemakeTokenTypes {
                     RULE_KEYWORD, CHECKPOINT_KEYWORD,
                     WORKFLOW_LOCALRULES_KEYWORD, WORKFLOW_RULEORDER_KEYWORD
             ))
-
-    val RULE_PARAM_IDENTIFIER_LIKE = TokenSet.create(
-            WORKFLOW_SINGULARITY_KEYWORD, WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD, PyTokenTypes.IDENTIFIER
-    )
 }

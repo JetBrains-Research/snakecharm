@@ -143,7 +143,7 @@ class SnakemakeStatementParsing(
         val keyword = myBuilder.tokenText
         val ruleParam = myBuilder.mark()
 
-        if (!SnakemakeTokenTypes.RULE_PARAM_IDENTIFIER_LIKE.contains(myBuilder.tokenType)) {
+        if (myBuilder.tokenType != PyTokenTypes.IDENTIFIER) {
             myBuilder.error("Rule parameter identifier is expected") // bundle
             nextToken()
             ruleParam.drop()
