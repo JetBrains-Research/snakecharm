@@ -31,6 +31,7 @@
     <lang.syntaxHighlighterFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterFactory"/>
     <!--<annotator language="Snakemake" implementationClass="com.jetbrains.snakemake.lang.highlighter.SnakemakeDumbAwareAnnotator"/>-->
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeDumbAwareAnnotator"/>
+    <lang.foldingBuilder language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.SnakeMakeFoldingBuilder"/>
   </extensions>
 
   <extensions defaultExtensionNs="Pythonid">

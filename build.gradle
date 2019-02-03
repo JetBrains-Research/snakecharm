@@ -20,7 +20,7 @@ def hasPyCharm = project.hasProperty('pycharmPath')
 def hasPythonPlugin = project.hasProperty('pythonPlugin')
 
 group 'com.jetbrains'
-version '0.1-SNAPSHOT'
+version '0.2-SNAPSHOT'
 
 intellij {
     pluginName 'snakecharm'

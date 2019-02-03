@@ -1,6 +1,5 @@
 package com.jetbrains.snakecharm.lang.parser
 
-import com.intellij.openapi.application.PathManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.ParsingTestCase
@@ -10,9 +9,8 @@ import com.jetbrains.python.PythonParserDefinition
 import com.jetbrains.python.PythonTokenSetContributor
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFunction
+import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor
-import java.io.File
-import java.nio.file.Path
 
 
 /**
@@ -34,22 +32,7 @@ class SnakemakeParsingTest : ParsingTestCase(
         PythonDialectsTokenSetProvider.reset()
     }
 
-    override fun getTestDataPath(): String {
-        val homePath = projectHomePath(SnakemakeParsingTest::class.java)
-        checkNotNull(homePath)
-        return homePath.resolve("testData").toString()
-    }
-
-    private fun projectHomePath(aClass: Class<*>): Path? {
-        val rootPath = PathManager.getResourceRoot(
-                aClass,
-                "/" + aClass.name.replace('.', '/') + ".class"
-        )
-        return when (rootPath) {
-            null -> null
-            else -> File(rootPath).toPath().parent.parent.parent
-        }
-    }
+    override fun getTestDataPath() = SnakemakeTestUtil.getTestDataPath().toString()
 
     override fun createFile(name: String, text: String): PsiFile {
         val file = super.createFile(name, text)
