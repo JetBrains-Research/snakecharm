@@ -19,6 +19,9 @@ At the moment the plugin is available for PyCharm 2018.3.x or for IntelliJ Platf
 * Open `PyCharm` (or other `IntelliJ Platfrom` based IDE with `Python Community Edition` plugin installed)
 * Open `Settings | Plugins | Settings Gear Icon | Install Plugin from Disk...` and select pluign *.jar file
 
+Plugin tested with:
+* IDEA CI 2018.3, Python Community Edition Plugin: 2018.3.183.4284.36
+* PyCharm 2018.3.1 (Professional Edition), Build #PY-183.4588.64
 
 # Support
 Contact me at roman.chernyatchik@jetbrains.com
