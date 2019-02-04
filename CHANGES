@@ -5,9 +5,10 @@ Here you can see the full list of changes between each big release.
 
 Version 0.2
 -------------
-
-Released on <unreleased>
-
+Released on Feb 4th 2019
+- sinceBuild "183.4284"
+- untilBuild "184"
+    
 Fixed
 - *.smk file not recognized as Snakemake files, see issue #28
 - *.rules files support, see issue #21

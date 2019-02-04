@@ -7,6 +7,7 @@ buildscript {
 plugins {
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
+    // See https://github.com/JetBrains/gradle-intellij-plugin
     id 'org.jetbrains.intellij' version '0.4.1'
 
     // Kotlin
@@ -25,7 +26,8 @@ version '0.2-SNAPSHOT'
 intellij {
     pluginName 'snakecharm'
     version ideaVersion
-    
+    sandboxDirectory = "${project.rootDir}/.sandbox"
+    ideaDependencyCachePath  = "${project.rootDir}/.idea_distrib_cache"
     updateSinceUntilBuild false
 
     plugins = []
@@ -39,23 +41,25 @@ intellij {
             throw new StopActionException("Define either pycharmPath or pythonPlugin in your gradle.properties")
         }
 
+    instrumentCode Boolean.valueOf(instrumentPluginCode)
     downloadSources Boolean.valueOf(downloadIdeaSources)
-
+    // intellijRepo = "https://www.jetbrains.com/intellij-repository"
+    
     publishPlugin {
+        channels publishChannels.split(',')
         username publishUsername
         password publishPassword
     }
 }
 
 patchPluginXml {
-    changeNotes """
-      Initial version: no changes.<br>
-      <em>most HTML tags may be used</em>"""
-    // sinceBuild ""
-    // untilBuild ""
+    // Use change notes on github
+    //changeNotes """ """
+    sinceBuild "183.4284"
+    untilBuild "184"
 }
 
-sourceCompatibility = 1.8
+sourceCompatibility = javaVersion
 targetCompatibility = sourceCompatibility
 compileKotlin { kotlinOptions.jvmTarget = sourceCompatibility }
 compileTestKotlin { kotlinOptions.jvmTarget = sourceCompatibility }

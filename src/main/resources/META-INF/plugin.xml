@@ -8,8 +8,13 @@
 
   <description><![CDATA[
     Adds Snakemake language support.<br>
-    Snakemake is a language for workflow management, see
-    <a href="https://snakemake.readthedocs.io/en/stable/">Snakemake Home Page</a>
+    <a href="https://snakemake.readthedocs.io/en/stable/">Snakemake</a> is a language for workflow management.
+    <br>
+    <br>
+    <a href="https://github.com/JetBrains-Research/snakecharm">SnakeCharm at GitHub</a><br>
+    <a href="https://github.com/JetBrains-Research/snakecharm/issues">Issue tracker</a><br>
+    <a href="https://github.com/JetBrains-Research/snakecharm/releases">Releases</a><br>
+    <a href="https://github.com/JetBrains-Research/snakecharm/blob/master/CHANGES">Changelog</a><br>
     ]]></description>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
@@ -32,6 +37,8 @@
     <!--<annotator language="Snakemake" implementationClass="com.jetbrains.snakemake.lang.highlighter.SnakemakeDumbAwareAnnotator"/>-->
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeDumbAwareAnnotator"/>
     <lang.foldingBuilder language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.SnakeMakeFoldingBuilder"/>
+    <!--<enterBetweenBracesDelegate language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.editorActions.EnterInRuleParamsListDelegate"/>-->
+    <!--<codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>-->
   </extensions>
 
   <extensions defaultExtensionNs="Pythonid">
