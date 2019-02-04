@@ -14,3 +14,4 @@ Fixed
 - Do not parse/highlight as keywords several top level workflow params, see issue #29
 - Improved code indentation in rules, no line continuation is inserted, but indentation
   is relative to ':', see issue #26
+- Rules and rule params folding support #15
