@@ -1,5 +1,5 @@
 <idea-plugin>
-  <id>com.jetbrains.snakecharm</id>
+  <id>SnakeCharm</id>
   <name>SnakeCharm</name>
   <vendor email="roman.chernyatchik@jetbrains.com"
           url="https://research.jetbrains.org/groups/biolabs">
@@ -24,8 +24,6 @@
   <depends>com.intellij.modules.lang</depends>
   <depends optional="true">com.intellij.modules.python</depends>
 
-  <!--<idea-version since-build="183.0" until-build="183.*"/>-->
-  
   <extensions defaultExtensionNs="com.intellij">
     <fileTypeFactory implementation="com.jetbrains.snakecharm.SnakemakeFileTypeFactory"/>
     <lang.parserDefinition

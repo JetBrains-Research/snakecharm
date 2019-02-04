@@ -3,11 +3,11 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
-Version 0.2
+Version 0.2.2018.3
 -------------
 Released on Feb 4th 2019
 - sinceBuild "183.4284"
-- untilBuild "184"
+- untilBuild "191.*"
     
 Fixed
 - *.smk file not recognized as Snakemake files, see issue #28

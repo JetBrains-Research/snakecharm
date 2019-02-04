@@ -20,8 +20,7 @@ apply plugin: 'kotlin'
 def hasPyCharm = project.hasProperty('pycharmPath')
 def hasPythonPlugin = project.hasProperty('pythonPlugin')
 
-group 'com.jetbrains'
-version '0.2-SNAPSHOT'
+version '0.2-2018.3'
 
 intellij {
     pluginName 'snakecharm'
@@ -30,7 +29,7 @@ intellij {
     ideaDependencyCachePath  = "${project.rootDir}/.idea_distrib_cache"
     updateSinceUntilBuild false
 
-    plugins = []
+    plugins = ["PsiViewer:183.2153"]
     if (hasPyCharm) {
             alternativeIdePath pycharmPath
         }
@@ -44,19 +43,18 @@ intellij {
     instrumentCode Boolean.valueOf(instrumentPluginCode)
     downloadSources Boolean.valueOf(downloadIdeaSources)
     // intellijRepo = "https://www.jetbrains.com/intellij-repository"
-    
-    publishPlugin {
-        channels publishChannels.split(',')
-        username publishUsername
-        password publishPassword
-    }
+}
+
+publishPlugin {
+    channels publishChannels.split(',')
+    token intellijPublishToken
 }
 
 patchPluginXml {
     // Use change notes on github
     //changeNotes """ """
-    sinceBuild "183.4284"
-    untilBuild "184"
+    sinceBuild "183.4284.36"
+    untilBuild "191.*"
 }
 
 sourceCompatibility = javaVersion
