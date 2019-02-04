@@ -2,7 +2,7 @@
 
 **SnakeCharm** is a plugin for [PyCharm](https://www.jetbrains.com/pycharm/) / [IntelliJ Platform IDEs](https://www.jetbrains.com/products.html?fromMenu#type=ide) which adds support for [Snakemake](https://snakemake.readthedocs.io/en/stable/) workflows language.
 
-At the moment plugin is an early alpha version and will be improved in future. Plugin is available in [IntelliJ Plugins Repository](https://plugins.jetbrains.com/plugin/11947-snakecharm).
+At the moment plugin is an early alpha version and will be improved in future. 
 
 Features available in `*.smk`, `*.rule` and `Snakefile` files:
 * Python code syntax highlighting
@@ -19,6 +19,9 @@ In PyCharm (or other `IntelliJ Platfrom` based IDE with `Python Community Editio
 At the moment the plugin is tested with:
 * IDEA CI 2018.3, Python Community Edition Plugin: 2018.3.183.4284.36
 * PyCharm 2018.3.1 (Professional Edition), Build #PY-183.4588.64
+
+# IntelliJ Plugins Repository
+Plugin is available in IntelliJ Plugins Repository, see [SnakeCharm](https://plugins.jetbrains.com/plugin/11947-snakecharm).
 
 # Support
 Contact me at roman.chernyatchik@jetbrains.com or post issues in [Issue Tracker](https://github.com/JetBrains-Research/snakecharm/issues)
