@@ -47,7 +47,7 @@ intellij {
 
 publishPlugin {
     channels publishChannels.split(',')
-    token intellijPublishToken
+    token findProperty('intellijPublishToken') ?: 'no_token_given'
 }
 
 patchPluginXml {
