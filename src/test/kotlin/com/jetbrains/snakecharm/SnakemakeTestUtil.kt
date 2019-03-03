@@ -21,9 +21,17 @@ object SnakemakeTestUtil {
                 aClass,
                 "/" + aClass.name.replace('.', '/') + ".class"
         )
+
         return when (rootPath) {
             null -> null
-            else -> File(rootPath).toPath().parent.parent.parent
+            else -> {
+                val subDir = File(rootPath).toPath().parent.parent
+                when {
+                    subDir.fileName.toString() == "out" -> subDir.parent
+                    subDir.parent.fileName.toString() == "build" -> subDir.parent.parent
+                    else -> null
+                }
+            }
         }
     }
 }
