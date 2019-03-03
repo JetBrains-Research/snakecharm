@@ -20,7 +20,7 @@ apply plugin: 'kotlin'
 def hasPyCharm = project.hasProperty('pycharmPath')
 def hasPythonPlugin = project.hasProperty('pythonPlugin')
 
-version '0.2-2018.3'
+version '0.3.SNAPSHOT'
 
 intellij {
     pluginName 'snakecharm'
@@ -68,10 +68,13 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib"
-//    compile "org.jetbrains.kotlin:kotlin-reflect"
-//    compile 'org.jetbrains.kotlinx:kotlinx-support-jdk8:0.1'
     compile 'log4j:log4j:1.2.17'
 
     testCompile 'junit:junit:4.12'
     testCompile "org.jetbrains.kotlin:kotlin-test"
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.10'
+    distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }
