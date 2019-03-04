@@ -3,19 +3,35 @@ package com.jetbrains.snakecharm.lang.parser
 import com.jetbrains.python.PythonDialectsTokenSetContributor
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor
+import org.junit.After
+import org.junit.Before
+import org.junit.Ignore
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
 /**
  * @author Roman.Chernyatchik
  * @date 2018-12-31
+ *
+ * Let's 'convert' JUnit3 test (PyLexerTestCase) to JUnit4. So we can use all JUnit4 features, e.g. @Ignore
  */
+@RunWith(JUnit4::class)
 class SnakemakeLexerTest : PyLexerTestCase() {
-    override fun setUp() {
+    @Before
+    public override fun setUp() {
         super.setUp()
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SnakemakeTokenSetContributor())
         PythonDialectsTokenSetProvider.reset()
     }
 
-    fun testPythonExprAssignment() {
+    @After
+    public override fun tearDown() {
+        super.tearDown()
+    }
+
+    @Test
+    fun pythonExprAssignment() {
         doTest(
                 "TRACK = 'hg19.gtf'\n",
                 "Py:IDENTIFIER", "Py:SPACE", "Py:EQ", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
@@ -23,7 +39,8 @@ class SnakemakeLexerTest : PyLexerTestCase() {
                 "Py:STATEMENT_BREAK")
     }
 
-    fun testRule() {
+    @Test
+    fun rule() {
         doTest("""
             |rule all:
             |""".trimMargin().trimStart(),
@@ -32,7 +49,8 @@ class SnakemakeLexerTest : PyLexerTestCase() {
                 "Py:STATEMENT_BREAK")
     }
 
-    fun testRuleWithParams() {
+    @Test
+    fun ruleWithParams() {
         doTest("""
             |rule all:
             |    input: 'foo'
@@ -44,7 +62,9 @@ class SnakemakeLexerTest : PyLexerTestCase() {
                 "Py:STATEMENT_BREAK")
     }
 
-    fun testRuleParamStringLiteralWithLineBreak() {
+    @Ignore(value = "See issue https://github.com/JetBrains-Research/snakecharm/issues/16")
+    @Test
+    fun ruleParamStringLiteralWithLineBreak() {
         doTest("""
             |@workflow.input(
             |    "{dataset}/inputfile"
@@ -59,7 +79,8 @@ class SnakemakeLexerTest : PyLexerTestCase() {
                 "Py:AT")
     }
 
-    fun testToplevelKeywordsOnTopLevel() {
+    @Test
+    fun toplevelKeywordsOnTopLevel() {
         doTest("""
             |wildcard_constraints:
             |    foo = ".*"
@@ -73,7 +94,8 @@ class SnakemakeLexerTest : PyLexerTestCase() {
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
                 "Py:STATEMENT_BREAK")
     }
-    fun testToplevelKeywordsInRule() {
+    @Test
+    fun toplevelKeywordsInRule() {
         doTest("""
             |rule all:
             |    wildcard_constraints:

@@ -11,25 +11,40 @@ import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor
+import org.junit.*
+import org.junit.rules.TestName
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
 
 /**
  * @author Roman.Chernyatchik
  * @date 2018-12-31
  *
- * TODO: collect tests automatically from folder
  */
+@RunWith(JUnit4::class)
 class SnakemakeParsingTest : ParsingTestCase(
         "psi", "smk", SnakemakeParserDefinition(), PythonParserDefinition()
 ) {
     private var myLanguageLevel = LanguageLevel.getDefault()
+    @Rule
+    @JvmField
+    var currentTestName = TestName()
 
-    override fun setUp() {
+    override fun getName() = currentTestName.methodName.capitalize()
+
+    @Before
+    public override fun setUp() {
         super.setUp()
         registerExtensionPoint(PythonDialectsTokenSetContributor.EP_NAME, PythonDialectsTokenSetContributor::class.java)
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SnakemakeTokenSetContributor())
         PythonDialectsTokenSetProvider.reset()
+    }
+    
+    @After
+    public override fun tearDown() {
+        super.tearDown()
     }
 
     override fun getTestDataPath() = SnakemakeTestUtil.getTestDataPath().toString()
@@ -40,140 +55,177 @@ class SnakemakeParsingTest : ParsingTestCase(
         return file
     }
 
-    fun testPythonCode() {
+    @Test 
+    fun pythonCode() {
         doTest()
     }
 
-    fun testRule() {
+    @Test 
+    fun rule() {
         doTest()
     }
 
-    fun testRuleInPythonBlock() {
+    @Test 
+    fun ruleInPythonBlock() {
         doTest()
     }
 
-    fun testCheckpoint() {
+    @Test 
+    fun checkpoint() {
         doTest()
     }
 
-    fun testRuleNoName() {
+    @Test 
+    fun ruleNoName() {
         doTest()
     }
 
-    fun testRuleMultiple() {
+    @Test 
+    fun ruleMultiple() {
         doTest()
     }
 
-    fun testRuleMultipleSingleLine() {
+    @Test 
+    fun ruleMultipleSingleLine() {
         doTest()
     }
 
-    fun testRuleParams() {
+    @Test 
+    fun ruleParams() {
         doTest()
     }
 
-    fun testRuleInvalid() {
+    @Test 
+    fun ruleInvalid() {
         doTest()
     }
 
 
-    fun testRuleInvalidNoParamBody() {
+    @Test 
+    fun ruleInvalidNoParamBody() {
         doTest()
     }
 
-    fun testRuleInvalidNoParamBodyEof() {
+    @Test 
+    fun ruleInvalidNoParamBodyEof() {
         doTest()
     }
 
-    fun testRuleInvalidParam() {
+    @Test 
+    fun ruleInvalidParam() {
         doTest()
     }
 
-    fun testRuleMultipleSingleLineNoBreak() {
+    @Test 
+    fun ruleMultipleSingleLineNoBreak() {
         doTest()
     }
 
-    fun testRuleUnexpKeyword() {
+    @Test 
+    fun ruleUnexpKeyword() {
         doTest()
     }
 
-    fun testRuleParamsListArgs() {
+    @Test 
+    fun ruleParamsListArgs() {
         doTest()
     }
 
-    fun testRuleParamsListArgsKeywords() {
+    @Test 
+    fun ruleParamsListArgsKeywords() {
         doTest()
     }
 
-    fun testRuleParamsListArgsStringMultiline() {
+    @Ignore(value = "See issue https://github.com/JetBrains-Research/snakecharm/issues/16")
+    @Test 
+    fun ruleParamsListArgsStringMultiline() {
         doTest()
     }
 
-    fun testRuleParamsListArgsHangingComma() {
+    @Test 
+    fun ruleParamsListArgsHangingComma() {
         doTest()
     }
 
-    fun testRuleParamsListArgsMultiple() {
+    @Test 
+    fun ruleParamsListArgsMultiple() {
         doTest()
     }
 
-    fun testRuleParamsListArgsIndents() {
+    @Test 
+    fun ruleParamsListArgsIndents() {
         doTest()
     }
 
-    fun testRuleParamsListKeywordArgs() {
+    @Test 
+    fun ruleParamsListKeywordArgs() {
         doTest()
     }
 
-    fun testRuleParamsListKeywordArgsMultiple() {
+    @Test 
+    fun ruleParamsListKeywordArgsMultiple() {
         doTest()
     }
 
-    fun testRuleRun() {
+    @Test
+    fun ruleRun() {
         doTest()
     }
 
-    fun testRuleRunPythonBlock() {
+    @Test 
+    fun ruleRunPythonBlock() {
         doTest()
     }
 
-    fun testWorkflowParamsListArgsKeywords() {
+    @Test
+    fun workflowParamsListArgsKeywords() {
         doTest()
     }
 
-    fun testWorkflowParamsListArgsKeywordsInRule() {
+    @Test
+    fun workflowParamsListArgsKeywordsInRule() {
         doTest()
     }
 
-    fun testWorkflowTopLevelDecoratorsInRuleAsKeywordParams() {
+    @Test
+    fun workflowTopLevelDecoratorsInRuleAsKeywordParams() {
         doTest()
     }
 
-    fun testWorkflowPythonCodeBlockKeywords() {
+    @Test
+    fun workflowPythonCodeBlockKeywords() {
         doTest()
     }
 
-    fun testWorkflowRuleReorder() {
+    @Test
+    @Ignore(value = "See https://github.com/JetBrains-Research/snakecharm/issues/30")
+    fun workflowRuleReorder() {
         doTest()
     }
 
-    fun testWorkflowRuleReorderHangingSeparator() {
+    @Test
+    fun workflowRuleReorderHangingSeparator() {
         doTest()
     }
 
-    fun testWorkflowRuleReorderInvalid() {
+    @Test
+    fun workflowRuleReorderInvalid() {
         doTest()
     }
 
-    fun testWorkflowLocalrules() {
+    @Test
+    @Ignore(value = "See https://github.com/JetBrains-Research/snakecharm/issues/30")
+    fun workflowLocalrules() {
         doTest()
     }
 
-    fun testWorkflowLocalrulesInvalid() {
+    @Test
+    fun workflowLocalrulesInvalid() {
         doTest()
     }
 
-    fun testWorkflowLocalrulesHangingComma() {
+    @Test
+    fun workflowLocalrulesHangingComma() {
         doTest()
     }
 

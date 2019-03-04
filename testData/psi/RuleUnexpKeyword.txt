@@ -5,11 +5,13 @@ SnakemakeFile: RuleUnexpKeyword.smk
     PyStatementList
       PsiWhiteSpace('\n    ')
       PsiElement(Py:IDENTIFIER)('booo')
-      PsiElement(Py:COLON)(':')
       PsiErrorElement:Unexpected rule parameter 'booo'
         <empty list>
+  PsiElement(Py:COLON)(':')
   PsiWhiteSpace(' ')
-  PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')
+  PyExpressionStatement
+    PyStringLiteralExpression: 
+      PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')
   PsiErrorElement:Statement expected, found Py:DEDENT
     <empty list>
   PsiWhiteSpace('\n\n')
