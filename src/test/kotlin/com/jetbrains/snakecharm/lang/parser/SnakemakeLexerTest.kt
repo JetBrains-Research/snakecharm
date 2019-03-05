@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.lang.parser
 import com.jetbrains.python.PythonDialectsTokenSetContributor
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor
-import org.junit.Assume
 
 /**
  * @author Roman.Chernyatchik
@@ -45,9 +44,10 @@ class SnakemakeLexerTest : PyLexerTestCase() {
                 "Py:STATEMENT_BREAK")
     }
 
+    /* TODO #16
     fun testRuleParamStringLiteralWithLineBreak() {
         Assume.assumeFalse(
-                "Not Implemented Yet, see: See issue https://github.com/JetBrains-Research/snakecharm/issues/16",
+                "Feature Not Implemented Yet, see: See issue https://github.com/JetBrains-Research/snakecharm/issues/16",
                 true
         )
         doTest("""
@@ -63,6 +63,7 @@ class SnakemakeLexerTest : PyLexerTestCase() {
             |""".trimMargin().trimStart(),
                 "Py:AT")
     }
+    */
 
     fun testToplevelKeywordsOnTopLevel() {
         doTest("""

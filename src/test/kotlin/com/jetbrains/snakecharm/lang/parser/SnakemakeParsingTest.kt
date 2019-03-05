@@ -11,7 +11,6 @@ import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor
-import org.junit.Assume
 
 
 /**
@@ -105,14 +104,15 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    /* TODO #16
     fun testRuleParamsListArgsStringMultiline() {
         Assume.assumeFalse(
-                "Not Implemented Yet, see: See issue" +
+                "Feature Not Implemented Yet, see: See issue" +
                         " https://github.com/JetBrains-Research/snakecharm/issues/16",
                 true
         )
         doTest()
-    }
+    } */
 
     fun testRuleParamsListArgsHangingComma() {
         doTest()
@@ -158,14 +158,15 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    /* TODO #30
     fun testWorkflowRuleReorder() {
         Assume.assumeFalse(
-                "Not Implemented Yet, see: See issue" +
+                "Feature Not Implemented Yet, see: See issue" +
                         " https://github.com/JetBrains-Research/snakecharm/issues/30",
                 true
         )
         doTest()
-    }
+    }*/
 
     fun testWorkflowRuleReorderHangingSeparator() {
         doTest()
@@ -175,14 +176,15 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    /* TODO #30
     fun testWorkflowLocalrules() {
         Assume.assumeFalse(
-                "Not Implemented Yet, see: See issue" +
+                "Feature Not Implemented Yet, see: See issue" +
                         " https://github.com/JetBrains-Research/snakecharm/issues/30",
                 true
         )
         doTest()
-    }
+    }*/
 
     fun testWorkflowLocalrulesInvalid() {
         doTest()
