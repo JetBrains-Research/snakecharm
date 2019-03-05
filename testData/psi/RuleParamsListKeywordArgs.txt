@@ -14,7 +14,7 @@ SnakemakeFile: RuleParamsListKeywordArgs.smk
           PyKeywordArgumentImpl: input
             PsiElement(Py:IDENTIFIER)('input')
             PsiElement(Py:EQ)('=')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: in.bam
               PsiElement(Py:SINGLE_QUOTED_STRING)('"in.bam"')
       PsiWhiteSpace('\n    ')
       SMKRuleParameterListStatement
@@ -25,5 +25,5 @@ SnakemakeFile: RuleParamsListKeywordArgs.smk
           PyKeywordArgumentImpl: output
             PsiElement(Py:IDENTIFIER)('output')
             PsiElement(Py:EQ)('=')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: in.bam
               PsiElement(Py:SINGLE_QUOTED_STRING)('"in.bam"')

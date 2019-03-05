@@ -11,7 +11,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: iii
             PsiElement(Py:SINGLE_QUOTED_STRING)('"iii"')
       PsiWhiteSpace('\n  ')
       SMKRuleParameterListStatement
@@ -19,7 +19,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: ooo
             PsiElement(Py:SINGLE_QUOTED_STRING)('"ooo"')
       PsiWhiteSpace('\n\n  ')
       SMKRuleParameterListStatement
@@ -27,7 +27,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: ppp
             PsiElement(Py:SINGLE_QUOTED_STRING)('"ppp"')
       PsiWhiteSpace('\n  ')
       SMKRuleParameterListStatement
@@ -35,7 +35,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: logs/abc.log
             PsiElement(Py:SINGLE_QUOTED_STRING)('"logs/abc.log"')
       PsiWhiteSpace('\n  ')
       SMKRuleParameterListStatement
@@ -70,7 +70,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: 1.0
             PsiElement(Py:SINGLE_QUOTED_STRING)('"1.0"')
       PsiWhiteSpace('\n  ')
       SMKRuleParameterListStatement
@@ -78,7 +78,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: Executing somecommand with {threads} threads on the following files {input}.
             PsiElement(Py:SINGLE_QUOTED_STRING)('"Executing somecommand with {threads} threads on the following files {input}."')
       PsiWhiteSpace('\n\n  ')
       SMKRuleParameterListStatement
@@ -86,7 +86,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace('\n        ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: envs/ggplot.yaml
             PsiElement(Py:SINGLE_QUOTED_STRING)('"envs/ggplot.yaml"')
       PsiWhiteSpace('\n  ')
       SMKRuleParameterListStatement
@@ -99,7 +99,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
               PsiElement(Py:IDENTIFIER)('repeat')
             PyArgumentList
               PsiElement(Py:LPAR)('(')
-              PyStringLiteralExpression: 
+              PyStringLiteralExpression: benchmarks/somecommand/{sample}.tsv
                 PsiElement(Py:SINGLE_QUOTED_STRING)('"benchmarks/somecommand/{sample}.tsv"')
               PsiElement(Py:COMMA)(',')
               PsiWhiteSpace(' ')
@@ -112,7 +112,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: mygroup
             PsiElement(Py:SINGLE_QUOTED_STRING)('"mygroup"')
       PsiWhiteSpace('\n  ')
       SMKRuleParameterListStatement
@@ -120,7 +120,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: shallow
             PsiElement(Py:SINGLE_QUOTED_STRING)('"shallow"')
       PsiWhiteSpace('\n\n  ')
       SMKRuleParameterListStatement
@@ -128,7 +128,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace('\n        ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: docker://continuumio/miniconda3:4.4.10
             PsiElement(Py:SINGLE_QUOTED_STRING)('"docker://continuumio/miniconda3:4.4.10"')
       PsiWhiteSpace('\n\n  ')
       SMKRuleParameterListStatement
@@ -139,7 +139,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyKeywordArgumentImpl: dataset
             PsiElement(Py:IDENTIFIER)('dataset')
             PsiElement(Py:EQ)('=')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: \d+
               PsiElement(Py:SINGLE_QUOTED_STRING)('"\d+"')
       PsiWhiteSpace('\n  ')
       SMKRuleParameterListStatement
@@ -147,7 +147,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace('\n          ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: somecommand --group {wildcards.group}  < {input}  > {output}
             PsiElement(Py:SINGLE_QUOTED_STRING)('"somecommand --group {wildcards.group}  < {input}  > {output}"')
   PsiWhiteSpace('\n\n')
   SMKRule
@@ -162,7 +162,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace('\n      ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: 0.15.3/bio/bwa/mem
             PsiElement(Py:SINGLE_QUOTED_STRING)('"0.15.3/bio/bwa/mem"')
   PsiWhiteSpace('\n\n')
   SMKRule
@@ -177,7 +177,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace('\n      ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: path/to/script.py
             PsiElement(Py:SINGLE_QUOTED_STRING)('"path/to/script.py"')
   PsiWhiteSpace('\n\n')
   SMKRule
@@ -192,5 +192,5 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace('\n        ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: https://github.com/common-workflow-language/workflows/blob/fb406c95/tools/samtools-sort.cwl
             PsiElement(Py:SINGLE_QUOTED_STRING)('"https://github.com/common-workflow-language/workflows/blob/fb406c95/tools/samtools-sort.cwl"')

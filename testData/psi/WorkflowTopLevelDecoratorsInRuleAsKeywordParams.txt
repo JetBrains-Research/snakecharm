@@ -11,7 +11,7 @@ SnakemakeFile: WorkflowTopLevelDecoratorsInRuleAsKeywordParams.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: foo
             PsiElement(Py:SINGLE_QUOTED_STRING)('"foo"')
       PsiWhiteSpace('\n    ')
       SMKRuleParameterListStatement
@@ -24,7 +24,7 @@ SnakemakeFile: WorkflowTopLevelDecoratorsInRuleAsKeywordParams.smk
             PsiWhiteSpace(' ')
             PsiElement(Py:EQ)('=')
             PsiWhiteSpace(' ')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: foo4
               PsiElement(Py:SINGLE_QUOTED_STRING)('"foo4"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n        ')
@@ -33,7 +33,7 @@ SnakemakeFile: WorkflowTopLevelDecoratorsInRuleAsKeywordParams.smk
             PsiWhiteSpace(' ')
             PsiElement(Py:EQ)('=')
             PsiWhiteSpace(' ')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: foo1
               PsiElement(Py:SINGLE_QUOTED_STRING)('"foo1"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n        ')
@@ -42,7 +42,7 @@ SnakemakeFile: WorkflowTopLevelDecoratorsInRuleAsKeywordParams.smk
             PsiWhiteSpace(' ')
             PsiElement(Py:EQ)('=')
             PsiWhiteSpace(' ')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: foo2
               PsiElement(Py:SINGLE_QUOTED_STRING)('"foo2"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n        ')
@@ -51,7 +51,7 @@ SnakemakeFile: WorkflowTopLevelDecoratorsInRuleAsKeywordParams.smk
             PsiWhiteSpace(' ')
             PsiElement(Py:EQ)('=')
             PsiWhiteSpace(' ')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: foo5
               PsiElement(Py:SINGLE_QUOTED_STRING)('"foo5"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n        ')
@@ -60,7 +60,7 @@ SnakemakeFile: WorkflowTopLevelDecoratorsInRuleAsKeywordParams.smk
             PsiWhiteSpace(' ')
             PsiElement(Py:EQ)('=')
             PsiWhiteSpace(' ')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: foo6
               PsiElement(Py:SINGLE_QUOTED_STRING)('"foo6"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n        ')
@@ -69,7 +69,7 @@ SnakemakeFile: WorkflowTopLevelDecoratorsInRuleAsKeywordParams.smk
             PsiWhiteSpace(' ')
             PsiElement(Py:EQ)('=')
             PsiWhiteSpace(' ')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: foo7
               PsiElement(Py:SINGLE_QUOTED_STRING)('"foo7"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n        ')
@@ -78,7 +78,7 @@ SnakemakeFile: WorkflowTopLevelDecoratorsInRuleAsKeywordParams.smk
             PsiWhiteSpace(' ')
             PsiElement(Py:EQ)('=')
             PsiWhiteSpace(' ')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: foo8
               PsiElement(Py:SINGLE_QUOTED_STRING)('"foo8"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n        ')
@@ -87,7 +87,7 @@ SnakemakeFile: WorkflowTopLevelDecoratorsInRuleAsKeywordParams.smk
             PsiWhiteSpace(' ')
             PsiElement(Py:EQ)('=')
             PsiWhiteSpace(' ')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: foo9
               PsiElement(Py:SINGLE_QUOTED_STRING)('"foo9"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n        ')
@@ -96,7 +96,7 @@ SnakemakeFile: WorkflowTopLevelDecoratorsInRuleAsKeywordParams.smk
             PsiWhiteSpace(' ')
             PsiElement(Py:EQ)('=')
             PsiWhiteSpace(' ')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: foo10
               PsiElement(Py:SINGLE_QUOTED_STRING)('"foo10"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n        ')
@@ -105,7 +105,7 @@ SnakemakeFile: WorkflowTopLevelDecoratorsInRuleAsKeywordParams.smk
             PsiWhiteSpace(' ')
             PsiElement(Py:EQ)('=')
             PsiWhiteSpace(' ')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: foo10
               PsiElement(Py:SINGLE_QUOTED_STRING)('"foo10"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n        ')
@@ -114,6 +114,6 @@ SnakemakeFile: WorkflowTopLevelDecoratorsInRuleAsKeywordParams.smk
             PsiWhiteSpace(' ')
             PsiElement(Py:EQ)('=')
             PsiWhiteSpace(' ')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: foo10
               PsiElement(Py:SINGLE_QUOTED_STRING)('"foo10"')
           PsiElement(Py:COMMA)(',')

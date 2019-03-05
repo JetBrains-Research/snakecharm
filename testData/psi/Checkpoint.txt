@@ -13,7 +13,7 @@ SnakemakeFile: Checkpoint.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace('\n        ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: samples/{sample}.txt
             PsiElement(Py:SINGLE_QUOTED_STRING)('"samples/{sample}.txt"')
       PsiWhiteSpace('\n    ')
       SMKRuleParameterListStatement
@@ -21,7 +21,7 @@ SnakemakeFile: Checkpoint.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace('\n        ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: somestep/{sample}.txt
             PsiElement(Py:SINGLE_QUOTED_STRING)('"somestep/{sample}.txt"')
       PsiWhiteSpace('\n    ')
       SMKRuleParameterListStatement
@@ -31,5 +31,5 @@ SnakemakeFile: Checkpoint.smk
           PsiWhiteSpace('\n        ')
           PsiComment(Py:END_OF_LINE_COMMENT)('# simulate some output vale')
           PsiWhiteSpace('\n        ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: echo {wildcards.sample} > somestep/{wildcards.sample}.txt
             PsiElement(Py:SINGLE_QUOTED_STRING)('"echo {wildcards.sample} > somestep/{wildcards.sample}.txt"')

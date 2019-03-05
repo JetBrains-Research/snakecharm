@@ -11,11 +11,11 @@ SnakemakeFile: RuleParamsListArgsMultiple.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace('\n         ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: foo1
             PsiElement(Py:SINGLE_QUOTED_STRING)('"foo1"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n         ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: foo2
             PsiElement(Py:SINGLE_QUOTED_STRING)('"foo2"')
       PsiWhiteSpace('\n    ')
       SMKRuleParameterListStatement
@@ -23,11 +23,11 @@ SnakemakeFile: RuleParamsListArgsMultiple.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: boo1
             PsiElement(Py:SINGLE_QUOTED_STRING)('"boo1"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: boo2
             PsiElement(Py:SINGLE_QUOTED_STRING)('"boo2"')
       PsiWhiteSpace('\n    ')
       SMKRuleParameterListStatement
@@ -35,11 +35,11 @@ SnakemakeFile: RuleParamsListArgsMultiple.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: doo1
             PsiElement(Py:SINGLE_QUOTED_STRING)('"doo1"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n       ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: doo2
             PsiElement(Py:SINGLE_QUOTED_STRING)('"doo2"')
       PsiWhiteSpace('\n    ')
       SMKRuleParameterListStatement
@@ -47,5 +47,5 @@ SnakemakeFile: RuleParamsListArgsMultiple.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: zzzzzz
             PsiElement(Py:SINGLE_QUOTED_STRING)('"zzzzzz"')

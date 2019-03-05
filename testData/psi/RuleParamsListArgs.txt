@@ -11,7 +11,7 @@ SnakemakeFile: RuleParamsListArgs.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace('\n        ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: foo
             PsiElement(Py:SINGLE_QUOTED_STRING)('"foo"')
       PsiWhiteSpace('\n    ')
       SMKRuleParameterListStatement
@@ -19,5 +19,5 @@ SnakemakeFile: RuleParamsListArgs.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: boo
             PsiElement(Py:SINGLE_QUOTED_STRING)('"boo"')

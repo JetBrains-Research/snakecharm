@@ -4,7 +4,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      PyStringLiteralExpression: 
+      PyStringLiteralExpression: config.yaml
         PsiElement(Py:SINGLE_QUOTED_STRING)('"config.yaml"')
   PsiWhiteSpace('\n')
   SMKWorkflowParameterListStatement
@@ -12,7 +12,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      PyStringLiteralExpression: 
+      PyStringLiteralExpression: report/workflow.rst
         PsiElement(Py:SINGLE_QUOTED_STRING)('"report/workflow.rst"')
   PsiWhiteSpace('\n')
   SMKWorkflowParameterListStatement
@@ -20,7 +20,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      PyStringLiteralExpression: 
+      PyStringLiteralExpression: docker://continuumio/miniconda3:4.4.10
         PsiElement(Py:SINGLE_QUOTED_STRING)('"docker://continuumio/miniconda3:4.4.10"')
   PsiWhiteSpace('\n')
   SMKWorkflowParameterListStatement
@@ -28,7 +28,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace('\n    ')
-      PyStringLiteralExpression: 
+      PyStringLiteralExpression: tex.smrules
         PsiElement(Py:SINGLE_QUOTED_STRING)(''tex.smrules'')
   PsiWhiteSpace('\n')
   SMKWorkflowParameterListStatement
@@ -36,7 +36,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      PyStringLiteralExpression: 
+      PyStringLiteralExpression: path/to/workdir
         PsiElement(Py:SINGLE_QUOTED_STRING)('"path/to/workdir"')
   PsiWhiteSpace('\n')
   SMKWorkflowParameterListStatement
@@ -47,7 +47,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
       PyKeywordArgumentImpl: dataset
         PsiElement(Py:IDENTIFIER)('dataset')
         PsiElement(Py:EQ)('=')
-        PyStringLiteralExpression: 
+        PyStringLiteralExpression: \d+
           PsiElement(Py:SINGLE_QUOTED_STRING)('"\d+"')
   PsiWhiteSpace('\n\n')
   PyFunction('foo')
@@ -65,7 +65,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: config.yaml
             PsiElement(Py:SINGLE_QUOTED_STRING)('"config.yaml"')
       PsiWhiteSpace('\n    ')
       SMKWorkflowParameterListStatement
@@ -73,5 +73,5 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: path/to/other.snakefile
             PsiElement(Py:SINGLE_QUOTED_STRING)('"path/to/other.snakefile"')

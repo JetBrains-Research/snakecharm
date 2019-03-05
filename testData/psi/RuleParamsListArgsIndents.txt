@@ -11,31 +11,31 @@ SnakemakeFile: RuleParamsListArgsIndents.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: zoo1
             PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo1"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n           ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: zoo2
             PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo2"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n              ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: zoo3
             PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo3"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n                  ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: zoo4
             PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo4"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n           ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: zoo5
             PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo5"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n             ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: zoo6
             PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo6"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n           ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: zoo7
             PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo7"')
       PsiWhiteSpace('\n\n    ')
       SMKRuleParameterListStatement
@@ -43,15 +43,15 @@ SnakemakeFile: RuleParamsListArgsIndents.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: foo1
             PsiElement(Py:SINGLE_QUOTED_STRING)('"foo1"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n      ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: foo2
             PsiElement(Py:SINGLE_QUOTED_STRING)('"foo2"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n        ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: foo3
             PsiElement(Py:SINGLE_QUOTED_STRING)('"foo3"')
       PsiWhiteSpace('\n\n    ')
       SMKRuleParameterListStatement
@@ -59,13 +59,13 @@ SnakemakeFile: RuleParamsListArgsIndents.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: boo1
             PsiElement(Py:SINGLE_QUOTED_STRING)('"boo1"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n      ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: boo2
             PsiElement(Py:SINGLE_QUOTED_STRING)('"boo2"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n        ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: boo3
             PsiElement(Py:SINGLE_QUOTED_STRING)('"boo3"')

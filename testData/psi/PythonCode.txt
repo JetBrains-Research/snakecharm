@@ -37,5 +37,5 @@ SnakemakeFile: PythonCode.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:EQ)('=')
     PsiWhiteSpace(' ')
-    PyStringLiteralExpression: 
+    PyStringLiteralExpression: hg19.gtf
       PsiElement(Py:SINGLE_QUOTED_STRING)(''hg19.gtf'')

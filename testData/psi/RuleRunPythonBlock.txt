@@ -27,7 +27,7 @@ SnakemakeFile: RuleRunPythonBlock.smk
                     PsiElement(Py:IDENTIFIER)('txt')
                   PsiElement(Py:COMMA)(',')
                   PsiWhiteSpace(' ')
-                  PyStringLiteralExpression: 
+                  PyStringLiteralExpression: w
                     PsiElement(Py:SINGLE_QUOTED_STRING)(''w'')
                   PsiElement(Py:RPAR)(')')
               PsiWhiteSpace(' ')
@@ -54,6 +54,7 @@ SnakemakeFile: RuleRunPythonBlock.smk
                       PsiElement(Py:IDENTIFIER)('sep')
                       PsiElement(Py:EQ)('=')
                       PyStringLiteralExpression: 
+
                         PsiElement(Py:SINGLE_QUOTED_STRING)('"\n"')
                     PsiElement(Py:COMMA)(',')
                     PsiWhiteSpace(' ')
@@ -85,7 +86,7 @@ SnakemakeFile: RuleRunPythonBlock.smk
                 PsiElement(Py:IDENTIFIER)('foo')
               PyArgumentList
                 PsiElement(Py:LPAR)('(')
-                PyStringLiteralExpression: 
+                PyStringLiteralExpression: foo
                   PsiElement(Py:SINGLE_QUOTED_STRING)('"foo"')
                 PsiElement(Py:COMMA)(',')
                 PsiWhiteSpace(' ')
@@ -105,12 +106,12 @@ SnakemakeFile: RuleRunPythonBlock.smk
                 PsiElement(Py:IDENTIFIER)('foo')
               PyArgumentList
                 PsiElement(Py:LPAR)('(')
-                PyStringLiteralExpression: 
+                PyStringLiteralExpression: foodooo
                   PsiElement(Py:SINGLE_QUOTED_STRING)('"foo"')
                   PsiWhiteSpace('\n              ')
                   PsiElement(Py:SINGLE_QUOTED_STRING)('"dooo"')
                 PsiElement(Py:COMMA)(',')
                 PsiWhiteSpace('\n              ')
-                PyStringLiteralExpression: 
+                PyStringLiteralExpression: sss
                   PsiElement(Py:SINGLE_QUOTED_STRING)('"sss"')
                 PsiElement(Py:RPAR)(')')

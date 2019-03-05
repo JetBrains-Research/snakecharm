@@ -10,7 +10,7 @@ SnakemakeFile: RuleInvalidParam.smk
           <empty list>
         PsiWhiteSpace(' ')
         PyArgumentList
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: foo1
             PsiElement(Py:SINGLE_QUOTED_STRING)(''foo1'')
   PsiWhiteSpace('\n\n')
   SMKRule
@@ -24,7 +24,7 @@ SnakemakeFile: RuleInvalidParam.smk
   PsiElement(Py:COLON)(':')
   PsiWhiteSpace(' ')
   PyExpressionStatement
-    PyStringLiteralExpression: 
+    PyStringLiteralExpression: foo2
       PsiElement(Py:SINGLE_QUOTED_STRING)(''foo2'')
   PsiErrorElement:Statement expected, found Py:DEDENT
     <empty list>

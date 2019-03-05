@@ -17,5 +17,5 @@ SnakemakeFile: RuleInvalidNoParamBody.smk
     <empty list>
   PsiWhiteSpace(' ')
   PyExpressionStatement
-    PyStringLiteralExpression: 
+    PyStringLiteralExpression: foo
       PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')

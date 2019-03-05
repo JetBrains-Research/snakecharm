@@ -10,7 +10,7 @@ SnakemakeFile: RuleUnexpKeyword.smk
   PsiElement(Py:COLON)(':')
   PsiWhiteSpace(' ')
   PyExpressionStatement
-    PyStringLiteralExpression: 
+    PyStringLiteralExpression: foo
       PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')
   PsiErrorElement:Statement expected, found Py:DEDENT
     <empty list>
@@ -27,5 +27,5 @@ SnakemakeFile: RuleUnexpKeyword.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: foo
             PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')

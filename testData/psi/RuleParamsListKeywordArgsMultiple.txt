@@ -14,14 +14,14 @@ SnakemakeFile: RuleParamsListKeywordArgsMultiple.smk
           PyKeywordArgumentImpl: int1
             PsiElement(Py:IDENTIFIER)('int1')
             PsiElement(Py:EQ)('=')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: i1.bam
               PsiElement(Py:SINGLE_QUOTED_STRING)('"i1.bam"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n        ')
           PyKeywordArgumentImpl: int2
             PsiElement(Py:IDENTIFIER)('int2')
             PsiElement(Py:EQ)('=')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: i2.bam
               PsiElement(Py:SINGLE_QUOTED_STRING)('"i2.bam"')
       PsiWhiteSpace('\n    ')
       SMKRuleParameterListStatement
@@ -32,14 +32,14 @@ SnakemakeFile: RuleParamsListKeywordArgsMultiple.smk
           PyKeywordArgumentImpl: out1
             PsiElement(Py:IDENTIFIER)('out1')
             PsiElement(Py:EQ)('=')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: out1.bam
               PsiElement(Py:SINGLE_QUOTED_STRING)('"out1.bam"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace(' ')
           PyKeywordArgumentImpl: out2
             PsiElement(Py:IDENTIFIER)('out2')
             PsiElement(Py:EQ)('=')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: out2.bam
               PsiElement(Py:SINGLE_QUOTED_STRING)('"out2.bam"')
       PsiWhiteSpace('\n    ')
       SMKRuleParameterListStatement
@@ -50,12 +50,12 @@ SnakemakeFile: RuleParamsListKeywordArgsMultiple.smk
           PyKeywordArgumentImpl: out1
             PsiElement(Py:IDENTIFIER)('out1')
             PsiElement(Py:EQ)('=')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: out1.bam
               PsiElement(Py:SINGLE_QUOTED_STRING)('"out1.bam"')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace('\n        ')
           PyKeywordArgumentImpl: out2
             PsiElement(Py:IDENTIFIER)('out2')
             PsiElement(Py:EQ)('=')
-            PyStringLiteralExpression: 
+            PyStringLiteralExpression: out2.bam
               PsiElement(Py:SINGLE_QUOTED_STRING)('"out2.bam"')

@@ -11,7 +11,7 @@ SnakemakeFile: RuleMultiple.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: foo
             PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')
   PsiWhiteSpace('\n\n')
   SMKRule
@@ -26,5 +26,5 @@ SnakemakeFile: RuleMultiple.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: doo
             PsiElement(Py:SINGLE_QUOTED_STRING)(''doo'')

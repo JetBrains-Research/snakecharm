@@ -9,5 +9,5 @@ SnakemakeFile: RuleNoName.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: 
+          PyStringLiteralExpression: foo
             PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')
