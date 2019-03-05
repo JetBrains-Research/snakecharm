@@ -11,10 +11,7 @@ import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor
-import org.junit.*
-import org.junit.rules.TestName
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import org.junit.Assume
 
 
 /**
@@ -22,29 +19,17 @@ import org.junit.runners.JUnit4
  * @date 2018-12-31
  *
  */
-@RunWith(JUnit4::class)
 class SnakemakeParsingTest : ParsingTestCase(
         "psi", "smk", SnakemakeParserDefinition(), PythonParserDefinition()
 ) {
     private var myLanguageLevel = LanguageLevel.getDefault()
-    @Rule
-    @JvmField
-    var currentTestName = TestName()
 
-    override fun getName() = currentTestName.methodName.capitalize()
-
-    @Before
-    public override fun setUp() {
+    override fun setUp() {
         super.setUp()
         registerExtensionPoint(PythonDialectsTokenSetContributor.EP_NAME, PythonDialectsTokenSetContributor::class.java)
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SnakemakeTokenSetContributor())
         PythonDialectsTokenSetProvider.reset()
-    }
-    
-    @After
-    public override fun tearDown() {
-        super.tearDown()
     }
 
     override fun getTestDataPath() = SnakemakeTestUtil.getTestDataPath().toString()
@@ -55,177 +40,155 @@ class SnakemakeParsingTest : ParsingTestCase(
         return file
     }
 
-    @Test 
-    fun pythonCode() {
+    fun testPythonCode() {
         doTest()
     }
 
-    @Test 
-    fun rule() {
+    fun testRule() {
         doTest()
     }
 
-    @Test 
-    fun ruleInPythonBlock() {
+    fun testRuleInPythonBlock() {
         doTest()
     }
 
-    @Test 
-    fun checkpoint() {
+    fun testCheckpoint() {
         doTest()
     }
 
-    @Test 
-    fun ruleNoName() {
+    fun testRuleNoName() {
         doTest()
     }
 
-    @Test 
-    fun ruleMultiple() {
+    fun testRuleMultiple() {
         doTest()
     }
 
-    @Test 
-    fun ruleMultipleSingleLine() {
+    fun testRuleMultipleSingleLine() {
         doTest()
     }
 
-    @Test 
-    fun ruleParams() {
+    fun testRuleParams() {
         doTest()
     }
 
-    @Test 
-    fun ruleInvalid() {
+    fun testRuleInvalid() {
         doTest()
     }
 
 
-    @Test 
-    fun ruleInvalidNoParamBody() {
+    fun testRuleInvalidNoParamBody() {
         doTest()
     }
 
-    @Test 
-    fun ruleInvalidNoParamBodyEof() {
+    fun testRuleInvalidNoParamBodyEof() {
         doTest()
     }
 
-    @Test 
-    fun ruleInvalidParam() {
+    fun testRuleInvalidParam() {
         doTest()
     }
 
-    @Test 
-    fun ruleMultipleSingleLineNoBreak() {
+    fun testRuleMultipleSingleLineNoBreak() {
         doTest()
     }
 
-    @Test 
-    fun ruleUnexpKeyword() {
+    fun testRuleUnexpKeyword() {
         doTest()
     }
 
-    @Test 
-    fun ruleParamsListArgs() {
+    fun testRuleParamsListArgs() {
         doTest()
     }
 
-    @Test 
-    fun ruleParamsListArgsKeywords() {
+    fun testRuleParamsListArgsKeywords() {
         doTest()
     }
 
-    @Ignore(value = "See issue https://github.com/JetBrains-Research/snakecharm/issues/16")
-    @Test 
-    fun ruleParamsListArgsStringMultiline() {
+    fun testRuleParamsListArgsStringMultiline() {
+        Assume.assumeFalse(
+                "Not Implemented Yet, see: See issue" +
+                        " https://github.com/JetBrains-Research/snakecharm/issues/16",
+                true
+        )
         doTest()
     }
 
-    @Test 
-    fun ruleParamsListArgsHangingComma() {
+    fun testRuleParamsListArgsHangingComma() {
         doTest()
     }
 
-    @Test 
-    fun ruleParamsListArgsMultiple() {
+    fun testRuleParamsListArgsMultiple() {
         doTest()
     }
 
-    @Test 
-    fun ruleParamsListArgsIndents() {
+    fun testRuleParamsListArgsIndents() {
         doTest()
     }
 
-    @Test 
-    fun ruleParamsListKeywordArgs() {
+    fun testRuleParamsListKeywordArgs() {
         doTest()
     }
 
-    @Test 
-    fun ruleParamsListKeywordArgsMultiple() {
+    fun testRuleParamsListKeywordArgsMultiple() {
         doTest()
     }
 
-    @Test
-    fun ruleRun() {
+    fun testRuleRun() {
         doTest()
     }
 
-    @Test 
-    fun ruleRunPythonBlock() {
+    fun testRuleRunPythonBlock() {
         doTest()
     }
 
-    @Test
-    fun workflowParamsListArgsKeywords() {
+    fun testWorkflowParamsListArgsKeywords() {
         doTest()
     }
 
-    @Test
-    fun workflowParamsListArgsKeywordsInRule() {
+    fun testWorkflowParamsListArgsKeywordsInRule() {
         doTest()
     }
 
-    @Test
-    fun workflowTopLevelDecoratorsInRuleAsKeywordParams() {
+    fun testWorkflowTopLevelDecoratorsInRuleAsKeywordParams() {
         doTest()
     }
 
-    @Test
-    fun workflowPythonCodeBlockKeywords() {
+    fun testWorkflowPythonCodeBlockKeywords() {
         doTest()
     }
 
-    @Test
-    @Ignore(value = "See https://github.com/JetBrains-Research/snakecharm/issues/30")
-    fun workflowRuleReorder() {
+    fun testWorkflowRuleReorder() {
+        Assume.assumeFalse(
+                "Not Implemented Yet, see: See issue" +
+                        " https://github.com/JetBrains-Research/snakecharm/issues/30",
+                true
+        )
         doTest()
     }
 
-    @Test
-    fun workflowRuleReorderHangingSeparator() {
+    fun testWorkflowRuleReorderHangingSeparator() {
         doTest()
     }
 
-    @Test
-    fun workflowRuleReorderInvalid() {
+    fun testWorkflowRuleReorderInvalid() {
         doTest()
     }
 
-    @Test
-    @Ignore(value = "See https://github.com/JetBrains-Research/snakecharm/issues/30")
-    fun workflowLocalrules() {
+    fun testWorkflowLocalrules() {
+        Assume.assumeFalse(
+                "Not Implemented Yet, see: See issue" +
+                        " https://github.com/JetBrains-Research/snakecharm/issues/30",
+                true
+        )
         doTest()
     }
 
-    @Test
-    fun workflowLocalrulesInvalid() {
+    fun testWorkflowLocalrulesInvalid() {
         doTest()
     }
 
-    @Test
-    fun workflowLocalrulesHangingComma() {
+    fun testWorkflowLocalrulesHangingComma() {
         doTest()
     }
 
