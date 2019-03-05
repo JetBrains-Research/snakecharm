@@ -64,9 +64,17 @@ compileTestKotlin { kotlinOptions.jvmTarget = sourceCompatibility }
 
 repositories {
     mavenCentral()
+    if (hasPyCharm) {
+        flatDir {
+            dirs "$pycharmPath/lib"
+        }
+    }
 }
 
 dependencies {
+    if (hasPyCharm) {
+        compileOnly name: 'pycharm'
+    }
     compile "org.jetbrains.kotlin:kotlin-stdlib"
     compile 'log4j:log4j:1.2.17'
 
