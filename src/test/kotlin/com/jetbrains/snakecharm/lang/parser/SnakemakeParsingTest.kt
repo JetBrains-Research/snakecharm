@@ -1,14 +1,14 @@
 package com.jetbrains.snakecharm.lang.parser
 
+import com.intellij.lang.ASTFactory
+import com.intellij.lang.LanguageASTFactory
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.ParsingTestCase
-import com.jetbrains.python.PythonDialectsTokenSetContributor
-import com.jetbrains.python.PythonDialectsTokenSetProvider
-import com.jetbrains.python.PythonParserDefinition
-import com.jetbrains.python.PythonTokenSetContributor
+import com.jetbrains.python.*
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFunction
+import com.jetbrains.python.psi.impl.PythonASTFactory
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor
 
@@ -28,6 +28,7 @@ class SnakemakeParsingTest : ParsingTestCase(
         registerExtensionPoint(PythonDialectsTokenSetContributor.EP_NAME, PythonDialectsTokenSetContributor::class.java)
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SnakemakeTokenSetContributor())
+        addExplicitExtension<ASTFactory>(LanguageASTFactory.INSTANCE, PythonLanguage.getInstance(), PythonASTFactory())
         PythonDialectsTokenSetProvider.reset()
     }
 
