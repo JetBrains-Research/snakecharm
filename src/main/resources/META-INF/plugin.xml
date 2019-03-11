@@ -41,5 +41,6 @@
 
   <extensions defaultExtensionNs="Pythonid">
     <dialectsTokenSetContributor implementation="com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor"/>
+    <pyReferenceResolveProvider implementation="com.jetbrains.snakecharm.lang.psi.resolve.SnakemakeReferenceResolveProvider"/>
   </extensions>
 </idea-plugin>
