@@ -1,4 +1,4 @@
 DATASETS = []
 
 rule all:
-  input: expand<ref>("{dataset}/file.A.txt", dataset=DATASETS)
+  input: exp<ref>and("{dataset}/file.A.txt", dataset=DATASETS)
