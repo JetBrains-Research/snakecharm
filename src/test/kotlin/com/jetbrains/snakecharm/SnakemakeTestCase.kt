@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm
 
+import com.intellij.lang.java.parser.JavaParserUtil.setLanguageLevel
 import com.intellij.openapi.roots.impl.FilePropertyPusher
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
@@ -8,14 +9,14 @@ import com.intellij.testFramework.fixtures.TempDirTestFixture
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
-import com.jetbrains.python.psi.impl.PythonLanguageLevelPusher
+import com.jetbrains.python.psi.LanguageLevel
 
 /**
  * @author Roman.Chernyatchik
  * @date 2019-02-03
  */
 abstract class SnakemakeTestCase : UsefulTestCase() {
-    // TODO: could be extend PyTestCase here?
+    // TODO: could be extend SnakemakeTestCase here?
 
     private val PYTHON_2_MOCK_SDK = "2.7"
     private val PYTHON_3_MOCK_SDK = "3.7"
@@ -65,5 +66,18 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
      */
     protected fun createTempDirFixture(): TempDirTestFixture {
         return LightTempDirTestFixtureImpl(true) // "tmp://" dir by default
+    }
+
+    protected fun setLanguageLevel(languageLevel: LanguageLevel?) {
+        PythonLanguageLevelPusher.setForcedLanguageLevel(fixture!!.project, languageLevel)
+    }
+
+    protected fun runWithLanguageLevel(languageLevel: LanguageLevel, runnable: Runnable) {
+        setLanguageLevel(languageLevel)
+        try {
+            runnable.run()
+        } finally {
+            setLanguageLevel(null)
+        }
     }
 }
