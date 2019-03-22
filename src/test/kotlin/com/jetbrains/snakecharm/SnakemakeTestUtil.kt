@@ -23,7 +23,7 @@ object SnakemakeTestUtil {
         )
         return when (rootPath) {
             null -> null
-            else -> File(rootPath).toPath().parent.parent.parent.parent
+            else -> File(rootPath).toPath().parent.parent.parent
         }
     }
 }
