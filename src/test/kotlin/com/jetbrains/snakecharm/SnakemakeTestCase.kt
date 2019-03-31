@@ -10,6 +10,7 @@ import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.psi.LanguageLevel
+import com.jetbrains.python.psi.impl.PythonLanguageLevelPusher
 
 /**
  * @author Roman.Chernyatchik
