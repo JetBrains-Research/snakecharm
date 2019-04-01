@@ -1,5 +1,5 @@
-__author__ = "Johannes KÃ¶ster"
-__copyright__ = "Copyright 2015, Johannes KÃ¶ster"
+__author__ = "Johannes Köster"
+__copyright__ = "Copyright 2015, Johannes Köster"
 __email__ = "koester@jimmy.harvard.edu"
 __license__ = "MIT"
 
@@ -301,8 +301,8 @@ def snakemake(snakefile,
     use_threads = force_use_threads or (os.name != "posix") or cluster or cluster_sync or drmaa
     if not keep_logger:
         stdout = (
-                (dryrun and not (printdag or printd3dag or printrulegraph)) or
-                listrules or list_target_rules or list_resources
+            (dryrun and not (printdag or printd3dag or printrulegraph)) or
+            listrules or list_target_rules or list_resources
         )
         setup_logger(handler=log_handler,
                      quiet=quiet,
@@ -373,28 +373,28 @@ def snakemake(snakefile,
                                     "be used as default provider.")
 
         workflow = Workflow(snakefile=snakefile,
-                            jobscript=jobscript,
-                            overwrite_shellcmd=overwrite_shellcmd,
-                            overwrite_config=overwrite_config,
-                            overwrite_workdir=workdir,
-                            overwrite_configfile=configfile,
-                            overwrite_clusterconfig=cluster_config_content,
-                            config_args=config_args,
-                            debug=debug,
-                            use_conda=use_conda or list_conda_envs or cleanup_conda,
-                            use_singularity=use_singularity,
-                            conda_prefix=conda_prefix,
-                            singularity_prefix=singularity_prefix,
-                            shadow_prefix=shadow_prefix,
-                            singularity_args=singularity_args,
-                            mode=mode,
-                            wrapper_prefix=wrapper_prefix,
-                            printshellcmds=printshellcmds,
-                            restart_times=restart_times,
-                            attempt=attempt,
-                            default_remote_provider=_default_remote_provider,
-                            default_remote_prefix=default_remote_prefix,
-                            run_local=run_local)
+                        jobscript=jobscript,
+                        overwrite_shellcmd=overwrite_shellcmd,
+                        overwrite_config=overwrite_config,
+                        overwrite_workdir=workdir,
+                        overwrite_configfile=configfile,
+                        overwrite_clusterconfig=cluster_config_content,
+                        config_args=config_args,
+                        debug=debug,
+                        use_conda=use_conda or list_conda_envs or cleanup_conda,
+                        use_singularity=use_singularity,
+                        conda_prefix=conda_prefix,
+                        singularity_prefix=singularity_prefix,
+                        shadow_prefix=shadow_prefix,
+                        singularity_args=singularity_args,
+                        mode=mode,
+                        wrapper_prefix=wrapper_prefix,
+                        printshellcmds=printshellcmds,
+                        restart_times=restart_times,
+                        attempt=attempt,
+                        default_remote_provider=_default_remote_provider,
+                        default_remote_prefix=default_remote_prefix,
+                        run_local=run_local)
         success = True
         workflow.include(snakefile,
                          overwrite_first_rule=True,
@@ -679,32 +679,32 @@ def get_argument_parser(profile=None):
                   "Profile has to be given as either absolute path, relative "
                   "path or name of a directory available in either "
                   "{site} or {user}.".format(
-                site=dirs.site_config_dir,
-                user=dirs.user_config_dir), file=sys.stderr)
+                      site=dirs.site_config_dir,
+                      user=dirs.user_config_dir), file=sys.stderr)
             exit(1)
         config_files = [config_file]
 
     parser = configargparse.ArgumentParser(
         description="Snakemake is a Python based language and execution "
-                    "environment for GNU Make-like workflows.",
+        "environment for GNU Make-like workflows.",
         default_config_files=config_files,
         config_file_parser_class=YAMLConfigFileParser)
 
     group_exec = parser.add_argument_group("EXECUTION")
 
     group_exec.add_argument("target",
-                            nargs="*",
-                            default=None,
-                            help="Targets to build. May be rules or files.")
+                        nargs="*",
+                        default=None,
+                        help="Targets to build. May be rules or files.")
 
     group_exec.add_argument("--dryrun", "-n",
-                            action="store_true",
-                            help="Do not execute anything, and display what would be done. "
-                                 "If you have a very large workflow, use --dryrun --quiet to just "
-                                 "print a summary of the DAG of jobs.")
+                        action="store_true",
+                        help="Do not execute anything, and display what would be done. "
+                             "If you have a very large workflow, use --dryrun --quiet to just "
+                             "print a summary of the DAG of jobs.")
 
     group_exec.add_argument("--profile",
-                            help="""
+                        help="""
                         Name of profile to use for configuring
                         Snakemake. Snakemake will search for a corresponding
                         folder in {} and {}. Alternatively, this can be an
@@ -719,9 +719,9 @@ def get_argument_parser(profile=None):
                                    dirs.user_config_dir))
 
     group_exec.add_argument("--snakefile", "-s",
-                            metavar="FILE",
-                            default="Snakefile",
-                            help="The workflow definition in a snakefile.")
+                        metavar="FILE",
+                        default="Snakefile",
+                        help="The workflow definition in a snakefile.")
     group_exec.add_argument(
         "--cores", "--jobs", "-j",
         action="store",
@@ -769,10 +769,10 @@ def get_argument_parser(profile=None):
          "Values specified in JSON or YAML format are available in the global config "
          "dictionary inside the workflow."))
     group_exec.add_argument("--directory", "-d",
-                            metavar="DIR",
-                            action="store",
-                            help=("Specify working directory (relative paths in "
-                                  "the snakefile will use this as their origin)."))
+                        metavar="DIR",
+                        action="store",
+                        help=("Specify working directory (relative paths in "
+                              "the snakefile will use this as their origin)."))
     group_exec.add_argument(
         "--touch", "-t",
         action="store_true",
@@ -782,8 +782,8 @@ def get_argument_parser(profile=None):
               "fool future invocations of snakemake. Fails if a file does "
               "not yet exist."))
     group_exec.add_argument("--keep-going", "-k",
-                            action="store_true",
-                            help="Go on with independent jobs if a job fails.")
+                        action="store_true",
+                        help="Go on with independent jobs if a job fails.")
     group_exec.add_argument(
         "--force", "-f",
         action="store_true",
@@ -827,106 +827,109 @@ def get_argument_parser(profile=None):
         "--rerun-incomplete", "--ri",
         action="store_true",
         help=("Re-run all "
-              "jobs the output of which is recognized as incomplete."))
+                "jobs the output of which is recognized as incomplete."))
     group_exec.add_argument(
         "--shadow-prefix",
         metavar="DIR",
         help=("Specify a directory in which the 'shadow' directory is created. "
-              "If not supplied, the value is set to the '.snakemake' directory relative "
-              "to the working directory."))
+                "If not supplied, the value is set to the '.snakemake' directory relative "
+                "to the working directory."))
 
     group_utils = parser.add_argument_group("UTILITIES")
 
     group_utils.add_argument("--report",
-                             metavar="HTMLFILE",
-                             help="Create an HTML report with results and statistics.")
+                        nargs="?",
+                        const="report.html",
+                        metavar="HTMLFILE",
+                        help="Create an HTML report with results and statistics. "
+                             "If no filename is given, report.html is the default.")
     group_utils.add_argument("--export-cwl",
-                             action="store",
-                             metavar="FILE",
-                             help="Compile workflow to CWL and store it in given FILE.")
+                        action="store",
+                        metavar="FILE",
+                        help="Compile workflow to CWL and store it in given FILE.")
     group_utils.add_argument("--list", "-l",
-                             action="store_true",
-                             help="Show available rules in given Snakefile.")
+                        action="store_true",
+                        help="Show available rules in given Snakefile.")
     group_utils.add_argument("--list-target-rules", "--lt",
-                             action="store_true",
-                             help="Show available target rules in given Snakefile.")
+                        action="store_true",
+                        help="Show available target rules in given Snakefile.")
     group_utils.add_argument(
         "--dag",
         action="store_true",
         help="Do not execute anything and print the directed "
-             "acyclic graph of jobs in the dot language. Recommended "
-             "use on Unix systems: snakemake --dag | dot | display")
+        "acyclic graph of jobs in the dot language. Recommended "
+        "use on Unix systems: snakemake --dag | dot | display")
     group_utils.add_argument(
         "--rulegraph",
         action="store_true",
         help="Do not execute anything and print the dependency graph "
-             "of rules in the dot language. This will be less "
-             "crowded than above DAG of jobs, but also show less information. "
-             "Note that each rule is displayed once, hence the displayed graph will be "
-             "cyclic if a rule appears in several steps of the workflow. "
-             "Use this if above option leads to a DAG that is too large. "
-             "Recommended use on Unix systems: snakemake --rulegraph | dot | display")
+        "of rules in the dot language. This will be less "
+        "crowded than above DAG of jobs, but also show less information. "
+        "Note that each rule is displayed once, hence the displayed graph will be "
+        "cyclic if a rule appears in several steps of the workflow. "
+        "Use this if above option leads to a DAG that is too large. "
+        "Recommended use on Unix systems: snakemake --rulegraph | dot | display")
     group_utils.add_argument("--d3dag",
-                             action="store_true",
-                             help="Print the DAG in D3.js compatible JSON format.")
+                        action="store_true",
+                        help="Print the DAG in D3.js compatible JSON format.")
     group_utils.add_argument(
         "--summary", "-S",
         action="store_true",
         help="Print a summary of all files created by the workflow. The "
-             "has the following columns: filename, modification time, "
-             "rule version, status, plan.\n"
-             "Thereby rule version contains the version"
-             "the file was created with (see the version keyword of rules), and "
-             "status denotes whether the file is missing, its input files are "
-             "newer or if version or implementation of the rule changed since "
-             "file creation. Finally the last column denotes whether the file "
-             "will be updated or created during the next workflow execution.")
+        "has the following columns: filename, modification time, "
+        "rule version, status, plan.\n"
+        "Thereby rule version contains the version"
+        "the file was created with (see the version keyword of rules), and "
+        "status denotes whether the file is missing, its input files are "
+        "newer or if version or implementation of the rule changed since "
+        "file creation. Finally the last column denotes whether the file "
+        "will be updated or created during the next workflow execution.")
     group_utils.add_argument(
         "--detailed-summary", "-D",
         action="store_true",
         help="Print a summary of all files created by the workflow. The "
-             "has the following columns: filename, modification time, "
-             "rule version, input file(s), shell command, status, plan.\n"
-             "Thereby rule version contains the version"
-             "the file was created with (see the version keyword of rules), and "
-             "status denotes whether the file is missing, its input files are "
-             "newer or if version or implementation of the rule changed since "
-             "file creation. The input file and shell command columns are self"
-             "explanatory. Finally the last column denotes whether the file "
-             "will be updated or created during the next workflow execution.")
+        "has the following columns: filename, modification time, "
+        "rule version, input file(s), shell command, status, plan.\n"
+        "Thereby rule version contains the version"
+        "the file was created with (see the version keyword of rules), and "
+        "status denotes whether the file is missing, its input files are "
+        "newer or if version or implementation of the rule changed since "
+        "file creation. The input file and shell command columns are self"
+        "explanatory. Finally the last column denotes whether the file "
+        "will be updated or created during the next workflow execution.")
     group_utils.add_argument(
         "--archive",
         metavar="FILE",
         help="Archive the workflow into the given tar archive FILE. The archive "
-             "will be created such that the workflow can be re-executed on a vanilla "
-             "system. The function needs conda and git to be installed. "
-             "It will archive every file that is under git version control. "
-             "Note that it is best practice to have the Snakefile, config files, and "
-             "scripts under version control. Hence, they will be included in the archive. "
-             "Further, it will add input files that are not generated by "
-             "by the workflow itself and conda environments. Note that symlinks are "
-             "dereferenced. Supported "
-             "formats are .tar, .tar.gz, .tar.bz2 and .tar.xz."
+        "will be created such that the workflow can be re-executed on a vanilla "
+        "system. The function needs conda and git to be installed. "
+        "It will archive every file that is under git version control. "
+        "Note that it is best practice to have the Snakefile, config files, and "
+        "scripts under version control. Hence, they will be included in the archive. "
+        "Further, it will add input files that are not generated by "
+        "by the workflow itself and conda environments. Note that symlinks are "
+        "dereferenced. Supported "
+        "formats are .tar, .tar.gz, .tar.bz2 and .tar.xz."
     )
     group_utils.add_argument(
         "--cleanup-metadata", "--cm",
         nargs="+",
         metavar="FILE",
         help="Cleanup the metadata "
-             "of given files. That means that snakemake removes any tracked "
-             "version info, and any marks that files are incomplete.")
+        "of given files. That means that snakemake removes any tracked "
+        "version info, and any marks that files are incomplete.")
     group_utils.add_argument(
         "--cleanup-shadow", action="store_true",
         help="Cleanup old shadow directories which have not been deleted due "
              "to failures or power loss.")
     group_utils.add_argument("--unlock",
-                             action="store_true",
-                             help="Remove a lock on the working directory.")
+                     action="store_true",
+                     help="Remove a lock on the working directory.")
     group_utils.add_argument(
         "--list-version-changes", "--lv",
         action="store_true",
         help="List all output files that have been created with "
-             "a different version (as determined by the version keyword).")
+        "a different version (as determined by the version keyword).")
     group_utils.add_argument(
         "--list-code-changes", "--lc",
         action="store_true",
@@ -945,44 +948,43 @@ def get_argument_parser(profile=None):
         "--list-params-changes", "--lp",
         action="store_true",
         help="List all output files for which the defined params have changed "
-             "in the Snakefile.")
+        "in the Snakefile.")
     group_utils.add_argument(
         "--list-untracked", "--lu",
         action="store_true",
         help="List all files in the working directory that are not used in the  "
-             "workflow. This can be used e.g. for identifying leftover files. Hidden files "
-             "and directories are ignored.")
+        "workflow. This can be used e.g. for identifying leftover files. Hidden files "
+        "and directories are ignored.")
     group_utils.add_argument(
         "--delete-all-output",
         action="store_true",
         help="Remove all files generated by the workflow. Use together with --dryrun "
-             "to list files without actually deleting anything. Note that this will "
-             "not recurse into subworkflows. It will also remove files flagged as "
-             "protected. Use with care!"
+        "to list files without actually deleting anything. Note that this will "
+        "not recurse into subworkflows. Write-protected files are not removed. "
+        "Nevertheless, use with care!"
     )
     group_utils.add_argument(
         "--delete-temp-output",
         action="store_true",
         help="Remove all temporary files generated by the workflow. Use together "
-             "with --dryrun to list files without actually deleting anything. Note "
-             "that this will not recurse into subworkflows. It will also remove files "
-             "flagged as protected. Use with care!"
+        "with --dryrun to list files without actually deleting anything. Note "
+        "that this will not recurse into subworkflows."
     )
     group_utils.add_argument(
         "--bash-completion",
         action="store_true",
         help="Output code to register bash completion for snakemake. Put the "
-             "following in your .bashrc (including the accents): "
-             "`snakemake --bash-completion` or issue it in an open terminal "
-             "session.")
+        "following in your .bashrc (including the accents): "
+        "`snakemake --bash-completion` or issue it in an open terminal "
+        "session.")
     group_utils.add_argument("--version", "-v",
-                             action="version",
-                             version=__version__)
+                        action="version",
+                        version=__version__)
 
     group_output = parser.add_argument_group("OUTPUT")
     group_output.add_argument("--reason", "-r",
-                              action="store_true",
-                              help="Print the reason for each executed rule.")
+                        action="store_true",
+                        help="Print the reason for each executed rule.")
     group_output.add_argument(
         "--gui",
         nargs="?",
@@ -990,12 +992,12 @@ def get_argument_parser(profile=None):
         metavar="PORT",
         type=str,
         help="Serve an HTML based user interface to the given network and "
-             "port e.g. 168.129.10.15:8000. By default Snakemake is only "
-             "available in the local network (default port: 8000). To make "
-             "Snakemake listen to all ip addresses add the special host address "
-             "0.0.0.0 to the url (0.0.0.0:8000). This is important if Snakemake "
-             "is used in a virtualised environment like Docker. If possible, a "
-             "browser window is opened.")
+        "port e.g. 168.129.10.15:8000. By default Snakemake is only "
+        "available in the local network (default port: 8000). To make "
+        "Snakemake listen to all ip addresses add the special host address "
+        "0.0.0.0 to the url (0.0.0.0:8000). This is important if Snakemake "
+        "is used in a virtualised environment like Docker. If possible, a "
+        "browser window is opened.")
     group_output.add_argument(
         "--printshellcmds", "-p",
         action="store_true",
@@ -1004,26 +1006,26 @@ def get_argument_parser(profile=None):
         "--debug-dag",
         action="store_true",
         help="Print candidate and selected jobs (including their wildcards) while "
-             "inferring DAG. This can help to debug unexpected DAG topology or errors.")
+        "inferring DAG. This can help to debug unexpected DAG topology or errors.")
     group_output.add_argument(
         "--stats",
         metavar="FILE",
         help=
         "Write stats about Snakefile execution in JSON format to the given file.")
     group_output.add_argument("--nocolor",
-                              action="store_true",
-                              help="Do not use a colored output.")
+                        action="store_true",
+                        help="Do not use a colored output.")
     group_output.add_argument("--quiet", "-q",
-                              action="store_true",
-                              help="Do not output any progress or rule information.")
+                        action="store_true",
+                        help="Do not output any progress or rule information.")
     group_output.add_argument(
         "--print-compilation",
         action="store_true",
         help="Print the python representation of the workflow.")
 
     group_output.add_argument("--verbose",
-                              action="store_true",
-                              help="Print debugging output.")
+                        action="store_true",
+                        help="Print debugging output.")
 
     group_behavior = parser.add_argument_group("BEHAVIOR")
     group_behavior.add_argument(
@@ -1038,11 +1040,11 @@ def get_argument_parser(profile=None):
               "several can produce the same file. This allows the user to "
               "prioritize rules by their order in the snakefile."))
     group_behavior.add_argument("--nolock",
-                                action="store_true",
-                                help="Do not lock the working directory")
+                        action="store_true",
+                        help="Do not lock the working directory")
     group_behavior.add_argument("--ignore-incomplete", "--ii",
-                                action="store_true",
-                                help="Do not check for incomplete output files.")
+                        action="store_true",
+                        help="Do not check for incomplete output files.")
     group_behavior.add_argument(
         "--latency-wait", "--output-wait", "-w",
         type=int,
@@ -1057,15 +1059,15 @@ def get_argument_parser(profile=None):
         nargs="*",
         metavar="FILE",
         help="Wait --latency-wait seconds for these "
-             "files to be present before executing the workflow. "
-             "This option is used internally to handle filesystem latency in cluster "
-             "environments.")
+        "files to be present before executing the workflow. "
+        "This option is used internally to handle filesystem latency in cluster "
+        "environments.")
     group_behavior.add_argument(
         "--notemp", "--nt",
         action="store_true",
         help="Ignore temp() declarations. This is useful when running only "
-             "a part of the workflow, since temp() would lead to deletion of "
-             "probably needed files by other parts of the workflow.")
+        "a part of the workflow, since temp() would lead to deletion of "
+        "probably needed files by other parts of the workflow.")
     group_behavior.add_argument(
         "--keep-remote",
         action="store_true",
@@ -1099,46 +1101,46 @@ def get_argument_parser(profile=None):
     group_behavior.add_argument(
         "--attempt", default=1, type=int,
         help="Internal use only: define the initial value of the attempt "
-             "parameter (default: 1).")
+        "parameter (default: 1).")
     group_behavior.add_argument(
         "--wrapper-prefix",
         default="https://bitbucket.org/snakemake/snakemake-wrappers/raw/",
         help="Prefix for URL created from wrapper directive (default: "
-             "https://bitbucket.org/snakemake/snakemake-wrappers/raw/). Set this to "
-             "a different URL to use your fork or a local clone of the repository, "
-             "e.g., use a git URL like 'git+file://path/to/your/local/clone@'."
+        "https://bitbucket.org/snakemake/snakemake-wrappers/raw/). Set this to "
+        "a different URL to use your fork or a local clone of the repository, "
+        "e.g., use a git URL like 'git+file://path/to/your/local/clone@'."
     )
     group_behavior.add_argument("--default-remote-provider",
-                                choices=["S3", "GS", "FTP", "SFTP", "S3Mocked", "gfal", "gridftp", "iRODS"],
-                                help="Specify default remote provider to be used for "
-                                     "all input and output files that don't yet specify "
-                                     "one.")
+                        choices=["S3", "GS", "FTP", "SFTP", "S3Mocked", "gfal", "gridftp", "iRODS"],
+                        help="Specify default remote provider to be used for "
+                        "all input and output files that don't yet specify "
+                        "one.")
     group_behavior.add_argument("--default-remote-prefix",
-                                default="",
-                                help="Specify prefix for default remote provider. E.g. "
-                                     "a bucket name.")
+                        default="",
+                        help="Specify prefix for default remote provider. E.g. "
+                        "a bucket name.")
     group_behavior.add_argument("--no-shared-fs",
-                                action="store_true",
-                                help="Do not assume that jobs share a common file "
-                                     "system. When this flag is activated, Snakemake will "
-                                     "assume that the filesystem on a cluster node is not "
-                                     "shared with other nodes. For example, this will lead "
-                                     "to downloading remote files on each cluster node "
-                                     "separately. Further, it won't take special measures "
-                                     "to deal with filesystem latency issues. This option "
-                                     "will in most cases only make sense in combination with "
-                                     "--default-remote-provider. Further, when using --cluster "
-                                     "you will have to also provide --cluster-status. "
-                                     "Only activate this if you "
-                                     "know what you are doing.")
+                        action="store_true",
+                        help="Do not assume that jobs share a common file "
+                        "system. When this flag is activated, Snakemake will "
+                        "assume that the filesystem on a cluster node is not "
+                        "shared with other nodes. For example, this will lead "
+                        "to downloading remote files on each cluster node "
+                        "separately. Further, it won't take special measures "
+                        "to deal with filesystem latency issues. This option "
+                        "will in most cases only make sense in combination with "
+                        "--default-remote-provider. Further, when using --cluster "
+                        "you will have to also provide --cluster-status. "
+                        "Only activate this if you "
+                        "know what you are doing.")
     group_behavior.add_argument(
         "--greediness",
         type=float,
         default=None,
         help="Set the greediness of scheduling. This value between 0 and 1 "
-             "determines how careful jobs are selected for execution. The default "
-             "value (1.0) provides the best speed and still acceptable scheduling "
-             "quality.")
+        "determines how careful jobs are selected for execution. The default "
+        "value (1.0) provides the best speed and still acceptable scheduling "
+        "quality.")
     group_behavior.add_argument(
         "--no-hooks",
         action="store_true",
@@ -1146,12 +1148,12 @@ def get_argument_parser(profile=None):
     group_behavior.add_argument(
         "--overwrite-shellcmd",
         help="Provide a shell command that shall be executed instead of those "
-             "given in the workflow. "
-             "This is for debugging purposes only.")
+        "given in the workflow. "
+        "This is for debugging purposes only.")
     group_behavior.add_argument("--debug",
-                                action="store_true",
-                                help="Allow to debug rules with e.g. PDB. This flag "
-                                     "allows to set breakpoints in run blocks.")
+                        action="store_true",
+                        help="Allow to debug rules with e.g. PDB. This flag "
+                        "allows to set breakpoints in run blocks.")
     group_behavior.add_argument(
         "--runtime-profile",
         metavar="FILE",
@@ -1195,14 +1197,14 @@ def get_argument_parser(profile=None):
         const="",
         metavar="ARGS",
         help="Execute snakemake on a cluster accessed via DRMAA, "
-             "Snakemake compiles jobs into scripts that are "
-             "submitted to the cluster with the given command, once all input "
-             "files for a particular job are present. ARGS can be used to "
-             "specify options of the underlying cluster system, "
-             "thereby using the job properties input, output, params, wildcards, log, "
-             "threads and dependencies, e.g.: "
-             "--drmaa ' -pe threaded {threads}'. Note that ARGS must be given in quotes and "
-             "with a leading whitespace.")
+        "Snakemake compiles jobs into scripts that are "
+        "submitted to the cluster with the given command, once all input "
+        "files for a particular job are present. ARGS can be used to "
+        "specify options of the underlying cluster system, "
+        "thereby using the job properties input, output, params, wildcards, log, "
+        "threads and dependencies, e.g.: "
+        "--drmaa ' -pe threaded {threads}'. Note that ARGS must be given in quotes and "
+        "with a leading whitespace.")
 
     group_cluster.add_argument(
         "--cluster-config", "-u",
@@ -1220,45 +1222,45 @@ def get_argument_parser(profile=None):
         "--immediate-submit", "--is",
         action="store_true",
         help="Immediately submit all jobs to the cluster instead of waiting "
-             "for present input files. This will fail, unless you make "
-             "the cluster aware of job dependencies, e.g. via:\n"
-             "$ snakemake --cluster 'sbatch --dependency {dependencies}.\n"
-             "Assuming that your submit script (here sbatch) outputs the "
-             "generated job id to the first stdout line, {dependencies} will "
-             "be filled with space separated job ids this job depends on.")
+        "for present input files. This will fail, unless you make "
+        "the cluster aware of job dependencies, e.g. via:\n"
+        "$ snakemake --cluster 'sbatch --dependency {dependencies}.\n"
+        "Assuming that your submit script (here sbatch) outputs the "
+        "generated job id to the first stdout line, {dependencies} will "
+        "be filled with space separated job ids this job depends on.")
     group_cluster.add_argument(
         "--jobscript", "--js",
         metavar="SCRIPT",
         help="Provide a custom job script for submission to the cluster. "
-             "The default script resides as 'jobscript.sh' in the "
-             "installation directory.")
+        "The default script resides as 'jobscript.sh' in the "
+        "installation directory.")
     group_cluster.add_argument(
         "--jobname", "--jn",
         default="snakejob.{name}.{jobid}.sh",
         metavar="NAME",
         help="Provide a custom name for the jobscript that is submitted to the "
-             "cluster (see --cluster). NAME is \"snakejob.{name}.{jobid}.sh\" "
-             "per default. The wildcard {jobid} has to be present in the name.")
+        "cluster (see --cluster). NAME is \"snakejob.{name}.{jobid}.sh\" "
+        "per default. The wildcard {jobid} has to be present in the name.")
     group_cluster.add_argument(
         "--cluster-status",
         help="Status command for cluster execution. This is only considered "
-             "in combination with the --cluster flag. If provided, Snakemake will "
-             "use the status command to determine if a job has finished successfully "
-             "or failed. For this it is necessary that the submit command provided "
-             "to --cluster returns the cluster job id. Then, the status command "
-             "will be invoked with the job id. Snakemake expects it to return "
-             "'success' if the job was successfull, 'failed' if the job failed and "
-             "'running' if the job still runs."
+        "in combination with the --cluster flag. If provided, Snakemake will "
+        "use the status command to determine if a job has finished successfully "
+        "or failed. For this it is necessary that the submit command provided "
+        "to --cluster returns the cluster job id. Then, the status command "
+        "will be invoked with the job id. Snakemake expects it to return "
+        "'success' if the job was successfull, 'failed' if the job failed and "
+        "'running' if the job still runs."
     )
     group_cluster.add_argument(
         "--drmaa-log-dir",
         metavar="DIR",
         help="Specify a directory in which stdout and stderr files of DRMAA"
-             " jobs will be written. The value may be given as a relative path,"
-             " in which case Snakemake will use the current invocation directory"
-             " as the origin. If given, this will override any given '-o' and/or"
-             " '-e' native specification. If not given, all DRMAA stdout and"
-             " stderr files are written to the current working directory.")
+        " jobs will be written. The value may be given as a relative path,"
+        " in which case Snakemake will use the current invocation directory"
+        " as the origin. If given, this will override any given '-o' and/or"
+        " '-e' native specification. If not given, all DRMAA stdout and"
+        " stderr files are written to the current working directory.")
 
     group_cloud = parser.add_argument_group("CLOUD")
 
@@ -1266,12 +1268,12 @@ def get_argument_parser(profile=None):
         "--kubernetes", metavar="NAMESPACE",
         nargs="?", const="default",
         help="Execute workflow in a kubernetes cluster (in the cloud). "
-             "NAMESPACE is the namespace you want to use for your job (if nothing "
-             "specified: 'default'). "
-             "Usually, this requires --default-remote-provider and "
-             "--default-remote-prefix to be set to a S3 or GS bucket where your . "
-             "data shall be stored. It is further advisable to activate conda "
-             "integration via --use-conda.")
+        "NAMESPACE is the namespace you want to use for your job (if nothing "
+        "specified: 'default'). "
+        "Usually, this requires --default-remote-provider and "
+        "--default-remote-prefix to be set to a S3 or GS bucket where your . "
+        "data shall be stored. It is further advisable to activate conda "
+        "integration via --use-conda.")
     group_cloud.add_argument(
         "--kubernetes-env", nargs="+", metavar="ENVVAR", default=[],
         help="Specify environment variables to pass to the kubernetes job.")
@@ -1291,11 +1293,11 @@ def get_argument_parser(profile=None):
         "--use-conda",
         action="store_true",
         help="If defined in the rule, run job in a conda environment. "
-             "If this flag is not set, the conda directive is ignored.")
+        "If this flag is not set, the conda directive is ignored.")
     group_conda.add_argument("--list-conda-envs",
-                             action="store_true",
-                             help="List all conda environments and their location on "
-                                  "disk.")
+                        action="store_true",
+                        help="List all conda environments and their location on "
+                        "disk.")
     group_conda.add_argument(
         "--cleanup-conda", action="store_true",
         help="Cleanup unused conda environments.")
@@ -1303,17 +1305,17 @@ def get_argument_parser(profile=None):
         "--conda-prefix",
         metavar="DIR",
         help="Specify a directory in which the 'conda' and 'conda-archive' "
-             "directories are created. These are used to store conda environments "
-             "and their archives, respectively. If not supplied, the value is set "
-             "to the '.snakemake' directory relative to the invocation directory. "
-             "If supplied, the `--use-conda` flag must also be set. The value may "
-             "be given as a relative path, which will be extrapolated to the "
-             "invocation directory, or as an absolute path.")
+        "directories are created. These are used to store conda environments "
+        "and their archives, respectively. If not supplied, the value is set "
+        "to the '.snakemake' directory relative to the invocation directory. "
+        "If supplied, the `--use-conda` flag must also be set. The value may "
+        "be given as a relative path, which will be extrapolated to the "
+        "invocation directory, or as an absolute path.")
     group_conda.add_argument("--create-envs-only",
-                             action="store_true",
-                             help="If specified, only creates the job-specific "
-                                  "conda environments then exits. The `--use-conda` "
-                                  "flag must also be set.")
+                        action="store_true",
+                        help="If specified, only creates the job-specific "
+                        "conda environments then exits. The `--use-conda` "
+                        "flag must also be set.")
 
     group_singularity = parser.add_argument_group("SINGULARITY")
 
@@ -1321,17 +1323,17 @@ def get_argument_parser(profile=None):
         "--use-singularity",
         action="store_true",
         help="If defined in the rule, run job within a singularity container. "
-             "If this flag is not set, the singularity directive is ignored."
+        "If this flag is not set, the singularity directive is ignored."
     )
     group_singularity.add_argument(
         "--singularity-prefix",
         metavar="DIR",
         help="Specify a directory in which singularity images will be stored."
-             "If not supplied, the value is set "
-             "to the '.snakemake' directory relative to the invocation directory. "
-             "If supplied, the `--use-singularity` flag must also be set. The value "
-             "may be given as a relative path, which will be extrapolated to the "
-             "invocation directory, or as an absolute path.")
+        "If not supplied, the value is set "
+        "to the '.snakemake' directory relative to the invocation directory. "
+        "If supplied, the `--use-singularity` flag must also be set. The value "
+        "may be given as a relative path, which will be extrapolated to the "
+        "invocation directory, or as an absolute path.")
     group_singularity.add_argument(
         "--singularity-args",
         default="",

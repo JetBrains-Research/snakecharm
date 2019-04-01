@@ -1,5 +1,5 @@
-__author__ = "Johannes KÃ¶ster"
-__copyright__ = "Copyright 2015, Johannes KÃ¶ster"
+__author__ = "Johannes Köster"
+__copyright__ = "Copyright 2015, Johannes Köster"
 __email__ = "koester@jimmy.harvard.edu"
 __license__ = "MIT"
 
@@ -16,7 +16,7 @@ import copy
 import functools
 import subprocess as sp
 from itertools import product, chain
-from collections import Iterable, namedtuple
+import collections
 from snakemake.exceptions import MissingOutputException, WorkflowError, WildcardError, RemoteFileException
 from snakemake.logging import logger
 from inspect import isfunction, ismethod
@@ -99,7 +99,7 @@ class _IOFile(str):
         obj = str.__new__(cls, file)
         obj._is_function = isfunction(file) or ismethod(file)
         obj._is_function = obj._is_function or (
-                isinstance(file, AnnotatedString) and bool(file.callable))
+            isinstance(file, AnnotatedString) and bool(file.callable))
         obj._file = file
         obj.rule = None
         obj._regex = None
@@ -134,7 +134,7 @@ class _IOFile(str):
             if self.is_remote:
                 if hasattr(self.remote_object, func.__name__):
                     return getattr(self.remote_object, func.__name__)(*args, **
-                    kwargs)
+                                                                      kwargs)
             return func(self, *args, **kwargs)
 
         return wrapper
@@ -190,17 +190,17 @@ class _IOFile(str):
                            "for relative file paths.".format(self._file, hint))
         if self._file.startswith(" "):
             logger.warning("File path '{}' starts with whitespace. "
-                           "This is likely unintended. {}".format(self._file, hint))
+                "This is likely unintended. {}".format(self._file, hint))
         if self._file.endswith(" "):
             logger.warning("File path '{}' ends with whitespace. "
-                           "This is likely unintended. {}".format(self._file, hint))
+                "This is likely unintended. {}".format(self._file, hint))
         if "\n" in self._file:
             logger.warning("File path '{}' contains line break. "
-                           "This is likely unintended. {}".format(self._file, hint))
+                "This is likely unintended. {}".format(self._file, hint))
         if _double_slash_regex.search(self._file) is not None:
             logger.warning("File path {} contains double '{}'. "
-                           "This is likely unintended. {}".format(
-                self._file, os.path.sep, hint))
+                "This is likely unintended. {}".format(
+                    self._file, os.path.sep, hint))
 
     @property
     def exists(self):
@@ -241,7 +241,7 @@ class _IOFile(str):
         if not self.is_remote:
             return False
         if (self.rule.workflow.iocache.active and
-                self.remote_object.provider.allows_directories):
+            self.remote_object.provider.allows_directories):
             # The idea is to first check existence of parent directories and
             # cache the results.
             # We omit the last 2 ancestors, because these are "." and the host
@@ -499,7 +499,7 @@ _wildcard_regex = re.compile(
     """, re.VERBOSE)
 
 
-def wait_for_files(files, latency_wait=3, force_stay_on_remote=False):
+def wait_for_files(files, latency_wait=3, force_stay_on_remote=False, ignore_pipe=False):
     """Wait for given files to be present in filesystem."""
     files = list(files)
     def get_missing():
@@ -507,9 +507,9 @@ def wait_for_files(files, latency_wait=3, force_stay_on_remote=False):
             f for f in files
             if not (f.exists_remote
                     if (isinstance(f, _IOFile) and
-                        f.is_remote and
-                        (force_stay_on_remote or f.should_stay_on_remote))
-                    else os.path.exists(f))]
+                       f.is_remote and
+                       (force_stay_on_remote or f.should_stay_on_remote))
+                    else os.path.exists(f) if not (is_flagged(f, "pipe") and ignore_pipe) else True)]
 
     missing = get_missing()
     if missing:
@@ -578,7 +578,7 @@ def regex(filepattern):
         else:
             wildcards.add(wildcard)
             f.append("(?P<{}>{})".format(wildcard, match.group("constraint") if
-            match.group("constraint") else ".+"))
+                                         match.group("constraint") else ".+"))
         last = match.end()
     f.append(re.escape(filepattern[last:]))
     f.append("$")  # ensure that the match spans the whole file
@@ -611,7 +611,7 @@ def apply_wildcards(pattern,
 
 def not_iterable(value):
     return isinstance(value, str) or isinstance(value, dict) or not isinstance(
-        value, Iterable)
+        value, collections.Iterable)
 
 
 def is_callable(value):
@@ -743,7 +743,7 @@ def checkpoint_target(value):
     return flag(value, "checkpoint_target")
 
 
-ReportObject = namedtuple("ReportObject", ["caption", "category"])
+ReportObject = collections.namedtuple("ReportObject", ["caption", "category"])
 
 
 def report(value, caption=None, category=None):
@@ -781,7 +781,7 @@ def expand(*args, **wildcards):
 
     def flatten(wildcards):
         for wildcard, values in wildcards.items():
-            if isinstance(values, str) or not isinstance(values, Iterable):
+            if isinstance(values, str) or not isinstance(values, collections.Iterable):
                 values = [values]
             yield [(wildcard, value) for value in values]
 
@@ -821,7 +821,7 @@ def glob_wildcards(pattern, files=None):
 
     names = [match.group('name')
              for match in _wildcard_regex.finditer(pattern)]
-    Wildcards = namedtuple("Wildcards", names)
+    Wildcards = collections.namedtuple("Wildcards", names)
     wildcards = Wildcards(*[list() for name in names])
 
     pattern = re.compile(regex(pattern))
@@ -942,9 +942,9 @@ def git_content(git_file):
         return git.Repo(root_path).git.show('{}:{}'.format(version, file_path))
     else:
         raise WorkflowError("Provided git path ({}) doesn't meet the "
-                            "expected format:".format(git_file) +
-                            ", expected format is "
-                            "git+file://PATH_TO_REPO/PATH_TO_FILE_INSIDE_REPO@VERSION")
+                        "expected format:".format(git_file) +
+                        ", expected format is "
+                        "git+file://PATH_TO_REPO/PATH_TO_FILE_INSIDE_REPO@VERSION")
     return None
 
 def strip_wildcard_constraints(pattern):
@@ -1034,7 +1034,7 @@ class Namedlist(list):
     def allitems(self):
         next = 0
         for name, index in sorted(self._names.items(),
-                                  key=lambda item: (item[1][0], item[1][0] + 1 if item[1][1] is None else item[1][1])):
+                key=lambda item: (item[1][0], item[1][0] + 1 if item[1][1] is None else item[1][1])):
 
             start, end = index
             if end is None:
@@ -1123,7 +1123,7 @@ def _load_configfile(configpath, filetype="Config"):
                 raise WorkflowError("{} file is not valid JSON and PyYAML "
                                     "has not been installed. Please install "
                                     "PyYAML to use YAML config files.".format(
-                    filetype))
+                                    filetype))
             try:
                 # From http://stackoverflow.com/a/21912744/84349
                 class OrderedLoader(yaml.Loader):
@@ -1140,7 +1140,7 @@ def _load_configfile(configpath, filetype="Config"):
                 raise WorkflowError("Config file is not valid JSON or YAML. "
                                     "In case of YAML, make sure to not mix "
                                     "whitespace and tab indentation.".format(
-                    filetype))
+                                    filetype))
     except FileNotFoundError:
         raise WorkflowError("{} file {} not found.".format(filetype, configpath))
 
