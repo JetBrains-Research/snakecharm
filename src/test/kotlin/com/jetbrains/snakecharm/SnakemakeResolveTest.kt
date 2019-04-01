@@ -31,7 +31,10 @@ class SnakemakeResolveTest : SnakemakeResolveTestCase() {
     }
 
     fun testExpandTopLevel() {
-        //val result = resolve()
+        assertResolvesTo(PyFunction::class.java, "expand")
+    }
+
+    fun testExpandNested() {
         assertResolvesTo(PyFunction::class.java, "expand")
     }
 
