@@ -1,6 +1,5 @@
 package com.jetbrains.snakecharm
 
-import com.intellij.lang.java.parser.JavaParserUtil.setLanguageLevel
 import com.intellij.openapi.roots.impl.FilePropertyPusher
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
@@ -22,9 +21,13 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
     private val PYTHON_2_MOCK_SDK = "2.7"
     private val PYTHON_3_MOCK_SDK = "3.7"
     protected val ourPyDescriptor = PyLightProjectDescriptor(
-            PYTHON_2_MOCK_SDK, SnakemakeTestUtil.getTestDataPath().toString())
+            PYTHON_2_MOCK_SDK,
+            SnakemakeTestUtil.getTestDataPath().toString()
+    )
     protected val ourPy3Descriptor = PyLightProjectDescriptor(
-            PYTHON_3_MOCK_SDK, SnakemakeTestUtil.getTestDataPath().toString()
+            PYTHON_3_MOCK_SDK,
+            SnakemakeTestUtil.getTestDataPath().toString(),
+            SnakemakeTestUtil.getTestDataPath().resolve("MockPackages3")
     )
 
     open protected val projectDescriptor = ourPy3Descriptor

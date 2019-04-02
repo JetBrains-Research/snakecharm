@@ -37,6 +37,4 @@ class SnakemakeResolveTest : SnakemakeResolveTestCase() {
     fun testExpandNested() {
         assertResolvesTo(PyFunction::class.java, "expand")
     }
-
-
 }

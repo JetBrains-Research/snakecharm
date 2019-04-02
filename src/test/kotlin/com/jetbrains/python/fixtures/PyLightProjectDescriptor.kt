@@ -26,6 +26,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightProjectDescriptor
 import com.jetbrains.python.PythonMockSdk
 import com.jetbrains.python.PythonModuleTypeBase
+import java.nio.file.Path
 import java.nio.file.Paths
 
 /**
@@ -34,15 +35,17 @@ import java.nio.file.Paths
  */
 class PyLightProjectDescriptor(
         private val myPythonVersion: String,
-        private val testDataRoot: String
+        private val testDataRoot: String,
+        private vararg val additionalLibraryRoots: Path
 ) : LightProjectDescriptor() {
 
     /**
      * @return additional roots to add to mock python
      */
     protected val additionalRoots: Array<VirtualFile>
-        // TODO should this not be hardcoded?
-        get() = listOfNotNull(VfsUtil.findFile(Paths.get("snakemake"), true)).toTypedArray()
+        get() = additionalLibraryRoots
+                .map { VfsUtil.findFile(it, true)!! }
+                .toTypedArray()
 
     override fun getModuleType(): ModuleType<*> {
         return PythonModuleTypeBase.getInstance()
