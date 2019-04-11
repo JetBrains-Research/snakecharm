@@ -1,5 +1,4 @@
 DATASETS = []
 
 rule all:
-  input: expand("{dataset}/file.A.txt", dataset=DATASETS)
-#         <ref>
+  input: e<caret>xpand("{dataset}/file.A.txt", dataset=DATASETS)

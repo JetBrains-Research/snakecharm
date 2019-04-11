@@ -9,26 +9,18 @@ import com.jetbrains.snakecharm.fixtures.SnakemakeResolveTestCase
 
 class SnakemakeResolveTest : SnakemakeResolveTestCase() {
     override fun doResolve(): PsiElement? {
-        val ref = findReferenceByMarker()
-        return ref?.resolve()
-    }
-
-    private fun findReferenceByMarker(): PsiReference? {
-        fixture?.configureByFile("resolve/" + getTestName(false) + ".smk")
-        return SnakemakeResolveTestCase.findReferenceByMarker(fixture?.file)
-    }
-
-    protected fun resolve(): PsiElement? {
-        val ref = configureByFile("resolve/" + getTestName(false) + ".smk")
-        //  if need be: PythonLanguageLevelPusher.setForcedLanguageLevel(project, LanguageLevel.PYTHON26);
+        val ref = getReference()
         return ref?.resolve()
     }
 
     private fun multiResolve(): Array<ResolveResult> {
-        val ref = findReferenceByMarker()
+        val ref = getReference()
         assertTrue(ref is PsiPolyVariantReference)
         return (ref as PsiPolyVariantReference).multiResolve(false)
     }
+
+    private fun getReference(): PsiReference? = fixture?.getReferenceAtCaretPosition("resolve/" +
+            getTestName(false) + ".smk")
 
     fun testExpandTopLevel() {
         assertResolvesTo(PyFunction::class.java, "expand")
@@ -37,4 +29,5 @@ class SnakemakeResolveTest : SnakemakeResolveTestCase() {
     fun testExpandNested() {
         assertResolvesTo(PyFunction::class.java, "expand")
     }
+
 }

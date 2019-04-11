@@ -1,5 +1,4 @@
 DATASETS = []
 
 rule all:
-  input: directory(expand("{dataset}/dir", dataset=DATASETS))
-#                    <ref>
+  input: directory(ex<caret>pand("{dataset}/dir", dataset=DATASETS))
