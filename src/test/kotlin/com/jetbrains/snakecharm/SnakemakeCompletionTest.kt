@@ -27,4 +27,8 @@ class SnakemakeCompletionTest : SnakemakeTestCase() {
     fun testExpandPyFile() {
         doTest(".py")
     }
+
+    fun testExpandCalledAsObjectMethod() {
+        doTest()
+    }
 }
