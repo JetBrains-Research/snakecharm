@@ -1,0 +1,2 @@
+rule rulename:
+  input: expand()
