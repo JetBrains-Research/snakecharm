@@ -29,7 +29,7 @@ intellij {
     ideaDependencyCachePath  = "${project.rootDir}/.idea_distrib_cache"
     updateSinceUntilBuild false
 
-    plugins = ["PsiViewer:183.2153"]
+    plugins = []
     if (hasPyCharm) {
             alternativeIdePath pycharmPath
         }
