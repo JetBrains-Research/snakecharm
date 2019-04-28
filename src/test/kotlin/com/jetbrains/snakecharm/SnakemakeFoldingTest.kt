@@ -5,11 +5,10 @@ package com.jetbrains.snakecharm
  * @date 2019-02-03
  */
 class SnakemakeFoldingTest : SnakemakeTestCase() {
-    //TODO see PyFoldingTest
-
     private fun doTest() {
-        val testDataDir = SnakemakeTestUtil.getTestDataPath().resolve("folding")
-        fixture!!.testFolding("$testDataDir/${getTestName(true)}.smk")
+        val testDataRoot = SnakemakeTestUtil.getTestDataPath()
+        val testName = getTestName(true)
+        fixture!!.testFolding("$testDataRoot/folding/$testName.smk")
     }
 
     fun testPythonBlocks() {
