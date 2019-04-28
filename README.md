@@ -32,3 +32,8 @@ Contact me at roman.chernyatchik@jetbrains.com or post issues in [Issue Tracker]
 
 # Development
 Pull requests are welcome. It is my side project, so I appreciate your help implementing plugin desired features.
+
+FAQ:
+* If you get "Unimplemented substep definition" in all `*.feature` files, ensure:
+  * Not installed or disabled: `Substeps IntelliJ Plugin` 
+  * Plugins installed: `Cucumber Java`, `Gherkin`
