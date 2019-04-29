@@ -51,7 +51,8 @@ class ExpandCompletionContributor : CompletionContributor() {
             override fun addCompletions(parameters: CompletionParameters,
                                         context: ProcessingContext,
                                         result: CompletionResultSet) {
-                if (parameters.originalFile.language != Language.findLanguageByID("Snakemake")) {
+                val language = parameters.originalFile.language
+                if (language != Language.findLanguageByID("Snakemake")) {
                     return
                 }
 

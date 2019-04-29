@@ -5,6 +5,7 @@ import com.intellij.codeInsight.completion.impl.CamelHumpMatcher
 class SnakemakeCompletionTest : SnakemakeTestCase() {
     
     private fun doTest(fileExtension: String = ".smk") {
+        // TODO remove call to deprecated method
         CamelHumpMatcher.forceStartMatching(fixture?.testRootDisposable)
         val testName = getTestName(true)
         fixture?.configureByFile("completion/$testName$fileExtension")
@@ -30,5 +31,13 @@ class SnakemakeCompletionTest : SnakemakeTestCase() {
 
     fun testExpandCalledAsObjectMethod() {
         doTest()
+    }
+
+    /*fun testExpandPyDoc() {
+        doTest()
+    }*/
+
+    fun testExpandPyiFile() {
+        doTest(".pyi")
     }
 }
