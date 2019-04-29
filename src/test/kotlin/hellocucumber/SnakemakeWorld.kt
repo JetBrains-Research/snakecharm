@@ -7,5 +7,6 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
  * @date 2019-04-28
  */
 object SnakemakeWorld {
-    lateinit var myFixture: CodeInsightTestFixture
+    var myFixture: CodeInsightTestFixture? = null
+    fun fixture()= myFixture!!
 }
