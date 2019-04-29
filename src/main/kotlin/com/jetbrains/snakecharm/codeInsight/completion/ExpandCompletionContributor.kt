@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.codeInsight.completion
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.lang.Language
+import com.intellij.patterns.PatternCondition
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -20,8 +21,12 @@ class ExpandCompletionContributor : CompletionContributor() {
         private val REFERENCE = psiElement(PyReferenceExpression::class.java)
 
         private val EXPAND_CAPTURE = psiElement()
-                .withParent(REFERENCE)
-        // TODO how to exclude calling the function as an object method?
+                .inside(REFERENCE)
+                .with(object : PatternCondition<PsiElement>("isFirstChild") {
+                    override fun accepts(element: PsiElement, context: ProcessingContext): Boolean {
+                        return element.parent.node.firstChildNode == element.node
+                    }
+                })
 
 
         class SnakemakeExpandCompletionProvider : CompletionProvider<CompletionParameters>() {
@@ -34,7 +39,6 @@ class ExpandCompletionContributor : CompletionContributor() {
                 val resolveContext = facade.createResolveContextFromFoothold(element).copyWithMembers()
                 val qualifiedName = QualifiedName.fromDottedString(dottedString)
                 val resolve = facade.resolveQualifiedName(qualifiedName, resolveContext)
-                // TODO or are we satisfied with just (resolve[0] as PyFile)?
                 resolve.map {
                     val function = (it as PyFile).findTopLevelFunction(functionName)
                     if (function != null) {
