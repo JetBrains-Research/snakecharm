@@ -15,6 +15,7 @@ import com.jetbrains.python.psi.PyPsiFacade
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.resolve.CompletionVariantsProcessor
 import com.jetbrains.python.psi.resolve.PyResolveUtil
+import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 
 class ExpandCompletionContributor : CompletionContributor() {
     companion object {
@@ -51,8 +52,7 @@ class ExpandCompletionContributor : CompletionContributor() {
             override fun addCompletions(parameters: CompletionParameters,
                                         context: ProcessingContext,
                                         result: CompletionResultSet) {
-                val language = parameters.originalFile.language
-                if (language != Language.findLanguageByID("Snakemake")) {
+                if (parameters.originalFile.language != SnakemakeLanguageDialect) {
                     return
                 }
 
