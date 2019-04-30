@@ -8,6 +8,7 @@ import com.intellij.testFramework.fixtures.TempDirTestFixture
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
+import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.impl.PythonLanguageLevelPusher
 
 /**
@@ -15,14 +16,18 @@ import com.jetbrains.python.psi.impl.PythonLanguageLevelPusher
  * @date 2019-02-03
  */
 abstract class SnakemakeTestCase : UsefulTestCase() {
-    // TODO: could be extend PyTestCase here?
+    // TODO: could be extend SnakemakeTestCase here?
 
     private val PYTHON_2_MOCK_SDK = "2.7"
     private val PYTHON_3_MOCK_SDK = "3.7"
     protected val ourPyDescriptor = PyLightProjectDescriptor(
-            PYTHON_2_MOCK_SDK, SnakemakeTestUtil.getTestDataPath().toString())
+            PYTHON_2_MOCK_SDK,
+            SnakemakeTestUtil.getTestDataPath().toString()
+    )
     protected val ourPy3Descriptor = PyLightProjectDescriptor(
-            PYTHON_3_MOCK_SDK, SnakemakeTestUtil.getTestDataPath().toString()
+            PYTHON_3_MOCK_SDK,
+            SnakemakeTestUtil.getTestDataPath().toString(),
+            SnakemakeTestUtil.getTestDataPath().resolve("MockPackages3")
     )
 
     open protected val projectDescriptor = ourPy3Descriptor
@@ -65,5 +70,18 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
      */
     protected fun createTempDirFixture(): TempDirTestFixture {
         return LightTempDirTestFixtureImpl(true) // "tmp://" dir by default
+    }
+
+    protected fun setLanguageLevel(languageLevel: LanguageLevel?) {
+        PythonLanguageLevelPusher.setForcedLanguageLevel(fixture!!.project, languageLevel)
+    }
+
+    protected fun runWithLanguageLevel(languageLevel: LanguageLevel, runnable: Runnable) {
+        setLanguageLevel(languageLevel)
+        try {
+            runnable.run()
+        } finally {
+            setLanguageLevel(null)
+        }
     }
 }

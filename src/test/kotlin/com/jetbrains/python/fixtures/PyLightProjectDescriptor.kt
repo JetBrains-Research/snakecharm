@@ -21,10 +21,13 @@ import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightProjectDescriptor
 import com.jetbrains.python.PythonMockSdk
 import com.jetbrains.python.PythonModuleTypeBase
+import java.nio.file.Path
+import java.nio.file.Paths
 
 /**
  * Project descriptor (extracted from [com.jetbrains.python.fixtures.PyTestCase]) and should be used with it.
@@ -32,14 +35,17 @@ import com.jetbrains.python.PythonModuleTypeBase
  */
 class PyLightProjectDescriptor(
         private val myPythonVersion: String,
-        private val testDataRoot: String
+        private val testDataRoot: String,
+        private vararg val additionalLibraryRoots: Path
 ) : LightProjectDescriptor() {
 
     /**
      * @return additional roots to add to mock python
      */
     protected val additionalRoots: Array<VirtualFile>
-        get() = VirtualFile.EMPTY_ARRAY
+        get() = additionalLibraryRoots
+                .map { VfsUtil.findFile(it, true)!! }
+                .toTypedArray()
 
     override fun getModuleType(): ModuleType<*> {
         return PythonModuleTypeBase.getInstance()
