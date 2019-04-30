@@ -81,26 +81,36 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile "org.jetbrains.kotlin:kotlin-test"
 
+//    testImplementation 'io.cucumber:cucumber-java:4.2.6'
+//    testImplementation 'io.cucumber:cucumber-junit:4.2.6'
     testImplementation 'info.cukes:cucumber-java:1.2.4'
     testImplementation 'info.cukes:cucumber-junit:1.2.4'
 }
 
-
-configurations {
-    cucumberRuntime {
-        extendsFrom testImplementation
-    }
-}
-
 task cucumber() {
-    dependsOn assemble, compileKotlin, compileTestKotlin
+    dependsOn assemble, compileTestKotlin
     doLast {
         javaexec {
             main = "cucumber.api.cli.Main"
-            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'pretty', '--glue', 'gradle.cucumber', 'src/test/resources']
+
+            classpath =  project.sourceSets.test.runtimeClasspath
+
+            // for cucumber 4.2.6: remove old version from classpath, it is there from idea platform dependency
+//            classpath =  project.sourceSets.test.runtimeClasspath.filter {
+//                 it.parentFile.name != "lib" || !it.name.startsWith("cucumber-")
+//            }
+            args = ['--plugin', 'pretty', '--glue', 'hellocucumber', 'src/test/resources']
         }
     }
+}
+
+
+test {
+    include '**/*RunCucumberTest.class'
+    classpath = project.sourceSets.test.runtimeClasspath.filter {
+        it.parentFile.name != "lib" || !it.name.startsWith("cucumber-")
+    }
+
 }
 
 wrapper {
