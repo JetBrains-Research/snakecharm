@@ -21,12 +21,13 @@ class SnakemakeResolveTest : SnakemakeResolveTestCase() {
     }
 
     fun testExpandPythonFile() {
+        // do not enable snakemake specific resolves in ordinary python files
         assertUnresolved(".py")
     }
 
     // resolve for docstrings is not supported, thus resolve fail is expected
-    fun testExpandDocstring() {
-        assertUnresolved(".smk")
+    fun testExpandPythonDialect() {
+        assertUnresolved(".pyi")
     }
 
 }
