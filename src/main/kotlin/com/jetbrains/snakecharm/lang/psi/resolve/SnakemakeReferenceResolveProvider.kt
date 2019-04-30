@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.lang.psi.resolve
 
+import com.intellij.lang.Language
 import com.intellij.psi.util.QualifiedName
 import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.resolve.PyReferenceResolveProvider
@@ -10,6 +11,10 @@ class SnakemakeReferenceResolveProvider : PyReferenceResolveProvider {
     private val namesToFQN = hashMapOf("expand" to "snakemake.io")
 
     override fun resolveName(element: PyQualifiedExpression, context: TypeEvalContext): List<RatedResolveResult> {
+        if (context.origin?.language != Language.findLanguageByID("Snakemake")) {
+            return emptyList()
+        }
+
         val facade = PyPsiFacade.getInstance(element.project)
 
         val fullyQualifiedName = namesToFQN[element.name] ?: return emptyList()
