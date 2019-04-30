@@ -4,7 +4,7 @@ import com.intellij.openapi.vfs.ex.temp.TempFileSystem
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.jetbrains.snakecharm.SnakemakeTestCase
-import kotlin.test.assertNotEquals
+import junit.framework.TestCase
 
 abstract class SnakemakeResolveTestCase : SnakemakeTestCase() {
     companion object {
@@ -43,15 +43,14 @@ abstract class SnakemakeResolveTestCase : SnakemakeTestCase() {
             expectedElementName: String,
             expectedContainingFilePath: String? = null,
             fileExtension: String = ".smk"
-    ): T = assertResolveResult(doResolve(fileExtension), expectedClass, expectedElementName, expectedContainingFilePath)
-
-    protected fun <T : PsiElement> assertResolveFail(
-            expectedClass: Class<T>,
-            expectedElementName: String,
-            fileExtension: String
     ) {
-        val resolveResult = doResolve(fileExtension)
-        assertTrue(resolveResult?.javaClass != expectedClass)
-        assertNotEquals(expectedElementName, (resolveResult as PsiNamedElement?)?.name)
+        assertResolveResult(
+                doResolve(fileExtension),
+                expectedClass, expectedElementName, expectedContainingFilePath
+        )
+    }
+
+    protected fun assertUnresolved(fileExtension: String) {
+        TestCase.assertNull(doResolve(fileExtension))
     }
 }
