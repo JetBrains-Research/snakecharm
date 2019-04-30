@@ -4,7 +4,6 @@ import com.intellij.openapi.vfs.ex.temp.TempFileSystem
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.jetbrains.snakecharm.SnakemakeTestCase
-import junit.framework.TestCase
 
 abstract class SnakemakeResolveTestCase : SnakemakeTestCase() {
     companion object {
