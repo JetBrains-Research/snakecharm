@@ -2,7 +2,6 @@ package com.jetbrains.snakecharm.codeInsight.completion
 
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElement
-import com.intellij.lang.Language
 import com.intellij.patterns.PatternCondition
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
