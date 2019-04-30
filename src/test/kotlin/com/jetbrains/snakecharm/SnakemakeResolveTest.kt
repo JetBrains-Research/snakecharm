@@ -25,8 +25,8 @@ class SnakemakeResolveTest : SnakemakeResolveTestCase() {
         assertUnresolved(".py")
     }
 
-    // resolve for docstrings is not supported, thus resolve fail is expected
     fun testExpandPythonDialect() {
+        // do not enable snakemake specific resolves in python based other languages
         assertUnresolved(".pyi")
     }
 
