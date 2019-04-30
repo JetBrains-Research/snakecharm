@@ -21,7 +21,12 @@ class SnakemakeResolveTest : SnakemakeResolveTestCase() {
     }
 
     fun testExpandPythonFile() {
-        assertResolveFail(PyFunction::class.java, ".py")
+        assertResolveFail(PyFunction::class.java, "expand", ".py")
+    }
+
+    // resolve for docstrings is not supported, thus resolve fail is expected
+    fun testExpandDocstring() {
+        assertResolveFail(PyFunction::class.java, "expand",".smk")
     }
 
 }
