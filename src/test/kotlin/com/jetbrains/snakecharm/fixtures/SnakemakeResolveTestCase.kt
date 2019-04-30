@@ -4,44 +4,44 @@ import com.intellij.openapi.vfs.ex.temp.TempFileSystem
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.jetbrains.snakecharm.SnakemakeTestCase
+import junit.framework.TestCase
 
 abstract class SnakemakeResolveTestCase : SnakemakeTestCase() {
     companion object {
-        fun <T : PsiElement> assertResolveResult(element: PsiElement?,
-                                                 aClass: Class<T>,
-                                                 name: String,
-                                                 containingFilePath: String?): T {
-            assertInstanceOf(element, aClass)
-            assertEquals(name, (element as PsiNamedElement).name)
-            if (containingFilePath != null) {
-                val virtualFile = element.getContainingFile().virtualFile
+        fun <T : PsiElement> assertResolveResult(
+                actualElement: PsiElement?,
+                expectedClass: Class<T>,
+                expectedElementName: String,
+                expectedContainingFilePath: String?
+        ): T {
+            assertInstanceOf(actualElement, expectedClass)
+            assertEquals(expectedElementName, (actualElement as PsiNamedElement).name)
+            if (expectedContainingFilePath != null) {
+                val virtualFile = actualElement.getContainingFile().virtualFile
                 if (virtualFile.fileSystem is TempFileSystem) {
-                    assertEquals(containingFilePath, virtualFile.path)
+                    assertEquals(expectedContainingFilePath, virtualFile.path)
                 } else {
-                    assertEquals(containingFilePath, virtualFile.name)
+                    assertEquals(expectedContainingFilePath, virtualFile.name)
                 }
 
             }
-            return element as T
+            return actualElement as T
         }
     }
 
-    private fun doResolve(): PsiElement? {
-        val ref = fixture?.getReferenceAtCaretPosition("resolve/" +
-                getTestName(false) + ".smk")
-        return ref?.resolve()
-    }
+    private fun doResolve(fileExtension: String): PsiElement? = fixture
+            ?.getReferenceAtCaretPosition("resolve/${getTestName(true)}$fileExtension")
+            ?.resolve()
 
-    protected fun <T : PsiElement> assertResolvesTo(aClass: Class<T>,
-                                                    name: String,
-                                                    containingFilePath: String? = null): T {
-        val element: PsiElement?
-        try {
-            element = doResolve()
-        } catch (e: Exception) {
-            throw RuntimeException(e)
-        }
+    protected fun <T : PsiElement> assertResolvesTo(
+            expectedClass: Class<T>,
+            expectedElementName: String,
+            expectedContainingFilePath: String? = null,
+            fileExtension: String = ".smk"
+    ): T = assertResolveResult(doResolve(fileExtension), expectedClass, expectedElementName, expectedContainingFilePath)
 
-        return assertResolveResult(element, aClass, name, containingFilePath)
-    }
+    protected fun <T : PsiElement> assertResolveFail(
+            expectedClass: Class<T>,
+            fileExtension: String
+    ) = assertTrue(doResolve(fileExtension)?.javaClass != expectedClass)
 }
