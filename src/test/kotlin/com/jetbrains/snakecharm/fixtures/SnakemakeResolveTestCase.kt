@@ -29,9 +29,14 @@ abstract class SnakemakeResolveTestCase : SnakemakeTestCase() {
         }
     }
 
-    private fun doResolve(fileExtension: String): PsiElement? = fixture
-            ?.getReferenceAtCaretPosition("resolve/${getTestName(true)}$fileExtension")
-            ?.resolve()
+    private fun doResolve(fileExtension: String): PsiElement? {
+        val path = "resolve/${getTestName(true)}$fileExtension"
+        val ref = fixture!!.getReferenceAtCaretPosition(path)
+        requireNotNull(ref) {
+            "Precondition not met: no reference at caret was found"
+        }
+        return ref.resolve()
+    }
 
     protected fun <T : PsiElement> assertResolvesTo(
             expectedClass: Class<T>,
