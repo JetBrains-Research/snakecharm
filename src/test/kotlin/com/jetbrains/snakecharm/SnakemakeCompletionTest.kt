@@ -1,7 +1,5 @@
 package com.jetbrains.snakecharm
 
-import com.intellij.codeInsight.completion.impl.CamelHumpMatcher
-
 class SnakemakeCompletionTest : SnakemakeTestCase() {
     
     private fun doTest(fileExtension: String = ".smk") {
