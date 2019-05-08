@@ -45,4 +45,8 @@ class SnakemakeCompletionTest : SnakemakeTestCase() {
     fun testExpandEmptyContext() {
         checkCompletionListForString("expand")
     }
+
+    fun testExpandNoPrefixAfterInput() {
+        checkCompletionListForString("expand")
+    }
 }

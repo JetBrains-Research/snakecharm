@@ -1,0 +1,2 @@
+rule NAME:
+    input: <caret>
