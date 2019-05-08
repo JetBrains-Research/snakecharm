@@ -36,4 +36,9 @@ class SnakemakeCompletionTest : SnakemakeTestCase() {
     fun testExpandPyiFile() {
         doTest(".pyi")
     }
+
+    // currently fails
+    /*fun testExpandEmptyContext() {
+        doTest()
+    }*/
 }
