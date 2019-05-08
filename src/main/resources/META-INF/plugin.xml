@@ -19,7 +19,7 @@
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
        on how to target different products -->
-  
+
   <!-- PyCharm / Python plugin dependency -->
   <depends>com.intellij.modules.lang</depends>
   <depends optional="true">com.intellij.modules.python</depends>
@@ -27,8 +27,8 @@
   <extensions defaultExtensionNs="com.intellij">
     <fileTypeFactory implementation="com.jetbrains.snakecharm.SnakemakeFileTypeFactory"/>
     <lang.parserDefinition
-        language="Snakemake"
-        implementationClass="com.jetbrains.snakecharm.lang.parser.SnakemakeParserDefinition"
+            language="Snakemake"
+            implementationClass="com.jetbrains.snakecharm.lang.parser.SnakemakeParserDefinition"
     />
     <!--<colorSettingsPage implementation="com.jetbrains.snakemake.lang.highlighter.SnakemakeColorsPage"/>-->
     <lang.syntaxHighlighterFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterFactory"/>
@@ -37,6 +37,7 @@
     <lang.foldingBuilder language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.SnakeMakeFoldingBuilder"/>
     <!--<enterBetweenBracesDelegate language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.editorActions.EnterInRuleParamsListDelegate"/>-->
     <!--<codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>-->
+    <completion.contributor language="Python" implementationClass="com.jetbrains.snakecharm.codeInsight.completion.ExpandCompletionContributor"/>
   </extensions>
 
   <extensions defaultExtensionNs="Pythonid">
