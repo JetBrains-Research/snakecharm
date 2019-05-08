@@ -4,9 +4,14 @@ class SnakemakeCompletionTest : SnakemakeTestCase() {
     
     private fun doTest(fileExtension: String = ".smk") {
         val testName = getTestName(true)
-        fixture?.configureByFile("completion/$testName$fileExtension")
-        fixture?.completeBasic()
-        fixture?.checkResultByFile("completion/$testName.after$fileExtension")
+        fixture?.testCompletion("completion/$testName$fileExtension",
+                "completion/$testName.after$fileExtension")
+    }
+
+    private fun checkCompletionListForString(string: String) {
+        val testName = getTestName(true)
+        val variants = fixture?.getCompletionVariants("completion/$testName.smk") ?: emptyList()
+        assertTrue(variants.contains(string))
     }
     
     fun testExpandRule() {
@@ -37,8 +42,7 @@ class SnakemakeCompletionTest : SnakemakeTestCase() {
         doTest(".pyi")
     }
 
-    // currently fails
-    /*fun testExpandEmptyContext() {
-        doTest()
-    }*/
+    fun testExpandEmptyContext() {
+        checkCompletionListForString("expand")
+    }
 }
