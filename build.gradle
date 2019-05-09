@@ -99,7 +99,7 @@ task cucumber() {
 //            classpath =  project.sourceSets.test.runtimeClasspath.filter {
 //                 it.parentFile.name != "lib" || !it.name.startsWith("cucumber-")
 //            }
-            args = ['--plugin', 'pretty', '--glue', 'hellocucumber', 'src/test/resources']
+            args = ['--plugin', 'pretty', '--glue', 'com.jetbrains.snakecharm.cucumber', 'src/test/resources']
         }
     }
 }
@@ -107,7 +107,7 @@ task cucumber() {
 
 test {
     include '**/*Test.class'
-    //include '**/*RunCucumberTest.class'
+    //exclude '**/AllCucumberFeaturesTest.class'
     classpath = project.sourceSets.test.runtimeClasspath.filter {
         it.parentFile.name != "lib" || !it.name.startsWith("cucumber-")
     }

@@ -6,6 +6,9 @@ import com.intellij.psi.PsiNamedElement
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import junit.framework.TestCase
 
+/**
+ * We are using cucumber tests instead
+ */
 abstract class SnakemakeResolveTestCase : SnakemakeTestCase() {
     companion object {
         fun <T : PsiElement> assertResolveResult(

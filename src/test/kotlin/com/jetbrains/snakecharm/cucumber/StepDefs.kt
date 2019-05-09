@@ -1,11 +1,8 @@
-package hellocucumber
+package com.jetbrains.snakecharm.cucumber
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.text.StringUtil
-import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.jetbrains.python.PythonDialectsTokenSetProvider
@@ -13,9 +10,6 @@ import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import cucumber.api.java.en.Given
-import cucumber.api.java.en.Then
-import cucumber.api.java.en.When
-import junit.framework.Assert.*
 
 /**
  * @author Roman.Chernyatchik
@@ -79,67 +73,4 @@ class StepDefs {
             }
         }, ModalityState.NON_MODAL)
     }
-
-
-    @When("^I put the caret at (.+)$")
-    fun iPutCaretAt(marker: String) {
-        ApplicationManager.getApplication().invokeAndWait({
-            val editor = SnakemakeWorld.fixture().editor
-            val position = getPositionBySignature(editor, marker, false)
-            editor.caretModel.moveToOffset(position)
-        }, ModalityState.NON_MODAL)
-    }
-
-
-    @Then("^reference should resolve to \"(.+)\" in \"(.+)\"$")
-    fun referenceShouldResolveToIn(marker: String, file: String) {
-        ApplicationManager.getApplication().runReadAction { 
-            val ref = getReferenceAtOffset()
-            assertNotNull(ref)
-            val result = if (ref is PsiPolyVariantReference) {
-                val results = ref.multiResolve(false)
-                assertNotNull(results)
-                assertEquals(1, results.size.toLong())
-                results[0].element
-            } else {
-                ref!!.resolve()
-            }
-            assertNotNull(result)
-            val containingFile = result!!.containingFile
-            assertNotNull(containingFile)
-            assertEquals(file, containingFile.name)
-
-            val text = TextRange.from(result.textOffset, marker.length).substring(containingFile.text)
-            assertEquals(marker, text)
-        }
-    }
-
-    private fun getReferenceAtOffset() = SnakemakeWorld.fixture()
-            .file.findReferenceAt(getOffsetUnderCaret())
-
-    fun getOffsetUnderCaret() = SnakemakeWorld.fixture().editor.caretModel.offset
-
-
-    private fun getPositionBySignature(editor: Editor, marker: String, after: Boolean): Int {
-        val text = editor.document.text
-        val pos = text.indexOf(marker)
-        assertTrue(pos >= 0)
-        return if (after) pos + marker.length else pos
-    }
-
 }
-
-//import cucumber.api.PendingException
-//import cucumber.api.java8.En
-//
-//class StepDefs2 : En {
-//    init {
-//        Given("^today is Sunday\$") {
-//            throw PendingException()
-//        }
-//
-//        Given("foooooo") {
-//
-//        }
-//    }
-//}

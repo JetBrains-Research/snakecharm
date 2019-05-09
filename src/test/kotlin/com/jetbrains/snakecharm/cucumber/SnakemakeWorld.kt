@@ -1,4 +1,4 @@
-package hellocucumber
+package com.jetbrains.snakecharm.cucumber
 
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 
