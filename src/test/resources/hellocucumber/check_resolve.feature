@@ -22,5 +22,5 @@ Feature: Check Resolve
     Examples:
     | ptn | method_name | file  |
     | exp | expand      | io.py |
-    | tem | temp        | io.py |
-    | pro | protected   | io.py |
+#    | tem | temp        | io.py |
+#    | pro | protected   | io.py |

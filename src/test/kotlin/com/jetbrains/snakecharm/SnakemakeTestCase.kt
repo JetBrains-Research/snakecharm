@@ -18,12 +18,16 @@ import com.jetbrains.python.psi.impl.PythonLanguageLevelPusher
 abstract class SnakemakeTestCase : UsefulTestCase() {
     // TODO: could be extend SnakemakeTestCase here?
 
-    private val PYTHON_2_MOCK_SDK = "2.7"
-    private val PYTHON_3_MOCK_SDK = "3.7"
+    companion object {
+        const val PYTHON_2_MOCK_SDK = "2.7"
+        const val PYTHON_3_MOCK_SDK = "3.7"
+    }
+
     protected val ourPyDescriptor = PyLightProjectDescriptor(
             PYTHON_2_MOCK_SDK,
             SnakemakeTestUtil.getTestDataPath().toString()
     )
+
     protected val ourPy3Descriptor = PyLightProjectDescriptor(
             PYTHON_3_MOCK_SDK,
             SnakemakeTestUtil.getTestDataPath().toString(),

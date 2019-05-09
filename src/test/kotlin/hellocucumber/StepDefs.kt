@@ -10,6 +10,7 @@ import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
+import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import cucumber.api.java.en.Given
 import cucumber.api.java.en.Then
@@ -21,13 +22,21 @@ import junit.framework.Assert.*
  * @date 2019-04-28
  */
 class StepDefs {
-    @Given("^a snakemake project$")
+    @Given("^a (snakemake|python)? project$")
     @Throws(Exception::class)
-    fun configureSnakemakeProject() {
+    fun configureSnakemakeProject(projectType: String) {
+        val additionalRoots = if (projectType == "snakemake") {
+           arrayOf(SnakemakeTestUtil.getTestDataPath().resolve("MockPackages3"))
+        } else {
+            emptyArray()
+        }
+
         // SnakemakeWorld.myFixture = ...
         // Write code here that turns the phrase above into concrete actions
         val projectDescriptor = PyLightProjectDescriptor(
-                "3.7", SnakemakeTestUtil.getTestDataPath().toString()
+                SnakemakeTestCase.PYTHON_3_MOCK_SDK,
+                SnakemakeTestUtil.getTestDataPath().toString(),
+                *additionalRoots
         )
 
         val fixtureBuilder = IdeaTestFixtureFactory
