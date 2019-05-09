@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.lang.psi.resolve
+package com.jetbrains.snakecharm.codeInsight.resolve
 
 import com.intellij.psi.util.QualifiedName
 import com.jetbrains.python.psi.PyFile
