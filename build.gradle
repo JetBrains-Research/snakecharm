@@ -106,7 +106,8 @@ task cucumber() {
 
 
 test {
-    include '**/*RunCucumberTest.class'
+    include '**/*Test.class'
+    //include '**/*RunCucumberTest.class'
     classpath = project.sourceSets.test.runtimeClasspath.filter {
         it.parentFile.name != "lib" || !it.name.startsWith("cucumber-")
     }
