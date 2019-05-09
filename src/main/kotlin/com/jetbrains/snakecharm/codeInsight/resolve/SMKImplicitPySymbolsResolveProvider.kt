@@ -9,7 +9,7 @@ import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 
-class SnakemakeReferenceResolveProvider : PyReferenceResolveProvider {
+class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
     private val namesToFQN = hashMapOf("expand" to "snakemake.io")
 
     override fun resolveName(element: PyQualifiedExpression, context: TypeEvalContext): List<RatedResolveResult> {
