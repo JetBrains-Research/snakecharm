@@ -6,7 +6,7 @@ import com.jetbrains.python.inspections.PyInspectionVisitor
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
+import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 
 class SnakemakeResourcesUnnamedArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -16,7 +16,7 @@ class SnakemakeResourcesUnnamedArgsInspection : SnakemakeInspection() {
     ) = object : PyInspectionVisitor(holder, session) {
 
         override fun visitPyArgumentList(node: PyArgumentList?) {
-            if (node?.containingFile !is SnakemakeFile) {
+            if (node?.language !is SnakemakeLanguageDialect) {
                 return
             }
 
