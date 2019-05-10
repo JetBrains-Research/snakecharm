@@ -1,6 +1,5 @@
 package com.jetbrains.snakecharm
 
-import com.intellij.AbstractBundle
 import com.intellij.CommonBundle
 import com.intellij.reference.SoftReference
 import org.jetbrains.annotations.NonNls
