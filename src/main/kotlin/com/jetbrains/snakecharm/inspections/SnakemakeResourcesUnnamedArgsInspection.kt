@@ -34,7 +34,5 @@ class SnakemakeResourcesUnnamedArgsInspection : SnakemakeInspection() {
         }
     }
 
-    override fun getDisplayName(): String {
-        return SnakemakeBundle.message("INSP.NAME.resources.unnamed.args")
-    }
+    override fun getDisplayName(): String = SnakemakeBundle.message("INSP.NAME.resources.unnamed.args")
 }

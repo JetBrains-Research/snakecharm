@@ -6,6 +6,6 @@ import com.jetbrains.python.inspections.PyInspectionVisitor
 import com.jetbrains.snakecharm.lang.psi.SnakemakeVisitor
 
 abstract class SnakemakeInspectionVisitor(
-        holder: ProblemsHolder?,
+        holder: ProblemsHolder,
         session: LocalInspectionToolSession
 ) : SnakemakeVisitor, PyInspectionVisitor(holder, session)
