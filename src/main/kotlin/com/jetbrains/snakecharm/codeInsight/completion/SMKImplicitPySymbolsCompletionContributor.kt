@@ -17,7 +17,7 @@ import com.jetbrains.python.psi.resolve.CompletionVariantsProcessor
 import com.jetbrains.python.psi.resolve.PyResolveUtil
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 
-class ExpandCompletionContributor : CompletionContributor() {
+class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
     companion object {
         private val REFERENCE = psiElement(PyReferenceExpression::class.java)
 
