@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.ASTNode
+import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStatement
 import com.jetbrains.python.psi.impl.PyElementImpl
@@ -17,6 +18,12 @@ class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyState
                 "script", "wrapper", "cwl"
         )
     }
+
+    val sectionName: String?
+        get() = firstChild.text
+
+    val argumentList: PyArgumentList?
+        get() = children.filter { it is PyArgumentList }.elementAtOrNull(0) as? PyArgumentList
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
         when (pyVisitor) {

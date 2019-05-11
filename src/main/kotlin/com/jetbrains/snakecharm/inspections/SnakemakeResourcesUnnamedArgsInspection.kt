@@ -19,16 +19,13 @@ class SnakemakeResourcesUnnamedArgsInspection : SnakemakeInspection() {
                 return
             }
 
-            val section = st.firstChild
-            if (!section.textMatches("resources")) {
+            if (st.sectionName != "resources") {
                 return
             }
 
-            st.children.filter { it is PyArgumentList }.forEach {
-                it.children.forEach { child ->
-                    if (child !is PyKeywordArgument) {
-                        registerProblem(child, SnakemakeBundle.message("INSP.NAME.resources.unnamed.args"))
-                    }
+            st.argumentList?.arguments?.forEach {
+                if (it !is PyKeywordArgument) {
+                    registerProblem(it, SnakemakeBundle.message("INSP.NAME.resources.unnamed.args"))
                 }
             }
         }
