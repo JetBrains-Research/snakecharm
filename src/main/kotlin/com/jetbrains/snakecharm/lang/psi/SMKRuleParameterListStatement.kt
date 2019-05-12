@@ -10,8 +10,9 @@ import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 
 class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyStatement { // PyNamedElementContainer
     companion object {
+        const val RESOURCES = "resources"
         val PARAMS_NAMES = setOf(
-                "output", "input", "params", "log", "resources",
+                "output", "input", "params", "log", RESOURCES,
                 "benchmark", "version", "message", "shell", "threads", "singularity",
                 "priority", "benchmark", "wildcard_constraints", "group", "shadow",
                 "conda", // >= 4.8
