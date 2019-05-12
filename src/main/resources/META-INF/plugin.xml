@@ -40,11 +40,26 @@
     <completion.contributor
         language="Python"
         implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor"
-/>
+    />
+
+    <moduleService
+        serviceInterface="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
+        serviceImplementation="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
+    />
   </extensions>
+
+  <module-components>
+    <component>
+      <implementation-class>com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider</implementation-class>
+    </component>
+  </module-components>
+
 
   <extensions defaultExtensionNs="Pythonid">
     <dialectsTokenSetContributor implementation="com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor"/>
-    <pyReferenceResolveProvider implementation="com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider"/>
+    <pyReferenceResolveProvider
+        implementation="com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider"
+    />
+
   </extensions>
 </idea-plugin>

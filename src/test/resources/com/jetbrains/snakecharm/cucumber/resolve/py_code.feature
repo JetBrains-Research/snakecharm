@@ -1,4 +1,4 @@
-Feature: Ensure that resolve works in python part of snakemake file
+Feature: Resolve in python part of snakemake file
 
   Scenario: Resolve any python method
     Given a snakemake project

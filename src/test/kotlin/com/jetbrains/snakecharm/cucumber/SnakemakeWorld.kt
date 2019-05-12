@@ -8,5 +8,8 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
  */
 object SnakemakeWorld {
     var myFixture: CodeInsightTestFixture? = null
+    var myCompletionList: List<String>? = null
+
     fun fixture()= myFixture!!
+    fun comletionList()= myCompletionList!!
 }

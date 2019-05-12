@@ -1,2 +1,0 @@
-rule NAME:
-    input: <caret>
