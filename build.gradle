@@ -8,7 +8,7 @@ plugins {
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
     // See https://github.com/JetBrains/gradle-intellij-plugin
-    id 'org.jetbrains.intellij' version '0.4.1'
+    id 'org.jetbrains.intellij' version '0.4.8'
 
     // Kotlin
     id "org.jetbrains.kotlin.jvm" version "1.3.11"
@@ -80,9 +80,45 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile "org.jetbrains.kotlin:kotlin-test"
+
+//    testImplementation 'io.cucumber:cucumber-java:4.2.6'
+//    testImplementation 'io.cucumber:cucumber-junit:4.2.6'
+    testImplementation 'info.cukes:cucumber-java:1.2.4'
+    testImplementation 'info.cukes:cucumber-junit:1.2.4'
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.10'
+task cucumber() {
+    dependsOn assemble, compileTestKotlin
+    doLast {
+        javaexec {
+            main = "cucumber.api.cli.Main"
+
+            classpath =  project.sourceSets.test.runtimeClasspath
+
+            // for cucumber 4.2.6: remove old version from classpath, it is there from idea platform dependency
+//            classpath =  project.sourceSets.test.runtimeClasspath.filter {
+//                 it.parentFile.name != "lib" || !it.name.startsWith("cucumber-")
+//            }
+            args = ['--plugin', 'pretty', '--glue', 'com.jetbrains.snakecharm.cucumber', 'src/test/resources']
+        }
+    }
+}
+
+test {
+    reports {
+        // turn off html reports... windows can't handle certain cucumber test name characters.
+        junitXml.enabled = true
+        html.enabled = false
+    }
+    include '**/*Test.class'
+    //exclude '**/AllCucumberFeaturesTest.class'
+    classpath = project.sourceSets.test.runtimeClasspath.filter {
+        it.parentFile.name != "lib" || !it.name.startsWith("cucumber-")
+    }
+
+}
+
+wrapper {
+    gradleVersion = '5.4'
     distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }
