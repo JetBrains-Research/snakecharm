@@ -37,6 +37,11 @@
     <lang.foldingBuilder language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.SnakeMakeFoldingBuilder"/>
     <!--<enterBetweenBracesDelegate language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.editorActions.EnterInRuleParamsListDelegate"/>-->
     <!--<codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>-->
+    <localInspection language="Snakemake" shortName="SnakemakeRuleRedeclarationInspection"
+                     suppressId="SnakemakeRuleRedeclaration" bundle="SnakemakeBundle"
+                     groupKey="INSP.GROUP.snakemake" enabledByDefault="true" level="WARNING"
+                     implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeRuleRedeclarationInspection"
+                     key="INSP.NAME.rule.redeclaration"/>
   </extensions>
 
   <extensions defaultExtensionNs="Pythonid">

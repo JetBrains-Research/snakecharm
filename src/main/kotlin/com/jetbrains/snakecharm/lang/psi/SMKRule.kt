@@ -12,6 +12,7 @@ import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.PyStatementListContainer
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyElementImpl
+import com.jetbrains.snakecharm.inspections.SnakemakeInspectionVisitor
 import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 
 open class SMKRule(node: ASTNode): PyElementImpl(node), PyStatementListContainer, PsiNamedElement {
@@ -39,10 +40,10 @@ open class SMKRule(node: ASTNode): PyElementImpl(node), PyStatementListContainer
     fun getNameNode() = getIdentifierNode(node)
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
-        if (pyVisitor is SnakemakeAnnotator) {
-            pyVisitor.visitSMKRule(this)
-        } else {
-            super.acceptPyVisitor(pyVisitor)
+        when (pyVisitor) {
+            is SnakemakeAnnotator -> pyVisitor.visitSMKRule(this)
+            is SnakemakeInspectionVisitor -> pyVisitor.visitSMKRule(this)
+            else -> super.acceptPyVisitor(pyVisitor)
         }
     }
 
