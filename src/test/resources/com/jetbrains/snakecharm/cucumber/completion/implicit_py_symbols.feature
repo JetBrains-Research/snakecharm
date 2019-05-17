@@ -107,6 +107,7 @@ Feature: Completion in python part of snakemake file
       | config  | config        |
 # XXX     | shell   | shell()       |
 
+  #noinspection SpellCheckingInspection
   Scenario: Complete in not-empty context
      Given a snakemake project
      Given I open a file "foo.smk" with text
