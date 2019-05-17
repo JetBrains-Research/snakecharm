@@ -46,6 +46,12 @@
         serviceInterface="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
         serviceImplementation="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
     />
+    
+    <localInspection language="Snakemake" shortName="SnakemakeResourcesUnnamedArgsInspection"
+                     suppressId="SnakemakeResourcesUnnamedArgs" bundle="SnakemakeBundle"
+                     groupKey="INSP.GROUP.snakemake" enabledByDefault="true" level="WARNING"
+                     implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeResourcesKeywordArgsInspection"
+                     key="INSP.NAME.resources.unnamed.args"/>
   </extensions>
 
   <module-components>
