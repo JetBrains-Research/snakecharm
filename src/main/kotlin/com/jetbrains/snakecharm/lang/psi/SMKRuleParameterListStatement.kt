@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiElement
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStatement
@@ -11,6 +12,7 @@ import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyStatement { // PyNamedElementContainer
     companion object {
         const val RESOURCES = "resources"
+
         val PARAMS_NAMES = setOf(
                 "output", "input", "params", "log", RESOURCES,
                 "benchmark", "version", "message", "shell", "threads", "singularity",
@@ -20,8 +22,8 @@ class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyState
         )
     }
 
-    val sectionName: String?
-        get() = firstChild.text
+    val section: PsiElement
+        get() = firstChild
 
     val argumentList: PyArgumentList?
         get() = children.filter { it is PyArgumentList }.elementAtOrNull(0) as? PyArgumentList

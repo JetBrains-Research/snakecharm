@@ -18,7 +18,8 @@ class SnakemakeResourcesUnnamedArgsInspection : SnakemakeInspection() {
                 return
             }
 
-            if (st.sectionName != SMKRuleParameterListStatement.RESOURCES) {
+            val sectionName = st.section.text
+            if (sectionName != SMKRuleParameterListStatement.RESOURCES) {
                 return
             }
 
