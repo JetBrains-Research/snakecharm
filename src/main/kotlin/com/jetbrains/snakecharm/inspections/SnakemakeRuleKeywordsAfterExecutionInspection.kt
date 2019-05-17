@@ -21,8 +21,8 @@ class SnakemakeRuleKeywordsAfterExecutionInspection : SnakemakeInspection() {
             var executionSectionOccured = false
             var executionSectionName = "execution"
 
-            val statements = smkRule.statementList.statements
-            for (st in statements) {
+            val sections = smkRule.getSections()
+            for (st in sections) {
                 if (st is SMKRuleParameterListStatement) {
                     val sectionName = st.section.text ?: return
                     val isRunSection = SMKRuleParameterListStatement.EXECUTION_KEYWORDS.contains(sectionName)

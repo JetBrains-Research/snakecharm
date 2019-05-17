@@ -48,6 +48,18 @@ open class SMKRule(node: ASTNode): PyElementImpl(node), PyStatementListContainer
     }
 
     override fun getStatementList() = childToPsiNotNull<PyStatementList>(PyElementTypes.STATEMENT_LIST)
+
+    fun getSections(): List<SMKRuleSection> {
+        val sections = mutableListOf<SMKRuleSection>()
+        // iterate over children, not statements, since SMKRuleRunParameter isn't a statement
+        statementList.children.forEach {
+            if (it is SMKRuleSection) {
+                sections.add(it)
+            }
+        }
+
+        return sections
+    }
 }
 
 fun getIdentifierNode(node: ASTNode): ASTNode? {

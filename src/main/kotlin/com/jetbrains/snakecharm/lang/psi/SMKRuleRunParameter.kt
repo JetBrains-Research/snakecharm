@@ -8,7 +8,7 @@ import com.jetbrains.python.psi.PyStatementListContainer
 import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 
-class SMKRuleRunParameter(node: ASTNode): PyElementImpl(node), PyStatementListContainer { // PyNamedElementContainer
+class SMKRuleRunParameter(node: ASTNode): PyElementImpl(node), PyStatementListContainer, SMKRuleSection { // PyNamedElementContainer
     companion object {
         const val PARAM_NAME = "run"
     }
