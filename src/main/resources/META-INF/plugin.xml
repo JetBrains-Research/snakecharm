@@ -58,6 +58,12 @@
                      groupKey="INSP.GROUP.snakemake" enabledByDefault="true" level="WARNING"
                      implementationClass="com.jetbrains.snakecharm.inspections.SnakemakePositionalArgsAfterKeywordArgsInspection"
                      key="INSP.NAME.positional.args.after.keyword.args"/>
+
+    <localInspection language="Snakemake" shortName="SnakemakeRuleRedeclarationInspection"
+                     suppressId="SnakemakeRuleRedeclaration" bundle="SnakemakeBundle"
+                     groupKey="INSP.GROUP.snakemake" enabledByDefault="true" level="WARNING"
+                     implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeRuleRedeclarationInspection"
+                     key="INSP.NAME.rule.redeclaration"/>
   </extensions>
 
   <module-components>
