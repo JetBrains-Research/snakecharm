@@ -81,6 +81,16 @@
         key="INSP.NAME.rule.redeclaration"
         implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeRuleRedeclarationInspection"
     />
+    <localInspection
+            language="Snakemake" shortName="SnakemakeRuleKeywordsAfterExecutionInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SnakemakeRuleKeywordsAfterRun"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.rule.keywords.after.execution"
+            implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeRuleKeywordsAfterExecutionInspection"
+    />
   </extensions>
 
   <module-components>
