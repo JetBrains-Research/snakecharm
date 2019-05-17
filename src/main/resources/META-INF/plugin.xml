@@ -46,12 +46,18 @@
         serviceInterface="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
         serviceImplementation="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
     />
-    
+
     <localInspection language="Snakemake" shortName="SnakemakeResourcesUnnamedArgsInspection"
                      suppressId="SnakemakeResourcesUnnamedArgs" bundle="SnakemakeBundle"
                      groupKey="INSP.GROUP.snakemake" enabledByDefault="true" level="WARNING"
                      implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeResourcesKeywordArgsInspection"
                      key="INSP.NAME.resources.unnamed.args"/>
+
+    <localInspection language="Snakemake" shortName="SnakemakePositionalArgsAfterKeywordArgsInspection"
+                     suppressId="SnakemakePositionalArgsAfterKeywordArgs" bundle="SnakemakeBundle"
+                     groupKey="INSP.GROUP.snakemake" enabledByDefault="true" level="WARNING"
+                     implementationClass="com.jetbrains.snakecharm.inspections.SnakemakePositionalArgsAfterKeywordArgsInspection"
+                     key="INSP.NAME.positional.args.after.keyword.args"/>
   </extensions>
 
   <module-components>

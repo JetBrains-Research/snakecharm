@@ -12,4 +12,3 @@ abstract class SnakemakeAnnotator: PyAnnotator(), SMKElementVisitor {
     override val pyElementVisitor: PyElementVisitor
         get() = this
 }
-
