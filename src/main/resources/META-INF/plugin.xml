@@ -47,23 +47,40 @@
         serviceImplementation="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
     />
 
-    <localInspection language="Snakemake" shortName="SnakemakeResourcesUnnamedArgsInspection"
-                     suppressId="SnakemakeResourcesUnnamedArgs" bundle="SnakemakeBundle"
-                     groupKey="INSP.GROUP.snakemake" enabledByDefault="true" level="WARNING"
-                     implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeResourcesKeywordArgsInspection"
-                     key="INSP.NAME.resources.unnamed.args"/>
+    <localInspection
+        language="Snakemake"
+        shortName="SnakemakeResourcesUnnamedArgsInspection"
+        enabledByDefault="true"
+        level="WARNING"
+        suppressId="SnakemakeResourcesUnnamedArgs"
+        bundle="SnakemakeBundle"
+        groupKey="INSP.GROUP.snakemake"
+        key="INSP.NAME.resources.unnamed.args"
+        implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeResourcesKeywordArgsInspection"
+    />
 
-    <localInspection language="Snakemake" shortName="SnakemakePositionalArgsAfterKeywordArgsInspection"
-                     suppressId="SnakemakePositionalArgsAfterKeywordArgs" bundle="SnakemakeBundle"
-                     groupKey="INSP.GROUP.snakemake" enabledByDefault="true" level="WARNING"
-                     implementationClass="com.jetbrains.snakecharm.inspections.SnakemakePositionalArgsAfterKeywordArgsInspection"
-                     key="INSP.NAME.positional.args.after.keyword.args"/>
+    <localInspection
+        language="Snakemake"
+        shortName="SnakemakePositionalArgsAfterKeywordArgsInspection"
+        enabledByDefault="true"
+        level="WARNING"
+        suppressId="SnakemakePositionalArgsAfterKeywordArgs"
+        bundle="SnakemakeBundle"
+        groupKey="INSP.GROUP.snakemake"
+        key="INSP.NAME.positional.args.after.keyword.args"
+        implementationClass="com.jetbrains.snakecharm.inspections.SnakemakePositionalArgsAfterKeywordArgsInspection"
+    />
 
-    <localInspection language="Snakemake" shortName="SnakemakeRuleRedeclarationInspection"
-                     suppressId="SnakemakeRuleRedeclaration" bundle="SnakemakeBundle"
-                     groupKey="INSP.GROUP.snakemake" enabledByDefault="true" level="WARNING"
-                     implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeRuleRedeclarationInspection"
-                     key="INSP.NAME.rule.redeclaration"/>
+    <localInspection
+        language="Snakemake" shortName="SnakemakeRuleRedeclarationInspection"
+        enabledByDefault="true"
+        level="WARNING"
+        suppressId="SnakemakeRuleRedeclaration"
+        bundle="SnakemakeBundle"
+        groupKey="INSP.GROUP.snakemake"
+        key="INSP.NAME.rule.redeclaration"
+        implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeRuleRedeclarationInspection"
+    />
   </extensions>
 
   <module-components>
