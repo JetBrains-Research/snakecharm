@@ -14,7 +14,7 @@ class SnakemakeResourcesKeywordArgsInspection : SnakemakeInspection() {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         override fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {
-            if (st.containingFile.language !is SnakemakeLanguageDialect) {
+            if (st.containingFile.language != SnakemakeLanguageDialect) {
                 return
             }
 
