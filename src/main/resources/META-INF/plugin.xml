@@ -49,10 +49,10 @@
 
     <localInspection
         language="Snakemake"
-        shortName="SnakemakeResourcesUnnamedArgsInspection"
+        shortName="SnakemakeResourcesKeywordArgsInspection"
         enabledByDefault="true"
         level="WARNING"
-        suppressId="SnakemakeResourcesUnnamedArgs"
+        suppressId="SnakemakeResourcesKeywordArgsInspection"
         bundle="SnakemakeBundle"
         groupKey="INSP.GROUP.snakemake"
         key="INSP.NAME.resources.unnamed.args"
@@ -80,6 +80,17 @@
         groupKey="INSP.GROUP.snakemake"
         key="INSP.NAME.rule.redeclaration"
         implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeRuleRedeclarationInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SnakemakeMultipleRunOrShellKeywordsInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SnakemakeMultipleRunOrShellKeywords"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.multiple.run.or.shell.keywords"
+            implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeMultipleRunOrShellKeywordsInspection"
     />
   </extensions>
 
