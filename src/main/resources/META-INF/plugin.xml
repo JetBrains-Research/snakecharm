@@ -95,6 +95,7 @@
     <pyReferenceResolveProvider
         implementation="com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider"
     />
+    <typeProvider implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeRulesTypeProvider"/>
 
   </extensions>
 </idea-plugin>
