@@ -25,13 +25,13 @@ class SnakemakeRuleKeywordsAfterExecutionInspection : SnakemakeInspection() {
             for (st in sections) {
                 if (st is SMKRuleParameterListStatement) {
                     val sectionName = st.section.text ?: return
-                    val isRunSection = SMKRuleParameterListStatement.EXECUTION_KEYWORDS.contains(sectionName)
-                    if (isRunSection) {
+                    val isExecutionSection = SMKRuleParameterListStatement.EXECUTION_KEYWORDS.contains(sectionName)
+                    if (isExecutionSection) {
                         executionSectionOccured = true
                         executionSectionName = sectionName
                     }
 
-                    if (executionSectionOccured && !isRunSection) {
+                    if (executionSectionOccured && !isExecutionSection) {
                         registerProblem(st.section,
                                 SnakemakeBundle.message("INSP.NAME.rule.keywords.after.$0", executionSectionName))
                     }
