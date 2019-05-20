@@ -89,12 +89,12 @@
     </component>
   </module-components>
 
-
   <extensions defaultExtensionNs="Pythonid">
     <dialectsTokenSetContributor implementation="com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor"/>
     <pyReferenceResolveProvider
         implementation="com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider"
     />
-
+    <typeProvider implementation="com.jetbrains.snakecharm.PyRuleTypeProvider"/>
   </extensions>
+
 </idea-plugin>
