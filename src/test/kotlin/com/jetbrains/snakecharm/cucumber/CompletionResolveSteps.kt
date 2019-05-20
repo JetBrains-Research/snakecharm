@@ -92,13 +92,13 @@ class CompletionResolveSteps {
 
     @Then("^completion list should contain items (.+)$")
     fun completionListShouldContainMethods(lookupItems: List<String>) {
-        assertHasElements(SnakemakeWorld.comletionList(), lookupItems)
+        assertHasElements(SnakemakeWorld.completionList(), lookupItems)
     }
 
     @Then("^completion list shouldn't contain:$")
     fun completionListShouldNotContain(table: DataTable) {
         val lookupStrings = table.asList(String::class.java)
-        assertNotInCompletionList(SnakemakeWorld.comletionList(), lookupStrings)
+        assertNotInCompletionList(SnakemakeWorld.completionList(), lookupStrings)
     }
 
     @Then("^I invoke autocompletion popup, select \"([^\"]+)\" lookup item and see a text:")

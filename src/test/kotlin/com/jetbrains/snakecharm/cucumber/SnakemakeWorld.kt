@@ -11,5 +11,5 @@ object SnakemakeWorld {
     var myCompletionList: List<String>? = null
 
     fun fixture()= myFixture!!
-    fun comletionList()= myCompletionList!!
+    fun completionList()= myCompletionList!!
 }
