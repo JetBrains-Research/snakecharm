@@ -27,7 +27,7 @@ class SnakemakeRulesType : PyType {
 
         val rules = getRules(location)
         val result = ArrayList<Any>()
-        rules.forEach { result.add(LookupElementBuilder.create(it.first)) }
+        rules.forEach { result.add(LookupElementBuilder.create(it.first).withTypeText(it.second.containingFile.name)) }
 
         return ArrayUtil.toObjectArray(result)
     }
