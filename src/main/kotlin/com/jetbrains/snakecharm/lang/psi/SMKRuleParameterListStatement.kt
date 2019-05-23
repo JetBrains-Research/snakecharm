@@ -9,16 +9,22 @@ import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.inspections.SnakemakeInspectionVisitor
 import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 
-class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyStatement { // PyNamedElementContainer
+class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyStatement, SMKRuleSection { // PyNamedElementContainer
     companion object {
         const val RESOURCES = "resources"
+        const val SHELL = "shell"
+        const val SCRIPT = "script"
+        const val WRAPPER = "wrapper"
+        const val CWL = "cwl"
+
+        val EXECUTION_KEYWORDS = setOf(SHELL, SCRIPT, WRAPPER, CWL)
 
         val PARAMS_NAMES = setOf(
                 "output", "input", "params", "log", RESOURCES,
-                "benchmark", "version", "message", "shell", "threads", "singularity",
+                "benchmark", "version", "message", SHELL, "threads", "singularity",
                 "priority", "benchmark", "wildcard_constraints", "group", "shadow",
                 "conda", // >= 4.8
-                "script", "wrapper", "cwl"
+                SCRIPT, WRAPPER, CWL
         )
     }
 
