@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiElement
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStatementList
@@ -17,6 +18,9 @@ class SMKRuleRunParameter(node: ASTNode): PyElementImpl(node), PyStatementListCo
             childToPsi(PyElementTypes.STATEMENT_LIST) ?: error("Statement list missing for workflow parameter $text")
 
     fun getNameNode() = getIdentifierNode(node)
+
+    val section: PsiElement?
+        get() = firstChild
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
             if (pyVisitor is SnakemakeAnnotator) {
