@@ -3,9 +3,9 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionTool
 import com.jetbrains.snakecharm.fixtures.SnakemakeInspectionTestCase
 
-class SnakemakeRuleKeywordsAfterExecutionInspectionTest : SnakemakeInspectionTestCase() {
+class SnakemakeRuleSectionAfterExecutionInspectionTest : SnakemakeInspectionTestCase() {
     override val inspectionClass: Class<out LocalInspectionTool>
-        get() = SnakemakeRuleKeywordsAfterExecutionInspection::class.java
+        get() = SnakemakeRuleSectionAfterExecutionInspection::class.java
 
     fun testNoRuleKeywordsAfterShell() {
         doTest()

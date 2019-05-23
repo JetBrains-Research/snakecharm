@@ -6,7 +6,7 @@ rule NAME:
     shell:
         "cat {input} > {output}"
 
-rule <warning descr="This rule name is already used by another rule.">NAME</warning>:
+rule <error descr="This rule name is already used by another rule.">NAME</error>:
     input:
         "outputfile.txt"
     output:

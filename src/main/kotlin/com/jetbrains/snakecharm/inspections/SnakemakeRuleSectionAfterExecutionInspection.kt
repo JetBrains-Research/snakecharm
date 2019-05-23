@@ -6,9 +6,8 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SMKRule
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
-import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
 
-class SnakemakeMultipleRunOrShellKeywordsInspection : SnakemakeInspection() {
+class SnakemakeRuleSectionAfterExecutionInspection : SnakemakeInspection() {
     override fun buildVisitor(
             holder: ProblemsHolder,
             isOnTheFly: Boolean,
@@ -19,32 +18,33 @@ class SnakemakeMultipleRunOrShellKeywordsInspection : SnakemakeInspection() {
                 return
             }
 
-            var executionSectionOccured = false
+            var executionSectionOccurred = false
+            var executionSectionName: String? = null
 
             val sections = smkRule.getSections()
             for (st in sections) {
                 if (st is SMKRuleParameterListStatement) {
                     val sectionName = st.section.text ?: return
-                    val isExecutionSection = SMKRuleParameterListStatement.EXECUTION_KEYWORDS.contains(sectionName)
-
-                    if (executionSectionOccured && isExecutionSection) {
-                        registerProblem(st.section,
-                                SnakemakeBundle.message("INSP.NAME.multiple.run.or.shell.keywords"))
-                    }
-
+                    val isExecutionSection = sectionName in SMKRuleParameterListStatement.EXECUTION_KEYWORDS
                     if (isExecutionSection) {
-                        executionSectionOccured = true
+                        executionSectionOccurred = true
+                        executionSectionName = sectionName
                     }
-                } else if (st is SMKRuleRunParameter) {
-                    if (executionSectionOccured) {
-                        registerProblem(st.section,
-                                SnakemakeBundle.message("INSP.NAME.multiple.run.or.shell.keywords"))
+
+                    if (executionSectionOccurred && !isExecutionSection) {
+                        requireNotNull(executionSectionName)
+
+                        registerProblem(st,
+                                SnakemakeBundle.message(
+                                        "INSP.NAME.rule.section.after.execution.message",
+                                        sectionName,
+                                        executionSectionName
+                                )
+                        )
                     }
-                    executionSectionOccured = true
                 }
             }
+
         }
     }
-
-    override fun getDisplayName(): String = SnakemakeBundle.message("INSP.NAME.multiple.run.or.shell.keywords")
 }

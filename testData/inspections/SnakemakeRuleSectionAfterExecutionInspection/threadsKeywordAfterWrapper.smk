@@ -5,4 +5,4 @@ rule name:
         "outputfile.txt"
     wrapper:
         "dir/wrapper"
-    <warning descr="Rule keyword 'threads' isn't allowed after 'wrapper' keyword.">threads</warning>: 8
+    <error descr="Rule section 'threads' isn't allowed after 'wrapper' section.">threads: 8</error>

@@ -5,4 +5,4 @@ rule name:
         "outputfile.txt"
     script:
         "script_file.py"
-    <warning descr="Rule keyword 'log' isn't allowed after 'script' keyword.">log</warning>: "log_path"
+    <error descr="Rule section 'log' isn't allowed after 'script' section.">log: "log_path"</error>

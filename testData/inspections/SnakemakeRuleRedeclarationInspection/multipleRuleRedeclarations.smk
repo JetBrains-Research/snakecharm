@@ -10,7 +10,7 @@ rule ANOTHER_NAME:
     shell:
         "cat {input} > {output}"
 
-rule <warning descr="This rule name is already used by another rule.">NAME</warning>:
+rule <error descr="This rule name is already used by another rule.">NAME</error>:
     input:
         "input.txt"
     output:
@@ -26,7 +26,7 @@ rule DIFFERENT_NAME:
     shell:
         "cat {input} > {output}"
 
-rule <warning descr="This rule name is already used by another rule.">ANOTHER_NAME</warning>:
+rule <error descr="This rule name is already used by another rule.">ANOTHER_NAME</error>:
     input:
         "inputfile.txt"
     output:
@@ -34,7 +34,7 @@ rule <warning descr="This rule name is already used by another rule.">ANOTHER_NA
     shell:
         "echo ${input} > {output}"
 
-rule <warning descr="This rule name is already used by another rule.">NAME</warning>:
+rule <error descr="This rule name is already used by another rule.">NAME</error>:
     input:
         "inputfile.txt"
     output:

@@ -5,5 +5,5 @@ rule NAME:
         "outputfile.txt"
     shell:
         "cat {input} > {output}"
-    <warning descr="Multiple run or shell keywords are not allowed.">run</warning>:
-        print('string')
+    <error descr="Multiple run or shell sections are not allowed.">run:
+        print('string')</error>

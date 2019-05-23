@@ -51,7 +51,7 @@
         language="Snakemake"
         shortName="SnakemakeResourcesKeywordArgsInspection"
         enabledByDefault="true"
-        level="WARNING"
+        level="ERROR"
         suppressId="SnakemakeResourcesKeywordArgsInspection"
         bundle="SnakemakeBundle"
         groupKey="INSP.GROUP.snakemake"
@@ -63,7 +63,7 @@
         language="Snakemake"
         shortName="SnakemakePositionalArgsAfterKeywordArgsInspection"
         enabledByDefault="true"
-        level="WARNING"
+        level="ERROR"
         suppressId="SnakemakePositionalArgsAfterKeywordArgs"
         bundle="SnakemakeBundle"
         groupKey="INSP.GROUP.snakemake"
@@ -74,7 +74,7 @@
     <localInspection
         language="Snakemake" shortName="SnakemakeRuleRedeclarationInspection"
         enabledByDefault="true"
-        level="WARNING"
+        level="ERROR"
         suppressId="SnakemakeRuleRedeclaration"
         bundle="SnakemakeBundle"
         groupKey="INSP.GROUP.snakemake"
@@ -83,26 +83,26 @@
     />
 
     <localInspection
-            language="Snakemake" shortName="SnakemakeRuleKeywordsAfterExecutionInspection"
+            language="Snakemake" shortName="SnakemakeRuleSectionAfterExecutionInspection"
             enabledByDefault="true"
-            level="WARNING"
-            suppressId="SnakemakeRuleKeywordsAfterRun"
+            level="ERROR"
+            suppressId="SnakemakeRuleSectionAfterExecution"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.rule.keywords.after.execution"
-            implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeRuleKeywordsAfterExecutionInspection"
+            key="INSP.NAME.rule.section.after.execution"
+            implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeRuleSectionAfterExecutionInspection"
     />
 
 
     <localInspection
-            language="Snakemake" shortName="SnakemakeMultipleRunOrShellKeywordsInspection"
+            language="Snakemake" shortName="SnakemakeMultipleExecutionSectionsInspection"
             enabledByDefault="true"
-            level="WARNING"
-            suppressId="SnakemakeMultipleRunOrShellKeywords"
+            level="ERROR"
+            suppressId="SnakemakeMultipleExecutionSections"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.multiple.run.or.shell.keywords"
-            implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeMultipleRunOrShellKeywordsInspection"
+            key="INSP.NAME.multiple.run.or.shell.section"
+            implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeMultipleExecutionSectionsInspection"
     />
   </extensions>
 
