@@ -6,7 +6,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SMKRule
 
-class SnakemakeRuleRedeclarationInspection : SnakemakeInspection() {
+class SmkRuleRedeclarationInspection : SnakemakeInspection() {
     override fun buildVisitor(
             holder: ProblemsHolder,
             isOnTheFly: Boolean,

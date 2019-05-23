@@ -3,9 +3,9 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionTool
 import com.jetbrains.snakecharm.fixtures.SnakemakeInspectionTestCase
 
-class SnakemakeMultipleExecutionSectionsInspectionTest : SnakemakeInspectionTestCase() {
+class SmkMultipleExecutionSectionsInspectionTest : SnakemakeInspectionTestCase() {
     override val inspectionClass: Class<out LocalInspectionTool>
-        get() = SnakemakeMultipleExecutionSectionsInspection::class.java
+        get() = SmkMultipleExecutionSectionsInspection::class.java
 
     fun testSingleShellKeyword() {
         doTest()

@@ -3,9 +3,9 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionTool
 import com.jetbrains.snakecharm.fixtures.SnakemakeInspectionTestCase
 
-class SnakemakeResourcesKeywordArgsInspectionTest : SnakemakeInspectionTestCase() {
+class SmkResourcesKeywordArgsInspectionTest : SnakemakeInspectionTestCase() {
     override val inspectionClass: Class<out LocalInspectionTool>
-        get() = SnakemakeResourcesKeywordArgsInspection::class.java
+        get() = SmkResourcesKeywordArgsInspection::class.java
 
     fun testResourcesAllArgsKeyword() {
         doTest()

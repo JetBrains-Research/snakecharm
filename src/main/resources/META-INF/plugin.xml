@@ -49,60 +49,60 @@
 
     <localInspection
         language="Snakemake"
-        shortName="SnakemakeResourcesKeywordArgsInspection"
+        shortName="SmkResourcesKeywordArgsInspection"
         enabledByDefault="true"
         level="ERROR"
-        suppressId="SnakemakeResourcesKeywordArgsInspection"
+        suppressId="SmkResourcesKeywordArgsInspection"
         bundle="SnakemakeBundle"
         groupKey="INSP.GROUP.snakemake"
         key="INSP.NAME.resources.unnamed.args"
-        implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeResourcesKeywordArgsInspection"
+        implementationClass="com.jetbrains.snakecharm.inspections.SmkResourcesKeywordArgsInspection"
     />
 
     <localInspection
         language="Snakemake"
-        shortName="SnakemakePositionalArgsAfterKeywordArgsInspection"
+        shortName="SmkPositionalArgsAfterKeywordArgsInspection"
         enabledByDefault="true"
         level="ERROR"
-        suppressId="SnakemakePositionalArgsAfterKeywordArgs"
+        suppressId="SmkPositionalArgsAfterKeywordArgs"
         bundle="SnakemakeBundle"
         groupKey="INSP.GROUP.snakemake"
         key="INSP.NAME.positional.args.after.keyword.args"
-        implementationClass="com.jetbrains.snakecharm.inspections.SnakemakePositionalArgsAfterKeywordArgsInspection"
+        implementationClass="com.jetbrains.snakecharm.inspections.SmkPositionalArgsAfterKeywordArgsInspection"
     />
 
     <localInspection
-        language="Snakemake" shortName="SnakemakeRuleRedeclarationInspection"
+        language="Snakemake" shortName="SmkRuleRedeclarationInspection"
         enabledByDefault="true"
         level="ERROR"
-        suppressId="SnakemakeRuleRedeclaration"
+        suppressId="SmkRuleRedeclaration"
         bundle="SnakemakeBundle"
         groupKey="INSP.GROUP.snakemake"
         key="INSP.NAME.rule.redeclaration"
-        implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeRuleRedeclarationInspection"
+        implementationClass="com.jetbrains.snakecharm.inspections.SmkRuleRedeclarationInspection"
     />
 
     <localInspection
-            language="Snakemake" shortName="SnakemakeRuleSectionAfterExecutionInspection"
+            language="Snakemake" shortName="SmkRuleSectionAfterExecutionInspection"
             enabledByDefault="true"
             level="ERROR"
-            suppressId="SnakemakeRuleSectionAfterExecution"
+            suppressId="SmkRuleSectionAfterExecution"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.rule.section.after.execution"
-            implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeRuleSectionAfterExecutionInspection"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkRuleSectionAfterExecutionInspection"
     />
 
 
     <localInspection
-            language="Snakemake" shortName="SnakemakeMultipleExecutionSectionsInspection"
+            language="Snakemake" shortName="SmkMultipleExecutionSectionsInspection"
             enabledByDefault="true"
             level="ERROR"
-            suppressId="SnakemakeMultipleExecutionSections"
+            suppressId="SmkMultipleExecutionSections"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.multiple.run.or.shell.section"
-            implementationClass="com.jetbrains.snakecharm.inspections.SnakemakeMultipleExecutionSectionsInspection"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkMultipleExecutionSectionsInspection"
     />
   </extensions>
 

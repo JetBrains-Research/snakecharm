@@ -7,7 +7,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 
-class SnakemakePositionalArgsAfterKeywordArgsInspection : SnakemakeInspection() {
+class SmkPositionalArgsAfterKeywordArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
             holder: ProblemsHolder,
             isOnTheFly: Boolean,
