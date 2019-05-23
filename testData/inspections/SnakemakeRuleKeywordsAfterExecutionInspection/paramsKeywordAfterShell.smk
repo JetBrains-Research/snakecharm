@@ -5,4 +5,4 @@ rule name:
         "outputfile.txt"
     shell:
         "cat {input} > {output}"
-    <warning descr="No rule keywords allowed after 'shell' keyword.">params</warning>: mem_mb=100
+    <warning descr="Rule keyword 'params' isn't allowed after 'shell' keyword.">params</warning>: mem_mb=100
