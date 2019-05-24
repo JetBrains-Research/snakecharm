@@ -103,22 +103,40 @@ class CompletionResolveSteps {
 
     @Then("^I invoke autocompletion popup, select \"([^\"]+)\" lookup item and see a text:")
     fun iInvokeAutocompletionPopupAndSelectItem(lookupText: String, text: String) {
+        autoCompleteAndCheck(lookupText, text, Lookup.NORMAL_SELECT_CHAR)
+    }
+
+    @Then("^I invoke autocompletion popup, select \"([^\"]+)\" lookup in (normal|replace|statement|auto) mode and see a text:$")
+    fun iInvokeAutocompletionPopupAndSelectItemWithChar(lookupText: String, mode: String, text: String) {
+        val ch = when (mode) {
+            "normal" -> Lookup.NORMAL_SELECT_CHAR
+            "replace" -> Lookup.REPLACE_SELECT_CHAR
+            "statement" -> Lookup.COMPLETE_STATEMENT_SELECT_CHAR
+            "auto" -> Lookup.AUTO_INSERT_SELECT_CHAR
+            else -> error("Unsupported mode: $mode")
+        }
+
+        autoCompleteAndCheck(lookupText, text, ch)
+    }
+
+    private fun autoCompleteAndCheck(lookupText: String, text: String, ch: Char) {
         iInvokeAutocompletionPopup()
 
         val fixture = SnakemakeWorld.fixture()
         val lookupElements = fixture.lookupElements
+
 
         ApplicationManager.getApplication().invokeAndWait(
                 {
                     checkCompletionResult(
                             LookupFilter.create(lookupText), lookupElements,
                             fixture, false,
-                            StringUtil.convertLineSeparators(text)
+                            StringUtil.convertLineSeparators(text),
+                            ch
                     )
                 },
                 ModalityState.NON_MODAL)
     }
-
     /*
     @When("^I press Enter$")
     fun iPressEnter() {
@@ -233,7 +251,8 @@ class CompletionResolveSteps {
             lookupElements: Array<LookupElement>?,
             fixture: CodeInsightTestFixture,
             checkByFilePath: Boolean,
-            completionResultTextOrFileRelativePath: String
+            completionResultTextOrFileRelativePath: String,
+            completionSelectChar: Char
     ) {
         // If completion list contained only one variant completion list will be closed and
         // variant will be automatically inserted
@@ -249,7 +268,7 @@ class CompletionResolveSteps {
         // zero or several variants
         assertNotNull(lookupElements)
 
-        selectItem(lookupFilter.findElement(lookupElements), Lookup.NORMAL_SELECT_CHAR, fixture.project)
+        selectItem(lookupFilter.findElement(lookupElements), completionSelectChar, fixture.project)
         if (checkByFilePath) {
             fixture.checkResultByFile(completionResultTextOrFileRelativePath)
         } else {

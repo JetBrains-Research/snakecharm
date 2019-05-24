@@ -3,22 +3,21 @@ package com.jetbrains.snakecharm.codeInsight.completion
 import com.intellij.codeInsight.completion.*
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.patterns.PatternCondition
-import com.intellij.patterns.PlatformPatterns
+import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.resolve.CompletionVariantsProcessor
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache
-import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 
 class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
     companion object {
-        private val REFERENCE = PlatformPatterns.psiElement(PyReferenceExpression::class.java)
+        val IN_PY_REF = psiElement().inside(PyReferenceExpression::class.java)
 
-        private val REF_CAPTURE = PlatformPatterns.psiElement()
-                .inside(REFERENCE)
-                .inFile(PlatformPatterns.psiFile().withLanguage(SnakemakeLanguageDialect))
+        private val REF_CAPTURE = psiElement()
+                .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
+                .and(IN_PY_REF)
                 .with(object : PatternCondition<PsiElement>("isFirstChild") {
                     override fun accepts(element: PsiElement, context: ProcessingContext): Boolean {
                         // check that this element is "first" in parent PyReferenceExpression, e.g. that

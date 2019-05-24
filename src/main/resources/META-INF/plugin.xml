@@ -41,6 +41,10 @@
         language="Python"
         implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor"
     />
+    <completion.contributor
+        language="Python"
+        implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKKeywordCompletionContributor"
+    />
 
     <moduleService
         serviceInterface="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
