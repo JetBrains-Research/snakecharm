@@ -104,6 +104,8 @@
             key="INSP.NAME.multiple.run.or.shell.section"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkMultipleExecutionSectionsInspection"
     />
+
+    <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
   </extensions>
 
   <module-components>
