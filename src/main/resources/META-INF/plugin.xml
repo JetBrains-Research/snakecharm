@@ -112,7 +112,6 @@
             key="INSP.NAME.multiple.run.or.shell.section"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkMultipleExecutionSectionsInspection"
     />
-
     <localInspection
             language="Snakemake" shortName="SmkShadowSettingsInspection"
             enabledByDefault="true"
@@ -134,6 +133,7 @@
             key="INSP.NAME.shadow.multiple.settings"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkShadowMultipleSettingsInspection"
     />
+    <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
   </extensions>
 
   <module-components>
