@@ -28,9 +28,16 @@ At the moment the plugin is tested with:
 # IntelliJ Plugins Repository
 Plugin is available in IntelliJ Plugins Repository, see [SnakeCharm](https://plugins.jetbrains.com/plugin/11947-snakecharm).
 
+# EAP version
+Early builds of coming releases are available in EAP channel. To receive this updates add EAP repository:
+* Open IntelliJ IDEA / PyCharm / .. IDE setting
+* In Plugins section press 'gear' icon, select `Manage Plugin Repositories...`
+* Add repo `https://plugins.jetbrains.com/plugins/eap/list` using `+` button, press OK
+
+Now EAP build will be also available as updates
+
 # Support
 Contact me at roman.chernyatchik@jetbrains.com or post issues in [Issue Tracker](https://github.com/JetBrains-Research/snakecharm/issues)
-
 
 # FAQ:
 * If you get "Unimplemented substep definition" in all `*.feature` files, ensure:
