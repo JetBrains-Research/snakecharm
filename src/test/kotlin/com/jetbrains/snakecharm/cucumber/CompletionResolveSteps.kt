@@ -28,6 +28,7 @@ import junit.framework.TestCase
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 /**
  * @author Roman.Chernyatchik
@@ -76,6 +77,39 @@ class CompletionResolveSteps {
 
             val text = TextRange.from(result.textOffset, marker.length).substring(containingFile.text)
             assertEquals(marker, text)
+        }
+    }
+
+    @Then("^reference should multi resolve to name, file, times$")
+    fun referenceShouldMultiResolveToIn(table: DataTable) {
+        ApplicationManager.getApplication().runReadAction {
+            val ref = getReferenceAtOffset()
+            assertNotNull(ref)
+
+            val results = multiResolve(ref)
+
+            assertEquals(0, results.filter { it == null }.size)
+            assertEquals(0, results.filter { it!!.containingFile == null }.size)
+
+            val completionList = results
+                    .map { result ->
+                        result!!.text to result.containingFile.name
+                    }
+                    .groupBy { it }
+                    .map { entry -> entry.key to entry.value.size }
+                    .toMap()
+
+            val records = table.asLists(String::class.java)
+
+            records.forEach { row ->
+                val key = row[0] to row[1]
+                val expectedTimes = row[2].toInt()
+                val actualTimes = completionList.getOrDefault(key, 0)
+                assertEquals(
+                        expectedTimes, actualTimes,
+                        "Expected $expectedTimes but was $actualTimes occurrences of $key"
+                )
+            }
         }
     }
 
@@ -170,6 +204,16 @@ class CompletionResolveSteps {
             results[0].element
         }
         else -> ref.resolve()
+    }
+
+    private fun multiResolve(ref: PsiReference) = when (ref) {
+        is PsiPolyVariantReference -> {
+            val results = ref.multiResolve(false)
+            assertNotNull(results)
+            assertTrue(results.isNotEmpty())
+            results.map { it.element}
+        }
+        else -> listOf(ref.resolve())
     }
 
     private fun doComplete() {

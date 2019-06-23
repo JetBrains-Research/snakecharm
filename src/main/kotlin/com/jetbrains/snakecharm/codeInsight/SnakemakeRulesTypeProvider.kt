@@ -5,6 +5,7 @@ import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.PyTypeProviderBase
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
 import com.jetbrains.snakecharm.lang.psi.types.SnakemakeRulesType
 
 class SnakemakeRulesTypeProvider : PyTypeProviderBase() {
@@ -12,11 +13,16 @@ class SnakemakeRulesTypeProvider : PyTypeProviderBase() {
             referenceExpression: PyReferenceExpression,
             context: TypeEvalContext
     ): PyType? {
-        if (referenceExpression.containingFile.language != SnakemakeLanguageDialect) {
+
+        if (!SnakemakeLanguageDialect.isInsideSmkFile(referenceExpression)) {
             return null
         }
 
+        val psiFile = referenceExpression.containingFile
         val name = referenceExpression.referencedName
-        return if (name == "rules") SnakemakeRulesType() else null
+
+        // XXX: at the moment affects all "rules" variables in a *.smk file, better to
+        // affect only "rules" which is resolved to appropriate place
+        return if (name == "rules") SnakemakeRulesType(psiFile as SnakemakeFile) else null
     }
 }

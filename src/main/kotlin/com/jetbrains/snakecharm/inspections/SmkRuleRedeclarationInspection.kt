@@ -15,7 +15,7 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
         private val ruleNames = mutableSetOf<String>()
 
         override fun visitSMKRule(smkRule: SMKRule) {
-            if (smkRule.containingFile.language != SnakemakeLanguageDialect) {
+            if (!SnakemakeLanguageDialect.isInsideSmkFile(smkRule)) {
                 return
             }
 

@@ -13,7 +13,7 @@ class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
             element: PyQualifiedExpression,
             context: TypeEvalContext
     ): List<RatedResolveResult> {
-        if (context.origin?.language == SnakemakeLanguageDialect) {
+        if (SnakemakeLanguageDialect.isInsideSmkFile(context.origin)) {
             val module = ModuleUtilCore.findModuleForPsiElement(element)
             if (module != null) {
                 val elements = ImplicitPySymbolsCache.instance(module).find(element.name!!)

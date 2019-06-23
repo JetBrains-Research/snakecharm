@@ -71,3 +71,23 @@ Feature: Resolve rule names used with rules (e.g. 'rules.NAME')
       | rules.aa  | aaaa      | aaaa        | foo.smk      |
       | rules.bbb | bbbb      | bbbb        | foo.smk      |
 
+
+  Scenario: Multi resolve for rules with same name
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule foo:
+      input: "path/to/input"
+      output: "path/to/output"
+      shell: "shell command"
+
+    rule foo:
+      input: "path/to/input"
+      output: "path/to/output"
+      script: "script.py"
+
+    rules.foo
+    """
+    When I put the caret after rules.f
+    Then reference should multi resolve to name, file, times
+    | foo | foo.smk | 2 |
