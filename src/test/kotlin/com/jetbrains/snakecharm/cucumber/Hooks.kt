@@ -11,9 +11,7 @@ class Hooks {
     @After(order = 1)
     @Throws(Throwable::class)
     fun cleanup() {
-        if (SnakemakeWorld.myFixture != null) {
-            SnakemakeWorld.myFixture!!.tearDown()
-        }
+        SnakemakeWorld.myFixture?.tearDown()
     }
 //
 //    @After(order = 0)
