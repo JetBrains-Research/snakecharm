@@ -20,7 +20,7 @@ apply plugin: 'kotlin'
 def hasPyCharm = project.hasProperty('pycharmPath')
 def hasPythonPlugin = project.hasProperty('pythonPlugin')
 
-version '0.3.SNAPSHOT'
+version '0.3.2018.3'
 
 intellij {
     pluginName 'snakecharm'

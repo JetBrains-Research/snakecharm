@@ -31,10 +31,18 @@ Plugin is available in IntelliJ Plugins Repository, see [SnakeCharm](https://plu
 # Support
 Contact me at roman.chernyatchik@jetbrains.com or post issues in [Issue Tracker](https://github.com/JetBrains-Research/snakecharm/issues)
 
-# Development
-Pull requests are welcome. It is my side project, so I appreciate your help implementing plugin desired features.
 
-FAQ:
+# FAQ:
 * If you get "Unimplemented substep definition" in all `*.feature` files, ensure:
   * Not installed or disabled: `Substeps IntelliJ Plugin` 
   * Plugins installed: `Cucumber Java`, `Gherkin`
+  
+# Development
+
+Pull requests are welcome. It is my side project, so I appreciate your help implementing plugin desired features.
+
+Release plugin:
+* Fix version in `build.gradle`
+* Fix since/until build versions in `build.gradle`
+* Fix change notes in `CHANGES` file
+* Use 'publishPlugin' task

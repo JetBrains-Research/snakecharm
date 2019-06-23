@@ -3,6 +3,22 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
+Version 0.3.2018.3
+-------------
+Released on June 23th 2019 (eap channel)
+- sinceBuild "183.4284"
+- untilBuild "191.*"
+
+Features
+- Completion/resolve for methods like 'touch', 'expand', etc., also `rules`, `config` objects, see #1
+- Completion/resolve for rules names after 'rules.'
+
+Code inspections:
+- Multiple run or shell keywords inspections, #48
+- A rule name is already used by another rule, #17
+- Positional argument follows keyword argument
+- No rule keywords allowed after run/shell/script/wrapper/cwl in rule foo.', #37
+
 Version 0.2.2018.3
 -------------
 Released on Feb 4th 2019
