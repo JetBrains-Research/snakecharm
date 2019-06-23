@@ -16,7 +16,7 @@ Features
 Code inspections:
 - Multiple run or shell keywords inspections, #48
 - A rule name is already used by another rule, #17
-- Positional argument follows keyword argument
+- A positional argument follows a keyword argument
 - No rule keywords allowed after run/shell/script/wrapper/cwl in rule foo.', #37
 
 Version 0.2.2018.3
