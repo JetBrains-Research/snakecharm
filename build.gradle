@@ -31,14 +31,12 @@ intellij {
 
     plugins = []
     if (hasPyCharm) {
-            alternativeIdePath pycharmPath
-        }
-        else if (hasPythonPlugin) {
-            plugins += [pythonPlugin]
-        }
-        else {
-            throw new StopActionException("Define either pycharmPath or pythonPlugin in your gradle.properties")
-        }
+        alternativeIdePath pycharmPath
+    } else if (hasPythonPlugin) {
+        plugins += [pythonPlugin]
+    } else {
+        throw new StopActionException("Define either pycharmPath or pythonPlugin in your gradle.properties")
+    }
 
     instrumentCode Boolean.valueOf(instrumentPluginCode)
     downloadSources Boolean.valueOf(downloadIdeaSources)
