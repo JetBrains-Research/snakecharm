@@ -16,13 +16,14 @@ class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyState
         const val SCRIPT = "script"
         const val WRAPPER = "wrapper"
         const val CWL = "cwl"
+        const val SHADOW = "shadow"
 
         val EXECUTION_KEYWORDS = setOf(SHELL, SCRIPT, WRAPPER, CWL)
 
         val PARAMS_NAMES = setOf(
                 "output", "input", "params", "log", RESOURCES,
                 "benchmark", "version", "message", SHELL, "threads", "singularity",
-                "priority", "benchmark", "wildcard_constraints", "group", "shadow",
+                "priority", "benchmark", "wildcard_constraints", "group", SHADOW,
                 "conda", // >= 4.8
                 SCRIPT, WRAPPER, CWL
         )
@@ -33,6 +34,8 @@ class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyState
 
     val argumentList: PyArgumentList?
         get() = children.filter { it is PyArgumentList }.elementAtOrNull(0) as? PyArgumentList
+
+    override fun getName() = getNameNode()?.text
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
         when (pyVisitor) {
