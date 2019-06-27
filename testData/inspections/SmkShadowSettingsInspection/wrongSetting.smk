@@ -3,4 +3,4 @@ rule NAME:
          "inputfile.txt"
     output:
           "outputfile.txt"
-    shadow: <warning descr="Only 'full', 'shallow' and 'minimal' shadow settings are allowed.">"parameter"</warning>
+    shadow: <warning descr="Shadow must either be 'shallow', 'full', 'minimal', or True (equivalent to 'full').">"parameter"</warning>
