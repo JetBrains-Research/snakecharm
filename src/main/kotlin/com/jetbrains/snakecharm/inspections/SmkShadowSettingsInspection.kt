@@ -21,8 +21,7 @@ class SmkShadowSettingsInspection : SnakemakeInspection()  {
                 return
             }
 
-            val argument = if (st.argumentList?.arguments?.size != 0) st.argumentList!!.arguments[0] else null
-
+            val argument = st.argumentList?.arguments?.elementAtOrNull(0)
             if (argument != null &&
                     argument is PyStringLiteralExpression &&
                     argument.stringValue !in ShadowSectionSettingsProvider.SHADOW_SETTINGS) {
