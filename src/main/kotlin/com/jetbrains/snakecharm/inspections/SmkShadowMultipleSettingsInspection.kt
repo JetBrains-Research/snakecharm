@@ -2,13 +2,11 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
-import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.completion.ShadowSectionSettingsProvider
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 
-class SmkShadowSettingsInspection : SnakemakeInspection()  {
+class SmkShadowMultipleSettingsInspection : SnakemakeInspection()  {
     override fun buildVisitor(
             holder: ProblemsHolder,
             isOnTheFly: Boolean,
@@ -21,16 +19,13 @@ class SmkShadowSettingsInspection : SnakemakeInspection()  {
                 return
             }
 
-            val stringLiteral = st.argumentList?.arguments?.get(0)
-
-            if (stringLiteral != null &&
-                    stringLiteral is PyStringLiteralExpression &&
-                    stringLiteral.stringValue !in ShadowSectionSettingsProvider.SHADOW_SETTINGS) {
-                registerProblem(stringLiteral.originalElement,
-                        SnakemakeBundle.message("INSP.NAME.shadow.settings"))
+            val size = st.argumentList?.arguments?.size
+            if (size != null && size > 1) {
+                registerProblem(st.argumentList!!.originalElement,
+                        SnakemakeBundle.message("INSP.NAME.shadow.multiple.settings"))
             }
         }
     }
 
-    override fun getDisplayName(): String = SnakemakeBundle.message("INSP.NAME.shadow.settings")
+    override fun getDisplayName(): String = SnakemakeBundle.message("INSP.NAME.shadow.multiple.settings")
 }
