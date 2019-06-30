@@ -195,6 +195,10 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testDocstrings() {
+        doTest()
+    }
+
     /**
      * Test with latest versions of Python 2 and Python 3.
      */

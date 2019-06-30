@@ -115,6 +115,11 @@ class SnakemakeStatementParsing(
         }
         checkMatches(PyTokenTypes.COLON, "Rule name identifier or ':' expected") // bundle
 
+        // Skipping a docstring
+        if (myBuilder.tokenType === PyTokenTypes.TRIPLE_QUOTED_STRING) {
+            parsingContext.expressionParser.parseExpression()
+        }
+
         val ruleStatements = myBuilder.mark()
         val multiline = atToken(PyTokenTypes.STATEMENT_BREAK)
         if (!multiline) {
@@ -142,6 +147,17 @@ class SnakemakeStatementParsing(
     private fun parseRuleParameter(): Boolean {
         if (myBuilder.eof()) {
             return false
+        }
+
+        // Skipping a docstring
+        if (myBuilder.tokenType === PyTokenTypes.TRIPLE_QUOTED_STRING) {
+            parsingContext.expressionParser.parseExpression()
+
+            if (myBuilder.tokenType === PyTokenTypes.STATEMENT_BREAK) {
+                nextToken()
+            }
+
+            return true
         }
 
         val keyword = myBuilder.tokenText
