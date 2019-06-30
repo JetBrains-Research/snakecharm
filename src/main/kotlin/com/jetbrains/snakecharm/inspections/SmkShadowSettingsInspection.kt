@@ -21,9 +21,8 @@ class SmkShadowSettingsInspection : SnakemakeInspection()  {
                 return
             }
 
-            val argument = st.argumentList?.arguments?.elementAtOrNull(0)
-            if (argument != null &&
-                    argument is PyStringLiteralExpression &&
+            val argument = st.argumentList?.arguments?.firstOrNull()
+            if (argument is PyStringLiteralExpression &&
                     argument.stringValue !in ShadowSectionSettingsProvider.SHADOW_SETTINGS) {
                 registerProblem(argument.originalElement,
                         SnakemakeBundle.message("INSP.NAME.shadow.settings"))
