@@ -39,6 +39,13 @@ open class SMKRule(node: ASTNode): PyElementImpl(node), PyStatementListContainer
 
     fun getNameNode() = getIdentifierNode(node)
 
+    fun getSectionByName(sectionName: String) =
+            statementList.statements.find {
+                (it as SMKRuleParameterListStatement)
+                    .section
+                    .textMatches(sectionName)
+            } as? SMKRuleParameterListStatement
+
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
         when (pyVisitor) {
             is SnakemakeAnnotator -> pyVisitor.visitSMKRule(this)

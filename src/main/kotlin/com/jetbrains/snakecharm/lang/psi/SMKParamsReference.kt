@@ -8,47 +8,38 @@ import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.util.parentOfType
+import com.intellij.util.PlatformIcons
 import com.jetbrains.python.psi.resolve.RatedResolveResult
+import icons.PythonIcons
 import java.util.*
 
 
 class SMKParamsReference(
         element: PsiElement, textRange: TextRange
-) : PsiReferenceBase<PsiElement>(element, textRange), PsiPolyVariantReference {
+) : PsiReferenceBase<PsiElement>(element, textRange) {
     private val key: String = element.text.substring(textRange.startOffset, textRange.endOffset)
 
-    override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
-        val paramsSection = getParamsSection() ?: return emptyArray()
-        paramsSection.argumentList?.arguments?.forEach {
+    override fun resolve(): PsiElement? {
+        getKeywordArguments()?.forEach {
             if (it.name == this.key) {
-                return arrayOf(RatedResolveResult(RatedResolveResult.RATE_NORMAL, it))
+                return it
             }
         }
-        return emptyArray()
-    }
-
-    override fun resolve(): PsiElement? {
-        val resolveResults = multiResolve(false)
-        return if (resolveResults.size == 1) resolveResults[0].element else null
+        return null
     }
 
     override fun getVariants(): Array<Any> {
-        val paramsSection = getParamsSection() ?: return emptyArray()
-        val variants = ArrayList<LookupElement>()
-        paramsSection.argumentList?.arguments?.forEach {
-            variants.add(LookupElementBuilder.create(it.name!!))
+        val variants = mutableListOf<LookupElement>()
+        getKeywordArguments()?.forEach {
+            variants.add(LookupElementBuilder.create(it.name!!).withIcon(PlatformIcons.PARAMETER_ICON))
         }
         return variants.toTypedArray()
     }
 
     private fun getParamsSection(): SMKRuleParameterListStatement? {
         val rule = this.element.parentOfType<SMKRule>() ?: return null
-        return rule.statementList.statements
-                ?.find {
-                    (it as SMKRuleParameterListStatement)
-                            .section
-                            .textMatches(SMKRuleParameterListStatement.PARAMS)
-                }
-                as? SMKRuleParameterListStatement
+        return rule.getSectionByName(SMKRuleParameterListStatement.PARAMS)
     }
+
+    private fun getKeywordArguments() = getParamsSection()?.argumentList?.arguments
 }
