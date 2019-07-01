@@ -195,7 +195,19 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-    fun testDocstrings() {
+    fun testSingleLineDocstring() {
+        doTest()
+    }
+
+    fun testMultiLineDocstrings() {
+        doTest()
+    }
+
+    fun testSingleQuotedDocstrings() {
+        doTest()
+    }
+
+    fun testCrazyDocstrings() {
         doTest()
     }
 

@@ -50,9 +50,9 @@ SnakemakeFile: RuleInvalidParam.smk
     PsiElement(Py:IDENTIFIER)('all4')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
-    PyStringLiteralExpression: input
-      PsiElement(Py:SINGLE_QUOTED_STRING)(''input'')
     PyStatementList
+      PyStringLiteralExpression: input
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''input'')
       PsiErrorElement:Rule parameter identifier is expected
         <empty list>
       PsiElement(Py:COLON)(':')

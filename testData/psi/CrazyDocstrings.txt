@@ -1,0 +1,36 @@
+SnakemakeFile: CrazyDocstrings.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('NAME')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      PyStringLiteralExpression: Docstring 1
+        PsiElement(Py:TRIPLE_QUOTED_STRING)('"""Docstring 1"""')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: Docstring 2Docstring 3
+        PsiElement(Py:TRIPLE_QUOTED_STRING)('"""Docstring 2"""')
+        PsiWhiteSpace(' ')
+        PsiElement(Py:TRIPLE_QUOTED_STRING)('"""Docstring 3"""')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: Docstring 4
+        PsiElement(Py:TRIPLE_QUOTED_STRING)('"""Docstring 4"""')
+      PsiWhiteSpace(' ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: input.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"input.txt"')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: Docstring 5
+        PsiElement(Py:TRIPLE_QUOTED_STRING)('"""Docstring 5"""')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: output.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"output.txt"')
