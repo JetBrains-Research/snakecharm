@@ -18,14 +18,13 @@ SnakemakeFile: RuleInvalidParam.smk
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: input
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''input'')
       PsiErrorElement:Rule parameter identifier is expected
         <empty list>
-      PsiElement(Py:SINGLE_QUOTED_STRING)(''input'')
-  PsiElement(Py:COLON)(':')
+      PsiElement(Py:COLON)(':')
   PsiWhiteSpace(' ')
-  PyExpressionStatement
-    PyStringLiteralExpression: foo2
-      PsiElement(Py:SINGLE_QUOTED_STRING)(''foo2'')
+  PsiElement(Py:SINGLE_QUOTED_STRING)(''foo2'')
   PsiErrorElement:Statement expected, found Py:DEDENT
     <empty list>
   PsiWhiteSpace('\n\n')
@@ -51,13 +50,12 @@ SnakemakeFile: RuleInvalidParam.smk
     PsiElement(Py:IDENTIFIER)('all4')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
+    PyStringLiteralExpression: input
+      PsiElement(Py:SINGLE_QUOTED_STRING)(''input'')
     PyStatementList
       PsiErrorElement:Rule parameter identifier is expected
         <empty list>
-      PsiElement(Py:SINGLE_QUOTED_STRING)(''input'')
-  PsiElement(Py:COLON)(':')
-  PsiErrorElement:Statement expected, found Py:COLON
-    <empty list>
+      PsiElement(Py:COLON)(':')
   PsiWhiteSpace(' ')
   PyExpressionStatement
     PyReferenceExpression: foo4

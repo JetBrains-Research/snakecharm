@@ -115,8 +115,9 @@ class SnakemakeStatementParsing(
         }
         checkMatches(PyTokenTypes.COLON, "Rule name identifier or ':' expected") // bundle
 
+
         // Skipping a docstring
-        if (myBuilder.tokenType === PyTokenTypes.TRIPLE_QUOTED_STRING) {
+        if (myBuilder.tokenType.isPythonString()) {
             parsingContext.expressionParser.parseExpression()
         }
 
@@ -150,7 +151,7 @@ class SnakemakeStatementParsing(
         }
 
         // Skipping a docstring
-        if (myBuilder.tokenType === PyTokenTypes.TRIPLE_QUOTED_STRING) {
+        if (myBuilder.tokenType.isPythonString()) {
             parsingContext.expressionParser.parseExpression()
 
             if (myBuilder.tokenType === PyTokenTypes.STATEMENT_BREAK) {
@@ -216,4 +217,9 @@ class SnakemakeStatementParsing(
 //    override fun getFunctionParser(): FunctionParsing {
 //        return super.getFunctionParser()
 //    }
+}
+
+fun IElementType?.isPythonString() : Boolean {
+    return this === PyTokenTypes.TRIPLE_QUOTED_STRING ||
+            this === PyTokenTypes.SINGLE_QUOTED_STRING
 }

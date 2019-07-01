@@ -2,7 +2,7 @@ SnakemakeFile: Docstrings.smk
   SMKRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('NAME')
+    PsiElement(Py:IDENTIFIER)('TRIPLE_QUOTED_DOCSTRINGS')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStringLiteralExpression: Docstring 1
@@ -12,8 +12,13 @@ SnakemakeFile: Docstrings.smk
       PyStringLiteralExpression: Docstring 2
         PsiElement(Py:TRIPLE_QUOTED_STRING)('"""Docstring 2"""')
       PsiWhiteSpace('\n    ')
-      PyStringLiteralExpression: Docstring 3
+      PyStringLiteralExpression: Docstring 3Docstring 4
         PsiElement(Py:TRIPLE_QUOTED_STRING)('"""Docstring 3"""')
+        PsiWhiteSpace(' ')
+        PsiElement(Py:TRIPLE_QUOTED_STRING)('"""Docstring 4"""')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: Docstring 5
+        PsiElement(Py:TRIPLE_QUOTED_STRING)('"""Docstring 5"""')
       PsiWhiteSpace(' ')
       SMKRuleParameterListStatement
         PsiElement(Py:IDENTIFIER)('input')
@@ -23,6 +28,8 @@ SnakemakeFile: Docstrings.smk
           PyStringLiteralExpression: input.txt
             PsiElement(Py:SINGLE_QUOTED_STRING)('"input.txt"')
       PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: Docstring 6
+        PsiElement(Py:TRIPLE_QUOTED_STRING)('"""Docstring 6"""')
       SMKRuleParameterListStatement
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
@@ -30,5 +37,81 @@ SnakemakeFile: Docstrings.smk
           PsiWhiteSpace(' ')
           PyStringLiteralExpression: output.txt
             PsiElement(Py:SINGLE_QUOTED_STRING)('"output.txt"')
-
-
+  PsiWhiteSpace('\n\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('DOUBLE_QUOTED_DOCSTRINGS')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStringLiteralExpression: Docstring 1
+      PsiElement(Py:SINGLE_QUOTED_STRING)('"Docstring 1"')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: Docstring 2
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"Docstring 2"')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: Docstring 3Docstring 4
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"Docstring 3"')
+        PsiWhiteSpace(' ')
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"Docstring 4"')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: Docstring 5
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"Docstring 5"')
+      PsiWhiteSpace(' ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: input.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"input.txt"')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: Docstring 6
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"Docstring 6"')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: output.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"output.txt"')
+  PsiWhiteSpace('\n\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('SINGLE_QUOTED_DOCSTRINGS')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStringLiteralExpression: Docstring 1
+      PsiElement(Py:SINGLE_QUOTED_STRING)(''Docstring 1'')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: Docstring 2
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''Docstring 2'')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: Docstring 3Docstring 4
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''Docstring 3'')
+        PsiWhiteSpace(' ')
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''Docstring 4'')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: Docstring 5
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''Docstring 5'')
+      PsiWhiteSpace(' ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: input.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"input.txt"')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: Docstring 6
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''Docstring 6'')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: output.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"output.txt"')
