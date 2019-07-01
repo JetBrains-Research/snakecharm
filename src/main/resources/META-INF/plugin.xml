@@ -112,6 +112,28 @@
             key="INSP.NAME.multiple.run.or.shell.section"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkMultipleExecutionSectionsInspection"
     />
+
+    <localInspection
+            language="Snakemake" shortName="SmkShadowSettingsInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkShadowSettingsInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.shadow.settings"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkShadowSettingsInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkShadowMultipleSettingsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkShadowMultipleSettingsInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.shadow.multiple.settings"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkShadowMultipleSettingsInspection"
+    />
   </extensions>
 
   <module-components>
