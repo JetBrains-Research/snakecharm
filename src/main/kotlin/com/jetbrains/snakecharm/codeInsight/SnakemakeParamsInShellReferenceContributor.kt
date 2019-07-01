@@ -19,7 +19,7 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
                         .psiElement(PyStringLiteralExpression::class.java)
                         .withParent(PyArgumentList::class.java),
                 object : PsiReferenceProvider() {
-                    private val paramsPattern = Pattern.compile("\\{params\\.(.+?)[.}]")
+                    private val paramsPattern = Pattern.compile("\\{params\\.([a-zA-Z]+?)[^a-zA-Z]")
 
                     override fun getReferencesByElement(
                             element: PsiElement,
