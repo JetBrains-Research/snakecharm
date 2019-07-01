@@ -5,6 +5,7 @@ import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.*
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
+import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SMKParamsReference
@@ -14,9 +15,11 @@ import java.util.regex.Pattern
 class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
         registrar.registerReferenceProvider(
-                PlatformPatterns.psiElement(),
+                PlatformPatterns
+                        .psiElement(PyStringLiteralExpression::class.java)
+                        .withParent(PyArgumentList::class.java),
                 object : PsiReferenceProvider() {
-                    private val paramsPattern = Pattern.compile("\\{params\\.(.+?)}")
+                    private val paramsPattern = Pattern.compile("\\{params\\.([^.]+?)}")
 
                     override fun getReferencesByElement(
                             element: PsiElement,
@@ -35,6 +38,7 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
                         if (element is PyStringLiteralExpression && isShellCommand) {
 
                             val paramsMatcher = paramsPattern.matcher(element.text)
+
                             while (paramsMatcher.find()) {
                                 paramReferences.add(SMKParamsReference(element,
                                         TextRange(paramsMatcher.start(1), paramsMatcher.end(1))))
