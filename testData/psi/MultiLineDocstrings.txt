@@ -2,15 +2,14 @@ SnakemakeFile: MultiLineDocstrings.smk
   SMKRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('NAME')
+    PsiElement(Py:IDENTIFIER)('Name')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      PyStringLiteralExpression: Docstring 1
-        PsiElement(Py:TRIPLE_QUOTED_STRING)('"""Docstring 1"""')
-      PsiWhiteSpace('\n    ')
-      PyStringLiteralExpression: Docstring 2
-        PsiElement(Py:TRIPLE_QUOTED_STRING)('"""Docstring 2"""')
+      PyStringLiteralExpression:  line 1
+    line 2
+
+        PsiElement(Py:TRIPLE_QUOTED_STRING)('""" line 1\n    line 2\n    """')
       PsiWhiteSpace('\n    ')
       SMKRuleParameterListStatement
         PsiElement(Py:IDENTIFIER)('input')
