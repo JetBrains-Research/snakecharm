@@ -195,6 +195,22 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testSingleLineDocstring() {
+        doTest()
+    }
+
+    fun testMultiLineDocstrings() {
+        doTest()
+    }
+
+    fun testSingleQuotedDocstrings() {
+        doTest()
+    }
+
+    fun testCrazyDocstrings() {
+        doTest()
+    }
+
     /**
      * Test with latest versions of Python 2 and Python 3.
      */
