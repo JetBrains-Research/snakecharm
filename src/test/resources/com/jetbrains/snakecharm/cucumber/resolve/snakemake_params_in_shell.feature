@@ -20,3 +20,20 @@ Feature: Resolve for params in shell section
       | ptn         | text          | symbol_name | file         |
       | {params.out | outdir        | outdir      | foo.smk      |
       | {params.xm  | xmx           | xmx         | foo.smk      |
+
+    Scenario: Resolve in shell section in case of 'nested' parameters
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      import os
+      rule aaaa:
+        input: "path/to/input"
+        output: "path/to/output"
+        params:
+          xmx=os
+        shell: "command {params.xmx.path}"
+      """
+      When I put the caret after {params.xm
+      Then reference should resolve to "xmx" in "foo.smk"
+
+
