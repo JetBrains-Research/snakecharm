@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.PlatformPatterns.psiElement
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.PyTokenTypes
@@ -98,14 +99,21 @@ object ColonAndWhiteSpaceTail : TailType() {
 object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
             .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
-            .inside(SMKRule::class.java)
-            .andNot(psiElement().inside(PyArgumentList::class.java))
+            .inside(SMKRule::class.java)!!
 
     override fun addCompletions(
             parameters: CompletionParameters,
             context: ProcessingContext,
             result: CompletionResultSet
     ) {
+        if (PsiTreeUtil.getParentOfType(parameters.originalPosition, PyArgumentList::class.java) != null) {
+            // cannot move this check into CAPTURER because fake token inserted on completion breaks
+            // PSI and current psi element looks like in PyArgumentList
+            // XXX: probably we need force SnakeMake parser to accept any identifier name as section name
+            // XXX and add inspection which tells about sections with unsupported names
+            return
+        }
+
         (SMKRuleParameterListStatement.PARAMS_NAMES + setOf(SMKRuleRunParameter.PARAM_NAME)).forEach { s ->
             result.addElement(TailTypeDecorator.withTail(
                     PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
