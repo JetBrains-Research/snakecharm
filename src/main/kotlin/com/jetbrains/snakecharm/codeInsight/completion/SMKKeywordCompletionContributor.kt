@@ -89,7 +89,8 @@ object ColonAndWhiteSpaceTail : TailType() {
         }
 
         // insert
-        editor.document.insertString(iterator.start, ": ")
+        editor.document.insertString(tailOffset, ": ")
+
         return moveCaret(editor, tailOffset, 2)
     }
 }

@@ -141,7 +141,7 @@ class CompletionResolveSteps {
         autoCompleteAndCheck(lookupText, text, Lookup.NORMAL_SELECT_CHAR)
     }
 
-    @Then("^I invoke autocompletion popup, select \"([^\"]+)\" lookup in (normal|replace|statement|auto) mode and see a text:$")
+    @Then("^I invoke autocompletion popup, select \"([^\"]+)\" lookup item in (normal|replace|statement|auto) mode and see a text:$")
     fun iInvokeAutocompletionPopupAndSelectItemWithChar(lookupText: String, mode: String, text: String) {
         val ch = when (mode) {
             "normal" -> Lookup.NORMAL_SELECT_CHAR
