@@ -1,0 +1,32 @@
+SnakemakeFile: HangingComa.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('my_rule')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: my_input.file
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''my_input.file'')
+          PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: my_output.file
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''my_output.file'')
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: echo hi world
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''echo hi world'')
