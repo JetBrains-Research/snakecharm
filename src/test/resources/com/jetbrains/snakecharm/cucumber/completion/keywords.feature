@@ -98,3 +98,21 @@ Feature: Completion for snakemake keyword-like things
       | rule                  |
       | checkpoint            |
 
+  Scenario Outline: Complete at rule level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule NAME:
+      <str>
+    """
+    When I put the caret after <str>
+    Then I invoke autocompletion popup, select "<result>" lookup item and see a text:
+    """
+    rule NAME:
+      <result>: 
+    """
+   Examples:
+    | str | result |
+    | inp | input  |
+    | out | output |
+

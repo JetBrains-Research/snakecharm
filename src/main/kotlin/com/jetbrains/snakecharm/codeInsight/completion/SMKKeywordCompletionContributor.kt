@@ -90,6 +90,7 @@ object ColonAndWhiteSpaceTail : TailType() {
 
         // insert
         editor.document.insertString(iterator.start, ": ")
+
         return moveCaret(editor, tailOffset, 2)
     }
 }
@@ -108,7 +109,14 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
         (SMKRuleParameterListStatement.PARAMS_NAMES + setOf(SMKRuleRunParameter.PARAM_NAME)).forEach { s ->
             result.addElement(TailTypeDecorator.withTail(
                     PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
-                    ColonAndWhiteSpaceTail
+                    object : TailType() {
+                        override fun processTail(editor: Editor, tailOffset: Int): Int {
+                            val iterator = (editor as EditorEx).highlighter.createIterator(tailOffset)
+                            editor.document.insertString(iterator.end, ": ")
+
+                            return moveCaret(editor, tailOffset, 2)
+                        }
+                    }
             ))
         }
     }
