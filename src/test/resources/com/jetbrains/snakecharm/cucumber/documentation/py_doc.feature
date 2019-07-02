@@ -3,7 +3,7 @@ Feature: Check documentation popup for python file
 
   Scenario: Documentation for some python method
     Given a snakemake project
-    Given I open a file "foo.smk" with text
+    Given I open a file "foo.py" with text
     """
     def foo():
       pass
@@ -16,7 +16,7 @@ Feature: Check documentation popup for python file
 
   Scenario: Navigation info for some python method
       Given a snakemake project
-      Given I open a file "foo.smk" with text
+      Given I open a file "foo.py" with text
       """
       def foo():
         \"\"\"my documentation\"\"\"
