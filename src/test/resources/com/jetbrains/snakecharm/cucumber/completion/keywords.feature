@@ -134,7 +134,7 @@ Feature: Completion for snakemake keyword-like things
       | run | run                  |
       | wr  | wrapper              |
 
-  Scenario: Complete and skip colon at rule level
+  Scenario: Complete and replace at rule level
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
