@@ -8,7 +8,7 @@ plugins {
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
     // See https://github.com/JetBrains/gradle-intellij-plugin
-    id 'org.jetbrains.intellij' version '0.4.8'
+    id 'org.jetbrains.intellij' version '0.4.9'
 
     // Kotlin
     id "org.jetbrains.kotlin.jvm" version "1.3.11"
@@ -17,30 +17,31 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'kotlin'
 
-def hasPyCharm = project.hasProperty('pycharmPath')
 def hasPythonPlugin = project.hasProperty('pythonPlugin')
 
-version '0.3.3.2018.3'
+version '0.4.2018.3'
 
 intellij {
     pluginName 'snakecharm'
-    version ideaVersion
-    sandboxDirectory = "${project.rootDir}/.sandbox"
-    ideaDependencyCachePath  = "${project.rootDir}/.idea_distrib_cache"
-    updateSinceUntilBuild false
+    version ideVersion
+    type ideType
+    def usePyCharm = "PC" == ideType || "PY" == ideType
 
     plugins = []
-    if (hasPyCharm) {
-        alternativeIdePath pycharmPath
+    if (usePyCharm && hasPythonPlugin)  {
+        throw new StopActionException("Cannot install python plugin in PyCharm. Use PyCharm or IDEA with defined pythonPlugin.")
     } else if (hasPythonPlugin) {
         plugins += [pythonPlugin]
-    } else {
-        throw new StopActionException("Define either pycharmPath or pythonPlugin in your gradle.properties")
+    } else if (!usePyCharm) {
+        throw new StopActionException("Define either PyCharm build or other ide with pythonPlugin in your gradle.properties")
     }
 
+    sandboxDirectory "${project.rootDir}/.sandbox${usePyCharm ? "_pycharm" : "" }"
+    ideaDependencyCachePath  "${project.rootDir}/.idea_distrib_cache"
+    updateSinceUntilBuild false
     instrumentCode Boolean.valueOf(instrumentPluginCode)
     downloadSources Boolean.valueOf(downloadIdeaSources)
-    // intellijRepo = "https://www.jetbrains.com/intellij-repository"
+    // intellijRepo "https://www.jetbrains.com/intellij-repository"
 }
 
 publishPlugin {
@@ -52,7 +53,7 @@ patchPluginXml {
     // Use change notes on github
     //changeNotes """ """
     sinceBuild "183.4284.36"
-    untilBuild "191.*"
+    untilBuild "192.*"
 }
 
 sourceCompatibility = javaVersion
@@ -62,17 +63,9 @@ compileTestKotlin { kotlinOptions.jvmTarget = sourceCompatibility }
 
 repositories {
     mavenCentral()
-    if (hasPyCharm) {
-        flatDir {
-            dirs "$pycharmPath/lib"
-        }
-    }
 }
 
 dependencies {
-    if (hasPyCharm) {
-        compileOnly name: 'pycharm'
-    }
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation "org.jetbrains.kotlin:kotlin-reflect"
     implementation 'log4j:log4j:1.2.17'
