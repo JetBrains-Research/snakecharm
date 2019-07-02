@@ -24,7 +24,6 @@ Feature: Annotate additional syntax
       | params               | "file.txt" | PY.DECORATOR             |
       | log                  | "file.txt" | PY.DECORATOR             |
       | resources            | foo        | PY.DECORATOR             |
-      | benchmark            | ""         | PY.DECORATOR             |
       | version              | ""         | PY.DECORATOR             |
       | message              | ""         | PY.DECORATOR             |
       | threads              | ""         | PY.DECORATOR             |
