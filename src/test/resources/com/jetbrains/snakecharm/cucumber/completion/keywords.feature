@@ -59,7 +59,7 @@ Feature: Completion for snakemake keyword-like things
       roo: "foo"
       """
       When I put the caret at roo:
-      Then I invoke autocompletion popup, select "<item>" lookup in replace mode and see a text:
+      Then I invoke autocompletion popup, select "<item>" lookup item in replace mode and see a text:
       """
       <item>: "foo"
       """
@@ -115,4 +115,18 @@ Feature: Completion for snakemake keyword-like things
     | str | result |
     | inp | input  |
     | out | output |
+
+  Scenario: Complete and skip colon at rule level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule NAME:
+      input: "in.txt"
+    """
+    When I put the caret at input
+    Then I invoke autocompletion popup, select "output" lookup item in replace mode and see a text:
+    """
+    rule NAME:
+      output: "in.txt"
+    """
 
