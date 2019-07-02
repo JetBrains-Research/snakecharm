@@ -111,10 +111,28 @@ Feature: Completion for snakemake keyword-like things
     rule NAME:
       <result>: 
     """
-   Examples:
-    | str | result |
-    | inp | input  |
-    | out | output |
+    Examples:
+      | str | result               |
+      | inp | input                |
+      | out | output               |
+      | par | params               |
+      | lo  | log                  |
+      | re  | resources            |
+      | be  | benchmark            |
+      | ve  | version              |
+      | me  | message              |
+      | th  | threads              |
+      | si  | singularity          |
+      | pr  | priority             |
+      | wi  | wildcard_constraints |
+      | gr  | group                |
+      | sh  | shadow               |
+      | co  | conda                |
+      | cw  | cwl                  |
+      | sc  | script               |
+      | sh  | shell                |
+      | run | run                  |
+      | wr  | wrapper              |
 
   Scenario: Complete and skip colon at rule level
     Given a snakemake project
