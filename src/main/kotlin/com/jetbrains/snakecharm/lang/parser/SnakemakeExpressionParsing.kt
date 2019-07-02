@@ -138,21 +138,46 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             separatorMissingMsg: String,
             ruleMissingMsg: String
     ): Boolean {
+        matchToken(PyTokenTypes.STATEMENT_BREAK)
+        matchToken(PyTokenTypes.INDENT)
+
         val argList = myBuilder.mark()
 
         var result = true
         var argsNumber = 0
-        while (!myBuilder.eof() && !atToken(PyTokenTypes.STATEMENT_BREAK)) {
+        while (!myBuilder.eof()) {
+            if (matchToken(PyTokenTypes.STATEMENT_BREAK)) {
+                if (matchToken(PyTokenTypes.DEDENT)) {
+                    while (matchToken(PyTokenTypes.DEDENT)) {}
+                    break
+                }
+                if (!matchToken(PyTokenTypes.INDENT)) {
+                    break
+                }
+            }
+
             argsNumber++
             if (argsNumber > 1) {
                 if (!checkMatches(separatorToken, separatorMissingMsg)) { // bundle
                     result = false
                     nextToken()
+                } else {
+                    matchToken(PyTokenTypes.STATEMENT_BREAK)
+                    matchToken(PyTokenTypes.INDENT)
+                    matchToken(PyTokenTypes.INCONSISTENT_DEDENT)
+                    matchToken(PyTokenTypes.DEDENT)
                 }
-                if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
+            }
+
+            if (matchToken(PyTokenTypes.STATEMENT_BREAK)) {
+                if (matchToken(PyTokenTypes.DEDENT)) {
+                    break
+                }
+                if (!matchToken(PyTokenTypes.INDENT)) {
                     break
                 }
             }
+
             if (!checkMatches(PyTokenTypes.IDENTIFIER, ruleMissingMsg)) {
                 result = false
                 nextToken()

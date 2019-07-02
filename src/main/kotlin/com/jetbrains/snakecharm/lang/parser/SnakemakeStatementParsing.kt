@@ -63,7 +63,7 @@ class SnakemakeStatementParsing(
                             " executed by the cluster command.") // bundle
                 }
 
-                nextToken()
+                // nextToken()
                 workflowParam.done(SnakemakeElementTypes.WORKFLOW_LOCALRULES_STATEMENT)
             }
             tt === SnakemakeTokenTypes.WORKFLOW_RULEORDER_KEYWORD  -> {
