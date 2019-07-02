@@ -78,6 +78,7 @@ object ColonAndWhiteSpaceTail : TailType() {
 
     override fun processTail(editor: Editor, tailOffset: Int): Int {
         val iterator = (editor as EditorEx).highlighter.createIterator(tailOffset)
+        // if already ": " after item (e.g. replace completion) => just move caret
         if (!iterator.atEnd() && iterator.tokenType === PyTokenTypes.COLON) {
             iterator.advance()
             if (!iterator.atEnd() && iterator.tokenType === PyTokenTypes.COLON) {
