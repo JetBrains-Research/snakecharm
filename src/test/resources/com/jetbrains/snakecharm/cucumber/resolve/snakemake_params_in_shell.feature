@@ -12,6 +12,7 @@ Feature: Resolve for params in shell section
         outdir=lambda wildcards, output: os.path.dirname(str(output)),
         xmx=lambda wildcards: str(800 // int(wildcards.bin)),
         file1="path",
+        _file1="path"
       shell: "command {params.<text>}"
     """
     When I put the caret after <ptn>
@@ -22,6 +23,7 @@ Feature: Resolve for params in shell section
       | {params.out | outdir        | outdir      | foo.smk      |
       | {params.xm  | xmx           | xmx         | foo.smk      |
       | {params.fi  | file1         | file1       | foo.smk      |
+      | {params._fi | _file1        | _file1      | foo.smk      |
 
     Scenario Outline: Resolve in shell section in case of 'nested' parameters
       Given a snakemake project
