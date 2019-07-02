@@ -3,11 +3,10 @@ package com.jetbrains.snakecharm.codeInsight
 import com.intellij.openapi.util.TextRange
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.*
-import com.intellij.psi.util.parentOfType
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
-import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyStringLiteralExpression
-import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.codeInsight.completion.SMKKeywordCompletionContributor
 import com.jetbrains.snakecharm.lang.psi.SMKParamsReference
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 import java.util.regex.Pattern
@@ -17,27 +16,22 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
         registrar.registerReferenceProvider(
                 PlatformPatterns
                         .psiElement(PyStringLiteralExpression::class.java)
-                        .withParent(PyArgumentList::class.java),
+                        .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
+                        .inside(SMKKeywordCompletionContributor.IN_RULE_SECTION),
                 object : PsiReferenceProvider() {
-                    private val identifierRegex = "[_a-zA-Z]\\w*"
-                    private val paramsPattern = Pattern.compile("\\{params\\.($identifierRegex)")
+                    private val paramsPattern = Pattern.compile("\\{params\\.([_a-zA-Z]\\w*)")
 
                     override fun getReferencesByElement(
                             element: PsiElement,
                             context: ProcessingContext
                     ): Array<PsiReference> {
-                        if (element.containingFile.language != SnakemakeLanguageDialect) {
-                            return emptyArray()
-                        }
-
                         val paramReferences = mutableListOf<PsiReference>()
 
-                        val isShellCommand = element
-                                .parentOfType<SMKRuleParameterListStatement>()
+                        val isShellCommand = PsiTreeUtil
+                                .getParentOfType(element, SMKRuleParameterListStatement::class.java)
                                 ?.section
                                 ?.textMatches(SMKRuleParameterListStatement.SHELL) ?: return emptyArray()
-                        if (element is PyStringLiteralExpression && isShellCommand) {
-
+                        if (isShellCommand) {
                             val paramsMatcher = paramsPattern.matcher(element.text)
 
                             while (paramsMatcher.find()) {
