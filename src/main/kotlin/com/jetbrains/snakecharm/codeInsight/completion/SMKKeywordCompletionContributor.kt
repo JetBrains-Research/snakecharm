@@ -11,6 +11,7 @@ import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.completion.PythonLookupElement
+import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.RULE_LIKE
@@ -18,7 +19,6 @@ import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.WORKFLOW_TOPLEVE
 import com.jetbrains.snakecharm.lang.psi.SMKRule
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
-import com.jetbrains.snakecharm.lang.psi.SMKRuleSection
 
 /**
  * @author Roman.Chernyatchik
@@ -26,9 +26,8 @@ import com.jetbrains.snakecharm.lang.psi.SMKRuleSection
  */
 class SMKKeywordCompletionContributor: CompletionContributor() {
     companion object {
-        val IN_RULE = psiElement().inside(SMKRule::class.java)!!
-        val IN_RULE_SECTION = psiElement().inside(SMKRuleSection::class.java)!!
         val IN_SNAKEMAKE = PlatformPatterns.psiFile().withLanguage(SnakemakeLanguageDialect)
+        val IN_RULE = psiElement().inside(SMKRule::class.java)!!
     }
 
     init {
@@ -98,8 +97,8 @@ object ColonAndWhiteSpaceTail : TailType() {
 object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
             .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
-            .inside(SMKKeywordCompletionContributor.IN_RULE)
-            .andNot(SMKKeywordCompletionContributor.IN_RULE_SECTION)
+            .inside(SMKRule::class.java)
+            .andNot(psiElement().inside(PyArgumentList::class.java))
 
     override fun addCompletions(
             parameters: CompletionParameters,

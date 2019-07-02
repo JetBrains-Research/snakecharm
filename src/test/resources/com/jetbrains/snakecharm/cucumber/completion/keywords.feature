@@ -148,3 +148,31 @@ Feature: Completion for snakemake keyword-like things
       output: "in.txt"
     """
 
+  Scenario: Complete at rule level after comma
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule NAME:
+      output: "out.txt",
+      input: "in.txt"
+    """
+    When I put the caret at input
+    And I invoke autocompletion popup
+    Then completion list should contain:
+       | input  |
+       | output |
+       | run    |
+
+  Scenario: Complete at rule section level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule NAME:
+      output: "out.txt"
+      input: "in.txt"
+    """
+    When I put the caret at "in
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+       | output |
+       | run    |
