@@ -21,6 +21,7 @@ import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.ui.UIUtil
+import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.getOffsetUnderCaret
 import cucumber.api.DataTable
 import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
@@ -329,10 +330,6 @@ class CompletionResolveSteps {
             CommandProcessor.getInstance().executeCommand(
                     project, { lookup.finishLookup(ch) }, "", null)
         }
-    }
-
-    companion object {
-        fun getOffsetUnderCaret() = SnakemakeWorld.fixture().editor.caretModel.offset
     }
 }
 
