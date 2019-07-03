@@ -27,17 +27,11 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
                     ): Array<PsiReference> {
                         val paramReferences = mutableListOf<PsiReference>()
 
-                        val isShellCommand = PsiTreeUtil
-                                .getParentOfType(element, SMKRuleParameterListStatement::class.java)
-                                ?.section
-                                ?.textMatches(SMKRuleParameterListStatement.SHELL) ?: return emptyArray()
-                        if (isShellCommand) {
-                            val paramsMatcher = paramsPattern.matcher(element.text)
+                        val paramsMatcher = paramsPattern.matcher(element.text)
 
-                            while (paramsMatcher.find()) {
-                                paramReferences.add(SMKParamsReference(element,
-                                        TextRange(paramsMatcher.start(1), paramsMatcher.end(1))))
-                            }
+                        while (paramsMatcher.find()) {
+                            paramReferences.add(SMKParamsReference(element,
+                                    TextRange(paramsMatcher.start(1), paramsMatcher.end(1))))
                         }
 
                         return paramReferences.toTypedArray()
