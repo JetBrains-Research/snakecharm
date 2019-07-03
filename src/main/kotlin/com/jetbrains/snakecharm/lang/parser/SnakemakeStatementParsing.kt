@@ -7,6 +7,7 @@ import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.StatementParsing
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SnakemakeElementTypes
@@ -113,6 +114,9 @@ class SnakemakeStatementParsing(
         if (atToken(PyTokenTypes.IDENTIFIER)) {
             nextToken()
         }
+
+        // at the moment we continue parsing rule even if colon missed, probably better
+        // to drop rule and scroll up to next STATEMENT_BREAK/RULE/CHECKPOINT/other toplevel keyword or eof()
         checkMatches(PyTokenTypes.COLON, "Rule name identifier or ':' expected") // bundle
 
         val ruleStatements = myBuilder.mark()
@@ -122,25 +126,37 @@ class SnakemakeStatementParsing(
             parsingContext.expressionParser.parseExpression()
         }
 
+        // Wile typing new rule at some moment is could be incomplete, e.g. missing indent and
+        // no sections after current rule before next rule
+        var incompleteRule = false
         val multiline = atToken(PyTokenTypes.STATEMENT_BREAK)
         if (!multiline) {
             parseRuleParameter()
         } else {
             nextToken()
-            checkMatches(PyTokenTypes.INDENT, "Indent expected...") // bundle
-            while (!atToken(PyTokenTypes.DEDENT)) {
-                if (!parseRuleParameter()) {
-                    break
+            incompleteRule = !checkMatches(PyTokenTypes.INDENT, "Indent expected...")
+            if (!incompleteRule) {
+                while (!atToken(PyTokenTypes.DEDENT)) {
+                    if (!parseRuleParameter()) {
+                        break
+                    }
                 }
             }
         }
+
         ruleStatements.done(PyElementTypes.STATEMENT_LIST)
         ruleMarker.done(when {
             atRuleToken -> SnakemakeElementTypes.RULE_DECLARATION
             else -> SnakemakeElementTypes.CHECKPOINT_DECLARATION
         })
+
         context.popScope()
-        if (multiline) {
+
+        if (incompleteRule && atToken(PyTokenTypes.IDENTIFIER,  SnakemakeNames.RULE_KEYWORD)) {
+            // inside rule scope, we remap some snakemake keywords to identifiers
+            // see #com.jetbrains.snakecharm.lang.parser.SnakemakeStatementParsing.filter
+            myBuilder.remapCurrentToken(SnakemakeTokenTypes.RULE_KEYWORD)
+        } else if (multiline) {
             nextToken()
         }
     }
@@ -207,6 +223,7 @@ class SnakemakeStatementParsing(
         if (source in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
             val scope = myContext.scope as SnakemakeParsingScope
             return when {
+                //XXX: breaks rule keyword!!!!
                 scope.inRule -> PyTokenTypes.IDENTIFIER
                 else -> source
             }

@@ -143,6 +143,18 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testRuleIncomplete1() {
+        doTest()
+    }
+
+    fun testRuleIncomplete2() {
+        doTest()
+    }
+
+    fun testRuleIncomplete3() {
+        doTest()
+    }
+
     fun testWorkflowParamsListArgsKeywords() {
         doTest()
     }
