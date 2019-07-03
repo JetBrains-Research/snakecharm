@@ -34,7 +34,7 @@ class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyState
         get() = firstChild
 
     val argumentList: PyArgumentList?
-        get() = children.filter { it is PyArgumentList }.elementAtOrNull(0) as? PyArgumentList
+        get() = children.filterIsInstance<PyArgumentList>().firstOrNull()
 
     override fun getName() = getNameNode()?.text
 
