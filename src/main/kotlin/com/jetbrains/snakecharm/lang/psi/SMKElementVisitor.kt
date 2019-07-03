@@ -15,8 +15,12 @@ interface SMKElementVisitor {
      */
     val pyElementVisitor: PyElementVisitor
 
-    fun visitSMKRule(smkRule: SMKRule) {
-        pyElementVisitor.visitPyElement(smkRule)
+    fun visitSMKRule(rule: SMKRule) {
+        pyElementVisitor.visitPyElement(rule)
+    }
+
+    fun visitSMKCheckPoint(checkPoint: SMKCheckPoint) {
+        pyElementVisitor.visitPyElement(checkPoint)
     }
 
     fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {

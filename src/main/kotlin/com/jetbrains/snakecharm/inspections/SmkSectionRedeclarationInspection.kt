@@ -4,7 +4,9 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.lang.psi.SMKCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SMKRule
+import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
 
 class SmkSectionRedeclarationInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -12,10 +14,18 @@ class SmkSectionRedeclarationInspection : SnakemakeInspection() {
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
-        override fun visitSMKRule(smkRule: SMKRule) {
+        override fun visitSMKRule(rule: SMKRule) {
+            visitSMKRuleLike(rule)
+        }
+
+        override fun visitSMKCheckPoint(checkPoint: SMKCheckPoint) {
+            visitSMKRuleLike(checkPoint)
+        }
+
+        private fun visitSMKRuleLike(rule: SmkRuleLike) {
             val sectionNamesSet = HashSet<String>()
 
-            smkRule.getSections().forEach {
+            rule.getSections().forEach {
                 val name = it.name ?: return
                 if (sectionNamesSet.contains(name)) {
                     registerProblem(

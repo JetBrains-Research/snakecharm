@@ -13,7 +13,7 @@ import com.jetbrains.python.psi.PyStatementListContainer
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyElementImpl
 
-open class SMKRule(node: ASTNode): PyElementImpl(node), PyStatementListContainer, PsiNamedElement {
+abstract class SmkRuleLike(node: ASTNode): PyElementImpl(node), PyStatementListContainer, PsiNamedElement {
     //TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SMKRule>
     // SnakemakeNamedElement, SnakemakeScopeOwner
 
@@ -43,11 +43,6 @@ open class SMKRule(node: ASTNode): PyElementImpl(node), PyStatementListContainer
                     .section
                     .textMatches(sectionName)
             } as? SMKRuleParameterListStatement
-
-    override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
-        is SMKElementVisitor -> pyVisitor.visitSMKRule(this)
-        else -> super.acceptPyVisitor(pyVisitor)
-    }
 
     override fun getStatementList() = childToPsiNotNull<PyStatementList>(PyElementTypes.STATEMENT_LIST)
 
