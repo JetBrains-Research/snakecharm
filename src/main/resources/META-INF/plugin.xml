@@ -37,6 +37,8 @@
     <lang.foldingBuilder language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.SnakeMakeFoldingBuilder"/>
     <!--<enterBetweenBracesDelegate language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.editorActions.EnterInRuleParamsListDelegate"/>-->
     <!--<codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>-->
+    <lang.documentationProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.documentation.SmkShadowSettingsDocumentation"/>
+
     <completion.contributor
         language="Python"
         implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor"
@@ -44,6 +46,10 @@
     <completion.contributor
         language="Python"
         implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKKeywordCompletionContributor"
+    />
+    <completion.contributor
+            language="Python"
+            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKShadowSettingsCompletionContributor"
     />
 
     <moduleService
@@ -108,6 +114,28 @@
             key="INSP.NAME.multiple.run.or.shell.section"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkMultipleExecutionSectionsInspection"
     />
+
+    <localInspection
+            language="Snakemake" shortName="SmkShadowSettingsInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkShadowSettingsInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.shadow.settings"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkShadowSettingsInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkShadowMultipleSettingsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkShadowMultipleSettingsInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.shadow.multiple.settings"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkShadowMultipleSettingsInspection"
+    />
   </extensions>
 
   <module-components>
@@ -122,6 +150,7 @@
     <pyReferenceResolveProvider
         implementation="com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider"
     />
+    <typeProvider implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeRulesTypeProvider"/>
 
   </extensions>
 </idea-plugin>

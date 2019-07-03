@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.cucumber
 
+import com.intellij.codeInspection.ex.InspectionProfileImpl
 import cucumber.api.java.After
 
 /**
@@ -11,9 +12,8 @@ class Hooks {
     @After(order = 1)
     @Throws(Throwable::class)
     fun cleanup() {
-        if (SnakemakeWorld.myFixture != null) {
-            SnakemakeWorld.myFixture!!.tearDown()
-        }
+        InspectionProfileImpl.INIT_INSPECTIONS = false
+        SnakemakeWorld.myFixture?.tearDown()
     }
 //
 //    @After(order = 0)

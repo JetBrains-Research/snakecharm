@@ -21,6 +21,7 @@ import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.ui.UIUtil
+import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.getOffsetUnderCaret
 import cucumber.api.DataTable
 import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
@@ -28,6 +29,7 @@ import junit.framework.TestCase
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 /**
  * @author Roman.Chernyatchik
@@ -79,6 +81,39 @@ class CompletionResolveSteps {
         }
     }
 
+    @Then("^reference should multi resolve to name, file, times$")
+    fun referenceShouldMultiResolveToIn(table: DataTable) {
+        ApplicationManager.getApplication().runReadAction {
+            val ref = getReferenceAtOffset()
+            assertNotNull(ref)
+
+            val results = multiResolve(ref)
+
+            assertEquals(0, results.filter { it == null }.size)
+            assertEquals(0, results.filter { it!!.containingFile == null }.size)
+
+            val completionList = results
+                    .map { result ->
+                        result!!.text to result.containingFile.name
+                    }
+                    .groupBy { it }
+                    .map { entry -> entry.key to entry.value.size }
+                    .toMap()
+
+            val records = table.asLists(String::class.java)
+
+            records.forEach { row ->
+                val key = row[0] to row[1]
+                val expectedTimes = row[2].toInt()
+                val actualTimes = completionList.getOrDefault(key, 0)
+                assertEquals(
+                        expectedTimes, actualTimes,
+                        "Expected $expectedTimes but was $actualTimes occurrences of $key"
+                )
+            }
+        }
+    }
+
     @When("^I invoke autocompletion popup$")
     fun iInvokeAutocompletionPopup() {
         Registry.get("ide.completion.variant.limit").setValue(10000)
@@ -106,7 +141,7 @@ class CompletionResolveSteps {
         autoCompleteAndCheck(lookupText, text, Lookup.NORMAL_SELECT_CHAR)
     }
 
-    @Then("^I invoke autocompletion popup, select \"([^\"]+)\" lookup in (normal|replace|statement|auto) mode and see a text:$")
+    @Then("^I invoke autocompletion popup, select \"([^\"]+)\" lookup item in (normal|replace|statement|auto) mode and see a text:$")
     fun iInvokeAutocompletionPopupAndSelectItemWithChar(lookupText: String, mode: String, text: String) {
         val ch = when (mode) {
             "normal" -> Lookup.NORMAL_SELECT_CHAR
@@ -170,6 +205,16 @@ class CompletionResolveSteps {
             results[0].element
         }
         else -> ref.resolve()
+    }
+
+    private fun multiResolve(ref: PsiReference) = when (ref) {
+        is PsiPolyVariantReference -> {
+            val results = ref.multiResolve(false)
+            assertNotNull(results)
+            assertTrue(results.isNotEmpty())
+            results.map { it.element}
+        }
+        else -> listOf(ref.resolve())
     }
 
     private fun doComplete() {
@@ -285,10 +330,6 @@ class CompletionResolveSteps {
             CommandProcessor.getInstance().executeCommand(
                     project, { lookup.finishLookup(ch) }, "", null)
         }
-    }
-
-    companion object {
-        fun getOffsetUnderCaret() = SnakemakeWorld.fixture().editor.caretModel.offset
     }
 }
 

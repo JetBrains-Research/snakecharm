@@ -3,13 +3,45 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
+Version 0.4.2018.3
+-------------
+Released on <...> (eap channel)
+- sinceBuild "183.4284"
+- untilBuild "192.*"
+
+Features:
+- Completion for `shadow` level values, see #12
+- Inspection for `shadow` level values, see #65
+
+Fixed:
+- NoClassDefFoundError: com/intellij/psi/util/PsiTreeUtilKt, see #70
+- Rule docstrings trigger a syntax error, see #31
+
+
+
+Version 0.3.2018.3
+-------------
+Released on June 23th 2019 (eap channel)
+- sinceBuild "183.4284"
+- untilBuild "191.*"
+
+Features:
+- Completion/resolve for methods like 'touch', 'expand', etc., also `rules`, `config` objects, see #1
+- Completion/resolve for rules names after 'rules.'
+
+Code inspections:
+- Multiple run or shell keywords inspections, #48
+- A rule name is already used by another rule, #17
+- A positional argument follows a keyword argument
+- No rule keywords allowed after run/shell/script/wrapper/cwl in rule foo.', #37
+
 Version 0.2.2018.3
 -------------
 Released on Feb 4th 2019
 - sinceBuild "183.4284"
 - untilBuild "191.*"
     
-Fixed
+Fixed:
 - *.smk file not recognized as Snakemake files, see issue #28
 - *.rules files support, see issue #21
 - Do not parse/highlight as keywords several top level workflow params, see issue #29

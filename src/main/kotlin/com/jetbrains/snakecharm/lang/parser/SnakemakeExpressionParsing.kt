@@ -71,7 +71,9 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                     }
 
                     // Case: hanging 'comma', next statement is another rule param block
-                    if (myBuilder.tokenType === PyTokenTypes.DEDENT) {
+                    if (myBuilder.tokenType === PyTokenTypes.DEDENT ||
+                            (myBuilder.tokenType == PyTokenTypes.IDENTIFIER &&
+                                    myBuilder.lookAhead(1) == PyTokenTypes.COLON)) {
                         indents = commMarkerIndents
                         commaMarker.rollbackTo()
                         break

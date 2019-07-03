@@ -15,7 +15,7 @@ class SmkPositionalArgsAfterKeywordArgsInspection : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
         override fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {
-            if (st.containingFile.language != SnakemakeLanguageDialect) {
+            if (!SnakemakeLanguageDialect.isInsideSmkFile(st)) {
                 return
             }
 

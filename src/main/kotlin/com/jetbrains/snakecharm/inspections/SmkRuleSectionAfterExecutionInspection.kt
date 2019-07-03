@@ -14,7 +14,7 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         override fun visitSMKRule(smkRule: SMKRule) {
-            if (smkRule.containingFile.language != SnakemakeLanguageDialect) {
+            if (!SnakemakeLanguageDialect.isInsideSmkFile(smkRule)) {
                 return
             }
 
