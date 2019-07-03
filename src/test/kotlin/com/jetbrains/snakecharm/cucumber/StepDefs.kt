@@ -1,5 +1,7 @@
 package com.jetbrains.snakecharm.cucumber
 
+import com.intellij.codeInspection.LocalInspectionEP
+import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.util.text.StringUtil
@@ -9,7 +11,11 @@ import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
+import com.jetbrains.snakecharm.inspections.SmkShadowMultipleSettingsInspection
+import com.jetbrains.snakecharm.inspections.SmkShadowSettingsInspection
 import cucumber.api.java.en.Given
+import junit.framework.Assert.fail
+
 
 /**
  * @author Roman.Chernyatchik
@@ -19,8 +25,12 @@ class StepDefs {
     @Given("^a (snakemake|python)? project$")
     @Throws(Exception::class)
     fun configureSnakemakeProject(projectType: String) {
+        // XXX: Seems don't need to enable them, enabled via fixture.enableInspection()
+        //if (enabledInspections != null) {
+        //    InspectionProfileImpl.INIT_INSPECTIONS = true
+        //}
         val additionalRoots = if (projectType == "snakemake") {
-           arrayOf(SnakemakeTestUtil.getTestDataPath().resolve("MockPackages3"))
+            arrayOf(SnakemakeTestUtil.getTestDataPath().resolve("MockPackages3"))
         } else {
             emptyArray()
         }
@@ -61,6 +71,25 @@ class StepDefs {
     @Given("^I open a file \"(.+)\" with text$")
     fun iOpenAFile(name: String, text: String) {
         createAndAddFile(name, text)
+    }
+
+    @Given("^([^\\]]+) inspection is enabled$")
+    fun inspectionIsEnabled(inspectionName: String) {
+        val fixture = SnakemakeWorld.fixture()
+        when (inspectionName) {
+            "Shadow Settings" -> fixture.enableInspections(SmkShadowSettingsInspection::class.java)
+            "Shadow Multiple Settings" -> fixture.enableInspections(SmkShadowMultipleSettingsInspection::class.java)
+            else -> {
+                for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {
+                    val o = provider.instance
+                    if (o is LocalInspectionTool && inspectionName == o.shortName) {
+                        fixture.enableInspections(o)
+                        return
+                    }
+                }
+                fail("Unknown inspection:$inspectionName")
+            }
+        }
     }
 
     fun createAndAddFile(name: String, text: String) {

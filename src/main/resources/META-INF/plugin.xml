@@ -37,6 +37,8 @@
     <lang.foldingBuilder language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.SnakeMakeFoldingBuilder"/>
     <!--<enterBetweenBracesDelegate language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.editorActions.EnterInRuleParamsListDelegate"/>-->
     <!--<codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>-->
+    <lang.documentationProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.documentation.SmkShadowSettingsDocumentation"/>
+
     <completion.contributor
         language="Python"
         implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor"

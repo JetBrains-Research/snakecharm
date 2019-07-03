@@ -3,9 +3,11 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
-Version 0.3.3.2018.3
+Version 0.4.2018.3
 -------------
 Released on <...> (eap channel)
+- sinceBuild "183.4284"
+- untilBuild "192.*"
 
 Features:
 - Completion for `shadow` level values, see #12

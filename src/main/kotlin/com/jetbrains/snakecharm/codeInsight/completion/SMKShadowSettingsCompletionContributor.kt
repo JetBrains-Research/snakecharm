@@ -22,8 +22,7 @@ class SMKShadowSettingsCompletionContributor : CompletionContributor() {
 object ShadowSectionSettingsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = PlatformPatterns.psiElement()
             .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
-            .inside(SMKKeywordCompletionContributor.IN_RULE)
-            .inside(SMKKeywordCompletionContributor.IN_RULE_SECTION)
+            .inside(SMKRuleParameterListStatement::class.java)
             .inside(PyStringLiteralExpression::class.java)!!
 
     val SHADOW_SETTINGS = listOf("shallow", "full", "minimal")
@@ -33,8 +32,8 @@ object ShadowSectionSettingsProvider : CompletionProvider<CompletionParameters>(
             context: ProcessingContext,
             result: CompletionResultSet
     ) {
-        val parentListStatement = PsiTreeUtil.getParentOfType(parameters.position, SMKRuleParameterListStatement::class.java)
-        if (parentListStatement?.name == SMKRuleParameterListStatement.SHADOW) {
+        val parentListStatement = PsiTreeUtil.getParentOfType(parameters.position, SMKRuleParameterListStatement::class.java)!!
+        if (parentListStatement.name == SMKRuleParameterListStatement.SHADOW) {
             SHADOW_SETTINGS.forEach {
                 result.addElement(LookupElementBuilder.create(it).withIcon(PlatformIcons.PARAMETER_ICON))
             }
