@@ -17,7 +17,7 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
                 PlatformPatterns
                         .psiElement(PyStringLiteralExpression::class.java)
                         .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
-                        .inside(SMKKeywordCompletionContributor.IN_RULE_SECTION),
+                        .inside(SMKRuleParameterListStatement::class.java),
                 object : PsiReferenceProvider() {
                     private val paramsPattern = Pattern.compile("\\{params\\.([_a-zA-Z]\\w*)")
 
@@ -26,12 +26,17 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
                             context: ProcessingContext
                     ): Array<PsiReference> {
                         val paramReferences = mutableListOf<PsiReference>()
-
                         val paramsMatcher = paramsPattern.matcher(element.text)
 
-                        while (paramsMatcher.find()) {
-                            paramReferences.add(SMKParamsReference(element,
-                                    TextRange(paramsMatcher.start(1), paramsMatcher.end(1))))
+                        val isShellCommand = PsiTreeUtil
+                                .getParentOfType(element, SMKRuleParameterListStatement::class.java)
+                                ?.section
+                                ?.textMatches(SMKRuleParameterListStatement.SHELL) ?: return emptyArray()
+                        if (isShellCommand) {
+                            while (paramsMatcher.find()) {
+                                paramReferences.add(SMKParamsReference(element,
+                                        TextRange(paramsMatcher.start(1), paramsMatcher.end(1))))
+                            }
                         }
 
                         return paramReferences.toTypedArray()
