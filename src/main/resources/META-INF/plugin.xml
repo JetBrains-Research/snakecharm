@@ -17,140 +17,143 @@
     <a href="https://github.com/JetBrains-Research/snakecharm/blob/master/CHANGES">Changelog</a><br>
     ]]></description>
 
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-         on how to target different products -->
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
 
-    <!-- PyCharm / Python plugin dependency -->
-    <depends>com.intellij.modules.lang</depends>
-    <depends optional="true">com.intellij.modules.python</depends>
+  <!-- PyCharm / Python plugin dependency -->
+  <depends>com.intellij.modules.lang</depends>
+  <depends optional="true">com.intellij.modules.python</depends>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <fileTypeFactory implementation="com.jetbrains.snakecharm.SnakemakeFileTypeFactory"/>
-        <lang.parserDefinition
-                language="Snakemake"
-                implementationClass="com.jetbrains.snakecharm.lang.parser.SnakemakeParserDefinition"
-        />
-        <!--<colorSettingsPage implementation="com.jetbrains.snakemake.lang.highlighter.SnakemakeColorsPage"/>-->
-        <lang.syntaxHighlighterFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterFactory"/>
-        <!--<annotator language="Snakemake" implementationClass="com.jetbrains.snakemake.lang.highlighter.SnakemakeDumbAwareAnnotator"/>-->
-        <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeDumbAwareAnnotator"/>
-        <lang.foldingBuilder language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.SnakeMakeFoldingBuilder"/>
-        <!--<enterBetweenBracesDelegate language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.editorActions.EnterInRuleParamsListDelegate"/>-->
-        <!--<codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>-->
-        <completion.contributor
-                language="Python"
-                implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor"
-        />
-        <completion.contributor
-                language="Python"
-                implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKKeywordCompletionContributor"
-        />
-        <completion.contributor
-                language="Python"
-                implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKShadowSettingsCompletionContributor"
-        />
+  <extensions defaultExtensionNs="com.intellij">
+    <fileTypeFactory implementation="com.jetbrains.snakecharm.SnakemakeFileTypeFactory"/>
+    <lang.parserDefinition
+            language="Snakemake"
+            implementationClass="com.jetbrains.snakecharm.lang.parser.SnakemakeParserDefinition"
+    />
+    <!--<colorSettingsPage implementation="com.jetbrains.snakemake.lang.highlighter.SnakemakeColorsPage"/>-->
+    <lang.syntaxHighlighterFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterFactory"/>
+    <!--<annotator language="Snakemake" implementationClass="com.jetbrains.snakemake.lang.highlighter.SnakemakeDumbAwareAnnotator"/>-->
+    <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeDumbAwareAnnotator"/>
+    <lang.foldingBuilder language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.SnakeMakeFoldingBuilder"/>
+    <!--<enterBetweenBracesDelegate language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.editorActions.EnterInRuleParamsListDelegate"/>-->
+    <!--<codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>-->
+    <lang.documentationProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.documentation.SmkShadowSettingsDocumentation"/>
 
-        <moduleService
-                serviceInterface="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
-                serviceImplementation="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
-        />
+    <completion.contributor
+        language="Python"
+        implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor"
+    />
+    <completion.contributor
+        language="Python"
+        implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKKeywordCompletionContributor"
+    />
+    <completion.contributor
+            language="Python"
+            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKShadowSettingsCompletionContributor"
+    />
 
-        <localInspection
-                language="Snakemake"
-                shortName="SmkResourcesKeywordArgsInspection"
-                enabledByDefault="true"
-                level="ERROR"
-                suppressId="SmkResourcesKeywordArgsInspection"
-                bundle="SnakemakeBundle"
-                groupKey="INSP.GROUP.snakemake"
-                key="INSP.NAME.resources.unnamed.args"
-                implementationClass="com.jetbrains.snakecharm.inspections.SmkResourcesKeywordArgsInspection"
-        />
+    <moduleService
+        serviceInterface="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
+        serviceImplementation="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
+    />
 
-        <localInspection
-                language="Snakemake"
-                shortName="SmkPositionalArgsAfterKeywordArgsInspection"
-                enabledByDefault="true"
-                level="ERROR"
-                suppressId="SmkPositionalArgsAfterKeywordArgs"
-                bundle="SnakemakeBundle"
-                groupKey="INSP.GROUP.snakemake"
-                key="INSP.NAME.positional.args.after.keyword.args"
-                implementationClass="com.jetbrains.snakecharm.inspections.SmkPositionalArgsAfterKeywordArgsInspection"
-        />
+    <localInspection
+        language="Snakemake"
+        shortName="SmkResourcesKeywordArgsInspection"
+        enabledByDefault="true"
+        level="ERROR"
+        suppressId="SmkResourcesKeywordArgsInspection"
+        bundle="SnakemakeBundle"
+        groupKey="INSP.GROUP.snakemake"
+        key="INSP.NAME.resources.unnamed.args"
+        implementationClass="com.jetbrains.snakecharm.inspections.SmkResourcesKeywordArgsInspection"
+    />
 
-        <localInspection
-                language="Snakemake" shortName="SmkRuleRedeclarationInspection"
-                enabledByDefault="true"
-                level="ERROR"
-                suppressId="SmkRuleRedeclaration"
-                bundle="SnakemakeBundle"
-                groupKey="INSP.GROUP.snakemake"
-                key="INSP.NAME.rule.redeclaration"
-                implementationClass="com.jetbrains.snakecharm.inspections.SmkRuleRedeclarationInspection"
-        />
+    <localInspection
+        language="Snakemake"
+        shortName="SmkPositionalArgsAfterKeywordArgsInspection"
+        enabledByDefault="true"
+        level="ERROR"
+        suppressId="SmkPositionalArgsAfterKeywordArgs"
+        bundle="SnakemakeBundle"
+        groupKey="INSP.GROUP.snakemake"
+        key="INSP.NAME.positional.args.after.keyword.args"
+        implementationClass="com.jetbrains.snakecharm.inspections.SmkPositionalArgsAfterKeywordArgsInspection"
+    />
 
-        <localInspection
-                language="Snakemake" shortName="SmkRuleSectionAfterExecutionInspection"
-                enabledByDefault="true"
-                level="ERROR"
-                suppressId="SmkRuleSectionAfterExecution"
-                bundle="SnakemakeBundle"
-                groupKey="INSP.GROUP.snakemake"
-                key="INSP.NAME.rule.section.after.execution"
-                implementationClass="com.jetbrains.snakecharm.inspections.SmkRuleSectionAfterExecutionInspection"
-        />
+    <localInspection
+        language="Snakemake" shortName="SmkRuleRedeclarationInspection"
+        enabledByDefault="true"
+        level="ERROR"
+        suppressId="SmkRuleRedeclaration"
+        bundle="SnakemakeBundle"
+        groupKey="INSP.GROUP.snakemake"
+        key="INSP.NAME.rule.redeclaration"
+        implementationClass="com.jetbrains.snakecharm.inspections.SmkRuleRedeclarationInspection"
+    />
 
-
-        <localInspection
-                language="Snakemake" shortName="SmkMultipleExecutionSectionsInspection"
-                enabledByDefault="true"
-                level="ERROR"
-                suppressId="SmkMultipleExecutionSections"
-                bundle="SnakemakeBundle"
-                groupKey="INSP.GROUP.snakemake"
-                key="INSP.NAME.multiple.run.or.shell.section"
-                implementationClass="com.jetbrains.snakecharm.inspections.SmkMultipleExecutionSectionsInspection"
-        />
-
-        <localInspection
-                language="Snakemake" shortName="SmkShadowSettingsInspection"
-                enabledByDefault="true"
-                level="WARNING"
-                suppressId="SmkShadowSettingsInspection"
-                bundle="SnakemakeBundle"
-                groupKey="INSP.GROUP.snakemake"
-                key="INSP.NAME.shadow.settings"
-                implementationClass="com.jetbrains.snakecharm.inspections.SmkShadowSettingsInspection"
-        />
-
-        <localInspection
-                language="Snakemake" shortName="SmkShadowMultipleSettingsInspection"
-                enabledByDefault="true"
-                level="ERROR"
-                suppressId="SmkShadowMultipleSettingsInspection"
-                bundle="SnakemakeBundle"
-                groupKey="INSP.GROUP.snakemake"
-                key="INSP.NAME.shadow.multiple.settings"
-                implementationClass="com.jetbrains.snakecharm.inspections.SmkShadowMultipleSettingsInspection"
-        />
-
-        <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
-    </extensions>
-
-    <module-components>
-        <component>
-            <implementation-class>com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider</implementation-class>
-        </component>
-    </module-components>
+    <localInspection
+            language="Snakemake" shortName="SmkRuleSectionAfterExecutionInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkRuleSectionAfterExecution"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.rule.section.after.execution"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkRuleSectionAfterExecutionInspection"
+    />
 
 
-    <extensions defaultExtensionNs="Pythonid">
-        <dialectsTokenSetContributor implementation="com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor"/>
-        <pyReferenceResolveProvider
-                implementation="com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider"
-        />
-        <typeProvider implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeRulesTypeProvider"/>
+    <localInspection
+            language="Snakemake" shortName="SmkMultipleExecutionSectionsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkMultipleExecutionSections"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.multiple.run.or.shell.section"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkMultipleExecutionSectionsInspection"
+    />
 
-    </extensions>
+    <localInspection
+            language="Snakemake" shortName="SmkShadowSettingsInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkShadowSettingsInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.shadow.settings"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkShadowSettingsInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkShadowMultipleSettingsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkShadowMultipleSettingsInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.shadow.multiple.settings"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkShadowMultipleSettingsInspection"
+    />
+
+    <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
+  </extensions>
+
+  <module-components>
+    <component>
+      <implementation-class>com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider</implementation-class>
+    </component>
+  </module-components>
+
+
+  <extensions defaultExtensionNs="Pythonid">
+    <dialectsTokenSetContributor implementation="com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor"/>
+    <pyReferenceResolveProvider
+        implementation="com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider"
+    />
+    <typeProvider implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeRulesTypeProvider"/>
+
+  </extensions>
+>>>>>>> master
 </idea-plugin>

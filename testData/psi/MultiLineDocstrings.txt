@@ -1,0 +1,28 @@
+SnakemakeFile: MultiLineDocstrings.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('Name')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression:  line 1
+    line 2
+    
+        PsiElement(Py:TRIPLE_QUOTED_STRING)('""" line 1\n    line 2\n    """')
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: input.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"input.txt"')
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: output.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"output.txt"')

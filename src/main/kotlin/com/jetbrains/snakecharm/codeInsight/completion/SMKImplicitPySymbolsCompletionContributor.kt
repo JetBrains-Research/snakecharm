@@ -5,7 +5,7 @@ import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.patterns.PatternCondition
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.parentOfType
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.resolve.CompletionVariantsProcessor
@@ -22,7 +22,9 @@ class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
                     override fun accepts(element: PsiElement, context: ProcessingContext): Boolean {
                         // check that this element is "first" in parent PyReferenceExpression, e.g. that
                         // we don't have some prefix with '.', e.g. element is 'exp<caret>', not 'foo.exp<caret>'
-                        return !(element.parentOfType<PyReferenceExpression>()?.isQualified ?: true)
+                        
+                        val refExpression = PsiTreeUtil.getParentOfType(element, PyReferenceExpression::class.java)
+                        return !(refExpression?.isQualified ?: true)
                     }
                 })
     }
