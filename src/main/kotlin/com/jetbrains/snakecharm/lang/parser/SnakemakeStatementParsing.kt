@@ -80,7 +80,7 @@ class SnakemakeStatementParsing(
                     myBuilder.error("Expected a descending order of rule names, e.g. rule1 > rule2 > rule3 ...") // bundle
                 }
 
-                nextToken()
+                //nextToken()
                 workflowParam.done(SnakemakeElementTypes.WORKFLOW_RULESREORDER_STATEMENT)
             }
             tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS -> {

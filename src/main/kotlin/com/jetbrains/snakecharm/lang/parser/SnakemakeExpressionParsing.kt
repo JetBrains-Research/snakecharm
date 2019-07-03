@@ -140,8 +140,12 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             separatorMissingMsg: String,
             ruleMissingMsg: String
     ): Boolean {
+        var indentBalance = 0
+
         matchToken(PyTokenTypes.STATEMENT_BREAK)
-        matchToken(PyTokenTypes.INDENT)
+        if (matchToken(PyTokenTypes.INDENT)) {
+            indentBalance++
+        }
 
         val argList = myBuilder.mark()
 
@@ -149,12 +153,13 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         var argsNumber = 0
         while (!myBuilder.eof()) {
             if (matchToken(PyTokenTypes.STATEMENT_BREAK)) {
-                if (matchToken(PyTokenTypes.DEDENT)) {
-                    while (matchToken(PyTokenTypes.DEDENT)) {}
-                    break
+                while (matchToken(PyTokenTypes.DEDENT)) {
+                    indentBalance--
                 }
                 if (!matchToken(PyTokenTypes.INDENT)) {
                     break
+                } else {
+                    indentBalance++
                 }
             }
 
@@ -165,18 +170,29 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                     nextToken()
                 } else {
                     matchToken(PyTokenTypes.STATEMENT_BREAK)
-                    matchToken(PyTokenTypes.INDENT)
-                    matchToken(PyTokenTypes.INCONSISTENT_DEDENT)
-                    matchToken(PyTokenTypes.DEDENT)
+                    if (matchToken(PyTokenTypes.INDENT)) {
+                        indentBalance++
+                    }
+                    if (matchToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
+                        result = false
+                        myBuilder.error("Unindent does not match any outer indentation level")
+                        nextToken()
+                    }
+                    if (matchToken(PyTokenTypes.DEDENT)) {
+                        indentBalance--
+                    }
                 }
             }
 
             if (matchToken(PyTokenTypes.STATEMENT_BREAK)) {
                 if (matchToken(PyTokenTypes.DEDENT)) {
+                    indentBalance--
                     break
                 }
                 if (!matchToken(PyTokenTypes.INDENT)) {
                     break
+                } else {
+                    indentBalance++
                 }
             }
 
@@ -184,6 +200,11 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 result = false
                 nextToken()
             }
+        }
+
+        if (indentBalance != 0) {
+            result = false
+            myBuilder.error("Inconsistent indentation")
         }
 
         argList.done(PyElementTypes.ARGUMENT_LIST)
