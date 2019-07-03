@@ -6,8 +6,6 @@ import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStatement
 import com.jetbrains.python.psi.impl.PyElementImpl
-import com.jetbrains.snakecharm.inspections.SnakemakeInspectionVisitor
-import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 
 class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyStatement, SMKRuleSection { // PyNamedElementContainer
     companion object {
@@ -38,12 +36,9 @@ class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyState
 
     override fun getName() = getNameNode()?.text
 
-    override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
-        when (pyVisitor) {
-            is SnakemakeAnnotator -> pyVisitor.visitSMKRuleParameterListStatement(this)
-            is SnakemakeInspectionVisitor -> pyVisitor.visitSMKRuleParameterListStatement(this)
-            else -> super.acceptPyVisitor(pyVisitor)
-        }
+    override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
+        is SMKElementVisitor -> pyVisitor.visitSMKRuleParameterListStatement(this)
+        else -> super.acceptPyVisitor(pyVisitor)
     }
 
     fun getNameNode() = getIdentifierNode(node)

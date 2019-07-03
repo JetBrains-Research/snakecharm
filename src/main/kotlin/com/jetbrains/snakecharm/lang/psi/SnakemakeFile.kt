@@ -2,10 +2,10 @@ package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
+import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.impl.PyFileImpl
 import com.jetbrains.snakecharm.SnakemakeFileType
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
-import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 
 /**
  * @author Roman.Chernyatchik
@@ -25,7 +25,9 @@ class SnakemakeFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, S
         val ruleNameAndPsi = arrayListOf<Pair<String, PsiElement>>()
 
         // TODO[romeo]: refactor code: replace SnakemakeAnnotator with SMKElementVisitor
-        acceptChildren(object : SnakemakeAnnotator() {
+        acceptChildren(object : PyElementVisitor(), SMKElementVisitor {
+            override val pyElementVisitor: PyElementVisitor = this
+
             override fun visitSMKRule(smkRule: SMKRule) {
                 val element = smkRule.getNameNode()?.psi
                 if (element != null) {
