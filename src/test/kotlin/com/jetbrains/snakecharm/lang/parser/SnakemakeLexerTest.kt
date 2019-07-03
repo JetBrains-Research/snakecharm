@@ -140,6 +140,55 @@ class SnakemakeLexerTest : PyLexerTestCase() {
 
      */
 
+    fun testSeveralRuleWithParams() {
+        doTest("""
+            |rule all:
+            |    input: 'foo'
+            |rule last:
+            |    output: 'boo'
+            |""".trimMargin().trimStart(),
+                "Py:RULE_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+                "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
+                "Py:RULE_KEYWORD",  "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+                "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
+                "Py:STATEMENT_BREAK")
+    }
+
+    fun testRuleIncomplete1() {
+        doTest("""
+            |rule all:
+            |rule last:
+            |    output: 'boo'
+            |""".trimMargin().trimStart(),
+                "Py:RULE_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+                "Py:RULE_KEYWORD",  "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+                "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
+                "Py:STATEMENT_BREAK")
+    }
+
+    fun testRuleIncomplete2() {
+        doTest("""
+            |rule all:
+            |    
+            |rule last:
+            |    output: 'boo'
+            |""".trimMargin().trimStart(),
+                "Py:RULE_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+                "Py:RULE_KEYWORD",  "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+                "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
+                "Py:STATEMENT_BREAK")
+    }
+
     private fun doTest(text: String, vararg expectedTokens: String) {
         doLexerTest(text, SnakemakeLexer(), *expectedTokens)
     }

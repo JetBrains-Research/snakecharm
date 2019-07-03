@@ -137,6 +137,17 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkShadowMultipleSettingsInspection"
     />
 
+    <localInspection
+            language="Snakemake" shortName="SmkSectionRedeclarationInspection"
+            enabledByDefault="true"
+            level="WEAK WARNING"
+            suppressId="SmkSectionRedeclarationInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.redeclaration"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionRedeclarationInspection"
+    />
+
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
   </extensions>
 

@@ -7,7 +7,7 @@ import com.jetbrains.python.parsing.ParsingScope
  * @date 2018-12-31
  */
 class SnakemakeParsingScope : ParsingScope() {
-    var inRule: Boolean = false
+    var inRuleSectionsList: Boolean = false
         private set
 
     // In rule or workflow params args list
@@ -18,7 +18,7 @@ class SnakemakeParsingScope : ParsingScope() {
 
     fun withRule(): SnakemakeParsingScope {
         val result = copy()
-        result.inRule = true
+        result.inRuleSectionsList = true
         return result
     }
 
@@ -30,7 +30,7 @@ class SnakemakeParsingScope : ParsingScope() {
 
     override fun copy(): SnakemakeParsingScope {
         val copy = super.copy() as SnakemakeParsingScope
-        copy.inRule = inRule
+        copy.inRuleSectionsList = inRuleSectionsList
         copy.inParamArgsList = inParamArgsList
         return copy
     }
