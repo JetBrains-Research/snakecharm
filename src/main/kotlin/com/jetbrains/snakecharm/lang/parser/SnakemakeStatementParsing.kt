@@ -165,8 +165,10 @@ class SnakemakeStatementParsing(
             // see #com.jetbrains.snakecharm.lang.parser.SnakemakeStatementParsing.filter
             //
             // Do nothing, next rule will be parsed automatically
-        } else if (multiline) {
-            nextToken()
+            // XXX probably recover until some useful token, see recoverUntilMatches() method
+            // XXX at the moment it seems any complex behaviour isn't needed
+        } else if (multiline && !myBuilder.eof()) {
+            nextToken() // probably check toke type
         }
     }
 
@@ -243,6 +245,26 @@ class SnakemakeStatementParsing(
 //    override fun getFunctionParser(): FunctionParsing {
 //        return super.getFunctionParser()
 //    }
+
+    /**
+     * Skips tokens until token from expected set and marks it with error
+     */
+    private fun recoverUntilMatches(errorMessage: String, vararg types: IElementType) {
+        val errorMarker = myBuilder.mark()
+        var hasNonWhitespaceTokens = false
+        while (!(atAnyOfTokens(*types) || myBuilder.eof())) {
+            // Regular whitespace tokens are already skipped by advancedLexer()
+            if (!atToken(PyTokenTypes.STATEMENT_BREAK)) {
+                hasNonWhitespaceTokens = true
+            }
+            myBuilder.advanceLexer()
+        }
+        if (hasNonWhitespaceTokens) {
+            errorMarker.error(errorMessage)
+        } else {
+            errorMarker.drop()
+        }
+    }
 }
 
 fun IElementType?.isPythonString() : Boolean {
