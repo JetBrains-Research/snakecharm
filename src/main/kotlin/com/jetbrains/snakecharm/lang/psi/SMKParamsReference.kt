@@ -30,9 +30,11 @@ class SMKParamsReference(
 
     override fun getVariants(): Array<Any> {
         val variants = mutableListOf<LookupElement>()
-        getKeywordArguments()?.forEach {
-            variants.add(LookupElementBuilder.create(it.name!!).withIcon(PlatformIcons.PARAMETER_ICON))
-        }
+        getKeywordArguments()
+                ?.filter { it.name != null }
+                ?.forEach {
+                    variants.add(LookupElementBuilder.create(it.name!!).withIcon(PlatformIcons.PARAMETER_ICON))
+                }
         return variants.toTypedArray()
     }
 
