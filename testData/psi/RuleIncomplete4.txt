@@ -1,4 +1,4 @@
-SnakemakeFile: RuleIncomplete3.smk
+SnakemakeFile: RuleIncomplete4.smk
   SMKRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
