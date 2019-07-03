@@ -11,6 +11,7 @@ import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
+import com.jetbrains.snakecharm.inspections.SmkSectionRedeclarationInspection
 import com.jetbrains.snakecharm.inspections.SmkShadowMultipleSettingsInspection
 import com.jetbrains.snakecharm.inspections.SmkShadowSettingsInspection
 import cucumber.api.java.en.Given
@@ -79,6 +80,7 @@ class StepDefs {
         when (inspectionName) {
             "Shadow Settings" -> fixture.enableInspections(SmkShadowSettingsInspection::class.java)
             "Shadow Multiple Settings" -> fixture.enableInspections(SmkShadowMultipleSettingsInspection::class.java)
+            "Section Redeclaration" -> fixture.enableInspections(SmkSectionRedeclarationInspection::class.java)
             else -> {
                 for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {
                     val o = provider.instance
