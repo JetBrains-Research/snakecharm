@@ -20,9 +20,9 @@ import java.util.regex.Pattern
 
 
 class ActionsSteps {
-    @When("^I expect inspection (error|warning|info|TYPO) on <(.+)> with message$")
+    @When("^I expect inspection (error|warning|info|TYPO) on <([^>]+)> with message$")
     fun iExpectInspectionOn(level: String, signature: String, message: String) {
-        iExpectInspectionOnAt(level, signature, signature, message)
+        iExpectInspectionOnIn(level, signature, signature, message)
     }
 
     @Given("^I expect no inspection (error|warning|info|TYPO)$")
@@ -31,8 +31,8 @@ class ActionsSteps {
         //This step just for more readable tests
     }
 
-    @Given("^I expect inspection (error|warning|info|TYPO) on <(.+)> in <(.+)> with message$")
-    fun iExpectInspectionOnAt(level: String, text: String, signature: String, message: String) {
+    @Given("^I expect inspection (error|warning|info|TYPO) on <([^>]+)> in <(.+)> with message$")
+    fun iExpectInspectionOnIn(level: String, text: String, signature: String, message: String) {
         val newText = "<$level descr=\"$message\">$text</$level>"
         val fixture = SnakemakeWorld.fixture()
         val psiFile = fixture.file
