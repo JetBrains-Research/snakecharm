@@ -104,7 +104,6 @@ class SnakemakeStatementParsing(
     private fun parseRuleDeclaration(atRuleToken: Boolean) {
         val context = parsingContext
         val scope = context.scope
-        context.pushScope(scope.withRule())
 
         val ruleMarker: PsiBuilder.Marker = myBuilder.mark()
         nextToken()
@@ -113,8 +112,10 @@ class SnakemakeStatementParsing(
         if (atToken(PyTokenTypes.IDENTIFIER)) {
             nextToken()
         }
-        checkMatches(PyTokenTypes.COLON, "Rule name identifier or ':' expected") // bundle
 
+        // XXX at the moment we continue parsing rule even if colon missed, probably better
+        // XXX to drop rule and scroll up to next STATEMENT_BREAK/RULE/CHECKPOINT/other toplevel keyword or eof()
+        checkMatches(PyTokenTypes.COLON, "Rule name identifier or ':' expected")  // bundle
         val ruleStatements = myBuilder.mark()
 
         // Skipping a docstring
@@ -122,26 +123,52 @@ class SnakemakeStatementParsing(
             parsingContext.expressionParser.parseExpression()
         }
 
+        // Wile typing new rule at some moment is could be incomplete, e.g. missing indent and
+        // no sections after current rule before next rule
+        var incompleteRule = false
+
+        // in rule scopes helps to parse toplevel keywords as identifiers
+        // see #com.jetbrains.snakecharm.lang.parser.SnakemakeStatementParsing.filter
+        var inRuleScope: SnakemakeParsingScope? = scope.withRule()
+
         val multiline = atToken(PyTokenTypes.STATEMENT_BREAK)
         if (!multiline) {
+            context.pushScope(inRuleScope!!)
             parseRuleParameter()
         } else {
             nextToken()
-            checkMatches(PyTokenTypes.INDENT, "Indent expected...") // bundle
-            while (!atToken(PyTokenTypes.DEDENT)) {
-                if (!parseRuleParameter()) {
-                    break
+            incompleteRule = !checkMatches(PyTokenTypes.INDENT, "Indent expected...")
+            if (incompleteRule) {
+                inRuleScope = null
+            } else {
+                context.pushScope(inRuleScope!!)
+                while (!atToken(PyTokenTypes.DEDENT)) {
+                    if (!parseRuleParameter()) {
+                        break
+                    }
                 }
             }
         }
+
+        if (inRuleScope != null) {
+            context.popScope()
+        }
+
         ruleStatements.done(PyElementTypes.STATEMENT_LIST)
         ruleMarker.done(when {
             atRuleToken -> SnakemakeElementTypes.RULE_DECLARATION
             else -> SnakemakeElementTypes.CHECKPOINT_DECLARATION
         })
-        context.popScope()
-        if (multiline) {
-            nextToken()
+
+        if (incompleteRule && atToken(SnakemakeTokenTypes.RULE_KEYWORD)) {
+            // inside rule scope, we remap some snakemake keywords to identifiers
+            // see #com.jetbrains.snakecharm.lang.parser.SnakemakeStatementParsing.filter
+            //
+            // Do nothing, next rule will be parsed automatically
+            // XXX probably recover until some useful token, see recoverUntilMatches() method
+            // XXX at the moment it seems any complex behaviour isn't needed
+        } else if (multiline && !myBuilder.eof()) {
+            nextToken() // probably check toke type
         }
     }
 
@@ -207,7 +234,8 @@ class SnakemakeStatementParsing(
         if (source in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
             val scope = myContext.scope as SnakemakeParsingScope
             return when {
-                scope.inRule -> PyTokenTypes.IDENTIFIER
+                //XXX: breaks rule keyword!!!!
+                scope.inRuleSectionsList -> PyTokenTypes.IDENTIFIER
                 else -> source
             }
         }
@@ -217,6 +245,26 @@ class SnakemakeStatementParsing(
 //    override fun getFunctionParser(): FunctionParsing {
 //        return super.getFunctionParser()
 //    }
+
+    /**
+     * Skips tokens until token from expected set and marks it with error
+     */
+    private fun recoverUntilMatches(errorMessage: String, vararg types: IElementType) {
+        val errorMarker = myBuilder.mark()
+        var hasNonWhitespaceTokens = false
+        while (!(atAnyOfTokens(*types) || myBuilder.eof())) {
+            // Regular whitespace tokens are already skipped by advancedLexer()
+            if (!atToken(PyTokenTypes.STATEMENT_BREAK)) {
+                hasNonWhitespaceTokens = true
+            }
+            myBuilder.advanceLexer()
+        }
+        if (hasNonWhitespaceTokens) {
+            errorMarker.error(errorMessage)
+        } else {
+            errorMarker.drop()
+        }
+    }
 }
 
 fun IElementType?.isPythonString() : Boolean {

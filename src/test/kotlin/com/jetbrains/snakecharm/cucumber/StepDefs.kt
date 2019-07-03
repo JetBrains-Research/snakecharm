@@ -82,6 +82,7 @@ class StepDefs {
             "Rule Redeclaration" -> fixture.enableInspections(SmkRuleRedeclarationInspection::class.java)
             "Rule Section After Execution Section" ->
                 fixture.enableInspections(SmkRuleSectionAfterExecutionInspection::class.java)
+            "Section Redeclaration" -> fixture.enableInspections(SmkSectionRedeclarationInspection::class.java)
             else -> {
                 for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {
                     val o = provider.instance
