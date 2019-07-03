@@ -28,7 +28,7 @@ Feature: Rule section redeclaration inspection
     And Section Redeclaration inspection is enabled
     Then I expect inspection warning on <params: c="c_value", a="value"> with message
     """
-    Declaration of section 'params' above overshadows this declaration.
+    Declaration of section 'params' above overrides this declaration.
     """
     When I check highlighting errors
 
@@ -49,10 +49,10 @@ Feature: Rule section redeclaration inspection
     And Section Redeclaration inspection is enabled
     Then I expect inspection warning on <params: c="c_value", a="value"> with message
     """
-    Declaration of section 'params' above overshadows this declaration.
+    Declaration of section 'params' above overrides this declaration.
     """
     And I expect inspection warning on <params: b="value"> with message
     """
-    Declaration of section 'params' above overshadows this declaration.
+    Declaration of section 'params' above overrides this declaration.
     """
     When I check highlighting errors
