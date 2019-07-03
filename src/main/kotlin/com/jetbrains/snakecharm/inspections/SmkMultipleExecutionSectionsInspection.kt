@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SMKRule
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
@@ -15,10 +14,6 @@ class SmkMultipleExecutionSectionsInspection : SnakemakeInspection() {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         override fun visitSMKRule(smkRule: SMKRule) {
-            if (!SnakemakeLanguageDialect.isInsideSmkFile(smkRule)) {
-                return
-            }
-
             var executionSectionOccurred = false
 
             val sections = smkRule.getSections()

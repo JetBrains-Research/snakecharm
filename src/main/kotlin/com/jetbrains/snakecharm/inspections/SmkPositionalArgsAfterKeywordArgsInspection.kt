@@ -4,7 +4,6 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 
 class SmkPositionalArgsAfterKeywordArgsInspection : SnakemakeInspection() {
@@ -15,10 +14,6 @@ class SmkPositionalArgsAfterKeywordArgsInspection : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
         override fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {
-            if (!SnakemakeLanguageDialect.isInsideSmkFile(st)) {
-                return
-            }
-
             var encounteredKeywordArgument = false
             val arguments = st.argumentList?.arguments ?: return
             for (argument in arguments) {

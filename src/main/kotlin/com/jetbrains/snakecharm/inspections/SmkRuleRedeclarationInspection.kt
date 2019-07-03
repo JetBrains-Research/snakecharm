@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SMKRule
 
 class SmkRuleRedeclarationInspection : SnakemakeInspection() {
@@ -15,10 +14,6 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
         private val ruleNames = mutableSetOf<String>()
 
         override fun visitSMKRule(smkRule: SMKRule) {
-            if (!SnakemakeLanguageDialect.isInsideSmkFile(smkRule)) {
-                return
-            }
-
             val ruleName = smkRule.name ?: return
             if (ruleNames.contains(ruleName)) {
                 registerProblem(smkRule.getNameNode()?.psi,

@@ -4,7 +4,6 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SMKRule
 
 class SmkSectionRedeclarationInspection : SnakemakeInspection() {
@@ -14,10 +13,6 @@ class SmkSectionRedeclarationInspection : SnakemakeInspection() {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         override fun visitSMKRule(smkRule: SMKRule) {
-            if (!SnakemakeLanguageDialect.isInsideSmkFile(smkRule)) {
-                return
-            }
-
             val sectionNamesSet = HashSet<String>()
 
             smkRule.getSections().forEach {
