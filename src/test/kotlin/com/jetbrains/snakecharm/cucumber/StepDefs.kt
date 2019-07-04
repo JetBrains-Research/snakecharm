@@ -4,11 +4,16 @@ import com.intellij.codeInspection.LocalInspectionEP
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.text.StringUtil
+import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.jetbrains.python.PythonDialectsTokenSetProvider
+import com.jetbrains.python.codeInsight.controlflow.ControlFlowCache
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
+import com.jetbrains.python.inspections.PyUnreachableCodeInspection
+import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.inspections.*
@@ -83,6 +88,7 @@ class StepDefs {
             "Rule Section After Execution Section" ->
                 fixture.enableInspections(SmkRuleSectionAfterExecutionInspection::class.java)
             "Section Redeclaration" -> fixture.enableInspections(SmkSectionRedeclarationInspection::class.java)
+            "Unreachable Code" -> fixture.enableInspections(PyUnreachableCodeInspection::class.java)
             else -> {
                 for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {
                     val o = provider.instance
