@@ -7,6 +7,7 @@ import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.StatementParsing
+import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SnakemakeElementTypes
@@ -31,7 +32,7 @@ class SnakemakeStatementParsing(
         val context = parsingContext
         val scope = context.scope
 
-        // myBuilder.setDebugMode(true)
+        myBuilder.setDebugMode(true)
 
         val tt = myBuilder.tokenType
         if (tt !in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS || scope.inParamArgsList) {
@@ -51,36 +52,32 @@ class SnakemakeStatementParsing(
             tt === SnakemakeTokenTypes.WORKFLOW_LOCALRULES_KEYWORD -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
-                checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))
 
-                val res = parsingContext.expressionParser.parseRulesList(
-                        PyTokenTypes.COMMA,
-                        "',' expected",
-                        "Expected a rule name identifier." // bundle
-                )
+                /*Although this method contains expression/keyword arguments parsing logic
+                and we only expect identifiers, it's better to keep complicated indentation check logic in one method
+                rather than duplicate it.
+                An annotator checks that localrules section contains identifiers and commas only.*/
+                val res = parsingContext.expressionParser.parseRuleParamArgumentList(PyTokenTypes.COMMA)
+
                 if (!res) {
-                    myBuilder.error("Expected a comma separated list of rules that shall not be" +
-                            " executed by the cluster command.") // bundle
+                    myBuilder.error(SnakemakeBundle.message("PARSE.expected.localrules"))
                 }
 
-                // nextToken()
                 workflowParam.done(SnakemakeElementTypes.WORKFLOW_LOCALRULES_STATEMENT)
             }
             tt === SnakemakeTokenTypes.WORKFLOW_RULEORDER_KEYWORD  -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
-                checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))
 
-                val res = parsingContext.expressionParser.parseRulesList(
-                        PyTokenTypes.GT,
-                        "'>' expected",
-                        "Expected a rule name identifier" // bundle
-                )
+                /*Although this method contains expression/keyword arguments parsing logic
+                and we only expect identifiers, it's better to keep complicated indentation check logic in one method
+                rather than duplicate it.
+                An annotator checks that ruleorder section contains identifiers and > only.*/
+                val res = parsingContext.expressionParser.parseRuleParamArgumentList(PyTokenTypes.GT)
                 if (!res) {
-                    myBuilder.error("Expected a descending order of rule names, e.g. rule1 > rule2 > rule3 ...") // bundle
+                    myBuilder.error(SnakemakeBundle.message("PARSE.expected.ruleorder"))
                 }
 
-                //nextToken()
                 workflowParam.done(SnakemakeElementTypes.WORKFLOW_RULESREORDER_STATEMENT)
             }
             tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS -> {

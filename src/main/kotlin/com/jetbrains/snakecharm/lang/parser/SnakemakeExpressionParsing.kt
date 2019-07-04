@@ -7,6 +7,7 @@ import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.ExpressionParsing
 import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.psi.PyElementType
+import com.jetbrains.snakecharm.SnakemakeBundle
 
 /**
  * @author Roman.Chernyatchik
@@ -15,16 +16,16 @@ import com.jetbrains.python.psi.PyElementType
 class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionParsing(context) {
     override fun getParsingContext() = myContext as SnakemakeParserContext
 
-    fun parseRuleParamArgumentList(): Boolean {
+    fun parseRuleParamArgumentList(separatorToken: PyElementType = PyTokenTypes.COMMA): Boolean {
         val context = myContext
         val scope = context.scope as SnakemakeParsingScope
         myContext.pushScope(scope.withParamsArgsList())
-        val result = doParseRuleParamArgumentList()
+        val result = doParseRuleParamArgumentList(separatorToken)
         context.popScope()
         return result
     }
 
-    private fun doParseRuleParamArgumentList(): Boolean {
+    private fun doParseRuleParamArgumentList(separatorToken: PyElementType): Boolean {
         // let's make ':' part of arg list, similar as '(', ')' are parts of arg list
         // helps with formatting, e.g. enter handler
         val hasColon = myBuilder.tokenType == PyTokenTypes.COLON
@@ -51,7 +52,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
 
             // comma if several args:
             if (argNumber > 1) {
-                if (matchToken(PyTokenTypes.COMMA)) {
+                if (matchToken(separatorToken)) {
                     val commaMarker = myBuilder.mark()
                     val commMarkerIndents = indents
 
@@ -85,10 +86,9 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         break
                     }
                 } else {
-                    myBuilder.error(message("PARSE.expected.comma.or.rpar"))
+                    myBuilder.error(SnakemakeBundle.message("PARSE.expected.separator.message", separatorToken.toString()))
                     break
                 }
-
             }
 
             // *args or **kw
@@ -112,9 +112,21 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         keywordArgMarker.done(PyElementTypes.KEYWORD_ARGUMENT_EXPRESSION)
                         continue
                     }
-                    keywordArgMarker.rollbackTo()
+                    if (atToken(separatorToken)) {
+                        keywordArgMarker.drop()
+                        continue
+                    } else {
+                        keywordArgMarker.rollbackTo()
+                    }
+                    // the change above does not seem to affect both correct and incorrect parsing cases
+                    // as the change only matter in case of separatorToken after IDENTIFIER
+                    // and the call to parseSingleExpression below
+                    // would parse IDENTIFIER and move lexer to separatorToken anyway
+                    // keeping this as a comment in case something was missed
+                    // keywordArgMarker.rollbackTo()
                 }
                 if (!parseSingleExpression(false)) {
+                    // TODO error messages for identifiers (localrules|ruleorder)
                     myBuilder.error(message("PARSE.expected.expression"))
                     break
                 }
@@ -133,82 +145,5 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         argList.done(PyElementTypes.ARGUMENT_LIST)
 
         return true
-    }
-
-    fun parseRulesList(
-            separatorToken: PyElementType,
-            separatorMissingMsg: String,
-            ruleMissingMsg: String
-    ): Boolean {
-        var indentBalance = 0
-
-        matchToken(PyTokenTypes.STATEMENT_BREAK)
-        if (matchToken(PyTokenTypes.INDENT)) {
-            indentBalance++
-        }
-
-        val argList = myBuilder.mark()
-
-        var result = true
-        var argsNumber = 0
-        while (!myBuilder.eof()) {
-            if (matchToken(PyTokenTypes.STATEMENT_BREAK)) {
-                while (matchToken(PyTokenTypes.DEDENT)) {
-                    indentBalance--
-                }
-                if (!matchToken(PyTokenTypes.INDENT)) {
-                    break
-                } else {
-                    indentBalance++
-                }
-            }
-
-            argsNumber++
-            if (argsNumber > 1) {
-                if (!checkMatches(separatorToken, separatorMissingMsg)) { // bundle
-                    result = false
-                    nextToken()
-                } else {
-                    matchToken(PyTokenTypes.STATEMENT_BREAK)
-                    if (matchToken(PyTokenTypes.INDENT)) {
-                        indentBalance++
-                    }
-                    if (matchToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
-                        result = false
-                        myBuilder.error("Unindent does not match any outer indentation level")
-                        nextToken()
-                    }
-                    if (matchToken(PyTokenTypes.DEDENT)) {
-                        indentBalance--
-                    }
-                }
-            }
-
-            if (matchToken(PyTokenTypes.STATEMENT_BREAK)) {
-                if (matchToken(PyTokenTypes.DEDENT)) {
-                    indentBalance--
-                    break
-                }
-                if (!matchToken(PyTokenTypes.INDENT)) {
-                    break
-                } else {
-                    indentBalance++
-                }
-            }
-
-            if (!checkMatches(PyTokenTypes.IDENTIFIER, ruleMissingMsg)) {
-                result = false
-                nextToken()
-            }
-        }
-
-        if (indentBalance != 0) {
-            result = false
-            myBuilder.error("Inconsistent indentation")
-        }
-
-        argList.done(PyElementTypes.ARGUMENT_LIST)
-
-        return result
     }
 }
