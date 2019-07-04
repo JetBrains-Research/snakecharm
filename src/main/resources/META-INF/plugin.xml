@@ -70,18 +70,6 @@
     />
 
     <localInspection
-        language="Snakemake"
-        shortName="SmkPositionalArgsAfterKeywordArgsInspection"
-        enabledByDefault="true"
-        level="ERROR"
-        suppressId="SmkPositionalArgsAfterKeywordArgs"
-        bundle="SnakemakeBundle"
-        groupKey="INSP.GROUP.snakemake"
-        key="INSP.NAME.positional.args.after.keyword.args"
-        implementationClass="com.jetbrains.snakecharm.inspections.SmkPositionalArgsAfterKeywordArgsInspection"
-    />
-
-    <localInspection
         language="Snakemake" shortName="SmkRuleRedeclarationInspection"
         enabledByDefault="true"
         level="ERROR"
@@ -101,18 +89,6 @@
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.rule.section.after.execution"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkRuleSectionAfterExecutionInspection"
-    />
-
-
-    <localInspection
-            language="Snakemake" shortName="SmkMultipleExecutionSectionsInspection"
-            enabledByDefault="true"
-            level="ERROR"
-            suppressId="SmkMultipleExecutionSections"
-            bundle="SnakemakeBundle"
-            groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.multiple.run.or.shell.section"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkMultipleExecutionSectionsInspection"
     />
 
     <localInspection

@@ -5,6 +5,7 @@ import com.intellij.lang.annotation.Annotator
 import com.intellij.openapi.project.DumbAware
 import com.intellij.psi.PsiElement
 import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
+import com.jetbrains.snakecharm.lang.validation.SnakemakeSyntaxErrorAnnotator
 
 /**
  * @author Roman.Chernyatchik
@@ -14,7 +15,7 @@ class SnakemakeDumbAwareAnnotator: Annotator, DumbAware {
     private var myHolder: AnnotationHolder? = null
 
     companion object {
-        val ANNOTATORS = listOf(SnakemakeSyntaxAnnotator)
+        val ANNOTATORS = listOf(SnakemakeSyntaxAnnotator, SnakemakeSyntaxErrorAnnotator)
     }
 
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
