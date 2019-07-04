@@ -77,6 +77,15 @@ class StepDefs {
         createAndAddFile(name, text)
     }
 
+    @Given("^I expect controlflow")
+    fun iexpectControlflow(expectedCFG: String) {
+        val actualCFG = ApplicationManager.getApplication().runReadAction(Computable<String> {
+            val flow = ControlFlowCache.getControlFlow(SnakemakeWorld.fixture().file as PyFile)
+            flow.instructions.joinToString(separator = "\n")
+        })
+        UsefulTestCase.assertSameLines(expectedCFG.trim(), actualCFG.trim())
+    }
+
     @Given("^([^\\]]+) inspection is enabled$")
     fun inspectionIsEnabled(inspectionName: String) {
         val fixture = SnakemakeWorld.fixture()
