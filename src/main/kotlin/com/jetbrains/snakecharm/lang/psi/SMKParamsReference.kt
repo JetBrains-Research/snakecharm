@@ -34,6 +34,5 @@ class SMKParamsReference(
         val rule = this.element.parentOfType<SMKRule>() ?: return null
         return rule.getSectionByName(SMKRuleParameterListStatement.PARAMS)
     }
-
     private fun getKeywordArguments() = getParamsSection()?.keywordArguments
 }

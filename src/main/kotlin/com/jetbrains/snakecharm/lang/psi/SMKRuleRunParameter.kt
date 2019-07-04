@@ -7,7 +7,6 @@ import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.PyStatementListContainer
 import com.jetbrains.python.psi.impl.PyElementImpl
-import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 
 class SMKRuleRunParameter(node: ASTNode): PyElementImpl(node), PyStatementListContainer, SMKRuleSection { // PyNamedElementContainer
     companion object {
@@ -22,11 +21,8 @@ class SMKRuleRunParameter(node: ASTNode): PyElementImpl(node), PyStatementListCo
     val section: PsiElement?
         get() = firstChild
 
-    override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
-            if (pyVisitor is SnakemakeAnnotator) {
-                pyVisitor.visitSMKRuleRunParameter(this)
-            } else {
-                super.acceptPyVisitor(pyVisitor)
-            }
-        }
+    override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
+        is SMKElementVisitor -> pyVisitor.visitSMKRuleRunParameter(this)
+        else -> super.acceptPyVisitor(pyVisitor)
+    }
 }

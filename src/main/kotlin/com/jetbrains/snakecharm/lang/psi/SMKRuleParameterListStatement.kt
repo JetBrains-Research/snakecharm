@@ -4,8 +4,6 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.impl.PyElementImpl
-import com.jetbrains.snakecharm.inspections.SnakemakeInspectionVisitor
-import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 
 class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyStatement, SMKRuleSection { // PyNamedElementContainer
     companion object {

@@ -3,9 +3,10 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.psi.SMKCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SMKRule
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
+import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
 
 class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -13,15 +14,19 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
-        override fun visitSMKRule(smkRule: SMKRule) {
-            if (!SnakemakeLanguageDialect.isInsideSmkFile(smkRule)) {
-                return
-            }
+        override fun visitSMKRule(rule: SMKRule) {
+            visitSMKRuleLike(rule)
+        }
 
+        override fun visitSMKCheckPoint(checkPoint: SMKCheckPoint) {
+            visitSMKRuleLike(checkPoint)
+        }
+
+        private fun visitSMKRuleLike(rule: SmkRuleLike) {
             var executionSectionOccurred = false
             var executionSectionName: String? = null
 
-            val sections = smkRule.getSections()
+            val sections = rule.getSections()
             for (st in sections) {
                 if (st is SMKRuleParameterListStatement) {
                     val sectionName = st.section.text ?: return
