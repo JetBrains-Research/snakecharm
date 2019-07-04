@@ -41,5 +41,5 @@ class SMKParamsReference(
         return rule.getSectionByName(SMKRuleParameterListStatement.PARAMS)
     }
 
-    private fun getKeywordArguments() = getParamsSection()?.argumentList?.arguments
+    private fun getKeywordArguments() = getParamsSection()?.keywordArguments
 }

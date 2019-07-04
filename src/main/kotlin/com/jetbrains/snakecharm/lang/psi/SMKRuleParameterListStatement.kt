@@ -2,9 +2,7 @@ package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
-import com.jetbrains.python.psi.PyArgumentList
-import com.jetbrains.python.psi.PyElementVisitor
-import com.jetbrains.python.psi.PyStatement
+import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.impl.PyElementImpl
 
 class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyStatement, SMKRuleSection { // PyNamedElementContainer
@@ -33,6 +31,9 @@ class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyState
 
     val argumentList: PyArgumentList?
         get() = children.filterIsInstance<PyArgumentList>().firstOrNull()
+
+    val keywordArguments: List<PyExpression>?
+        get() = argumentList?.arguments?.filterIsInstance<PyKeywordArgument>()
 
     override fun getName() = getNameNode()?.text
 
