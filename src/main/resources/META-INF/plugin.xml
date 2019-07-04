@@ -142,5 +142,4 @@
     <typeProvider implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeRulesTypeProvider"/>
 
   </extensions>
->>>>>>> master
 </idea-plugin>
