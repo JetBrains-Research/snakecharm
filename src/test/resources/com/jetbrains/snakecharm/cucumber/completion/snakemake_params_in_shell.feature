@@ -37,3 +37,24 @@ Feature: Completion for params in shell section
     Then completion list shouldn't contain:
       | outdir      |
       | xmx         |
+
+  Scenario: no values for unnamed parameters in the completion list
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule aaaa:
+      input: "path/to/input"
+      output: "path/to/output"
+      params:
+        1,
+        outdir=lambda wildcards, output: os.path.dirname(str(output)),
+        xmx=lambda wildcards: str(800 // int(wildcards.bin))
+      shell: "command {params.outdir}"
+    """
+    When I put the caret after {params.
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | outdir      |
+      | xmx         |
+    And completion list shouldn't contain:
+      | 1           |
