@@ -6,8 +6,15 @@ Feature: Annotate syntax errors
     """
     rule NAME:
         params: a="value", a1="value1", a="_value"
+
+    checkpoint NAME2:
+        params: b="value", b1="value1", b="_value"
     """
     Then I expect inspection error on <a="_value"> with message
+    """
+    Keyword argument repeated.
+    """
+    And I expect inspection error on <b="_value"> with message
     """
     Keyword argument repeated.
     """
