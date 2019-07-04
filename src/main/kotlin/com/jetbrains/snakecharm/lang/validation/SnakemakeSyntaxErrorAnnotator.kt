@@ -18,13 +18,13 @@ object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
 
         st.argumentList?.arguments?.forEach {arg ->
             if (arg is PyKeywordArgument) {
-                if (arg.keyword in seenKeywords) {
-                    holder.createErrorAnnotation(
-                            arg.textRange,
-                            SnakemakeBundle.message("ANN.keyword.argument.repeated")
-                    )
-                } else {
-                    seenKeywords.add(arg.keyword!!)
+                arg.keyword?.let { keyword ->
+                    if (!seenKeywords.add(keyword)) {
+                        holder.createErrorAnnotation(
+                                arg.textRange,
+                                SnakemakeBundle.message("ANN.keyword.argument.repeated")
+                        )
+                    }
                 }
                 encounteredKeywordArgument = true
             } else {
@@ -38,14 +38,14 @@ object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
         }
     }
 
-    override fun visitSMKRule(smkRule: SMKRule) {
+    override fun visitSMKRule(rule: SMKRule) {
         var executionSectionOccurred = false
 
-        val sections = smkRule.getSections()
+        val sections = rule.getSections()
         for (st in sections) {
             when (st) {
                 is SMKRuleParameterListStatement -> {
-                    val sectionName = st.section.text ?: return
+                    val sectionName = st.section.text
                     val isExecutionSection = sectionName in SMKRuleParameterListStatement.EXECUTION_KEYWORDS
 
                     if (executionSectionOccurred && isExecutionSection) {
