@@ -14,7 +14,8 @@ object SnakemakeSyntaxAnnotator: SnakemakeAnnotator() {
         visitSMKRuleLike(checkPoint)
     }
 
-    private fun visitSMKRuleLike(ruleLike: SmkRuleLike) {
+
+    private fun visitSMKRuleLike(ruleLike: SmkRuleLike<SmkSectionStatement>) {
         val nameNode = ruleLike.getNameNode()
         if (nameNode != null) {
             addHighlightingAnnotation(nameNode, PY_FUNC_DEFINITION)

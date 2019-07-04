@@ -12,7 +12,8 @@ import com.jetbrains.python.psi.PyStatementListContainer
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyElementImpl
 
-abstract class SmkRuleLike(node: ASTNode): PyElementImpl(node), PyStatementListContainer, PsiNamedElement {
+abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode):
+        PyElementImpl(node), PyStatementListContainer, PsiNamedElement {
     //TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SMKRule>
     // SnakemakeNamedElement, SnakemakeScopeOwner
 
@@ -39,7 +40,7 @@ abstract class SmkRuleLike(node: ASTNode): PyElementImpl(node), PyStatementListC
     fun getSectionByName(sectionName: String) =
             statementList.statements.find {
                 (it as SmkSectionStatement).section.textMatches(sectionName)
-            } as? SmkSectionStatement
+            } as? T
 
     override fun getStatementList() = childToPsiNotNull<PyStatementList>(PyElementTypes.STATEMENT_LIST)
 

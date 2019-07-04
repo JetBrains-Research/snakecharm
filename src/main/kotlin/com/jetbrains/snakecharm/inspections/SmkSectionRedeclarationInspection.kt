@@ -7,6 +7,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SMKCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SMKRule
 import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
+import com.jetbrains.snakecharm.lang.psi.SmkSectionStatement
 
 class SmkSectionRedeclarationInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -22,7 +23,7 @@ class SmkSectionRedeclarationInspection : SnakemakeInspection() {
             visitSMKRuleLike(checkPoint)
         }
 
-        private fun visitSMKRuleLike(rule: SmkRuleLike) {
+        private fun visitSMKRuleLike(rule: SmkRuleLike<SmkSectionStatement>) {
             val sectionNamesSet = HashSet<String>()
 
             rule.getSections().forEach {
