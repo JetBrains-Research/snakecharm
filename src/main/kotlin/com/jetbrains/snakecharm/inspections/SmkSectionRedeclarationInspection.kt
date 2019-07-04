@@ -1,20 +1,19 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
+import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SMKCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SMKRule
 import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
 
-class SmkRuleRedeclarationInspection : SnakemakeInspection() {
+class SmkSectionRedeclarationInspection : SnakemakeInspection() {
     override fun buildVisitor(
             holder: ProblemsHolder,
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
-        private val ruleNames = mutableSetOf<String>()
-
         override fun visitSMKRule(rule: SMKRule) {
             visitSMKRuleLike(rule)
         }
@@ -24,15 +23,20 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
         }
 
         private fun visitSMKRuleLike(rule: SmkRuleLike) {
-            val ruleName = rule.name ?: return
-            if (ruleNames.contains(ruleName)) {
-                registerProblem(rule.getNameNode()?.psi,
-                        SnakemakeBundle.message("INSP.NAME.rule.redeclaration"))
-            } else {
-                ruleNames.add(ruleName)
+            val sectionNamesSet = HashSet<String>()
+
+            rule.getSections().forEach {
+                val name = it.name ?: return
+                if (sectionNamesSet.contains(name)) {
+                    registerProblem(
+                            it,
+                            SnakemakeBundle.message("INSP.NAME.section.redeclaration.message", name),
+                            ProblemHighlightType.LIKE_UNUSED_SYMBOL
+                    )
+                }
+                sectionNamesSet.add(name)
             }
+
         }
     }
-
-    override fun getDisplayName(): String = SnakemakeBundle.message("INSP.NAME.rule.redeclaration")
 }

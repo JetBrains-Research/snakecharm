@@ -5,7 +5,6 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.completion.ShadowSectionSettingsProvider
-import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 
 class SmkShadowSettingsInspection : SnakemakeInspection()  {
@@ -16,8 +15,7 @@ class SmkShadowSettingsInspection : SnakemakeInspection()  {
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
         override fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {
-            if (!SnakemakeLanguageDialect.isInsideSmkFile(st) ||
-                    st.name != SMKRuleParameterListStatement.SHADOW) {
+            if (st.name != SMKRuleParameterListStatement.SHADOW) {
                 return
             }
 

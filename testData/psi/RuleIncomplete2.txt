@@ -1,0 +1,26 @@
+SnakemakeFile: RuleIncomplete2.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PsiErrorElement:Rule name identifier or ':' expected
+      <empty list>
+    PyStatementList
+      PsiErrorElement:Indent expected...
+        <empty list>
+  PsiWhiteSpace('\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('my_rule')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: out.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''out.txt'')
+          PsiElement(Py:COMMA)(',')

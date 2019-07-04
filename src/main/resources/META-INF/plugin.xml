@@ -1,12 +1,12 @@
 <idea-plugin>
-  <id>SnakeCharm</id>
-  <name>SnakeCharm</name>
-  <vendor email="roman.chernyatchik@jetbrains.com"
-          url="https://research.jetbrains.org/groups/biolabs">
-    JetBrains Research
-  </vendor>
+    <id>SnakeCharm</id>
+    <name>SnakeCharm</name>
+    <vendor email="roman.chernyatchik@jetbrains.com"
+            url="https://research.jetbrains.org/groups/biolabs">
+        JetBrains Research
+    </vendor>
 
-  <description><![CDATA[
+    <description><![CDATA[
     Adds Snakemake language support.<br>
     <a href="https://snakemake.readthedocs.io/en/stable/">Snakemake</a> is a language for workflow management.
     <br>
@@ -136,6 +136,19 @@
             key="INSP.NAME.shadow.multiple.settings"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkShadowMultipleSettingsInspection"
     />
+
+    <localInspection
+            language="Snakemake" shortName="SmkSectionRedeclarationInspection"
+            enabledByDefault="true"
+            level="WEAK WARNING"
+            suppressId="SmkSectionRedeclarationInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.redeclaration"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionRedeclarationInspection"
+    />
+
+    <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
   </extensions>
 
   <module-components>
@@ -153,4 +166,5 @@
     <typeProvider implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeRulesTypeProvider"/>
 
   </extensions>
+>>>>>>> master
 </idea-plugin>
