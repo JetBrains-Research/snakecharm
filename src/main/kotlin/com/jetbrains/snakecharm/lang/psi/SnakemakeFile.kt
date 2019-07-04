@@ -22,6 +22,22 @@ class SnakemakeFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, S
 
     override fun getStub(): StubElement<SnakemakeFile>? = null
 
+    fun collectSubworkflows(): List<Pair<String, PsiElement>> {
+        val subworkflowNameAndPsi = arrayListOf<Pair<String, PsiElement>>()
+
+        acceptChildren(object : PyElementVisitor(), SMKElementVisitor {
+            override val pyElementVisitor: PyElementVisitor = this
+
+            override fun visitSMKSubworkflow(subworkflow: SmkSubworkflow) {
+                val element = subworkflow.getNameNode()?.psi
+                if (element != null) {
+                    subworkflowNameAndPsi.add(subworkflow.name!! to element)
+                }
+            }
+        })
+        return subworkflowNameAndPsi
+    }
+
     fun collectRules(): List<Pair<String, PsiElement>> {
         // TODO: add tests, this is simple impl for internship task practice
         val ruleNameAndPsi = arrayListOf<Pair<String, PsiElement>>()

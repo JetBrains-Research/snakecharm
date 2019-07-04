@@ -124,6 +124,28 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionRedeclarationInspection"
     />
 
+    <localInspection
+            language="Snakemake" shortName="SmkSubworkflowMultipleArgsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkSubworkflowMultipleArgsInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.subworkflow.multiple.args"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSubworkflowMultipleArgsInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkSubworkflowRedeclarationInspection"
+            enabledByDefault="true"
+            level="WEAK WARNING"
+            suppressId="SmkSubworkflowRedeclarationInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.subworkflow.redeclaration"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSubworkflowRedeclarationInspection"
+    />
+
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
   </extensions>
 
@@ -142,5 +164,4 @@
     <typeProvider implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeRulesTypeProvider"/>
 
   </extensions>
->>>>>>> master
 </idea-plugin>

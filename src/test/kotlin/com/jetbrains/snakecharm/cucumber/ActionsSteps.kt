@@ -31,9 +31,10 @@ class ActionsSteps {
         //This step just for more readable tests
     }
 
-    @Given("^I expect inspection (error|warning|info|TYPO) on <([^>]+)> in <(.+)> with message$")
+    @Given("^I expect inspection (error|warning|info|TYPO|weak warning) on <([^>]+)> in <(.+)> with message$")
     fun iExpectInspectionOnIn(level: String, text: String, signature: String, message: String) {
-        val newText = "<$level descr=\"$message\">$text</$level>"
+        val tag = level.replace(' ', '_')
+        val newText = "<$tag descr=\"$message\">$text</$tag>"
         val fixture = SnakemakeWorld.fixture()
         val psiFile = fixture.file
         val project = psiFile.project
