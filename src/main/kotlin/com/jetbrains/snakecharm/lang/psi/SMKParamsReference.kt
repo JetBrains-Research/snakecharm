@@ -6,7 +6,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.PlatformIcons
-import com.intellij.util.containers.toMutableSmartList
 
 
 class SMKParamsReference(
@@ -14,25 +13,20 @@ class SMKParamsReference(
 ) : PsiReferenceBase<PsiElement>(element, textRange) {
     private val key: String = element.text.substring(textRange.startOffset, textRange.endOffset)
 
-    override fun resolve(): PsiElement? {
-        getKeywordArguments()?.forEach {
-            if (it.name == this.key) {
-                return it
-            }
-        }
-        return null
-    }
+    override fun resolve() =
+            getKeywordArguments().firstOrNull { it.name == key }
 
-    override fun getVariants(): Array<Any> {
-        return (getKeywordArguments()
-                ?.map { arg ->
-                    LookupElementBuilder.create(arg.keyword!!).withIcon(PlatformIcons.PARAMETER_ICON)
-                } ?: emptyList()).toMutableSmartList().toTypedArray()
-    }
+    override fun getVariants() =
+            getKeywordArguments()
+                    .mapNotNull { arg -> arg.keyword }
+                    .map { keyword ->
+                        LookupElementBuilder.create(keyword).withIcon(PlatformIcons.PARAMETER_ICON)
+                    }
+                    .toTypedArray()
 
-    private fun getParamsSection(): SMKRuleParameterListStatement? {
-        val rule = this.element.parentOfType<SMKRule>() ?: return null
-        return rule.getSectionByName(SMKRuleParameterListStatement.PARAMS)
-    }
-    private fun getKeywordArguments() = getParamsSection()?.keywordArguments
+    private fun getParamsSection() =
+            element.parentOfType<SMKRule>()?.getSectionByName(SMKRuleParameterListStatement.PARAMS)
+
+    private fun getKeywordArguments() =
+            getParamsSection()?.keywordArguments ?: emptyList()
 }
