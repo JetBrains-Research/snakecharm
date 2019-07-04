@@ -32,6 +32,16 @@ class SnakemakeLexerTest : PyLexerTestCase() {
                 "Py:STATEMENT_BREAK")
     }
 
+    fun testSubworkflow() {
+        doTest("""
+            |subworkflow otherworkflow:
+            |""".trimMargin().trimStart(),
+                "Py:SUBWORKFLOW_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+                "Py:STATEMENT_BREAK")
+    }
+
+    /*
     fun testRuleWithParams() {
         doTest("""
             |rule all:
@@ -43,7 +53,7 @@ class SnakemakeLexerTest : PyLexerTestCase() {
                 "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
                 "Py:STATEMENT_BREAK")
     }
-
+    */
     /* TODO #16
     fun testRuleParamStringLiteralWithLineBreak() {
         Assume.assumeFalse(

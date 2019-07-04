@@ -24,10 +24,8 @@ class SMKParamsReference(
                     }
                     .toTypedArray()
 
-    private fun getParamsSection(): SmkSectionStatement? {
-        val rule = this.element.parentOfType<SMKRule>() ?: return null
-        return rule.getSectionByName(SMKRuleParameterListStatement.PARAMS)
-    }
+    private fun getParamsSection() =
+            element.parentOfType<SMKRule>()?.getSectionByName(SMKRuleParameterListStatement.PARAMS)
 
     private fun getKeywordArguments() =
             getParamsSection()?.keywordArguments ?: emptyList()
