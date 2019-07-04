@@ -13,27 +13,27 @@ object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
             return
         }
 
-        val argumentNamesSet = HashSet<String>()
+        val seenKeywords = HashSet<String>()
         var encounteredKeywordArgument = false
 
-        st.argumentList?.arguments?.forEach {
-            // check argument name
-            val name = it.name
-            if (argumentNamesSet.contains(name)) {
-                holder.createErrorAnnotation(it.textRange, SnakemakeBundle.message("ANN.keyword.argument.repeated"))
-            } else if (name != null) {
-                argumentNamesSet.add(name)
-            }
-
-            // check if positional or keyword argument
-            if (!encounteredKeywordArgument && it is PyKeywordArgument) {
+        st.argumentList?.arguments?.forEach {arg ->
+            if (arg is PyKeywordArgument) {
+                if (arg.keyword in seenKeywords) {
+                    holder.createErrorAnnotation(
+                            arg.textRange,
+                            SnakemakeBundle.message("ANN.keyword.argument.repeated")
+                    )
+                } else {
+                    seenKeywords.add(arg.keyword!!)
+                }
                 encounteredKeywordArgument = true
-            }
-            if (encounteredKeywordArgument && it !is PyKeywordArgument) {
-                holder.createErrorAnnotation(
-                        it,
-                        SnakemakeBundle.message("ANN.positional.argument.after.keyword.argument")
-                )
+            } else {
+                if (encounteredKeywordArgument) {
+                    holder.createErrorAnnotation(
+                            arg,
+                            SnakemakeBundle.message("ANN.positional.argument.after.keyword.argument")
+                    )
+                }
             }
         }
     }
@@ -43,22 +43,25 @@ object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
 
         val sections = smkRule.getSections()
         for (st in sections) {
-            if (st is SMKRuleParameterListStatement) {
-                val sectionName = st.section.text ?: return
-                val isExecutionSection = sectionName in SMKRuleParameterListStatement.EXECUTION_KEYWORDS
+            when (st) {
+                is SMKRuleParameterListStatement -> {
+                    val sectionName = st.section.text ?: return
+                    val isExecutionSection = sectionName in SMKRuleParameterListStatement.EXECUTION_KEYWORDS
 
-                if (executionSectionOccurred && isExecutionSection) {
-                    holder.createErrorAnnotation(st, SnakemakeBundle.message("ANN.multiple.execution.sections"))
+                    if (executionSectionOccurred && isExecutionSection) {
+                        holder.createErrorAnnotation(st, SnakemakeBundle.message("ANN.multiple.execution.sections"))
+                    }
+
+                    if (isExecutionSection) {
+                        executionSectionOccurred = true
+                    }
                 }
-
-                if (isExecutionSection) {
+                is SMKRuleRunParameter -> {
+                    if (executionSectionOccurred) {
+                        holder.createErrorAnnotation(st, SnakemakeBundle.message("ANN.multiple.execution.sections"))
+                    }
                     executionSectionOccurred = true
                 }
-            } else if (st is SMKRuleRunParameter) {
-                if (executionSectionOccurred) {
-                    holder.createErrorAnnotation(st, SnakemakeBundle.message("ANN.multiple.execution.sections"))
-                }
-                executionSectionOccurred = true
             }
         }
     }
