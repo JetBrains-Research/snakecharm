@@ -30,12 +30,12 @@ class SMKParamsReference(
 
     override fun getVariants(): Array<Any> {
         val variants = mutableListOf<LookupElement>()
-        getKeywordArguments()
-                ?.filter { it.name != null }
-                ?.forEach {
-                    variants.add(LookupElementBuilder.create(it.name!!).withIcon(PlatformIcons.PARAMETER_ICON))
-                }
+        variants.addAll(getKeywordArguments()
+                ?.map { arg ->
+                    LookupElementBuilder.create(arg.keyword!!).withIcon(PlatformIcons.PARAMETER_ICON)
+                } ?: emptyList())
         return variants.toTypedArray()
+
     }
 
     private fun getParamsSection(): SMKRuleParameterListStatement? {
@@ -43,5 +43,5 @@ class SMKParamsReference(
         return rule.getSectionByName(SMKRuleParameterListStatement.PARAMS)
     }
 
-    private fun getKeywordArguments() = getParamsSection()?.argumentList?.arguments
+    private fun getKeywordArguments() = getParamsSection()?.keywordArguments
 }
