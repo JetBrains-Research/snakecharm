@@ -4,7 +4,6 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 
 class SmkResourcesKeywordArgsInspection : SnakemakeInspection() {
@@ -14,10 +13,6 @@ class SmkResourcesKeywordArgsInspection : SnakemakeInspection() {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         override fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {
-            if (!SnakemakeLanguageDialect.isInsideSmkFile(st)) {
-                return
-            }
-
             val sectionName = st.section.text
             if (sectionName != SMKRuleParameterListStatement.RESOURCES) {
                 return

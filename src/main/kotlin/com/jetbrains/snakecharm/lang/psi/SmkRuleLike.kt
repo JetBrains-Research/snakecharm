@@ -12,10 +12,8 @@ import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.PyStatementListContainer
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyElementImpl
-import com.jetbrains.snakecharm.inspections.SnakemakeInspectionVisitor
-import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 
-open class SMKRule(node: ASTNode): PyElementImpl(node), PyStatementListContainer, PsiNamedElement {
+abstract class SmkRuleLike(node: ASTNode): PyElementImpl(node), PyStatementListContainer, PsiNamedElement {
     //TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SMKRule>
     // SnakemakeNamedElement, SnakemakeScopeOwner
 
@@ -39,13 +37,12 @@ open class SMKRule(node: ASTNode): PyElementImpl(node), PyStatementListContainer
 
     fun getNameNode() = getIdentifierNode(node)
 
-    override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
-        when (pyVisitor) {
-            is SnakemakeAnnotator -> pyVisitor.visitSMKRule(this)
-            is SnakemakeInspectionVisitor -> pyVisitor.visitSMKRule(this)
-            else -> super.acceptPyVisitor(pyVisitor)
-        }
-    }
+    fun getSectionByName(sectionName: String) =
+            statementList.statements.find {
+                (it as SMKRuleParameterListStatement)
+                    .section
+                    .textMatches(sectionName)
+            } as? SMKRuleParameterListStatement
 
     override fun getStatementList() = childToPsiNotNull<PyStatementList>(PyElementTypes.STATEMENT_LIST)
 

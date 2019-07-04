@@ -6,8 +6,16 @@ import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 
 object SnakemakeSyntaxAnnotator: SnakemakeAnnotator() {
-    override fun visitSMKRule(smkRule: SMKRule) {
-        val nameNode = smkRule.getNameNode()
+    override fun visitSMKRule(rule: SMKRule) {
+        visitSMKRuleLike(rule)
+    }
+
+    override fun visitSMKCheckPoint(checkPoint: SMKCheckPoint) {
+        visitSMKRuleLike(checkPoint)
+    }
+
+    private fun visitSMKRuleLike(ruleLike: SmkRuleLike) {
+        val nameNode = ruleLike.getNameNode()
         if (nameNode != null) {
             addHighlightingAnnotation(nameNode, PY_FUNC_DEFINITION)
         }
