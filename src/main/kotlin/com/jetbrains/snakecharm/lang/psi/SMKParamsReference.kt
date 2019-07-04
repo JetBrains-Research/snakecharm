@@ -1,17 +1,12 @@
 package com.jetbrains.snakecharm.lang.psi
 
-import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiReferenceBase
-import com.intellij.psi.ResolveResult
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.PlatformIcons
-import com.jetbrains.python.psi.resolve.RatedResolveResult
-import icons.PythonIcons
-import java.util.*
+import com.intellij.util.containers.toMutableSmartList
 
 
 class SMKParamsReference(
@@ -29,13 +24,10 @@ class SMKParamsReference(
     }
 
     override fun getVariants(): Array<Any> {
-        val variants = mutableListOf<LookupElement>()
-        variants.addAll(getKeywordArguments()
+        return (getKeywordArguments()
                 ?.map { arg ->
                     LookupElementBuilder.create(arg.keyword!!).withIcon(PlatformIcons.PARAMETER_ICON)
-                } ?: emptyList())
-        return variants.toTypedArray()
-
+                } ?: emptyList()).toMutableSmartList().toTypedArray()
     }
 
     private fun getParamsSection(): SMKRuleParameterListStatement? {
