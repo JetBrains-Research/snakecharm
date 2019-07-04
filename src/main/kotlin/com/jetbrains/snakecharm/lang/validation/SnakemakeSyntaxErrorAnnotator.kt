@@ -13,22 +13,27 @@ object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
             return
         }
 
-        val seenKeywords = HashSet<String>()
+        val seenKeywords2Value = HashMap<String, String>()
         var encounteredKeywordArgument = false
 
-        st.argumentList?.arguments?.forEach {arg ->
-            if (arg is PyKeywordArgument) {
-                arg.keyword?.let { keyword ->
-                    if (!seenKeywords.add(keyword)) {
-                        holder.createErrorAnnotation(
-                                arg.textRange,
-                                SnakemakeBundle.message("ANN.keyword.argument.repeated")
-                        )
+        st.argumentList?.arguments?.forEach { arg ->
+            when (arg) {
+                is PyKeywordArgument -> {
+                    arg.keyword?.let { keyword ->
+                        val keywordValue = seenKeywords2Value[keyword]
+                        if (keywordValue == null) {
+                            // arg value is nullable, let's take arg text which isn't null
+                            seenKeywords2Value[keyword] = arg.text
+                        } else {
+                            holder.createErrorAnnotation(
+                                    arg.textRange,
+                                    SnakemakeBundle.message("ANN.keyword.argument.already.provided", keywordValue)
+                            )
+                        }
                     }
+                    encounteredKeywordArgument = true
                 }
-                encounteredKeywordArgument = true
-            } else {
-                if (encounteredKeywordArgument) {
+                else -> if (encounteredKeywordArgument) {
                     holder.createErrorAnnotation(
                             arg,
                             SnakemakeBundle.message("ANN.positional.argument.after.keyword.argument")
