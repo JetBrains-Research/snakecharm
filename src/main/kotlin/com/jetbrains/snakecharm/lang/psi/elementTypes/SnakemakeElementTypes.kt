@@ -38,6 +38,6 @@ object SnakemakeElementTypes {
 
     val WORKFLOW_RULESREORDER_STATEMENT = PyElementType(
             "SMK_WORKFLOW_RULESREORDER_STATEMENT",
-            SMKWorkflowRulesReorderStatement::class.java
+            SMKWorkflowRulesOrderStatement::class.java
     )
 }

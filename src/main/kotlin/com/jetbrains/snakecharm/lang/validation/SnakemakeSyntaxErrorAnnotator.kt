@@ -1,11 +1,11 @@
 package com.jetbrains.snakecharm.lang.validation
 
+import com.intellij.psi.PsiIdentifier
+import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
-import com.jetbrains.snakecharm.lang.psi.SMKRule
-import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
-import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
+import com.jetbrains.snakecharm.lang.psi.*
 
 object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
     override fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {
@@ -64,5 +64,25 @@ object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
                 }
             }
         }
+    }
+
+    override fun visitSMKWorkflowLocalRulesStatement(st: SMKWorkflowLocalRulesStatement) {
+        placeErrorOnNonIdentifiers(st.argumentList, SnakemakeBundle.message("ANN.expressions.in.localrules"))
+    }
+
+    override fun visitSMKWorkflowRuleOrderStatement(st: SMKWorkflowRulesOrderStatement) {
+        placeErrorOnNonIdentifiers(st.argumentList, SnakemakeBundle.message("ANN.expressions.in.ruleorder"))
+    }
+
+    private fun placeErrorOnNonIdentifiers(
+            argumentList: PyArgumentList?,
+            errorMessage: String
+    ) {
+        argumentList
+                ?.arguments
+                ?.filter { it !is PsiIdentifier }
+                ?.forEach {
+                    holder.createErrorAnnotation(it, errorMessage)
+                }
     }
 }
