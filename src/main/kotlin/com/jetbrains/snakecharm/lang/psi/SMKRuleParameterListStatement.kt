@@ -32,7 +32,7 @@ class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyState
     val argumentList: PyArgumentList?
         get() = children.filterIsInstance<PyArgumentList>().firstOrNull()
 
-    val keywordArguments: List<PyExpression>?
+    val keywordArguments: List<PyKeywordArgument>?
         get() = argumentList?.arguments?.filterIsInstance<PyKeywordArgument>()
 
     override fun getName() = getNameNode()?.text
