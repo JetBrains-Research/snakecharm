@@ -11,9 +11,7 @@ import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
-import com.jetbrains.snakecharm.inspections.SmkSectionRedeclarationInspection
-import com.jetbrains.snakecharm.inspections.SmkShadowMultipleSettingsInspection
-import com.jetbrains.snakecharm.inspections.SmkShadowSettingsInspection
+import com.jetbrains.snakecharm.inspections.*
 import cucumber.api.java.en.Given
 import junit.framework.Assert.fail
 
@@ -80,6 +78,10 @@ class StepDefs {
         when (inspectionName) {
             "Shadow Settings" -> fixture.enableInspections(SmkShadowSettingsInspection::class.java)
             "Shadow Multiple Settings" -> fixture.enableInspections(SmkShadowMultipleSettingsInspection::class.java)
+            "Resources Keyword Arguments" -> fixture.enableInspections(SmkResourcesKeywordArgsInspection::class.java)
+            "Rule Redeclaration" -> fixture.enableInspections(SmkRuleRedeclarationInspection::class.java)
+            "Rule Section After Execution Section" ->
+                fixture.enableInspections(SmkRuleSectionAfterExecutionInspection::class.java)
             "Section Redeclaration" -> fixture.enableInspections(SmkSectionRedeclarationInspection::class.java)
             else -> {
                 for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {

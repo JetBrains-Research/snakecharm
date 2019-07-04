@@ -23,7 +23,7 @@ class SMKRuleParameterListStatement(node: ASTNode): SmkSectionStatement(node) { 
                 SCRIPT, WRAPPER, CWL
         )
     }
-
+  
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SMKElementVisitor -> pyVisitor.visitSMKRuleParameterListStatement(this)
         else -> super.acceptPyVisitor(pyVisitor)
