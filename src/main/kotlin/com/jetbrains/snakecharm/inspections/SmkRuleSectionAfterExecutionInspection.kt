@@ -3,10 +3,7 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.psi.SMKCheckPoint
-import com.jetbrains.snakecharm.lang.psi.SMKRule
-import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
-import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
+import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -22,7 +19,7 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
             visitSMKRuleLike(checkPoint)
         }
 
-        private fun visitSMKRuleLike(rule: SmkRuleLike) {
+        private fun visitSMKRuleLike(rule: SmkRuleLike<SmkSectionStatement>) {
             var executionSectionOccurred = false
             var executionSectionName: String? = null
 

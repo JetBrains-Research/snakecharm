@@ -159,6 +159,10 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testRuleIncomplete5() {
+        doTest()
+    }
+
     fun testWorkflowParamsListArgsKeywords() {
         doTest()
     }
@@ -228,6 +232,10 @@ class SnakemakeParsingTest : ParsingTestCase(
     }
 
     fun testHangingComa() {
+        doTest()
+    }
+
+    fun testSingleSubworkflow() {
         doTest()
     }
 

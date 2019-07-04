@@ -9,6 +9,7 @@ import com.jetbrains.python.psi.PyElementType
  */
 object SnakemakeTokenTypes {
     val RULE_KEYWORD = PyElementType("RULE_KEYWORD") // rule
+    val SUBWORKFLOW_KEYWORD = PyElementType("SUBWORKFLOW_KEYWORD")
     val CHECKPOINT_KEYWORD = PyElementType("CHECKPOINT_KEYWORD") // rule
 
     val WORKFLOW_CONFIGFILE_KEYWORD = PyElementType("WORKFLOW_CONFIGFILE_KEYWORD")
@@ -45,7 +46,7 @@ object SnakemakeTokenTypes {
             ))
 
     val RULE_LIKE = TokenSet.create(
-            RULE_KEYWORD, CHECKPOINT_KEYWORD
+            RULE_KEYWORD, CHECKPOINT_KEYWORD, SUBWORKFLOW_KEYWORD
     )
 
     val WORKFLOW_TOPLEVEL_DECORATORS = TokenSet.orSet(

@@ -1,0 +1,42 @@
+SnakemakeFile: RuleIncomplete5.smk
+  SmkSubworkflow
+    PsiElement(Py:SUBWORKFLOW_KEYWORD)('subworkflow')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('NAME')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiErrorElement:Indent expected...
+        <empty list>
+  PsiWhiteSpace('\n\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('a')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiErrorElement:Indent expected...
+        <empty list>
+  PsiWhiteSpace('\n\n')
+  SMKCheckPoint
+    PsiElement(Py:CHECKPOINT_KEYWORD)('checkpoint')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('b')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiErrorElement:Indent expected...
+        <empty list>
+  PsiWhiteSpace('\n\n')
+  SmkSubworkflow
+    PsiElement(Py:SUBWORKFLOW_KEYWORD)('subworkflow')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('otherworkflow')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SMKSubworkflowParameterListStatement
+        PsiElement(Py:IDENTIFIER)('workdir')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n       ')
+          PyStringLiteralExpression: ../path/to/otherworkflow
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"../path/to/otherworkflow"')

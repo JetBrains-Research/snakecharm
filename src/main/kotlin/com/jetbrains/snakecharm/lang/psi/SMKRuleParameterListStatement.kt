@@ -1,11 +1,9 @@
 package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.ASTNode
-import com.intellij.psi.PsiElement
-import com.jetbrains.python.psi.*
-import com.jetbrains.python.psi.impl.PyElementImpl
+import com.jetbrains.python.psi.PyElementVisitor
 
-class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyStatement, SMKRuleSection { // PyNamedElementContainer
+class SMKRuleParameterListStatement(node: ASTNode): SmkSectionStatement(node) { // PyNamedElementContainer
     companion object {
         const val RESOURCES = "resources"
         const val PARAMS = "params"
@@ -25,22 +23,9 @@ class SMKRuleParameterListStatement(node: ASTNode): PyElementImpl(node), PyState
                 SCRIPT, WRAPPER, CWL
         )
     }
-
-    val section: PsiElement
-        get() = firstChild
-
-    val argumentList: PyArgumentList?
-        get() = children.filterIsInstance<PyArgumentList>().firstOrNull()
-
-    val keywordArguments: List<PyKeywordArgument>?
-        get() = argumentList?.arguments?.filterIsInstance<PyKeywordArgument>()
-
-    override fun getName() = getNameNode()?.text
-
+  
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SMKElementVisitor -> pyVisitor.visitSMKRuleParameterListStatement(this)
         else -> super.acceptPyVisitor(pyVisitor)
     }
-
-    fun getNameNode() = getIdentifierNode(node)
 }
