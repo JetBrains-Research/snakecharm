@@ -36,7 +36,7 @@ class SMKParamsReference(
         return variants.toTypedArray()
     }
 
-    private fun getParamsSection(): SMKRuleParameterListStatement? {
+    private fun getParamsSection(): SmkSectionStatement? {
         val rule = this.element.parentOfType<SMKRule>() ?: return null
         return rule.getSectionByName(SMKRuleParameterListStatement.PARAMS)
     }

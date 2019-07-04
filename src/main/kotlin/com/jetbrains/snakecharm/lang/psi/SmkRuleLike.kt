@@ -7,7 +7,6 @@ import com.intellij.psi.TokenType
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonDialectsTokenSetProvider
-import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.PyStatementListContainer
 import com.jetbrains.python.psi.PyUtil
@@ -39,24 +38,13 @@ abstract class SmkRuleLike(node: ASTNode): PyElementImpl(node), PyStatementListC
 
     fun getSectionByName(sectionName: String) =
             statementList.statements.find {
-                (it as SMKRuleParameterListStatement)
-                    .section
-                    .textMatches(sectionName)
-            } as? SMKRuleParameterListStatement
+                (it as SmkSectionStatement).section.textMatches(sectionName)
+            } as? SmkSectionStatement
 
     override fun getStatementList() = childToPsiNotNull<PyStatementList>(PyElementTypes.STATEMENT_LIST)
 
-    fun getSections(): List<SMKRuleSection> {
-        val sections = mutableListOf<SMKRuleSection>()
-        // iterate over children, not statements, since SMKRuleRunParameter isn't a statement
-        statementList.children.forEach {
-            if (it is SMKRuleSection) {
-                sections.add(it)
-            }
-        }
-
-        return sections
-    }
+    // iterate over children, not statements, since SMKRuleRunParameter isn't a statement
+    fun getSections() = statementList.children.filterIsInstance<SMKRuleSection>()
 }
 
 fun getIdentifierNode(node: ASTNode): ASTNode? {

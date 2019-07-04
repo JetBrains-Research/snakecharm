@@ -1,0 +1,31 @@
+SnakemakeFile: SingleSubworkflow.smk
+  SmkSubworkflow
+    PsiElement(Py:SUBWORKFLOW_KEYWORD)('subworkflow')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('otherworkflow')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SMKSubworkflowParameterListStatement
+        PsiElement(Py:IDENTIFIER)('workdir')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PyStringLiteralExpression: ../path/to/otherworkflow
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"../path/to/otherworkflow"')
+      PsiWhiteSpace('\n    ')
+      SMKSubworkflowParameterListStatement
+        PsiElement(Py:IDENTIFIER)('snakefile')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PyStringLiteralExpression: ../path/to/otherworkflow/Snakefile
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"../path/to/otherworkflow/Snakefile"')
+      PsiWhiteSpace('\n    ')
+      SMKSubworkflowParameterListStatement
+        PsiElement(Py:IDENTIFIER)('configfile')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PyStringLiteralExpression: path/to/custom_configfile.yaml
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"path/to/custom_configfile.yaml"')

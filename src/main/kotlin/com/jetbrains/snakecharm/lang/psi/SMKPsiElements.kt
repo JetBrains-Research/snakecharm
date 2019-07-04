@@ -17,3 +17,11 @@ class SMKCheckPoint(node: ASTNode) : SmkRuleLike(node) {
     }
 }
 
+class SmkSubworkflow(node: ASTNode): SmkRuleLike(node) {
+    override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
+        when (pyVisitor) {
+            is SMKElementVisitor -> pyVisitor.visitSMKSubworkflow(this)
+            else -> super.acceptPyVisitor(pyVisitor)
+        }
+    }
+}

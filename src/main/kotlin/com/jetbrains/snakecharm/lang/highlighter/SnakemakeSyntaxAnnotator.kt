@@ -21,7 +21,21 @@ object SnakemakeSyntaxAnnotator: SnakemakeAnnotator() {
         }
     }
 
+    override fun visitSMKSubworkflow(smkSubworkflow: SmkSubworkflow) {
+        val nameNode = smkSubworkflow.getNameNode()
+        if (nameNode != null) {
+            addHighlightingAnnotation(nameNode, PY_FUNC_DEFINITION)
+        }
+    }
+
     override fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {
+        val nameNode = st.getNameNode()
+        if (nameNode != null) {
+            addHighlightingAnnotation(nameNode, PyHighlighter.PY_DECORATOR)
+        }
+    }
+
+    override fun visitSMKSubworkflowParameterListStatement(st: SMKSubworkflowParameterListStatement) {
         val nameNode = st.getNameNode()
         if (nameNode != null) {
             addHighlightingAnnotation(nameNode, PyHighlighter.PY_DECORATOR)

@@ -8,7 +8,7 @@ object SnakemakeNames {
     const val RULE_KEYWORD = "rule"
     const val CHECKPOINT_KEYWORD = "checkpoint"
 
-//    const val SUBWORKFLOW_KEYWORD = "subworkflow"
+    const val SUBWORKFLOW_KEYWORD = "subworkflow"
 
     const val WORKFLOW_CONFIGFILE_KEYWORD = "configfile"
     const val WORKFLOW_REPORT_KEYWORD = "report"
