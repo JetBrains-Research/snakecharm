@@ -10,9 +10,6 @@ import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
 class SMKWorkflowLocalRulesStatement(node: ASTNode): PyElementImpl(node), PyStatement {
     fun getKeywordNode() = node.findChildByType(SnakemakeTokenTypes.WORKFLOW_LOCALRULES_KEYWORD)
 
-    val argumentList: PyArgumentList?
-        get() = children.filterIsInstance<PyArgumentList>().firstOrNull()
-
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SMKElementVisitor -> pyVisitor.visitSMKWorkflowLocalRulesStatement(this)
         else -> super.acceptPyVisitor(pyVisitor)

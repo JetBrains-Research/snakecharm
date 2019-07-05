@@ -46,6 +46,4 @@ object SnakemakeElementTypes {
             "SMK_WORKFLOW_RULESREORDER_STATEMENT",
             SMKWorkflowRuleOrderStatement::class.java
     )
-
-    val RULE_ARGUMENT_IDENTIFIER = PyElementType("SMK_RULE_ARGUMENT_IDENTIFIER", SMKRuleIdentifierArgument::class.java)
 }
