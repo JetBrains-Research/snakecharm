@@ -56,3 +56,18 @@ Feature: Rule section redeclaration inspection
     Declaration of section 'params' above overrides this declaration.
     """
     When I check highlighting errors
+
+  Scenario: Subworkflow section redeclaration
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    subworkflow NAME:
+      snakefile: "foo.smk"
+      snakefile: "boo.smk"
+    """
+    And Section Redeclaration inspection is enabled
+    Then I expect inspection warning on <snakefile: "boo.smk"> with message
+    """
+    Declaration of section 'snakefile' above overrides this declaration.
+    """
+    When I check highlighting errors

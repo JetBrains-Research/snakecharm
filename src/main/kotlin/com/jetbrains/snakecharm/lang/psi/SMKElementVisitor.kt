@@ -23,8 +23,8 @@ interface SMKElementVisitor {
         pyElementVisitor.visitPyElement(checkPoint)
     }
 
-    fun visitSMKSubworkflow(smkSubworkflow: SmkSubworkflow) {
-        pyElementVisitor.visitPyElement(smkSubworkflow)
+    fun visitSMKSubworkflow(subworkflow: SmkSubworkflow) {
+        pyElementVisitor.visitPyElement(subworkflow)
     }
 
     fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {
