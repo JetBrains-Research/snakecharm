@@ -65,24 +65,4 @@ object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
             }
         }
     }
-
-    override fun visitSMKWorkflowLocalRulesStatement(st: SMKWorkflowLocalRulesStatement) {
-        placeErrorOnNonIdentifiers(st.argumentList, SnakemakeBundle.message("ANN.expressions.in.localrules"))
-    }
-
-    override fun visitSMKWorkflowRuleOrderStatement(st: SMKWorkflowRulesOrderStatement) {
-        placeErrorOnNonIdentifiers(st.argumentList, SnakemakeBundle.message("ANN.expressions.in.ruleorder"))
-    }
-
-    private fun placeErrorOnNonIdentifiers(
-            argumentList: PyArgumentList?,
-            errorMessage: String
-    ) {
-        argumentList
-                ?.arguments
-                ?.filter { it !is PsiIdentifier }
-                ?.forEach {
-                    holder.createErrorAnnotation(it, errorMessage)
-                }
-    }
 }

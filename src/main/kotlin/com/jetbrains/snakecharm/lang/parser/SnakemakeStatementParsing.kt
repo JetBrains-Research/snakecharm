@@ -6,6 +6,7 @@ import com.jetbrains.python.PyBundle
 import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
+import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
@@ -53,11 +54,15 @@ class SnakemakeStatementParsing(
                 val workflowParam = myBuilder.mark()
                 nextToken()
 
-                /*Although this method contains expression/keyword arguments parsing logic
-                and we only expect identifiers, it's better to keep complicated indentation check logic in one method
-                rather than duplicate it.
-                An annotator checks that localrules section contains identifiers and commas only.*/
-                val res = parsingContext.expressionParser.parseRuleParamArgumentList(PyTokenTypes.COMMA)
+                /* parseRuleParamArgumentList contains complicated indentation logic,
+                * so it makes sense to use this method and not write a shorter one with duplicated code.
+                * However, since localrules and ruleorder sections require specific treatment in error checking.
+                * additional parameters were added to the method and are used here. */
+                val res = parsingContext.expressionParser
+                        .parseRuleParamArgumentList(
+                                PyTokenTypes.COMMA,
+                                SnakemakeBundle.message("PARSE.expected.identifier")
+                        ) { parseIdentifier() }
 
                 if (!res) {
                     myBuilder.error(SnakemakeBundle.message("PARSE.expected.localrules"))
@@ -69,11 +74,15 @@ class SnakemakeStatementParsing(
                 val workflowParam = myBuilder.mark()
                 nextToken()
 
-                /*Although this method contains expression/keyword arguments parsing logic
-                and we only expect identifiers, it's better to keep complicated indentation check logic in one method
-                rather than duplicate it.
-                An annotator checks that ruleorder section contains identifiers and > only.*/
-                val res = parsingContext.expressionParser.parseRuleParamArgumentList(PyTokenTypes.GT)
+                /* parseRuleParamArgumentList contains complicated indentation logic,
+                * so it makes sense to use this method and not write a shorter one with duplicated code.
+                * However, since localrules and ruleorder sections require specific treatment in error checking.
+                * additional parameters were added to the method and are used here. */
+                val res = parsingContext.expressionParser
+                        .parseRuleParamArgumentList(
+                                PyTokenTypes.GT,
+                                SnakemakeBundle.message("PARSE.expected.identifier")
+                        ) { parseIdentifier() }
                 if (!res) {
                     myBuilder.error(SnakemakeBundle.message("PARSE.expected.ruleorder"))
                 }
@@ -261,6 +270,14 @@ class SnakemakeStatementParsing(
         } else {
             errorMarker.drop()
         }
+    }
+
+    private fun parseIdentifier(): Boolean {
+        if (Parsing.isIdentifier(myBuilder)) {
+            Parsing.advanceIdentifierLike(myBuilder)
+            return true
+        }
+        return false
     }
 }
 

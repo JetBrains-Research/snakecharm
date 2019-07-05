@@ -16,16 +16,24 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionParsing(context) {
     override fun getParsingContext() = myContext as SnakemakeParserContext
 
-    fun parseRuleParamArgumentList(separatorToken: PyElementType = PyTokenTypes.COMMA): Boolean {
+    fun parseRuleParamArgumentList(
+            separatorToken: PyElementType = PyTokenTypes.COMMA,
+            parsingErrorMessage: String = message("PARSE.expected.expression"),
+            parsingFunction: () -> Boolean = { parseSingleExpression(false) }
+    ): Boolean {
         val context = myContext
         val scope = context.scope as SnakemakeParsingScope
         myContext.pushScope(scope.withParamsArgsList())
-        val result = doParseRuleParamArgumentList(separatorToken)
+        val result = doParseRuleParamArgumentList(separatorToken, parsingFunction, parsingErrorMessage)
         context.popScope()
         return result
     }
 
-    private fun doParseRuleParamArgumentList(separatorToken: PyElementType): Boolean {
+    private fun doParseRuleParamArgumentList(
+            separatorToken: PyElementType,
+            parsingFunction: () -> Boolean,
+            parsingErrorMessage: String
+    ): Boolean {
         // let's make ':' part of arg list, similar as '(', ')' are parts of arg list
         // helps with formatting, e.g. enter handler
         val hasColon = myBuilder.tokenType == PyTokenTypes.COLON
@@ -112,22 +120,10 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         keywordArgMarker.done(PyElementTypes.KEYWORD_ARGUMENT_EXPRESSION)
                         continue
                     }
-                    if (atToken(separatorToken)) {
-                        keywordArgMarker.drop()
-                        continue
-                    } else {
-                        keywordArgMarker.rollbackTo()
-                    }
-                    // the change above does not seem to affect both correct and incorrect parsing cases
-                    // as the change only matter in case of separatorToken after IDENTIFIER
-                    // and the call to parseSingleExpression below
-                    // would parse IDENTIFIER and move lexer to separatorToken anyway
-                    // keeping this as a comment in case something was missed
-                    // keywordArgMarker.rollbackTo()
+                    keywordArgMarker.rollbackTo()
                 }
-                if (!parseSingleExpression(false)) {
-                    // TODO error messages for identifiers (localrules|ruleorder)
-                    myBuilder.error(message("PARSE.expected.expression"))
+                if (!parsingFunction()) {
+                    myBuilder.error(parsingErrorMessage)
                     break
                 }
             }
