@@ -26,8 +26,7 @@ import com.jetbrains.snakecharm.lang.psi.*
 class SMKKeywordCompletionContributor: CompletionContributor() {
     companion object {
         val IN_SNAKEMAKE = PlatformPatterns.psiFile().withLanguage(SnakemakeLanguageDialect)
-        val IN_RULE = psiElement().inside(SMKRule::class.java)!!
-        val IN_CHECKPOINT = psiElement().inside(SMKCheckPoint::class.java)!!
+        val IN_RULE_OR_CHECKPOINT = psiElement().inside(SmkRuleOrCheckpoint::class.java)
     }
 
     init {
@@ -48,8 +47,7 @@ class SMKKeywordCompletionContributor: CompletionContributor() {
 object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
             .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
-            .andNot(SMKKeywordCompletionContributor.IN_RULE)
-            .andNot(SMKKeywordCompletionContributor.IN_CHECKPOINT)
+            .andNot(SMKKeywordCompletionContributor.IN_RULE_OR_CHECKPOINT)
 
     override fun addCompletions(
             parameters: CompletionParameters,
@@ -99,7 +97,7 @@ object ColonAndWhiteSpaceTail : TailType() {
 object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
             .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
-            .inside(SMKRule::class.java)!!
+            .inside(SmkRuleOrCheckpoint::class.java)!!
 
     override fun addCompletions(
             parameters: CompletionParameters,
