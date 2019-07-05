@@ -23,7 +23,7 @@ import com.jetbrains.snakecharm.lang.psi.*
  * @author Roman.Chernyatchik
  * @date 2019-05-23
  */
-class SMKKeywordCompletionContributor: CompletionContributor() {
+class SMKKeywordCompletionContributor : CompletionContributor() {
     companion object {
         val IN_SNAKEMAKE = PlatformPatterns.psiFile().withLanguage(SnakemakeLanguageDialect)
         val IN_RULE = psiElement().inside(SMKRule::class.java)!!
@@ -72,9 +72,12 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
         ).forEach { (tokenSet, tail) ->
             tokenSet.types.forEach { tt ->
                 val s = tokenType2Name[tt]!!
-                val lookupElement = PythonLookupElement(s, true, null)
 
-                result.addElement(TailTypeDecorator.withTail(lookupElement, tail))
+                result.addElement(
+                        TailTypeDecorator.withTail(
+                                PythonLookupElement(s, true, null), tail
+                        )
+                )
             }
         }
     }
@@ -121,10 +124,14 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
         }
 
         (SMKRuleParameterListStatement.PARAMS_NAMES + setOf(SMKRuleRunParameter.PARAM_NAME)).forEach { s ->
-            result.addElement(TailTypeDecorator.withTail(
-                    PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
-                    ColonAndWhiteSpaceTail
-            ))
+
+            result.addElement(
+                    TailTypeDecorator.withTail(
+                            PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
+                            ColonAndWhiteSpaceTail
+                    )
+
+            )
         }
     }
 }
@@ -144,10 +151,12 @@ object SubworkflowSectionKeywordsProvider : CompletionProvider<CompletionParamet
         }
 
         SMKSubworkflowParameterListStatement.PARAMS_NAMES.forEach { s ->
-            result.addElement(TailTypeDecorator.withTail(
-                    PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
-                    ColonAndWhiteSpaceTail
-            ))
+            result.addElement(
+                    TailTypeDecorator.withTail(
+                            PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
+                            ColonAndWhiteSpaceTail
+                    )
+            )
         }
     }
 }
