@@ -32,8 +32,8 @@
     />
     <!--<colorSettingsPage implementation="com.jetbrains.snakemake.lang.highlighter.SnakemakeColorsPage"/>-->
     <lang.syntaxHighlighterFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterFactory"/>
-    <!--<annotator language="Snakemake" implementationClass="com.jetbrains.snakemake.lang.highlighter.SnakemakeDumbAwareAnnotator"/>-->
-    <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeDumbAwareAnnotator"/>
+    <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkDumbAwareAnnotatorManager"/>
+    <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkStandardAnnotatorManager"/>
     <lang.foldingBuilder language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.SnakeMakeFoldingBuilder"/>
     <!--<enterBetweenBracesDelegate language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.editorActions.EnterInRuleParamsListDelegate"/>-->
     <!--<codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>-->
@@ -162,6 +162,9 @@
         implementation="com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider"
     />
     <typeProvider implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeRulesTypeProvider"/>
-
+    <visitorFilter
+            language="Snakemake"
+            implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeVisitorFilter"
+    />
   </extensions>
 </idea-plugin>
