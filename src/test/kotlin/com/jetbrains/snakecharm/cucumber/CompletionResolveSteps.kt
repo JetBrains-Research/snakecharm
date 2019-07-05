@@ -287,6 +287,7 @@ class CompletionResolveSteps {
     private fun getPositionBySignature(editor: Editor, marker: String, after: Boolean): Int {
         val text = editor.document.text
         val pos = text.indexOf(marker)
+        require(pos == text.lastIndexOf(marker)) { "Multiple marker entries" }
         require(pos >= 0)
         return if (after) pos + marker.length else pos
     }

@@ -4,10 +4,7 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.psi.SMKCheckPoint
-import com.jetbrains.snakecharm.lang.psi.SMKRule
-import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
-import com.jetbrains.snakecharm.lang.psi.SmkSectionStatement
+import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkSectionRedeclarationInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -21,6 +18,10 @@ class SmkSectionRedeclarationInspection : SnakemakeInspection() {
 
         override fun visitSMKCheckPoint(checkPoint: SMKCheckPoint) {
             visitSMKRuleLike(checkPoint)
+        }
+
+        override fun visitSMKSubworkflow(subworkflow: SmkSubworkflow) {
+            visitSMKRuleLike(subworkflow)
         }
 
         private fun visitSMKRuleLike(rule: SmkRuleLike<SmkSectionStatement>) {

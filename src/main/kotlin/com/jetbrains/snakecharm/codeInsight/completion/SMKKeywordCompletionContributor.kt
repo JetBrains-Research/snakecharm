@@ -26,7 +26,8 @@ import com.jetbrains.snakecharm.lang.psi.*
 class SMKKeywordCompletionContributor: CompletionContributor() {
     companion object {
         val IN_SNAKEMAKE = PlatformPatterns.psiFile().withLanguage(SnakemakeLanguageDialect)
-        val IN_RULE_OR_CHECKPOINT = psiElement().inside(SmkRuleOrCheckpoint::class.java)
+        val IN_RULE_OR_CHECKPOINT = psiElement().inside(SmkRuleOrCheckpoint::class.java)!!
+        val IN_SUBWORKFLOW = psiElement().inside(SmkSubworkflow::class.java)!!
     }
 
     init {
@@ -41,6 +42,12 @@ class SMKKeywordCompletionContributor: CompletionContributor() {
                 RuleSectionKeywordsProvider.CAPTURE,
                 RuleSectionKeywordsProvider
         )
+
+        extend(
+                CompletionType.BASIC,
+                SubworkflowSectionKeywordsProvider.CAPTURE,
+                SubworkflowSectionKeywordsProvider
+        )
       }
 }
 
@@ -48,6 +55,7 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
     val CAPTURE = psiElement()
             .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
             .andNot(SMKKeywordCompletionContributor.IN_RULE_OR_CHECKPOINT)
+            .andNot(SMKKeywordCompletionContributor.IN_SUBWORKFLOW)
 
     override fun addCompletions(
             parameters: CompletionParameters,
@@ -113,6 +121,29 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
         }
 
         (SMKRuleParameterListStatement.PARAMS_NAMES + setOf(SMKRuleRunParameter.PARAM_NAME)).forEach { s ->
+            result.addElement(TailTypeDecorator.withTail(
+                    PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
+                    ColonAndWhiteSpaceTail
+            ))
+        }
+    }
+}
+
+object SubworkflowSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
+    val CAPTURE = psiElement()
+            .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
+            .inside(SMKKeywordCompletionContributor.IN_SUBWORKFLOW)!!
+
+    override fun addCompletions(
+            parameters: CompletionParameters,
+            context: ProcessingContext,
+            result: CompletionResultSet
+    ) {
+        if (PsiTreeUtil.getParentOfType(parameters.originalPosition, PyArgumentList::class.java) != null) {
+            return
+        }
+
+        SMKSubworkflowParameterListStatement.PARAMS_NAMES.forEach { s ->
             result.addElement(TailTypeDecorator.withTail(
                     PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
                     ColonAndWhiteSpaceTail

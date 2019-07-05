@@ -12,7 +12,7 @@ import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
 
-class SnakemakeRulesType(private val smkFile: SnakemakeFile) : PyType {
+class SnakemakeRulesType(smkFile: SnakemakeFile) : PyType {
     private val ruleNamesAndPsiElements = smkFile.collectRules()
 
     override fun getName() = "rules"
@@ -59,8 +59,8 @@ class SnakemakeRulesType(private val smkFile: SnakemakeFile) : PyType {
             return emptyList()
         }
 
-        return namedRules.map { (_, psi) ->
-            RatedResolveResult(RatedResolveResult.RATE_NORMAL, psi)
+        return namedRules.map { (_, ruleElement) ->
+            RatedResolveResult(RatedResolveResult.RATE_NORMAL, ruleElement.getNameElement())
         }
     }
 
