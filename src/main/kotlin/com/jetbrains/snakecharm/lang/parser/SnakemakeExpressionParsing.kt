@@ -65,11 +65,11 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         while (!myBuilder.eof() && !atToken(PyTokenTypes.STATEMENT_BREAK)) {
             argNumber++
 
-            // comma if several args:
+            // separator if several args:
             if (argNumber > 1) {
                 if (matchToken(separatorToken)) {
-                    val commaMarker = myBuilder.mark()
-                    val commMarkerIndents = indents
+                    val separatorMarker = myBuilder.mark()
+                    val separatorMarkerIndents = indents
 
                     // skip indents/dedents:
                     if (matchToken(PyTokenTypes.STATEMENT_BREAK)) {
@@ -86,15 +86,15 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         }
                     }
 
-                    // Case: hanging 'comma', next statement is another rule param block
+                    // Case: hanging separator, next statement is another rule param block
                     if (myBuilder.tokenType === PyTokenTypes.DEDENT ||
                             (myBuilder.tokenType == PyTokenTypes.IDENTIFIER &&
                                     myBuilder.lookAhead(1) == PyTokenTypes.COLON)) {
-                        indents = commMarkerIndents
-                        commaMarker.rollbackTo()
+                        indents = separatorMarkerIndents
+                        separatorMarker.rollbackTo()
                         break
                     } else {
-                        commaMarker.drop()
+                        separatorMarker.drop()
                     }
 
                     if (myBuilder.eof()) {
