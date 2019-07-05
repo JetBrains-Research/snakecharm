@@ -1,75 +1,87 @@
 Feature: Rule names completion for 'rules' object
   (e.g. there's a rule named 'aaaa', then 'rules.aa' completes to 'rules.aaaa')
 
-  Scenario: Complete in input section for a single other rule present
+  Scenario Outline: Complete in input section for a single other section present
     Given a snakemake project
     Given I open a file "foo.smk" with text
      """
-     rule aaaa:
+     <section> aaaa:
        input: "path/to/input"
        output: "path/to/output"
        shell: "shell command"
 
-     rule bbbb:
-       input: rules.aaa
+     <section> bbbb:
+       input: <section>s.aaa
      """
-    When I put the caret after input: rules.aaa
+    When I put the caret after input: <section>s.aaa
     Then I invoke autocompletion popup, select "aaaa" lookup item and see a text:
      """
-     rule aaaa:
+     <section> aaaa:
        input: "path/to/input"
        output: "path/to/output"
        shell: "shell command"
 
-     rule bbbb:
-       input: rules.aaaa
+     <section> bbbb:
+       input: <section>s.aaaa
      """
+  Examples:
+    | section    |
+    | rule       |
+    | checkpoint |
 
-  Scenario: Complete in input section for multiple rules
+  Scenario Outline: Complete in input section for multiple section definitions
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule aaaa:
+    <section> aaaa:
       input: "path/to/input"
       output: "path/to/output"
       shell: "shell command"
 
-    rule bbbb:
+    <section> bbbb:
       input: "path/to/input"
       output: "path/to/output"
       script: "script.py"
 
-    rule cccc:
-      input: rules.
+    <section> cccc:
+      input: <section>s.
     """
-    When I put the caret after input: rules.
+    When I put the caret after input: <section>s.
     And I invoke autocompletion popup
     Then completion list should contain:
       | aaaa    |
       | bbbb    |
       | cccc    |
+    Examples:
+      | section    |
+      | rule       |
+      | checkpoint |
 
-  Scenario: Complete at top level for multiple rules
+  Scenario Outline: Complete at top level for multiple sections
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule aaaa:
+    <section> aaaa:
       input: "path/to/input"
       output: "path/to/output"
       shell: "shell command"
 
-    rule bbbb:
+    <section> bbbb:
       input: "path/to/input"
       output: "path/to/output"
       script: "script.py"
 
-    rules.ccc
+    <section>s.ccc
     """
-    When I put the caret after rules.
+    When I put the caret after <section>s.
     And I invoke autocompletion popup
     Then completion list should contain:
       | aaaa    |
       | bbbb    |
+    Examples:
+      | section    |
+      | rule       |
+      | checkpoint |
 
 
 

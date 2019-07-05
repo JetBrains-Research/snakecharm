@@ -161,7 +161,7 @@
     <pyReferenceResolveProvider
         implementation="com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider"
     />
-    <typeProvider implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeRulesTypeProvider"/>
+    <typeProvider implementation="com.jetbrains.snakecharm.codeInsight.SmkSectionTypeProvider"/>
     <visitorFilter
             language="Snakemake"
             implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeVisitorFilter"
