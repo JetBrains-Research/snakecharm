@@ -22,34 +22,32 @@ class SnakemakeFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, S
 
     override fun getStub(): StubElement<SnakemakeFile>? = null
 
-    fun collectSubworkflows(): List<Pair<String, PsiElement>> {
-        val subworkflowNameAndPsi = arrayListOf<Pair<String, PsiElement>>()
+    fun collectSubworkflows(): List<Pair<String, SmkSubworkflow>> {
+        val subworkflowNameAndPsi = arrayListOf<Pair<String, SmkSubworkflow>>()
 
         acceptChildren(object : PyElementVisitor(), SMKElementVisitor {
             override val pyElementVisitor: PyElementVisitor = this
 
             override fun visitSMKSubworkflow(subworkflow: SmkSubworkflow) {
-                val element = subworkflow.getNameNode()?.psi
-                if (element != null) {
-                    subworkflowNameAndPsi.add(subworkflow.name!! to element)
+                if (subworkflow.name != null) {
+                    subworkflowNameAndPsi.add(subworkflow.name!! to subworkflow)
                 }
             }
         })
         return subworkflowNameAndPsi
     }
 
-    fun collectRules(): List<Pair<String, PsiElement>> {
+    fun collectRules(): List<Pair<String, SMKRule>> {
         // TODO: add tests, this is simple impl for internship task practice
-        val ruleNameAndPsi = arrayListOf<Pair<String, PsiElement>>()
+        val ruleNameAndPsi = arrayListOf<Pair<String, SMKRule>>()
 
         acceptChildren(object : PyElementVisitor(), SMKElementVisitor {
             override val pyElementVisitor: PyElementVisitor = this
 
             // TODO: collect checkpoints or not?
             override fun visitSMKRule(rule: SMKRule) {
-                val element = rule.getNameNode()?.psi
-                if (element != null) {
-                    ruleNameAndPsi.add(rule.name!! to element)
+                if (rule.name != null) {
+                    ruleNameAndPsi.add(rule.name!! to rule)
                 }
             }
         })

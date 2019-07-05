@@ -12,11 +12,11 @@ class SmkSubworkflowRedeclarationInspection : SnakemakeInspection() {
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
-        private val subworkflows = (session.file as SnakemakeFile).collectSubworkflows()
+        private val subworkflowsNameAndPsi = (session.file as SnakemakeFile).collectSubworkflows()
 
         override fun visitSMKSubworkflow(subworkflow: SmkSubworkflow) {
-            val nameNode = subworkflow.getNameNode()?.psi ?: return
-            if (nameNode !== subworkflows.findLast { it.first == nameNode.text }?.second) {
+            val name = subworkflow.name ?: return
+            if (subworkflow !== subworkflowsNameAndPsi.findLast { it.first == name }?.second) {
                 registerProblem(subworkflow.originalElement,
                         SnakemakeBundle.message("INSP.NAME.subworkflow.redeclaration"),
                         ProblemHighlightType.LIKE_UNUSED_SYMBOL)
