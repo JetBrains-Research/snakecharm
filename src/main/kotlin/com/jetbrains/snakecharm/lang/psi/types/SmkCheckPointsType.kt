@@ -12,10 +12,10 @@ import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
 
-class SmkRulesType(smkFile: SnakemakeFile) : PyType {
-    private val ruleNamesAndPsiElements = smkFile.collectRules()
+class SmkCheckPointsType(smkFile: SnakemakeFile) : PyType {
+    private val checkpointNamesAndPsiElements = smkFile.collectCheckPoints()
 
-    override fun getName() = "rules"
+    override fun getName() = "checkpoints"
 
     override fun getCompletionVariants(
             completionPrefix: String?,
@@ -26,7 +26,7 @@ class SmkRulesType(smkFile: SnakemakeFile) : PyType {
             return emptyArray()
         }
 
-        return ruleNamesAndPsiElements.map { (name, psi) ->
+        return checkpointNamesAndPsiElements.map { (name, psi) ->
             LookupElementBuilder
                     .create(name)
                     .withTypeText(psi.containingFile.name)
@@ -36,7 +36,7 @@ class SmkRulesType(smkFile: SnakemakeFile) : PyType {
     override fun assertValid(message: String?) {
         // [romeo] Not sure is our type always valid or check whether any element is invalid
 
-        val invalidItem = ruleNamesAndPsiElements.firstOrNull { !it.second.isValid }?.second
+        val invalidItem = checkpointNamesAndPsiElements.firstOrNull { !it.second.isValid }?.second
         if (invalidItem != null) {
             throw PsiInvalidElementAccessException(invalidItem, invalidItem.javaClass.toString() + ": " + message)
         }
@@ -54,7 +54,7 @@ class SmkRulesType(smkFile: SnakemakeFile) : PyType {
             return mutableListOf()
         }
 
-        val namedRules = ruleNamesAndPsiElements.filter { (ruleName, _) -> ruleName == name }
+        val namedRules = checkpointNamesAndPsiElements.filter { (checkpointName, _) -> checkpointName == name }
         if (namedRules.isEmpty()) {
             return emptyList()
         }
