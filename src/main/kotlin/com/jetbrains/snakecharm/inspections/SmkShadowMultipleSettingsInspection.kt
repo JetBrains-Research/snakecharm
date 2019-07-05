@@ -17,9 +17,9 @@ class SmkShadowMultipleSettingsInspection : SnakemakeInspection()  {
                 return
             }
 
-            val size = st.argumentList?.arguments?.size
-            if (size != null && size > 1) {
-                st.argumentList!!.arguments.forEach {
+            val args = st.argumentList?.arguments ?: emptyArray()
+            if (args.size > 1) {
+                args.forEach {
                     registerProblem(it,
                             SnakemakeBundle.message("INSP.NAME.shadow.multiple.settings"))
                 }

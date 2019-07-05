@@ -13,9 +13,9 @@ class SmkSubworkflowMultipleArgsInspection  : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
         override fun visitSMKSubworkflowParameterListStatement(st: SMKSubworkflowParameterListStatement) {
-            val size = st.argumentList?.arguments?.size
-            if (size != null && size > 1) {
-                st.argumentList!!.arguments.forEach {
+            val args = st.argumentList?.arguments ?: emptyArray()
+            if (args.size > 1) {
+                args.forEach {
                     registerProblem(it,
                             SnakemakeBundle.message("INSP.NAME.subworkflow.multiple.args"))
                 }

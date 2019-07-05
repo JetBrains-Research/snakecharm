@@ -20,7 +20,7 @@ import java.util.regex.Pattern
 
 
 class ActionsSteps {
-    @When("^I expect inspection (error|warning|info|TYPO) on <([^>]+)> with message$")
+    @When("^I expect inspection (error|warning|info|TYPO|weak warning) on <([^>]+)> with message$")
     fun iExpectInspectionOn(level: String, signature: String, message: String) {
         iExpectInspectionOnIn(level, signature, signature, message)
     }
@@ -31,8 +31,17 @@ class ActionsSteps {
         //This step just for more readable tests
     }
 
+    @Given("^I expect inspection (error|warning|info|TYPO|weak warning) with message \"(.*)\" on")
+    fun iExpectInspectionWithMessageOn(level: String, message: String, signature: String) {
+        iExpectInspectionOnIn(level, signature, signature, message)
+    }
+
     @Given("^I expect inspection (error|warning|info|TYPO|weak warning) on <([^>]+)> in <(.+)> with message$")
     fun iExpectInspectionOnIn(level: String, text: String, signature: String, message: String) {
+        require(!Pattern.compile("(^|[^\\\\])\"").matcher(message).find()) {
+            "Quotes should be escaped in message: $message"
+        }
+
         val tag = level.replace(' ', '_')
         val newText = "<$tag descr=\"$message\">$text</$tag>"
         val fixture = SnakemakeWorld.fixture()

@@ -13,8 +13,9 @@ Feature: Subworkflow redeclaration inspection
         snakefile: "boo.smk"
     """
     And Subworkflow Redeclaration inspection is enabled
-    Then I expect inspection weak warning on <NAME> in <subworkflow NAME:> with message
+    Then I expect inspection weak warning with message "Only last subworkflow with the same name will be executed" on
     """
-    Only last subworkflow with the same name will be executed
+    subworkflow NAME:
+        snakefile: "snake.smk"
     """
     When I check highlighting weak warnings
