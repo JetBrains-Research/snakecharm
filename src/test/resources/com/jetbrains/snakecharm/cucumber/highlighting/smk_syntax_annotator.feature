@@ -39,3 +39,25 @@ Feature: Annotate additional syntax
       | shell                | ""         | PY.DECORATOR             |
       | run                  | ""         | PY.PREDEFINED_DEFINITION |
       | wrapper              | ""         | PY.DECORATOR             |
+
+  Scenario Outline: Annotate Subworkflows
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    subworkflow NAME:
+        <section>: <text>
+    """
+    Then I expect inspection info on <NAME> with message
+    """
+    PY.FUNC_DEFINITION
+    """
+    Then I expect inspection info on <<section>> with message
+    """
+    <highlighting>
+    """
+    When I check highlighting infos
+    Examples:
+      | section              | text       | highlighting             |
+      | workdir              | "file.txt" | PY.DECORATOR             |
+      | snakefile            | "file.txt" | PY.DECORATOR             |
+      | configfile           | "file.txt" | PY.DECORATOR             |
