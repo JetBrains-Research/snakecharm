@@ -176,3 +176,52 @@ Feature: Completion for snakemake keyword-like things
     Then completion list shouldn't contain:
        | output |
        | run    |
+
+  Scenario: Complete and replace at subworkflow level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    subworkflow NAME:
+      configfile: "in.txt"
+    """
+    When I put the caret at configfile
+    Then I invoke autocompletion popup, select "snakefile" lookup item in replace mode and see a text:
+    """
+    subworkflow NAME:
+      snakefile: "in.txt"
+    """
+
+  Scenario Outline: Complete at subworkflow level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    subworkflow NAME:
+      <str>#here
+    """
+    When I put the caret at #here
+    Then I invoke autocompletion popup, select "<result>" lookup item and see a text:
+    """
+    subworkflow NAME:
+      <result>: #here
+    """
+    Examples:
+      | str | result               |
+      | con | configfile           |
+      | sna | snakefile            |
+      | wor | workdir              |
+
+  Scenario: Completion list at subworkflow level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    subworkflow a:
+    """
+    When I put the caret after subworkflow a:
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | configfile |
+      | snakefile  |
+      | workdir    |
+    And completion list shouldn't contain:
+      | subworkflow |
+      | rule        |
