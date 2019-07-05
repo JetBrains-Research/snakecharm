@@ -17,9 +17,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.RULE_LIKE
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE
-import com.jetbrains.snakecharm.lang.psi.SMKRule
-import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
-import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
+import com.jetbrains.snakecharm.lang.psi.*
 
 /**
  * @author Roman.Chernyatchik
@@ -29,6 +27,7 @@ class SMKKeywordCompletionContributor: CompletionContributor() {
     companion object {
         val IN_SNAKEMAKE = PlatformPatterns.psiFile().withLanguage(SnakemakeLanguageDialect)
         val IN_RULE = psiElement().inside(SMKRule::class.java)!!
+        val IN_CHECKPOINT = psiElement().inside(SMKCheckPoint::class.java)!!
     }
 
     init {
@@ -50,6 +49,7 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
     val CAPTURE = psiElement()
             .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
             .andNot(SMKKeywordCompletionContributor.IN_RULE)
+            .andNot(SMKKeywordCompletionContributor.IN_CHECKPOINT)
 
     override fun addCompletions(
             parameters: CompletionParameters,
