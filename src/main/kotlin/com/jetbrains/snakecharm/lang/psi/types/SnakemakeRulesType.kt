@@ -59,8 +59,8 @@ class SnakemakeRulesType(smkFile: SnakemakeFile) : PyType {
             return emptyList()
         }
 
-        return namedRules.map { (_, psi) ->
-            RatedResolveResult(RatedResolveResult.RATE_NORMAL, psi.getNameNode()!!.psi)
+        return namedRules.map { (_, ruleElement) ->
+            RatedResolveResult(RatedResolveResult.RATE_NORMAL, ruleElement.getNameElement())
         }
     }
 
