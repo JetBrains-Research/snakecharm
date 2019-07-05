@@ -96,12 +96,8 @@ class SnakemakeStatementParsing(
                 val workflowParam = myBuilder.mark()
                 nextToken()
 
-                /* parseRuleParamArgumentList contains complicated indentation logic,
-                * so it makes sense to use this method and not write a shorter one with duplicated code.
-                * However, since localrules and ruleorder sections require specific treatment in error checking.
-                * additional parameters were added to the method and are used here. */
                 val res = parsingContext.expressionParser
-                        .parseRuleParamArgumentList(
+                        .parseArgumentList(
                                 PyTokenTypes.COMMA,
                                 SnakemakeBundle.message("PARSE.expected.identifier")
                         ) { parseIdentifier() }
@@ -116,12 +112,8 @@ class SnakemakeStatementParsing(
                 val workflowParam = myBuilder.mark()
                 nextToken()
 
-                /* parseRuleParamArgumentList contains complicated indentation logic,
-                * so it makes sense to use this method and not write a shorter one with duplicated code.
-                * However, since localrules and ruleorder sections require specific treatment in error checking.
-                * additional parameters were added to the method and are used here. */
                 val res = parsingContext.expressionParser
-                        .parseRuleParamArgumentList(
+                        .parseArgumentList(
                                 PyTokenTypes.GT,
                                 SnakemakeBundle.message("PARSE.expected.identifier")
                         ) { parseIdentifier() }
@@ -293,25 +285,6 @@ class SnakemakeStatementParsing(
 //        return super.getFunctionParser()
 //    }
 
-    /**
-     * Skips tokens until token from expected set and marks it with error
-     */
-    private fun recoverUntilMatches(errorMessage: String, vararg types: IElementType) {
-        val errorMarker = myBuilder.mark()
-        var hasNonWhitespaceTokens = false
-        while (!(atAnyOfTokens(*types) || myBuilder.eof())) {
-            // Regular whitespace tokens are already skipped by advancedLexer()
-            if (!atToken(PyTokenTypes.STATEMENT_BREAK)) {
-                hasNonWhitespaceTokens = true
-            }
-            myBuilder.advanceLexer()
-        }
-        if (hasNonWhitespaceTokens) {
-            errorMarker.error(errorMessage)
-        } else {
-            errorMarker.drop()
-        }
-    }
 
     private fun parseIdentifier(): Boolean {
         if (Parsing.isIdentifier(myBuilder)) {

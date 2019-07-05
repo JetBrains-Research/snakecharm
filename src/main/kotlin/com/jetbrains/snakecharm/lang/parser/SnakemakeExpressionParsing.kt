@@ -1,6 +1,6 @@
 package com.jetbrains.snakecharm.lang.parser
 
-import com.jetbrains.python.PyBundle
+import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
@@ -16,29 +16,36 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionParsing(context) {
     override fun getParsingContext() = myContext as SnakemakeParserContext
 
-    fun parseRuleParamArgumentList(
-            separatorToken: PyElementType = PyTokenTypes.COMMA,
-            parsingErrorMessage: String = message("PARSE.expected.expression"),
-            parsingFunction: () -> Boolean = { parseSingleExpression(false) }
+    fun parseRuleParamArgumentList() =
+            parseArgumentList(
+                    PyTokenTypes.COMMA,
+                    message("PARSE.expected.expression")
+            ) { parseRuleParamArgument() }
+
+    fun parseArgumentList(
+            separatorToken: PyElementType,
+            errorMessage: String,
+            parsingFunction: () -> Boolean
     ): Boolean {
         val context = myContext
         val scope = context.scope as SnakemakeParsingScope
         myContext.pushScope(scope.withParamsArgsList())
-        val result = doParseRuleParamArgumentList(separatorToken, parsingFunction, parsingErrorMessage)
+        val result = doParseRuleParamArgumentList(separatorToken) {
+            parseArgumentAndReportErrors(errorMessage, separatorToken, parsingFunction)
+        }
         context.popScope()
         return result
     }
 
     private fun doParseRuleParamArgumentList(
             separatorToken: PyElementType,
-            parsingFunction: () -> Boolean,
-            parsingErrorMessage: String
+            parseArgumentFunction: () -> Unit
     ): Boolean {
         // let's make ':' part of arg list, similar as '(', ')' are parts of arg list
         // helps with formatting, e.g. enter handler
         val hasColon = myBuilder.tokenType == PyTokenTypes.COLON
         if (!hasColon) {
-            myBuilder.error(PyBundle.message("PARSE.expected.colon"))
+            myBuilder.error(message("PARSE.expected.colon"))
         }
         val argList = myBuilder.mark()
         if (hasColon) {
@@ -94,39 +101,14 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         break
                     }
                 } else {
-                    myBuilder.error(SnakemakeBundle.message("PARSE.expected.separator.message", separatorToken.toString()))
+                    myBuilder.error(
+                            SnakemakeBundle.message("PARSE.expected.separator.message", separatorToken.toString())
+                    )
                     break
                 }
             }
 
-            // *args or **kw
-            if (myBuilder.tokenType === PyTokenTypes.MULT || myBuilder.tokenType === PyTokenTypes.EXP) {
-                val starArgMarker = myBuilder.mark()
-                myBuilder.advanceLexer()
-                if (!parseSingleExpression(false)) {
-                    myBuilder.error(message("PARSE.expected.expression"))
-                }
-                starArgMarker.done(PyElementTypes.STAR_ARGUMENT_EXPRESSION)
-            } else {
-                // arg or named arg:
-                if (Parsing.isIdentifier(myBuilder)) {
-                    val keywordArgMarker = myBuilder.mark()
-                    Parsing.advanceIdentifierLike(myBuilder)
-                    if (myBuilder.tokenType === PyTokenTypes.EQ) {
-                        myBuilder.advanceLexer()
-                        if (!parseSingleExpression(false)) {
-                            myBuilder.error(message("PARSE.expected.expression"))
-                        }
-                        keywordArgMarker.done(PyElementTypes.KEYWORD_ARGUMENT_EXPRESSION)
-                        continue
-                    }
-                    keywordArgMarker.rollbackTo()
-                }
-                if (!parsingFunction()) {
-                    myBuilder.error(parsingErrorMessage)
-                    break
-                }
-            }
+            parseArgumentFunction()
         }
         nextToken()
 
@@ -141,5 +123,68 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         argList.done(PyElementTypes.ARGUMENT_LIST)
 
         return true
+    }
+
+    private fun parseArgumentAndReportErrors(
+            errorMessage: String,
+            separatorToken: PyElementType,
+            parseArgumentFunction: () -> Boolean
+    ) {
+        if (!parseArgumentFunction()) {
+            recoverUntilMatches(errorMessage, separatorToken)
+        }
+    }
+
+    private fun parseRuleParamArgument(): Boolean {
+        // *args or **kw
+        if (myBuilder.tokenType === PyTokenTypes.MULT || myBuilder.tokenType === PyTokenTypes.EXP) {
+            val starArgMarker = myBuilder.mark()
+            myBuilder.advanceLexer()
+            if (!parseSingleExpression(false)) {
+                myBuilder.error(message("PARSE.expected.expression"))
+            }
+            starArgMarker.done(PyElementTypes.STAR_ARGUMENT_EXPRESSION)
+        } else {
+            // arg or named arg:
+            if (Parsing.isIdentifier(myBuilder)) {
+                val keywordArgMarker = myBuilder.mark()
+                Parsing.advanceIdentifierLike(myBuilder)
+                if (myBuilder.tokenType === PyTokenTypes.EQ) {
+                    myBuilder.advanceLexer()
+                    if (!parseSingleExpression(false)) {
+                        myBuilder.error(message("PARSE.expected.expression"))
+                    }
+                    keywordArgMarker.done(PyElementTypes.KEYWORD_ARGUMENT_EXPRESSION)
+                    return true
+                }
+                keywordArgMarker.rollbackTo()
+            }
+            if (!parseSingleExpression(false)) {
+                myBuilder.error(message("PARSE.expected.expression"))
+                return false
+            }
+        }
+        return true
+    }
+
+
+    /**
+     * Skips tokens until token from expected set and marks it with error
+     */
+    private fun recoverUntilMatches(errorMessage: String, vararg types: IElementType) {
+        val errorMarker = myBuilder.mark()
+        var hasNonWhitespaceTokens = false
+        while (!(atAnyOfTokens(*types) || myBuilder.eof())) {
+            // Regular whitespace tokens are already skipped by advancedLexer()
+            if (!atToken(PyTokenTypes.STATEMENT_BREAK)) {
+                hasNonWhitespaceTokens = true
+            }
+            myBuilder.advanceLexer()
+        }
+        if (hasNonWhitespaceTokens) {
+            errorMarker.error(errorMessage)
+        } else {
+            errorMarker.drop()
+        }
     }
 }
