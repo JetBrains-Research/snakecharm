@@ -101,10 +101,12 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         break
                     }
                 } else {
-                    myBuilder.error(
-                            SnakemakeBundle.message("PARSE.expected.separator.message", separatorToken.toString())
+                    separatorToken.specialMethodName
+                    recoverUntilMatches(
+                            SnakemakeBundle.message("PARSE.expected.separator.message", separatorToken.toString()),
+                            separatorToken,
+                            PyTokenTypes.STATEMENT_BREAK
                     )
-                    break
                 }
             }
 
@@ -131,7 +133,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             parseArgumentFunction: () -> Boolean
     ) {
         if (!parseArgumentFunction()) {
-            recoverUntilMatches(errorMessage, separatorToken)
+            recoverUntilMatches(errorMessage, separatorToken, PyTokenTypes.STATEMENT_BREAK)
         }
     }
 
