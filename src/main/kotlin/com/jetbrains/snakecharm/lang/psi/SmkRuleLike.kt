@@ -27,15 +27,16 @@ abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode):
     }
 
     override fun setName(name: String): PsiElement {
-        val nameElement = PyUtil.createNewName(this, name)
-        val nameNode = getNameNode()
-        if (nameNode != null) {
-            node.replaceChild(nameNode, nameElement)
+        val newNameNode = PyUtil.createNewName(this, name)
+        getNameNode()?.let {
+            node.replaceChild(it, newNameNode)
         }
         return this
     }
 
-    fun getNameNode() = getIdentifierNode(node)
+    private fun getNameNode() = getIdentifierNode(node)
+
+    fun getNameElement() = getNameNode()?.psi
 
     fun getSectionByName(sectionName: String) =
             statementList.statements.find {

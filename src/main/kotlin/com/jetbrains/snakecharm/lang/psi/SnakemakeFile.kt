@@ -22,18 +22,46 @@ class SnakemakeFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, S
 
     override fun getStub(): StubElement<SnakemakeFile>? = null
 
-    fun collectRules(): List<Pair<String, PsiElement>> {
-        // TODO: add tests, this is simple impl for internship task practice
-        val ruleNameAndPsi = arrayListOf<Pair<String, PsiElement>>()
+    fun collectSubworkflows(): List<Pair<String, SmkSubworkflow>> {
+        val subworkflowNameAndPsi = arrayListOf<Pair<String, SmkSubworkflow>>()
 
         acceptChildren(object : PyElementVisitor(), SMKElementVisitor {
             override val pyElementVisitor: PyElementVisitor = this
 
-            // TODO: collect checkpoints or not?
+            override fun visitSMKSubworkflow(subworkflow: SmkSubworkflow) {
+                if (subworkflow.name != null) {
+                    subworkflowNameAndPsi.add(subworkflow.name!! to subworkflow)
+                }
+            }
+        })
+        return subworkflowNameAndPsi
+    }
+
+    fun collectCheckPoints(): List<Pair<String, SMKCheckPoint>> {
+        val checkpointNameAndPsi = arrayListOf<Pair<String, SMKCheckPoint>>()
+
+        acceptChildren(object : PyElementVisitor(), SMKElementVisitor {
+            override val pyElementVisitor: PyElementVisitor = this
+
+            override fun visitSMKCheckPoint(checkPoint: SMKCheckPoint) {
+                if (checkPoint.name != null) {
+                    checkpointNameAndPsi.add(checkPoint.name!! to checkPoint)
+                }
+            }
+        })
+        return checkpointNameAndPsi
+    }
+
+    fun collectRules(): List<Pair<String, SMKRule>> {
+        // TODO: add tests, this is simple impl for internship task practice
+        val ruleNameAndPsi = arrayListOf<Pair<String, SMKRule>>()
+
+        acceptChildren(object : PyElementVisitor(), SMKElementVisitor {
+            override val pyElementVisitor: PyElementVisitor = this
+
             override fun visitSMKRule(rule: SMKRule) {
-                val element = rule.getNameNode()?.psi
-                if (element != null) {
-                    ruleNameAndPsi.add(rule.name!! to element)
+                if (rule.name != null) {
+                    ruleNameAndPsi.add(rule.name!! to rule)
                 }
             }
         })

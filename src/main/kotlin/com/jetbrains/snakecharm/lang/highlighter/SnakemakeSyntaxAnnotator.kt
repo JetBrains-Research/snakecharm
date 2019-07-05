@@ -16,16 +16,14 @@ object SnakemakeSyntaxAnnotator: SnakemakeAnnotator() {
 
 
     private fun visitSMKRuleLike(ruleLike: SmkRuleLike<SmkSectionStatement>) {
-        val nameNode = ruleLike.getNameNode()
-        if (nameNode != null) {
-            addHighlightingAnnotation(nameNode, PY_FUNC_DEFINITION)
+        ruleLike.getNameElement()?.let { nameElement ->
+            addHighlightingAnnotation(nameElement, PY_FUNC_DEFINITION)
         }
     }
 
-    override fun visitSMKSubworkflow(smkSubworkflow: SmkSubworkflow) {
-        val nameNode = smkSubworkflow.getNameNode()
-        if (nameNode != null) {
-            addHighlightingAnnotation(nameNode, PY_FUNC_DEFINITION)
+    override fun visitSMKSubworkflow(subworkflow: SmkSubworkflow) {
+        subworkflow.getNameElement()?.let { nameElement ->
+            addHighlightingAnnotation(nameElement, PY_FUNC_DEFINITION)
         }
     }
 
