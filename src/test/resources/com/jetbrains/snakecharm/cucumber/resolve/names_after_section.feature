@@ -1,25 +1,28 @@
-Feature: Resolve rule names used with rules (e.g. 'rules.NAME')
-  to their corresponding declarations
+Feature: Resolve section names to their corresponding declarations
 
-  Scenario: Resolve for a particular rule name when 'rules' is used inside a rule section
+  Scenario Outline: Resolve for a particular section name when '<section>s' is used inside a rule section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule aaaa:
+    <section> aaaa:
       input: "path/to/input"
       output: "path/to/output"
       shell: "shell command"
 
-    rule bbbb:
+    <section> bbbb:
       input: "path/to/input"
       output: "path/to/output"
       script: "script.py"
 
-    rule cccc:
-      input: rules.aaaa
+    <section> cccc:
+      input: <section>s.aaaa
     """
-    When I put the caret after   input: rules.aa
+    When I put the caret after   input: <section>s.aa
     Then reference should resolve to "aaaa" in "foo.smk"
+    Examples:
+      | section    |
+      | rule       |
+      | checkpoint |
 
   Scenario Outline: Resolve for all rule names when 'rules' is used inside a rule section
     Given a snakemake project
@@ -72,22 +75,26 @@ Feature: Resolve rule names used with rules (e.g. 'rules.NAME')
       | rules.bbb | bbbb      | bbbb        | foo.smk      |
 
 
-  Scenario: Multi resolve for rules with same name
+  Scenario Outline: Multi resolve for sections with same name
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule foo:
+    <section> foo:
       input: "path/to/input"
       output: "path/to/output"
       shell: "shell command"
 
-    rule foo:
+    <section> foo:
       input: "path/to/input"
       output: "path/to/output"
       script: "script.py"
 
-    rules.foo
+    <section>s.foo
     """
-    When I put the caret after rules.f
+    When I put the caret after <section>s.f
     Then reference should multi resolve to name, file, times
     | foo | foo.smk | 2 |
+    Examples:
+      | section    |
+      | rule       |
+      | checkpoint |

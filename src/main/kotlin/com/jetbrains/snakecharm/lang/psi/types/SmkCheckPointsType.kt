@@ -34,8 +34,6 @@ class SmkCheckPointsType(smkFile: SnakemakeFile) : PyType {
     }
 
     override fun assertValid(message: String?) {
-        // [romeo] Not sure is our type always valid or check whether any element is invalid
-
         val invalidItem = checkpointNamesAndPsiElements.firstOrNull { !it.second.isValid }?.second
         if (invalidItem != null) {
             throw PsiInvalidElementAccessException(invalidItem, invalidItem.javaClass.toString() + ": " + message)
@@ -51,15 +49,15 @@ class SmkCheckPointsType(smkFile: SnakemakeFile) : PyType {
     ): List<RatedResolveResult> {
 
         if (!SnakemakeLanguageDialect.isInsideSmkFile(location)) {
-            return mutableListOf()
-        }
-
-        val namedRules = checkpointNamesAndPsiElements.filter { (checkpointName, _) -> checkpointName == name }
-        if (namedRules.isEmpty()) {
             return emptyList()
         }
 
-        return namedRules.map { (_, psi) ->
+        val namedCheckPoints = checkpointNamesAndPsiElements.filter { (checkpointName, _) -> checkpointName == name }
+        if (namedCheckPoints.isEmpty()) {
+            return emptyList()
+        }
+
+        return namedCheckPoints.map { (_, psi) ->
             RatedResolveResult(RatedResolveResult.RATE_NORMAL, psi.getNameNode()!!.psi)
         }
     }

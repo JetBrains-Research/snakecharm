@@ -51,7 +51,7 @@ class SmkRulesType(smkFile: SnakemakeFile) : PyType {
     ): List<RatedResolveResult> {
 
         if (!SnakemakeLanguageDialect.isInsideSmkFile(location)) {
-            return mutableListOf()
+            return emptyList()
         }
 
         val namedRules = ruleNamesAndPsiElements.filter { (ruleName, _) -> ruleName == name }
