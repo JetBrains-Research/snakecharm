@@ -121,7 +121,7 @@ class SnakemakeStatementParsing(
                     myBuilder.error(SnakemakeBundle.message("PARSE.expected.ruleorder"))
                 }
 
-                workflowParam.done(SnakemakeElementTypes.WORKFLOW_RULESREORDER_STATEMENT)
+                workflowParam.done(SnakemakeElementTypes.WORKFLOW_RULEORDER_STATEMENT)
             }
             tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS -> {
                 val decoratorMarker = myBuilder.mark()
@@ -287,10 +287,13 @@ class SnakemakeStatementParsing(
 
 
     private fun parseIdentifier(): Boolean {
+        val referenceMarker = myBuilder.mark()
         if (Parsing.isIdentifier(myBuilder)) {
             Parsing.advanceIdentifierLike(myBuilder)
+            referenceMarker.done(PyElementTypes.REFERENCE_EXPRESSION)
             return true
         }
+        referenceMarker.drop()
         return false
     }
 }
