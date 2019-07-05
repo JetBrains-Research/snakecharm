@@ -47,7 +47,7 @@ interface SMKElementVisitor {
         pyElementVisitor.visitPyStatementList(st.statementList)
     }
 
-    fun visitSMKWorkflowRuleOrderStatement(st: SMKWorkflowRulesOrderStatement) {
+    fun visitSMKWorkflowRuleOrderStatement(st: SMKWorkflowRuleOrderStatement) {
         pyElementVisitor.visitPyStatement(st)
     }
 

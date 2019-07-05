@@ -71,7 +71,7 @@ object SnakemakeSyntaxAnnotator: SnakemakeAnnotator() {
         }
     }
 
-    override fun visitSMKWorkflowRuleOrderStatement(st: SMKWorkflowRulesOrderStatement) {
+    override fun visitSMKWorkflowRuleOrderStatement(st: SMKWorkflowRuleOrderStatement) {
         val keywordNode = st.getKeywordNode()
         if (keywordNode != null) {
             addHighlightingAnnotation(keywordNode, PyHighlighter.PY_KEYWORD)
