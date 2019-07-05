@@ -25,7 +25,8 @@ class SMKParamsReference(
                     .toTypedArray()
 
     private fun getParamsSection() =
-            element.parentOfType<SMKRule>()?.getSectionByName(SMKRuleParameterListStatement.PARAMS)
+            element.parentOfType<SmkRuleLike<SMKRuleParameterListStatement>>()
+                    ?.getSectionByName(SMKRuleParameterListStatement.PARAMS)
 
     private fun getKeywordArguments() =
             getParamsSection()?.keywordArguments ?: emptyList()
