@@ -148,20 +148,46 @@ Feature: Completion for snakemake keyword-like things
       output: "in.txt"
     """
 
-  Scenario: Complete at rule level after comma
+  Scenario Outline: Complete at rule/checkpoint level after comma
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule NAME:
+    <rule_like> NAME:
       output: "out.txt",
-      input: "in.txt"
+      <text>
     """
-    When I put the caret at input
+    When I put the caret at <text>
     And I invoke autocompletion popup
     Then completion list should contain:
        | input  |
        | output |
        | run    |
+    Examples:
+      | rule_like | text |
+      | rule       | # here |
+      | rule       | input: "in.txt" |
+#      | checkpoint | TODO
+
+ Scenario Outline: Complete at rule/checkpoint level after comma (args on new line)
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      output:
+         "out.txt",
+      <text>
+    """
+    When I put the caret at <text>
+    And I invoke autocompletion popup
+    Then completion list should contain:
+       | input  |
+       | output |
+       | run    |
+    Examples:
+      | rule_like | text |
+      | rule       | # here |
+      | rule       | input: "in.txt" |
+#      | checkpoint | TODO
 
   Scenario: Complete at rule section level
     Given a snakemake project
