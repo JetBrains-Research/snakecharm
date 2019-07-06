@@ -15,7 +15,8 @@ class SnakemakeFileTypeFactory: FileTypeFactory() {
                 SnakemakeFileType,
                 ExactFileNameMatcher("Snakefile", true),
                 ExtensionFileNameMatcher(SnakemakeFileType.defaultExtension),
-                ExtensionFileNameMatcher("rule")
+                ExtensionFileNameMatcher("rule"),
+                ExtensionFileNameMatcher("rules")
         )
     }
 }
