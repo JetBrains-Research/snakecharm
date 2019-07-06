@@ -163,12 +163,13 @@ Feature: Completion for snakemake keyword-like things
        | output |
        | run    |
     Examples:
-      | rule_like | text |
-      | rule       | # here |
-      | rule       | input: "in.txt" |
-#      | checkpoint | TODO
+      | rule_like | text            |
+      | rule      | # here          |
+      | rule      | input: "in.txt" |
+#      | checkpoint | # here          |  TODO[for darya] uncomment when checkpoint completion is done
+#      | checkpoint | input: "in.txt" |  TODO[for darya] uncomment when checkpoint completion is done
 
- Scenario Outline: Complete at rule/checkpoint level after comma (args on new line)
+  Scenario Outline: Complete at rule/checkpoint level after comma (args on new line)
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -180,14 +181,15 @@ Feature: Completion for snakemake keyword-like things
     When I put the caret at <text>
     And I invoke autocompletion popup
     Then completion list should contain:
-       | input  |
-       | output |
-       | run    |
+      | input  |
+      | output |
+      | run    |
     Examples:
-      | rule_like | text |
-      | rule       | # here |
+      | rule_like  | text            |
+      | rule       | # here          |
       | rule       | input: "in.txt" |
-#      | checkpoint | TODO
+#      | checkpoint | # here          | TODO[for darya] uncomment when checkpoint completion is done
+#      | checkpoint | input: "in.txt" | TODO[for darya] uncomment when checkpoint completion is done
 
   Scenario: Complete at rule section level
     Given a snakemake project
@@ -251,3 +253,84 @@ Feature: Completion for snakemake keyword-like things
     And completion list shouldn't contain:
       | subworkflow |
       | rule        |
+
+  Scenario Outline: Do not show rule/checkpoint section keywords where not needed
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> all:
+        <text>
+      """
+    When I put the caret at <ptn>
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | output     |
+      | message    |
+      | run        |
+    Examples:
+      | rule_like  | text              | ptn   |
+      | rule       | input: foo        | foo   |
+      | rule       | input: foo, #here | #here |
+      | rule       | input: foo.boo    | boo   |
+      | rule       | run: foo          | foo   |
+      | checkpoint | input: foo        | foo   |
+      | checkpoint | input: foo, #here | #here |
+      | checkpoint | run: foo          | foo   |
+
+  Scenario Outline: Do not show subworkflow section keywords where not needed
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      subworkflow all:
+        snakefile: <text>
+      """
+    When I put the caret at <ptn>
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | snakefile  |
+      | configfile |
+    Examples:
+      | text       | ptn   |
+      | foo        | foo   |
+      | foo, #here | #here |
+      | foo.boo    | boo   |
+
+  Scenario: Do not show toplevel keywords in dot reference #97 completion
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rules.
+    """
+    When I put the caret after rules.
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | localrules |
+      | configfile |
+      | workdir    |
+      | onstart    |
+
+  Scenario Outline: Do not show toplevel keywords in rule like declarations
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+     """
+     <rule_like> all:
+       <text>
+     """
+    When I put the caret at <ptn>
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | localrules |
+      | onstart    |
+    Examples:
+      | rule_like   | text                | ptn   |
+      | rule        | input: foo          | foo   |
+      | rule        | input: foo, #here   | #here |
+      | rule        | input: foo.boo      | boo   |
+      | rule        | run: foo            | foo   |
+      | checkpoint  | input: foo          | foo   |
+      | checkpoint  | input: foo, #here   | #here |
+      | checkpoint  | input: foo.boo      | boo   |
+      | checkpoint  | run: foo            | foo   |
+      | subworkflow | workdir: foo        | foo   |
+      | subworkflow | workdir: foo, #here | #here |
+      | subworkflow | workdir: foo.boo    | boo   |
