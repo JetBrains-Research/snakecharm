@@ -7,3 +7,7 @@ checkpoint somestep:
     shell:
         # simulate some output vale
         "echo {wildcards.sample} > somestep/{wildcards.sample}.txt"
+
+checkpoint somestep2:
+    run:
+        foo()

@@ -33,3 +33,23 @@ SnakemakeFile: Checkpoint.smk
           PsiWhiteSpace('\n        ')
           PyStringLiteralExpression: echo {wildcards.sample} > somestep/{wildcards.sample}.txt
             PsiElement(Py:SINGLE_QUOTED_STRING)('"echo {wildcards.sample} > somestep/{wildcards.sample}.txt"')
+  PsiWhiteSpace('\n\n')
+  SMKCheckPoint
+    PsiElement(Py:CHECKPOINT_KEYWORD)('checkpoint')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('somestep2')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SMKRuleRunParameter
+        PsiElement(Py:IDENTIFIER)('run')
+        PsiElement(Py:COLON)(':')
+        PsiWhiteSpace('\n        ')
+        PyStatementList
+          PyExpressionStatement
+            PyCallExpression: foo
+              PyReferenceExpression: foo
+                PsiElement(Py:IDENTIFIER)('foo')
+              PyArgumentList
+                PsiElement(Py:LPAR)('(')
+                PsiElement(Py:RPAR)(')')
