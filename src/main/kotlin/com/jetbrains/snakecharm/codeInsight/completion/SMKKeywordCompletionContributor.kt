@@ -26,7 +26,6 @@ import com.jetbrains.snakecharm.lang.psi.*
 class SMKKeywordCompletionContributor : CompletionContributor() {
     companion object {
         val IN_SNAKEMAKE = PlatformPatterns.psiFile().withLanguage(SnakemakeLanguageDialect)
-        val IN_RULE = psiElement().inside(SMKRule::class.java)!!
         val IN_SUBWORKFLOW = psiElement().inside(SmkSubworkflow::class.java)!!
     }
 
