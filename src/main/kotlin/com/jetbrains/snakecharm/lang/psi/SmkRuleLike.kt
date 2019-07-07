@@ -14,6 +14,9 @@ import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.PyStatementListContainer
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyElementImpl
+import com.jetbrains.python.psi.impl.PyPsiUtils
+import com.jetbrains.snakecharm.SnakemakeIcons
+import javax.swing.Icon
 
 abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode): PyElementImpl(node),
         PyStatementListContainer, PyStatement, ScopeOwner,
@@ -52,6 +55,11 @@ abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode): PyElementI
 
     // iterate over children, not statements, since SMKRuleRunParameter isn't a statement
     fun getSections() = statementList.children.filterIsInstance<SMKRuleSection>()
+
+    override fun getIcon(flags: Int): Icon? {
+        PyPsiUtils.assertValid(this)
+        return SnakemakeIcons.FILE
+    }
 }
 
 fun getIdentifierNode(node: ASTNode): ASTNode? {
