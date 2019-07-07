@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.cucumber
 
+import com.intellij.psi.PsiReference
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 
 /**
@@ -10,6 +11,7 @@ object SnakemakeWorld {
     var myFixture: CodeInsightTestFixture? = null
     var myCompletionList: List<String>? = null
     var myGeneratedDocPopupText: String? = null
+    var myFoundRefs: List<PsiReference> = emptyList()
 
     fun fixture()= myFixture!!
     fun completionList()= myCompletionList!!

@@ -57,8 +57,8 @@ class SmkCheckPointsType(smkFile: SnakemakeFile) : PyType {
             return emptyList()
         }
 
-        return namedCheckPoints.map { (_, psi) ->
-            RatedResolveResult(RatedResolveResult.RATE_NORMAL, psi.nameIdentifier)
+        return namedCheckPoints.map { (_, smkCheckPoint) ->
+            RatedResolveResult(RatedResolveResult.RATE_NORMAL, smkCheckPoint)
         }
     }
 
