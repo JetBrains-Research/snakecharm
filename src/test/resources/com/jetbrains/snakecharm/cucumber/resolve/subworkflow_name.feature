@@ -16,4 +16,4 @@ Feature: Resolve subworkflow name to its corresponding declaration
         otherworkflow()
     """
     When I put the caret at otherworkflow()
-    Then reference should resolve to "subworkflow" in "foo.smk"
+    Then reference should resolve to "otherworkflow" in "foo.smk"
