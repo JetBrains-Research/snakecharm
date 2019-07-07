@@ -10,7 +10,7 @@ Feature: Rename rules/checkpoints
       <rule_like> boo:
         input: <rule_like>s.foo
       """
-    When I put the caret at <rule_like> foo:
+    When I put the caret after <rule_like> fo
     When I invoke rename with name "doo"
     Then the file "foo.smk" should have text
     """
