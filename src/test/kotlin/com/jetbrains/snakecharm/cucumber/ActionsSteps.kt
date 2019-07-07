@@ -108,6 +108,13 @@ class ActionsSteps {
         )
     }
 
+    @When("^I invoke rename with name \"(.+)\"$")
+    fun iInvokeRenameWithName(newName: String) {
+        ApplicationManager.getApplication().invokeAndWait {
+                SnakemakeWorld.fixture().renameElementAtCaret(newName)
+        }
+    }
+
     private fun findTargetElementFor(element: PsiElement, editor: Editor) =
             DocumentationManager.getInstance(element.project)
                     .findTargetElement(editor, element.containingFile, element)
