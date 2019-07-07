@@ -18,7 +18,7 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       input: <rule_like>s.aaaa
     """
     When I put the caret after input: <rule_like>s.aa
-    Then reference should resolve to "<rule_like> aaaa" in "foo.smk"
+    Then reference should resolve to "aaaa" in "foo.smk"
     Examples:
       | target     | rule_like  |
       | rule       | rule       |
@@ -44,7 +44,7 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       input: <rule_like>s.<symbol_name>
     """
     When I put the caret after <rule_like>s.<ptn>
-    Then reference should resolve to "<rule_like> <symbol_name>" in "<file>"
+    Then reference should resolve to "<symbol_name>" in "<file>"
 
     Examples:
       | ptn | symbol_name | file    | rule_like  |
@@ -72,7 +72,7 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
     <rule_like>s.<symbol_name>
     """
     When I put the caret after <rule_like>s.<ptn>
-    Then reference should resolve to "<rule_like> <symbol_name>" in "<file>"
+    Then reference should resolve to "<symbol_name>" in "<file>"
 
     Examples:
       | rule_like  | ptn | symbol_name | file    |
