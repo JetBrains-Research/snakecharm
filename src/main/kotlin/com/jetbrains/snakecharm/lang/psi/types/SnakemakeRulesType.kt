@@ -60,7 +60,7 @@ class SmkRulesType(smkFile: SnakemakeFile) : PyType {
         }
 
         return namedRules.map { (_, ruleElement) ->
-            RatedResolveResult(RatedResolveResult.RATE_NORMAL, ruleElement.getNameElement())
+            RatedResolveResult(RatedResolveResult.RATE_NORMAL, ruleElement.nameIdentifier)
         }
     }
 

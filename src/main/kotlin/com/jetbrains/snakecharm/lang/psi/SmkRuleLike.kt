@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.TokenType
 import com.jetbrains.python.PyElementTypes
@@ -12,8 +13,10 @@ import com.jetbrains.python.psi.PyStatementListContainer
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyElementImpl
 
-abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode):
-        PyElementImpl(node), PyStatementListContainer, PsiNamedElement {
+abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode): PyElementImpl(node),
+        PyStatementListContainer,
+        PsiNamedElement, PsiNameIdentifierOwner
+{
     //TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SMKRule>
     // SnakemakeNamedElement, SnakemakeScopeOwner
 
@@ -34,9 +37,9 @@ abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode):
         return this
     }
 
-    private fun getNameNode() = getIdentifierNode(node)
+    override fun getNameIdentifier() = getNameNode()?.psi
 
-    fun getNameElement() = getNameNode()?.psi
+    private fun getNameNode() = getIdentifierNode(node)
 
     fun getSectionByName(sectionName: String) =
             statementList.statements.find {

@@ -27,7 +27,7 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
         private fun visitSMKRuleLike(rule: SmkRuleLike<SmkSectionStatement>) {
             val ruleName = rule.name ?: return
             if (ruleNames.contains(ruleName)) {
-                registerProblem(rule.getNameElement(),
+                registerProblem(rule.nameIdentifier,
                         SnakemakeBundle.message("INSP.NAME.rule.redeclaration"))
             } else {
                 ruleNames.add(ruleName)
