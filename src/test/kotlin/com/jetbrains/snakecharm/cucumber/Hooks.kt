@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.cucumber
 
 import com.intellij.codeInspection.ex.InspectionProfileImpl
 import cucumber.api.java.After
+import java.lang.reflect.Modifier
 
 /**
  * @author Roman.Chernyatchik
@@ -16,10 +17,12 @@ class Hooks {
         SnakemakeWorld.myFixture?.tearDown()
 
         for (field in SnakemakeWorld::class.java.declaredFields) {
-            if (field.type == Boolean::class.javaPrimitiveType) {
-                field.set(null, false)
-            } else {
-                field.set(null, null)
+            if (field.modifiers == Modifier.PUBLIC) {
+                if (field.type == Boolean::class.javaPrimitiveType) {
+                    field.set(null, false)
+                } else {
+                    field.set(null, null)
+                }
             }
         }
     }
