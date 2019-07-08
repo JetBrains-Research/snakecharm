@@ -16,5 +16,8 @@ class SMKWorkflowParameterListStatement(node: ASTNode) : PyElementImpl(node), Py
         else -> super.acceptPyVisitor(pyVisitor)
     }
 
+    val keywordName: String?
+            get() = getKeywordNode()?.text
+
     fun getKeywordNode() = node.findChildByType(SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
 }

@@ -146,6 +146,7 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkSubworkflowRedeclarationInspection"
     />
 
+    <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SmkWorkflowReferenceContributor"/>
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
 
     <findUsagesHandlerFactory
