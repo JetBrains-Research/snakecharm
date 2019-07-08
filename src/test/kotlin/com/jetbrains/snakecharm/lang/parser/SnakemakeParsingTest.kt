@@ -189,9 +189,9 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-    /*fun testWorkflowRuleorderInvalid() {
+    fun testWorkflowRuleorderInvalid() {
         doTest()
-    }*/
+    }
 
     fun testWorkflowLocalrules() {
         doTest()
