@@ -1,11 +1,11 @@
 package com.jetbrains.snakecharm.lang.validation
 
-import com.intellij.psi.PsiIdentifier
-import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
-import com.jetbrains.snakecharm.lang.psi.*
+import com.jetbrains.snakecharm.lang.psi.SMKRule
+import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
+import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
 
 object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
     override fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {
