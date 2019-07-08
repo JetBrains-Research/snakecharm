@@ -20,11 +20,11 @@ Feature: Annotate syntax errors
       """
       When I check highlighting errors
 
-  Scenario: Annotate positional argument after keyword argument
+  Scenario Outline: Annotate positional argument after keyword argument
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule NAME:
+    <rule_like> NAME:
         input: file1="file1.txt", "file2.txt", file3="file3.txt"
     """
     Then I expect inspection error on <"file2.txt"> with message
@@ -32,12 +32,16 @@ Feature: Annotate syntax errors
     Positional argument after keyword argument.
     """
     When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
-  Scenario: Annotate multiple run/shell/script/wrapper/cwl sections.
+  Scenario Outline: Annotate multiple run/shell/script/wrapper/cwl sections.
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule NAME:
+    <rule_like> NAME:
         input: "file1.txt"
         output: touch("output.txt")
         script: "script.py"
@@ -53,6 +57,11 @@ Feature: Annotate syntax errors
     Multiple run/shell sections.
     """
     When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
 
 
 

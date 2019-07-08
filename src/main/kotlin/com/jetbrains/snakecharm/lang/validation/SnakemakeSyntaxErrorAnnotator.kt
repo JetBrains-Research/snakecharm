@@ -3,9 +3,7 @@ package com.jetbrains.snakecharm.lang.validation
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
-import com.jetbrains.snakecharm.lang.psi.SMKRule
-import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
-import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
+import com.jetbrains.snakecharm.lang.psi.*
 
 object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
     override fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {
@@ -44,9 +42,17 @@ object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
     }
 
     override fun visitSMKRule(rule: SMKRule) {
+        checkMultipleExecutionSections(rule)
+    }
+
+    override fun visitSMKCheckPoint(checkPoint: SMKCheckPoint) {
+        checkMultipleExecutionSections(checkPoint)
+    }
+
+    private fun checkMultipleExecutionSections(ruleOrCheckpoint: SmkRuleOrCheckpoint) {
         var executionSectionOccurred = false
 
-        val sections = rule.getSections()
+        val sections = ruleOrCheckpoint.getSections()
         for (st in sections) {
             when (st) {
                 is SMKRuleParameterListStatement -> {

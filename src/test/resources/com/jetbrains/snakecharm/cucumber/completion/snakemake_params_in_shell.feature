@@ -1,11 +1,11 @@
 Feature: Completion for params in shell section
   Complete params section arguments in shell section
 
-  Scenario: Complete in shell section
+  Scenario Outline: Complete in shell section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule aaaa:
+    <rule_like> aaaa:
       input: "path/to/input"
       output: "path/to/output"
       params:
@@ -18,13 +18,17 @@ Feature: Completion for params in shell section
     Then completion list should contain:
       | outdir      |
       | xmx         |
+    Examples:
+      | rule_like   |
+      | rule        |
+      | checkpoint  |
 
 
-  Scenario: Not completed in wrapper section
+  Scenario Outline: Not completed in wrapper section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule aaaa:
+    <rule_like> aaaa:
       input: "path/to/input"
       output: "path/to/output"
       params:
@@ -37,12 +41,16 @@ Feature: Completion for params in shell section
     Then completion list shouldn't contain:
       | outdir      |
       | xmx         |
+    Examples:
+      | rule_like   |
+      | rule        |
+      | checkpoint  |
 
-  Scenario: no values for unnamed parameters in the completion list
+  Scenario Outline: no values for unnamed parameters in the completion list
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule aaaa:
+    <rule_like> aaaa:
       input: "path/to/input"
       output: "path/to/output"
       params:
@@ -58,21 +66,7 @@ Feature: Completion for params in shell section
       | xmx         |
     And completion list shouldn't contain:
       | 1           |
-
-  Scenario: Completed in shell section for checkpoints.
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    checkpoint aaaa:
-      input: "path/to/input"
-      output: "path/to/output"
-      params:
-        outdir=lambda wildcards, output: os.path.dirname(str(output)),
-        xmx=lambda wildcards: str(800 // int(wildcards.bin))
-      shell: "command {params.outdir}"
-    """
-    When I put the caret after {params.
-    And I invoke autocompletion popup
-    Then completion list should contain:
-      | outdir      |
-      | xmx         |
+    Examples:
+      | rule_like   |
+      | rule        |
+      | checkpoint  |
