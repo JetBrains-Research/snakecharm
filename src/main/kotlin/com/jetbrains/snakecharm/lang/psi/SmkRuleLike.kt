@@ -42,6 +42,13 @@ abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode): PyElementI
         return this
     }
 
+    override fun getNameIdentifier() = getNameNode()?.psi
+
+    /**
+     * Use name start offset here, required for navigation & find usages, e.g. when ask for usages on name identifier
+     */
+    override fun getTextOffset() = getNameNode()?.startOffset ?: super.getTextOffset()
+
     private fun getNameNode() = getIdentifierNode(node)
 
     fun getSectionByName(sectionName: String) =
