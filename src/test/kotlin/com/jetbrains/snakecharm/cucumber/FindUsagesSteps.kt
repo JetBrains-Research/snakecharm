@@ -35,7 +35,17 @@ class FindUsagesSteps {
             val actualRefs = SnakemakeWorld.myFoundRefs
             assertEquals(
                     expectedRefs.size, actualRefs.size,
-                    "The number of found usages doesn't match"
+                    "The number of found usages doesn't match. Actual refs:\n"
+                            + actualRefs.joinToString(separator = "\n") { ref ->
+                        val elem = ref.element
+                        val psiFile = elem.containingFile
+                        val textOffset = elem.textOffset
+                        val textLength = elem.textLength
+                        val content = TextRange.from(textOffset, textLength).substring(psiFile.text)
+                        "|${psiFile.name}|$textOffset|$textLength|\n" +
+                                "Content: <$content>"
+
+                    }
             )
 
             val sortedActualRefs = actualRefs.sortedBy { it.element.containingFile.name }
