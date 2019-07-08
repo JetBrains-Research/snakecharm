@@ -185,9 +185,9 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }*/
 
-    /*fun testWorkflowRuleorderHangingSeparator() {
+    fun testWorkflowRuleorderHangingSeparator() {
         doTest()
-    }*/
+    }
 
     /*fun testWorkflowRuleorderInvalid() {
         doTest()

@@ -8,11 +8,13 @@ SnakemakeFile: WorkflowRuleorderHangingSeparator.smk
         PsiElement(Py:IDENTIFIER)('rule1')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
-      PsiWhiteSpace('\n\n')
-      PsiErrorElement:identifier expected
-        PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
-        PsiElement(Py:COLON)(':')
-        PsiWhiteSpace(' ')
+  PsiWhiteSpace('\n\n')
+  SMKWorkflowRuleOrderStatement
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      SMKRuleReference
         PsiElement(Py:IDENTIFIER)('rule1')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
@@ -21,17 +23,18 @@ SnakemakeFile: WorkflowRuleorderHangingSeparator.smk
         PsiElement(Py:IDENTIFIER)('rule2')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
-      PsiWhiteSpace('\n\n')
-
-    SMKWorkflowRuleOrderStatement
+  PsiWhiteSpace('\n\n')
+  SMKWorkflowRuleOrderStatement
     PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      PsiElement(Py:IDENTIFIER)('rule1')
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('rule1')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      PsiElement(Py:IDENTIFIER)('rule2')
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('rule2')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
