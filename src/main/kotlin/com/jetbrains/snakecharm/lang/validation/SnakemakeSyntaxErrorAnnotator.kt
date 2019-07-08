@@ -1,5 +1,7 @@
 package com.jetbrains.snakecharm.lang.validation
 
+import com.intellij.psi.PsiIdentifier
+import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect

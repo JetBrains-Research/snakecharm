@@ -62,7 +62,6 @@ class SmkRulesType(smkFile: SnakemakeFile) : PyType {
             direction: AccessDirection,
             resolveContext: PyResolveContext
     ): List<RatedResolveResult> {
-
         if (!SnakemakeLanguageDialect.isInsideSmkFile(location)) {
             return emptyList()
         }

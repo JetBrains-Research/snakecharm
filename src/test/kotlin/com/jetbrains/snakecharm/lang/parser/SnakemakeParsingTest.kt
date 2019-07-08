@@ -179,33 +179,23 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-    /* TODO #30
-    fun testWorkflowRuleReorder() {
-        Assume.assumeFalse(
-                "Feature Not Implemented Yet, see: See issue" +
-                        " https://github.com/JetBrains-Research/snakecharm/issues/30",
-                true
-        )
+
+    // TODO #96
+    /*fun testWorkflowRuleorder() {
         doTest()
     }*/
 
-    fun testWorkflowRuleReorderHangingSeparator() {
+    fun testWorkflowRuleorderHangingSeparator() {
         doTest()
     }
 
-    fun testWorkflowRuleReorderInvalid() {
+    fun testWorkflowRuleorderInvalid() {
         doTest()
     }
 
-    /* TODO #30
     fun testWorkflowLocalrules() {
-        Assume.assumeFalse(
-                "Feature Not Implemented Yet, see: See issue" +
-                        " https://github.com/JetBrains-Research/snakecharm/issues/30",
-                true
-        )
         doTest()
-    }*/
+    }
 
     fun testWorkflowLocalrulesInvalid() {
         doTest()

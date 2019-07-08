@@ -1,42 +1,36 @@
 SnakemakeFile: WorkflowLocalrulesInvalid.smk
   SMKWorkflowLocalRulesStatement
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
-    PsiElement(Py:COLON)(':')
-    PsiWhiteSpace(' ')
     PyArgumentList
-      PsiErrorElement:Expected a rule name identifier.
-        <empty list>
-      PsiElement(Py:SINGLE_QUOTED_STRING)(''foo1'')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PsiErrorElement:identifier expected
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''foo1'')
       PsiElement(Py:COMMA)(',')
       PsiWhiteSpace(' ')
-      PsiElement(Py:IDENTIFIER)('foo2')
-    PsiErrorElement:Expected a comma separated list of rules that shall not be executed by the cluster command.
-      <empty list>
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('foo2')
   PsiWhiteSpace('\n\n')
   SMKWorkflowLocalRulesStatement
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
-    PsiElement(Py:COLON)(':')
-    PsiWhiteSpace(' ')
     PyArgumentList
-      PsiElement(Py:IDENTIFIER)('foo3')
-      PsiErrorElement:',' expected
-        <empty list>
+      PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      PsiElement(Py:IDENTIFIER)('foo4')
-    PsiErrorElement:Expected a comma separated list of rules that shall not be executed by the cluster command.
-      <empty list>
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('foo3')
+      PsiWhiteSpace(' ')
+      PsiErrorElement:',' expected
+        PsiElement(Py:IDENTIFIER)('foo4')
   PsiWhiteSpace('\n\n')
   SMKWorkflowLocalRulesStatement
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
-    PsiElement(Py:COLON)(':')
     PyArgumentList
-      <empty list>
-  PsiWhiteSpace('\n  ')
-  PsiErrorElement:Unexpected indent
-    <empty list>
-  PyExpressionStatement
-    PyReferenceExpression: foo5
-      PsiElement(Py:IDENTIFIER)('foo5')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n  ')
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('foo5')
+      PsiErrorElement:Dedent expected
+        <empty list>
   PsiWhiteSpace('\n  ')
   PyExpressionStatement
     PyReferenceExpression: foo6
@@ -46,7 +40,8 @@ SnakemakeFile: WorkflowLocalrulesInvalid.smk
   PsiWhiteSpace('\n\n')
   SMKWorkflowLocalRulesStatement
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
-    PsiElement(Py:COLON)(':')
-    PsiWhiteSpace(' ')
     PyArgumentList
-      PsiElement(Py:IDENTIFIER)('foo7')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('foo7')
