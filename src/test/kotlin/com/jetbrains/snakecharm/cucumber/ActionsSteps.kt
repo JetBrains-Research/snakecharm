@@ -33,7 +33,8 @@ class ActionsSteps {
 
     @Given("^I expect inspection (error|warning|info|TYPO|weak warning) with message \"(.*)\" on")
     fun iExpectInspectionWithMessageOn(level: String, message: String, signature: String) {
-        iExpectInspectionOnIn(level, signature, signature, message.replace("\r", ""))
+        println("!!! ${signature.count { it == '\r' }}")
+        iExpectInspectionOnIn(level, signature, signature.replace("\r", ""), message)
     }
 
     @Given("^I expect inspection (error|warning|info|TYPO|weak warning) on <([^>]+)> in <(.+)> with message$")
@@ -49,7 +50,8 @@ class ActionsSteps {
         val project = psiFile.project
         val document = PsiDocumentManager.getInstance(fixture.project).getDocument(fixture.file)!!
         val pos = document.text.indexOf(signature)
-        assertTrue("Signature <$signature> wasn't found in the file ${psiFile.name}", pos >= 0)
+        assertTrue("Signature <$signature> wasn't found in the file ${psiFile.name}." +
+                "Diagnostics: ${document.text.count { it == '\r' }}", pos >= 0)
 
         val posInSignature = signature.indexOf(text)
         assertTrue(posInSignature >= 0)
