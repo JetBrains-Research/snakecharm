@@ -51,6 +51,10 @@
             language="Python"
             implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKShadowSettingsCompletionContributor"
     />
+    <completion.contributor
+            language="Python"
+            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKRuleReferenceCompletionContributor"
+    />
 
     <moduleService
         serviceInterface="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"

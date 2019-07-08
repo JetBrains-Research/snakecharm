@@ -20,8 +20,6 @@ Feature: Completion for rule names in localrules and ruleorder sections
     Then completion list should contain:
       | rule2       |
       | rule3       |
-    And completion list shouldn't contain:
-      | rule1       |
 
   Scenario: Complete in ruleorder section
     Given a snakemake project
@@ -43,5 +41,3 @@ Feature: Completion for rule names in localrules and ruleorder sections
     Then completion list should contain:
       | rule1       |
       | rule2       |
-    And completion list shouldn't contain:
-      | rule3       |
