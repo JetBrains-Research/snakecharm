@@ -34,7 +34,7 @@ abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode):
         return this
     }
 
-    private fun getNameNode() = getIdentifierNode(node)
+    fun getNameNode() = getIdentifierNode(node)
 
     fun getNameElement() = getNameNode()?.psi
 

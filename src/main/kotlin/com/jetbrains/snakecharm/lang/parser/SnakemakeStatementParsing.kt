@@ -98,6 +98,7 @@ class SnakemakeStatementParsing(
 
                 val res = parsingContext.expressionParser
                         .parseArgumentList(
+                                ",",
                                 PyTokenTypes.COMMA,
                                 SnakemakeBundle.message("PARSE.expected.identifier")
                         ) { parseIdentifier() }
@@ -114,6 +115,7 @@ class SnakemakeStatementParsing(
 
                 val res = parsingContext.expressionParser
                         .parseArgumentList(
+                                ">",
                                 PyTokenTypes.GT,
                                 SnakemakeBundle.message("PARSE.expected.identifier")
                         ) { parseIdentifier() }
@@ -290,7 +292,7 @@ class SnakemakeStatementParsing(
         val referenceMarker = myBuilder.mark()
         if (Parsing.isIdentifier(myBuilder)) {
             Parsing.advanceIdentifierLike(myBuilder)
-            referenceMarker.done(PyElementTypes.REFERENCE_EXPRESSION)
+            referenceMarker.done(SnakemakeElementTypes.RULE_REFERENCE)
             return true
         }
         referenceMarker.drop()

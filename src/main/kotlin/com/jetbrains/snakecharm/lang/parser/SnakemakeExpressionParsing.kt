@@ -18,27 +18,30 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
 
     fun parseRuleParamArgumentList() =
             parseArgumentList(
+                    ",",
                     PyTokenTypes.COMMA,
                     message("PARSE.expected.expression")
             ) { parseRuleParamArgument() }
 
     fun parseArgumentList(
-            separatorToken: PyElementType,
+            separatorTokenText: String,
+            separatorTokenType: PyElementType,
             errorMessage: String,
             parsingFunction: () -> Boolean
     ): Boolean {
         val context = myContext
         val scope = context.scope as SnakemakeParsingScope
         myContext.pushScope(scope.withParamsArgsList())
-        val result = doParseRuleParamArgumentList(separatorToken) {
-            parseArgumentAndReportErrors(errorMessage, separatorToken, parsingFunction)
+        val result = doParseRuleParamArgumentList(separatorTokenText, separatorTokenType) {
+            parseArgumentAndReportErrors(errorMessage, separatorTokenType, parsingFunction)
         }
         context.popScope()
         return result
     }
 
     private fun doParseRuleParamArgumentList(
-            separatorToken: PyElementType,
+            separatorTokenText: String,
+            separatorTokenType: PyElementType,
             parseArgumentFunction: () -> Unit
     ): Boolean {
         // let's make ':' part of arg list, similar as '(', ')' are parts of arg list
@@ -67,7 +70,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
 
             // separator if several args:
             if (argNumber > 1) {
-                if (matchToken(separatorToken)) {
+                if (matchToken(separatorTokenType)) {
                     val separatorMarker = myBuilder.mark()
                     val separatorMarkerIndents = indents
 
@@ -101,10 +104,9 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         break
                     }
                 } else {
-                    separatorToken.specialMethodName
                     recoverUntilMatches(
-                            SnakemakeBundle.message("PARSE.expected.separator.message", separatorToken.toString()),
-                            separatorToken,
+                            SnakemakeBundle.message("PARSE.expected.separator.message", separatorTokenText),
+                            separatorTokenType,
                             PyTokenTypes.STATEMENT_BREAK
                     )
                 }

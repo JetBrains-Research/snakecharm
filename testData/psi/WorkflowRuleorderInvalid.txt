@@ -4,33 +4,31 @@ SnakemakeFile: WorkflowRuleReorderInvalid.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      PsiErrorElement:Expected a rule name identifier
-        <empty list>
-      PsiElement(Py:SINGLE_QUOTED_STRING)(''rule1'')
+      PsiErrorElement:identifier expected
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''rule1'')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      PsiElement(Py:IDENTIFIER)('rule2')
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('rule2')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      PsiElement(Py:IDENTIFIER)('rule3')
-    PsiErrorElement:Expected a descending order of rule names, e.g. rule1 > rule2 > rule3 ...
-      <empty list>
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('rule3')
   PsiWhiteSpace('\n\n')
   SMKWorkflowRulesReorderStatement
     PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      PsiElement(Py:IDENTIFIER)('rule4')
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('rule4')
       PsiErrorElement:'>' expected
         <empty list>
       PsiElement(Py:COMMA)(',')
       PsiWhiteSpace(' ')
       PsiElement(Py:IDENTIFIER)('rule5')
-    PsiErrorElement:Expected a descending order of rule names, e.g. rule1 > rule2 > rule3 ...
-      <empty list>
   PsiWhiteSpace('\n\n')
   SMKWorkflowRulesReorderStatement
     PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
@@ -40,12 +38,9 @@ SnakemakeFile: WorkflowRuleReorderInvalid.smk
       PsiElement(Py:IDENTIFIER)('rule6')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
-      PsiErrorElement:Expected a rule name identifier
-        <empty list>
       PsiWhiteSpace(' ')
-      PsiElement(Py:SINGLE_QUOTED_STRING)(''rule7'')
-    PsiErrorElement:Expected a descending order of rule names, e.g. rule1 > rule2 > rule3 ...
-      <empty list>
+      PsiErrorElement:identifier expected
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''rule7'')
   PsiWhiteSpace('\n\n')
   SMKWorkflowRulesReorderStatement
     PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
@@ -57,8 +52,6 @@ SnakemakeFile: WorkflowRuleReorderInvalid.smk
         <empty list>
       PsiWhiteSpace(' ')
       PsiElement(Py:IDENTIFIER)('rule9')
-    PsiErrorElement:Expected a descending order of rule names, e.g. rule1 > rule2 > rule3 ...
-      <empty list>
   PsiWhiteSpace('\n\n')
   SMKWorkflowRulesReorderStatement
     PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
