@@ -16,12 +16,11 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionParsing(context) {
     override fun getParsingContext() = myContext as SnakemakeParserContext
 
-    fun parseRuleParamArgumentList() =
-            parseArgumentList(
-                    ",",
-                    PyTokenTypes.COMMA,
-                    message("PARSE.expected.expression")
-            ) { parseRuleParamArgument() }
+    fun parseRuleLikeSectionArgumentList() = parseArgumentList(
+            ",", PyTokenTypes.COMMA,
+            message("PARSE.expected.expression"),
+            this::parseRuleParamArgument
+    )
 
     fun parseArgumentList(
             separatorTokenText: String,
