@@ -84,6 +84,7 @@ class StepDefs {
             "Subworkflow Multiple Args" -> fixture.enableInspections(SmkSubworkflowMultipleArgsInspection::class.java)
             "Subworkflow Redeclaration" -> fixture.enableInspections(SmkSubworkflowRedeclarationInspection::class.java)
             "Unreachable Code" -> fixture.enableInspections(PyUnreachableCodeInspection::class.java)
+            "Undefined name" -> fixture.enableInspections(SmkUndefinedNameInspection::class.java)
             else -> {
                 for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {
                     val o = provider.instance

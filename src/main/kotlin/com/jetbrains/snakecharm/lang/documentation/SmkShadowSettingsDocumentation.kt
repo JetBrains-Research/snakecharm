@@ -37,8 +37,8 @@ class SmkShadowSettingsDocumentation : AbstractDocumentationProvider() {
             contextElement: PsiElement?): PsiElement? {
         return contextElement
     }
-}
 
-fun PsiElement.isInShadowSection(): Boolean =
-        PsiTreeUtil.getParentOfType(this, SMKRuleParameterListStatement::class.java)?.name ==
-                SMKRuleParameterListStatement.SHADOW
+    private fun PsiElement.isInShadowSection(): Boolean =
+            PsiTreeUtil.getParentOfType(this, SMKRuleParameterListStatement::class.java)?.name ==
+                    SMKRuleParameterListStatement.SHADOW
+}
