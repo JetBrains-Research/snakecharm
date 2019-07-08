@@ -98,56 +98,6 @@ Feature: Completion for snakemake keyword-like things
       | rule                  |
       | checkpoint            |
 
-  Scenario Outline: Complete at rule level
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    rule NAME:
-      <str>
-    """
-    When I put the caret after <str>
-    Then I invoke autocompletion popup, select "<result>" lookup item and see a text:
-    """
-    rule NAME:
-      <result>: 
-    """
-    Examples:
-      | str | result               |
-      | inp | input                |
-      | out | output               |
-      | par | params               |
-      | lo  | log                  |
-      | re  | resources            |
-      | be  | benchmark            |
-      | ve  | version              |
-      | me  | message              |
-      | th  | threads              |
-      | si  | singularity          |
-      | pr  | priority             |
-      | wi  | wildcard_constraints |
-      | gr  | group                |
-      | sh  | shadow               |
-      | co  | conda                |
-      | cw  | cwl                  |
-      | sc  | script               |
-      | sh  | shell                |
-      | run | run                  |
-      | wr  | wrapper              |
-
-  Scenario: Complete and replace at rule level
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    rule NAME:
-      input: "in.txt"
-    """
-    When I put the caret at input
-    Then I invoke autocompletion popup, select "output" lookup item in replace mode and see a text:
-    """
-    rule NAME:
-      output: "in.txt"
-    """
-
   Scenario Outline: Complete at rule/checkpoint level after comma
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -190,20 +140,6 @@ Feature: Completion for snakemake keyword-like things
       | rule       | input: "in.txt" |
 #      | checkpoint | # here          | TODO[for darya] uncomment when checkpoint completion is done
 #      | checkpoint | input: "in.txt" | TODO[for darya] uncomment when checkpoint completion is done
-
-  Scenario: Complete at rule section level
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    rule NAME:
-      output: "out.txt"
-      input: "in.txt"
-    """
-    When I put the caret at "in
-    And I invoke autocompletion popup
-    Then completion list shouldn't contain:
-       | output |
-       | run    |
 
   Scenario: Complete and replace at subworkflow level
     Given a snakemake project
@@ -253,6 +189,118 @@ Feature: Completion for snakemake keyword-like things
     And completion list shouldn't contain:
       | subworkflow |
       | rule        |
+
+  Scenario Outline: Complete at rule/checkpoint level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        <str>
+      """
+    When I put the caret after <str>
+    Then I invoke autocompletion popup, select "<result>" lookup item and see a text:
+      """
+      <rule_like> NAME:
+        <result>: 
+      """
+    Examples:
+      | rule_like  | str | result               |
+      | rule       | inp | input                |
+      | checkpoint | inp | input                |
+      | rule       | out | output               |
+      | checkpoint | out | output               |
+      | rule       | par | params               |
+      | checkpoint | par | params               |
+      | rule       | lo  | log                  |
+      | checkpoint | lo  | log                  |
+      | rule       | re  | resources            |
+      | checkpoint | re  | resources            |
+      | rule       | be  | benchmark            |
+      | checkpoint | be  | benchmark            |
+      | rule       | ve  | version              |
+      | checkpoint | ve  | version              |
+      | rule       | me  | message              |
+      | checkpoint | me  | message              |
+      | rule       | th  | threads              |
+      | checkpoint | th  | threads              |
+      | rule       | si  | singularity          |
+      | checkpoint | si  | singularity          |
+      | rule       | pr  | priority             |
+      | checkpoint | pr  | priority             |
+      | rule       | wi  | wildcard_constraints |
+      | checkpoint | wi  | wildcard_constraints |
+      | rule       | gr  | group                |
+      | checkpoint | gr  | group                |
+      | rule       | sh  | shadow               |
+      | checkpoint | sh  | shadow               |
+      | rule       | co  | conda                |
+      | checkpoint | co  | conda                |
+      | rule       | cw  | cwl                  |
+      | checkpoint | cw  | cwl                  |
+      | rule       | sc  | script               |
+      | checkpoint | sc  | script               |
+      | rule       | sh  | shell                |
+      | checkpoint | sh  | shell                |
+      | rule       | run | run                  |
+      | checkpoint | run | run                  |
+      | rule       | wr  | wrapper              |
+      | checkpoint | wr  | wrapper              |
+
+  Scenario Outline: Complete and replace at rule/checkpoint level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      input: "in.txt"
+    """
+    When I put the caret at input
+    Then I invoke autocompletion popup, select "output" lookup item in replace mode and see a text:
+    """
+    <rule_like> NAME:
+      output: "in.txt"
+    """
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Complete at rule/checkpoint level after comma
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      output: "out.txt",
+      input: "in.txt"
+    """
+    When I put the caret at input
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | input  |
+      | output |
+      | run    |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Complete at rule/checkpoint section level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      output: "out.txt"
+      input: "in.txt"
+    """
+    When I put the caret at "in
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | output     |
+      | run        |
+      | checkpoint |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
   Scenario Outline: Do not show rule/checkpoint section keywords where not needed
     Given a snakemake project

@@ -1,11 +1,11 @@
 Feature: Rule sections after execution sections inspection.
   Execution sections being: run, script, wrapper, shell, cwl.
 
-  Scenario: Params section after shell section
+  Scenario Outline: Params section after shell section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule NAME:
+    <rule_like> NAME:
         input: "input.txt"
         output: "output.txt"
         shell: "command"
@@ -17,12 +17,16 @@ Feature: Rule sections after execution sections inspection.
     Rule section 'params' isn't allowed after 'shell' section.
     """
     When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
-  Scenario: Threads section after wrapper section
+  Scenario Outline: Threads section after wrapper section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule NAME:
+    <rule_like> NAME:
         input: "input.txt"
         output: "output.txt"
         wrapper: "dir/wrapper"
@@ -34,13 +38,17 @@ Feature: Rule sections after execution sections inspection.
     Rule section 'threads' isn't allowed after 'wrapper' section.
     """
     When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
 
-  Scenario: Log section after script section
+  Scenario Outline: Log section after script section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule NAME:
+    <rule_like> NAME:
         input: "input.txt"
         output: "output.txt"
         script: "script_file.py"
@@ -52,12 +60,16 @@ Feature: Rule sections after execution sections inspection.
     Rule section 'log' isn't allowed after 'script' section.
     """
     When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
-  Scenario: Resources section after cwl section
+  Scenario Outline: Resources section after cwl section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule NAME:
+    <rule_like> NAME:
         input: "input.txt"
         output: "output.txt"
         cwl: "https://github.com/repository/with/file.cwl"
@@ -69,5 +81,9 @@ Feature: Rule sections after execution sections inspection.
     Rule section 'resources' isn't allowed after 'cwl' section.
     """
     When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
 
