@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.lang.parser
 import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyBundle
-import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.Parsing
@@ -127,7 +126,7 @@ class SnakemakeStatementParsing(
             tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS -> {
                 val decoratorMarker = myBuilder.mark()
                 nextToken()
-                checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))
+                checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
                 parseSuite()
                 decoratorMarker.done(SnakemakeElementTypes.WORKFLOW_PYTHON_BLOCK_PARAMETER)
             }
