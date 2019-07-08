@@ -35,8 +35,8 @@ abstract class SnakemakeAnnotatorManager : Annotator, DumbAware {
     }
 }
 
-class SmkStandardAnnotatorManager : SnakemakeAnnotatorManager(), DumbAware {
-    override val annotators = listOf(
+class SmkStandardAnnotatorManager : SnakemakeAnnotatorManager() {
+    override val annotators: List<PyAnnotator> = listOf(
             SmkReturnAnnotator
     )
 }

@@ -45,8 +45,12 @@ object SnakemakeTokenTypes {
                     WORKFLOW_LOCALRULES_KEYWORD, WORKFLOW_RULEORDER_KEYWORD
             ))
 
-    val RULE_LIKE = TokenSet.create(
-            RULE_KEYWORD, CHECKPOINT_KEYWORD, SUBWORKFLOW_KEYWORD
+    val RULE_OR_CHECKPOINT = TokenSet.create(
+            RULE_KEYWORD, CHECKPOINT_KEYWORD
+    )
+
+    val RULE_LIKE = TokenSet.orSet(
+            RULE_OR_CHECKPOINT, TokenSet.create(SUBWORKFLOW_KEYWORD)
     )
 
     val WORKFLOW_TOPLEVEL_DECORATORS = TokenSet.orSet(

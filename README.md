@@ -50,6 +50,16 @@ Contact me at roman.chernyatchik@jetbrains.com or post issues in [Issue Tracker]
 
 Pull requests are welcome. It is my side project, so I appreciate your help implementing plugin desired features.
 
+Build plugin from sources:
+* Run `./gradlew assemble`
+* Plugin bundle is located in ` build/distributions/snakecharm-*.zip`
+
+Install plugin from *.zip bundle:
+* Open IDEA/PyCharm Preferences
+* Choose `Plugins` section
+* Press gear icon and choose `Install Plugin from Disk...`
+* Use `*.zip` bundle download from Plugin Manager or built from sources 
+
 Release plugin:
 * Fix version in `build.gradle`
 * Fix since/until build versions in `build.gradle`

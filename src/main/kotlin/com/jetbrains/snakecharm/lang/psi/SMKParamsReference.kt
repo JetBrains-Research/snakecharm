@@ -4,7 +4,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
-import com.intellij.psi.util.parentOfType
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.PlatformIcons
 
 
@@ -25,8 +25,8 @@ class SMKParamsReference(
                     .toTypedArray()
 
     private fun getParamsSection() =
-            element.parentOfType<SmkRuleLike<SMKRuleParameterListStatement>>()
-                    ?.getSectionByName(SMKRuleParameterListStatement.PARAMS)
+            PsiTreeUtil.getParentOfType(element, SMKRule::class.java)
+            ?.getSectionByName(SMKRuleParameterListStatement.PARAMS)
 
     private fun getKeywordArguments() =
             getParamsSection()?.keywordArguments ?: emptyList()

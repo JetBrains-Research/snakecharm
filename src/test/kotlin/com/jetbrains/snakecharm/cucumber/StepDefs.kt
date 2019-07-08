@@ -3,9 +3,7 @@ package com.jetbrains.snakecharm.cucumber
 import com.intellij.codeInspection.LocalInspectionEP
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.util.Computable
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
@@ -63,20 +61,6 @@ class StepDefs {
         PythonDialectsTokenSetProvider.reset()
     }
 
-    @Given("^a file \"(.+)\" with text$")
-    fun aFileWithText(name: String, text: String) {
-        ApplicationManager.getApplication().invokeAndWait({
-            ApplicationManager.getApplication().runWriteAction {
-                SnakemakeWorld.fixture().addFileToProject(name, text)
-            }
-        }, ModalityState.NON_MODAL)
-    }
-
-    @Given("^I open a file \"(.+)\" with text$")
-    fun iOpenAFile(name: String, text: String) {
-        createAndAddFile(name, text)
-    }
-
     @Given("^I expect controlflow")
     fun iexpectControlflow(expectedCFG: String) {
         val actualCFG = ApplicationManager.getApplication().runReadAction(Computable<String> {
@@ -111,16 +95,5 @@ class StepDefs {
                 fail("Unknown inspection:$inspectionName")
             }
         }
-    }
-
-    fun createAndAddFile(name: String, text: String) {
-        ApplicationManager.getApplication().invokeAndWait({
-            ApplicationManager.getApplication().runWriteAction {
-                val file = SnakemakeWorld.fixture().addFileToProject(
-                        name, StringUtil.convertLineSeparators(text)
-                )
-                SnakemakeWorld.fixture().configureFromExistingVirtualFile(file.virtualFile)
-            }
-        }, ModalityState.NON_MODAL)
     }
 }

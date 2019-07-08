@@ -16,13 +16,13 @@ object SnakemakeSyntaxAnnotator: SnakemakeAnnotator() {
 
 
     private fun visitSMKRuleLike(ruleLike: SmkRuleLike<SmkSectionStatement>) {
-        ruleLike.getNameElement()?.let { nameElement ->
+        ruleLike.nameIdentifier?.let { nameElement ->
             addHighlightingAnnotation(nameElement, PY_FUNC_DEFINITION)
         }
     }
 
     override fun visitSMKSubworkflow(subworkflow: SmkSubworkflow) {
-        subworkflow.getNameElement()?.let { nameElement ->
+        subworkflow.nameIdentifier?.let { nameElement ->
             addHighlightingAnnotation(nameElement, PY_FUNC_DEFINITION)
         }
     }

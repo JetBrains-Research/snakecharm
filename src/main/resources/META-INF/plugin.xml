@@ -147,6 +147,11 @@
     />
 
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
+
+    <findUsagesHandlerFactory
+            implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"
+            id="Python" order="last, before default"
+    />
   </extensions>
 
   <module-components>
@@ -161,7 +166,7 @@
     <pyReferenceResolveProvider
         implementation="com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider"
     />
-    <typeProvider implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeRulesTypeProvider"/>
+    <typeProvider implementation="com.jetbrains.snakecharm.codeInsight.SmkSectionTypeProvider"/>
     <visitorFilter
             language="Snakemake"
             implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeVisitorFilter"

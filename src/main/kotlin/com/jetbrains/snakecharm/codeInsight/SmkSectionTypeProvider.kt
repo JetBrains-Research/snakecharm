@@ -6,9 +6,11 @@ import com.jetbrains.python.psi.types.PyTypeProviderBase
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
-import com.jetbrains.snakecharm.lang.psi.types.SnakemakeRulesType
+import com.jetbrains.snakecharm.lang.psi.types.SmkCheckPointsType
+import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 
-class SnakemakeRulesTypeProvider : PyTypeProviderBase() {
+class SmkSectionTypeProvider : PyTypeProviderBase() {
+
     override fun getReferenceExpressionType(
             referenceExpression: PyReferenceExpression,
             context: TypeEvalContext
@@ -23,6 +25,10 @@ class SnakemakeRulesTypeProvider : PyTypeProviderBase() {
 
         // XXX: at the moment affects all "rules" variables in a *.smk file, better to
         // affect only "rules" which is resolved to appropriate place
-        return if (name == "rules") SnakemakeRulesType(psiFile as SnakemakeFile) else null
+        return when (name) {
+            "rules" -> SmkRulesType(psiFile as SnakemakeFile)
+            "checkpoints" -> SmkCheckPointsType(psiFile as SnakemakeFile)
+            else -> null
+        }
     }
 }

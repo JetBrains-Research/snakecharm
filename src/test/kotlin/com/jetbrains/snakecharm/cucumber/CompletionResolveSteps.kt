@@ -15,6 +15,7 @@ import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.util.text.StringUtil
+import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiReference
 import com.intellij.testFramework.UsefulTestCase
@@ -94,7 +95,10 @@ class CompletionResolveSteps {
 
             val completionList = results
                     .map { result ->
-                        result!!.text to result.containingFile.name
+                        when (result){
+                            is PsiNamedElement -> "${result.name} (${result.javaClass.simpleName})"
+                            else -> result!!.text
+                        } to result.containingFile.name
                     }
                     .groupBy { it }
                     .map { entry -> entry.key to entry.value.size }
@@ -102,13 +106,18 @@ class CompletionResolveSteps {
 
             val records = table.asLists(String::class.java)
 
+            val actualRefsInfo = completionList.entries.joinToString(separator = "\n") {(nameAndFile, times) ->
+                "|${nameAndFile.first}| ${nameAndFile.second} | $times |"
+            }
+
             records.forEach { row ->
                 val key = row[0] to row[1]
                 val expectedTimes = row[2].toInt()
                 val actualTimes = completionList.getOrDefault(key, 0)
                 assertEquals(
                         expectedTimes, actualTimes,
-                        "Expected $expectedTimes but was $actualTimes occurrences of $key"
+                        "Expected $expectedTimes but was $actualTimes occurrences of $key." +
+                                " Actual refs:\n$actualRefsInfo\n"
                 )
             }
         }
@@ -287,8 +296,10 @@ class CompletionResolveSteps {
     private fun getPositionBySignature(editor: Editor, marker: String, after: Boolean): Int {
         val text = editor.document.text
         val pos = text.indexOf(marker)
+        require(pos >= 0) {
+            "Marker <$marker> not found in <$text>"
+        }
         require(pos == text.lastIndexOf(marker)) { "Multiple marker entries" }
-        require(pos >= 0)
         return if (after) pos + marker.length else pos
     }
 
