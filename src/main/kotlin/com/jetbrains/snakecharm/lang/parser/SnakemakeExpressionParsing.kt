@@ -87,6 +87,17 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                                 nextToken()
                             }
                         }
+
+                        // Case: hanging 'comma', next statement is another rule param block
+                        // statement break after comma, if 'indents == 0' => we just left arg list
+                        if (indents == 0) {
+                            // game over, let's go to next section
+
+                            // rollback because after loop we expected to be at statement break
+                            indents = separatorMarkerIndents
+                            separatorMarker.rollbackTo()
+                            break
+                        }
                     }
 
                     // Case: hanging separator, next statement is another rule param block

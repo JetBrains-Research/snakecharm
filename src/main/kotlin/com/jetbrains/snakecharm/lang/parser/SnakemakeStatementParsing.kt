@@ -10,6 +10,7 @@ import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.python.psi.PyElementType
+import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.RULE_OR_CHECKPOINT
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
 import com.jetbrains.snakecharm.lang.psi.SMKSubworkflowParameterListStatement
@@ -242,13 +243,12 @@ class SnakemakeStatementParsing(
 
         when {
             keyword in section.parameters -> {
-                // TODO: probably do this behaviour by default and use inspection error
-                // instead of parsing errors..
+                // TODO: probably do this parsing behaviour by default and show inspection error
+                // for keyword not in `section.parameters` instead of parsing errors..
                 result = parsingContext.expressionParser.parseRuleParamArgumentList()
                 ruleParam.done(section.parameterListStatement)
             }
-            section.sectionKeyword ===  SnakemakeTokenTypes.RULE_KEYWORD &&
-                    keyword == SMKRuleRunParameter.PARAM_NAME -> {
+            section.sectionKeyword in RULE_OR_CHECKPOINT && keyword == SMKRuleRunParameter.PARAM_NAME -> {
                 checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
                 statementParser.parseSuite()
                 ruleParam.done(SnakemakeElementTypes.RULE_RUN_STATEMENT)

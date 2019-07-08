@@ -1,85 +1,85 @@
-Feature: Rule names completion for 'rules' object
-  (e.g. there's a rule named 'aaaa', then 'rules.aa' completes to 'rules.aaaa')
+Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
+  (e.g. there's a rule named 'aaaa', then 'rules.aa' completes to 'rules.aaaa', similar for checkpoints)
 
-  Scenario Outline: Complete in input section for a single other section present
+  Scenario Outline: Complete rule/checkpoint names in input section (single declaration)
     Given a snakemake project
     Given I open a file "foo.smk" with text
      """
-     <section> aaaa:
+     <rule_like> aaaa:
        input: "path/to/input"
        output: "path/to/output"
        shell: "shell command"
 
-     <section> bbbb:
-       input: <section>s.aaa
+     <rule_like> bbbb:
+       input: <rule_like>s.aaa
      """
-    When I put the caret after input: <section>s.aaa
+    When I put the caret after input: <rule_like>s.aaa
     Then I invoke autocompletion popup, select "aaaa" lookup item and see a text:
      """
-     <section> aaaa:
+     <rule_like> aaaa:
        input: "path/to/input"
        output: "path/to/output"
        shell: "shell command"
 
-     <section> bbbb:
-       input: <section>s.aaaa
+     <rule_like> bbbb:
+       input: <rule_like>s.aaaa
      """
   Examples:
-    | section    |
+    | rule_like    |
     | rule       |
     | checkpoint |
 
-  Scenario Outline: Complete in input section for multiple section definitions
+  Scenario Outline: Complete rule/checkpoint names in input section (multiple declarations)
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    <section> aaaa:
+    <rule_like> aaaa:
       input: "path/to/input"
       output: "path/to/output"
       shell: "shell command"
 
-    <section> bbbb:
+    <rule_like> bbbb:
       input: "path/to/input"
       output: "path/to/output"
       script: "script.py"
 
-    <section> cccc:
-      input: <section>s.
+    <rule_like> cccc:
+      input: <rule_like>s.
     """
-    When I put the caret after input: <section>s.
+    When I put the caret after input: <rule_like>s.
     And I invoke autocompletion popup
     Then completion list should contain:
       | aaaa    |
       | bbbb    |
       | cccc    |
     Examples:
-      | section    |
+      | rule_like    |
       | rule       |
       | checkpoint |
 
-  Scenario Outline: Complete at top level for multiple sections
+  Scenario Outline: Complete at top level for multiple rule/checkpoint declarations
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    <section> aaaa:
+    <rule_like> aaaa:
       input: "path/to/input"
       output: "path/to/output"
       shell: "shell command"
 
-    <section> bbbb:
+    <rule_like> bbbb:
       input: "path/to/input"
       output: "path/to/output"
       script: "script.py"
 
-    <section>s.ccc
+    <rule_like>s.ccc
     """
-    When I put the caret after <section>s.
+    When I put the caret after <rule_like>s.
     And I invoke autocompletion popup
     Then completion list should contain:
       | aaaa    |
       | bbbb    |
     Examples:
-      | section    |
+      | rule_like    |
       | rule       |
       | checkpoint |
 

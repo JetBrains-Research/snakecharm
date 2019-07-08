@@ -2,18 +2,26 @@ package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.TokenType
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonDialectsTokenSetProvider
+import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
+import com.jetbrains.python.psi.PyStatement
 import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.PyStatementListContainer
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyElementImpl
+import com.jetbrains.python.psi.impl.PyPsiUtils
+import com.jetbrains.snakecharm.SnakemakeIcons
+import javax.swing.Icon
 
-abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode):
-        PyElementImpl(node), PyStatementListContainer, PsiNamedElement {
+abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode): PyElementImpl(node),
+        PyStatementListContainer, PyStatement, ScopeOwner,
+        PsiNamedElement, PsiNameIdentifierOwner
+{
     //TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SMKRule>
     // SnakemakeNamedElement, SnakemakeScopeOwner
 
@@ -34,9 +42,7 @@ abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode):
         return this
     }
 
-    fun getNameNode() = getIdentifierNode(node)
-
-    fun getNameElement() = getNameNode()?.psi
+    private fun getNameNode() = getIdentifierNode(node)
 
     fun getSectionByName(sectionName: String) =
             statementList.statements.find {
@@ -47,6 +53,11 @@ abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode):
 
     // iterate over children, not statements, since SMKRuleRunParameter isn't a statement
     fun getSections() = statementList.children.filterIsInstance<SMKRuleSection>()
+
+    override fun getIcon(flags: Int): Icon? {
+        PyPsiUtils.assertValid(this)
+        return SnakemakeIcons.FILE
+    }
 }
 
 fun getIdentifierNode(node: ASTNode): ASTNode? {

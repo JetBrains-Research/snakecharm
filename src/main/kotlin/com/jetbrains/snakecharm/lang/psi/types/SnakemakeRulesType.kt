@@ -1,15 +1,23 @@
 package com.jetbrains.snakecharm.lang.psi.types
 
+import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiInvalidElementAccessException
+import com.intellij.psi.PsiManager
 import com.intellij.util.ProcessingContext
+import com.jetbrains.python.codeInsight.completion.PythonCompletionWeigher
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
+import com.jetbrains.snakecharm.SnakemakeFileType
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.psi.SMKRule
 import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
 
 class SmkRulesType(smkFile: SnakemakeFile) : PyType {
@@ -27,9 +35,14 @@ class SmkRulesType(smkFile: SnakemakeFile) : PyType {
         }
 
         return ruleNamesAndPsiElements.map { (name, psi) ->
-            LookupElementBuilder
-                    .create(name)
-                    .withTypeText(psi.containingFile.name)
+            PrioritizedLookupElement.withPriority(
+                    LookupElementBuilder
+                            .createWithSmartPointer(name, psi)
+                            .withTypeText(psi.containingFile.name)
+                            .withIcon(psi.getIcon(0))
+                    ,
+                    PythonCompletionWeigher.WEIGHT_DELTA.toDouble()
+            )
         }.toTypedArray()
     }
 
@@ -59,7 +72,7 @@ class SmkRulesType(smkFile: SnakemakeFile) : PyType {
         }
 
         return namedRules.map { (_, ruleElement) ->
-            RatedResolveResult(RatedResolveResult.RATE_NORMAL, ruleElement.getNameElement())
+            RatedResolveResult(RatedResolveResult.RATE_NORMAL, ruleElement)
         }
     }
 
