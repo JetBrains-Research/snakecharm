@@ -25,7 +25,7 @@ class SMKParamsReference(
                     .toTypedArray()
 
     private fun getParamsSection() =
-            PsiTreeUtil.getParentOfType(element, SMKRule::class.java)
+            PsiTreeUtil.getParentOfType(element, SmkRuleOrCheckpoint::class.java)
             ?.getSectionByName(SMKRuleParameterListStatement.PARAMS)
 
     private fun getKeywordArguments() =
