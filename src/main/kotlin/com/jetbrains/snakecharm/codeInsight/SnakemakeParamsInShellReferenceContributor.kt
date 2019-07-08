@@ -7,6 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.codeInsight.completion.SMKKeywordCompletionContributor
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SMKParamsReference
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 import java.util.regex.Pattern
@@ -30,7 +31,7 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
 
                         val isShellCommand = PsiTreeUtil
                                 .getParentOfType(element, SMKRuleParameterListStatement::class.java)!!
-                                .section.textMatches(SMKRuleParameterListStatement.SHELL)
+                                .section.textMatches(SnakemakeNames.SECTION_SHELL)
                         if (isShellCommand) {
                             while (paramsMatcher.find()) {
                                 paramReferences.add(SMKParamsReference(element,
