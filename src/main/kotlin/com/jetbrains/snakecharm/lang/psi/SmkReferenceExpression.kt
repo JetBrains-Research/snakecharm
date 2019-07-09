@@ -4,13 +4,11 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiNamedElement
-import com.intellij.psi.PsiReference
-import com.intellij.psi.PsiReferenceBase
+import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyElementImpl
+import com.jetbrains.python.psi.resolve.RatedResolveResult
 
 class SmkReferenceExpression(node: ASTNode): PyElementImpl(node), PsiNamedElement{
     override fun getName() = getNameNode()?.text
@@ -29,14 +27,21 @@ class SmkReferenceExpression(node: ASTNode): PyElementImpl(node), PsiNamedElemen
     private fun getNameNode() = getIdentifierNode(node)
 
     private class SmkRuleOrCheckpointNameReference(
-            element: PsiElement,
+            private val element: PsiNamedElement,
             textRange: TextRange
-    ) : PsiReferenceBase<PsiElement>(element, textRange) {
+    ) : PsiReferenceBase<PsiElement>(element, textRange), PsiPolyVariantReference {
         private val key: String = element.text
 
         override fun resolve(): PsiElement? =
                 getRules().firstOrNull { it.first == key }?.second ?:
                 getCheckpoints().firstOrNull { it.first == key }?.second
+
+        override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
+            val elements = mutableListOf<PsiElement>()
+            elements.addAll(getRules().filter { it.first == key }.map { it.second })
+            elements.addAll(getCheckpoints().filter { it.first == key }.map { it.second })
+            return elements.map { RatedResolveResult(RatedResolveResult.RATE_NORMAL, it) }.toTypedArray()
+        }
 
         override fun getVariants(): Array<Any> {
             val variants = mutableListOf<LookupElement>()
@@ -52,7 +57,7 @@ class SmkReferenceExpression(node: ASTNode): PyElementImpl(node), PsiNamedElemen
         }
 
         override fun handleElementRename(newElementName: String): PsiElement =
-                element.let { (it as PsiNamedElement).setName(newElementName) }
+                element.let { it.setName(newElementName) }
 
         private fun getRules() = PsiTreeUtil.getParentOfType(element, SnakemakeFile::class.java)
                 ?.collectRules() ?: emptyList()
