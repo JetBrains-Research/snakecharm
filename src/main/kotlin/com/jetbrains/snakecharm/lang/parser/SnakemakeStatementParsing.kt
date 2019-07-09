@@ -292,7 +292,7 @@ class SnakemakeStatementParsing(
         val referenceMarker = myBuilder.mark()
         if (Parsing.isIdentifier(myBuilder)) {
             Parsing.advanceIdentifierLike(myBuilder)
-            referenceMarker.done(SnakemakeElementTypes.RULE_REFERENCE)
+            referenceMarker.done(SnakemakeElementTypes.REFERENCE_EXPRESSION)
             return true
         }
         referenceMarker.drop()

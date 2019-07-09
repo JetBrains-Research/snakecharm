@@ -4,7 +4,7 @@ SnakemakeFile: WorkflowRuleorder.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule1')
   PsiWhiteSpace('\n\n')
   SMKWorkflowRuleOrderStatement
@@ -12,17 +12,17 @@ SnakemakeFile: WorkflowRuleorder.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule1')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule2')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule3')
   PsiWhiteSpace('\n\n')
   SMKWorkflowRuleOrderStatement
@@ -30,27 +30,27 @@ SnakemakeFile: WorkflowRuleorder.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace('\n  ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule1')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule2')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('doo')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace('\n  ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('roo')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('ho')
   PsiWhiteSpace('\n\n')
   SMKWorkflowRuleOrderStatement
@@ -58,27 +58,27 @@ SnakemakeFile: WorkflowRuleorder.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule1')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule2')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('doo')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace('\n  ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('roo')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('ho')
   PsiWhiteSpace('\n\n')
   SMKWorkflowRuleOrderStatement
@@ -86,22 +86,22 @@ SnakemakeFile: WorkflowRuleorder.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace('\n    ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule1')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule2')
       PsiWhiteSpace('\n    ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule3')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace('  ')
-      SMKRuleReference
+      SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule4')
   PsiWhiteSpace('\n\n')
   PyFunction('foo')
@@ -119,10 +119,10 @@ SnakemakeFile: WorkflowRuleorder.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          SMKRuleReference
+          SmkReferenceExpression
             PsiElement(Py:IDENTIFIER)('tex2pdf_with_bib')
           PsiWhiteSpace(' ')
           PsiElement(Py:GT)('>')
           PsiWhiteSpace(' ')
-          SMKRuleReference
+          SmkReferenceExpression
             PsiElement(Py:IDENTIFIER)('tex2pdf_without_bib')

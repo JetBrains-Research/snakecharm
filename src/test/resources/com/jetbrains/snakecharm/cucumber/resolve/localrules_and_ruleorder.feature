@@ -19,10 +19,36 @@ Feature: Resolve for rules in localrules and ruleorder
     Then reference should resolve to "<symbol_name>" in "<file>"
 
     Examples:
-      | ptn             | text      | symbol_name | file         |
-      | localrules: aaa | aaaa      | aaaa        | foo.smk      |
-      | localrules: bbb | bbbb      | bbbb        | foo.smk      |
-      | localrules: ccc | cccc      | cccc        | foo.smk      |
+      | ptn                  | text       | symbol_name | file         |
+      | localrules: aaa      | aaaa       | aaaa        | foo.smk      |
+      | localrules: bbb      | bbbb       | bbbb        | foo.smk      |
+      | localrules: ccc      | cccc       | cccc        | foo.smk      |
+      | localrules: aaaa, bb | aaaa, bbbb | bbbb        | foo.smk      |
+
+  Scenario Outline: Resolve in localrules section above all rule declarations
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    localrules: <text>
+
+    rule aaaa:
+      input: "input.txt"
+
+    rule bbbb:
+      output: touch("output.txt")
+
+    checkpoint cccc:
+      output: touch("_output.txt")
+    """
+    When I put the caret after <ptn>
+    Then reference should resolve to "<symbol_name>" in "<file>"
+
+    Examples:
+      | ptn                  | text       | symbol_name | file         |
+      | localrules: aaa      | aaaa       | aaaa        | foo.smk      |
+      | localrules: bbb      | bbbb       | bbbb        | foo.smk      |
+      | localrules: ccc      | cccc       | cccc        | foo.smk      |
+      | localrules: aaaa, bb | aaaa, bbbb | bbbb        | foo.smk      |
 
   Scenario Outline: Resolve in ruleorder section
     Given a snakemake project
@@ -46,6 +72,31 @@ Feature: Resolve for rules in localrules and ruleorder
       | ptn             | text      | symbol_name | file         |
       | > bbb           | bbbb      | bbbb        | foo.smk      |
       | > ccc           | cccc      | cccc        | foo.smk      |
+
+
+  Scenario Outline: Resolve in ruleorder section above all rule declarations
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    ruleorder: aaaa > <text>
+
+    rule aaaa:
+      input: "input.txt"
+
+    rule bbbb:
+      output: touch("output.txt")
+
+    checkpoint cccc:
+      output: touch("_output.txt")
+    """
+    When I put the caret after <ptn>
+    Then reference should resolve to "<symbol_name>" in "<file>"
+
+    Examples:
+      | ptn             | text      | symbol_name | file         |
+      | > bbb           | bbbb      | bbbb        | foo.smk      |
+      | > ccc           | cccc      | cccc        | foo.smk      |
+      | ruleorder: aa   | aaaa      | aaaa        | foo.smk       |
 
 
 
