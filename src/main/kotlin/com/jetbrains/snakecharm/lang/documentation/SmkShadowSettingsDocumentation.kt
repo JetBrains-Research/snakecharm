@@ -41,5 +41,5 @@ class SmkShadowSettingsDocumentation : AbstractDocumentationProvider() {
   
     private fun PsiElement.isInShadowSection(): Boolean =
             PsiTreeUtil.getParentOfType(this, SMKRuleParameterListStatement::class.java)?.name ==
-                    SMKRuleParameterListStatement.SHADOW
+                    SnakemakeNames.SECTION_SHADOW
 }
