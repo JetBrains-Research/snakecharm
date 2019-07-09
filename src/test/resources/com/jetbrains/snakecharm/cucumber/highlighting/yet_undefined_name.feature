@@ -36,9 +36,13 @@ Feature: Yet-undefined name after rules/checkpoints
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule ANOTHER_NAME:
+    rule ANOTHER:
       input: rules.NAME
     """
     And Undefined name inspection is enabled
-    And I expect no inspection warning
+    And Unresolved reference inspection is enabled
+    Then I expect inspection warning on <NAME> with message
+    """
+    Cannot find reference 'NAME' in 'rules'
+    """
     When I check highlighting warnings
