@@ -12,7 +12,8 @@ import com.intellij.psi.PsiReferenceBase
 import com.jetbrains.python.psi.PyStringLiteralExpression
 
 open class SmkFileReference(
-        element: SMKWorkflowParameterListStatement, textRange: TextRange
+        element: SMKWorkflowParameterListStatement,
+        textRange: TextRange
 ) : PsiReferenceBase<SMKWorkflowParameterListStatement>(element, textRange) {
     private val key = element.text.substring(textRange.startOffset, textRange.endOffset)
 
