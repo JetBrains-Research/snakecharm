@@ -12,16 +12,26 @@ import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SMKRule
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
 
-class SmkRulesType(
-        private val containingRule: SMKRule?,
-        smkFile: SnakemakeFile
-) : PyType {
-    private val ruleNamesAndPsiElements = smkFile.collectRules()
 
-    override fun getName() = "rules"
+class SmkRulesType(
+        containingRule: SMKRule?,
+        smkFile: SnakemakeFile
+) : AbstractSmkRuleOrCheckpointType<SMKRule>(
+        containingRule, smkFile.collectRules(), SnakemakeNames.SMK_VARS_RULES
+)
+
+abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
+        private val containingRule: T?,
+        private val nameAndDeclarationElement: List<Pair<String, T>>,
+        private val typeName: String
+) : PyType {
+
+    override fun getName() = typeName
 
     override fun getCompletionVariants(
             completionPrefix: String?,
@@ -32,14 +42,14 @@ class SmkRulesType(
             return emptyArray()
         }
 
-        return ruleNamesAndPsiElements
-                .filter { it.first != containingRule?.name }
-                .map { (name, psi) ->
+        return nameAndDeclarationElement
+                .filter { (_, elem) -> elem != containingRule }
+                .map { (name, elem) ->
                     PrioritizedLookupElement.withPriority(
                             LookupElementBuilder
-                                    .createWithSmartPointer(name, psi)
-                                    .withTypeText(psi.containingFile.name)
-                                    .withIcon(psi.getIcon(0))
+                                    .createWithSmartPointer(name, elem)
+                                    .withTypeText(elem.containingFile.name)
+                                    .withIcon(elem.getIcon(0))
                             ,
                             PythonCompletionWeigher.WEIGHT_DELTA.toDouble()
                     )
@@ -49,7 +59,7 @@ class SmkRulesType(
     override fun assertValid(message: String?) {
         // [romeo] Not sure is our type always valid or check whether any element is invalid
 
-        val invalidItem = ruleNamesAndPsiElements.firstOrNull { !it.second.isValid }?.second
+        val invalidItem = nameAndDeclarationElement.firstOrNull { (_, elem) -> !elem.isValid }?.second
         if (invalidItem != null) {
             throw PsiInvalidElementAccessException(invalidItem, invalidItem.javaClass.toString() + ": " + message)
         }
@@ -66,13 +76,15 @@ class SmkRulesType(
             return emptyList()
         }
 
-        val namedRules = ruleNamesAndPsiElements.filter { (ruleName, _) -> ruleName == name }
-        if (namedRules.isEmpty()) {
+        val elementsWithSameName = nameAndDeclarationElement.filter { (ruleName, _) ->
+            ruleName == name
+        }
+        if (elementsWithSameName.isEmpty()) {
             return emptyList()
         }
 
-        return namedRules.map { (_, ruleElement) ->
-            RatedResolveResult(RatedResolveResult.RATE_NORMAL, ruleElement)
+        return elementsWithSameName.map { (_, element) ->
+            RatedResolveResult(RatedResolveResult.RATE_NORMAL, element)
         }
     }
 
