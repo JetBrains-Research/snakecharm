@@ -149,7 +149,7 @@
     <localInspection
             language="Snakemake" shortName="SmkYetUndefinedNameInspection"
             enabledByDefault="true"
-            level="WARNING"
+            level="ERROR"
             suppressId="SmkYetUndefinedNameInspection"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"

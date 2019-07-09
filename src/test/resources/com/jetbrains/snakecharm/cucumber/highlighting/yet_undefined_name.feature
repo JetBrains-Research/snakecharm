@@ -1,48 +1,74 @@
 Feature: Yet-undefined name after rules/checkpoints
 
-  Scenario: Name not defined yet
+  Scenario Outline: Name not defined yet
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule NAME:
-      input: rules.ANOTHER_NAME
+    <section> NAME:
+      input: <section>s.ANOTHER_NAME
 
-    rule ANOTHER_NAME:
+    <section> ANOTHER_NAME:
       input: "in.txt"
     """
     And Undefined name inspection is enabled
-    Then I expect inspection warning on <rules.ANOTHER_NAME> with message
+    Then I expect inspection error on <ANOTHER_NAME> with message
     """
     This name hasn't been defined yet: ANOTHER_NAME
     """
-    When I check highlighting warnings
+    When I check highlighting errors
+    Examples:
+    | section    |
+    | rule       |
+    | checkpoint |
 
-  Scenario: All names are defined
+  Scenario Outline: All names are defined
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule NAME:
+    <section> NAME:
       input: "a.txt"
 
-    rule ANOTHER_NAME:
-      input: rules.NAME
+    <section> ANOTHER_NAME:
+      input: <section>s.NAME
     """
     And Undefined name inspection is enabled
-    Then I expect no inspection warning
-    When I check highlighting warnings
+    Then I expect no inspection error
+    When I check highlighting errors
+    Examples:
+    | section    |
+    | rule       |
+    | checkpoint |
 
-
-  Scenario: Unresolved name isn't undefined
+  Scenario Outline: Unresolved name isn't undefined
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule ANOTHER:
-      input: rules.NAME
+    <section> ANOTHER:
+      input: <section>s.NAME
     """
     And Undefined name inspection is enabled
     And Unresolved reference inspection is enabled
     Then I expect inspection warning on <NAME> with message
     """
-    Cannot find reference 'NAME' in 'rules'
+    Cannot find reference 'NAME' in '<section>s'
     """
-    When I check highlighting warnings
+    When I check highlighting errors
+    Examples:
+    | section    |
+    | rule       |
+    | checkpoint |
+
+  Scenario Outline: No inspection in 'run' section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <section> ANOTHER:
+      run: <section>s.NAME
+    """
+    And Undefined name inspection is enabled
+    Then I expect no inspection error
+    When I check highlighting errors
+    Examples:
+    | section    |
+    | rule       |
+    | checkpoint |
