@@ -34,7 +34,7 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
                                 .section.textMatches(SnakemakeNames.SECTION_SHELL)
                         if (isShellCommand) {
                             while (paramsMatcher.find()) {
-                                paramReferences.add(SMKParamsReference(element,
+                                paramReferences.add(SMKParamsReference(element  as PyStringLiteralExpression,
                                         TextRange(paramsMatcher.start(1), paramsMatcher.end(1))))
                             }
                         }

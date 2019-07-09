@@ -146,6 +146,17 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkSubworkflowRedeclarationInspection"
     />
 
+    <localInspection
+            language="Snakemake" shortName="SmkYetUndefinedNameInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkYetUndefinedNameInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.undefined.name"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkYetUndefinedNameInspection"
+    />
+
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
 
     <findUsagesHandlerFactory
