@@ -124,5 +124,34 @@ Feature: Resolve for rules in localrules and ruleorder
       | ruleorder: aa   |
       | ruleorder: aa   |
 
+  Scenario Outline: Multiresolve in localrules section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    localrules: aaaa, bbbb
+
+    rule aaaa:
+      input: "input.txt"
+
+    rule aaaa:
+      output: touch("output.txt")
+
+    checkpoint aaaa:
+      output: touch("_output.txt")
+
+    rule bbbb:
+      output: touch("output1.txt")
+    """
+    When I put the caret after <ptn>
+    Then reference should multi resolve to name, file, times
+      | aaaa (SMKRule)       | foo.smk | 2 |
+      | aaaa (SMKCheckPoint) | foo.smk | 1 |
+
+    Examples:
+      | ptn            |
+      | localrules: aa |
+      | localrules: aa |
+      | localrules: aa |
+
 
 
