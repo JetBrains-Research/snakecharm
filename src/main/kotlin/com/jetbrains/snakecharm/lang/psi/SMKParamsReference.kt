@@ -2,16 +2,17 @@ package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.PlatformIcons
+import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 
 
 class SMKParamsReference(
-        element: PsiElement, textRange: TextRange
-) : PsiReferenceBase<PsiElement>(element, textRange) {
+        element: PyStringLiteralExpression,
+        textRange: TextRange
+) : PsiReferenceBase<PyStringLiteralExpression>(element, textRange) {
     private val key: String = element.text.substring(textRange.startOffset, textRange.endOffset)
 
     override fun resolve() =
