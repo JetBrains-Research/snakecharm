@@ -4,7 +4,10 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.*
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNamedElement
+import com.intellij.psi.PsiReference
+import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyElementImpl
@@ -47,6 +50,9 @@ class SmkReferenceExpression(node: ASTNode): PyElementImpl(node), PsiNamedElemen
             })
             return variants.toTypedArray()
         }
+
+        override fun handleElementRename(newElementName: String): PsiElement =
+                element.let { (it as PsiNamedElement).setName(newElementName) }
 
         private fun getRules() = PsiTreeUtil.getParentOfType(element, SnakemakeFile::class.java)
                 ?.collectRules() ?: emptyList()
