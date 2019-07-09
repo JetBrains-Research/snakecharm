@@ -20,13 +20,13 @@ class SmkYetUndefinedNameInspection : SnakemakeInspection() {
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
-        override fun visitPyReferenceExpression(node: PyReferenceExpression?) {
+        override fun visitPyReferenceExpression(node: PyReferenceExpression) {
             val parentRun = PsiTreeUtil.getParentOfType(node, SMKRuleRunParameter::class.java)
-            if (node?.text !in INSPECTED_KEYWORDS || parentRun != null) {
+            if (node.text !in INSPECTED_KEYWORDS || parentRun != null) {
                 return
             }
 
-            val parent = node!!.parent
+            val parent = node.parent
             val resolvedNode = parent.reference?.resolve() // Either corresponding rule or checkpoint or null
 
             if (resolvedNode != null && resolvedNode.containingFile == node.containingFile &&
