@@ -1,0 +1,78 @@
+SnakemakeFile: WorkflowRuleorderInvalid.smk
+  SMKWorkflowRuleOrderStatement
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PsiErrorElement:identifier expected
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''rule1'')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('rule2')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('rule3')
+  PsiWhiteSpace('\n\n')
+  SMKWorkflowRuleOrderStatement
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('rule4')
+      PsiErrorElement:'>' expected
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace(' ')
+        PsiElement(Py:IDENTIFIER)('rule5')
+  PsiWhiteSpace('\n\n')
+  SMKWorkflowRuleOrderStatement
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('rule6')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      PsiErrorElement:identifier expected
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''rule7'')
+  PsiWhiteSpace('\n\n')
+  SMKWorkflowRuleOrderStatement
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('rule8')
+      PsiWhiteSpace(' ')
+      PsiErrorElement:'>' expected
+        PsiElement(Py:IDENTIFIER)('rule9')
+  PsiWhiteSpace('\n\n')
+  SMKWorkflowRuleOrderStatement
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n  ')
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('rule10')
+      PsiErrorElement:Dedent expected
+        <empty list>
+  PsiWhiteSpace('\n  ')
+  PyExpressionStatement
+    PyReferenceExpression: rule11
+      PsiElement(Py:IDENTIFIER)('rule11')
+  PsiErrorElement:Statement expected, found Py:DEDENT
+    <empty list>
+  PsiWhiteSpace('\n\n')
+  SMKWorkflowRuleOrderStatement
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      SMKRuleReference
+        PsiElement(Py:IDENTIFIER)('rule12')
