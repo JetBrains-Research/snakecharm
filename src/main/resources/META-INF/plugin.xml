@@ -147,14 +147,14 @@
     />
 
     <localInspection
-            language="Snakemake" shortName="SmkUndefinedNameInspection"
+            language="Snakemake" shortName="SmkYetUndefinedNameInspection"
             enabledByDefault="true"
             level="ERROR"
-            suppressId="SmkUndefinedNameInspection"
+            suppressId="SmkYetUndefinedNameInspection"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.undefined.name"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkUndefinedNameInspection"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkYetUndefinedNameInspection"
     />
 
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>

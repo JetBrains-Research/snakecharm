@@ -4,10 +4,13 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 
-class SmkUndefinedNameInspection : SnakemakeInspection() {
+class SmkYetUndefinedNameInspection : SnakemakeInspection() {
     companion object {
-        val INSPECTED_KEYWORDS = setOf("checkpoints", "rules")
+        val INSPECTED_KEYWORDS = setOf(
+                SnakemakeNames.RULE_KEYWORD + "s",
+                SnakemakeNames.CHECKPOINT_KEYWORD + "s")
     }
 
     override fun buildVisitor(
@@ -23,9 +26,8 @@ class SmkUndefinedNameInspection : SnakemakeInspection() {
             val parent = node!!.parent
             val resolvedNode = parent.reference?.resolve() // Either corresponding rule or checkpoint or null
 
-            if (resolvedNode == null || resolvedNode.textOffset > parent.textOffset) {
-                registerProblem(parent,
-                        SnakemakeBundle.message("INSP.NAME.undefined.name") +
+            if (resolvedNode != null && resolvedNode.textOffset > parent.textOffset) {
+                registerProblem(parent,SnakemakeBundle.message("INSP.NAME.undefined.name") +
                                 ": ${(node.parent as PyReferenceExpression).name}")
             }
         }
