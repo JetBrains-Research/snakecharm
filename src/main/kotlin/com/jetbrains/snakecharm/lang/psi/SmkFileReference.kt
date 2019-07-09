@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.lang.psi
 
-import com.intellij.openapi.module.ModuleUtilCore
-import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
@@ -18,14 +17,18 @@ open class SmkFileReference(
     private val key = element.text.substring(textRange.startOffset, textRange.endOffset)
 
     protected fun collectFilesLike(predicate: (file: PsiFile) -> Boolean): Array<Any> {
-        val module = ModuleUtilCore.findModuleForPsiElement(element) ?: return emptyArray()
+        val parentDir = (element.parent as? PsiFile)?.originalFile?.virtualFile?.parent
+                ?: return emptyArray()
         val psiManager = PsiManager.getInstance(element.project)
-        return ModuleRootManager.getInstance(module).contentRoots.asSequence()
-                .flatMap { root ->
-                    VfsUtil.collectChildrenRecursively(root).asSequence()
-                }
+        return VfsUtil.collectChildrenRecursively(parentDir)
+                .asSequence()
                 .mapNotNull { psiManager.findFile(it) }
                 .filter(predicate)
+                .map {
+                    LookupElementBuilder
+                            .create(VfsUtil.getRelativeLocation(it.virtualFile, parentDir)!!)
+                            .withIcon(it.getIcon(0))
+                }
                 .toList()
                 .toTypedArray()
     }

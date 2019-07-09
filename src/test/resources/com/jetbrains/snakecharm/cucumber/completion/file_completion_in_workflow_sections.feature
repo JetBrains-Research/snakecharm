@@ -61,31 +61,3 @@ Feature: Complete file names in workflow sections
     Then completion list shouldn't contain:
     | a.yaml |
     | a.html |
-
-  Scenario Outline: All appropriate files in project are collected
-    Given a snakemake project
-    Given a file "a.<file_type>" with text
-    """
-    """
-    Given a file "A/ab.<file_type>" with text
-    """
-    """
-    Given a file "A/B/C/ac.<file_type>" with text
-    """
-    """
-    Given I open a file "foo.smk" with text
-    """
-    <section>: "a"
-    """
-    When I put the caret after a
-    And I invoke autocompletion popup
-    Then completion list should contain:
-    |a.<file_type>|
-    |ac.<file_type>|
-    |ab.<file_type>|
-    Examples:
-    | section    | file_type |
-    | include    | smk       |
-    | configfile | yaml      |
-    | configfile | yml       |
-    | report     | html      |
