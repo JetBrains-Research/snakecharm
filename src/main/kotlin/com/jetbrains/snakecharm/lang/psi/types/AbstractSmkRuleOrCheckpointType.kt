@@ -12,18 +12,8 @@ import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
-import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SMKRule
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
-import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
 
-
-class SmkRulesType(
-        containingRule: SMKRule?,
-        smkFile: SnakemakeFile
-) : AbstractSmkRuleOrCheckpointType<SMKRule>(
-        containingRule, smkFile.collectRules(), SnakemakeNames.SMK_VARS_RULES
-)
 
 abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
         private val containingRule: T?,
