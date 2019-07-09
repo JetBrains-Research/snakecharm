@@ -4,13 +4,12 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_CHECKPOINTS
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_RULES
 
 class SmkYetUndefinedNameInspection : SnakemakeInspection() {
     companion object {
-        val INSPECTED_KEYWORDS = setOf(
-                SnakemakeNames.RULE_KEYWORD + "s",
-                SnakemakeNames.CHECKPOINT_KEYWORD + "s")
+        val INSPECTED_KEYWORDS = setOf(SMK_VARS_RULES, SMK_VARS_CHECKPOINTS)
     }
 
     override fun buildVisitor(
