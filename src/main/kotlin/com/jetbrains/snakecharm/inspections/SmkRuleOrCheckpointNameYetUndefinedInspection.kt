@@ -4,44 +4,56 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyReferenceExpression
+import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_CHECKPOINTS
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_RULES
-import com.jetbrains.snakecharm.lang.psi.SMKRule
 import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.types.SmkCheckPointsType
+import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 
 class SmkRuleOrCheckpointNameYetUndefinedInspection : SnakemakeInspection() {
-    companion object {
-        val INSPECTED_KEYWORDS = setOf(SMK_VARS_RULES, SMK_VARS_CHECKPOINTS)
-    }
-
     override fun buildVisitor(
             holder: ProblemsHolder,
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {
-            val parentRun = PsiTreeUtil.getParentOfType(node, SMKRuleRunParameter::class.java)
-            if (node.text !in INSPECTED_KEYWORDS || parentRun != null) {
+            val nodeFile = node.containingFile
+            val type = TypeEvalContext.codeAnalysis(node.project, nodeFile).getType(node)
+            if (type !is SmkRulesType && type !is SmkCheckPointsType) {
                 return
             }
 
-            val parent = node.parent
-            val resolvedNode = parent.reference?.resolve() // Either corresponding rule or checkpoint or null
+            val containingRunSection = PsiTreeUtil.getParentOfType(node, SMKRuleRunParameter::class.java)
+            if (containingRunSection != null) {
+                return
+            }
 
-            if (resolvedNode != null && resolvedNode.containingFile == node.containingFile &&
-                (resolvedNode.textOffset > parent.textOffset ||
-                 resolvedNode === PsiTreeUtil.getParentOfType(node, SMKRule::class.java))) {
+            // Expected that parent is rule name, e.g. `foo` in `rules.foo` reference:
+            val ruleNameReference = node.parent as? PyReferenceExpression ?: return
 
-                val identifier = node.nextSibling.nextSibling
+            // Either corresponding rule or checkpoint or null
+            val target = ruleNameReference.reference.resolve()
+            val targetRuleLikeElem = target as? SmkRuleOrCheckpoint ?: return
+
+            // parent is
+            val ruleNameOffset = ruleNameReference.textOffset
+
+            val targetFile = targetRuleLikeElem.containingFile
+            val targetOffset = targetRuleLikeElem.textOffset
+
+            val nodeRuleLikeElem = PsiTreeUtil.getParentOfType(
+                    node, SmkRuleOrCheckpoint::class.java
+            )
+
+            if (targetFile == nodeFile
+                    && (targetOffset > ruleNameOffset || targetRuleLikeElem === nodeRuleLikeElem)) {
+
                 val message = SnakemakeBundle.message(
                         "INSP.NAME.rule.or.checkpoint.name.yet.undefined.msg",
-                            (node.parent as PyReferenceExpression).name!!
-                        )
-                registerProblem(
-                        identifier,
-                        message
+                        targetRuleLikeElem.name ?: "n/a"
                 )
+                registerProblem(ruleNameReference.nameElement?.psi, message)
             }
         }
     }
