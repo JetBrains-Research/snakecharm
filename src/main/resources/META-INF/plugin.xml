@@ -147,14 +147,14 @@
     />
 
     <localInspection
-            language="Snakemake" shortName="SmkYetUndefinedNameInspection"
+            language="Snakemake" shortName="SmkRuleOrCheckpointNameYetUndefinedInspection"
             enabledByDefault="true"
             level="ERROR"
-            suppressId="SmkYetUndefinedNameInspection"
+            suppressId="SmkRuleOrCheckpointNameYetUndefinedInspection"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.undefined.name"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkYetUndefinedNameInspection"
+            key="INSP.NAME.rule.or.checkpoint.name.yet.undefined"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkRuleOrCheckpointNameYetUndefinedInspection"
     />
 
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>

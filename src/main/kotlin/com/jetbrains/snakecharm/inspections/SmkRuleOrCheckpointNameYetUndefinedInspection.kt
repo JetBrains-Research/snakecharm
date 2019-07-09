@@ -10,7 +10,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_RULES
 import com.jetbrains.snakecharm.lang.psi.SMKRule
 import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
 
-class SmkYetUndefinedNameInspection : SnakemakeInspection() {
+class SmkRuleOrCheckpointNameYetUndefinedInspection : SnakemakeInspection() {
     companion object {
         val INSPECTED_KEYWORDS = setOf(SMK_VARS_RULES, SMK_VARS_CHECKPOINTS)
     }
@@ -32,13 +32,19 @@ class SmkYetUndefinedNameInspection : SnakemakeInspection() {
             if (resolvedNode != null && resolvedNode.containingFile == node.containingFile &&
                 (resolvedNode.textOffset > parent.textOffset ||
                  resolvedNode === PsiTreeUtil.getParentOfType(node, SMKRule::class.java))) {
+
                 val identifier = node.nextSibling.nextSibling
-                registerProblem(identifier,
-                        SnakemakeBundle.message("INSP.NAME.undefined.name") +
-                        ": ${(node.parent as PyReferenceExpression).name}")
+                val message = SnakemakeBundle.message(
+                        "INSP.NAME.rule.or.checkpoint.name.yet.undefined.msg",
+                            (node.parent as PyReferenceExpression).name!!
+                        )
+                registerProblem(
+                        identifier,
+                        message
+                )
             }
         }
     }
 
-    override fun getDisplayName(): String = SnakemakeBundle.message("INSP.NAME.undefined.name")
+    override fun getDisplayName(): String = SnakemakeBundle.message("INSP.NAME.rule.or.checkpoint.name.yet.undefined")
 }

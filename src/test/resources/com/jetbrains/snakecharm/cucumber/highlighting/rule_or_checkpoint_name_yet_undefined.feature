@@ -10,10 +10,10 @@ Feature: Yet-undefined name after rules/checkpoints
     <section> ANOTHER_NAME:
       input: "in.txt"
     """
-    And Undefined name inspection is enabled
+    And Rule or Checkpoint Name yet undefined inspection is enabled
     Then I expect inspection error on <ANOTHER_NAME> with message
     """
-    This name hasn't been defined yet: ANOTHER_NAME
+    Rule or Checkpoint name 'ANOTHER_NAME' has not been defined yet
     """
     When I check highlighting errors
     Examples:
@@ -31,7 +31,7 @@ Feature: Yet-undefined name after rules/checkpoints
     <section> ANOTHER_NAME:
       input: <section>s.NAME
     """
-    And Undefined name inspection is enabled
+    And Rule or Checkpoint Name yet undefined inspection is enabled
     Then I expect no inspection error
     When I check highlighting errors
     Examples:
@@ -46,7 +46,7 @@ Feature: Yet-undefined name after rules/checkpoints
     <section> ANOTHER:
       input: <section>s.NAME
     """
-    And Undefined name inspection is enabled
+    And Rule or Checkpoint Name yet undefined inspection is enabled
     And Unresolved reference inspection is enabled
     Then I expect inspection warning on <NAME> with message
     """
@@ -65,7 +65,7 @@ Feature: Yet-undefined name after rules/checkpoints
     <section> ANOTHER:
       run: <section>s.NAME
     """
-    And Undefined name inspection is enabled
+    And Rule or Checkpoint Name yet undefined inspection is enabled
     Then I expect no inspection error
     When I check highlighting errors
     Examples:
