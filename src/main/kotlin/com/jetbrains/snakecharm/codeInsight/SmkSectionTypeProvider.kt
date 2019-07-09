@@ -1,10 +1,13 @@
 package com.jetbrains.snakecharm.codeInsight
 
+import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.PyTypeProviderBase
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.psi.SMKCheckPoint
+import com.jetbrains.snakecharm.lang.psi.SMKRule
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_CHECKPOINTS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_RULES
 import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
@@ -27,8 +30,14 @@ class SmkSectionTypeProvider : PyTypeProviderBase() {
         // XXX: at the moment affects all "rules" variables in a *.smk file, better to
         // affect only "rules" which is resolved to appropriate place
         return when (referenceExpression.referencedName) {
-            SMK_VARS_RULES -> SmkRulesType(psiFile as SnakemakeFile)
-            SMK_VARS_CHECKPOINTS -> SmkCheckPointsType(psiFile as SnakemakeFile)
+            SMK_VARS_RULES -> SmkRulesType(
+                    PsiTreeUtil.getParentOfType(referenceExpression, SMKRule::class.java),
+                    psiFile as SnakemakeFile
+            )
+            SMK_VARS_CHECKPOINTS -> SmkCheckPointsType(
+                    PsiTreeUtil.getParentOfType(referenceExpression, SMKCheckPoint::class.java),
+                    psiFile as SnakemakeFile
+            )
             else -> null
         }
     }

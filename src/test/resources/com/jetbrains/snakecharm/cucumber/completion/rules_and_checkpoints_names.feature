@@ -24,10 +24,10 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
      <rule_like> bbbb:
        input: <rule_like>s.aaaa
      """
-  Examples:
-    | rule_like    |
-    | rule       |
-    | checkpoint |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
   Scenario Outline: Complete rule/checkpoint names in input section (multiple declarations)
     Given a snakemake project
@@ -51,9 +51,10 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
     Then completion list should contain:
       | aaaa    |
       | bbbb    |
+    And completion list shouldn't contain:
       | cccc    |
     Examples:
-      | rule_like    |
+      | rule_like  |
       | rule       |
       | checkpoint |
 
@@ -79,7 +80,7 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       | aaaa    |
       | bbbb    |
     Examples:
-      | rule_like    |
+      | rule_like  |
       | rule       |
       | checkpoint |
 

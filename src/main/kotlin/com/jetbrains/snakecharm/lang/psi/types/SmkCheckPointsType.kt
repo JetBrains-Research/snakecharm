@@ -10,9 +10,13 @@ import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.psi.SMKCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
 
-class SmkCheckPointsType(smkFile: SnakemakeFile) : PyType {
+class SmkCheckPointsType(
+        private val containingCheckpoint: SMKCheckPoint?,
+        smkFile: SnakemakeFile
+) : PyType {
     private val checkpointNamesAndPsiElements = smkFile.collectCheckPoints()
 
     override fun getName() = "checkpoints"
@@ -26,11 +30,13 @@ class SmkCheckPointsType(smkFile: SnakemakeFile) : PyType {
             return emptyArray()
         }
 
-        return checkpointNamesAndPsiElements.map { (name, psi) ->
-            LookupElementBuilder
-                    .create(name)
-                    .withTypeText(psi.containingFile.name)
-        }.toTypedArray()
+        return checkpointNamesAndPsiElements
+                .filter { it.first != containingCheckpoint?.name }
+                .map { (name, psi) ->
+                    LookupElementBuilder
+                            .create(name)
+                            .withTypeText(psi.containingFile.name)
+                }.toTypedArray()
     }
 
     override fun assertValid(message: String?) {
