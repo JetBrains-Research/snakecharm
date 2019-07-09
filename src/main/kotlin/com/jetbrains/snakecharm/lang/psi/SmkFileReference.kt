@@ -1,34 +1,74 @@
 package com.jetbrains.snakecharm.lang.psi
 
+import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiReferenceBase
 import com.jetbrains.python.psi.PyStringLiteralExpression
 
-class SmkFileReference(
-        element: PsiElement, textRange: TextRange
-) : PsiReferenceBase<PsiElement>(element, textRange) {
-    private val key: String = element.text.substring(textRange.startOffset, textRange.endOffset)
+open class SmkFileReference(
+        element: SMKWorkflowParameterListStatement, textRange: TextRange
+) : PsiReferenceBase<SMKWorkflowParameterListStatement>(element, textRange) {
+    private val key = element.text.substring(textRange.startOffset, textRange.endOffset)
+
+    protected fun collectFilesLike(predicate: (file: PsiFile) -> Boolean): Array<Any> {
+        val module = ModuleUtilCore.findModuleForPsiElement(element) ?: return emptyArray()
+        val psiManager = PsiManager.getInstance(element.project)
+        return ModuleRootManager.getInstance(module).contentRoots.asSequence()
+                .flatMap { root ->
+                    VfsUtil.collectChildrenRecursively(root).asSequence()
+                }
+                .mapNotNull { psiManager.findFile(it) }
+                .filter(predicate)
+                .toList()
+                .toTypedArray()
+    }
 
     override fun resolve(): PsiElement? {
-        val stringLiteral = (element as? SMKWorkflowParameterListStatement)?.
-                argumentList?.children?.firstOrNull {
-            it is PyStringLiteralExpression && it.text == key
+        val stringLiteral = element.argumentList?.arguments?.firstOrNull {
+            it is PyStringLiteralExpression && it.text.removeSurrounding("\"") == key
         } ?: return null
 
-        val parentFolder = stringLiteral.containingFile.virtualFile?.parent ?: return null
+        val parentFolder = element.containingFile.virtualFile?.parent ?: return null
 
-        val filePath = (stringLiteral as PyStringLiteralExpression).stringValue
+        val filePath = (stringLiteral as? PyStringLiteralExpression)?.stringValue
         val vfm = VirtualFileManager.getInstance()
 
         // Trying to find the file anywhere
-        val virtualFile = parentFolder.findFileByRelativePath(filePath) ?:
+        val virtualFile = parentFolder.findFileByRelativePath(filePath!!) ?:
         vfm.getFileSystem(LocalFileSystem.PROTOCOL).findFileByPath(filePath) ?:
         vfm.findFileByUrl(filePath)
 
         return virtualFile?.let { PsiManager.getInstance(stringLiteral.project).findFile(it) }
+    }
+}
+
+class SmkIncludeReference(
+        element: SMKWorkflowParameterListStatement, textRange: TextRange
+) : SmkFileReference(element, textRange) {
+    override fun getVariants() = collectFilesLike {
+        it is SnakemakeFile && it.name != element.containingFile.name
+    }
+}
+
+class SmkConfigfileReference(
+        element: SMKWorkflowParameterListStatement, textRange: TextRange
+) : SmkFileReference(element, textRange) {
+    override fun getVariants() = collectFilesLike {
+        it.name.endsWith(".yaml") || it.name.endsWith(".yml")
+    }
+}
+
+class SmkReportReference(
+        element: SMKWorkflowParameterListStatement, textRange: TextRange
+) : SmkFileReference(element, textRange) {
+    override fun getVariants() = collectFilesLike {
+        it.name.endsWith(".html")
     }
 }

@@ -26,18 +26,25 @@ class SMKWorkflowParameterListStatement(node: ASTNode) : PyElementImpl(node), Py
         else -> super.acceptPyVisitor(pyVisitor)
     }
 
+    private fun createReference(textRange: TextRange) =
+            when (keywordName) {
+                SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD -> SmkConfigfileReference(this, textRange)
+                SnakemakeNames.WORKFLOW_REPORT_KEYWORD -> SmkReportReference(this, textRange)
+                else -> SmkIncludeReference(this, textRange)
+            } as PsiReference
+
     override fun getReferences(): Array<PsiReference> {
         if (keywordName !in WORKFLOWS_WITH_FILE_REFERENCES) {
             return emptyArray()
         }
 
-        val stringLiteralArgs = this.argumentList?.children?.filter {
+        val stringLiteralArgs = this.argumentList?.arguments?.filter {
             it is PyStringLiteralExpression
         }
 
         return stringLiteralArgs?.map {
             val offset = keywordName!!.length + it.startOffsetInParent
-            SmkFileReference(this, TextRange(offset, offset + it.textLength)) as PsiReference
+            createReference(TextRange(offset + 1, offset + it.textLength - 1))
         }?.toTypedArray() ?: emptyArray()
     }
 
