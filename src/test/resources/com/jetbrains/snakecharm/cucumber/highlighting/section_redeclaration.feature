@@ -1,9 +1,9 @@
 Feature: Rule section redeclaration inspection
-  Scenario: No section redeclarations
+  Scenario Outline: No section redeclarations
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule NAME:
+    <rule_like> NAME:
         input: "input.txt"
         output: "output.txt"
         params: a="value"
@@ -13,12 +13,16 @@ Feature: Rule section redeclaration inspection
     Then I expect no inspection error
     And I expect no inspection warning
     When I check highlighting errors
+  Examples:
+    | rule_like  |
+    | checkpoint |
+    | rule       |
 
-  Scenario: Single section redeclaration
+  Scenario Outline: Single section redeclaration
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule NAME:
+    <rule_like> NAME:
         input: "input.txt"
         output: "output.txt"
         params: a="value", b="b_value"
@@ -31,12 +35,16 @@ Feature: Rule section redeclaration inspection
     Declaration of section 'params' above overrides this declaration.
     """
     When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
-  Scenario: Multiple section redeclarations
+  Scenario Outline: Multiple section redeclarations
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule NAME:
+    <rule_like> NAME:
         input: "input.txt"
         output: "output.txt"
         params: a="value", b="b_value"
@@ -56,6 +64,10 @@ Feature: Rule section redeclaration inspection
     Declaration of section 'params' above overrides this declaration.
     """
     When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
   Scenario: Subworkflow section redeclaration
     Given a snakemake project

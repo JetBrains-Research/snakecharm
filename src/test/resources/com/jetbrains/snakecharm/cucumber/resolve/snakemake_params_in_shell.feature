@@ -1,11 +1,11 @@
 Feature: Resolve for params in shell section
   Resolve params arguments in shell section
 
-  Scenario Outline: Resolve in shell section
+  Scenario Outline: Resolve in shell section in rules/checkpoints
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule aaaa:
+    <rule_like> aaaa:
       input: "path/to/input"
       output: "path/to/output"
       params:
@@ -19,30 +19,35 @@ Feature: Resolve for params in shell section
     Then reference should resolve to "<symbol_name>" in "<file>"
 
     Examples:
-      | ptn         | text          | symbol_name | file         |
-      | {params.out | outdir        | outdir      | foo.smk      |
-      | {params.xm  | xmx           | xmx         | foo.smk      |
-      | {params.fi  | file1         | file1       | foo.smk      |
-      | {params._fi | _file1        | _file1      | foo.smk      |
+    | rule_like  | ptn         | text          | symbol_name | file         |
+    | rule       | {params.out | outdir        | outdir      | foo.smk      |
+    | rule       | {params.xm  | xmx           | xmx         | foo.smk      |
+    | rule       | {params.fi  | file1         | file1       | foo.smk      |
+    | rule       | {params._fi | _file1        | _file1      | foo.smk      |
+    | checkpoint | {params.out | outdir        | outdir      | foo.smk      |
+    | checkpoint | {params.xm  | xmx           | xmx         | foo.smk      |
+    | checkpoint | {params.fi  | file1         | file1       | foo.smk      |
+    | checkpoint | {params._fi | _file1        | _file1      | foo.smk      |
 
-    Scenario Outline: Resolve in shell section in case of 'nested' parameters
-      Given a snakemake project
-      Given I open a file "foo.smk" with text
+  Scenario Outline: Resolve in shell section in case of 'nested' parameters in rules/checkpoints
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
       """
       import os
-      rule aaaa:
+      <rule_like> aaaa:
         input: "path/to/input"
         output: "path/to/output"
         params:
           xmx=os
         shell: "command {params.xmx<suffix>}"
       """
-      When I put the caret after {params.xm
-      Then reference should resolve to "xmx" in "foo.smk"
-      Examples:
-        | suffix   |
-        | .path    |
-        | [path]   |
-        | {'path'} |
-
-
+    When I put the caret after {params.xm
+    Then reference should resolve to "xmx" in "foo.smk"
+    Examples:
+    | rule_like  | suffix   |
+    | rule       | .path    |
+    | rule       | [path]   |
+    | rule       | {'path'} |
+    | checkpoint | .path    |
+    | checkpoint | [path]   |
+    | checkpoint | {'path'} |

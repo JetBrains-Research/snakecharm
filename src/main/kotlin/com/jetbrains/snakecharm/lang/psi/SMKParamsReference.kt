@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.PlatformIcons
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 
 
 class SMKParamsReference(
@@ -25,9 +26,8 @@ class SMKParamsReference(
                     .toTypedArray()
 
     private fun getParamsSection() =
-            PsiTreeUtil
-                    .getParentOfType(element, SMKRule::class.java)
-                    ?.getSectionByName(SMKRuleParameterListStatement.PARAMS)
+            PsiTreeUtil.getParentOfType(element, SmkRuleOrCheckpoint::class.java)
+            ?.getSectionByName(SnakemakeNames.SECTION_PARAMS)
 
     private fun getKeywordArguments() =
             getParamsSection()?.keywordArguments ?: emptyList()

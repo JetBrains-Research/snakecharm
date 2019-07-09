@@ -7,6 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyStringLiteralExpression
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 
 class SMKShadowSettingsCompletionContributor : CompletionContributor() {
@@ -33,7 +34,7 @@ object ShadowSectionSettingsProvider : CompletionProvider<CompletionParameters>(
             result: CompletionResultSet
     ) {
         val parentListStatement = PsiTreeUtil.getParentOfType(parameters.position, SMKRuleParameterListStatement::class.java)!!
-        if (parentListStatement.name == SMKRuleParameterListStatement.SHADOW) {
+        if (parentListStatement.name == SnakemakeNames.SECTION_SHADOW) {
             SHADOW_SETTINGS.forEach {
                 result.addElement(LookupElementBuilder.create(it).withIcon(PlatformIcons.PARAMETER_ICON))
             }

@@ -19,7 +19,7 @@ apply plugin: 'kotlin'
 
 def hasPythonPlugin = project.hasProperty('pythonPlugin')
 
-version '0.4.2018.3'
+version "${project.version}.${project.buildCounter}.${project.sincePlatform}"
 
 intellij {
     pluginName 'snakecharm'
@@ -52,8 +52,8 @@ publishPlugin {
 patchPluginXml {
     // Use change notes on github
     //changeNotes """ """
-    sinceBuild "183.4284.36"
-    untilBuild "192.*"
+    sinceBuild "${project.sinceBuild}"
+    untilBuild "${project.untilBuild}"
 }
 
 sourceCompatibility = javaVersion

@@ -59,3 +59,26 @@ Feature: Rule redeclaration inspection
     This rule name is already used by another rule.
     """
     When I check highlighting errors
+
+  Scenario: Checkpoint redeclaration
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    checkpoint NAME:
+        input: "input.txt"
+        output: "output.txt"
+        resources: threads=4, mem_mb=100
+        shell: "command"
+
+    rule ANOTHER_NAME:
+        output: touch("file.txt")
+
+    rule NAME: #overrides
+        output: touch("output.txt")
+    """
+    And Rule Redeclaration inspection is enabled
+    Then I expect inspection error on <NAME> in <rule NAME: #overrides> with message
+    """
+    This rule name is already used by another rule.
+    """
+    When I check highlighting errors

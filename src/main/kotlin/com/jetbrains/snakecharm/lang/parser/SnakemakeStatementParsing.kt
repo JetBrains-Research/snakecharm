@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.lang.parser
 import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyBundle
-import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.Parsing
@@ -90,19 +89,18 @@ class SnakemakeStatementParsing(
             tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
-                parsingContext.expressionParser.parseRuleParamArgumentList()
+                parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
                 workflowParam.done(SnakemakeElementTypes.WORKFLOW_PARAMETER_LIST_STATEMENT)
             }
             tt === SnakemakeTokenTypes.WORKFLOW_LOCALRULES_KEYWORD -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
 
-                val res = parsingContext.expressionParser
-                        .parseArgumentList(
-                                ",",
-                                PyTokenTypes.COMMA,
-                                SnakemakeBundle.message("PARSE.expected.identifier")
-                        ) { parseIdentifier() }
+                val res = parsingContext.expressionParser.parseArgumentList(
+                        ",", PyTokenTypes.COMMA,
+                        SnakemakeBundle.message("PARSE.expected.identifier"),
+                        this::parseIdentifier
+                )
 
                 if (!res) {
                     myBuilder.error(SnakemakeBundle.message("PARSE.expected.localrules"))
@@ -114,12 +112,12 @@ class SnakemakeStatementParsing(
                 val workflowParam = myBuilder.mark()
                 nextToken()
 
-                val res = parsingContext.expressionParser
-                        .parseArgumentList(
-                                ">",
-                                PyTokenTypes.GT,
-                                SnakemakeBundle.message("PARSE.expected.identifier")
-                        ) { parseIdentifier() }
+                val res = parsingContext.expressionParser.parseArgumentList(
+                        ">", PyTokenTypes.GT,
+                        SnakemakeBundle.message("PARSE.expected.identifier"),
+                        this::parseIdentifier
+                )
+
                 if (!res) {
                     myBuilder.error(SnakemakeBundle.message("PARSE.expected.ruleorder"))
                 }
@@ -129,7 +127,7 @@ class SnakemakeStatementParsing(
             tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS -> {
                 val decoratorMarker = myBuilder.mark()
                 nextToken()
-                checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))
+                checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
                 parseSuite()
                 decoratorMarker.done(SnakemakeElementTypes.WORKFLOW_PYTHON_BLOCK_PARAMETER)
             }
@@ -245,7 +243,7 @@ class SnakemakeStatementParsing(
             keyword in section.parameters -> {
                 // TODO: probably do this parsing behaviour by default and show inspection error
                 // for keyword not in `section.parameters` instead of parsing errors..
-                result = parsingContext.expressionParser.parseRuleParamArgumentList()
+                result = parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
                 ruleParam.done(section.parameterListStatement)
             }
             section.sectionKeyword in RULE_OR_CHECKPOINT && keyword == SMKRuleRunParameter.PARAM_NAME -> {

@@ -8,6 +8,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 
 
@@ -41,4 +42,4 @@ class SmkShadowSettingsDocumentation : AbstractDocumentationProvider() {
 
 fun PsiElement.isInShadowSection(): Boolean =
         PsiTreeUtil.getParentOfType(this, SMKRuleParameterListStatement::class.java)?.name ==
-                SMKRuleParameterListStatement.SHADOW
+                SnakemakeNames.SECTION_SHADOW
