@@ -64,7 +64,26 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         }
         var indents = if (argsOnNextLine) 1 else 0
         var argNumber = 0
-        while (!myBuilder.eof() && !atToken(PyTokenTypes.STATEMENT_BREAK)) {
+        while (!myBuilder.eof()) {
+            if (matchToken(PyTokenTypes.STATEMENT_BREAK)) {
+                if (indents > 0 && atToken(separatorTokenType)) {
+                    continue
+                }
+
+                if (matchToken(PyTokenTypes.INDENT)) {
+                    indents++
+                } else {
+                    while (!myBuilder.eof() && atToken(PyTokenTypes.DEDENT) && indents > 0) {
+                        nextToken()
+                        indents--
+                    }
+                    // leave this section
+                    if (indents == 0 || myBuilder.eof()) {
+                        break
+                    }
+                }
+            }
+
             argNumber++
 
             // separator if several args:
@@ -121,14 +140,14 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
 
             parseArgumentFunction()
         }
-        nextToken()
 
-        // Eat all matching dedents
-        while (indents > 0 && !myBuilder.eof()) {
-            if (checkMatches(PyTokenTypes.DEDENT, "Dedent expected")) { // bundle
-                indents--
-            } else {
-                break
+        if (matchToken(PyTokenTypes.STATEMENT_BREAK)) {
+            while (indents > 0 && !myBuilder.eof()) {
+                if (checkMatches(PyTokenTypes.DEDENT, "Dedent expected")) { // bundle
+                    indents--
+                } else {
+                    break
+                }
             }
         }
         argList.done(PyElementTypes.ARGUMENT_LIST)
