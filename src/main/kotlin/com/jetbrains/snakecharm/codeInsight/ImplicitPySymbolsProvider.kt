@@ -12,6 +12,7 @@ import com.intellij.openapi.roots.ModuleRootEvent
 import com.intellij.openapi.roots.ModuleRootListener
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.QualifiedName
+import com.jetbrains.extensions.python.inherits
 import com.jetbrains.python.packaging.PyPackageManager
 import com.jetbrains.python.psi.PyElement
 import com.jetbrains.python.psi.PyFile
@@ -132,15 +133,24 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
 
 
                 ////////////////////////////////////////
-                /*
-                //TODO: inside 'rule': input, output, wildcards, params
-                collectClassInstances(listOf(
-                        ("snakemake.io" to "InputFiles") to "input",
-                        ("snakemake.io" to "OutputFiles") to "output",
-                        ("snakemake.io" to "Params") to "params",
-                        ("snakemake.io" to "Wildcards") to "wildcards"
-                ), usedFiles, elementsCache, SMKContext.IN_RULE)
-                */
+                // inside 'rule run': input, output, wildcards, params
+                // snakemake.io.InputFiles
+                // snakemake.io.OutputFiles
+                // snakemake.io.Params
+                // snakemake.io.Log
+                // snakemake.io.Wildcards
+                // snakemake.io.Resources
+                collectTopLevelClassesInstancesFrom(
+                        "snakemake.io",
+                        "snakemake.io.Namedlist",
+                        SmkCodeInsightScope.RULELIKE_RUN_SECTION, usedFiles, elementsCache
+                ) { className ->
+                    when (className) {
+                        "InputFiles" -> "input"
+                        "OutputFiles" -> "output"
+                        else -> className.toLowerCase()
+                    }
+                }
 
                 ////////////////////////////////////////
                 val contentVersion = usedFiles.map { it.containingFile.virtualFile.timeStamp }.hashCode()
@@ -209,39 +219,72 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
         }
     }
 
-    /*
     private fun collectClassInstances(
-            moduleClassAndInstanceName: List<Pair<Pair<String, String>, String>>,
+            moduleClassAndVariableName: List<Pair<Pair<String, String>, String>>,
+            scope: SmkCodeInsightScope,
             usedFiles: MutableList<PsiFile>,
-            elementsCache: MutableList<Pair<String, PyElement>>,
-            context: SMKContext
+            elementsCache: MutableList<ImplicitPySymbol>
     ) {
-        moduleClassAndInstanceName.forEach { (moduleFqnAndClass, varName) ->
+        moduleClassAndVariableName.forEach { (moduleFqnAndClass, varName) ->
             val (pyModuleFqn, className) = moduleFqnAndClass
             val pyFiles = collectPyFiles(pyModuleFqn, usedFiles)
 
             pyFiles
+                    .asSequence()
                     .filter { it.isValid }
                     .mapNotNull { it.findTopLevelClass(className) }
                     .forEach { pyClass ->
                         val constructor = pyClass.findInitOrNew(
-                                false,
+                                false, //TODO false
                                 TypeEvalContext.userInitiated(
                                         pyClass.project,
                                         pyClass.originalElement.containingFile
                                 ))
 
-                        elementsCache.add(Trinity(
-                                pyClass.name!!,
+                        elementsCache.add(ImplicitPySymbol(
+                                varName,
                                 (constructor ?: pyClass) as PyElement,
-                                context
+                                scope
                         ))
-
-                        // TODO: varName
                     }
         }
     }
-     */
+
+    private fun collectTopLevelClassesInstancesFrom(
+            pyModuleFqn: String,
+            parentClassRequirement: String?,
+            scope: SmkCodeInsightScope,
+            usedFiles: MutableList<PsiFile>,
+            elementsCache: MutableList<ImplicitPySymbol>,
+            className2VarNameFun: (String) -> String
+    ) {
+        val pyFiles = collectPyFiles(pyModuleFqn, usedFiles)
+
+        // collect top level classes inherited from [parentClassRequirement]:
+        pyFiles
+                .asSequence()
+                .filter { it.isValid }
+                .flatMap { it.topLevelClasses.asSequence() }
+                .filter { it.name != null }
+                .forEach { pyClass ->
+                    val typeEvalContext = TypeEvalContext.userInitiated(
+                            pyClass.project,
+                            pyClass.originalElement.containingFile
+                    )
+                    val constructor = pyClass.findInitOrNew(
+                            false, //TODO true
+                             typeEvalContext
+                    )
+
+                    if (parentClassRequirement == null || pyClass.inherits(typeEvalContext, parentClassRequirement)) {
+                        val varName = className2VarNameFun(pyClass.name!!)
+                        elementsCache.add(ImplicitPySymbol(
+                                varName,
+                                (constructor ?: pyClass) as PyElement, scope
+                        ))
+                    }
+                }
+    }
 
     private fun collectMethods(
             moduleAndMethod: List<Pair<String, String>>,

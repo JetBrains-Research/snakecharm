@@ -79,15 +79,60 @@ Feature: Completion in python part of snakemake file
     When I put the caret after run:
     And I invoke autocompletion popup
     Then completion list should contain:
-    | expand      |
-    | config      |
-    | rules       |
-    | shell       |
-# TODO implement:
-#    | input       |
-#    | output       |
-#    | params       |
-#    | wildcards       |
+    | expand    |
+    | config    |
+    | rules     |
+    | shell     |
+    | input     |
+    | output    |
+    | params    |
+    | wildcards |
+    | resources |
+    | log       |
+    | threads   |
+
+
+  Scenario: Not-completed in rule outside run section
+     Given a snakemake project
+     Given I open a file "foo.smk" with text
+     """
+      rule NAME:
+        log:
+          foo = 1
+     """
+     When I put the caret at foo = 1
+     And I invoke autocompletion popup
+     Then completion list shouldn't contain:
+     | output    |
+     | params    |
+     | wildcards |
+     | wildcards |
+     | resources |
+     | log       |
+     | threads   |
+
+  Scenario Outline: Not-completed in top level python block
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <block>:
+         foo = 1
+      """
+    When I put the caret at foo = 1
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | output    |
+      | params    |
+      | wildcards |
+      | wildcards |
+      | resources |
+      | log       |
+      | threads   |
+    Examples:
+      | block     |
+      | onstart   |
+      | onerror   |
+      | onsuccess |
 
 
   Scenario Outline: Parenthesis inserted after method completion
@@ -105,7 +150,7 @@ Feature: Completion in python part of snakemake file
       | item    | inserted_text |
       | expand  | expand()      |
       | config  | config        |
-# XXX     | shell   | shell()       |
+      | shell   | shell()       |
 
   #noinspection SpellCheckingInspection
   Scenario: Complete in not-empty context

@@ -12,8 +12,8 @@ abstract class SmkSectionStatement(node: ASTNode): PyElementImpl(node), PyStatem
 
     open fun getNameNode() = getIdentifierNode(node)
 
-    open val section: PsiElement
-        get() = firstChild
+    open val section: PsiElement?
+        get() = getNameNode()?.psi
 
     open val keywordArguments: List<PyKeywordArgument>?
         get() = argumentList?.arguments?.filterIsInstance<PyKeywordArgument>()

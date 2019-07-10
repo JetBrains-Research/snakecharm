@@ -53,7 +53,7 @@ abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode): PyElementI
 
     fun getSectionByName(sectionName: String) =
             statementList.statements.find {
-                (it as SmkSectionStatement).section.textMatches(sectionName)
+                (it as SmkSectionStatement).section?.textMatches(sectionName) == true
             } as? T
 
     override fun getStatementList() = childToPsiNotNull<PyStatementList>(PyElementTypes.STATEMENT_LIST)

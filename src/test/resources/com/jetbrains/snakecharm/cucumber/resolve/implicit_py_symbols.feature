@@ -81,22 +81,104 @@ Feature: Resolve implicitly imported python names
     rule NAME:
       output: "path/to/output"
       run:
-        <text>
+        <text> #here
     """
     When I put the caret at <ptn>
-    Then reference should resolve to "<symbol_name>" in "<file>"
+    Then reference should multi resolve to name, file, times[, class name]
+      | <symbol_name> | <file> | <times> |
 
     Examples:
-      | ptn    | text        | symbol_name | file        |
-      | exp    | expand()    | expand      | io.py       |
-      | she    | shell()     | __new       | shell.py    |
-      | con    | config["a"] | config      | workflow.py |
-      | rules  | rules.foo   | rules       | workflow.py |
-# TODO: implement:
-#      | inp    | input[0]    | input       | io.py       |
-#      | out    | output.foo  | output      | io.py       |
-#      | par    | params      | params      | xx.py       |
-#      | wil    | wildcards   | wildcards   | xx.py       |
+      | ptn        | text        | symbol_name | file        | times |
+      | exp        | expand()    | expand      | io.py       | 1     |
+      | she        | shell()     | __new__     | shell.py    | 1     |
+      | con        | config["a"] | config      | workflow.py | 1     |
+      | rules      | rules.foo   | rules       | workflow.py | 1     |
+      | inp        | input[0]    | InputFiles  | io.py       | 1     |
+      | output.foo | output.foo  | OutputFiles | io.py       | 1     |
+      | par        | params      | Params      | io.py       | 1     |
+      | wil        | wildcards   | Wildcards   | io.py       | 1     |
+      | res        | resources   | Resources   | io.py       | 1     |
+      | lo         | log         | Log         | io.py       | 1     |
+
+  Scenario Outline: Resolve threads inside run section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      output: "path/to/output"
+      <text>
+      run:
+        threads #here
+    """
+    When I put the caret at threads #here
+    Then reference should multi resolve to name, file, times[, class name]
+      | <symbol_name> | <file> | <times> | <class> |
+
+    Examples:
+      | rule_like  | text       | symbol_name | file    | times | class                         |
+      | rule       | threads: 1 | threads: 1  | foo.smk | 1     | SMKRuleParameterListStatement |
+      | rule       | log: ""    | NAME        | foo.smk | 1     | SMKRule                       |
+      | checkpoint | log: ""    | NAME        | foo.smk | 1     | SMKCheckPoint                 |
+
+  Scenario Outline: Not-resolved threads if part of reference
+        Given a snakemake project
+        Given I open a file "foo.smk" with text
+        """
+        <rule_like> NAME:
+            threads: 1
+            run:
+              a.threads #here
+        """
+        When I put the caret after a.thr
+        Then reference should not multi resolve to files
+         | foo.smk |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Not-resolved in rule outside run section
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        log:
+          <text> #here
+      """
+      When I put the caret at <ptn>
+      Then reference should not resolve
+
+    Examples:
+      | rule_like  | ptn       | text       |
+      | rule       | out       | output.foo |
+      | rule       | par       | params     |
+      | rule       | wild      | wildcards  |
+      | rule       | res       | resources  |
+      | rule       | log #here | log        |
+      | rule       | thr       | threads    |
+      | checkpoint | out        | output.foo |
+      | checkpoint | wild      | wildcards  |
+
+  Scenario Outline: Not-resolved in top level python block
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+       """
+       <block>:
+           <text>
+       """
+    When I put the caret at <ptn>
+    Then reference should not resolve
+
+    Examples:
+      | block     | ptn | text       |
+      | onstart   | out | output.foo |
+      | onstart   | par | params     |
+      | onstart   | wil | wildcards  |
+      | onstart   | res | resources  |
+      | onstart   | lo  | log        |
+      | onstart   | thr | threads    |
+      | onerror   | wil | wildcards  |
+      | onsuccess | wil | wildcards  |
 
   Scenario: Resolve also works inside call args
     Given a snakemake project

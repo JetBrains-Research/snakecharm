@@ -6,11 +6,15 @@ import com.intellij.patterns.PatternCondition
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.resolve.CompletionVariantsProcessor
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
+import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
 class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
     companion object {
@@ -61,6 +65,13 @@ class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
                         processor.addElement(symbol.identifier, symbol.psiDeclaration)
                     }
 
+            if (contextScope == SmkCodeInsightScope.RULELIKE_RUN_SECTION) {
+                val ruleOrCheckpoint = contextElement.parentOfType<SmkRuleOrCheckpoint>()!!
+                val threadsSection = ruleOrCheckpoint.statementList.statements.asSequence()
+                        .filterIsInstance<SMKRuleParameterListStatement>()
+                        .filter { it.name == SnakemakeNames.SECTION_THREADS }.firstOrNull()
+                processor.addElement("threads", threadsSection ?: ruleOrCheckpoint)
+            }
             result.addAllElements(processor.resultList)
         }
     }

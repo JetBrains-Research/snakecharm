@@ -17,7 +17,7 @@ import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.inspections.*
 import cucumber.api.java.en.Given
-import junit.framework.Assert.fail
+import kotlin.test.fail
 
 
 /**

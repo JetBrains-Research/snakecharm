@@ -73,7 +73,7 @@ class CompletionResolveSteps {
             assertNotNull(ref)
             val result = resolve(ref)
             assertNotNull(result)
-            val containingFile = result!!.containingFile
+            val containingFile = result.containingFile
             assertNotNull(containingFile)
             assertEquals(file, containingFile.name)
 
@@ -82,7 +82,7 @@ class CompletionResolveSteps {
         }
     }
 
-    @Then("^reference should multi resolve to name, file, times$")
+    @Then("^reference should multi resolve to name, file, times\\[, class name\\]$")
     fun referenceShouldMultiResolveToIn(table: DataTable) {
         ApplicationManager.getApplication().runReadAction {
             val ref = getReferenceAtOffset()
@@ -93,10 +93,13 @@ class CompletionResolveSteps {
             assertEquals(0, results.filter { it == null }.size)
             assertEquals(0, results.filter { it!!.containingFile == null }.size)
 
-            val completionList = results
+            val completionListKey2 = results
                     .map { result ->
                         when (result){
-                            is PsiNamedElement -> "${result.name} (${result.javaClass.simpleName})"
+                            is PsiNamedElement -> {
+                                "${result.name}"
+                                // "${result.name} (${result.textRange})"
+                            }
                             else -> result!!.text
                         } to result.containingFile.name
                     }
@@ -104,24 +107,73 @@ class CompletionResolveSteps {
                     .map { entry -> entry.key to entry.value.size }
                     .toMap()
 
+            val completionListKey3 = results
+                    .map { result ->
+                        Triple(when (result) {
+                            is PsiNamedElement -> {
+                                "${result.name}"
+                                // "${result.name} (${result.textRange})"
+                            }
+                            else -> result!!.text
+                        }, result.javaClass.simpleName, result.containingFile.name)
+                    }
+                    .groupBy { it }
+                    .map { entry -> entry.key to entry.value.size }
+                    .toMap()
+
             val records = table.asLists(String::class.java)
 
-            val actualRefsInfo = completionList.entries.joinToString(separator = "\n") {(nameAndFile, times) ->
-                "|${nameAndFile.first}| ${nameAndFile.second} | $times |"
+            val actualRefsInfo = completionListKey3.entries.joinToString(separator = "\n") { (nameAndFile, times) ->
+                "|${nameAndFile.first}| ${nameAndFile.third} | $times | ${nameAndFile.second} |"
             }
 
             records.forEach { row ->
-                val key = row[0] to row[1]
                 val expectedTimes = row[2].toInt()
-                val actualTimes = completionList.getOrDefault(key, 0)
+                val expectedClassName = if (row.size >= 4) row[3] else null
+
+                val (key, actualTimes) = if (expectedClassName == null) {
+                    val key = row[0] to row[1]
+                    key to completionListKey2.getOrDefault(key, 0)
+                } else {
+                    val key = Triple(row[0], expectedClassName, row[1])
+                    key to completionListKey3.getOrDefault(key, 0)
+                }
+
                 assertEquals(
-                        expectedTimes, actualTimes,
+                        actualTimes, expectedTimes,
                         "Expected $expectedTimes but was $actualTimes occurrences of $key." +
                                 " Actual refs:\n$actualRefsInfo\n"
                 )
             }
         }
     }
+
+    @Then("^reference should not multi resolve to files$")
+    fun referenceShouldNotMultiResolveToIn(table: DataTable) {
+        ApplicationManager.getApplication().runReadAction {
+            val ref = getReferenceAtOffset()
+            assertNotNull(ref)
+
+            val results = multiResolve(ref)
+
+            assertEquals(0, results.filter { it == null }.size)
+            assertEquals(0, results.filter { it!!.containingFile == null }.size)
+
+            val completionList = results.map { it!!.containingFile.name }
+            val actualRefsInfo = results.joinToString(separator = "\n") {el ->
+                "|${el!!.containingFile.name} | # ${ if (el is PsiNamedElement) el.name else el.text}"
+            }
+
+            table.asList(String::class.java).forEach { fileName ->
+                assertTrue(
+                        fileName !in completionList,
+                        "Expected no items from $fileName in completion list." +
+                                " Actual refs:\n$actualRefsInfo\n"
+                )
+            }
+        }
+    }
+
 
     @When("^I invoke autocompletion popup$")
     fun iInvokeAutocompletionPopup() {

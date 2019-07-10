@@ -14,9 +14,11 @@ import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.myGeneratedDocPopupText
 import cucumber.api.java.en.Given
 import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
-import junit.framework.Assert.*
 import java.io.File.separator
 import java.util.regex.Pattern
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
+import kotlin.test.fail
 
 
 class ActionsSteps {
@@ -51,8 +53,9 @@ class ActionsSteps {
         val document = PsiDocumentManager.getInstance(fixture.project).getDocument(fixture.file)!!
         val pos = document.text.indexOf(signature)
         assertTrue(
-                "Signature <$signature> wasn't found in the file ${psiFile.name}.",
-                pos >= 0
+                pos >= 0,
+                "Signature <$signature> wasn't found in the file ${psiFile.name}."
+
         )
 
         val posInSignature = signature.indexOf(text)
@@ -107,8 +110,8 @@ class ActionsSteps {
         val docPopupText = myGeneratedDocPopupText
         assertNotNull(docPopupText)
         assertTrue(
-                "Expected <$text> to be in <$docPopupText>",
-                text in docPopupText!!
+                text in docPopupText,
+                "Expected <$text> to be in <$docPopupText>"
         )
     }
 
