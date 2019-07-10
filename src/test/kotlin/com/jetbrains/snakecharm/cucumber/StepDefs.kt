@@ -68,7 +68,7 @@ class StepDefs {
             val flow = ControlFlowCache.getControlFlow(SnakemakeWorld.fixture().file as PyFile)
             flow.instructions.joinToString(separator = "\n")
         })
-        UsefulTestCase.assertSameLines(expectedCFG.trim(), actualCFG.trim())
+        UsefulTestCase.assertSameLines(expectedCFG.replace("\r", "").trim(), actualCFG.trim())
     }
 
     @Given("^([^\\]]+) inspection is enabled$")
