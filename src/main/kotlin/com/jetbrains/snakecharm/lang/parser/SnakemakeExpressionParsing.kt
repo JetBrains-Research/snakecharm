@@ -15,6 +15,20 @@ import com.jetbrains.snakecharm.SnakemakeBundle
  * @author Roman.Chernyatchik
  * @date 2019-01-04
  */
+/**
+ * IMPORTANT! PLEASE READ BEFORE MODIFYING PARSER CODE OR DEBUGGING!
+ * Due to SnakemakeStatementParsing utilizing filter method when the parser has entered a rule section,
+ * behaviour in debug and at runtime could differ.
+ * Be careful when using any method which calls getTokenType() (such as atToken(), matchToken(), etc.),
+ * as getTokenType() skips whitespace tokens and applies filter, substituting tokenTypes in myBuilder.myLexTypes().
+ * Meanwhile nextToken() only advances lexer by one lexeme and does not look at the current token.
+ * getTokenType() might be called during debug and apply filter, while it would not be called at runtime,
+ * thus the different behaviour.
+ *
+ * If you need to check the current token type, best to avoid debugging in IDE and to use debug print.
+ * One can get the current token type without filter via a call to myBuilder.rawLookup(0).
+ * However, it's best to keep rawLookup() calls to a minimum.
+ */
 class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionParsing(context) {
     override fun getParsingContext() = myContext as SnakemakeParserContext
 
@@ -69,29 +83,18 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         var incorrectUnindentMarker: PsiBuilder.Marker? = null
         while (!myBuilder.eof()) {
             if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
-                println(myBuilder.rawLookup(2))
                 nextToken()
-                println(myBuilder.rawLookup(1))
-                /*
-                 * IMPORTANT: PLEASE READ BEFORE MODIFYING OR DEBUGGING!
-                 * if you check token type here or anywhere else via any method that uses getTokenType(),
-                 * e.g. atToken(), matchToken(), etc.,
-                 * it might apply filter and change the token type,
-                 * while nextToken() does not do that,
-                 * it just increases the current lexeme number, doesn't look at the token.
-                 * use myBuilder.rawLookup(0) to check the current token type without filter application
-                 */
+                // It's important to use rawLookup() here to avoid accidentally applying a filter to the current token.
                 if (indents == 0 &&
                         !findTokenRawLookup(separatorTokenType) &&
                         !findTokenRawLookup(PyTokenTypes.INDENT) &&
                         !findTokenRawLookup(PyTokenTypes.INCONSISTENT_DEDENT) &&
                         !findTokenRawLookup(PyTokenTypes.DEDENT)) {
-                    println(myBuilder.rawLookup(1))
                     break
                 }
 
                 /*
-                 * if an indent/dedent/inconsistent dedent/separator token was found,
+                 * If an indent/dedent/inconsistent dedent/separator token was found,
                  * it's ok to match it, no filters will be applied
                  */
                 if (indents > 0 && atToken(separatorTokenType)) {
@@ -102,26 +105,21 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                     indents++
                 } else {
                     // IMPORTANT: note that myBuilder.eof() could apply filter to lexemes
+                    // which is why it must be evaluated second
                     while (indents > 0 && !myBuilder.eof()) {
                         // IMPORTANT: keep this check inside the loop body
                         /* atToken() uses getTokenType() which might apply a filter to the current token
-                           whether or not this token is actually DEDENT */
-                        // atToken(PyTokenTypes.DEDENT)
-                        println("in dedent check loop:" + myBuilder.rawLookup(0))
-                        if (myBuilder.rawLookup(0) == PyTokenTypes.DEDENT) {
-                            println("after dedent:" + myBuilder.rawLookup(1))
+                           whether or not this token is actually DEDENT,
+                           which is why it's best not to invoke this method unless necessary. */
+                        if (atToken(PyTokenTypes.DEDENT)) {
                             nextToken()
-                            println("after dedent:" + myBuilder.rawLookup(0))
                             indents--
-                            println("after indents--:" + myBuilder.rawLookup(0))
                         } else {
-                            println("after dedent check loop in break:" + myBuilder.rawLookup(0))
                             break
                         }
                     }
                     // leave this section
                     if (indents == 0 || myBuilder.eof()) {
-                        println("when you leave section:" + myBuilder.rawLookup(0))
                         break
                     }
                 }
@@ -191,12 +189,12 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             }
 
             parseArgumentFunction()
+            // mark everything that was incorrectly unindented
             incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
             incorrectUnindentMarker = null
         }
 
-        println("in the end before the statement break match " + myBuilder.rawLookup(0))
-        if (myBuilder.rawLookup(0) == PyTokenTypes.STATEMENT_BREAK) {
+        if (checkCurrentTokenSafe(PyTokenTypes.STATEMENT_BREAK)) {
             nextToken()
             while (indents > 0 && !myBuilder.eof()) {
                 if (checkMatches(PyTokenTypes.DEDENT, SnakemakeBundle.message("PARSE.expected.dedent"))) {
@@ -282,4 +280,6 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         }
         return myBuilder.rawLookup(steps) == tokenType
     }
+
+    private fun checkCurrentTokenSafe(tokenType: IElementType) = myBuilder.rawLookup(0) == tokenType
 }
