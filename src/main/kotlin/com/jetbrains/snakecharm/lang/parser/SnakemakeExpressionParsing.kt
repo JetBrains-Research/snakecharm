@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.lang.parser
 
+import com.intellij.lang.impl.PsiBuilderImpl
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyElementTypes
@@ -65,7 +66,31 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         var indents = if (argsOnNextLine) 1 else 0
         var argNumber = 0
         while (!myBuilder.eof()) {
-            if (matchToken(PyTokenTypes.STATEMENT_BREAK)) {
+            if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
+                println(myBuilder.rawLookup(2))
+                nextToken()
+                println(myBuilder.rawLookup(1))
+                /*
+                 * IMPORTANT: PLEASE READ BEFORE MODIFYING OR DEBUGGING!
+                 * if you check token type here or anywhere else via any method that uses getTokenType(),
+                 * e.g. atToken(), matchToken(), etc.,
+                 * it might apply filter and change the token type,
+                 * while nextToken() does not do that,
+                 * it just increases the current lexeme number, doesn't look at the token
+                 */
+                if (indents == 0 &&
+                        !findTokenRawLookup(separatorTokenType) &&
+                        !findTokenRawLookup(PyTokenTypes.INDENT) &&
+                        !findTokenRawLookup(PyTokenTypes.INCONSISTENT_DEDENT) &&
+                        !findTokenRawLookup(PyTokenTypes.DEDENT)) {
+                    println(myBuilder.rawLookup(1))
+                    break
+                }
+
+                /*
+                 * if an indent/dedent/inconsistent dedent/separator token was found,
+                 * it's ok to match it, no filters will be applied
+                 */
                 if (indents > 0 && atToken(separatorTokenType)) {
                     continue
                 }
@@ -73,9 +98,20 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 if (matchToken(PyTokenTypes.INDENT)) {
                     indents++
                 } else {
-                    while (!myBuilder.eof() && atToken(PyTokenTypes.DEDENT) && indents > 0) {
-                        nextToken()
-                        indents--
+                    while (!myBuilder.eof() && indents > 0) {
+                        if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
+                            myBuilder.error("Unindent does not match any outer indentation level")
+                            nextToken()
+                        }
+                        // IMPORTANT: keep this check inside the loop body
+                        /* atToken() uses getTokenType() which might apply a filter to the current token
+                           whether or not this token is actually DEDENT */
+                        else if (atToken(PyTokenTypes.DEDENT)) {
+                            nextToken()
+                            indents--
+                        } else {
+                            break
+                        }
                     }
                     // leave this section
                     if (indents == 0 || myBuilder.eof()) {
@@ -141,7 +177,8 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             parseArgumentFunction()
         }
 
-        if (matchToken(PyTokenTypes.STATEMENT_BREAK)) {
+        if (myBuilder.rawLookup(0) == PyTokenTypes.STATEMENT_BREAK) {
+            nextToken()
             while (indents > 0 && !myBuilder.eof()) {
                 if (checkMatches(PyTokenTypes.DEDENT, "Dedent expected")) { // bundle
                     indents--
@@ -151,7 +188,6 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             }
         }
         argList.done(PyElementTypes.ARGUMENT_LIST)
-
         return true
     }
 
@@ -216,5 +252,15 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         } else {
             errorMarker.drop()
         }
+    }
+
+    private fun findTokenRawLookup(tokenType: IElementType): Boolean {
+        var steps = 0
+        // TODO can it somehow be not PsiBuilderImpl?
+        while (myBuilder.rawLookup(steps) != null &&
+                (myBuilder as PsiBuilderImpl).whitespaceOrComment(myBuilder.rawLookup(steps))) {
+            steps++
+        }
+        return myBuilder.rawLookup(steps) == tokenType
     }
 }
