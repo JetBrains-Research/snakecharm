@@ -312,7 +312,6 @@ Feature: Completion for snakemake keyword-like things
     When I put the caret at <ptn>
     And I invoke autocompletion popup
     Then completion list shouldn't contain:
-      | output     |
       | message    |
       | run        |
     Examples:
