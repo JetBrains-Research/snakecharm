@@ -15,10 +15,6 @@ class SMKRuleRunParameter(node: ASTNode): PyElementImpl(node),
         ScopeOwner, // for control flow
         PyStatement, PyStatementListContainer, PyDocStringOwner
 {
-    companion object {
-        const val PARAM_NAME = "run"
-    }
-
     override fun getStatementList(): PyStatementList =
             childToPsi(PyElementTypes.STATEMENT_LIST) ?: error("Statement list missing for run section $text")
 

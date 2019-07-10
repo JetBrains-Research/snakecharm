@@ -44,6 +44,7 @@ object SnakemakeNames {
     const val SECTION_WRAPPER = "wrapper"
     const val SECTION_CWL = "cwl"
     const val SECTION_SHADOW = "shadow"
+    const val SECTION_RUN = "run"
 
     const val SMK_VARS_RULES = "rules"
     const val SMK_VARS_CHECKPOINTS = "checkpoints"

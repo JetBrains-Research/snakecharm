@@ -14,6 +14,7 @@ import com.jetbrains.python.codeInsight.completion.PythonLookupElement
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.RULE_LIKE
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE
@@ -130,7 +131,7 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
             context: ProcessingContext,
             result: CompletionResultSet
     ) {
-        (SMKRuleParameterListStatement.PARAMS_NAMES + setOf(SMKRuleRunParameter.PARAM_NAME)).forEach { s ->
+        (SMKRuleParameterListStatement.PARAMS_NAMES + setOf(SnakemakeNames.SECTION_RUN)).forEach { s ->
 
             result.addElement(
                     TailTypeDecorator.withTail(

@@ -7,11 +7,11 @@ import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.parsing.StatementParsing
-import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.python.psi.PyElementType
+import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.RULE_OR_CHECKPOINT
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
-import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
 import com.jetbrains.snakecharm.lang.psi.SMKSubworkflowParameterListStatement
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SnakemakeElementTypes
 
@@ -246,7 +246,7 @@ class SnakemakeStatementParsing(
                 result = parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
                 ruleParam.done(section.parameterListStatement)
             }
-            section.sectionKeyword in RULE_OR_CHECKPOINT && keyword == SMKRuleRunParameter.PARAM_NAME -> {
+            section.sectionKeyword in RULE_OR_CHECKPOINT && keyword == SnakemakeNames.SECTION_RUN -> {
                 checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
                 statementParser.parseSuite()
                 ruleParam.done(SnakemakeElementTypes.RULE_RUN_STATEMENT)
