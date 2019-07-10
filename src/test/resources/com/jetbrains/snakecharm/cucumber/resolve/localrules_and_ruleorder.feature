@@ -114,9 +114,9 @@ Feature: Resolve for rules in localrules and ruleorder
       output: touch("_output.txt")
     """
     When I put the caret after <ptn>
-    Then reference should multi resolve to name, file, times
-      | aaaa (SMKRule)       | foo.smk | 2 |
-      | aaaa (SMKCheckPoint) | foo.smk | 1 |
+    Then reference should multi resolve to name, file, times[, class name]
+      | aaaa | foo.smk | 2 | SMKRule       |
+      | aaaa | foo.smk | 1 | SMKCheckPoint |
 
     Examples:
       | ptn             |
@@ -143,9 +143,9 @@ Feature: Resolve for rules in localrules and ruleorder
       output: touch("output1.txt")
     """
     When I put the caret after <ptn>
-    Then reference should multi resolve to name, file, times
-      | aaaa (SMKRule)       | foo.smk | 2 |
-      | aaaa (SMKCheckPoint) | foo.smk | 1 |
+    Then reference should multi resolve to name, file, times[, class name]
+      | aaaa | foo.smk | 2 | SMKRule       |
+      | aaaa | foo.smk | 1 | SMKCheckPoint |
 
     Examples:
       | ptn            |
