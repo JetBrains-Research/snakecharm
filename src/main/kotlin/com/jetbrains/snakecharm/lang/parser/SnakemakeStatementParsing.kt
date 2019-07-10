@@ -7,8 +7,8 @@ import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.parsing.StatementParsing
-import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.RULE_OR_CHECKPOINT
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
@@ -117,6 +117,7 @@ class SnakemakeStatementParsing(
                         SnakemakeBundle.message("PARSE.expected.identifier"),
                         this::parseIdentifier
                 )
+
                 if (!res) {
                     myBuilder.error(SnakemakeBundle.message("PARSE.expected.ruleorder"))
                 }
@@ -289,7 +290,7 @@ class SnakemakeStatementParsing(
         val referenceMarker = myBuilder.mark()
         if (Parsing.isIdentifier(myBuilder)) {
             Parsing.advanceIdentifierLike(myBuilder)
-            referenceMarker.done(SnakemakeElementTypes.RULE_REFERENCE)
+            referenceMarker.done(SnakemakeElementTypes.REFERENCE_EXPRESSION)
             return true
         }
         referenceMarker.drop()
