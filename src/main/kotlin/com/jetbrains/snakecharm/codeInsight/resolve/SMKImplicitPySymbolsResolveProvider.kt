@@ -5,7 +5,8 @@ import com.jetbrains.python.psi.PyQualifiedExpression
 import com.jetbrains.python.psi.resolve.PyReferenceResolveProvider
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.TypeEvalContext
-import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache
+import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
+import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 
 class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
@@ -16,10 +17,15 @@ class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
         if (SnakemakeLanguageDialect.isInsideSmkFile(context.origin)) {
             val module = ModuleUtilCore.findModuleForPsiElement(element)
             if (module != null) {
-                val elements = ImplicitPySymbolsCache.instance(module).find(element.name!!)
-                if (elements.isNotEmpty()) {
-                    return elements.map { RatedResolveResult(RatedResolveResult.RATE_NORMAL, it) }
-                }
+                val contextScope = SmkCodeInsightScope[element]
+                val cache = ImplicitPySymbolsProvider.instance(module).cache
+
+                return SmkCodeInsightScope.values().asSequence()
+                        .filter { symbolScope -> contextScope.includes(symbolScope) }
+                        .flatMap { symbolScope -> cache.filter(symbolScope, element.name!!).asSequence() }
+                        .map {
+                            RatedResolveResult(RatedResolveResult.RATE_NORMAL, it.psiDeclaration)
+                        }.toList()
             }
         }
         return emptyList()

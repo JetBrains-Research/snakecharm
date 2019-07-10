@@ -28,10 +28,15 @@ import javax.swing.SwingUtilities
  * @date 2019-05-07
  */
 class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
+    @Volatile
+    var cache: ImplicitPySymbolsCache = ImplicitPySymbolsCache.emptyCache()
+        private set
+
     companion object {
         private val LOG = logger<ImplicitPySymbolsProvider>() // TODO: cleanup
         fun instance(module: Module) = module.getComponent(ImplicitPySymbolsProvider::class.java)!!
     }
+
 
     override fun initComponent() {
         LOG.debug("Init module: $module")
@@ -67,9 +72,8 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
     }
 
     private fun onChange(forceClear: Boolean) {
-        val cache = ImplicitPySymbolsCache.instance(module)
         if (forceClear) {
-            cache.clear()
+            cache = ImplicitPySymbolsCache.emptyCache()
         }
 
         val project = module.project
@@ -78,13 +82,23 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
                 if (module.isDisposed) {
                     return@runReadAction
                 }
-                
-                // TODO: Runtime uses Workflow().self.globals from snakemake/workflow.py
+
+                /**
+                 * TODO 1:
+                 *      Runtime uses Workflow().self.globals from snakemake/workflow.py
+                 *      so let's parse 'includes' and globals instead of hardcoded includes
+                 **/
+
+                /**
+                 * TODO 2:
+                 *      At the moment we recalculate cache on events, but replace only if smth change.
+                 *      Maybe we could recalculate cache less often
+                 **/
 
                 val usedFiles = arrayListOf<PsiFile>()
 
                 //val elementsCache = ArrayList<Pair<QualifiedName, PyElement>>()
-                val elementsCache = ArrayList<Pair<String, PyElement>>()
+                val elementsCache = ArrayList<ImplicitPySymbol>()
 
                 ///////////////////////////////////////
                 // E.g. rules, config, ... defined in Workflow code as global variables
@@ -93,7 +107,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
                 ///////////////////////////////////////
                 // E.g. expand, temp, .. from 'snakemake.io'
                 collectTopLevelMethodsFrom(
-                        "snakemake.io", usedFiles, elementsCache
+                        "snakemake.io", SmkCodeInsightScope.TOP_LEVEL, usedFiles, elementsCache
                 )
 
                 ///////////////////////////////////////
@@ -102,19 +116,19 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
                         "snakemake.utils" to "simplify_path",
                         "snakemake.wrapper" to "wrapper",
                         "snakemake.script" to "script"
-                ), usedFiles, elementsCache)
+                ), SmkCodeInsightScope.TOP_LEVEL, usedFiles, elementsCache)
 
                 ///////////////////////////////////////
                 // Collect hardcoded classes
                 collectClasses(listOf(
                         "snakemake.shell" to "shell"
-                ), usedFiles, elementsCache)
+                ), SmkCodeInsightScope.TOP_LEVEL, usedFiles, elementsCache)
 
                 ///////////////////////////////////////
                 // Collect variables
                 collectVars(listOf(
                         "snakemake.logging" to "logger"
-                ), usedFiles, elementsCache)
+                ), SmkCodeInsightScope.TOP_LEVEL, usedFiles, elementsCache)
 
 
                 ////////////////////////////////////////
@@ -130,13 +144,9 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
 
                 ////////////////////////////////////////
                 val contentVersion = usedFiles.map { it.containingFile.virtualFile.timeStamp }.hashCode()
-                val cacheContentVers = cache.contentVersion()
-                if (cacheContentVers == 0 || contentVersion != cacheContentVers || forceClear) {
-                    val newContent = elementsCache.groupBy(
-                            keySelector = { it.first },
-                            valueTransform = { it.second }
-                    )
-                    cache.replaceWith(contentVersion, newContent)
+                val cachedContentVersion = cache.contentVersion
+                if (cachedContentVersion == 0 || contentVersion != cachedContentVersion || forceClear) {
+                    cache = ImplicitPySymbolsCacheImpl(module, elementsCache, contentVersion)
 
                     LOG.debug("[CACHE UPDATED]")
 
@@ -155,15 +165,16 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
 
     private fun collectVars(
             moduleAndVariable: List<Pair<String, String>>,
+            scope: SmkCodeInsightScope,
             usedFiles: MutableList<PsiFile>,
-            elementsCache: MutableList<Pair<String, PyElement>>
+            elementsCache: MutableList<ImplicitPySymbol>
     ) {
         moduleAndVariable.forEach { (pyModuleFqn, varName) ->
             collectPyFiles(pyModuleFqn, usedFiles)
                     .forEach { pyFile ->
                         val attrib = pyFile.findTopLevelAttribute(varName)
-                        if (attrib != null) {
-                            elementsCache.add(attrib.name!! to attrib)
+                        if (attrib != null && attrib.name != null) {
+                            elementsCache.add(ImplicitPySymbol(attrib.name!!, attrib, scope))
                         }
                     }
         }
@@ -171,15 +182,18 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
 
     private fun collectClasses(
             moduleAndClass: List<Pair<String, String>>,
+            scope: SmkCodeInsightScope,
             usedFiles: MutableList<PsiFile>,
-            elementsCache: MutableList<Pair<String, PyElement>>
+            elementsCache: MutableList<ImplicitPySymbol>
     ) {
         moduleAndClass.forEach { (pyModuleFqn, className) ->
             val pyFiles = collectPyFiles(pyModuleFqn, usedFiles)
 
             pyFiles
+                    .asSequence()
                     .filter { it.isValid }
                     .mapNotNull { it.findTopLevelClass(className) }
+                    .filter { it.name != null }
                     .forEach { pyClass ->
                         val constructor = pyClass.findInitOrNew(
                                 false,
@@ -188,7 +202,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
                                         pyClass.originalElement.containingFile
                                 ))
                         if (constructor != null) {
-                            elementsCache.add(pyClass.name!! to constructor)
+                            elementsCache.add(ImplicitPySymbol(pyClass.name!!, constructor, scope))
                         }
 //                      //XXX: todo do we need 'else' here like:  elementsCache.add(pyClass.name!! to pyClass) ?
                     }
@@ -231,17 +245,20 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
 
     private fun collectMethods(
             moduleAndMethod: List<Pair<String, String>>,
+            scope: SmkCodeInsightScope,
             usedFiles: MutableList<PsiFile>,
-            elementsCache: MutableList<Pair<String, PyElement>>
+            elementsCache: MutableList<ImplicitPySymbol>
     ) {
         moduleAndMethod.forEach { (pyModuleFqn, methodName) ->
             val pyFiles = collectPyFiles(pyModuleFqn, usedFiles)
 
             pyFiles
+                    .asSequence()
                     .filter { it.isValid }
                     .mapNotNull { it.findTopLevelFunction(methodName) }
+                    .filter { it.name != null }
                     .forEach { pyFun ->
-                        elementsCache.add(pyFun.name!! to pyFun)
+                        elementsCache.add(ImplicitPySymbol(pyFun.name!!, pyFun, scope))
                     }
         }
     }
@@ -253,7 +270,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
         val pyFiles = resolveQualifiedName(
                 QualifiedName.fromDottedString(pyModuleFqn),
                 fromModule(module)
-        ).filter { it is PyFile } as List<PyFile>
+        ).filterIsInstance<PyFile>()
 
         usedFiles.addAll(pyFiles)
         return pyFiles
@@ -261,8 +278,9 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
 
     private fun collectTopLevelMethodsFrom(
             pyModuleFqn: String,
+            scope: SmkCodeInsightScope,
             usedFiles: MutableList<PsiFile>,
-            elementsCache: MutableList<Pair<String, PyElement>>
+            elementsCache: MutableList<ImplicitPySymbol>
     ) {
         val pyFiles = collectPyFiles(pyModuleFqn, usedFiles)
 
@@ -270,16 +288,18 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
 
         //val fqnComponents = methodsContainerFile.components.toTypedArray()
         pyFiles
+                .asSequence()
                 .filter { it.isValid }
-                .flatMap { it.topLevelFunctions }
+                .flatMap { it.topLevelFunctions.asSequence() }
+                .filter { it.name != null }
                 .forEach { pyFun ->
-                    elementsCache.add(pyFun.name!! to pyFun)
+                    elementsCache.add(ImplicitPySymbol(pyFun.name!!, pyFun, scope))
                 }
     }
 
     private fun collectWorkflowGlobalVariables(
             usedFiles: MutableList<PsiFile>,
-            elementsCache: MutableList<Pair<String, PyElement>>
+            elementsCache: MutableList<ImplicitPySymbol>
     ) {
         // snakemake.workflow -> cluster_config [snakemake/workflow.py, global cluster_config]: dict
         // snakemake.workflow -> config [snakemake/workflow.py, global config]: dict
@@ -305,7 +325,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
                     }
                 })
                 globals.forEach { (name, psi) ->
-                    elementsCache.add(name to psi)
+                    elementsCache.add(ImplicitPySymbol(name, psi, SmkCodeInsightScope.TOP_LEVEL))
                 }
             }
         }
@@ -314,6 +334,35 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
     fun scheduleUpdate() {
         SwingUtilities.invokeLater {
             onChange(true)
+        }
+    }
+}
+
+private class ImplicitPySymbolsCacheImpl(
+        private val module: Module,
+        symbols: List<ImplicitPySymbol>,
+        override val contentVersion: Int = 0
+): ImplicitPySymbolsCache {
+
+    private val scope2Symbols = toMap(symbols)
+
+    override operator fun get(scope: SmkCodeInsightScope) = validElements(scope2Symbols.getValue(scope))
+
+    private fun validElements(elements: List<ImplicitPySymbol>): List<ImplicitPySymbol> {
+        val validElements = elements.filter { it.psiDeclaration.isValid }
+        if (validElements.size != elements.size) {
+            ImplicitPySymbolsProvider.instance(module).scheduleUpdate()
+        }
+        return validElements
+    }
+
+    companion object {
+        private fun toMap(symbols: List<ImplicitPySymbol>): Map<SmkCodeInsightScope, List<ImplicitPySymbol>> {
+            val map = SmkCodeInsightScope.values().associate { it to arrayListOf<ImplicitPySymbol>() }
+            symbols.forEach { s ->
+                map.getValue(s.scope).add(s)
+            }
+            return map
         }
     }
 }

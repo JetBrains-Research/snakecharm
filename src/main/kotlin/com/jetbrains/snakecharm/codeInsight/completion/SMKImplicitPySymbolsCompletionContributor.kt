@@ -9,7 +9,8 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.resolve.CompletionVariantsProcessor
-import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache
+import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
+import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
 
 class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
     companion object {
@@ -49,10 +50,16 @@ class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
                     super.addElement(name, element)
                 }
             }
-            ImplicitPySymbolsCache.instance(module).all().forEach { (name, psi) ->
-                // processor.execute(it, ResolveState.initial())
-                processor.addElement(name, psi)
-            }
+            val contextScope = SmkCodeInsightScope[contextElement]
+            val cache = ImplicitPySymbolsProvider.instance(module).cache
+
+            SmkCodeInsightScope.values().asSequence()
+                    .filter { symbolScope -> contextScope.includes(symbolScope) }
+                    .flatMap { symbolScope -> cache[symbolScope].asSequence() }
+                    .forEach { symbol ->
+                        // processor.execute(it, ResolveState.initial())
+                        processor.addElement(symbol.identifier, symbol.psiDeclaration)
+                    }
 
             result.addAllElements(processor.resultList)
         }
