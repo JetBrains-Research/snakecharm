@@ -11,6 +11,7 @@ import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.codeInsight.controlflow.ControlFlowCache
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.inspections.PyUnreachableCodeInspection
+import com.jetbrains.python.inspections.unresolvedReference.PyUnresolvedReferencesInspection
 import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
@@ -84,6 +85,8 @@ class StepDefs {
             "Subworkflow Multiple Args" -> fixture.enableInspections(SmkSubworkflowMultipleArgsInspection::class.java)
             "Subworkflow Redeclaration" -> fixture.enableInspections(SmkSubworkflowRedeclarationInspection::class.java)
             "Unreachable Code" -> fixture.enableInspections(PyUnreachableCodeInspection::class.java)
+            "Rule or Checkpoint Name yet undefined" -> fixture.enableInspections(SmkRuleOrCheckpointNameYetUndefinedInspection::class.java)
+            "Unresolved reference" -> fixture.enableInspections(PyUnresolvedReferencesInspection::class.java)
             else -> {
                 for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {
                     val o = provider.instance
