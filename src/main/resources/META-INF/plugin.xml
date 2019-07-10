@@ -146,6 +146,17 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkSubworkflowRedeclarationInspection"
     />
 
+    <localInspection
+            language="Snakemake" shortName="SmkRuleOrCheckpointNameYetUndefinedInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkRuleOrCheckpointNameYetUndefinedInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.rule.or.checkpoint.name.yet.undefined"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkRuleOrCheckpointNameYetUndefinedInspection"
+    />
+
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
 
     <findUsagesHandlerFactory
