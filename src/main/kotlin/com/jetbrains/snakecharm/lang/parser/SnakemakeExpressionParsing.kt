@@ -101,23 +101,27 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 if (matchToken(PyTokenTypes.INDENT)) {
                     indents++
                 } else {
-                    while (!myBuilder.eof() && indents > 0) {
-                        if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
-                            myBuilder.error("Unindent does not match any outer indentation level")
-                            nextToken()
-                        }
+                    // IMPORTANT: note that myBuilder.eof() could apply filter to lexemes
+                    while (indents > 0 && !myBuilder.eof()) {
                         // IMPORTANT: keep this check inside the loop body
                         /* atToken() uses getTokenType() which might apply a filter to the current token
                            whether or not this token is actually DEDENT */
-                        else if (atToken(PyTokenTypes.DEDENT)) {
+                        // atToken(PyTokenTypes.DEDENT)
+                        println("in dedent check loop:" + myBuilder.rawLookup(0))
+                        if (myBuilder.rawLookup(0) == PyTokenTypes.DEDENT) {
+                            println("after dedent:" + myBuilder.rawLookup(1))
                             nextToken()
+                            println("after dedent:" + myBuilder.rawLookup(0))
                             indents--
+                            println("after indents--:" + myBuilder.rawLookup(0))
                         } else {
+                            println("after dedent check loop in break:" + myBuilder.rawLookup(0))
                             break
                         }
                     }
                     // leave this section
                     if (indents == 0 || myBuilder.eof()) {
+                        println("when you leave section:" + myBuilder.rawLookup(0))
                         break
                     }
                 }
@@ -140,7 +144,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                             // skip dedents while matched, we could have several dedent tokens in a raw
                             // skip dedent while inside current block (indents > 1)
 
-                            while (!myBuilder.eof() && indents > 1) {
+                            while (indents > 1 && !myBuilder.eof()) {
                                 if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
                                     incorrectUnindentMarker = myBuilder.mark()
                                     nextToken()
@@ -191,6 +195,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             incorrectUnindentMarker = null
         }
 
+        println("in the end before the statement break match " + myBuilder.rawLookup(0))
         if (myBuilder.rawLookup(0) == PyTokenTypes.STATEMENT_BREAK) {
             nextToken()
             while (indents > 0 && !myBuilder.eof()) {

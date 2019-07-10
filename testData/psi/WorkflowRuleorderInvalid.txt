@@ -60,14 +60,9 @@ SnakemakeFile: WorkflowRuleorderInvalid.smk
       PsiWhiteSpace('\n  ')
       SMKRuleReference
         PsiElement(Py:IDENTIFIER)('rule10')
-      PsiErrorElement:Dedent expected
-        <empty list>
-  PsiWhiteSpace('\n  ')
-  PyExpressionStatement
-    PyReferenceExpression: rule11
-      PsiElement(Py:IDENTIFIER)('rule11')
-  PsiErrorElement:Statement expected, found Py:DEDENT
-    <empty list>
+      PsiWhiteSpace('\n  ')
+      PsiErrorElement:'>' expected
+        PsiElement(Py:IDENTIFIER)('rule11')
   PsiWhiteSpace('\n\n')
   SMKWorkflowRuleOrderStatement
     PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')

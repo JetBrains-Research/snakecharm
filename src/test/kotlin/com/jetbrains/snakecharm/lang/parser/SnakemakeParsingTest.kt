@@ -65,9 +65,9 @@ class SnakemakeParsingTest : ParsingTestCase(
     }
 
     // TODO why did this stop working?
-    /*fun testRuleMultipleSingleLine() {
+    fun testRuleMultipleSingleLine() {
         doTest()
-    }*/
+    }
 
     fun testRuleParams() {
         doTest()
@@ -87,14 +87,14 @@ class SnakemakeParsingTest : ParsingTestCase(
     }
 
     // TODO why did this stop working?
-    /*fun testRuleInvalidParam() {
+    fun testRuleInvalidParam() {
         doTest()
-    }*/
+    }
 
     // TODO why did this stop working?
-    /*fun testRuleMultipleSingleLineNoBreak() {
+    fun testRuleMultipleSingleLineNoBreak() {
         doTest()
-    }*/
+    }
 
     fun testRuleUnexpKeyword() {
         doTest()
@@ -184,30 +184,26 @@ class SnakemakeParsingTest : ParsingTestCase(
 
 
     // TODO #96
-    /*fun testWorkflowRuleorder() {
+    fun testWorkflowRuleorder() {
         doTest()
-    }*/
+    }
 
     fun testWorkflowRuleorderHangingSeparator() {
         doTest()
     }
 
-    // TODO rewrite the test probably because I think the new PSI looks more logical
-    /*fun testWorkflowRuleorderInvalid() {
+    fun testWorkflowRuleorderInvalid() {
         doTest()
-    }*/
+    }
 
     // well this one isn't supposed to be working
     fun testWorkflowLocalrules() {
         doTest()
     }
 
-    // TODO rewrite the test probably because I think the new PSI looks more logical
-    // like, now it outright declares a comma is needed, nothing about dedents and whatnot,
-    // and you probably meant for another rule to be there if you put no dedent in
-    /*fun testWorkflowLocalrulesInvalid() {
+    fun testWorkflowLocalrulesInvalid() {
         doTest()
-    }*/
+    }
 
     fun testWorkflowLocalrulesHangingComma() {
         doTest()
@@ -236,6 +232,11 @@ class SnakemakeParsingTest : ParsingTestCase(
     fun testSingleSubworkflow() {
         doTest()
     }
+
+    // TODO why does this test fail? a really weird bug
+    /*fun testRuleMultipleSingleLineWithRuleSectionIndent() {
+        doTest()
+    }*/
 
     /**
      * Test with latest versions of Python 2 and Python 3.

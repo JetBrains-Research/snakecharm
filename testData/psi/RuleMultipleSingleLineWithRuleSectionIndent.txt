@@ -1,0 +1,201 @@
+SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all1')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: foo1
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo1'')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace('\n                          ')
+          PyStringLiteralExpression: foo0
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo0'')
+  PsiWhiteSpace('\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all2')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: foo2
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo2'')
+  PsiWhiteSpace('\n\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all3')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: foo1
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo1'')
+          PsiWhiteSpace('\n                          ')
+          PsiElement(Py:COMMA)(',')
+          PyStringLiteralExpression: foo0
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo0'')
+  PsiWhiteSpace('\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all4')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: foo2
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo2'')
+  PsiWhiteSpace('\n\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all5')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: foo1
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo1'')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace('\n                          ')
+          PyStringLiteralExpression: foo0
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo0'')
+          PsiElement(Py:COMMA)(',')
+  PsiWhiteSpace('\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all6')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: foo2
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo2'')
+  PsiWhiteSpace('\n\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all7')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: foo1
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo1'')
+          PsiWhiteSpace('\n                          ')
+          PsiErrorElement:',' expected
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo0'')
+          PsiErrorElement:expression expected
+            <empty list>
+  PsiWhiteSpace('\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all8')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: foo2
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo2'')
+  PsiWhiteSpace('\n\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all9')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: foo1
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo1'')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace('\n                          ')
+          PyStringLiteralExpression: foo0
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo0'')
+  PsiWhiteSpace('\n')
+  PyExpressionStatement
+    PyBinaryExpression
+      PyNumericLiteralExpression
+        PsiElement(Py:INTEGER_LITERAL)('5')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:PLUS)('+')
+      PsiWhiteSpace(' ')
+      PyNumericLiteralExpression
+        PsiElement(Py:INTEGER_LITERAL)('5')
+  PsiWhiteSpace('\n\n')
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all10')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: foo1
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo1'')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace('\n                          ')
+          PyStringLiteralExpression: foo0
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo0'')
+  PsiWhiteSpace('\n')
+  SMKWorkflowPythonBlockParameter
+    PsiElement(Py:WORKFLOW_ONSUCCESS_KEYWORD)('onsuccess')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    PyStatementList
+      PyExpressionStatement
+        PyCallExpression: print
+          PyReferenceExpression: print
+            PsiElement(Py:IDENTIFIER)('print')
+          PyArgumentList
+            PsiElement(Py:LPAR)('(')
+            PyStringLiteralExpression: Workflow finished, no error
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"Workflow finished, no error"')
+            PsiElement(Py:RPAR)(')')
