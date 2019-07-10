@@ -1,7 +1,5 @@
 package com.jetbrains.snakecharm.lang.psi
 
-import com.intellij.codeInsight.lookup.LookupElement
-import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
@@ -9,6 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.python.psi.resolve.RatedResolveResult
+import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 
 class SmkReferenceExpression(node: ASTNode): PyElementImpl(node), PsiNamedElement{
     override fun getName() = getNameNode()?.text
@@ -41,18 +40,10 @@ class SmkReferenceExpression(node: ASTNode): PyElementImpl(node), PsiNamedElemen
                         .map { (_, psi) -> RatedResolveResult(RatedResolveResult.RATE_NORMAL, psi) }
                         .toTypedArray()
 
-        override fun getVariants(): Array<Any> {
-            val variants = mutableListOf<LookupElement>()
-            variants.addAll(getRules().map {
-                LookupElementBuilder.create(it.first)
-                        .withTypeText(element.containingFile.name)
-            })
-            variants.addAll(getCheckpoints().map {
-                LookupElementBuilder.create(it.first)
-                        .withTypeText(element.containingFile.name)
-            })
-            return variants.toTypedArray()
-        }
+        override fun getVariants(): Array<Any> =
+                (getRules() + getCheckpoints()).map { (name, elem) ->
+                    AbstractSmkRuleOrCheckpointType.createRuleLikeLookupItem(name, elem)
+                }.toTypedArray()
 
         override fun handleElementRename(newElementName: String): PsiElement =
                 element.setName(newElementName)
