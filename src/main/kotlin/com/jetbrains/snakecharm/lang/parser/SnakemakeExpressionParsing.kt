@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.lang.parser
 
+import com.intellij.lang.PsiBuilder
 import com.intellij.lang.impl.PsiBuilderImpl
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyBundle.message
@@ -58,13 +59,14 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         val argsOnNextLine = myBuilder.tokenType === PyTokenTypes.STATEMENT_BREAK
         if (argsOnNextLine) {
             nextToken()
-            if (!checkMatches(PyTokenTypes.INDENT, "Indent expected...")) { // bundle
+            if (!checkMatches(PyTokenTypes.INDENT, SnakemakeBundle.message("PARSE.expected.indent"))) {
                 argList.done(PyElementTypes.ARGUMENT_LIST)
                 return false
             }
         }
         var indents = if (argsOnNextLine) 1 else 0
         var argNumber = 0
+        var incorrectUnindentMarker: PsiBuilder.Marker? = null
         while (!myBuilder.eof()) {
             if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
                 println(myBuilder.rawLookup(2))
@@ -76,7 +78,8 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                  * e.g. atToken(), matchToken(), etc.,
                  * it might apply filter and change the token type,
                  * while nextToken() does not do that,
-                 * it just increases the current lexeme number, doesn't look at the token
+                 * it just increases the current lexeme number, doesn't look at the token.
+                 * use myBuilder.rawLookup(0) to check the current token type without filter application
                  */
                 if (indents == 0 &&
                         !findTokenRawLookup(separatorTokenType) &&
@@ -136,9 +139,18 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         } else {
                             // skip dedents while matched, we could have several dedent tokens in a raw
                             // skip dedent while inside current block (indents > 1)
-                            while (!myBuilder.eof() && atToken(PyTokenTypes.DEDENT) && indents > 1) {
-                                indents--
-                                nextToken()
+
+                            while (!myBuilder.eof() && indents > 1) {
+                                if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
+                                    incorrectUnindentMarker = myBuilder.mark()
+                                    nextToken()
+                                }
+                                if (atToken(PyTokenTypes.DEDENT)) {
+                                    indents--
+                                    nextToken()
+                                } else {
+                                    break
+                                }
                             }
                         }
 
@@ -175,12 +187,14 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             }
 
             parseArgumentFunction()
+            incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
+            incorrectUnindentMarker = null
         }
 
         if (myBuilder.rawLookup(0) == PyTokenTypes.STATEMENT_BREAK) {
             nextToken()
             while (indents > 0 && !myBuilder.eof()) {
-                if (checkMatches(PyTokenTypes.DEDENT, "Dedent expected")) { // bundle
+                if (checkMatches(PyTokenTypes.DEDENT, SnakemakeBundle.message("PARSE.expected.dedent"))) {
                     indents--
                 } else {
                     break
@@ -241,7 +255,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         val errorMarker = myBuilder.mark()
         var hasNonWhitespaceTokens = false
         while (!(atAnyOfTokens(*types) || myBuilder.eof())) {
-            // Regular whitespace tokens are already skipped by advancedLexer()
+            // Regular whitespace tokens are already skipped by atToken()
             if (!atToken(PyTokenTypes.STATEMENT_BREAK)) {
                 hasNonWhitespaceTokens = true
             }
