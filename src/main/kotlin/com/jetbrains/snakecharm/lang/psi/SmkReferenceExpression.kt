@@ -27,21 +27,19 @@ class SmkReferenceExpression(node: ASTNode): PyElementImpl(node), PsiNamedElemen
     private fun getNameNode() = getIdentifierNode(node)
 
     private class SmkRuleOrCheckpointNameReference(
-            private val element: PsiNamedElement,
+            element: PsiNamedElement,
             textRange: TextRange
-    ) : PsiReferenceBase<PsiElement>(element, textRange), PsiPolyVariantReference {
+    ) : PsiReferenceBase<PsiNamedElement>(element, textRange), PsiPolyVariantReference {
         private val key: String = element.text
 
         override fun resolve(): PsiElement? =
-                getRules().firstOrNull { it.first == key }?.second ?:
-                getCheckpoints().firstOrNull { it.first == key }?.second
+                multiResolve(false).firstOrNull()?.element
 
-        override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
-            val elements = mutableListOf<PsiElement>()
-            elements.addAll(getRules().filter { it.first == key }.map { it.second })
-            elements.addAll(getCheckpoints().filter { it.first == key }.map { it.second })
-            return elements.map { RatedResolveResult(RatedResolveResult.RATE_NORMAL, it) }.toTypedArray()
-        }
+        override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> =
+                (getRules() + getCheckpoints())
+                        .filter { (name, _) -> name == key }
+                        .map { (_, psi) -> RatedResolveResult(RatedResolveResult.RATE_NORMAL, psi) }
+                        .toTypedArray()
 
         override fun getVariants(): Array<Any> {
             val variants = mutableListOf<LookupElement>()
@@ -57,7 +55,7 @@ class SmkReferenceExpression(node: ASTNode): PyElementImpl(node), PsiNamedElemen
         }
 
         override fun handleElementRename(newElementName: String): PsiElement =
-                element.let { it.setName(newElementName) }
+                element.setName(newElementName)
 
         private fun getRules() = PsiTreeUtil.getParentOfType(element, SnakemakeFile::class.java)
                 ?.collectRules() ?: emptyList()
