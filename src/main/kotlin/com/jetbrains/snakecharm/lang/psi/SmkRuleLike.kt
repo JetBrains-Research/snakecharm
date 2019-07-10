@@ -8,7 +8,6 @@ import com.intellij.psi.TokenType
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonDialectsTokenSetProvider
-import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
 import com.jetbrains.python.psi.PyStatement
 import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.PyStatementListContainer
@@ -19,7 +18,8 @@ import com.jetbrains.snakecharm.SnakemakeIcons
 import javax.swing.Icon
 
 abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode): PyElementImpl(node),
-        PyStatementListContainer, PyStatement, ScopeOwner,
+        PyStatementListContainer, PyStatement,
+        //ScopeOwner,
         PsiNamedElement, PsiNameIdentifierOwner
 {
     //TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SMKRule>
