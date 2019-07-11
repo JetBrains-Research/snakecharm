@@ -70,3 +70,44 @@ Feature: Completion for params in shell section
       | rule_like   |
       | rule        |
       | checkpoint  |
+
+  Scenario Outline: Completed in run section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> foo:
+      params: 0, a=1, b=2
+      run:
+        shell("echo {params.a}")
+    """
+    When I put the caret after {params.
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | a      |
+      | b      |
+    And completion list shouldn't contain:
+      | 0      |
+    Examples:
+      | rule_like   |
+      | rule        |
+      | checkpoint  |
+
+  Scenario Outline: Not completed in calls to other functions in run section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> foo:
+      params: 0, a=1, b=2
+      run:
+        wrapper("path/to/wrapper{params.a}.py")
+    """
+    When I put the caret after {params.
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | a      |
+      | b      |
+      | 0      |
+    Examples:
+      | rule_like   |
+      | rule        |
+      | checkpoint  |
