@@ -152,6 +152,17 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkRuleOrCheckpointNameYetUndefinedInspection"
     />
 
+    <localInspection
+            language="Snakemake" shortName="SmkLocalrulesRuleorderRepeatedRuleInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkLocalrulesRuleoderRepeatedRuleInspectoin"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.localrules.ruleorder.repeated.rule"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkLocalrulesRuleorderRepeatedRuleInspection"
+    />
+
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
 
     <findUsagesHandlerFactory
