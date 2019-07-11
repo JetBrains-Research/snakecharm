@@ -179,11 +179,9 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-
-    // TODO #96
-    /*fun testWorkflowRuleorder() {
+    fun testWorkflowRuleorder() {
         doTest()
-    }*/
+    }
 
     fun testWorkflowRuleorderHangingSeparator() {
         doTest()
@@ -229,11 +227,14 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-    /**
-     * Test with latest versions of Python 2 and Python 3.
-     */
+    fun testRuleMultipleSingleLineWithRuleSectionIndent() {
+        doTest()
+    }
+
     private fun doTest() {
-        doTest(LanguageLevel.fromPythonVersion("2"))
+        // Actually snakemake requires python 3.x and no need to have it working with python 2.x
+        //doTest(LanguageLevel.fromPythonVersion("2"))
+
         doTest(LanguageLevel.fromPythonVersion("3"))
     }
 

@@ -75,7 +75,7 @@ class SnakemakeStatementParsing(
         val context = parsingContext
         val scope = context.scope
 
-        myBuilder.setDebugMode(true)
+        myBuilder.setDebugMode(false)
 
         val tt = myBuilder.tokenType
 
@@ -188,6 +188,7 @@ class SnakemakeStatementParsing(
                         break
                     }
                 }
+
             }
         }
 

@@ -93,14 +93,14 @@ SnakemakeFile: WorkflowRuleorder.smk
       PsiWhiteSpace(' ')
       SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule2')
-      PsiWhiteSpace('\n    ')
+      PsiWhiteSpace('\n        ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
       SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule3')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
-      PsiWhiteSpace('  ')
+      PsiWhiteSpace(' ')
       SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule4')
   PsiWhiteSpace('\n\n')
