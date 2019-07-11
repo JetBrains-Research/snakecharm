@@ -12,6 +12,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SMKParamsReference
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
@@ -21,7 +22,7 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
     private val insideCallExpressionInRuleRunParameter = PlatformPatterns.psiElement()
             .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
             .inside(PyCallExpression::class.java)
-            .withAncestor(6, PlatformPatterns.psiElement(SMKRuleRunParameter::class.java))
+            .inside(SMKRuleRunParameter::class.java)
 
 
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
@@ -39,28 +40,32 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
                         val paramReferences = mutableListOf<PsiReference>()
                         val paramsMatcher = paramsPattern.matcher(element.text)
 
-                        val isShellCommand = PsiTreeUtil
-                                .getParentOfType(element, SMKRuleParameterListStatement::class.java)
-                                ?.section?.textMatches(SnakemakeNames.SECTION_SHELL) == true
-                        if (isShellCommand) {
-                            while (paramsMatcher.find()) {
-                                paramReferences.add(SMKParamsReference(element  as PyStringLiteralExpression,
-                                        TextRange(paramsMatcher.start(1), paramsMatcher.end(1))))
+                        if (insideRuleSection.accepts(element)) {
+                            val isShellCommand = PsiTreeUtil
+                                    .getParentOfType(element, SMKRuleParameterListStatement::class.java)
+                                    ?.section?.textMatches(SnakemakeNames.SECTION_SHELL) == true
+                            if (isShellCommand) {
+                                addParamsReferences(element, paramsMatcher, paramReferences)
                             }
-                        } else {
+                        }
+                        else {
                             val isShellCallExpression =
                                     PsiTreeUtil.getParentOfType(element, PyCallExpression::class.java)!!
                                             .callee?.name == SnakemakeNames.SECTION_SHELL
                             if (isShellCallExpression) {
-                                while (paramsMatcher.find()) {
-                                    paramReferences.add(SMKParamsReference(element as PyStringLiteralExpression,
-                                            TextRange(paramsMatcher.start(1), paramsMatcher.end(1))))
-                                }
+                                addParamsReferences(element, paramsMatcher, paramReferences)
                             }
                         }
 
                         return paramReferences.toTypedArray()
                     }
         })
+    }
+
+    private fun addParamsReferences(element: PsiElement, paramsMatcher: Matcher, paramReferences: MutableList<PsiReference>) {
+        while (paramsMatcher.find()) {
+            paramReferences.add(SMKParamsReference(element as PyStringLiteralExpression,
+                    TextRange(paramsMatcher.start(1), paramsMatcher.end(1))))
+        }
     }
 }
