@@ -62,7 +62,11 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
         })
     }
 
-    private fun addParamsReferences(element: PsiElement, paramsMatcher: Matcher, paramReferences: MutableList<PsiReference>) {
+    private fun addParamsReferences(
+            element: PsiElement,
+            paramsMatcher: Matcher,
+            paramReferences: MutableList<PsiReference>
+    ) {
         while (paramsMatcher.find()) {
             paramReferences.add(SMKParamsReference(element as PyStringLiteralExpression,
                     TextRange(paramsMatcher.start(1), paramsMatcher.end(1))))
