@@ -15,20 +15,6 @@ import com.jetbrains.snakecharm.SnakemakeBundle
  * @author Roman.Chernyatchik
  * @date 2019-01-04
  */
-/**
- * IMPORTANT! PLEASE READ BEFORE MODIFYING PARSER CODE OR DEBUGGING!
- * Due to SnakemakeStatementParsing utilizing filter method when the parser has entered a rule section,
- * behaviour in debug and at runtime could differ.
- * Be careful when using any method which calls getTokenType() (such as atToken(), matchToken(), etc.),
- * as getTokenType() skips whitespace tokens and applies filter, substituting tokenTypes in myBuilder.myLexTypes().
- * Meanwhile nextToken() only advances lexer by one lexeme and does not look at the current token.
- * getTokenType() might be called during debug and apply filter, while it would not be called at runtime,
- * thus the different behaviour.
- *
- * If you need to check the current token type, best to avoid debugging in IDE and to use debug print.
- * One can get the current token type without filter via a call to myBuilder.rawLookup(0).
- * However, it's best to keep rawLookup() calls to a minimum.
- */
 class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionParsing(context) {
     override fun getParsingContext() = myContext as SnakemakeParserContext
 
@@ -54,6 +40,22 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         return result
     }
 
+    /**
+     * IMPORTANT! PLEASE READ BEFORE MODIFYING PARSER CODE OR DEBUGGING!
+     * Due to [SnakemakeStatementParsing] utilizing filter method when the parser has entered a rule section,
+     * behaviour in debug and at runtime could differ.
+     * Be careful when using any method which calls [PsiBuilder.getTokenType]
+     * (such as [Parsing.atToken], [Parsing.matchToken], etc.),
+     * as [PsiBuilder.getTokenType] skips whitespace tokens and applies filter,
+     * substituting tokenTypes in myBuilder.myLexTypes.
+     * Meanwhile [Parsing.nextToken] only advances lexer by one lexeme and does not look at the current token.
+     * [PsiBuilder.getTokenType] might be called during debug and apply filter, while it would not be called at runtime,
+     * thus the different behaviour.
+     *
+     * If you need to check the current token type, best to avoid debugging in IDE and to use debug print.
+     * One can get the current token type without filter via a call to [PsiBuilder.rawLookup] with steps = 0.
+     * However, it's best to keep [PsiBuilder.rawLookup] calls to a minimum.
+     */
     private fun doParseRuleParamArgumentList(
             separatorTokenText: String,
             separatorTokenType: PyElementType,
@@ -86,10 +88,10 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 nextToken()
                 // It's important to use rawLookup() here to avoid accidentally applying a filter to the current token.
                 if (indents == 0 &&
-                        !findTokenRawLookup(separatorTokenType) &&
-                        !findTokenRawLookup(PyTokenTypes.INDENT) &&
-                        !findTokenRawLookup(PyTokenTypes.INCONSISTENT_DEDENT) &&
-                        !findTokenRawLookup(PyTokenTypes.DEDENT)) {
+                        !checkFirstNonWhitespaceTokenSafe(separatorTokenType) &&
+                        !checkFirstNonWhitespaceTokenSafe(PyTokenTypes.INDENT) &&
+                        !checkFirstNonWhitespaceTokenSafe(PyTokenTypes.INCONSISTENT_DEDENT) &&
+                        !checkFirstNonWhitespaceTokenSafe(PyTokenTypes.DEDENT)) {
                     break
                 }
 
@@ -194,6 +196,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             incorrectUnindentMarker = null
         }
 
+        // safe check is important here, be wary of that while modifying/debugging
         if (checkCurrentTokenSafe(PyTokenTypes.STATEMENT_BREAK)) {
             nextToken()
             while (indents > 0 && !myBuilder.eof()) {
@@ -271,9 +274,12 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         }
     }
 
-    private fun findTokenRawLookup(tokenType: IElementType): Boolean {
+    /**
+     * Skips whitespace tokens and checks the first non-whitespace token type against [tokenType]
+     * without applying filters.
+     */
+    private fun checkFirstNonWhitespaceTokenSafe(tokenType: IElementType): Boolean {
         var steps = 0
-        // TODO can it somehow be not PsiBuilderImpl?
         while (myBuilder.rawLookup(steps) != null &&
                 (myBuilder as PsiBuilderImpl).whitespaceOrComment(myBuilder.rawLookup(steps))) {
             steps++
@@ -281,5 +287,8 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         return myBuilder.rawLookup(steps) == tokenType
     }
 
+    /**
+     * Compares the current token against [tokenType] without applying filters.
+     */
     private fun checkCurrentTokenSafe(tokenType: IElementType) = myBuilder.rawLookup(0) == tokenType
 }

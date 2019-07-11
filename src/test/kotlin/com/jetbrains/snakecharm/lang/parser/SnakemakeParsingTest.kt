@@ -86,12 +86,10 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-    // TODO why did this stop working?
     fun testRuleInvalidParam() {
         doTest()
     }
 
-    // TODO why did this stop working?
     fun testRuleMultipleSingleLineNoBreak() {
         doTest()
     }
@@ -234,15 +232,14 @@ class SnakemakeParsingTest : ParsingTestCase(
     }
 
     // TODO why does this test fail? a really weird bug
-    /*fun testRuleMultipleSingleLineWithRuleSectionIndent() {
+    fun testRuleMultipleSingleLineWithRuleSectionIndent() {
         doTest()
-    }*/
+    }
 
-    /**
-     * Test with latest versions of Python 2 and Python 3.
-     */
     private fun doTest() {
-        doTest(LanguageLevel.fromPythonVersion("2"))
+        // Actually snakemake requires python 3.x and no need to have it working with python 2.x
+        //doTest(LanguageLevel.fromPythonVersion("2"))
+
         doTest(LanguageLevel.fromPythonVersion("3"))
     }
 
