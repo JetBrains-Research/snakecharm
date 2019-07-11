@@ -89,12 +89,16 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         while (!myBuilder.eof()) {
             if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
                 nextToken()
-                // It's important to use rawLookup() here to avoid accidentally applying a filter to the current token.
+                /* It's important to use rawLookup() inside atAnyOfTokensSage() here
+                   to avoid accidentally applying a filter to the current token. */
                 if (indents == 0 &&
-                        !checkFirstNonWhitespaceTokenSafe(separatorTokenType) &&
-                        !checkFirstNonWhitespaceTokenSafe(PyTokenTypes.INDENT) &&
-                        !checkFirstNonWhitespaceTokenSafe(PyTokenTypes.INCONSISTENT_DEDENT) &&
-                        !checkFirstNonWhitespaceTokenSafe(PyTokenTypes.DEDENT)) {
+                        !atAnyOfTokensSafe(
+                                separatorTokenType,
+                                PyTokenTypes.INDENT,
+                                PyTokenTypes.INCONSISTENT_DEDENT,
+                                PyTokenTypes.DEDENT
+                        )
+                ) {
                     break
                 }
 
@@ -278,16 +282,16 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
     }
 
     /**
-     * Skips whitespace tokens and checks the first non-whitespace token type against [tokenType]
+     * Skips whitespace tokens and checks the first non-whitespace token type against [tokenTypes]
      * without applying filters.
      */
-    private fun checkFirstNonWhitespaceTokenSafe(tokenType: IElementType): Boolean {
+    private fun atAnyOfTokensSafe(vararg tokenTypes: IElementType): Boolean {
         var steps = 0
         while (myBuilder.rawLookup(steps) != null &&
                 (myBuilder as PsiBuilderImpl).whitespaceOrComment(myBuilder.rawLookup(steps))) {
             steps++
         }
-        return myBuilder.rawLookup(steps) == tokenType
+        return tokenTypes.contains(myBuilder.rawLookup(steps))
     }
 
     /**
