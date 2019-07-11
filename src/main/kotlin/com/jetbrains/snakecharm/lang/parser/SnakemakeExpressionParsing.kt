@@ -41,7 +41,10 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
     }
 
     /**
-     * IMPORTANT! PLEASE READ BEFORE MODIFYING PARSER CODE OR DEBUGGING!
+     * XXX -------------------------------------------------------------------
+     * XXX IMPORTANT! PLEASE READ BEFORE MODIFYING PARSER CODE OR DEBUGGING!
+     * XXX -------------------------------------------------------------------
+     *
      * Due to [SnakemakeStatementParsing] utilizing filter method when the parser has entered a rule section,
      * behaviour in debug and at runtime could differ.
      * Be careful when using any method which calls [PsiBuilder.getTokenType]
