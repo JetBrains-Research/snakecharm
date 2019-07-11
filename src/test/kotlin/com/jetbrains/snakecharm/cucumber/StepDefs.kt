@@ -17,7 +17,7 @@ import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.inspections.*
 import cucumber.api.java.en.Given
-import junit.framework.Assert.fail
+import kotlin.test.fail
 
 
 /**
@@ -68,7 +68,7 @@ class StepDefs {
             val flow = ControlFlowCache.getControlFlow(SnakemakeWorld.fixture().file as PyFile)
             flow.instructions.joinToString(separator = "\n")
         })
-        UsefulTestCase.assertSameLines(expectedCFG.trim(), actualCFG.trim())
+        UsefulTestCase.assertSameLines(expectedCFG.replace("\r", "").trim(), actualCFG.trim())
     }
 
     @Given("^([^\\]]+) inspection is enabled$")

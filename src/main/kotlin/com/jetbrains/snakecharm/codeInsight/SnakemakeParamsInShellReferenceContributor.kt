@@ -31,7 +31,7 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
 
                         val isShellCommand = PsiTreeUtil
                                 .getParentOfType(element, SMKRuleParameterListStatement::class.java)!!
-                                .section.textMatches(SnakemakeNames.SECTION_SHELL)
+                                .section?.textMatches(SnakemakeNames.SECTION_SHELL) == true
                         if (isShellCommand) {
                             while (paramsMatcher.find()) {
                                 paramReferences.add(SMKParamsReference(element  as PyStringLiteralExpression,

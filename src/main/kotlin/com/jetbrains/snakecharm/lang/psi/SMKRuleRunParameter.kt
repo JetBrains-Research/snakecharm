@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.lang.psi
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.jetbrains.python.PyElementTypes
-import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
 import com.jetbrains.python.documentation.docstrings.DocStringUtil
 import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.impl.PyElementImpl
@@ -12,13 +11,9 @@ import com.jetbrains.python.psi.impl.PyElementImpl
 
 class SMKRuleRunParameter(node: ASTNode): PyElementImpl(node),
         SMKRuleSection,
-        ScopeOwner, // for control flow
+        //ScopeOwner, // for control flow
         PyStatement, PyStatementListContainer, PyDocStringOwner
 {
-    companion object {
-        const val PARAM_NAME = "run"
-    }
-
     override fun getStatementList(): PyStatementList =
             childToPsi(PyElementTypes.STATEMENT_LIST) ?: error("Statement list missing for run section $text")
 

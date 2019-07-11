@@ -9,9 +9,9 @@ import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.RULE_OR_CHECKPOINT
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
-import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
 import com.jetbrains.snakecharm.lang.psi.SMKSubworkflowParameterListStatement
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SnakemakeElementTypes
 
@@ -117,6 +117,7 @@ class SnakemakeStatementParsing(
                         SnakemakeBundle.message("PARSE.expected.identifier"),
                         this::parseIdentifier
                 )
+
                 if (!res) {
                     myBuilder.error(SnakemakeBundle.message("PARSE.expected.ruleorder"))
                 }
@@ -246,7 +247,7 @@ class SnakemakeStatementParsing(
                 result = parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
                 ruleParam.done(section.parameterListStatement)
             }
-            section.sectionKeyword in RULE_OR_CHECKPOINT && keyword == SMKRuleRunParameter.PARAM_NAME -> {
+            section.sectionKeyword in RULE_OR_CHECKPOINT && keyword == SnakemakeNames.SECTION_RUN -> {
                 checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
                 statementParser.parseSuite()
                 ruleParam.done(SnakemakeElementTypes.RULE_RUN_STATEMENT)
@@ -290,7 +291,7 @@ class SnakemakeStatementParsing(
         val referenceMarker = myBuilder.mark()
         if (Parsing.isIdentifier(myBuilder)) {
             Parsing.advanceIdentifierLike(myBuilder)
-            referenceMarker.done(SnakemakeElementTypes.RULE_REFERENCE)
+            referenceMarker.done(SnakemakeElementTypes.REFERENCE_EXPRESSION)
             return true
         }
         referenceMarker.drop()

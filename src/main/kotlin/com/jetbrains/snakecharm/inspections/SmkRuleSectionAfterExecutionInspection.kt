@@ -26,7 +26,7 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
             val sections = rule.getSections()
             for (st in sections) {
                 if (st is SMKRuleParameterListStatement) {
-                    val sectionName = st.section.text ?: return
+                    val sectionName = st.section?.text ?: return
                     val isExecutionSection = sectionName in SMKRuleParameterListStatement.EXECUTION_KEYWORDS
                     if (isExecutionSection) {
                         executionSectionOccurred = true

@@ -64,7 +64,6 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-    // TODO why did this stop working?
     fun testRuleMultipleSingleLine() {
         doTest()
     }
@@ -180,8 +179,6 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-
-    // TODO #96
     fun testWorkflowRuleorder() {
         doTest()
     }
@@ -194,7 +191,6 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-    // well this one isn't supposed to be working
     fun testWorkflowLocalrules() {
         doTest()
     }
@@ -231,7 +227,6 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-    // TODO why does this test fail? a really weird bug
     fun testRuleMultipleSingleLineWithRuleSectionIndent() {
         doTest()
     }

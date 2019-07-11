@@ -1,7 +1,5 @@
 package com.jetbrains.snakecharm.lang.validation
 
-import com.intellij.psi.PsiIdentifier
-import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
@@ -58,7 +56,7 @@ object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
         for (st in sections) {
             when (st) {
                 is SMKRuleParameterListStatement -> {
-                    val sectionName = st.section.text
+                    val sectionName = st.section?.text
                     val isExecutionSection = sectionName in SMKRuleParameterListStatement.EXECUTION_KEYWORDS
 
                     if (executionSectionOccurred && isExecutionSection) {

@@ -99,8 +99,8 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
     <rule_like>s.foo
     """
     When I put the caret after <rule_like>s.f
-    Then reference should multi resolve to name, file, times
-      | foo (<class>) | foo.smk | 2 |
+    Then reference should multi resolve to name, file, times[, class name]
+      | foo | foo.smk | 2 | <class> |
     Examples:
       | rule_like  | class         |
       | rule       | SMKRule       |

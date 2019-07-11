@@ -8,7 +8,6 @@ import com.intellij.psi.TokenType
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonDialectsTokenSetProvider
-import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
 import com.jetbrains.python.psi.PyStatement
 import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.PyStatementListContainer
@@ -19,7 +18,8 @@ import com.jetbrains.snakecharm.SnakemakeIcons
 import javax.swing.Icon
 
 abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode): PyElementImpl(node),
-        PyStatementListContainer, PyStatement, ScopeOwner,
+        PyStatementListContainer, PyStatement,
+        //ScopeOwner,
         PsiNamedElement, PsiNameIdentifierOwner
 {
     //TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SMKRule>
@@ -53,7 +53,7 @@ abstract class SmkRuleLike<out T:SmkSectionStatement>(node: ASTNode): PyElementI
 
     fun getSectionByName(sectionName: String) =
             statementList.statements.find {
-                (it as SmkSectionStatement).section.textMatches(sectionName)
+                (it as SmkSectionStatement).section?.textMatches(sectionName) == true
             } as? T
 
     override fun getStatementList() = childToPsiNotNull<PyStatementList>(PyElementTypes.STATEMENT_LIST)

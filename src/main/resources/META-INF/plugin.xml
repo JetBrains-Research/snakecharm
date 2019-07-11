@@ -52,11 +52,6 @@
             implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKShadowSettingsCompletionContributor"
     />
 
-    <moduleService
-        serviceInterface="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
-        serviceImplementation="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
-    />
-
     <localInspection
         language="Snakemake"
         shortName="SmkResourcesKeywordArgsInspection"

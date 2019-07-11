@@ -14,8 +14,7 @@ class SmkResourcesKeywordArgsInspection : SnakemakeInspection() {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         override fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {
-            val sectionName = st.section.text
-            if (sectionName != SnakemakeNames.SECTION_RESOURCES) {
+            if(st.section?.textMatches(SnakemakeNames.SECTION_RESOURCES) != true) {
                 return
             }
 

@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi.types
 
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiInvalidElementAccessException
@@ -35,14 +36,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
         return nameAndDeclarationElement
                 .filter { (_, elem) -> elem != containingRule }
                 .map { (name, elem) ->
-                    PrioritizedLookupElement.withPriority(
-                            LookupElementBuilder
-                                    .createWithSmartPointer(name, elem)
-                                    .withTypeText(elem.containingFile.name)
-                                    .withIcon(elem.getIcon(0))
-                            ,
-                            PythonCompletionWeigher.WEIGHT_DELTA.toDouble()
-                    )
+                    createRuleLikeLookupItem(name, elem)
                 }.toTypedArray()
     }
 
@@ -79,4 +73,17 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
     }
 
     override fun isBuiltin() = false
+
+    companion object {
+        fun <T: SmkRuleOrCheckpoint> createRuleLikeLookupItem(name: String, elem: T): LookupElement =
+                PrioritizedLookupElement.withPriority(
+                        LookupElementBuilder
+                                .createWithSmartPointer(name, elem)
+                                .withTypeText(elem.containingFile.name)
+                                .withIcon(elem.getIcon(0))
+                        ,
+                        PythonCompletionWeigher.WEIGHT_DELTA.toDouble()
+                )
+
+    }
 }

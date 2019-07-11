@@ -6,10 +6,15 @@ import com.intellij.patterns.PatternCondition
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.resolve.CompletionVariantsProcessor
-import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache
+import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
+import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
+import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
 class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
     companion object {
@@ -49,11 +54,24 @@ class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
                     super.addElement(name, element)
                 }
             }
-            ImplicitPySymbolsCache.instance(module).all().forEach { (name, psi) ->
-                // processor.execute(it, ResolveState.initial())
-                processor.addElement(name, psi)
-            }
+            val contextScope = SmkCodeInsightScope[contextElement]
+            val cache = ImplicitPySymbolsProvider.instance(module).cache
 
+            SmkCodeInsightScope.values().asSequence()
+                    .filter { symbolScope -> contextScope.includes(symbolScope) }
+                    .flatMap { symbolScope -> cache[symbolScope].asSequence() }
+                    .forEach { symbol ->
+                        // processor.execute(it, ResolveState.initial())
+                        processor.addElement(symbol.identifier, symbol.psiDeclaration)
+                    }
+
+            if (contextScope == SmkCodeInsightScope.RULELIKE_RUN_SECTION) {
+                val ruleOrCheckpoint = contextElement.parentOfType<SmkRuleOrCheckpoint>()!!
+                val threadsSection = ruleOrCheckpoint.statementList.statements.asSequence()
+                        .filterIsInstance<SMKRuleParameterListStatement>()
+                        .filter { it.name == SnakemakeNames.SECTION_THREADS }.firstOrNull()
+                processor.addElement("threads", threadsSection ?: ruleOrCheckpoint)
+            }
             result.addAllElements(processor.resultList)
         }
     }
