@@ -272,7 +272,9 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             var previousIndents = indents
             while (insideStringLiteral()) {
                 if (atAnyOfTokensSafe(PyTokenTypes.FSTRING_START)) {
-                    parseSingleExpression(false)
+                    val parseFunction = ExpressionParsing::class.java.getDeclaredMethod("parseFormattedStringNode")
+                    parseFunction.isAccessible = true
+                    parseFunction.invoke(this)
                 } else {
                     nextToken()
                 }
@@ -281,13 +283,16 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                     incorrectUnindentMarker.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
                     incorrectUnindentMarker = null
                 }
+
+                // when there's a binary concatenation expression
+                // TODO return to the previous string properly
+                /*if (atAnyOfTokensSafe(PyTokenTypes.PLUS)) {
+                    return parseSingleExpression(false)
+                } */
+
+                // when lines are separated with '\' symbol or there are two strings in a row like this: "1" "2"
                 if (insideStringLiteral()) {
                     continue
-                }
-
-                if (atAnyOfTokensSafe(PyTokenTypes.PLUS)) {
-                    stringLiteralMarker.rollbackTo()
-                    return parseSingleExpression(false)
                 }
 
                 if (!atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
