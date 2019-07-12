@@ -279,6 +279,12 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 if (atStringNode()) {
                     continue
                 }
+
+                if (atAnyOfTokensSafe(PyTokenTypes.PLUS)) {
+                    stringLiteralMarker.rollbackTo()
+                    return parseSingleExpression(false)
+                }
+
                 if (!atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
                     break
                 } else {
