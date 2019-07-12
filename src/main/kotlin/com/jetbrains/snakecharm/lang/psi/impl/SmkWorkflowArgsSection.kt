@@ -1,9 +1,11 @@
-package com.jetbrains.snakecharm.lang.psi
+package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
+import com.jetbrains.snakecharm.lang.psi.SMKElementVisitor
+import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
 
 /**
  * @author Roman.Chernyatchik

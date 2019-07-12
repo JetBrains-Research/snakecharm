@@ -1,8 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi.elementTypes
 
 import com.jetbrains.python.psi.PyElementType
-import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.psi.impl.SmkReferenceExpressionImpl
+import com.jetbrains.snakecharm.lang.psi.impl.*
 
 /**
  * @author Roman.Chernyatchik
@@ -48,5 +47,4 @@ object SnakemakeElementTypes {
             "SMK_REFERENCE_EXPRESSION",
             SmkReferenceExpressionImpl::class.java
     )
-
 }

@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.lang.psi
+package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
@@ -7,6 +7,9 @@ import com.jetbrains.python.documentation.docstrings.DocStringUtil
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.impl.PyElementImpl
+import com.jetbrains.snakecharm.lang.psi.SMKElementVisitor
+import com.jetbrains.snakecharm.lang.psi.SmkRunSection
+import com.jetbrains.snakecharm.lang.psi.getIdentifierNode
 
 class SmkRunSectionImpl(node: ASTNode): PyElementImpl(node), SmkRunSection {
     override fun getStatementList(): PyStatementList =
