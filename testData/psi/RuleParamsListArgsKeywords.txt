@@ -1,5 +1,5 @@
 SnakemakeFile: RuleParamsListArgsKeywords.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('foo1')
@@ -150,7 +150,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: somecommand --group {wildcards.group}  < {input}  > {output}
             PsiElement(Py:SINGLE_QUOTED_STRING)('"somecommand --group {wildcards.group}  < {input}  > {output}"')
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('foo2')
@@ -165,7 +165,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: 0.15.3/bio/bwa/mem
             PsiElement(Py:SINGLE_QUOTED_STRING)('"0.15.3/bio/bwa/mem"')
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('foo3')
@@ -180,7 +180,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: path/to/script.py
             PsiElement(Py:SINGLE_QUOTED_STRING)('"path/to/script.py"')
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('foo4')

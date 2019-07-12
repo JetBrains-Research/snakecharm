@@ -1,5 +1,5 @@
 SnakemakeFile: RuleParamsListArgsHangingComma.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all')
@@ -15,7 +15,7 @@ SnakemakeFile: RuleParamsListArgsHangingComma.smk
             PsiElement(Py:SINGLE_QUOTED_STRING)('"aaa1"')
           PsiElement(Py:COMMA)(',')
   PsiWhiteSpace('\n  \n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('samtools_sort')

@@ -1,5 +1,5 @@
 SnakemakeFile: RuleMultipleSingleLine.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all1')
@@ -14,7 +14,7 @@ SnakemakeFile: RuleMultipleSingleLine.smk
           PyStringLiteralExpression: foo1
             PsiElement(Py:SINGLE_QUOTED_STRING)(''foo1'')
   PsiWhiteSpace('\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all2')

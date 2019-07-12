@@ -1,5 +1,5 @@
 SnakemakeFile: RuleUnexpKeyword.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiElement(Py:COLON)(':')
     PyStatementList
@@ -15,7 +15,7 @@ SnakemakeFile: RuleUnexpKeyword.smk
   PsiErrorElement:Statement expected, found Py:DEDENT
     <empty list>
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all')

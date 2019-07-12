@@ -1,5 +1,5 @@
 SnakemakeFile: RuleRun.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('compose_merge')
@@ -15,7 +15,7 @@ SnakemakeFile: RuleRun.smk
             PyReferenceExpression: foo
               PsiElement(Py:IDENTIFIER)('foo')
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('compose_merge')

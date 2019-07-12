@@ -1,5 +1,5 @@
 SnakemakeFile: RuleInvalidParam.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiElement(Py:COLON)(':')
     PyStatementList
@@ -13,7 +13,7 @@ SnakemakeFile: RuleInvalidParam.smk
           PyStringLiteralExpression: foo1
             PsiElement(Py:SINGLE_QUOTED_STRING)(''foo1'')
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiElement(Py:COLON)(':')
     PyStatementList
@@ -28,7 +28,7 @@ SnakemakeFile: RuleInvalidParam.smk
   PsiErrorElement:Statement expected, found Py:DEDENT
     <empty list>
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all3')
@@ -44,7 +44,7 @@ SnakemakeFile: RuleInvalidParam.smk
           PyReferenceExpression: foo3
             PsiElement(Py:IDENTIFIER)('foo3')
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all4')

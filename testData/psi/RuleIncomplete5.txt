@@ -8,7 +8,7 @@ SnakemakeFile: RuleIncomplete5.smk
       PsiErrorElement:Indent expected...
         <empty list>
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('a')

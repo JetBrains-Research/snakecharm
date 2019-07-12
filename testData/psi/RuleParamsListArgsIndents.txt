@@ -1,5 +1,5 @@
 SnakemakeFile: RuleParamsListArgsIndents.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('samtools_sort')

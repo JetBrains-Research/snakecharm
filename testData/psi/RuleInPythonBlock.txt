@@ -9,7 +9,7 @@ SnakemakeFile: RuleInPythonBlock.smk
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('\n  ')
     PyStatementList
-      SMKRule
+      SmkRule
         PsiElement(Py:RULE_KEYWORD)('rule')
         PsiWhiteSpace(' ')
         PsiElement(Py:IDENTIFIER)('aa')
