@@ -270,13 +270,18 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             var statementBreakMarker: PsiBuilder.Marker? = null
             var incorrectUnindentMarker: PsiBuilder.Marker? = null
             var previousIndents = indents
-            while (atStringNode()) {
-                nextToken()
+            while (insideStringLiteral()) {
+                if (atAnyOfTokensSafe(PyTokenTypes.FSTRING_START)) {
+                    parseSingleExpression(false)
+                } else {
+                    nextToken()
+                }
+
                 if (incorrectUnindentMarker != null) {
                     incorrectUnindentMarker.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
                     incorrectUnindentMarker = null
                 }
-                if (atStringNode()) {
+                if (insideStringLiteral()) {
                     continue
                 }
 
@@ -324,7 +329,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         return parseSingleExpression(false)
     }
 
-    private fun atStringNode() = atAnyOfTokensSafe(*PyTokenTypes.STRING_NODES.types)
+    private fun insideStringLiteral() = atAnyOfTokensSafe(*PyTokenTypes.STRING_NODES.types, PyTokenTypes.FSTRING_START)
 
     /**
      * Skips tokens until token from expected set and marks it with error
