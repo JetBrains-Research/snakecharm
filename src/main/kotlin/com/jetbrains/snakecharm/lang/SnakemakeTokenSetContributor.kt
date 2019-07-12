@@ -12,15 +12,22 @@ import com.jetbrains.snakecharm.lang.psi.elementTypes.SnakemakeElementTypes
  */
 class SnakemakeTokenSetContributor : PythonDialectsTokenSetContributorBase() {
     override fun getStatementTokens() = TokenSet.create(
-            SmkStubElementTypes.RULE_DECLARATION,
-            SnakemakeElementTypes.RULE_PARAMETER_LIST_STATEMENT,
-            SnakemakeElementTypes.WORKFLOW_PARAMETER_LIST_STATEMENT
+            SnakemakeElementTypes.WORKFLOW_ARGS_SECTION_STATEMENT,
+            SnakemakeElementTypes.WORKFLOW_LOCALRULES_SECTION_STATEMENT,
+            SnakemakeElementTypes.WORKFLOW_RULEORDER_SECTION_STATEMENT,
+            SnakemakeElementTypes.WORKFLOW_PY_BLOCK_SECTION_STATEMENT,
+
+            SmkStubElementTypes.RULE_DECLARATION_STATEMENT,
+            SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT,
+            SnakemakeElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
+
+            SmkStubElementTypes.SUBWORKFLOW_DECLARATION_STATEMENT,
+            SnakemakeElementTypes.SUBWORKFLOW_ARGS_SECTION_STATEMENT
     )
 
-//    override fun getExpressionTokens(): TokenSet {
-//        // return TokenSet.create(SnakemakeTokenTypes.RULE_KEYWORD)
-//        return super.getExpressionTokens()
-//    }
+    override fun getExpressionTokens() = TokenSet.create(
+            SnakemakeElementTypes.REFERENCE_EXPRESSION
+    )
 
     override fun getKeywordTokens() = TokenSet.orSet(
             TokenSet.create(
@@ -34,12 +41,6 @@ class SnakemakeTokenSetContributor : PythonDialectsTokenSetContributorBase() {
             )
     )
 
-    //       @NotNull
-//  @Override
-//  public TokenSet getExpressionTokens() {
-//    return TokenSet.create(REFERENCE_EXPRESSION, ADDRESS_EXPRESSION, TYPECAST_EXPRESSION, SIZEOF_EXPRESSION, NEW_EXPRESSION);
-    //  }
-
 // TODO
 //    override fun getParameterTokens(): TokenSet {
 //        return TokenSet.create(NAMED_PARAMETER)
@@ -48,10 +49,5 @@ class SnakemakeTokenSetContributor : PythonDialectsTokenSetContributorBase() {
     // TODO: uncomment + tests
 //    override fun getUnbalancedBracesRecoveryTokens(): TokenSet {
 //        return TokenSet.create(SnakemakeTokenTypes.RULE_KEYWORD)
-//    }
-
-// TODO
-//    override fun getReferenceExpressionTokens(): TokenSet {
-//        return TokenSet.create(REFERENCE_EXPRESSION)
 //    }
 }

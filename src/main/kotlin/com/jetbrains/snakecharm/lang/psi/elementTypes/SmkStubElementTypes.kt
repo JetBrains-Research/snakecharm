@@ -12,7 +12,7 @@ import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleStub
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkSubworkflowStub
 
 object SmkStubElementTypes {
-    val RULE_DECLARATION: IStubElementType<SmkRuleStub, SmkRule> = SmkRuleElementType()
-    val CHECKPOINT_DECLARATION: IStubElementType<SmkCheckpointStub, SmkCheckPoint> = SmkCheckpointElementType()
-    val SUBWORKFLOW_DECLARATION: IStubElementType<SmkSubworkflowStub, SmkSubworkflow> = SmkSubworkflowElementType()
+    val RULE_DECLARATION_STATEMENT: IStubElementType<SmkRuleStub, SmkRule> = SmkRuleElementType()
+    val CHECKPOINT_DECLARATION_STATEMENT: IStubElementType<SmkCheckpointStub, SmkCheckPoint> = SmkCheckpointElementType()
+    val SUBWORKFLOW_DECLARATION_STATEMENT: IStubElementType<SmkSubworkflowStub, SmkSubworkflow> = SmkSubworkflowElementType()
 }

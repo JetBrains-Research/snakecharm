@@ -49,7 +49,7 @@ interface SmkWorkflowArgsSection: SmkArgsSection // PyNamedElementContainer
 interface SmkRunSection: SmkSection, PyStatementListContainer, PyDocStringOwner
     //ScopeOwner, // for control flow
 
-interface SMKWorkflowPythonBlockParameter : SmkSection,
+interface SmkWorkflowPythonBlockSection : SmkSection,
         ScopeOwner, // for control flow
         PyStatementListContainer, PyDocStringOwner
 

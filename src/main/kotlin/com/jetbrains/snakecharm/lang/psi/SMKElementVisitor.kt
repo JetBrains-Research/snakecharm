@@ -43,7 +43,7 @@ interface SMKElementVisitor {
         pyElementVisitor.visitPyStatement(st)
     }
 
-    fun visitSMKWorkflowPythonBlockParameter(st: SMKWorkflowPythonBlockParameter) {
+    fun visitSMKWorkflowPythonBlockParameter(st: SmkWorkflowPythonBlockSection) {
         pyElementVisitor.visitPyStatementList(st.statementList)
     }
 

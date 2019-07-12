@@ -48,7 +48,7 @@ object SnakemakeSyntaxAnnotator: SnakemakeAnnotator() {
         }
     }
 
-    override fun visitSMKWorkflowPythonBlockParameter(st: SMKWorkflowPythonBlockParameter) {
+    override fun visitSMKWorkflowPythonBlockParameter(st: SmkWorkflowPythonBlockSection) {
         val keywordNode = st.getSectionKeywordNode()
         if (keywordNode != null) {
             addHighlightingAnnotation(keywordNode, PyHighlighter.PY_KEYWORD)

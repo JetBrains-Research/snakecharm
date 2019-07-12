@@ -12,7 +12,7 @@ class SmkSubworkflowImpl:
         SmkRuleLikeImpl<SmkSubworkflowStub, SmkSubworkflow, SmkSubworkflowArgsSection>, SmkSubworkflow {
 
     constructor(node: ASTNode): super(node)
-    constructor(stub: SmkSubworkflowStub): super(stub, SmkStubElementTypes.SUBWORKFLOW_DECLARATION)
+    constructor(stub: SmkSubworkflowStub): super(stub, SmkStubElementTypes.SUBWORKFLOW_DECLARATION_STATEMENT)
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
         when (pyVisitor) {

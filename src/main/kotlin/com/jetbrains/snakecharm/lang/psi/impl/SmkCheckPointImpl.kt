@@ -12,7 +12,7 @@ class SmkCheckPointImpl
     : SmkRuleLikeImpl<SmkCheckpointStub, SmkCheckPoint, SmkRuleOrCheckpointArgsSection>, SmkCheckPoint {
 
     constructor(node: ASTNode): super(node)
-    constructor(stub: SmkCheckpointStub): super(stub, SmkStubElementTypes.CHECKPOINT_DECLARATION)
+    constructor(stub: SmkCheckpointStub): super(stub, SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT)
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SMKElementVisitor -> pyVisitor.visitSMKCheckPoint(this)

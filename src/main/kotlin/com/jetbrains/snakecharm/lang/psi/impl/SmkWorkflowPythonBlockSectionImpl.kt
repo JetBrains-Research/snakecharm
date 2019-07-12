@@ -8,9 +8,9 @@ import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.SMKElementVisitor
-import com.jetbrains.snakecharm.lang.psi.SMKWorkflowPythonBlockParameter
+import com.jetbrains.snakecharm.lang.psi.SmkWorkflowPythonBlockSection
 
-class SMKWorkflowPythonBlockParameterImpl(node: ASTNode) : PyElementImpl(node), SMKWorkflowPythonBlockParameter {
+class SmkWorkflowPythonBlockSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkflowPythonBlockSection {
 
     override fun getStatementList(): PyStatementList =
             childToPsi(PyElementTypes.STATEMENT_LIST) ?: error("Statement list missing for workflow parameter $text")

@@ -8,7 +8,9 @@ import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex.Companion.
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointStub
 
 class SmkCheckpointElementType
-    : SmkRuleLikeElementType<SmkCheckpointStub, SmkCheckPoint>("SMK_CHECKPOINT_DECLARATION", KEY){
+    : SmkRuleLikeElementType<SmkCheckpointStub, SmkCheckPoint>(
+        "SMK_CHECKPOINT_DECLARATION_STATEMENT", KEY
+){
 
     override fun createPsi(stub: SmkCheckpointStub) = SmkCheckPointImpl(stub)
 

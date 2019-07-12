@@ -23,9 +23,9 @@ import java.util.*
 class SnakeMakeFoldingBuilder : PythonFoldingBuilder() {
     companion object {
         val FOLDED_ELEMENTS = TokenSet.create(
-                SmkStubElementTypes.RULE_DECLARATION,
-                SnakemakeElementTypes.RULE_RUN_STATEMENT,
-                SnakemakeElementTypes.WORKFLOW_PYTHON_BLOCK_PARAMETER
+                SmkStubElementTypes.RULE_DECLARATION_STATEMENT,
+                SnakemakeElementTypes.RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT,
+                SnakemakeElementTypes.WORKFLOW_PY_BLOCK_SECTION_STATEMENT
         )
     }
 //    override fun isRegionCollapsedByDefault(node: ASTNode): Boolean {
