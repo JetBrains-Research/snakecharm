@@ -3,9 +3,9 @@ package com.jetbrains.snakecharm.lang.highlighter
 import com.jetbrains.python.highlighting.PyHighlighter
 import com.jetbrains.python.highlighting.PyHighlighter.PY_FUNC_DEFINITION
 import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
+import com.jetbrains.snakecharm.lang.validation.SmkAnnotator
 
-object SnakemakeSyntaxAnnotator: SnakemakeAnnotator() {
+object SmkSyntaxAnnotator: SmkAnnotator() {
     override fun visitSmkRule(rule: SmkRule) {
         visitSMKRuleLike(rule)
     }

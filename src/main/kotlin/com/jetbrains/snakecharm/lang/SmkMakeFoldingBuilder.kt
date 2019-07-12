@@ -13,19 +13,19 @@ import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonFoldingBuilder
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SnakemakeElementTypes
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import java.util.*
 
 /**
  * @author Roman.Chernyatchik
  * @date 2019-02-03
  */
-class SnakeMakeFoldingBuilder : PythonFoldingBuilder() {
+class SmkMakeFoldingBuilder : PythonFoldingBuilder() {
     companion object {
         val FOLDED_ELEMENTS = TokenSet.create(
                 SmkStubElementTypes.RULE_DECLARATION_STATEMENT,
-                SnakemakeElementTypes.RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT,
-                SnakemakeElementTypes.WORKFLOW_PY_BLOCK_SECTION_STATEMENT
+                SmkElementTypes.RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT,
+                SmkElementTypes.WORKFLOW_PY_BLOCK_SECTION_STATEMENT
         )
     }
 //    override fun isRegionCollapsedByDefault(node: ASTNode): Boolean {

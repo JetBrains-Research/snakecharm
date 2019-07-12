@@ -5,7 +5,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.*
 
-object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
+object SmkSyntaxErrorAnnotator : SmkAnnotator() {
     override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
         if (!SnakemakeLanguageDialect.isInsideSmkFile(st)) {
             return

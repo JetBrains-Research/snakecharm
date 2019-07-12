@@ -4,7 +4,7 @@ import com.intellij.psi.FileViewProvider
 import com.intellij.psi.stubs.StubElement
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.impl.PyFileImpl
-import com.jetbrains.snakecharm.SnakemakeFileType
+import com.jetbrains.snakecharm.SmkFileType
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 
 /**
@@ -15,7 +15,7 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
     // consider extend SnakemakeScopeOwner:ScopeOwner
     // e.g. CythonFile, CythonScopeOwner
 
-    override fun getIcon(flags: Int) = SnakemakeFileType.icon
+    override fun getIcon(flags: Int) = SmkFileType.icon
 
     override fun toString() = "SnakemakeFile: $name"
 

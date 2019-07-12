@@ -5,7 +5,7 @@ import com.jetbrains.python.psi.PyElementVisitor
 /**
  * Implements Snakemake specific visit* methods and accepts [PyElementVisitor] for possible delegation to python
  * visitor. This impl is chosen because [PyElementVisitor] is abstract class, not interface. Also we'd like to
- * add snakemake visit* support into [com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator]
+ * add snakemake visit* support into [com.jetbrains.snakecharm.lang.validation.SmkAnnotator]
  * and [com.jetbrains.snakecharm.inspections.SnakemakeInspectionVisitor] without copy-pasting implementation details
  * from [com.jetbrains.python.validation.PyAnnotator] and [com.jetbrains.python.inspections.PyInspectionVisitor]
  */

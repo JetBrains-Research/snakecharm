@@ -5,29 +5,29 @@ import com.jetbrains.python.PythonDialectsTokenSetContributorBase
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SnakemakeElementTypes
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 
 /**
  * @author Roman.Chernyatchik
  * @date 2018-12-31
  */
-class SnakemakeTokenSetContributor : PythonDialectsTokenSetContributorBase() {
+class SmkTokenSetContributor : PythonDialectsTokenSetContributorBase() {
     override fun getStatementTokens() = TokenSet.create(
-            SnakemakeElementTypes.WORKFLOW_ARGS_SECTION_STATEMENT,
-            SnakemakeElementTypes.WORKFLOW_LOCALRULES_SECTION_STATEMENT,
-            SnakemakeElementTypes.WORKFLOW_RULEORDER_SECTION_STATEMENT,
-            SnakemakeElementTypes.WORKFLOW_PY_BLOCK_SECTION_STATEMENT,
+            SmkElementTypes.WORKFLOW_ARGS_SECTION_STATEMENT,
+            SmkElementTypes.WORKFLOW_LOCALRULES_SECTION_STATEMENT,
+            SmkElementTypes.WORKFLOW_RULEORDER_SECTION_STATEMENT,
+            SmkElementTypes.WORKFLOW_PY_BLOCK_SECTION_STATEMENT,
 
             SmkStubElementTypes.RULE_DECLARATION_STATEMENT,
             SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT,
-            SnakemakeElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
+            SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
 
             SmkStubElementTypes.SUBWORKFLOW_DECLARATION_STATEMENT,
-            SnakemakeElementTypes.SUBWORKFLOW_ARGS_SECTION_STATEMENT
+            SmkElementTypes.SUBWORKFLOW_ARGS_SECTION_STATEMENT
     )
 
     override fun getExpressionTokens() = TokenSet.create(
-            SnakemakeElementTypes.REFERENCE_EXPRESSION
+            SmkElementTypes.REFERENCE_EXPRESSION
     )
 
     override fun getKeywordTokens() = TokenSet.orSet(

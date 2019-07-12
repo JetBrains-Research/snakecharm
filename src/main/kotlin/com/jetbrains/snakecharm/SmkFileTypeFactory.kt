@@ -9,12 +9,12 @@ import com.intellij.openapi.fileTypes.FileTypeFactory
  * @author Roman.Chernyatchik
  * @date 2018-12-30
  */
-class SnakemakeFileTypeFactory: FileTypeFactory() {
+class SmkFileTypeFactory: FileTypeFactory() {
     override fun createFileTypes(fileTypeConsumer: FileTypeConsumer) {
         fileTypeConsumer.consume(
-                SnakemakeFileType,
+                SmkFileType,
                 ExactFileNameMatcher("Snakefile", true),
-                ExtensionFileNameMatcher(SnakemakeFileType.defaultExtension),
+                ExtensionFileNameMatcher(SmkFileType.defaultExtension),
                 ExtensionFileNameMatcher("rule"),
                 ExtensionFileNameMatcher("rules")
         )

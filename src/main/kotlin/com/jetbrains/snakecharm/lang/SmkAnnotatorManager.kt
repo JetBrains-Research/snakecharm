@@ -5,16 +5,16 @@ import com.intellij.lang.annotation.Annotator
 import com.intellij.openapi.project.DumbAware
 import com.intellij.psi.PsiElement
 import com.jetbrains.python.validation.PyAnnotator
-import com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxAnnotator
+import com.jetbrains.snakecharm.lang.highlighter.SmkSyntaxAnnotator
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.validation.SmkReturnAnnotator
-import com.jetbrains.snakecharm.lang.validation.SnakemakeSyntaxErrorAnnotator
+import com.jetbrains.snakecharm.lang.validation.SmkSyntaxErrorAnnotator
 
 /**
  * @author Roman.Chernyatchik
  * @date 2019-01-09
  */
-abstract class SnakemakeAnnotatorManager : Annotator, DumbAware {
+abstract class SmkAnnotatorManager : Annotator, DumbAware {
     private var myHolder: AnnotationHolder? = null
 
     abstract val annotators: List<PyAnnotator>
@@ -35,15 +35,15 @@ abstract class SnakemakeAnnotatorManager : Annotator, DumbAware {
     }
 }
 
-class SmkStandardAnnotatorManager : SnakemakeAnnotatorManager() {
+class SmkStandardAnnotatorManager : SmkAnnotatorManager() {
     override val annotators: List<PyAnnotator> = listOf(
             SmkReturnAnnotator
     )
 }
 
-class SmkDumbAwareAnnotatorManager : SnakemakeAnnotatorManager(), DumbAware {
+class SmkDumbAwareAnnotatorManager : SmkAnnotatorManager(), DumbAware {
     override val annotators = listOf(
-            SnakemakeSyntaxAnnotator,
-            SnakemakeSyntaxErrorAnnotator
+            SmkSyntaxAnnotator,
+            SmkSyntaxErrorAnnotator
     )
 }

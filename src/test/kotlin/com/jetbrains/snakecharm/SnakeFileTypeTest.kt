@@ -29,6 +29,6 @@ class SnakeFileTypeTest: PlatformTestCase() {
         TestCase.assertNotNull(virtualFile)
         val psi = psiManager.findFile(virtualFile)
         TestCase.assertTrue(psi is SmkFile)
-        assertEquals(SnakemakeFileType, virtualFile.fileType)
+        assertEquals(SmkFileType, virtualFile.fileType)
     }
 }

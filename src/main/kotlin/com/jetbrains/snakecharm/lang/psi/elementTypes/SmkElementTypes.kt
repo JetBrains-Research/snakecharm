@@ -7,7 +7,7 @@ import com.jetbrains.snakecharm.lang.psi.impl.*
  * @author Roman.Chernyatchik
  * @date 2018-12-31
  */
-object SnakemakeElementTypes {
+object SmkElementTypes {
     val RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT = PyElementType(
             "SMK_RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT",
             SmkRuleOrCheckpointArgsSectionImpl::class.java
