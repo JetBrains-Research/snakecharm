@@ -1,0 +1,33 @@
+SnakemakeFile: RuleParamsListArgsStringMultilineIncorrectUnindent.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('NAME')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n            ')
+          PyStringLiteralExpression: file15_copy1
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file"')
+            PsiWhiteSpace('\n                    ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"15"')
+            PsiWhiteSpace('\n            ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"_copy"')
+            PsiWhiteSpace('\n                 ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"1"')
+            PsiErrorElement:Unindent does not match any outer indentation level.
+              PsiWhiteSpace('\n              ')
+              PsiElement(Py:SINGLE_QUOTED_STRING)('".txt"')
+          PsiWhiteSpace('\n            ')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: anotherfile.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"another"')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file"')
+            PsiWhiteSpace('\n                  ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('".txt"')

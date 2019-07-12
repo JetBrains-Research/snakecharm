@@ -16,13 +16,14 @@ import com.jetbrains.snakecharm.SnakemakeBundle
  * @date 2019-01-04
  */
 class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionParsing(context) {
+    private var indents = 0
+
     override fun getParsingContext() = myContext as SnakemakeParserContext
 
     fun parseRuleLikeSectionArgumentList() = parseArgumentList(
             ",", PyTokenTypes.COMMA,
-            message("PARSE.expected.expression"),
-            this::parseRuleParamArgument
-    )
+            message("PARSE.expected.expression")
+    ) { parseRuleParamArgument() }
 
     fun parseArgumentList(
             separatorTokenText: String,
@@ -83,7 +84,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 return false
             }
         }
-        var indents = if (argsOnNextLine) 1 else 0
+        indents = if (argsOnNextLine) 1 else 0
         var argNumber = 0
         var incorrectUnindentMarker: PsiBuilder.Marker? = null
         while (!myBuilder.eof()) {
@@ -123,6 +124,9 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         if (atToken(PyTokenTypes.DEDENT)) {
                             nextToken()
                             indents--
+                        } else if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
+                            myBuilder.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
+                            nextToken()
                         } else {
                             break
                         }
@@ -252,7 +256,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 }
                 keywordArgMarker.rollbackTo()
             }
-            if (!parseSingleExpression(false)) {
+            if (!parseSingleExpressionOrStringLiteral()) {
                 myBuilder.error(message("PARSE.expected.expression"))
                 return false
             }
@@ -260,6 +264,61 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         return true
     }
 
+    private fun parseSingleExpressionOrStringLiteral(): Boolean {
+        if (myBuilder.tokenType in PyTokenTypes.STRING_NODES) {
+            val stringLiteralMarker = myBuilder.mark()
+            var statementBreakMarker: PsiBuilder.Marker? = null
+            var incorrectUnindentMarker: PsiBuilder.Marker? = null
+            var previousIndents = indents
+            while (atStringNode()) {
+                nextToken()
+                if (incorrectUnindentMarker != null) {
+                    incorrectUnindentMarker.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
+                    incorrectUnindentMarker = null
+                }
+                if (atStringNode()) {
+                    continue
+                }
+                if (!atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
+                    break
+                } else {
+                    statementBreakMarker?.drop()
+                    statementBreakMarker = myBuilder.mark()
+                    previousIndents = indents
+                    nextToken()
+                }
+
+                if (atAnyOfTokensSafe(PyTokenTypes.INDENT)) {
+                    nextToken()
+                    indents++
+                } else {
+                    loop@ while (indents > 1 && !myBuilder.eof()) {
+                        when {
+                            atToken(PyTokenTypes.DEDENT) -> {
+                                nextToken()
+                                indents--
+                            }
+                            atToken(PyTokenTypes.INCONSISTENT_DEDENT) -> {
+                                incorrectUnindentMarker = myBuilder.mark()
+                                nextToken()
+                            }
+                            else -> break@loop
+                        }
+                    }
+                    if (indents == 0) {
+                        break
+                    }
+                }
+            }
+            statementBreakMarker?.rollbackTo()
+            indents = previousIndents
+            stringLiteralMarker.done(PyElementTypes.STRING_LITERAL_EXPRESSION)
+            return true
+        }
+        return parseSingleExpression(false)
+    }
+
+    private fun atStringNode() = atAnyOfTokensSafe(*PyTokenTypes.STRING_NODES.types)
 
     /**
      * Skips tokens until token from expected set and marks it with error
