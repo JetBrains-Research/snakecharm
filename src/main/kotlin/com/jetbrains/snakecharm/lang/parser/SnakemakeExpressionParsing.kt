@@ -292,7 +292,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                     nextToken()
                     indents++
                 } else {
-                    loop@ while (indents > 1 && !myBuilder.eof()) {
+                    loop@ while (indents > 0 && !myBuilder.eof()) {
                         when {
                             atToken(PyTokenTypes.DEDENT) -> {
                                 nextToken()
@@ -305,7 +305,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                             else -> break@loop
                         }
                     }
-                    if (indents == 0) {
+                    if (incorrectUnindentMarker == null && indents == 0) {
                         break
                     }
                 }
