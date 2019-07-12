@@ -29,14 +29,9 @@ SnakemakeFile: WorkflowLocalrulesInvalid.smk
       PsiWhiteSpace('\n  ')
       SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('foo5')
-      PsiErrorElement:Dedent expected
-        <empty list>
-  PsiWhiteSpace('\n  ')
-  PyExpressionStatement
-    PyReferenceExpression: foo6
-      PsiElement(Py:IDENTIFIER)('foo6')
-  PsiErrorElement:Statement expected, found Py:DEDENT
-    <empty list>
+      PsiWhiteSpace('\n  ')
+      PsiErrorElement:',' expected
+        PsiElement(Py:IDENTIFIER)('foo6')
   PsiWhiteSpace('\n\n')
   SMKWorkflowLocalRulesStatement
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')

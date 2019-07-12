@@ -8,7 +8,7 @@ SnakemakeFile: RuleInvalidNoParamBody.smk
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
-          PsiErrorElement:Indent expected...
+          PsiErrorElement:Indent expected
             <empty list>
   PsiWhiteSpace('\n    ')
   PsiElement(Py:IDENTIFIER)('output')
