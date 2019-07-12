@@ -219,7 +219,7 @@ class CompletionResolveSteps {
         iInvokeAutocompletionPopup()
 
         val fixture = SnakemakeWorld.fixture()
-        val lookupElements = fixture.lookupElements
+        val lookupElements = fixture.lookupElements?.filterNotNull()?.toTypedArray()
 
 
         ApplicationManager.getApplication().invokeAndWait(
@@ -293,28 +293,6 @@ class CompletionResolveSteps {
                 assertEquals(0, results.size.toLong())
             }
             else -> TestCase.assertNull(ref.resolve())
-        }
-    }
-
-    private fun assertHasElements(
-            actualLookupItems: List<String>,
-            expectedVariants: List<String>
-    ) {
-        val unmetElements = ArrayList<String>()
-
-        for (variant in expectedVariants) {
-            if (!actualLookupItems.contains(variant)) {
-                unmetElements.add(variant)
-            }
-        }
-        if (unmetElements.isNotEmpty()) {
-            org.junit.Assert.fail(
-                    """
-                    "Not all elements were found in real collection. Following elements were missed :[
-                    ${UsefulTestCase.toString(unmetElements)}] in collection:[
-                    ${UsefulTestCase.toString(actualLookupItems)}]
-                    """.trimIndent()
-            )
         }
     }
 
@@ -459,5 +437,28 @@ class LookupFilter private constructor(
             sb.append("Type: \"").append(elementPresentation.typeText).append("\"; ")
             return sb.toString()
         }
+    }
+}
+
+
+fun assertHasElements(
+        actualLookupItems: List<String>,
+        expectedVariants: List<String>
+) {
+    val unmetElements = ArrayList<String>()
+
+    for (variant in expectedVariants) {
+        if (!actualLookupItems.contains(variant)) {
+            unmetElements.add(variant)
+        }
+    }
+    if (unmetElements.isNotEmpty()) {
+        org.junit.Assert.fail(
+                """
+            "Not all elements were found in real collection. Following elements were missed :[
+            ${UsefulTestCase.toString(unmetElements)}] in collection:[
+            ${UsefulTestCase.toString(actualLookupItems)}]
+            """.trimIndent()
+        )
     }
 }

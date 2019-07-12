@@ -1,27 +1,12 @@
 package com.jetbrains.snakecharm.lang.psi
 
-import com.intellij.lang.ASTNode
-import com.jetbrains.python.psi.PyElementVisitor
+import com.intellij.psi.StubBasedPsiElement
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointStub
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleStub
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkSubworkflowStub
 
-class SMKRule(node: ASTNode): SmkRuleOrCheckpoint(node) {
-    override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
-        is SMKElementVisitor -> pyVisitor.visitSMKRule(this)
-        else -> super.acceptPyVisitor(pyVisitor)
-    }
-}
+interface SMKRule: SmkRuleOrCheckpoint, StubBasedPsiElement<SmkRuleStub>
 
-class SMKCheckPoint(node: ASTNode) : SmkRuleOrCheckpoint(node) {
-    override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
-        is SMKElementVisitor -> pyVisitor.visitSMKCheckPoint(this)
-        else -> super.acceptPyVisitor(pyVisitor)
-    }
-}
+interface SMKCheckPoint: SmkRuleOrCheckpoint, StubBasedPsiElement<SmkCheckpointStub>
 
-class SmkSubworkflow(node: ASTNode): SmkRuleLike<SMKSubworkflowParameterListStatement>(node) {
-    override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
-        when (pyVisitor) {
-            is SMKElementVisitor -> pyVisitor.visitSMKSubworkflow(this)
-            else -> super.acceptPyVisitor(pyVisitor)
-        }
-    }
-}
+interface SmkSubworkflow: SmkRuleLike<SMKSubworkflowParameterListStatement>, StubBasedPsiElement<SmkSubworkflowStub>

@@ -39,6 +39,11 @@
     <!--<codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>-->
     <lang.documentationProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.documentation.SmkShadowSettingsDocumentation"/>
 
+    <stubElementTypeHolder class="com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes"/>
+    <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex"/>
+    <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex"/>
+    <gotoSymbolContributor implementation="com.jetbrains.snakecharm.actions.SmkGotoSymbolContributor"/>
+
     <completion.contributor
         language="Python"
         implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor"

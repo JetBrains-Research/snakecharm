@@ -115,8 +115,8 @@ Feature: Resolve for rules in localrules and ruleorder
     """
     When I put the caret after <ptn>
     Then reference should multi resolve to name, file, times[, class name]
-      | aaaa | foo.smk | 2 | SMKRule       |
-      | aaaa | foo.smk | 1 | SMKCheckPoint |
+      | aaaa | foo.smk | 2 | SMKRuleImpl       |
+      | aaaa | foo.smk | 1 | SMKCheckPointImpl |
 
     Examples:
       | ptn             |
@@ -144,8 +144,8 @@ Feature: Resolve for rules in localrules and ruleorder
     """
     When I put the caret after <ptn>
     Then reference should multi resolve to name, file, times[, class name]
-      | aaaa | foo.smk | 2 | SMKRule       |
-      | aaaa | foo.smk | 1 | SMKCheckPoint |
+      | aaaa | foo.smk | 2 | SMKRuleImpl       |
+      | aaaa | foo.smk | 1 | SMKCheckPointImpl |
 
     Examples:
       | ptn            |
