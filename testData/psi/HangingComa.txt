@@ -6,7 +6,7 @@ SnakemakeFile: HangingComa.smk
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SmkRuleArgsSection
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -15,7 +15,7 @@ SnakemakeFile: HangingComa.smk
             PsiElement(Py:SINGLE_QUOTED_STRING)(''my_input.file'')
           PsiElement(Py:COMMA)(',')
       PsiWhiteSpace('\n    ')
-      SmkRuleArgsSection
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -23,7 +23,7 @@ SnakemakeFile: HangingComa.smk
           PyStringLiteralExpression: my_output.file
             PsiElement(Py:SINGLE_QUOTED_STRING)(''my_output.file'')
       PsiWhiteSpace('\n    ')
-      SmkRuleArgsSection
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('shell')
         PyArgumentList
           PsiElement(Py:COLON)(':')

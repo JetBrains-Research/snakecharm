@@ -131,7 +131,7 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
             context: ProcessingContext,
             result: CompletionResultSet
     ) {
-        (SmkRuleArgsSection.PARAMS_NAMES + setOf(SnakemakeNames.SECTION_RUN)).forEach { s ->
+        (SmkRuleOrCheckpointArgsSection.PARAMS_NAMES + setOf(SnakemakeNames.SECTION_RUN)).forEach { s ->
 
             result.addElement(
                     TailTypeDecorator.withTail(

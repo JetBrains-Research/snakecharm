@@ -6,7 +6,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.*
 
 object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
-    override fun visitSMKRuleParameterListStatement(st: SmkRuleArgsSection) {
+    override fun visitSMKRuleParameterListStatement(st: SmkRuleOrCheckpointArgsSection) {
         if (!SnakemakeLanguageDialect.isInsideSmkFile(st)) {
             return
         }
@@ -55,9 +55,9 @@ object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
         val sections = ruleOrCheckpoint.getSections()
         for (st in sections) {
             when (st) {
-                is SmkRuleArgsSection -> {
+                is SmkRuleOrCheckpointArgsSection -> {
                     val sectionName = st.sectionKeyword
-                    val isExecutionSection = sectionName in SmkRuleArgsSection.EXECUTION_KEYWORDS
+                    val isExecutionSection = sectionName in SmkRuleOrCheckpointArgsSection.EXECUTION_KEYWORDS
 
                     if (executionSectionOccurred && isExecutionSection) {
                         holder.createErrorAnnotation(st, SnakemakeBundle.message("ANN.multiple.execution.sections"))

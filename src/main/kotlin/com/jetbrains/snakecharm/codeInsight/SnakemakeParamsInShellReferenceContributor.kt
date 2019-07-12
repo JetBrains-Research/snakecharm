@@ -8,7 +8,7 @@ import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.codeInsight.completion.SMKKeywordCompletionContributor
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SmkRuleArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.impl.refs.SmkParamsReference
 import java.util.regex.Pattern
 
@@ -18,7 +18,7 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
                 PlatformPatterns
                         .psiElement(PyStringLiteralExpression::class.java)
                         .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
-                        .inside(SmkRuleArgsSection::class.java),
+                        .inside(SmkRuleOrCheckpointArgsSection::class.java),
                 object : PsiReferenceProvider() {
                     private val paramsPattern = Pattern.compile("\\{params\\.([_a-zA-Z]\\w*)")
 
@@ -30,7 +30,7 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
                         val paramsMatcher = paramsPattern.matcher(element.text)
 
                         val isShellCommand = PsiTreeUtil
-                                .getParentOfType(element, SmkRuleArgsSection::class.java)!!
+                                .getParentOfType(element, SmkRuleOrCheckpointArgsSection::class.java)!!
                                 .sectionKeyword == SnakemakeNames.SECTION_SHELL
                         if (isShellCommand) {
                             while (paramsMatcher.find()) {

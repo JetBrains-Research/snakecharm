@@ -6,7 +6,7 @@ SnakemakeFile: RuleMultipleSingleLine.smk
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SmkRuleArgsSection
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -21,7 +21,7 @@ SnakemakeFile: RuleMultipleSingleLine.smk
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SmkRuleArgsSection
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')

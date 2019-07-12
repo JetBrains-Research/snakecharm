@@ -18,9 +18,12 @@ interface SmkCheckPoint: SmkRuleOrCheckpoint, StubBasedPsiElement<SmkCheckpointS
 
 interface SmkSubworkflow: SmkRuleLike<SmkSubworkflowArgsSection>, StubBasedPsiElement<SmkSubworkflowStub>
 
-interface SmkRuleArgsSection : SmkArgsSection { // PyNamedElementContainer
+interface SmkRuleOrCheckpointArgsSection : SmkArgsSection { // PyNamedElementContainer
     companion object {
-        val EXECUTION_KEYWORDS = setOf(SnakemakeNames.SECTION_SHELL, SnakemakeNames.SECTION_SCRIPT, SnakemakeNames.SECTION_WRAPPER, SnakemakeNames.SECTION_CWL)
+        val EXECUTION_KEYWORDS = setOf(
+                SnakemakeNames.SECTION_SHELL, SnakemakeNames.SECTION_SCRIPT,
+                SnakemakeNames.SECTION_WRAPPER, SnakemakeNames.SECTION_CWL
+        )
 
         val PARAMS_NAMES = setOf(
                 SnakemakeNames.SECTION_OUTPUT, SnakemakeNames.SECTION_INPUT, SnakemakeNames.SECTION_PARAMS, SnakemakeNames.SECTION_LOG, SnakemakeNames.SECTION_RESOURCES,

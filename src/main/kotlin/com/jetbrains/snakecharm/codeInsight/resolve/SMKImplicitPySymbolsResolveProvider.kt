@@ -10,7 +10,7 @@ import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SmkRuleArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
 class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
@@ -35,7 +35,7 @@ class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
                     if (element.referencedName == SnakemakeNames.SECTION_THREADS) {
                         val ruleOrCheckpoint = element.parentOfType<SmkRuleOrCheckpoint>()!!
                         val threadsSection = ruleOrCheckpoint.statementList.statements.asSequence()
-                                .filterIsInstance<SmkRuleArgsSection>()
+                                .filterIsInstance<SmkRuleOrCheckpointArgsSection>()
                                 .filter { it.name == SnakemakeNames.SECTION_THREADS }.firstOrNull()
                          items.add(RatedResolveResult(RatedResolveResult.RATE_NORMAL, threadsSection ?: ruleOrCheckpoint))
                     }

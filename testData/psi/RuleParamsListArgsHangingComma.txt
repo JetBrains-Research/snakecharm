@@ -6,7 +6,7 @@ SnakemakeFile: RuleParamsListArgsHangingComma.smk
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n  ')
-      SmkRuleArgsSection
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -22,7 +22,7 @@ SnakemakeFile: RuleParamsListArgsHangingComma.smk
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SmkRuleArgsSection
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -35,7 +35,7 @@ SnakemakeFile: RuleParamsListArgsHangingComma.smk
             PsiElement(Py:SINGLE_QUOTED_STRING)('"boo2"')
           PsiElement(Py:COMMA)(',')
       PsiWhiteSpace('\n    ')
-      SmkRuleArgsSection
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -44,7 +44,7 @@ SnakemakeFile: RuleParamsListArgsHangingComma.smk
             PsiElement(Py:SINGLE_QUOTED_STRING)('"foo1"')
           PsiElement(Py:COMMA)(',')
       PsiWhiteSpace('\n    ')
-      SmkRuleArgsSection
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -57,7 +57,7 @@ SnakemakeFile: RuleParamsListArgsHangingComma.smk
             PsiElement(Py:SINGLE_QUOTED_STRING)('"zoo2"')
           PsiElement(Py:COMMA)(',')
       PsiWhiteSpace('\n    ')
-      SmkRuleArgsSection
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
           PsiElement(Py:COLON)(':')

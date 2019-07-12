@@ -30,7 +30,7 @@ SnakemakeFile: RuleParamsListArgsStringMultiline.smk
     PsiElement(Py:IDENTIFIER)('samtools_sort')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('\n    ')
-    SmkRuleArgsSection
+    SmkRuleOrCheckpointArgsSection
       PsiElement(Py:IDENTIFIER)('input')
       PsiElement(Py:COLON)(':')
       PyArgumentList

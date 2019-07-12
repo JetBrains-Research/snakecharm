@@ -5,7 +5,7 @@ SnakemakeFile: RuleInvalid.smk
       <empty list>
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SmkRuleArgsSection
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')

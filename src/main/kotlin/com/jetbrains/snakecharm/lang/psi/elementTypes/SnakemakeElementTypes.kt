@@ -10,7 +10,7 @@ import com.jetbrains.snakecharm.lang.psi.impl.*
 object SnakemakeElementTypes {
     val RULE_PARAMETER_LIST_STATEMENT = PyElementType(
             "SMK_RULE_PARAMETER_LIST_STATEMENT",
-            SmkRuleArgsSectionImpl::class.java
+            SmkRuleOrCheckpointArgsSectionImpl::class.java
     )
 
     val SUBWORKFLOW_PARAMETER_LIST_STATEMENT =  PyElementType(

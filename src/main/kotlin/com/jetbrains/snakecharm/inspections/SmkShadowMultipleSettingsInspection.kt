@@ -4,7 +4,7 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SmkRuleArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkShadowMultipleSettingsInspection : SnakemakeInspection()  {
     override fun buildVisitor(
@@ -13,7 +13,7 @@ class SmkShadowMultipleSettingsInspection : SnakemakeInspection()  {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
-        override fun visitSMKRuleParameterListStatement(st: SmkRuleArgsSection) {
+        override fun visitSMKRuleParameterListStatement(st: SmkRuleOrCheckpointArgsSection) {
             if (st.name != SnakemakeNames.SECTION_SHADOW) {
                 return
             }

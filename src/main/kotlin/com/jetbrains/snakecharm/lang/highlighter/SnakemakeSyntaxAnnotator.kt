@@ -27,7 +27,7 @@ object SnakemakeSyntaxAnnotator: SnakemakeAnnotator() {
         }
     }
 
-    override fun visitSMKRuleParameterListStatement(st: SmkRuleArgsSection) {
+    override fun visitSMKRuleParameterListStatement(st: SmkRuleOrCheckpointArgsSection) {
         val nameNode = st.getSectionKeywordNode()
         if (nameNode != null) {
             addHighlightingAnnotation(nameNode, PyHighlighter.PY_DECORATOR)

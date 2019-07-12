@@ -28,6 +28,9 @@ class SnakemakeTokenSetContributor : PythonDialectsTokenSetContributorBase() {
                     SnakemakeTokenTypes.SUBWORKFLOW_KEYWORD
                     // other keywords not here due to highlighting issues in context where they
                     // aren't keywords any more
+
+                    // TODO:  seems this keywords also better to highlight using annotator because
+                    // they are not keywords in some contexts (e.g. python code)
             )
     )
 

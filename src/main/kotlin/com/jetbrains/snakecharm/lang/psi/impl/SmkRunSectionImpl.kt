@@ -9,7 +9,7 @@ import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.psi.SMKElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
-import com.jetbrains.snakecharm.lang.psi.getIdentifierNode
+import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil.getIdentifierNode
 
 class SmkRunSectionImpl(node: ASTNode): PyElementImpl(node), SmkRunSection {
     override fun getStatementList(): PyStatementList =

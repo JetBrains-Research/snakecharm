@@ -5,7 +5,7 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SmkRuleArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkResourcesKeywordArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -13,7 +13,7 @@ class SmkResourcesKeywordArgsInspection : SnakemakeInspection() {
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
-        override fun visitSMKRuleParameterListStatement(st: SmkRuleArgsSection) {
+        override fun visitSMKRuleParameterListStatement(st: SmkRuleOrCheckpointArgsSection) {
             if(st.sectionKeyword != SnakemakeNames.SECTION_RESOURCES) {
                 return
             }

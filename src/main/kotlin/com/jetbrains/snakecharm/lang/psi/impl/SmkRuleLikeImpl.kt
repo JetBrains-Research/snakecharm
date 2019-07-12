@@ -10,9 +10,9 @@ import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyBaseElementImpl
 import com.jetbrains.python.psi.impl.PyPsiUtils
 import com.jetbrains.snakecharm.SnakemakeIcons
-import com.jetbrains.snakecharm.lang.psi.SmkSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
-import com.jetbrains.snakecharm.lang.psi.getIdentifierNode
+import com.jetbrains.snakecharm.lang.psi.SmkSection
+import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil.getIdentifierNode
 import javax.swing.Icon
 
 abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT: SmkRuleLike<S>, out S : SmkSection>

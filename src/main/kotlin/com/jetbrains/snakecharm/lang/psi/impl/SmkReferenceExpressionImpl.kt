@@ -10,7 +10,7 @@ import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
-import com.jetbrains.snakecharm.lang.psi.getIdentifierNode
+import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil.getIdentifierNode
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 
 class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferenceExpression {

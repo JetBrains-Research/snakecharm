@@ -16,7 +16,7 @@ SnakemakeFile: RuleIncomplete2.smk
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SmkRuleArgsSection
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
           PsiElement(Py:COLON)(':')

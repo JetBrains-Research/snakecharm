@@ -8,7 +8,7 @@ SnakemakeFile: Checkpoint.smk
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SmkRuleArgsSection
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -16,7 +16,7 @@ SnakemakeFile: Checkpoint.smk
           PyStringLiteralExpression: samples/{sample}.txt
             PsiElement(Py:SINGLE_QUOTED_STRING)('"samples/{sample}.txt"')
       PsiWhiteSpace('\n    ')
-      SmkRuleArgsSection
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -24,7 +24,7 @@ SnakemakeFile: Checkpoint.smk
           PyStringLiteralExpression: somestep/{sample}.txt
             PsiElement(Py:SINGLE_QUOTED_STRING)('"somestep/{sample}.txt"')
       PsiWhiteSpace('\n    ')
-      SmkRuleArgsSection
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('shell')
         PyArgumentList
           PsiElement(Py:COLON)(':')
