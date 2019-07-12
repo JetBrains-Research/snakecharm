@@ -4,7 +4,7 @@ import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.StubBasedPsiElement
 import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
 import com.jetbrains.python.psi.PyDocStringOwner
-import com.jetbrains.python.psi.PyElement
+import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.PyStatement
 import com.jetbrains.python.psi.PyStatementListContainer
 import com.jetbrains.snakecharm.lang.SnakemakeNames
@@ -58,4 +58,4 @@ interface SmkWorkflowLocalrulesSection: PyStatement, SmkArgsSection
 
 interface SmkWorkflowRuleorderSection: PyStatement, SmkArgsSection
 
-interface SmkReferenceExpression: PyElement, PsiNamedElement
+interface SmkReferenceExpression: PyExpression, PsiNamedElement
