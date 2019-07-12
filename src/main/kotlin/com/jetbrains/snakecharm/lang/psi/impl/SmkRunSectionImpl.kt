@@ -7,7 +7,7 @@ import com.jetbrains.python.documentation.docstrings.DocStringUtil
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.impl.PyElementImpl
-import com.jetbrains.snakecharm.lang.psi.SMKElementVisitor
+import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil.getIdentifierNode
 
@@ -21,7 +21,7 @@ class SmkRunSectionImpl(node: ASTNode): PyElementImpl(node), SmkRunSection {
         get() = firstChild
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
-        is SMKElementVisitor -> pyVisitor.visitSMKRuleRunParameter(this)
+        is SmkElementVisitor -> pyVisitor.visitSMKRuleRunParameter(this)
         else -> super.acceptPyVisitor(pyVisitor)
     }
 

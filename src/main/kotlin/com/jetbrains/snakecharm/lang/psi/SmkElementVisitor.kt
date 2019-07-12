@@ -9,7 +9,7 @@ import com.jetbrains.python.psi.PyElementVisitor
  * and [com.jetbrains.snakecharm.inspections.SnakemakeInspectionVisitor] without copy-pasting implementation details
  * from [com.jetbrains.python.validation.PyAnnotator] and [com.jetbrains.python.inspections.PyInspectionVisitor]
  */
-interface SMKElementVisitor {
+interface SmkElementVisitor {
     /**
      * Adapter instead of inheritance for to python specific methods
      */

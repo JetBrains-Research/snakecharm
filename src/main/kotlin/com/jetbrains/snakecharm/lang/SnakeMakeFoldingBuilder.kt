@@ -11,7 +11,7 @@ import com.intellij.psi.tree.TokenSet
 import com.intellij.testFramework.LightVirtualFile
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonFoldingBuilder
-import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
+import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SnakemakeElementTypes
 import java.util.*
@@ -39,7 +39,7 @@ class SnakeMakeFoldingBuilder : PythonFoldingBuilder() {
             document: Document,
             quick: Boolean
     ) {
-        if (root !is SnakemakeFile || root.virtualFile !is LightVirtualFile) {
+        if (root !is SmkFile || root.virtualFile !is LightVirtualFile) {
             collectDescriptors(root.node, descriptors)
         }
 

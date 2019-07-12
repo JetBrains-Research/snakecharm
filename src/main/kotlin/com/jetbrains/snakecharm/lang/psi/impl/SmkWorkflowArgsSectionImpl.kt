@@ -4,7 +4,7 @@ import com.intellij.lang.ASTNode
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
-import com.jetbrains.snakecharm.lang.psi.SMKElementVisitor
+import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
 
 /**
@@ -13,7 +13,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
  */
 class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkflowArgsSection {
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
-        is SMKElementVisitor -> pyVisitor.visitSMKWorkflowParameterListStatement(this)
+        is SmkElementVisitor -> pyVisitor.visitSMKWorkflowParameterListStatement(this)
         else -> super.acceptPyVisitor(pyVisitor)
     }
 

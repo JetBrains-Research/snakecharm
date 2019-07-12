@@ -10,7 +10,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_CHECKPOINTS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_RULES
 import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SmkRule
-import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
+import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckPointsType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 
@@ -32,11 +32,11 @@ class SmkSectionTypeProvider : PyTypeProviderBase() {
         return when (referenceExpression.referencedName) {
             SMK_VARS_RULES -> SmkRulesType(
                     PsiTreeUtil.getParentOfType(referenceExpression, SmkRule::class.java),
-                    psiFile as SnakemakeFile
+                    psiFile as SmkFile
             )
             SMK_VARS_CHECKPOINTS -> SmkCheckPointsType(
                     PsiTreeUtil.getParentOfType(referenceExpression, SmkCheckPoint::class.java),
-                    psiFile as SnakemakeFile
+                    psiFile as SmkFile
             )
             else -> null
         }

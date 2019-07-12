@@ -8,7 +8,7 @@ import com.jetbrains.snakecharm.lang.psi.*
  * @author Roman.Chernyatchik
  * @date 2019-01-09
  */
-abstract class SnakemakeAnnotator: PyAnnotator(), SMKElementVisitor {
+abstract class SnakemakeAnnotator: PyAnnotator(), SmkElementVisitor {
     override val pyElementVisitor: PyElementVisitor
         get() = this
 }

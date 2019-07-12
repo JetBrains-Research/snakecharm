@@ -6,7 +6,7 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.psi.PsiElement
 import com.jetbrains.python.validation.PyAnnotator
 import com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxAnnotator
-import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
+import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.validation.SmkReturnAnnotator
 import com.jetbrains.snakecharm.lang.validation.SnakemakeSyntaxErrorAnnotator
 
@@ -21,7 +21,7 @@ abstract class SnakemakeAnnotatorManager : Annotator, DumbAware {
 
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         val file = element.containingFile
-        if (file is SnakemakeFile) {
+        if (file is SmkFile) {
             annotators.forEach {
                 myHolder = holder
                 try {

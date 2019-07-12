@@ -2,7 +2,7 @@ package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.jetbrains.python.psi.PyElementVisitor
-import com.jetbrains.snakecharm.lang.psi.SMKElementVisitor
+import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRule
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
@@ -15,7 +15,7 @@ class SmkRuleImpl
     constructor(stub: SmkRuleStub): super(stub, SmkStubElementTypes.RULE_DECLARATION_STATEMENT)
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
-        is SMKElementVisitor -> pyVisitor.visitSMKRule(this)
+        is SmkElementVisitor -> pyVisitor.visitSMKRule(this)
         else -> super.acceptPyVisitor(pyVisitor)
     }
 }

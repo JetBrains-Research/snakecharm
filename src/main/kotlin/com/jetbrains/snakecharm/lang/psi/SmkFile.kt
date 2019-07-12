@@ -11,7 +11,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
  * @author Roman.Chernyatchik
  * @date 2018-12-31
  */
-class SnakemakeFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, SnakemakeLanguageDialect) {
+class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, SnakemakeLanguageDialect) {
     // consider extend SnakemakeScopeOwner:ScopeOwner
     // e.g. CythonFile, CythonScopeOwner
 
@@ -19,12 +19,12 @@ class SnakemakeFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, S
 
     override fun toString() = "SnakemakeFile: $name"
 
-    override fun getStub(): StubElement<SnakemakeFile>? = null
+    override fun getStub(): StubElement<SmkFile>? = null
 
     fun collectSubworkflows(): List<Pair<String, SmkSubworkflow>> {
         val subworkflowNameAndPsi = arrayListOf<Pair<String, SmkSubworkflow>>()
 
-        acceptChildren(object : PyElementVisitor(), SMKElementVisitor {
+        acceptChildren(object : PyElementVisitor(), SmkElementVisitor {
             override val pyElementVisitor: PyElementVisitor = this
 
             override fun visitSMKSubworkflow(subworkflow: SmkSubworkflow) {
@@ -39,7 +39,7 @@ class SnakemakeFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, S
     fun collectCheckPoints(): List<Pair<String, SmkCheckPoint>> {
         val checkpointNameAndPsi = arrayListOf<Pair<String, SmkCheckPoint>>()
 
-        acceptChildren(object : PyElementVisitor(), SMKElementVisitor {
+        acceptChildren(object : PyElementVisitor(), SmkElementVisitor {
             override val pyElementVisitor: PyElementVisitor = this
 
             override fun visitSMKCheckPoint(checkPoint: SmkCheckPoint) {
@@ -55,7 +55,7 @@ class SnakemakeFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, S
         // TODO: add tests, this is simple impl for internship task practice
         val ruleNameAndPsi = arrayListOf<Pair<String, SmkRule>>()
 
-        acceptChildren(object : PyElementVisitor(), SMKElementVisitor {
+        acceptChildren(object : PyElementVisitor(), SmkElementVisitor {
             override val pyElementVisitor: PyElementVisitor = this
 
             override fun visitSMKRule(rule: SmkRule) {

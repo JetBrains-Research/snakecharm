@@ -9,7 +9,7 @@ import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
-import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
+import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil.getIdentifierNode
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 
@@ -52,10 +52,10 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
         override fun handleElementRename(newElementName: String): PsiElement =
                 element.setName(newElementName)
 
-        private fun getRules() = PsiTreeUtil.getParentOfType(element, SnakemakeFile::class.java)
+        private fun getRules() = PsiTreeUtil.getParentOfType(element, SmkFile::class.java)
                 ?.collectRules() ?: emptyList()
 
-        private fun getCheckpoints() = PsiTreeUtil.getParentOfType(element, SnakemakeFile::class.java)
+        private fun getCheckpoints() = PsiTreeUtil.getParentOfType(element, SmkFile::class.java)
                 ?.collectCheckPoints()
                 ?: emptyList()
     }

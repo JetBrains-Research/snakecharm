@@ -2,7 +2,7 @@ package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.jetbrains.python.psi.PyElementVisitor
-import com.jetbrains.snakecharm.lang.psi.SMKElementVisitor
+import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflow
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
@@ -16,7 +16,7 @@ class SmkSubworkflowImpl:
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
         when (pyVisitor) {
-            is SMKElementVisitor -> pyVisitor.visitSMKSubworkflow(this)
+            is SmkElementVisitor -> pyVisitor.visitSMKSubworkflow(this)
             else -> super.acceptPyVisitor(pyVisitor)
         }
     }
