@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.lang
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PythonDialectsTokenSetContributorBase
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
+import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SnakemakeElementTypes
 
@@ -46,8 +47,7 @@ class SnakemakeTokenSetContributor : PythonDialectsTokenSetContributorBase() {
 //        return TokenSet.create(NAMED_PARAMETER)
 //    }
 
-    // TODO: uncomment + tests
-//    override fun getUnbalancedBracesRecoveryTokens(): TokenSet {
-//        return TokenSet.create(SnakemakeTokenTypes.RULE_KEYWORD)
-//    }
+    override fun getUnbalancedBracesRecoveryTokens(): TokenSet {
+        return WORKFLOW_TOPLEVEL_DECORATORS
+    }
 }
