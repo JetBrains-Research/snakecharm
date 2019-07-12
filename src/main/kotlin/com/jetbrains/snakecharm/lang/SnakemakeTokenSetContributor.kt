@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.lang
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PythonDialectsTokenSetContributorBase
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SnakemakeElementTypes
 
 /**
@@ -11,7 +12,7 @@ import com.jetbrains.snakecharm.lang.psi.elementTypes.SnakemakeElementTypes
  */
 class SnakemakeTokenSetContributor : PythonDialectsTokenSetContributorBase() {
     override fun getStatementTokens() = TokenSet.create(
-            SnakemakeElementTypes.RULE_DECLARATION,
+            SmkStubElementTypes.RULE_DECLARATION,
             SnakemakeElementTypes.RULE_PARAMETER_LIST_STATEMENT,
             SnakemakeElementTypes.WORKFLOW_PARAMETER_LIST_STATEMENT
     )

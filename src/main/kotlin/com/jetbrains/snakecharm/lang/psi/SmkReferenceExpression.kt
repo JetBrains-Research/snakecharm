@@ -42,7 +42,7 @@ class SmkReferenceExpression(node: ASTNode): PyElementImpl(node), PsiNamedElemen
 
         override fun getVariants(): Array<Any> =
                 (getRules() + getCheckpoints()).map { (name, elem) ->
-                    AbstractSmkRuleOrCheckpointType.createRuleLikeLookupItem(name, elem)
+                    AbstractSmkRuleOrCheckpointType.createRuleLikeLookupItem(name, elem as SmkRuleOrCheckpoint)
                 }.toTypedArray()
 
         override fun handleElementRename(newElementName: String): PsiElement =

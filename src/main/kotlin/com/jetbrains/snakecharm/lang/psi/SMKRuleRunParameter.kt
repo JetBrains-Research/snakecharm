@@ -19,6 +19,9 @@ class SMKRuleRunParameter(node: ASTNode): PyElementImpl(node),
 
     fun getNameNode() = getIdentifierNode(node)
 
+    override val sectionName: String?
+        get() = getNameNode()?.text
+
     val section: PsiElement?
         get() = firstChild
 

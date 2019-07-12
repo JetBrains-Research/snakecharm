@@ -8,10 +8,6 @@ import com.jetbrains.snakecharm.lang.psi.*
  * @date 2018-12-31
  */
 object SnakemakeElementTypes {
-    val RULE_DECLARATION = PyElementType("SMK_RULE_DECLARATION", SMKRule::class.java)
-    val CHECKPOINT_DECLARATION = PyElementType("SMK_CHECKPOINT_DECLARATION", SMKCheckPoint::class.java)
-    val SUBWORKFLOW_DECLARATION = PyElementType("SMK_SUBWORKFLOW_DECLARATION", SmkSubworkflow::class.java)
-
     val RULE_PARAMETER_LIST_STATEMENT = PyElementType(
             "SMK_RULE_PARAMETER_LIST_STATEMENT",
             SMKRuleParameterListStatement::class.java

@@ -12,6 +12,7 @@ import com.intellij.testFramework.LightVirtualFile
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonFoldingBuilder
 import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SnakemakeElementTypes
 import java.util.*
 
@@ -22,7 +23,7 @@ import java.util.*
 class SnakeMakeFoldingBuilder : PythonFoldingBuilder() {
     companion object {
         val FOLDED_ELEMENTS = TokenSet.create(
-                SnakemakeElementTypes.RULE_DECLARATION,
+                SmkStubElementTypes.RULE_DECLARATION,
                 SnakemakeElementTypes.RULE_RUN_STATEMENT,
                 SnakemakeElementTypes.WORKFLOW_PYTHON_BLOCK_PARAMETER
         )

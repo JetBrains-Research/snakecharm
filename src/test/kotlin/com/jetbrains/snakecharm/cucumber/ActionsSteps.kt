@@ -1,16 +1,19 @@
 package com.jetbrains.snakecharm.cucumber
 
 import com.intellij.codeInsight.documentation.DocumentationManager
+import com.intellij.ide.util.gotoByName.GotoSymbolModel2
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.findPsiElementUnderCaret
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.myGeneratedDocPopupText
+import cucumber.api.DataTable
 import cucumber.api.java.en.Given
 import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
@@ -121,6 +124,17 @@ class ActionsSteps {
                 SnakemakeWorld.fixture().renameElementAtCaret(newName)
         }
     }
+
+    @Then("^go to symbol should contain:$")
+    fun completionListShouldContain(table: DataTable) {
+        val names = ApplicationManager.getApplication().runReadAction(Computable {
+            val model = GotoSymbolModel2(SnakemakeWorld.fixture().project)
+            model.getNames(false).toList()
+        })
+        val expected = table.asList(String::class.java)
+        assertHasElements(names, expected)
+    }
+
 
     private fun findTargetElementFor(element: PsiElement, editor: Editor) =
             DocumentationManager.getInstance(element.project)

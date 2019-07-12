@@ -13,6 +13,9 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.RULE_OR_CHECKPOINT
 import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
 import com.jetbrains.snakecharm.lang.psi.SMKSubworkflowParameterListStatement
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.CHECKPOINT_DECLARATION
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.RULE_DECLARATION
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.SUBWORKFLOW_DECLARATION
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SnakemakeElementTypes
 
 
@@ -26,7 +29,7 @@ class SnakemakeStatementParsing(
 ) : StatementParsing(context, futureFlag) {
 
     private data class SectionParsingData(
-            val declaration: PyElementType,
+            val declaration: IElementType,
             val name: String,
             val parameterListStatement: PyElementType,
             val parameters: Set<String>,
@@ -34,7 +37,7 @@ class SnakemakeStatementParsing(
 
 
     private val ruleSectionParsingData = SectionParsingData(
-            declaration = SnakemakeElementTypes.RULE_DECLARATION,
+            declaration = RULE_DECLARATION,
             name = "rule",
             parameterListStatement = SnakemakeElementTypes.RULE_PARAMETER_LIST_STATEMENT,
             parameters = SMKRuleParameterListStatement.PARAMS_NAMES,
@@ -42,7 +45,7 @@ class SnakemakeStatementParsing(
     )
 
     private val checkpointSectionParsingData = SectionParsingData(
-            declaration = SnakemakeElementTypes.CHECKPOINT_DECLARATION,
+            declaration = CHECKPOINT_DECLARATION,
             name = "checkpoint",
             parameterListStatement = SnakemakeElementTypes.RULE_PARAMETER_LIST_STATEMENT,
             parameters = SMKRuleParameterListStatement.PARAMS_NAMES,
@@ -50,7 +53,7 @@ class SnakemakeStatementParsing(
     )
 
     private val subworkflowSectionParsingData = SectionParsingData(
-            declaration = SnakemakeElementTypes.SUBWORKFLOW_DECLARATION,
+            declaration = SUBWORKFLOW_DECLARATION,
             name = "subworkflow",
             parameterListStatement = SnakemakeElementTypes.SUBWORKFLOW_PARAMETER_LIST_STATEMENT,
             parameters = SMKSubworkflowParameterListStatement.PARAMS_NAMES,
