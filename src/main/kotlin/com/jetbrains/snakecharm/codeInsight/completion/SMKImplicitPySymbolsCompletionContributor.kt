@@ -13,7 +13,7 @@ import com.jetbrains.python.psi.resolve.CompletionVariantsProcessor
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
+import com.jetbrains.snakecharm.lang.psi.SmkRuleArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
 class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
@@ -68,7 +68,7 @@ class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
             if (contextScope == SmkCodeInsightScope.RULELIKE_RUN_SECTION) {
                 val ruleOrCheckpoint = contextElement.parentOfType<SmkRuleOrCheckpoint>()!!
                 val threadsSection = ruleOrCheckpoint.statementList.statements.asSequence()
-                        .filterIsInstance<SMKRuleParameterListStatement>()
+                        .filterIsInstance<SmkRuleArgsSection>()
                         .filter { it.name == SnakemakeNames.SECTION_THREADS }.firstOrNull()
                 processor.addElement("threads", threadsSection ?: ruleOrCheckpoint)
             }

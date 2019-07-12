@@ -6,7 +6,7 @@ import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.completion.ShadowSectionSettingsProvider
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
+import com.jetbrains.snakecharm.lang.psi.SmkRuleArgsSection
 
 class SmkShadowSettingsInspection : SnakemakeInspection()  {
     override fun buildVisitor(
@@ -15,7 +15,7 @@ class SmkShadowSettingsInspection : SnakemakeInspection()  {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
-        override fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {
+        override fun visitSMKRuleParameterListStatement(st: SmkRuleArgsSection) {
             if (st.name != SnakemakeNames.SECTION_SHADOW) {
                 return
             }

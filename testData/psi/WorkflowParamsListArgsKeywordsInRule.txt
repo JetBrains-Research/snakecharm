@@ -4,7 +4,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywordsInRule.smk
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleArgsSection
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -18,7 +18,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywordsInRule.smk
                 PsiElement(Py:SINGLE_QUOTED_STRING)('"report/workflow.rst"')
               PsiElement(Py:RPAR)(')')
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleArgsSection
         PsiElement(Py:IDENTIFIER)('wildcard_constraints')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -29,7 +29,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywordsInRule.smk
             PyStringLiteralExpression: \d+
               PsiElement(Py:SINGLE_QUOTED_STRING)('"\d+"')
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleArgsSection
         PsiElement(Py:IDENTIFIER)('singularity')
         PyArgumentList
           PsiElement(Py:COLON)(':')

@@ -15,11 +15,11 @@ interface SMKElementVisitor {
      */
     val pyElementVisitor: PyElementVisitor
 
-    fun visitSMKRule(rule: SMKRule) {
+    fun visitSMKRule(rule: SmkRule) {
         pyElementVisitor.visitPyElement(rule)
     }
 
-    fun visitSMKCheckPoint(checkPoint: SMKCheckPoint) {
+    fun visitSMKCheckPoint(checkPoint: SmkCheckPoint) {
         pyElementVisitor.visitPyElement(checkPoint)
     }
 
@@ -27,19 +27,19 @@ interface SMKElementVisitor {
         pyElementVisitor.visitPyElement(subworkflow)
     }
 
-    fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {
+    fun visitSMKRuleParameterListStatement(st: SmkRuleArgsSection) {
         pyElementVisitor.visitPyStatement(st)
     }
 
-    fun visitSMKRuleRunParameter(st: SMKRuleRunParameter) {
+    fun visitSMKRuleRunParameter(st: SmkRunSection) {
         pyElementVisitor.visitPyStatementList(st.statementList)
     }
 
-    fun visitSMKSubworkflowParameterListStatement(st: SMKSubworkflowParameterListStatement) {
+    fun visitSMKSubworkflowParameterListStatement(st: SmkSubworkflowArgsSection) {
         pyElementVisitor.visitPyStatement(st)
     }
 
-    fun visitSMKWorkflowParameterListStatement(st: SMKWorkflowParameterListStatement) {
+    fun visitSMKWorkflowParameterListStatement(st: SmkWorkflowArgsSection) {
         pyElementVisitor.visitPyStatement(st)
     }
 
@@ -47,11 +47,11 @@ interface SMKElementVisitor {
         pyElementVisitor.visitPyStatementList(st.statementList)
     }
 
-    fun visitSMKWorkflowRuleOrderStatement(st: SMKWorkflowRuleOrderStatement) {
+    fun visitSMKWorkflowRuleOrderStatement(st: SmkWorkflowRuleorderSection) {
         pyElementVisitor.visitPyStatement(st)
     }
 
-    fun visitSMKWorkflowLocalRulesStatement(st: SMKWorkflowLocalRulesStatement) {
+    fun visitSMKWorkflowLocalRulesStatement(st: SmkWorkflowLocalrulesSection) {
         pyElementVisitor.visitPyStatement(st)
     }
 }

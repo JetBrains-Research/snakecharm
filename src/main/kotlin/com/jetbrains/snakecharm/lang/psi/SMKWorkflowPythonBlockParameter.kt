@@ -8,15 +8,12 @@ import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS
 
-class SMKWorkflowPythonBlockParameter(node: ASTNode) : PyElementImpl(node),
-        ScopeOwner, // for control flow
-        PyStatement, PyStatementListContainer, PyDocStringOwner
-{
+class SMKWorkflowPythonBlockParameterImpl(node: ASTNode) : PyElementImpl(node), SMKWorkflowPythonBlockParameter {
 
     override fun getStatementList(): PyStatementList =
             childToPsi(PyElementTypes.STATEMENT_LIST) ?: error("Statement list missing for workflow parameter $text")
 
-    fun getKeywordNode() = node.findChildByType(WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS)
+    override fun getSectionKeywordNode() = node.findChildByType(WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS)
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SMKElementVisitor -> pyVisitor.visitSMKWorkflowPythonBlockParameter(this)

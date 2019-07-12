@@ -16,7 +16,7 @@ SnakemakeFile: RuleInPythonBlock.smk
         PsiElement(Py:COLON)(':')
         PyStatementList
           PsiWhiteSpace('\n    ')
-          SMKRuleParameterListStatement
+          SmkRuleArgsSection
             PsiElement(Py:IDENTIFIER)('output')
             PyArgumentList
               PsiElement(Py:COLON)(':')

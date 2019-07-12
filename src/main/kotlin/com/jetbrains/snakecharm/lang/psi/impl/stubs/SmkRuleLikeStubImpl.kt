@@ -6,8 +6,8 @@ import com.intellij.psi.stubs.NamedStub
 import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.jetbrains.python.psi.PyElement
-import com.jetbrains.snakecharm.lang.psi.SMKCheckPoint
-import com.jetbrains.snakecharm.lang.psi.SMKRule
+import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
+import com.jetbrains.snakecharm.lang.psi.SmkRule
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflow
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.CHECKPOINT_DECLARATION
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.RULE_DECLARATION
@@ -27,12 +27,12 @@ abstract class SmkRuleLikeStubImpl<StubT: NamedStub<PsiT>, PsiT>(
 class SmkCheckpointStubImpl(
         name: String?,
         parent: StubElement<*>?
-): SmkRuleLikeStubImpl<SmkCheckpointStub, SMKCheckPoint>(name, parent, CHECKPOINT_DECLARATION), SmkCheckpointStub
+): SmkRuleLikeStubImpl<SmkCheckpointStub, SmkCheckPoint>(name, parent, CHECKPOINT_DECLARATION), SmkCheckpointStub
 
 class SmkRuleStubImpl(
         name: String?,
         parent: StubElement<*>?
-): SmkRuleLikeStubImpl<SmkRuleStub, SMKRule>(name, parent, RULE_DECLARATION), SmkRuleStub
+): SmkRuleLikeStubImpl<SmkRuleStub, SmkRule>(name, parent, RULE_DECLARATION), SmkRuleStub
 
 class SmkSubworkflowStubImpl(
         name: String?,

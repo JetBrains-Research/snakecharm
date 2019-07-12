@@ -9,7 +9,7 @@ import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
+import com.jetbrains.snakecharm.lang.psi.SmkRuleArgsSection
 
 
 class SmkShadowSettingsDocumentation : AbstractDocumentationProvider() {
@@ -40,6 +40,6 @@ class SmkShadowSettingsDocumentation : AbstractDocumentationProvider() {
     }
   
     private fun PsiElement.isInShadowSection(): Boolean =
-            PsiTreeUtil.getParentOfType(this, SMKRuleParameterListStatement::class.java)?.name ==
+            PsiTreeUtil.getParentOfType(this, SmkRuleArgsSection::class.java)?.name ==
                     SnakemakeNames.SECTION_SHADOW
 }

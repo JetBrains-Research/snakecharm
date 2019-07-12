@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.lang.psi
+package com.jetbrains.snakecharm.lang.psi.impl.refs
 
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.util.TextRange
@@ -7,9 +7,10 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.PlatformIcons
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
 
-class SMKParamsReference(
+class SmkParamsReference(
         element: PyStringLiteralExpression,
         textRange: TextRange
 ) : PsiReferenceBase<PyStringLiteralExpression>(element, textRange) {

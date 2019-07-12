@@ -4,7 +4,7 @@ SnakemakeFile: RuleInvalidParam.smk
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PsiErrorElement:':' expected
           <empty list>
@@ -35,7 +35,7 @@ SnakemakeFile: RuleInvalidParam.smk
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SMKRuleParameterListStatement
+      SmkRuleArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PsiErrorElement:':' expected
           <empty list>

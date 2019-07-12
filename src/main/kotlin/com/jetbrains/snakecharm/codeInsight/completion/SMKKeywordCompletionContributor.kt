@@ -124,14 +124,14 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
             .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
             .inside(SmkRuleOrCheckpoint::class.java)!!
             .andNot(psiElement().inside(PyArgumentList::class.java))
-            .andNot(psiElement().inside(SMKRuleRunParameter::class.java))
+            .andNot(psiElement().inside(SmkRunSection::class.java))
 
     override fun addCompletions(
             parameters: CompletionParameters,
             context: ProcessingContext,
             result: CompletionResultSet
     ) {
-        (SMKRuleParameterListStatement.PARAMS_NAMES + setOf(SnakemakeNames.SECTION_RUN)).forEach { s ->
+        (SmkRuleArgsSection.PARAMS_NAMES + setOf(SnakemakeNames.SECTION_RUN)).forEach { s ->
 
             result.addElement(
                     TailTypeDecorator.withTail(
@@ -155,7 +155,7 @@ object SubworkflowSectionKeywordsProvider : CompletionProvider<CompletionParamet
             context: ProcessingContext,
             result: CompletionResultSet
     ) {
-        SMKSubworkflowParameterListStatement.PARAMS_NAMES.forEach { s ->
+        SmkSubworkflowArgsSection.PARAMS_NAMES.forEach { s ->
             result.addElement(
                     TailTypeDecorator.withTail(
                             PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),

@@ -2,7 +2,7 @@ package com.jetbrains.snakecharm.codeInsight
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
-import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
+import com.jetbrains.snakecharm.lang.psi.SmkRunSection
 
 enum class SmkCodeInsightScope {
     TOP_LEVEL,
@@ -15,7 +15,7 @@ enum class SmkCodeInsightScope {
 
     companion object {
         operator fun get(anchor: PsiElement) = when {
-            anchor.parentOfType<SMKRuleRunParameter>() != null -> RULELIKE_RUN_SECTION
+            anchor.parentOfType<SmkRunSection>() != null -> RULELIKE_RUN_SECTION
             else -> TOP_LEVEL
         }
     }

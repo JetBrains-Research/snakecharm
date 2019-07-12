@@ -8,8 +8,8 @@ import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.Processor
 import com.intellij.util.indexing.FindSymbolParameters
 import com.intellij.util.indexing.IdFilter
-import com.jetbrains.snakecharm.lang.psi.SMKCheckPoint
-import com.jetbrains.snakecharm.lang.psi.SMKRule
+import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
+import com.jetbrains.snakecharm.lang.psi.SmkRule
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
 
@@ -53,13 +53,13 @@ class SmkGotoSymbolContributor: ChooseByNameContributorEx{
         index.processElements(
                 SmkRuleNameIndex.KEY, name,
                 project, scope, parameters.idFilter,
-                SMKRule::class.java,
+                SmkRule::class.java,
                 processor
         )
         index.processElements(
                 SmkCheckpointNameIndex.KEY, name,
                 project, scope, parameters.idFilter,
-                SMKCheckPoint::class.java,
+                SmkCheckPoint::class.java,
                 processor
         )
 

@@ -6,7 +6,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.*
 
 object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
-    override fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {
+    override fun visitSMKRuleParameterListStatement(st: SmkRuleArgsSection) {
         if (!SnakemakeLanguageDialect.isInsideSmkFile(st)) {
             return
         }
@@ -41,11 +41,11 @@ object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
         }
     }
 
-    override fun visitSMKRule(rule: SMKRule) {
+    override fun visitSMKRule(rule: SmkRule) {
         checkMultipleExecutionSections(rule)
     }
 
-    override fun visitSMKCheckPoint(checkPoint: SMKCheckPoint) {
+    override fun visitSMKCheckPoint(checkPoint: SmkCheckPoint) {
         checkMultipleExecutionSections(checkPoint)
     }
 
@@ -55,9 +55,9 @@ object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
         val sections = ruleOrCheckpoint.getSections()
         for (st in sections) {
             when (st) {
-                is SMKRuleParameterListStatement -> {
-                    val sectionName = st.section?.text
-                    val isExecutionSection = sectionName in SMKRuleParameterListStatement.EXECUTION_KEYWORDS
+                is SmkRuleArgsSection -> {
+                    val sectionName = st.sectionKeyword
+                    val isExecutionSection = sectionName in SmkRuleArgsSection.EXECUTION_KEYWORDS
 
                     if (executionSectionOccurred && isExecutionSection) {
                         holder.createErrorAnnotation(st, SnakemakeBundle.message("ANN.multiple.execution.sections"))
@@ -67,7 +67,7 @@ object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
                         executionSectionOccurred = true
                     }
                 }
-                is SMKRuleRunParameter -> {
+                is SmkRunSection -> {
                     if (executionSectionOccurred) {
                         holder.createErrorAnnotation(st, SnakemakeBundle.message("ANN.multiple.execution.sections"))
                     }

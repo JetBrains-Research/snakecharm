@@ -10,15 +10,15 @@ import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyBaseElementImpl
 import com.jetbrains.python.psi.impl.PyPsiUtils
 import com.jetbrains.snakecharm.SnakemakeIcons
-import com.jetbrains.snakecharm.lang.psi.SMKRuleSection
+import com.jetbrains.snakecharm.lang.psi.SmkSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
 import com.jetbrains.snakecharm.lang.psi.getIdentifierNode
 import javax.swing.Icon
 
-abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT: SmkRuleLike<S>, out S : SMKRuleSection>
+abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT: SmkRuleLike<S>, out S : SmkSection>
     : PyBaseElementImpl<StubT>, SmkRuleLike<S>
 
-    //TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SMKRule>
+    //TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SmkRule>
     // SnakemakeNamedElement, SnakemakeScopeOwner
 
 {
@@ -52,13 +52,13 @@ abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT: SmkRuleLike<S>, ou
     private fun getNameNode() = getIdentifierNode(node)
 
     override fun getSectionByName(sectionName: String) = getSections().find {
-        it.sectionName == sectionName
+        it.sectionKeyword == sectionName
     } as? S
 
     override fun getStatementList() = childToPsiNotNull<PyStatementList>(PyElementTypes.STATEMENT_LIST)
 
     // iterate over children, not statements, since SMKRuleRunParameter isn't a statement
-    override fun getSections(): List<SMKRuleSection> = statementList.children.filterIsInstance<SMKRuleSection>()
+    override fun getSections(): List<SmkSection> = statementList.children.filterIsInstance<SmkSection>()
 
     override fun getIcon(flags: Int): Icon? {
         PyPsiUtils.assertValid(this)

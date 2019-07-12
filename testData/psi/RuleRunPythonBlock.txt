@@ -6,7 +6,7 @@ SnakemakeFile: RuleRunPythonBlock.smk
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SMKRuleRunParameter
+      SmkRunSection
         PsiElement(Py:IDENTIFIER)('run')
         PsiElement(Py:COLON)(':')
         PsiWhiteSpace('\n        ')

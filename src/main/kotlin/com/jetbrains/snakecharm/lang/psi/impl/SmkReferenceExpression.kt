@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.lang.psi
+package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
@@ -7,9 +7,13 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.python.psi.resolve.RatedResolveResult
+import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
+import com.jetbrains.snakecharm.lang.psi.getIdentifierNode
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 
-class SmkReferenceExpression(node: ASTNode): PyElementImpl(node), PsiNamedElement{
+class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferenceExpression {
     override fun getName() = getNameNode()?.text
 
     override fun setName(name: String): PsiElement {

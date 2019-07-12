@@ -1,14 +1,14 @@
 SnakemakeFile: Checkpoint.smk
   PsiComment(Py:END_OF_LINE_COMMENT)('# the checkpoint that shall trigger re-evaluation of the DAG')
   PsiWhiteSpace('\n')
-  SMKCheckPoint
+  SmkCheckPoint
     PsiElement(Py:CHECKPOINT_KEYWORD)('checkpoint')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('somestep')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -16,7 +16,7 @@ SnakemakeFile: Checkpoint.smk
           PyStringLiteralExpression: samples/{sample}.txt
             PsiElement(Py:SINGLE_QUOTED_STRING)('"samples/{sample}.txt"')
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleArgsSection
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -24,7 +24,7 @@ SnakemakeFile: Checkpoint.smk
           PyStringLiteralExpression: somestep/{sample}.txt
             PsiElement(Py:SINGLE_QUOTED_STRING)('"somestep/{sample}.txt"')
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleArgsSection
         PsiElement(Py:IDENTIFIER)('shell')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -34,14 +34,14 @@ SnakemakeFile: Checkpoint.smk
           PyStringLiteralExpression: echo {wildcards.sample} > somestep/{wildcards.sample}.txt
             PsiElement(Py:SINGLE_QUOTED_STRING)('"echo {wildcards.sample} > somestep/{wildcards.sample}.txt"')
   PsiWhiteSpace('\n\n')
-  SMKCheckPoint
+  SmkCheckPoint
     PsiElement(Py:CHECKPOINT_KEYWORD)('checkpoint')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('somestep2')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SMKRuleRunParameter
+      SmkRunSection
         PsiElement(Py:IDENTIFIER)('run')
         PsiElement(Py:COLON)(':')
         PsiWhiteSpace('\n        ')

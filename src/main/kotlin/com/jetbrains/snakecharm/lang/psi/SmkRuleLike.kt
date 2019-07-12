@@ -10,11 +10,11 @@ import com.jetbrains.python.psi.PyElement
 import com.jetbrains.python.psi.PyStatement
 import com.jetbrains.python.psi.PyStatementListContainer
 
-interface SmkRuleLike<out S : SMKRuleSection>: PyElement, PyStatementListContainer, PyStatement,
+interface SmkRuleLike<out S : SmkSection>: PyElement, PyStatementListContainer, PyStatement,
         //ScopeOwner,
         PsiNamedElement, PsiNameIdentifierOwner {
 
-    fun getSections(): List<SMKRuleSection>
+    fun getSections(): List<SmkSection>
     fun getSectionByName(sectionName: String): S?
 }
 

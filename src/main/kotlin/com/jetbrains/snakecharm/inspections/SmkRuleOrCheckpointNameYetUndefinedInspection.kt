@@ -6,8 +6,8 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.SmkRunSection
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckPointsType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 
@@ -24,7 +24,7 @@ class SmkRuleOrCheckpointNameYetUndefinedInspection : SnakemakeInspection() {
                 return
             }
 
-            val containingRunSection = PsiTreeUtil.getParentOfType(node, SMKRuleRunParameter::class.java)
+            val containingRunSection = PsiTreeUtil.getParentOfType(node, SmkRunSection::class.java)
             if (containingRunSection != null) {
                 return
             }

@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.psi.FileViewProvider
-import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.StubElement
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.impl.PyFileImpl
@@ -37,13 +36,13 @@ class SnakemakeFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, S
         return subworkflowNameAndPsi
     }
 
-    fun collectCheckPoints(): List<Pair<String, SMKCheckPoint>> {
-        val checkpointNameAndPsi = arrayListOf<Pair<String, SMKCheckPoint>>()
+    fun collectCheckPoints(): List<Pair<String, SmkCheckPoint>> {
+        val checkpointNameAndPsi = arrayListOf<Pair<String, SmkCheckPoint>>()
 
         acceptChildren(object : PyElementVisitor(), SMKElementVisitor {
             override val pyElementVisitor: PyElementVisitor = this
 
-            override fun visitSMKCheckPoint(checkPoint: SMKCheckPoint) {
+            override fun visitSMKCheckPoint(checkPoint: SmkCheckPoint) {
                 if (checkPoint.name != null) {
                     checkpointNameAndPsi.add(checkPoint.name!! to checkPoint)
                 }
@@ -52,14 +51,14 @@ class SnakemakeFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, S
         return checkpointNameAndPsi
     }
 
-    fun collectRules(): List<Pair<String, SMKRule>> {
+    fun collectRules(): List<Pair<String, SmkRule>> {
         // TODO: add tests, this is simple impl for internship task practice
-        val ruleNameAndPsi = arrayListOf<Pair<String, SMKRule>>()
+        val ruleNameAndPsi = arrayListOf<Pair<String, SmkRule>>()
 
         acceptChildren(object : PyElementVisitor(), SMKElementVisitor {
             override val pyElementVisitor: PyElementVisitor = this
 
-            override fun visitSMKRule(rule: SMKRule) {
+            override fun visitSMKRule(rule: SmkRule) {
                 if (rule.name != null) {
                     ruleNameAndPsi.add(rule.name!! to rule)
                 }

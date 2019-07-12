@@ -4,23 +4,15 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.documentation.docstrings.DocStringUtil
-import com.jetbrains.python.psi.*
+import com.jetbrains.python.psi.PyElementVisitor
+import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.impl.PyElementImpl
 
-
-
-class SMKRuleRunParameter(node: ASTNode): PyElementImpl(node),
-        SMKRuleSection,
-        //ScopeOwner, // for control flow
-        PyStatement, PyStatementListContainer, PyDocStringOwner
-{
+class SmkRunSectionImpl(node: ASTNode): PyElementImpl(node), SmkRunSection {
     override fun getStatementList(): PyStatementList =
             childToPsi(PyElementTypes.STATEMENT_LIST) ?: error("Statement list missing for run section $text")
 
-    fun getNameNode() = getIdentifierNode(node)
-
-    override val sectionName: String?
-        get() = getNameNode()?.text
+    override fun getSectionKeywordNode() = getIdentifierNode(node)
 
     val section: PsiElement?
         get() = firstChild

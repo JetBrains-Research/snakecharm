@@ -11,7 +11,7 @@ SnakemakeFile: MultiLineDocstrings.smk
     
         PsiElement(Py:TRIPLE_QUOTED_STRING)('""" line 1\n    line 2\n    """')
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -19,7 +19,7 @@ SnakemakeFile: MultiLineDocstrings.smk
           PyStringLiteralExpression: input.txt
             PsiElement(Py:SINGLE_QUOTED_STRING)('"input.txt"')
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleArgsSection
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
           PsiElement(Py:COLON)(':')

@@ -22,19 +22,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_VERSION
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_WRAPPER
 
-class SMKRuleParameterListStatement(node: ASTNode): SmkSectionStatement(node) { // PyNamedElementContainer
-    companion object {
-        val EXECUTION_KEYWORDS = setOf(SECTION_SHELL, SECTION_SCRIPT, SECTION_WRAPPER, SECTION_CWL)
-
-        val PARAMS_NAMES = setOf(
-                SECTION_OUTPUT, SECTION_INPUT, SECTION_PARAMS, SECTION_LOG, SECTION_RESOURCES,
-                SECTION_BENCHMARK, SECTION_VERSION, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS, SECTION_SINGULARITY,
-                SECTION_PRIORITY, SECTION_WILDCARD_CONSTRAINTS, SECTION_GROUP, SECTION_SHADOW,
-                SECTION_CONDA,
-                SECTION_SCRIPT, SECTION_WRAPPER, SECTION_CWL
-        )
-    }
-  
+class SmkRuleArgsSectionImpl(node: ASTNode): SmkArgsSectionImpl(node), SmkRuleArgsSection {
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SMKElementVisitor -> pyVisitor.visitSMKRuleParameterListStatement(this)
         else -> super.acceptPyVisitor(pyVisitor)
