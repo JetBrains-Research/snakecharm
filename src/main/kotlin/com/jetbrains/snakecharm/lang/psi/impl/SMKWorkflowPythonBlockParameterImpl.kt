@@ -3,7 +3,8 @@ package com.jetbrains.snakecharm.lang.psi.impl
 import com.intellij.lang.ASTNode
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.documentation.docstrings.DocStringUtil
-import com.jetbrains.python.psi.*
+import com.jetbrains.python.psi.PyElementVisitor
+import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.SMKElementVisitor
