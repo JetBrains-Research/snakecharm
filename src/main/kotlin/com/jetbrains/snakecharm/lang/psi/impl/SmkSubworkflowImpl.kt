@@ -16,7 +16,7 @@ class SmkSubworkflowImpl:
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
         when (pyVisitor) {
-            is SmkElementVisitor -> pyVisitor.visitSMKSubworkflow(this)
+            is SmkElementVisitor -> pyVisitor.visitSmkSubworkflow(this)
             else -> super.acceptPyVisitor(pyVisitor)
         }
     }

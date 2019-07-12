@@ -11,7 +11,7 @@ class SmkWorkflowLocalrulesSectionImpl(node: ASTNode): PyElementImpl(node), SmkW
     override fun getSectionKeywordNode() = node.findChildByType(SnakemakeTokenTypes.WORKFLOW_LOCALRULES_KEYWORD)
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
-        is SmkElementVisitor -> pyVisitor.visitSMKWorkflowLocalRulesStatement(this)
+        is SmkElementVisitor -> pyVisitor.visitSmkWorkflowLocalrulesSection(this)
         else -> super.acceptPyVisitor(pyVisitor)
     }
 }

@@ -15,7 +15,7 @@ class SmkShadowSettingsInspection : SnakemakeInspection()  {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
-        override fun visitSMKRuleParameterListStatement(st: SmkRuleOrCheckpointArgsSection) {
+        override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
             if (st.name != SnakemakeNames.SECTION_SHADOW) {
                 return
             }

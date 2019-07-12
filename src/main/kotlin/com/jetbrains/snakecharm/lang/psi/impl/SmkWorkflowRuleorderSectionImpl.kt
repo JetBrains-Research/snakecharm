@@ -11,7 +11,7 @@ class SmkWorkflowRuleorderSectionImpl(node: ASTNode): PyElementImpl(node), SmkWo
     override fun getSectionKeywordNode() = node.findChildByType(SnakemakeTokenTypes.WORKFLOW_RULEORDER_KEYWORD)
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
-        is SmkElementVisitor -> pyVisitor.visitSMKWorkflowRuleOrderStatement(this)
+        is SmkElementVisitor -> pyVisitor.visitSmkWorkflowRuleorderSection(this)
         else -> super.acceptPyVisitor(pyVisitor)
     }
 }

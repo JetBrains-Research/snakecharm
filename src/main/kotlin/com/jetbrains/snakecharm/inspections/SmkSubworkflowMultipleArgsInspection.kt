@@ -12,7 +12,7 @@ class SmkSubworkflowMultipleArgsInspection  : SnakemakeInspection() {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
-        override fun visitSMKSubworkflowParameterListStatement(st: SmkSubworkflowArgsSection) {
+        override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
             val args = st.argumentList?.arguments ?: emptyArray()
             if (args.size > 1) {
                 args.forEach {

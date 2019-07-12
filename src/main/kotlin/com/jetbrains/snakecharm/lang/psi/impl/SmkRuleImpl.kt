@@ -15,7 +15,7 @@ class SmkRuleImpl
     constructor(stub: SmkRuleStub): super(stub, SmkStubElementTypes.RULE_DECLARATION_STATEMENT)
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
-        is SmkElementVisitor -> pyVisitor.visitSMKRule(this)
+        is SmkElementVisitor -> pyVisitor.visitSmkRule(this)
         else -> super.acceptPyVisitor(pyVisitor)
     }
 }

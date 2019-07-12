@@ -27,7 +27,7 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
         acceptChildren(object : PyElementVisitor(), SmkElementVisitor {
             override val pyElementVisitor: PyElementVisitor = this
 
-            override fun visitSMKSubworkflow(subworkflow: SmkSubworkflow) {
+            override fun visitSmkSubworkflow(subworkflow: SmkSubworkflow) {
                 if (subworkflow.name != null) {
                     subworkflowNameAndPsi.add(subworkflow.name!! to subworkflow)
                 }
@@ -42,7 +42,7 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
         acceptChildren(object : PyElementVisitor(), SmkElementVisitor {
             override val pyElementVisitor: PyElementVisitor = this
 
-            override fun visitSMKCheckPoint(checkPoint: SmkCheckPoint) {
+            override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
                 if (checkPoint.name != null) {
                     checkpointNameAndPsi.add(checkPoint.name!! to checkPoint)
                 }
@@ -58,7 +58,7 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
         acceptChildren(object : PyElementVisitor(), SmkElementVisitor {
             override val pyElementVisitor: PyElementVisitor = this
 
-            override fun visitSMKRule(rule: SmkRule) {
+            override fun visitSmkRule(rule: SmkRule) {
                 if (rule.name != null) {
                     ruleNameAndPsi.add(rule.name!! to rule)
                 }

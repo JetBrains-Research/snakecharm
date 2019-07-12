@@ -15,43 +15,43 @@ interface SmkElementVisitor {
      */
     val pyElementVisitor: PyElementVisitor
 
-    fun visitSMKRule(rule: SmkRule) {
+    fun visitSmkRule(rule: SmkRule) {
         pyElementVisitor.visitPyElement(rule)
     }
 
-    fun visitSMKCheckPoint(checkPoint: SmkCheckPoint) {
+    fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
         pyElementVisitor.visitPyElement(checkPoint)
     }
 
-    fun visitSMKSubworkflow(subworkflow: SmkSubworkflow) {
+    fun visitSmkSubworkflow(subworkflow: SmkSubworkflow) {
         pyElementVisitor.visitPyElement(subworkflow)
     }
 
-    fun visitSMKRuleParameterListStatement(st: SmkRuleOrCheckpointArgsSection) {
+    fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
         pyElementVisitor.visitPyStatement(st)
     }
 
-    fun visitSMKRuleRunParameter(st: SmkRunSection) {
+    fun visitSmkRunSection(st: SmkRunSection) {
         pyElementVisitor.visitPyStatementList(st.statementList)
     }
 
-    fun visitSMKSubworkflowParameterListStatement(st: SmkSubworkflowArgsSection) {
+    fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
         pyElementVisitor.visitPyStatement(st)
     }
 
-    fun visitSMKWorkflowParameterListStatement(st: SmkWorkflowArgsSection) {
+    fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
         pyElementVisitor.visitPyStatement(st)
     }
 
-    fun visitSMKWorkflowPythonBlockParameter(st: SmkWorkflowPythonBlockSection) {
+    fun visitSmkWorkflowPythonBlockSection(st: SmkWorkflowPythonBlockSection) {
         pyElementVisitor.visitPyStatementList(st.statementList)
     }
 
-    fun visitSMKWorkflowRuleOrderStatement(st: SmkWorkflowRuleorderSection) {
+    fun visitSmkWorkflowRuleorderSection(st: SmkWorkflowRuleorderSection) {
         pyElementVisitor.visitPyStatement(st)
     }
 
-    fun visitSMKWorkflowLocalRulesStatement(st: SmkWorkflowLocalrulesSection) {
+    fun visitSmkWorkflowLocalrulesSection(st: SmkWorkflowLocalrulesSection) {
         pyElementVisitor.visitPyStatement(st)
     }
 }

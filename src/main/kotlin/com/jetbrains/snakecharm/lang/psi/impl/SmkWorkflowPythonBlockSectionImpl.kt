@@ -18,7 +18,7 @@ class SmkWorkflowPythonBlockSectionImpl(node: ASTNode) : PyElementImpl(node), Sm
     override fun getSectionKeywordNode() = node.findChildByType(WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS)
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
-        is SmkElementVisitor -> pyVisitor.visitSMKWorkflowPythonBlockParameter(this)
+        is SmkElementVisitor -> pyVisitor.visitSmkWorkflowPythonBlockSection(this)
         else -> super.acceptPyVisitor(pyVisitor)
     }
 

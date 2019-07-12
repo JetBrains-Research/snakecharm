@@ -6,11 +6,11 @@ import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.validation.SnakemakeAnnotator
 
 object SnakemakeSyntaxAnnotator: SnakemakeAnnotator() {
-    override fun visitSMKRule(rule: SmkRule) {
+    override fun visitSmkRule(rule: SmkRule) {
         visitSMKRuleLike(rule)
     }
 
-    override fun visitSMKCheckPoint(checkPoint: SmkCheckPoint) {
+    override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
         visitSMKRuleLike(checkPoint)
     }
 
@@ -21,55 +21,55 @@ object SnakemakeSyntaxAnnotator: SnakemakeAnnotator() {
         }
     }
 
-    override fun visitSMKSubworkflow(subworkflow: SmkSubworkflow) {
+    override fun visitSmkSubworkflow(subworkflow: SmkSubworkflow) {
         subworkflow.nameIdentifier?.let { nameElement ->
             addHighlightingAnnotation(nameElement, PY_FUNC_DEFINITION)
         }
     }
 
-    override fun visitSMKRuleParameterListStatement(st: SmkRuleOrCheckpointArgsSection) {
+    override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
         val nameNode = st.getSectionKeywordNode()
         if (nameNode != null) {
             addHighlightingAnnotation(nameNode, PyHighlighter.PY_DECORATOR)
         }
     }
 
-    override fun visitSMKSubworkflowParameterListStatement(st: SmkSubworkflowArgsSection) {
+    override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
         val nameNode = st.getSectionKeywordNode()
         if (nameNode != null) {
             addHighlightingAnnotation(nameNode, PyHighlighter.PY_DECORATOR)
         }
     }
 
-    override fun visitSMKRuleRunParameter(st: SmkRunSection) {
+    override fun visitSmkRunSection(st: SmkRunSection) {
         val nameNode = st.getSectionKeywordNode()
         if (nameNode != null) {
             addHighlightingAnnotation(nameNode, PyHighlighter.PY_PREDEFINED_DEFINITION)
         }
     }
 
-    override fun visitSMKWorkflowPythonBlockParameter(st: SmkWorkflowPythonBlockSection) {
+    override fun visitSmkWorkflowPythonBlockSection(st: SmkWorkflowPythonBlockSection) {
         val keywordNode = st.getSectionKeywordNode()
         if (keywordNode != null) {
             addHighlightingAnnotation(keywordNode, PyHighlighter.PY_KEYWORD)
         }
     }
 
-    override fun visitSMKWorkflowParameterListStatement(st: SmkWorkflowArgsSection) {
+    override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
         val keywordNode = st.getSectionKeywordNode()
         if (keywordNode != null) {
             addHighlightingAnnotation(keywordNode, PyHighlighter.PY_KEYWORD)
         }
     }
 
-    override fun visitSMKWorkflowLocalRulesStatement(st: SmkWorkflowLocalrulesSection) {
+    override fun visitSmkWorkflowLocalrulesSection(st: SmkWorkflowLocalrulesSection) {
         val keywordNode = st.getSectionKeywordNode()
         if (keywordNode != null) {
             addHighlightingAnnotation(keywordNode, PyHighlighter.PY_KEYWORD)
         }
     }
 
-    override fun visitSMKWorkflowRuleOrderStatement(st: SmkWorkflowRuleorderSection) {
+    override fun visitSmkWorkflowRuleorderSection(st: SmkWorkflowRuleorderSection) {
         val keywordNode = st.getSectionKeywordNode()
         if (keywordNode != null) {
             addHighlightingAnnotation(keywordNode, PyHighlighter.PY_KEYWORD)

@@ -7,7 +7,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode): SmkArgsSectionImpl(node), SmkRuleOrCheckpointArgsSection {
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
-        is SmkElementVisitor -> pyVisitor.visitSMKRuleParameterListStatement(this)
+        is SmkElementVisitor -> pyVisitor.visitSmkRuleOrCheckpointArgsSection(this)
         else -> super.acceptPyVisitor(pyVisitor)
     }
 }

@@ -11,11 +11,11 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
-        override fun visitSMKRule(rule: SmkRule) {
+        override fun visitSmkRule(rule: SmkRule) {
             visitSMKRuleLike(rule)
         }
 
-        override fun visitSMKCheckPoint(checkPoint: SmkCheckPoint) {
+        override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
             visitSMKRuleLike(checkPoint)
         }
 

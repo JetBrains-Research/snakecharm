@@ -6,7 +6,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.*
 
 object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
-    override fun visitSMKRuleParameterListStatement(st: SmkRuleOrCheckpointArgsSection) {
+    override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
         if (!SnakemakeLanguageDialect.isInsideSmkFile(st)) {
             return
         }
@@ -41,11 +41,11 @@ object SnakemakeSyntaxErrorAnnotator : SnakemakeAnnotator() {
         }
     }
 
-    override fun visitSMKRule(rule: SmkRule) {
+    override fun visitSmkRule(rule: SmkRule) {
         checkMultipleExecutionSections(rule)
     }
 
-    override fun visitSMKCheckPoint(checkPoint: SmkCheckPoint) {
+    override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
         checkMultipleExecutionSections(checkPoint)
     }
 

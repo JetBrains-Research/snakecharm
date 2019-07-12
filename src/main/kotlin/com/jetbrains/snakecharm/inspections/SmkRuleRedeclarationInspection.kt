@@ -16,11 +16,11 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         private val ruleNames = mutableSetOf<String>()
 
-        override fun visitSMKRule(rule: SmkRule) {
+        override fun visitSmkRule(rule: SmkRule) {
             visitSMKRuleLike(rule)
         }
 
-        override fun visitSMKCheckPoint(checkPoint: SmkCheckPoint) {
+        override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
             visitSMKRuleLike(checkPoint)
         }
 

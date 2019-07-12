@@ -15,7 +15,7 @@ class SmkCheckPointImpl
     constructor(stub: SmkCheckpointStub): super(stub, SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT)
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
-        is SmkElementVisitor -> pyVisitor.visitSMKCheckPoint(this)
+        is SmkElementVisitor -> pyVisitor.visitSmkCheckPoint(this)
         else -> super.acceptPyVisitor(pyVisitor)
     }
 }

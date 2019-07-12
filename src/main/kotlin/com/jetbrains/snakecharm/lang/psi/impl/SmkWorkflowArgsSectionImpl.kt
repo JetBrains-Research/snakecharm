@@ -13,7 +13,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
  */
 class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkflowArgsSection {
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
-        is SmkElementVisitor -> pyVisitor.visitSMKWorkflowParameterListStatement(this)
+        is SmkElementVisitor -> pyVisitor.visitSmkWorkflowArgsSection(this)
         else -> super.acceptPyVisitor(pyVisitor)
     }
 
