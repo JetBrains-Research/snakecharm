@@ -5,7 +5,6 @@ import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.PyTypeProviderBase
 import com.jetbrains.python.psi.types.TypeEvalContext
-import com.jetbrains.snakecharm.codeInsight.completion.WorkflowTopLevelKeywordsProvider
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_CHECKPOINTS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_RULES
@@ -28,7 +27,8 @@ class SmkSectionTypeProvider : PyTypeProviderBase() {
 
         val psiFile = referenceExpression.containingFile
 
-        if (WorkflowTopLevelKeywordsProvider.partOfSomeComplexReference(referenceExpression)) {
+        if (referenceExpression.parent.firstChild != referenceExpression) {
+            // part of some longer reference
             return null
         }
         // XXX: at the moment affects all "rules" variables in a *.smk file, better to

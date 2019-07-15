@@ -93,7 +93,7 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
         }
     }
 
-    fun partOfSomeComplexReference(element: PsiElement): Boolean {
+    private fun partOfSomeComplexReference(element: PsiElement): Boolean {
         val parent = element.parent
         if (parent is PyReferenceExpression && (parent.firstChild != element || parent.lastChild != element)) {
             return true
