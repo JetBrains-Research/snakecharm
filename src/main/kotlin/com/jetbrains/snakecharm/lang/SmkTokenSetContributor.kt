@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.lang
 
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PythonDialectsTokenSetContributorBase
+import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
@@ -30,14 +31,15 @@ class SmkTokenSetContributor : PythonDialectsTokenSetContributorBase() {
     )
 
     override fun getKeywordTokens() = TokenSet.orSet(
+            // XXX: after changing set of keywords tokens think of highlighting them via annotator and review
+            // [smk_syntax_annotator.feature]
+
             TokenSet.create(
-//                    SnakemakeTokenTypes.RULE_KEYWORD, SnakemakeTokenTypes.CHECKPOINT_KEYWORD,
-//                    SnakemakeTokenTypes.SUBWORKFLOW_KEYWORD
+                    SnakemakeTokenTypes.RULE_KEYWORD, SnakemakeTokenTypes.CHECKPOINT_KEYWORD,
+                    SnakemakeTokenTypes.SUBWORKFLOW_KEYWORD
+
                     // other keywords not here due to highlighting issues in context where they
                     // aren't keywords any more
-
-                    // TODO:  seems this keywords also better to highlight using annotator because
-                    // they are not keywords in some contexts (e.g. python code)
             )
     )
 
