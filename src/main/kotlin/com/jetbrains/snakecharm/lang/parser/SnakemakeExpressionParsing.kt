@@ -269,10 +269,6 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             return parseSingleExpression(false)
         }
         return true
-        /*if (atStringNodeOrFormattedString()) {
-            return parseMultilineStringLiteral()
-        }
-        return parseSingleExpression(false)*/
     }
 
     private fun atStringNodeOrFormattedString() = atAnyOfTokensSafe(*PyTokenTypes.STRING_NODES.types, PyTokenTypes.FSTRING_START)
@@ -321,9 +317,15 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         }
 
         var stringLiteralMarker = myBuilder.mark()
-        var statementBreakPosition = -1
+        var statementEndPosition = -1
+        var statementBreakMarker: PsiBuilder.Marker? = null // still necessary as we might need to rollback to this
         var incorrectUnindentMarker: PsiBuilder.Marker? = null
         var previousIndents = indents
+
+        // if true, we need a second pass to replace statement breaks with line breaks
+        // and do call expression parsing on this multiline string
+        var dotOccurred = false
+
         while (atStringNodeOrFormattedString()) {
             if (atAnyOfTokensSafe(PyTokenTypes.FSTRING_START)) {
                 val parseFunction = ExpressionParsing::class.java.getDeclaredMethod("parseFormattedStringNode")
@@ -344,12 +346,17 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             }
 
             if (!atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
-                if (atAnyOfTokensSafe(PyTokenTypes.PLUS, PyTokenTypes.DOT)) {
-                    statementBreakPosition = myBuilder.rawTokenIndex()
+                if (atAnyOfTokensSafe(PyTokenTypes.PLUS)) {
+                    statementEndPosition = myBuilder.rawTokenIndex()
+                } else if (atAnyOfTokensSafe(PyTokenTypes.DOT)) {
+                    statementEndPosition = myBuilder.rawTokenIndex()
+                    dotOccurred = true
                 }
                 break
             } else {
-                statementBreakPosition = myBuilder.rawTokenIndex()
+                statementBreakMarker?.drop()
+                statementBreakMarker = myBuilder.mark()
+                statementEndPosition = myBuilder.rawTokenIndex()
                 previousIndents = indents
                 nextToken()
             }
@@ -377,28 +384,37 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             }
         }
 
-        if (statementBreakPosition != -1) {
+        // second pass to replace all necessary statement breaks with line breaks
+        // it has to be done on the 2nd pass when it is already known which position signifies the end of the expression
+        if (dotOccurred) {
             stringLiteralMarker.rollbackTo()
+            if (statementEndPosition == -1) {
+                return parseSingleExpression(false)
+            }
             stringLiteralMarker = myBuilder.mark()
-            while (myBuilder.rawTokenIndex() < statementBreakPosition) {
+            while (myBuilder.rawTokenIndex() < statementEndPosition) {
                 if (atStringNodeOrFormattedString()) {
                     nextToken()
                     incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
                     incorrectUnindentMarker = null
                     continue
                 }
-                if (atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
+                if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
                     myBuilder.remapCurrentToken(PyTokenTypes.LINE_BREAK)
                 }
-                if (atAnyOfTokensSafe(PyTokenTypes.INCONSISTENT_DEDENT)) {
+                if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
                     incorrectUnindentMarker = myBuilder.mark()
                 }
                 nextToken()
             }
-            if (atAnyOfTokensSafe(PyTokenTypes.DOT)) {
-                stringLiteralMarker.rollbackTo()
-                return parseSingleExpression(false)
-            }
+            stringLiteralMarker.rollbackTo()
+            // third pass, this time to parse everything including the dot
+            return parseSingleExpression(false)
+
+        } else if (!atAnyOfTokensSafe(PyTokenTypes.PLUS)) {
+            statementBreakMarker?.rollbackTo()
+        } else {
+            statementBreakMarker?.drop()
         }
 
         if (atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
@@ -416,6 +432,36 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         } else {
             while (PyTokenTypes.ADDITIVE_OPERATIONS.contains(myBuilder.tokenType)) {
                 myBuilder.advanceLexer()
+
+                if (atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
+                    val statementBreakMarker = myBuilder.mark()
+                    nextToken()
+                    if (atAnyOfTokensSafe(PyTokenTypes.INDENT)) {
+                        indents++
+                        nextToken()
+                        statementBreakMarker.drop()
+                    } else {
+                        loop@ while (indents > 0 && !myBuilder.eof()) {
+                            when {
+                                atToken(PyTokenTypes.DEDENT) -> {
+                                    nextToken()
+                                    indents--
+                                }
+                                atToken(PyTokenTypes.INCONSISTENT_DEDENT) -> {
+                                    nextToken()
+                                }
+                                else -> break@loop
+                            }
+                        }
+
+                        if (indents == 0) {
+                            statementBreakMarker.rollbackTo()
+                        } else {
+                            statementBreakMarker.drop()
+                        }
+                    }
+                }
+
                 if (!parseMultilineStringTwoPasses()) {
                     myBuilder.error(message("PARSE.expected.expression"))
                 }
