@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.lang.parser
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.impl.PsiBuilderImpl
 import com.intellij.psi.tree.IElementType
+import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
@@ -10,12 +11,15 @@ import com.jetbrains.python.parsing.ExpressionParsing
 import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
+import java.lang.reflect.InvocationTargetException
 
 /**
  * @author Roman.Chernyatchik
  * @date 2019-01-04
  */
 class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionParsing(context) {
+    private val stringLiteralTokenSet = TokenSet.create(PyTokenTypes.FSTRING_START, *PyTokenTypes.STRING_NODES.types)
+
     private var indents = 0
 
     override fun getParsingContext() = myContext as SnakemakeParserContext
@@ -271,7 +275,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         return true
     }
 
-    private fun atStringNodeOrFormattedString() = atAnyOfTokensSafe(*PyTokenTypes.STRING_NODES.types, PyTokenTypes.FSTRING_START)
+    private fun atStringNodeOrFormattedString() = atAnyOfTokensSafe(*stringLiteralTokenSet.types)
 
     /**
      * Skips tokens until token from expected set and marks it with error
@@ -330,7 +334,11 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             if (atAnyOfTokensSafe(PyTokenTypes.FSTRING_START)) {
                 val parseFunction = ExpressionParsing::class.java.getDeclaredMethod("parseFormattedStringNode")
                 parseFunction.isAccessible = true
-                parseFunction.invoke(this)
+                try {
+                    parseFunction.invoke(this)
+                } catch (e: InvocationTargetException) {
+                    // TODO log or something? because it does happen sometimes bc of ProcessCanceledException
+                }
             } else {
                 nextToken()
             }
@@ -430,37 +438,10 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             expr.drop()
             return false
         } else {
-            while (PyTokenTypes.ADDITIVE_OPERATIONS.contains(myBuilder.tokenType)) {
+            while (atToken(PyTokenTypes.PLUS)) {
                 myBuilder.advanceLexer()
 
-                if (atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
-                    val statementBreakMarker = myBuilder.mark()
-                    nextToken()
-                    if (atAnyOfTokensSafe(PyTokenTypes.INDENT)) {
-                        indents++
-                        nextToken()
-                        statementBreakMarker.drop()
-                    } else {
-                        loop@ while (indents > 0 && !myBuilder.eof()) {
-                            when {
-                                atToken(PyTokenTypes.DEDENT) -> {
-                                    nextToken()
-                                    indents--
-                                }
-                                atToken(PyTokenTypes.INCONSISTENT_DEDENT) -> {
-                                    nextToken()
-                                }
-                                else -> break@loop
-                            }
-                        }
-
-                        if (indents == 0) {
-                            statementBreakMarker.rollbackTo()
-                        } else {
-                            statementBreakMarker.drop()
-                        }
-                    }
-                }
+                skipStatementBreaksUpToTokens(*stringLiteralTokenSet.types)
 
                 if (!parseMultilineStringTwoPasses()) {
                     myBuilder.error(message("PARSE.expected.expression"))
@@ -468,10 +449,50 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
 
                 expr.done(PyElementTypes.BINARY_EXPRESSION)
                 expr = expr.precede()
+                skipStatementBreaksUpToTokens(PyTokenTypes.PLUS)
             }
 
             expr.drop()
             return true
+        }
+    }
+
+    private fun skipStatementBreaksUpToTokens(vararg tokenTypes: IElementType) {
+        val marker = myBuilder.mark()
+        val previousIndents = indents
+        while (atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
+            nextToken()
+            if (atAnyOfTokensSafe(PyTokenTypes.INDENT)) {
+                indents++
+                nextToken()
+            } else {
+                skipDedents { myBuilder.error(SnakemakeBundle.message("PARSE.incorrect.unindent")) }
+            }
+            if (indents == 0) {
+                break
+            }
+        }
+        if (atAnyOfTokensSafe(*tokenTypes)) {
+            marker.drop()
+        } else {
+            indents = previousIndents
+            marker.rollbackTo()
+        }
+    }
+
+    private fun skipDedents(incorrectUnindentHandler: () -> Unit) {
+        loop@ while (indents > 0 && !myBuilder.eof()) {
+            when {
+                atAnyOfTokensSafe(PyTokenTypes.DEDENT) -> {
+                    nextToken()
+                    indents--
+                }
+                atAnyOfTokensSafe(PyTokenTypes.INCONSISTENT_DEDENT) -> {
+                    incorrectUnindentHandler()
+                    nextToken()
+                }
+                else -> break@loop
+            }
         }
     }
 }
