@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.stubs.NamedStub
 import com.jetbrains.python.PyElementTypes
+import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyBaseElementImpl
@@ -25,6 +26,8 @@ abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT: SmkRuleLike<S>, ou
     constructor(node: ASTNode): super(node)
     constructor(stub: StubT, nodeType: IStubElementType<StubT, PsiT>): super(stub, nodeType)
 
+    abstract val sectionTokenType: PyElementType
+
     override fun getName(): String? {
         val stub = stub
         if (stub != null) {
@@ -41,6 +44,8 @@ abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT: SmkRuleLike<S>, ou
         }
         return this
     }
+
+    override fun getSectionKeywordNode()= node.findChildByType(sectionTokenType)
 
     override fun getNameIdentifier() = getNameNode()?.psi
 

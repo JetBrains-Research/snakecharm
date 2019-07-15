@@ -2,10 +2,9 @@ package com.jetbrains.snakecharm.lang
 
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PythonDialectsTokenSetContributorBase
-import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 
 /**
  * @author Roman.Chernyatchik
@@ -32,8 +31,8 @@ class SmkTokenSetContributor : PythonDialectsTokenSetContributorBase() {
 
     override fun getKeywordTokens() = TokenSet.orSet(
             TokenSet.create(
-                    SnakemakeTokenTypes.RULE_KEYWORD, SnakemakeTokenTypes.CHECKPOINT_KEYWORD,
-                    SnakemakeTokenTypes.SUBWORKFLOW_KEYWORD
+//                    SnakemakeTokenTypes.RULE_KEYWORD, SnakemakeTokenTypes.CHECKPOINT_KEYWORD,
+//                    SnakemakeTokenTypes.SUBWORKFLOW_KEYWORD
                     // other keywords not here due to highlighting issues in context where they
                     // aren't keywords any more
 
