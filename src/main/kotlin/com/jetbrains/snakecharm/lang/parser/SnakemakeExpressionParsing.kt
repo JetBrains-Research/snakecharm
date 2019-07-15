@@ -265,76 +265,17 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
     }
 
     private fun parseSingleExpressionOrStringLiteral(): Boolean {
-        if (myBuilder.tokenType in PyTokenTypes.STRING_NODES) {
-            val stringLiteralMarker = myBuilder.mark()
-            var statementBreakMarker: PsiBuilder.Marker? = null
-            var incorrectUnindentMarker: PsiBuilder.Marker? = null
-            var previousIndents = indents
-            while (insideStringLiteral()) {
-                if (atAnyOfTokensSafe(PyTokenTypes.FSTRING_START)) {
-                    val parseFunction = ExpressionParsing::class.java.getDeclaredMethod("parseFormattedStringNode")
-                    parseFunction.isAccessible = true
-                    parseFunction.invoke(this)
-                } else {
-                    nextToken()
-                }
-
-                if (incorrectUnindentMarker != null) {
-                    incorrectUnindentMarker.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
-                    incorrectUnindentMarker = null
-                }
-
-                // when there's a binary concatenation expression
-                // TODO return to the previous string properly
-                /*if (atAnyOfTokensSafe(PyTokenTypes.PLUS)) {
-                    return parseSingleExpression(false)
-                } */
-
-                // when lines are separated with '\' symbol or there are two strings in a row like this: "1" "2"
-                if (insideStringLiteral()) {
-                    continue
-                }
-
-                if (!atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
-                    break
-                } else {
-                    statementBreakMarker?.drop()
-                    statementBreakMarker = myBuilder.mark()
-                    previousIndents = indents
-                    nextToken()
-                }
-
-                if (atAnyOfTokensSafe(PyTokenTypes.INDENT)) {
-                    nextToken()
-                    indents++
-                } else {
-                    loop@ while (indents > 0 && !myBuilder.eof()) {
-                        when {
-                            atToken(PyTokenTypes.DEDENT) -> {
-                                nextToken()
-                                indents--
-                            }
-                            atToken(PyTokenTypes.INCONSISTENT_DEDENT) -> {
-                                incorrectUnindentMarker = myBuilder.mark()
-                                nextToken()
-                            }
-                            else -> break@loop
-                        }
-                    }
-                    if (incorrectUnindentMarker == null && indents == 0) {
-                        break
-                    }
-                }
-            }
-            statementBreakMarker?.rollbackTo()
-            indents = previousIndents
-            stringLiteralMarker.done(PyElementTypes.STRING_LITERAL_EXPRESSION)
-            return true
+        if (!parseStringAdditiveExpression()) {
+            return parseSingleExpression(false)
         }
-        return parseSingleExpression(false)
+        return true
+        /*if (atStringNodeOrFormattedString()) {
+            return parseMultilineStringLiteral()
+        }
+        return parseSingleExpression(false)*/
     }
 
-    private fun insideStringLiteral() = atAnyOfTokensSafe(*PyTokenTypes.STRING_NODES.types, PyTokenTypes.FSTRING_START)
+    private fun atStringNodeOrFormattedString() = atAnyOfTokensSafe(*PyTokenTypes.STRING_NODES.types, PyTokenTypes.FSTRING_START)
 
     /**
      * Skips tokens until token from expected set and marks it with error
@@ -373,4 +314,111 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
      * Compares the current token against [tokenType] without applying filters.
      */
     private fun checkCurrentTokenSafe(tokenType: IElementType) = myBuilder.rawLookup(0) == tokenType
+
+    private fun parseMultilineStringLiteral(): Boolean {
+        if (!atStringNodeOrFormattedString()) {
+            return false
+        }
+
+        val stringLiteralMarker = myBuilder.mark()
+        var statementBreakMarker: PsiBuilder.Marker? = null
+        var incorrectUnindentMarker: PsiBuilder.Marker? = null
+        var previousIndents = indents
+        while (atStringNodeOrFormattedString()) {
+            if (atAnyOfTokensSafe(PyTokenTypes.FSTRING_START)) {
+                val parseFunction = ExpressionParsing::class.java.getDeclaredMethod("parseFormattedStringNode")
+                parseFunction.isAccessible = true
+                parseFunction.invoke(this)
+            } else {
+                nextToken()
+            }
+
+            if (incorrectUnindentMarker != null) {
+                incorrectUnindentMarker.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
+                incorrectUnindentMarker = null
+            }
+
+            // when there's a binary concatenation expression
+            // TODO return to the previous string properly
+            /*if (atAnyOfTokensSafe(PyTokenTypes.PLUS)) {
+                return parseSingleExpression(false)
+            } */
+
+            // when lines are separated with '\' symbol or there are two strings in a row like this: "1" "2"
+            if (atStringNodeOrFormattedString()) {
+                continue
+            }
+
+            if (!atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
+                if (atAnyOfTokensSafe(PyTokenTypes.PLUS)) {
+                    statementBreakMarker?.drop()
+                    previousIndents = indents
+                } else {
+                    statementBreakMarker?.rollbackTo()
+                }
+                statementBreakMarker = null
+                break
+            } else {
+                statementBreakMarker?.drop()
+                // we are currently at a statement break and we remap it into a line break
+                statementBreakMarker = myBuilder.mark()
+                previousIndents = indents
+                nextToken()
+            }
+
+            if (atAnyOfTokensSafe(PyTokenTypes.INDENT)) {
+                nextToken()
+                indents++
+            } else {
+                loop@ while (indents > 0 && !myBuilder.eof()) {
+                    when {
+                        atToken(PyTokenTypes.DEDENT) -> {
+                            nextToken()
+                            indents--
+                        }
+                        atToken(PyTokenTypes.INCONSISTENT_DEDENT) -> {
+                            incorrectUnindentMarker = myBuilder.mark()
+                            nextToken()
+                        }
+                        else -> break@loop
+                    }
+                }
+                if (incorrectUnindentMarker == null && indents == 0) {
+                    break
+                }
+            }
+        }
+
+        statementBreakMarker?.rollbackTo()
+        indents = previousIndents
+        stringLiteralMarker.done(PyElementTypes.STRING_LITERAL_EXPRESSION)
+        return true
+
+    }
+
+    private fun parseStringAdditiveExpression(): Boolean {
+        var expr = myBuilder.mark()
+        if (!parseMultilineStringLiteral()) {
+            if (atStringNodeOrFormattedString() && !parseMemberExpression(false)) {
+                expr.drop()
+                return false
+            }
+        } else {
+            while (PyTokenTypes.ADDITIVE_OPERATIONS.contains(myBuilder.tokenType)) {
+                myBuilder.advanceLexer()
+                if (!parseMultilineStringLiteral()) {
+                    myBuilder.error(message("PARSE.expected.expression"))
+                }
+
+                expr.done(PyElementTypes.BINARY_EXPRESSION)
+                expr = expr.precede()
+            }
+
+            expr.drop()
+            return true
+        }
+
+        expr.drop()
+        return false
+    }
 }
