@@ -19,4 +19,7 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
 
     override fun getSectionKeywordNode()= node
             .findChildByType(SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
+
+    override fun getPresentation() = super<SmkWorkflowArgsSection>.getPresentation()
+    override fun getIcon(flags: Int) = super<SmkWorkflowArgsSection>.getIcon(flags)
 }

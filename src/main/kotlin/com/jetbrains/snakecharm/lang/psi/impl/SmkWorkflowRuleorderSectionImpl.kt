@@ -14,4 +14,7 @@ class SmkWorkflowRuleorderSectionImpl(node: ASTNode): PyElementImpl(node), SmkWo
         is SmkElementVisitor -> pyVisitor.visitSmkWorkflowRuleorderSection(this)
         else -> super.acceptPyVisitor(pyVisitor)
     }
+
+    override fun getPresentation() = super<SmkWorkflowRuleorderSection>.getPresentation()
+    override fun getIcon(flags: Int) = super<SmkWorkflowRuleorderSection>.getIcon(flags)
 }

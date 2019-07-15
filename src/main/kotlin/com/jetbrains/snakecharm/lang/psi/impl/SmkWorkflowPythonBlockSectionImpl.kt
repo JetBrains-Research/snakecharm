@@ -22,6 +22,9 @@ class SmkWorkflowPythonBlockSectionImpl(node: ASTNode) : PyElementImpl(node), Sm
         else -> super.acceptPyVisitor(pyVisitor)
     }
 
+    override fun getPresentation() = super<SmkWorkflowPythonBlockSection>.getPresentation()
+    override fun getIcon(flags: Int) = super<SmkWorkflowPythonBlockSection>.getIcon(flags)
+
     /**
      * TODO: Think should we use [CachedStructuredDocStringProvider] like in PyFunctionImpl
      **/

@@ -9,4 +9,7 @@ abstract class SmkArgsSectionImpl(node: ASTNode): PyElementImpl(node), SmkArgsSe
     override fun getName() = getSectionKeywordNode()?.text
 
     override fun getSectionKeywordNode() = getIdentifierNode(node)
+
+    override fun getPresentation() = super<SmkArgsSection>.getPresentation()
+    override fun getIcon(flags: Int) = super<SmkArgsSection>.getIcon(flags)
 }

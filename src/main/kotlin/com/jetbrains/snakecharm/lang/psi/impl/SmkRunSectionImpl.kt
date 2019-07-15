@@ -25,6 +25,9 @@ class SmkRunSectionImpl(node: ASTNode): PyElementImpl(node), SmkRunSection {
         else -> super.acceptPyVisitor(pyVisitor)
     }
 
+    override fun getPresentation() = super<SmkRunSection>.getPresentation()
+    override fun getIcon(flags: Int) = super<SmkRunSection>.getIcon(flags)
+
     /**
      * TODO: Think should we use [CachedStructuredDocStringProvider] like in PyFunctionImpl
      **/
