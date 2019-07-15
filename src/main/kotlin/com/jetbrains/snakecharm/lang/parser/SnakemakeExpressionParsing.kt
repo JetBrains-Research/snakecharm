@@ -338,12 +338,6 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 incorrectUnindentMarker = null
             }
 
-            // when there's a binary concatenation expression
-            // TODO return to the previous string properly
-            /*if (atAnyOfTokensSafe(PyTokenTypes.PLUS)) {
-                return parseSingleExpression(false)
-            } */
-
             // when lines are separated with '\' symbol or there are two strings in a row like this: "1" "2"
             if (atStringNodeOrFormattedString()) {
                 continue
