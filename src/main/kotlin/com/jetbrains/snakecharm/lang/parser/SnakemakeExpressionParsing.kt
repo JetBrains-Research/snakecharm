@@ -338,6 +338,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                     parseFunction.invoke(this)
                 } catch (e: InvocationTargetException) {
                     // TODO log or something? because it does happen sometimes bc of ProcessCanceledException
+                    parseSingleExpression(false)
                 }
             } else {
                 nextToken()
@@ -395,6 +396,13 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         // second pass to replace all necessary statement breaks with line breaks
         // it has to be done on the 2nd pass when it is already known which position signifies the end of the expression
         if (dotOccurred) {
+            myBuilder.setTokenTypeRemapper { source, _, _, _ ->
+                if (source == PyTokenTypes.INDENT || source == PyTokenTypes.DEDENT) {
+                    PyTokenTypes.SPACE
+                } else {
+                    source
+                }
+            }
             stringLiteralMarker.rollbackTo()
             if (statementEndPosition == -1) {
                 return parseSingleExpression(false)
@@ -407,15 +415,21 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                     incorrectUnindentMarker = null
                     continue
                 }
-                if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
-                    myBuilder.remapCurrentToken(PyTokenTypes.LINE_BREAK)
+                println("${myBuilder.rawLookup(0)} ${myBuilder.rawLookup(1)} ${myBuilder.rawLookup(2)}")
+                while (atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK, PyTokenTypes.INDENT, PyTokenTypes.DEDENT)) {
+                    myBuilder.remapCurrentToken(PyTokenTypes.SPACE)
+                    println("${myBuilder.rawLookup(0)} ${myBuilder.rawLookup(1)} ${myBuilder.rawLookup(2)}")
+                    myBuilder.advanceLexer()
+                    println("${myBuilder.rawLookup(0)} ${myBuilder.rawLookup(1)} ${myBuilder.rawLookup(2)}")
                 }
+                println()
                 if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
                     incorrectUnindentMarker = myBuilder.mark()
                 }
                 nextToken()
             }
             stringLiteralMarker.rollbackTo()
+            myBuilder.setTokenTypeRemapper { source, _, _, _ -> source }
             // third pass, this time to parse everything including the dot
             return parseSingleExpression(false)
 
