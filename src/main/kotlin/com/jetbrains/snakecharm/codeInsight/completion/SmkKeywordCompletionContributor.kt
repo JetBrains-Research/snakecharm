@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.PlatformPatterns.psiElement
+import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
@@ -68,7 +69,7 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
         if (statement?.parent !is SmkFile && statement?.parentOfType<PyStatementListContainer>() !is PyStatementPart) {
             return
         }
-        if (partOfSomeComplexReference(parameters)) {
+        if (partOfSomeComplexReference(parameters.position)) {
             return
         }
 
@@ -92,8 +93,7 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
         }
     }
 
-    private fun partOfSomeComplexReference(parameters: CompletionParameters): Boolean {
-        val element = parameters.position
+    fun partOfSomeComplexReference(element: PsiElement): Boolean {
         val parent = element.parent
         if (parent is PyReferenceExpression && (parent.firstChild != element || parent.lastChild != element)) {
             return true

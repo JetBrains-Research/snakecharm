@@ -185,3 +185,21 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       | rule       | subworkflow2 |
       | checkpoint | subworkflow1 |
       | checkpoint | subworkflow2 |
+
+
+  Scenario Outline: No resolve for long reference with rules/checkpoints last part
+     Given a snakemake project
+     Given I open a file "foo1.smk" with text
+        """
+        <rule_like> boo:
+          input: "s"
+
+        <rule_like> foo:
+          input: roo.too.<rule_like>s.<symbol_name>
+        """
+     When I put the caret after <rule_like>s.
+     Then reference should not resolve
+     Examples:
+       | rule_like  | symbol_name  |
+       | rule       | boo |
+       | checkpoint | boo |
