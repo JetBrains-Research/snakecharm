@@ -22,7 +22,7 @@ class SMKShadowSettingsCompletionContributor : CompletionContributor() {
 
 object ShadowSectionSettingsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = PlatformPatterns.psiElement()
-            .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
+            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
             .inside(SmkRuleOrCheckpointArgsSection::class.java)
             .inside(PyStringLiteralExpression::class.java)!!
 

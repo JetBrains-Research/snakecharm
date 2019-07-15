@@ -50,7 +50,7 @@
     />
     <completion.contributor
         language="Python"
-        implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKKeywordCompletionContributor"
+        implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkKeywordCompletionContributor"
     />
     <completion.contributor
             language="Python"

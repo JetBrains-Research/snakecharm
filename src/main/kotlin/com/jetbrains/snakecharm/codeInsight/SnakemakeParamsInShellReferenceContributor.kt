@@ -6,7 +6,7 @@ import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyStringLiteralExpression
-import com.jetbrains.snakecharm.codeInsight.completion.SMKKeywordCompletionContributor
+import com.jetbrains.snakecharm.codeInsight.completion.SmkKeywordCompletionContributor
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.impl.refs.SmkParamsReference
@@ -17,7 +17,7 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
         registrar.registerReferenceProvider(
                 PlatformPatterns
                         .psiElement(PyStringLiteralExpression::class.java)
-                        .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
+                        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
                         .inside(SmkRuleOrCheckpointArgsSection::class.java),
                 object : PsiReferenceProvider() {
                     private val paramsPattern = Pattern.compile("\\{params\\.([_a-zA-Z]\\w*)")

@@ -7,12 +7,12 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.PlatformPatterns.psiElement
+import com.intellij.psi.util.parentOfType
 import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.completion.PythonLookupElement
-import com.jetbrains.python.psi.PyArgumentList
-import com.jetbrains.python.psi.PyReferenceExpression
+import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
@@ -24,11 +24,9 @@ import com.jetbrains.snakecharm.lang.psi.*
  * @author Roman.Chernyatchik
  * @date 2019-05-23
  */
-class SMKKeywordCompletionContributor : CompletionContributor() {
+class SmkKeywordCompletionContributor : CompletionContributor() {
     companion object {
         val IN_SNAKEMAKE = PlatformPatterns.psiFile().withLanguage(SnakemakeLanguageDialect)
-        val IN_RULE_OR_CHECKPOINT = psiElement().inside(SmkRuleOrCheckpoint::class.java)!!
-        val IN_SUBWORKFLOW = psiElement().inside(SmkSubworkflow::class.java)!!
     }
 
     init {
@@ -54,15 +52,22 @@ class SMKKeywordCompletionContributor : CompletionContributor() {
 
 object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
-            .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
-            .andNot(SMKKeywordCompletionContributor.IN_RULE_OR_CHECKPOINT)
-            .andNot(SMKKeywordCompletionContributor.IN_SUBWORKFLOW)
+            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+            .andNot(psiElement().inside(SmkSection::class.java)!!)
 
     override fun addCompletions(
             parameters: CompletionParameters,
             context: ProcessingContext,
             result: CompletionResultSet
     ) {
+        val expression = parameters.position.parentOfType<PyExpression>() as? PyReferenceExpression ?: return
+        val statement = expression.parentOfType<PyStatement>()
+        if (statement is PyImportStatementBase) {
+            return
+        }
+        if (statement?.parent !is SmkFile && statement?.parentOfType<PyStatementListContainer>() !is PyStatementPart) {
+            return
+        }
         if (partOfSomeComplexReference(parameters)) {
             return
         }
@@ -121,7 +126,7 @@ object ColonAndWhiteSpaceTail : TailType() {
 
 object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
-            .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
+            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
             .inside(SmkRuleOrCheckpoint::class.java)!!
             .andNot(psiElement().inside(PyArgumentList::class.java))
             .andNot(psiElement().inside(SmkRunSection::class.java))
@@ -146,8 +151,8 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
 
 object SubworkflowSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
-            .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
-            .inside(SMKKeywordCompletionContributor.IN_SUBWORKFLOW)!!
+            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+            .inside(psiElement().inside(SmkSubworkflow::class.java))!!
             .andNot(psiElement().inside(PyArgumentList::class.java))
 
     override fun addCompletions(

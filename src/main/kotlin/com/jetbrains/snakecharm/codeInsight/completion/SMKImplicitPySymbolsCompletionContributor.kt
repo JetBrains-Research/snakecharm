@@ -21,7 +21,7 @@ class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
         val IN_PY_REF = psiElement().inside(PyReferenceExpression::class.java)
 
         private val REF_CAPTURE = psiElement()
-                .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
+                .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
                 .and(IN_PY_REF)
                 .with(object : PatternCondition<PsiElement>("isFirstChild") {
                     override fun accepts(element: PsiElement, context: ProcessingContext): Boolean {
