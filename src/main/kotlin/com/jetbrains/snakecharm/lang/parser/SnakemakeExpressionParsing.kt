@@ -328,6 +328,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
 
         // if true, we need a second pass to replace statement breaks with line breaks
         // and do call expression parsing on this multiline string
+        // in order for python call expression parsing to work properly
         var dotOccurred = false
 
         while (atStringNodeOrFormattedString()) {
@@ -355,9 +356,9 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             }
 
             if (!atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
-                if (atAnyOfTokensSafe(PyTokenTypes.PLUS)) {
+                if (atAnyOfTokensSafe(PyTokenTypes.PLUS)) { // concatenation via `+`
                     statementEndPosition = myBuilder.rawTokenIndex()
-                } else if (atAnyOfTokensSafe(PyTokenTypes.DOT)) {
+                } else if (atAnyOfTokensSafe(PyTokenTypes.DOT)) { // call expression
                     statementEndPosition = myBuilder.rawTokenIndex()
                     dotOccurred = true
                 }
@@ -415,14 +416,10 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                     incorrectUnindentMarker = null
                     continue
                 }
-                println("${myBuilder.rawLookup(0)} ${myBuilder.rawLookup(1)} ${myBuilder.rawLookup(2)}")
                 while (atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK, PyTokenTypes.INDENT, PyTokenTypes.DEDENT)) {
                     myBuilder.remapCurrentToken(PyTokenTypes.SPACE)
-                    println("${myBuilder.rawLookup(0)} ${myBuilder.rawLookup(1)} ${myBuilder.rawLookup(2)}")
                     myBuilder.advanceLexer()
-                    println("${myBuilder.rawLookup(0)} ${myBuilder.rawLookup(1)} ${myBuilder.rawLookup(2)}")
                 }
-                println()
                 if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
                     incorrectUnindentMarker = myBuilder.mark()
                 }
