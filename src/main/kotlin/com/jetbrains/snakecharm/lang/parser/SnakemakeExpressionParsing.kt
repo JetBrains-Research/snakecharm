@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.lang.parser
 
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.impl.PsiBuilderImpl
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PyBundle.message
@@ -338,8 +339,9 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 try {
                     parseFunction.invoke(this)
                 } catch (e: InvocationTargetException) {
-                    // TODO log or something? because it does happen sometimes bc of ProcessCanceledException
-                    parseSingleExpression(false)
+                    if (e.cause is ProcessCanceledException) {
+                        throw (e.cause as ProcessCanceledException)
+                    }
                 }
             } else {
                 nextToken()
