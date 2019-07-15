@@ -49,6 +49,8 @@ object SmkSyntaxAnnotator: SmkAnnotator() {
     }
 
     private fun highlightSMKRuleLike(ruleLike: SmkRuleLike<SmkArgsSection>) {
+        highlightWorkflowSection(ruleLike)
+
         ruleLike.nameIdentifier?.let { nameElement ->
             addHighlightingAnnotation(nameElement, PY_FUNC_DEFINITION)
         }

@@ -22,33 +22,31 @@ Feature: Annotate additional syntax
       | ruleorder            | r1 > r2  |
       | localrules           | r1,r2    |
 
-# Implemented via [com.jetbrains.snakecharm.lang.SmkTokenSetContributor.getKeywordTokens] instead of annotator
-# don't know how to rewrite this test text attributes provided by highlighter, not annotator
-#  Scenario Outline: Annotate rule-like section
-#    Given a snakemake project
-#    Given I open a file "foo.smk" with text
-#    """
-#    <rule_like> NAME:
-#        <section>: <text>
-#    """
-#    Then I expect inspection info on <<rule_like>> with message
-#    """
-#    PY.KEYWORD
-#    """
-#    Then I expect inspection info on <NAME> with message
-#    """
-#    PY.FUNC_DEFINITION
-#    """
-#    Then I expect inspection info on <<section>> with message
-#    """
-#    <highlighting>
-#    """
-#    When I check highlighting infos
-#    Examples:
-#      | rule_like   | section   | text       | highlighting |
-#      | rule        | input     | "file.txt" | PY.DECORATOR |
-#      | checkpoint  | input     | "file.txt" | PY.DECORATOR |
-#      | subworkflow | snakefile | "file.txt" | PY.DECORATOR |
+  Scenario Outline: Annotate rule-like section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+        <section>: <text>
+    """
+    Then I expect inspection info on <<rule_like>> with message
+    """
+    PY.KEYWORD
+    """
+    Then I expect inspection info on <NAME> with message
+    """
+    PY.FUNC_DEFINITION
+    """
+    Then I expect inspection info on <<section>> with message
+    """
+    <highlighting>
+    """
+    When I check highlighting infos
+    Examples:
+      | rule_like   | section   | text       | highlighting |
+      | rule        | input     | "file.txt" | PY.DECORATOR |
+      | checkpoint  | input     | "file.txt" | PY.DECORATOR |
+      | subworkflow | snakefile | "file.txt" | PY.DECORATOR |
 
   Scenario Outline: Annotate Rules and Checkpoints
     Given a snakemake project
@@ -56,6 +54,10 @@ Feature: Annotate additional syntax
     """
     <rule_like> NAME:
         <section>: <text>
+    """
+    Then I expect inspection info on <<rule_like>> with message
+    """
+    PY.KEYWORD
     """
     Then I expect inspection info on <NAME> with message
     """
@@ -98,6 +100,10 @@ Feature: Annotate additional syntax
     subworkflow NAME:
         <section>: <text>
     """
+    Then I expect inspection info on <subworkflow> with message
+    """
+    PY.KEYWORD
+    """
     Then I expect inspection info on <NAME> with message
     """
     PY.FUNC_DEFINITION
@@ -135,6 +141,10 @@ Feature: Annotate additional syntax
               onstart = 1
               onsuccess = 1
               onerror = 1
+      """
+      Then I expect inspection info on <rule> with message
+      """
+      PY.KEYWORD
       """
       Then I expect inspection info on <foo> with message
       """

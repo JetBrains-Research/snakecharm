@@ -2,7 +2,6 @@ package com.jetbrains.snakecharm.lang
 
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PythonDialectsTokenSetContributorBase
-import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
@@ -30,23 +29,18 @@ class SmkTokenSetContributor : PythonDialectsTokenSetContributorBase() {
             SmkElementTypes.REFERENCE_EXPRESSION
     )
 
-    override fun getKeywordTokens() = TokenSet.orSet(
-            // XXX: after changing set of keywords tokens think of highlighting them via annotator and review
-            // [smk_syntax_annotator.feature]
+    /**
+     * keywords not here due to highlighting issues in context where they aren't keywords any more
+     * Highlighter ignores tokens remapped by filter, so adds highlighting where not needed, e.g.
+     * on 'rule' identifier in run section
+     */
+    override fun getKeywordTokens() = TokenSet.EMPTY!!
 
-            TokenSet.create(
-                    SnakemakeTokenTypes.RULE_KEYWORD, SnakemakeTokenTypes.CHECKPOINT_KEYWORD,
-                    SnakemakeTokenTypes.SUBWORKFLOW_KEYWORD
+    override fun getParameterTokens() = TokenSet.EMPTY!!
 
-                    // other keywords not here due to highlighting issues in context where they
-                    // aren't keywords any more
-            )
-    )
+    override fun getReferenceExpressionTokens() = TokenSet.EMPTY!!
 
-// TODO
-//    override fun getParameterTokens(): TokenSet {
-//        return TokenSet.create(NAMED_PARAMETER)
-//    }
+    override fun getFunctionDeclarationTokens()= TokenSet.EMPTY!!
 
     override fun getUnbalancedBracesRecoveryTokens(): TokenSet {
         return WORKFLOW_TOPLEVEL_DECORATORS
