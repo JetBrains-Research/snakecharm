@@ -27,7 +27,7 @@ class SmkSectionTypeProvider : PyTypeProviderBase() {
 
         val psiFile = referenceExpression.containingFile
 
-        if (referenceExpression.parent.firstChild != referenceExpression) {
+        if (referenceExpression.children.isNotEmpty()) {
             // part of some longer reference
             return null
         }
