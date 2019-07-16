@@ -221,7 +221,6 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-
     fun testRuleMultipleSingleLineWithRuleSectionIndent() {
         doTest()
     }

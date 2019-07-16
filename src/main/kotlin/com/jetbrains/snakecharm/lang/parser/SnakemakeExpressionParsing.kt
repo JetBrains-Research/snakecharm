@@ -282,7 +282,12 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
      */
     private fun checkCurrentTokenSafe(tokenType: IElementType) = myBuilder.rawLookup(0) == tokenType
 
-    private fun parseMultilineStringTwoPasses(): Boolean {
+    /**
+     * Parse multiline strings and method calls on strings.
+     * This method is necessary as the lexer adds statement breaks,
+     * preventing multiline strings from being correctly parsed by the Python parser.
+     */
+    private fun parseMultilineString(): Boolean {
         if (!atStringNodeOrFormattedString()) {
             return false
         }
@@ -388,23 +393,21 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             statementBreakMarker?.drop()
         }
 
-        if (atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
-            indents = previousIndents
-        }
+        indents = previousIndents
         stringLiteralMarker.done(PyElementTypes.STRING_LITERAL_EXPRESSION)
         return true
     }
 
     private fun parseStringAdditiveExpression(): Boolean {
         var expr = myBuilder.mark()
-        if (!parseMultilineStringTwoPasses()) {
+        if (!parseMultilineString()) {
             expr.drop()
             return false
         } else {
             while (atToken(PyTokenTypes.PLUS)) {
                 myBuilder.advanceLexer()
                 skipStatementBreaksUpToTokens(*stringLiteralTokenSet.types)
-                if (!parseMultilineStringTwoPasses()) {
+                if (!parseMultilineString()) {
                     myBuilder.error(message("PARSE.expected.expression"))
                 }
 
@@ -418,6 +421,12 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         }
     }
 
+    /**
+     * Skips statement breaks, indents, and dedents until another token occurs.
+     * If this token is one of [tokenTypes],
+     * we leave the method at this token with everything up to it parsed correctly,
+     * otherwise we roll back to statement break and restore the previous indent balance.
+     */
     private fun skipStatementBreaksUpToTokens(vararg tokenTypes: IElementType) {
         val marker = myBuilder.mark()
         val previousIndents = indents
@@ -441,6 +450,10 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         }
     }
 
+    /**
+     * Skips dedents while keeping the indent balance correct until reaches [indentLimit].
+     * Incorrect dedents are handled by [incorrectUnindentHandler].
+     */
     private fun skipDedents(
             indentLimit: Int = 0,
             incorrectUnindentHandler: () -> Unit
