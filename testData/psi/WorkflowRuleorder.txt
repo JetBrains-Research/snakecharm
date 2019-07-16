@@ -1,5 +1,5 @@
 SnakemakeFile: WorkflowRuleorder.smk
-  SMKWorkflowRuleOrderStatement
+  SmkWorkflowRuleorderSection
     PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
     PyArgumentList
       PsiElement(Py:COLON)(':')
@@ -7,7 +7,7 @@ SnakemakeFile: WorkflowRuleorder.smk
       SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule1')
   PsiWhiteSpace('\n\n')
-  SMKWorkflowRuleOrderStatement
+  SmkWorkflowRuleorderSection
     PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
     PyArgumentList
       PsiElement(Py:COLON)(':')
@@ -25,7 +25,7 @@ SnakemakeFile: WorkflowRuleorder.smk
       SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule3')
   PsiWhiteSpace('\n\n')
-  SMKWorkflowRuleOrderStatement
+  SmkWorkflowRuleorderSection
     PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
     PyArgumentList
       PsiElement(Py:COLON)(':')
@@ -53,7 +53,7 @@ SnakemakeFile: WorkflowRuleorder.smk
       SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('ho')
   PsiWhiteSpace('\n\n')
-  SMKWorkflowRuleOrderStatement
+  SmkWorkflowRuleorderSection
     PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
     PyArgumentList
       PsiElement(Py:COLON)(':')
@@ -81,7 +81,7 @@ SnakemakeFile: WorkflowRuleorder.smk
       SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('ho')
   PsiWhiteSpace('\n\n')
-  SMKWorkflowRuleOrderStatement
+  SmkWorkflowRuleorderSection
     PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
     PyArgumentList
       PsiElement(Py:COLON)(':')
@@ -93,14 +93,14 @@ SnakemakeFile: WorkflowRuleorder.smk
       PsiWhiteSpace(' ')
       SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule2')
-      PsiWhiteSpace('\n    ')
+      PsiWhiteSpace('\n        ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
       SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule3')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
-      PsiWhiteSpace('  ')
+      PsiWhiteSpace(' ')
       SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('rule4')
   PsiWhiteSpace('\n\n')
@@ -114,7 +114,7 @@ SnakemakeFile: WorkflowRuleorder.smk
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('\n  ')
     PyStatementList
-      SMKWorkflowRuleOrderStatement
+      SmkWorkflowRuleorderSection
         PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
         PyArgumentList
           PsiElement(Py:COLON)(':')

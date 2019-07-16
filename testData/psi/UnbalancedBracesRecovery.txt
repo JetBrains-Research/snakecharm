@@ -1,0 +1,368 @@
+SnakemakeFile: UnbalancedBracesRecovery.smk
+  PyExpressionStatement
+    PyCallExpression: foo
+      PyReferenceExpression: foo
+        PsiElement(Py:IDENTIFIER)('foo')
+      PyArgumentList
+        PsiElement(Py:LPAR)('(')
+        PyReferenceExpression: fo
+          PsiElement(Py:IDENTIFIER)('fo')
+        PsiErrorElement:',' or ')' expected
+          <empty list>
+    PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('ffff')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: foo
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyReferenceExpression: fo
+                PsiElement(Py:IDENTIFIER)('fo')
+              PsiErrorElement:',' or ')' expected
+                <empty list>
+          PsiWhiteSpace('\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('ffff')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: foo
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyReferenceExpression: fo
+                PsiElement(Py:IDENTIFIER)('fo')
+              PsiErrorElement:',' or ')' expected
+                <empty list>
+          PsiWhiteSpace('\n\n')
+  SmkCheckPoint
+    PsiElement(Py:CHECKPOINT_KEYWORD)('checkpoint')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('ffff')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: foo
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyReferenceExpression: fo
+                PsiElement(Py:IDENTIFIER)('fo')
+              PsiErrorElement:',' or ')' expected
+                <empty list>
+          PsiWhiteSpace('\n\n')
+  SmkSubworkflow
+    PsiElement(Py:SUBWORKFLOW_KEYWORD)('subworkflow')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('ffff')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkSubworkflowArgsSection
+        PsiElement(Py:IDENTIFIER)('snakefile')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: foo
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyReferenceExpression: fo
+                PsiElement(Py:IDENTIFIER)('fo')
+              PsiErrorElement:',' or ')' expected
+                <empty list>
+          PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('ffff')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: foo
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyReferenceExpression: fo
+                PsiElement(Py:IDENTIFIER)('fo')
+              PsiErrorElement:',' or ')' expected
+                <empty list>
+          PsiWhiteSpace('\n')
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyStringLiteralExpression: 
+        PsiElement(Py:SINGLE_QUOTED_STRING)('""')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('ffff')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: foo
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyReferenceExpression: fo
+                PsiElement(Py:IDENTIFIER)('fo')
+              PsiErrorElement:',' or ')' expected
+                <empty list>
+          PsiWhiteSpace('\n')
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_WORKDIR_KEYWORD)('workdir')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyStringLiteralExpression: 
+        PsiElement(Py:SINGLE_QUOTED_STRING)('""')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('ffff')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: foo
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyReferenceExpression: fo
+                PsiElement(Py:IDENTIFIER)('fo')
+              PsiErrorElement:',' or ')' expected
+                <empty list>
+          PsiWhiteSpace('\n')
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_SINGULARITY_KEYWORD)('singularity')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyStringLiteralExpression: 
+        PsiElement(Py:SINGLE_QUOTED_STRING)('""')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('ffff')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: foo
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyReferenceExpression: fo
+                PsiElement(Py:IDENTIFIER)('fo')
+              PsiErrorElement:',' or ')' expected
+                <empty list>
+          PsiWhiteSpace('\n')
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_REPORT_KEYWORD)('report')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyStringLiteralExpression: 
+        PsiElement(Py:SINGLE_QUOTED_STRING)('""')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('ffff')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: foo
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyReferenceExpression: fo
+                PsiElement(Py:IDENTIFIER)('fo')
+              PsiErrorElement:',' or ')' expected
+                <empty list>
+          PsiWhiteSpace('\n')
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD)('wildcard_constraints')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyKeywordArgumentImpl: fpp
+        PsiElement(Py:IDENTIFIER)('fpp')
+        PsiElement(Py:EQ)('=')
+        PyStringLiteralExpression: 
+          PsiElement(Py:SINGLE_QUOTED_STRING)('""')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('ffff')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: foo
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyReferenceExpression: fo
+                PsiElement(Py:IDENTIFIER)('fo')
+              PsiErrorElement:',' or ')' expected
+                <empty list>
+          PsiWhiteSpace('\n')
+  SmkWorkflowRuleorderSection
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('d')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('d')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('ffff')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: foo
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyReferenceExpression: fo
+                PsiElement(Py:IDENTIFIER)('fo')
+              PsiErrorElement:',' or ')' expected
+                <empty list>
+          PsiWhiteSpace('\n')
+  SmkWorkflowLocalrulesSection
+    PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('d')
+      PsiElement(Py:COMMA)(',')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('d')
+  PsiWhiteSpace('\n\n')
+  SmkWorkflowPythonBlockSection
+    PsiElement(Py:WORKFLOW_ONSTART_KEYWORD)('onstart')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    PyStatementList
+      PyExpressionStatement
+        PyCallExpression: foo
+          PyReferenceExpression: foo
+            PsiElement(Py:IDENTIFIER)('foo')
+          PyArgumentList
+            PsiElement(Py:LPAR)('(')
+            PyReferenceExpression: fo
+              PsiElement(Py:IDENTIFIER)('fo')
+            PsiErrorElement:',' or ')' expected
+              <empty list>
+        PsiWhiteSpace('\n\n')
+  SmkWorkflowPythonBlockSection
+    PsiElement(Py:WORKFLOW_ONSUCCESS_KEYWORD)('onsuccess')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    PyStatementList
+      PyExpressionStatement
+        PyCallExpression: foo
+          PyReferenceExpression: foo
+            PsiElement(Py:IDENTIFIER)('foo')
+          PyArgumentList
+            PsiElement(Py:LPAR)('(')
+            PyReferenceExpression: fo
+              PsiElement(Py:IDENTIFIER)('fo')
+            PsiErrorElement:',' or ')' expected
+              <empty list>
+        PsiWhiteSpace('\n\n')
+  SmkWorkflowPythonBlockSection
+    PsiElement(Py:WORKFLOW_ONERROR_KEYWORD)('onerror')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    PyStatementList
+      PyExpressionStatement
+        PyCallExpression: foo
+          PyReferenceExpression: foo
+            PsiElement(Py:IDENTIFIER)('foo')
+          PyArgumentList
+            PsiElement(Py:LPAR)('(')
+            PyReferenceExpression: fo
+              PsiElement(Py:IDENTIFIER)('fo')
+            PsiErrorElement:',' or ')' expected
+              <empty list>

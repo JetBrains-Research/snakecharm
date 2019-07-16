@@ -1,5 +1,7 @@
 package com.jetbrains.snakecharm.lang.parser
 
+import com.intellij.lang.PsiBuilder
+import com.intellij.lang.impl.PsiBuilderImpl
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyElementTypes
@@ -38,6 +40,25 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         return result
     }
 
+    /**
+     * XXX -------------------------------------------------------------------
+     * XXX IMPORTANT! PLEASE READ BEFORE MODIFYING PARSER CODE OR DEBUGGING!
+     * XXX -------------------------------------------------------------------
+     *
+     * Due to [SnakemakeStatementParsing] utilizing filter method when the parser has entered a rule section,
+     * behaviour in debug and at runtime could differ.
+     * Be careful when using any method which calls [PsiBuilder.getTokenType]
+     * (such as [Parsing.atToken], [Parsing.matchToken], etc.),
+     * as [PsiBuilder.getTokenType] skips whitespace tokens and applies filter,
+     * substituting tokenTypes in myBuilder.myLexTypes.
+     * Meanwhile [Parsing.nextToken] only advances lexer by one lexeme and does not look at the current token.
+     * [PsiBuilder.getTokenType] might be called during debug and apply filter, while it would not be called at runtime,
+     * thus the different behaviour.
+     *
+     * If you need to check the current token type, best to avoid debugging in IDE and to use debug print.
+     * One can get the current token type without filter via a call to [PsiBuilder.rawLookup] with steps = 0.
+     * However, it's best to keep [PsiBuilder.rawLookup] calls to a minimum.
+     */
     private fun doParseRuleParamArgumentList(
             separatorTokenText: String,
             separatorTokenType: PyElementType,
@@ -57,14 +78,62 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         val argsOnNextLine = myBuilder.tokenType === PyTokenTypes.STATEMENT_BREAK
         if (argsOnNextLine) {
             nextToken()
-            if (!checkMatches(PyTokenTypes.INDENT, "Indent expected...")) { // bundle
+            if (!checkMatches(PyTokenTypes.INDENT, SnakemakeBundle.message("PARSE.expected.indent"))) {
                 argList.done(PyElementTypes.ARGUMENT_LIST)
                 return false
             }
         }
         var indents = if (argsOnNextLine) 1 else 0
         var argNumber = 0
-        while (!myBuilder.eof() && !atToken(PyTokenTypes.STATEMENT_BREAK)) {
+        var incorrectUnindentMarker: PsiBuilder.Marker? = null
+        while (!myBuilder.eof()) {
+            if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
+                nextToken()
+                /* It's important to use rawLookup() inside atAnyOfTokensSage() here
+                   to avoid accidentally applying a filter to the current token. */
+                if (indents == 0 &&
+                        !atAnyOfTokensSafe(
+                                separatorTokenType,
+                                PyTokenTypes.INDENT,
+                                PyTokenTypes.INCONSISTENT_DEDENT,
+                                PyTokenTypes.DEDENT
+                        )
+                ) {
+                    break
+                }
+
+                /*
+                 * If an indent/dedent/inconsistent dedent/separator token was found,
+                 * it's ok to match it, no filters will be applied
+                 */
+                if (indents > 0 && atToken(separatorTokenType)) {
+                    continue
+                }
+
+                if (matchToken(PyTokenTypes.INDENT)) {
+                    indents++
+                } else {
+                    // IMPORTANT: note that myBuilder.eof() could apply filter to lexemes
+                    // which is why it must be evaluated second
+                    while (indents > 0 && !myBuilder.eof()) {
+                        // IMPORTANT: keep this check inside the loop body
+                        /* atToken() uses getTokenType() which might apply a filter to the current token
+                           whether or not this token is actually DEDENT,
+                           which is why it's best not to invoke this method unless necessary. */
+                        if (atToken(PyTokenTypes.DEDENT)) {
+                            nextToken()
+                            indents--
+                        } else {
+                            break
+                        }
+                    }
+                    // leave this section
+                    if (indents == 0 || myBuilder.eof()) {
+                        break
+                    }
+                }
+            }
+
             argNumber++
 
             // separator if several args:
@@ -81,9 +150,18 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         } else {
                             // skip dedents while matched, we could have several dedent tokens in a raw
                             // skip dedent while inside current block (indents > 1)
-                            while (!myBuilder.eof() && atToken(PyTokenTypes.DEDENT) && indents > 1) {
-                                indents--
-                                nextToken()
+
+                            while (indents > 1 && !myBuilder.eof()) {
+                                if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
+                                    incorrectUnindentMarker = myBuilder.mark()
+                                    nextToken()
+                                }
+                                if (atToken(PyTokenTypes.DEDENT)) {
+                                    indents--
+                                    nextToken()
+                                } else {
+                                    break
+                                }
                             }
                         }
 
@@ -120,19 +198,23 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             }
 
             parseArgumentFunction()
+            // mark everything that was incorrectly unindented
+            incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
+            incorrectUnindentMarker = null
         }
-        nextToken()
 
-        // Eat all matching dedents
-        while (indents > 0 && !myBuilder.eof()) {
-            if (checkMatches(PyTokenTypes.DEDENT, "Dedent expected")) { // bundle
-                indents--
-            } else {
-                break
+        // safe check is important here, be wary of that while modifying/debugging
+        if (checkCurrentTokenSafe(PyTokenTypes.STATEMENT_BREAK)) {
+            nextToken()
+            while (indents > 0 && !myBuilder.eof()) {
+                if (checkMatches(PyTokenTypes.DEDENT, SnakemakeBundle.message("PARSE.expected.dedent"))) {
+                    indents--
+                } else {
+                    break
+                }
             }
         }
         argList.done(PyElementTypes.ARGUMENT_LIST)
-
         return true
     }
 
@@ -186,7 +268,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         val errorMarker = myBuilder.mark()
         var hasNonWhitespaceTokens = false
         while (!(atAnyOfTokens(*types) || myBuilder.eof())) {
-            // Regular whitespace tokens are already skipped by advancedLexer()
+            // Regular whitespace tokens are already skipped by atToken()
             if (!atToken(PyTokenTypes.STATEMENT_BREAK)) {
                 hasNonWhitespaceTokens = true
             }
@@ -198,4 +280,22 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             errorMarker.drop()
         }
     }
+
+    /**
+     * Skips whitespace tokens and checks the first non-whitespace token type against [tokenTypes]
+     * without applying filters.
+     */
+    private fun atAnyOfTokensSafe(vararg tokenTypes: IElementType): Boolean {
+        var steps = 0
+        while (myBuilder.rawLookup(steps) != null &&
+                (myBuilder as PsiBuilderImpl).whitespaceOrComment(myBuilder.rawLookup(steps))) {
+            steps++
+        }
+        return tokenTypes.contains(myBuilder.rawLookup(steps))
+    }
+
+    /**
+     * Compares the current token against [tokenType] without applying filters.
+     */
+    private fun checkCurrentTokenSafe(tokenType: IElementType) = myBuilder.rawLookup(0) == tokenType
 }

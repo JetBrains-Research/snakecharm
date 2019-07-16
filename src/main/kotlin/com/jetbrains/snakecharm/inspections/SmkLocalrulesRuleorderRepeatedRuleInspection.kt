@@ -5,10 +5,8 @@ import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.psi.SMKRuleReference
-import com.jetbrains.snakecharm.lang.psi.SMKWorkflowLocalRulesStatement
-import com.jetbrains.snakecharm.lang.psi.SMKWorkflowRuleOrderStatement
-import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
+import com.jetbrains.snakecharm.lang.psi.SmkWorkflowLocalrulesSection
+import com.jetbrains.snakecharm.lang.psi.SmkWorkflowRuleorderSection
 
 class SmkLocalrulesRuleorderRepeatedRuleInspection  : SnakemakeInspection() {
     override fun buildVisitor(
@@ -18,16 +16,16 @@ class SmkLocalrulesRuleorderRepeatedRuleInspection  : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         private val ruleNames = mutableSetOf<String>()
 
-        override fun visitSMKWorkflowLocalRulesStatement(st: SMKWorkflowLocalRulesStatement) {
-            checkArgumentRepetition(st.ruleReferences ?: return)
+        override fun visitSmkWorkflowLocalrulesSection(st: SmkWorkflowLocalrulesSection) {
+            checkArgumentRepetition(st.argumentList)
         }
 
-        override fun visitSMKWorkflowRuleOrderStatement(st: SMKWorkflowRuleOrderStatement) {
-            checkArgumentRepetition(st.ruleReferences ?: return)
+        override fun visitSmkWorkflowRuleorderSection(st: SmkWorkflowRuleorderSection) {
+            checkArgumentRepetition(st.argumentList)
         }
 
-        private fun checkArgumentRepetition(ruleReferences: List<SmkReferenceExpression>) {
-            ruleReferences.forEach {
+        private fun checkArgumentRepetition(argumentList: PyArgumentList?) {
+            argumentList?.arguments?.forEach {
                 val name = it.name ?: return
                 if (!ruleNames.add(name)) {
                     registerProblem(it,

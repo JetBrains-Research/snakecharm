@@ -10,7 +10,7 @@ import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.impl.PythonASTFactory
 import com.jetbrains.snakecharm.SnakemakeTestUtil
-import com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor
+import com.jetbrains.snakecharm.lang.SmkTokenSetContributor
 
 
 /**
@@ -27,7 +27,7 @@ class SnakemakeParsingTest : ParsingTestCase(
         super.setUp()
         registerExtensionPoint(PythonDialectsTokenSetContributor.EP_NAME, PythonDialectsTokenSetContributor::class.java)
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
-        registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SnakemakeTokenSetContributor())
+        registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SmkTokenSetContributor())
         addExplicitExtension<ASTFactory>(LanguageASTFactory.INSTANCE, PythonLanguage.getInstance(), PythonASTFactory())
         PythonDialectsTokenSetProvider.reset()
     }
@@ -179,11 +179,9 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-
-    // TODO #96
-    /*fun testWorkflowRuleorder() {
+    fun testWorkflowRuleorder() {
         doTest()
-    }*/
+    }
 
     fun testWorkflowRuleorderHangingSeparator() {
         doTest()
@@ -229,11 +227,26 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-    /**
-     * Test with latest versions of Python 2 and Python 3.
-     */
+    fun testRuleMultipleSingleLineWithRuleSectionIndent() {
+        doTest()
+    }
+
+    fun testUnbalancedBracesRecovery() {
+        doTest()
+    }
+
+    fun testKeywordLikeIdentifiersAsIdentifiers() {
+        doTest()
+    }
+
+    fun testKeywordLikeIdentifiersAsKeywords() {
+        doTest()
+    }
+
     private fun doTest() {
-        doTest(LanguageLevel.fromPythonVersion("2"))
+        // Actually snakemake requires python 3.x and no need to have it working with python 2.x
+        //doTest(LanguageLevel.fromPythonVersion("2"))
+
         doTest(LanguageLevel.fromPythonVersion("3"))
     }
 

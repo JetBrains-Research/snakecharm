@@ -381,3 +381,68 @@ Feature: Completion for snakemake keyword-like things
       | subworkflow | workdir: foo        | foo   |
       | subworkflow | workdir: foo, #here | #here |
       | subworkflow | workdir: foo.boo    | boo   |
+
+  Scenario Outline: Do not show toplevel keywords in workflow sections
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+     """
+     <section>: #here
+     """
+    When I put the caret at #here
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | localrules |
+      | onstart    |
+      | ruleorder  |
+    Examples:
+      | section    |
+      | include    |
+      | configfile |
+
+  Scenario Outline: Do not show toplevel keywords in python expressions
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+     """
+     <text>
+     """
+    When I put the caret at <ptn>
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | localrules |
+      | onstart    |
+    Examples:
+      | text         | ptn     |
+      | "" #here     | " #here |
+      | import #here | #here   |
+      | from #here   | #here   |
+
+  Scenario Outline: Complete toplevel keywords in python blocks
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      if True:
+        # here 1
+      elif True:
+        # here 2
+      else:
+        # here 3
+
+      try:
+        # here 4
+      except:
+        # here 5
+      """
+    When I put the caret at # here <ptn>
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | localrules |
+      | onstart    |
+      | rule       |
+      | checkpoint |
+    Examples:
+      | ptn |
+      | 1   |
+      | 2   |
+      | 3   |
+      | 4   |
+      | 5   |

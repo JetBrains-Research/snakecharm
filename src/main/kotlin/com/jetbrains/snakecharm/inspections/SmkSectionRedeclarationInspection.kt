@@ -12,19 +12,19 @@ class SmkSectionRedeclarationInspection : SnakemakeInspection() {
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
-        override fun visitSMKRule(rule: SMKRule) {
+        override fun visitSmkRule(rule: SmkRule) {
             visitSMKRuleLike(rule)
         }
 
-        override fun visitSMKCheckPoint(checkPoint: SMKCheckPoint) {
+        override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
             visitSMKRuleLike(checkPoint)
         }
 
-        override fun visitSMKSubworkflow(subworkflow: SmkSubworkflow) {
+        override fun visitSmkSubworkflow(subworkflow: SmkSubworkflow) {
             visitSMKRuleLike(subworkflow)
         }
 
-        private fun visitSMKRuleLike(rule: SmkRuleLike<SmkSectionStatement>) {
+        private fun visitSMKRuleLike(rule: SmkRuleLike<SmkArgsSection>) {
             val sectionNamesSet = HashSet<String>()
 
             rule.getSections().forEach {

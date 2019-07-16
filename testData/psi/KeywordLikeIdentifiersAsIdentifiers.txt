@@ -1,0 +1,98 @@
+SnakemakeFile: KeywordLikeIdentifiersAsIdentifiers.smk
+  PyImportStatement
+    PsiElement(Py:IMPORT_KEYWORD)('import')
+    PsiWhiteSpace(' ')
+    PyImportElement:rule
+      PyReferenceExpression: rule
+        PsiElement(Py:IDENTIFIER)('rule')
+  PsiWhiteSpace('\n')
+  PyImportStatement
+    PsiElement(Py:IMPORT_KEYWORD)('import')
+    PsiWhiteSpace(' ')
+    PyImportElement:subworkflow
+      PyReferenceExpression: subworkflow
+        PsiElement(Py:IDENTIFIER)('subworkflow')
+  PsiWhiteSpace('\n')
+  PyImportStatement
+    PsiElement(Py:IMPORT_KEYWORD)('import')
+    PsiWhiteSpace(' ')
+    PyImportElement:workdir
+      PyReferenceExpression: workdir
+        PsiElement(Py:IDENTIFIER)('workdir')
+    PsiElement(Py:COMMA)(',')
+    PsiWhiteSpace(' ')
+    PyImportElement:wildcard_constraints
+      PyReferenceExpression: wildcard_constraints
+        PsiElement(Py:IDENTIFIER)('wildcard_constraints')
+  PsiWhiteSpace('\n')
+  PyFromImportStatement
+    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    PyReferenceExpression: utils
+      PyReferenceExpression: snakemake
+        PsiElement(Py:IDENTIFIER)('snakemake')
+      PsiElement(Py:DOT)('.')
+      PsiElement(Py:IDENTIFIER)('utils')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IMPORT_KEYWORD)('import')
+    PsiWhiteSpace(' ')
+    PyImportElement:report
+      PyReferenceExpression: report
+        PsiElement(Py:IDENTIFIER)('report')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SmkRunSection
+        PsiElement(Py:IDENTIFIER)('run')
+        PsiElement(Py:COLON)(':')
+        PsiWhiteSpace('\n    ')
+        PyStatementList
+          PyAssignmentStatement
+            PyTargetExpression: rule
+              PsiElement(Py:IDENTIFIER)('rule')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:EQ)('=')
+            PsiWhiteSpace(' ')
+            PyNumericLiteralExpression
+              PsiElement(Py:INTEGER_LITERAL)('1')
+          PsiWhiteSpace('\n    ')
+          PyAssignmentStatement
+            PyTargetExpression: checkpoint
+              PsiElement(Py:IDENTIFIER)('checkpoint')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:EQ)('=')
+            PsiWhiteSpace(' ')
+            PyNumericLiteralExpression
+              PsiElement(Py:INTEGER_LITERAL)('1')
+          PsiWhiteSpace('\n    ')
+          PyAssignmentStatement
+            PyTargetExpression: configfile
+              PsiElement(Py:IDENTIFIER)('configfile')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:EQ)('=')
+            PsiWhiteSpace(' ')
+            PyNumericLiteralExpression
+              PsiElement(Py:INTEGER_LITERAL)('2')
+          PsiWhiteSpace('\n    ')
+          PyAssignmentStatement
+            PyTargetExpression: report
+              PsiElement(Py:IDENTIFIER)('report')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:EQ)('=')
+            PsiWhiteSpace(' ')
+            PyNumericLiteralExpression
+              PsiElement(Py:INTEGER_LITERAL)('3')
+          PsiWhiteSpace('\n    ')
+          PyAssignmentStatement
+            PyTargetExpression: wildcard_constraints
+              PsiElement(Py:IDENTIFIER)('wildcard_constraints')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:EQ)('=')
+            PsiWhiteSpace(' ')
+            PyNumericLiteralExpression
+              PsiElement(Py:INTEGER_LITERAL)('4')
