@@ -21,6 +21,11 @@ import java.lang.reflect.InvocationTargetException
  */
 class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionParsing(context) {
     private val stringLiteralTokenSet = TokenSet.create(PyTokenTypes.FSTRING_START, *PyTokenTypes.STRING_NODES.types)
+    private val indentationTokenSet = TokenSet.create(
+            PyTokenTypes.INDENT,
+            PyTokenTypes.DEDENT,
+            PyTokenTypes.INCONSISTENT_DEDENT
+    )
 
     private var indents = 0
 
@@ -98,14 +103,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 nextToken()
                 /* It's important to use rawLookup() inside atAnyOfTokensSage() here
                    to avoid accidentally applying a filter to the current token. */
-                if (indents == 0 &&
-                        !atAnyOfTokensSafe(
-                                separatorTokenType,
-                                PyTokenTypes.INDENT,
-                                PyTokenTypes.INCONSISTENT_DEDENT,
-                                PyTokenTypes.DEDENT
-                        )
-                ) {
+                if (indents == 0 && !atAnyOfTokensSafe(separatorTokenType, *indentationTokenSet.types)) {
                     break
                 }
 
@@ -386,19 +384,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 nextToken()
                 indents++
             } else {
-                indent_loop@ while (indents > 0 && !myBuilder.eof()) {
-                    when {
-                        atToken(PyTokenTypes.DEDENT) -> {
-                            nextToken()
-                            indents--
-                        }
-                        atToken(PyTokenTypes.INCONSISTENT_DEDENT) -> {
-                            incorrectUnindentMarker = myBuilder.mark()
-                            nextToken()
-                        }
-                        else -> break@indent_loop
-                    }
-                }
+                skipDedents { incorrectUnindentMarker = myBuilder.mark() }
                 if (incorrectUnindentMarker == null && indents == 0) {
                     break
                 }
@@ -408,6 +394,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         // second pass to replace all necessary statement breaks with line breaks
         // it has to be done on the 2nd pass when it is already known which position signifies the end of the expression
         if (dotOccurred) {
+            incorrectUnindentMarker = null
             stringLiteralMarker.rollbackTo()
             if (statementEndPosition == -1) {
                 return parseMemberExpression(false)
@@ -420,20 +407,14 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
                         incorrectUnindentMarker = null
                     }
-                    atToken(PyTokenTypes.STATEMENT_BREAK) -> {
+                    /*
+                      atAnyOfTokens is safe to use because no keywords/anything else that is filtered
+                      should appear in a string literal before a dot,
+                      and we do need to skip all whitespaces up to the token,
+                      not just check that the token is present but stay at the current position.
+                    */
+                    atAnyOfTokens(PyTokenTypes.STATEMENT_BREAK, *indentationTokenSet.types) -> {
                         myBuilder.remapCurrentToken(PyTokenTypes.SPACE)
-                        /*
-                          atAnyOfTokens is safe to use because no keywords/anything else that is filtered
-                          should appear in a string literal before a dot,
-                          and we do need to skip all whitespaces up to the token,
-                          not just check that the token is present but stay at the current position.
-                        */
-                        if (atAnyOfTokens(PyTokenTypes.INDENT, PyTokenTypes.DEDENT)) {
-                            myBuilder.remapCurrentToken(PyTokenTypes.SPACE)
-                        }
-                    }
-                    atToken(PyTokenTypes.INCONSISTENT_DEDENT) -> {
-                        incorrectUnindentMarker = myBuilder.mark()
                     }
                     else -> myBuilder.advanceLexer()
                 }
