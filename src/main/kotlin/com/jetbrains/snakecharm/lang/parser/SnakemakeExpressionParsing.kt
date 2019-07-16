@@ -5,7 +5,6 @@ import com.intellij.lang.impl.PsiBuilderImpl
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
-import com.intellij.util.containers.concat
 import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
@@ -118,24 +117,8 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 if (matchToken(PyTokenTypes.INDENT)) {
                     indents++
                 } else {
-                    // IMPORTANT: note that myBuilder.eof() could apply filter to lexemes
-                    // which is why it must be evaluated second
-                    while (indents > 0 && !myBuilder.eof()) {
-                        // IMPORTANT: keep this check inside the loop body
-                        /* atToken() uses getTokenType() which might apply a filter to the current token
-                           whether or not this token is actually DEDENT,
-                           which is why it's best not to invoke this method unless necessary. */
-                        if (atToken(PyTokenTypes.DEDENT)) {
-                            nextToken()
-                            indents--
-                        } else if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
-                            myBuilder.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
-                            nextToken()
-                        } else {
-                            break
-                        }
-                    }
-                    // leave this section
+                    skipDedents { myBuilder.error(SnakemakeBundle.message("PARSE.incorrect.unindent")) }
+                    // leave this rule section
                     if (indents == 0 || myBuilder.eof()) {
                         break
                     }
@@ -158,19 +141,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         } else {
                             // skip dedents while matched, we could have several dedent tokens in a raw
                             // skip dedent while inside current block (indents > 1)
-
-                            while (indents > 1 && !myBuilder.eof()) {
-                                if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
-                                    incorrectUnindentMarker = myBuilder.mark()
-                                    nextToken()
-                                }
-                                if (atToken(PyTokenTypes.DEDENT)) {
-                                    indents--
-                                    nextToken()
-                                } else {
-                                    break
-                                }
-                            }
+                            skipDedents(1) { incorrectUnindentMarker = myBuilder.mark() }
                         }
 
                         // Case: hanging 'comma', next statement is another rule param block
@@ -260,7 +231,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 }
                 keywordArgMarker.rollbackTo()
             }
-            if (!parseSingleExpressionOrStringLiteral()) {
+            if (!parseSingleExpressionOrStringExpression()) {
                 myBuilder.error(message("PARSE.expected.expression"))
                 return false
             }
@@ -268,12 +239,8 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         return true
     }
 
-    private fun parseSingleExpressionOrStringLiteral(): Boolean {
-        if (!parseStringAdditiveExpression()) {
-            return parseSingleExpression(false)
-        }
-        return true
-    }
+    private fun parseSingleExpressionOrStringExpression() =
+            if (!parseStringAdditiveExpression()) parseSingleExpression(false) else true
 
     private fun atStringNodeOrFormattedString() = atAnyOfTokensSafe(*stringLiteralTokenSet.types)
 
@@ -334,6 +301,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         loop@while (atStringNodeOrFormattedString() || atAnyOfTokensSafe(PyTokenTypes.DOT)) {
             when {
                 atAnyOfTokensSafe(PyTokenTypes.FSTRING_START) -> {
+                    // will be replaced with call to Python API when it becomes public
                     val parseFunction = ExpressionParsing::class.java.getDeclaredMethod("parseFormattedStringNode")
                     parseFunction.isAccessible = true
                     try {
@@ -349,29 +317,24 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                     statementEndPosition = myBuilder.rawTokenIndex()
                     break@loop
                 }
-                else -> {
-                    nextToken()
-                }
+                else -> nextToken()
             }
 
-            if (incorrectUnindentMarker != null) {
-                incorrectUnindentMarker.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
-                incorrectUnindentMarker = null
-            }
-
-            // when lines are separated with '\' symbol or there are two strings in a row like this: "1" "2"
-            if (atStringNodeOrFormattedString()) {
-                continue
-            }
+            incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
+            incorrectUnindentMarker = null
 
             if (!atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
-                if (atAnyOfTokensSafe(PyTokenTypes.PLUS)) { // concatenation via `+`
-                    statementEndPosition = myBuilder.rawTokenIndex()
-                } else if (atAnyOfTokensSafe(PyTokenTypes.DOT)) { // call expression
-                    statementEndPosition = myBuilder.rawTokenIndex()
-                    dotOccurred = true
+                when {
+                    // when lines are separated with '\' symbol or there are two strings in a row like this: "1" "2"
+                    atStringNodeOrFormattedString() -> continue@loop
+                    atAnyOfTokensSafe(PyTokenTypes.PLUS) -> statementEndPosition = myBuilder.rawTokenIndex()
+                    atAnyOfTokensSafe(PyTokenTypes.DOT) -> {
+                        // call expression
+                        statementEndPosition = myBuilder.rawTokenIndex()
+                        dotOccurred = true
+                    }
+                    else -> break@loop
                 }
-                break
             } else {
                 statementBreakMarker?.drop()
                 statementBreakMarker = myBuilder.mark()
@@ -394,28 +357,23 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         // second pass to replace all necessary statement breaks with line breaks
         // it has to be done on the 2nd pass when it is already known which position signifies the end of the expression
         if (dotOccurred) {
-            incorrectUnindentMarker = null
             stringLiteralMarker.rollbackTo()
-            if (statementEndPosition == -1) {
+            if (statementEndPosition == -1) { // single line statement
                 return parseMemberExpression(false)
             }
             stringLiteralMarker = myBuilder.mark()
             while (myBuilder.rawTokenIndex() < statementEndPosition) {
                 when {
-                    atStringNodeOrFormattedString() -> {
-                        nextToken()
-                        incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
-                        incorrectUnindentMarker = null
-                    }
+                    atStringNodeOrFormattedString() -> nextToken()
                     /*
                       atAnyOfTokens is safe to use because no keywords/anything else that is filtered
                       should appear in a string literal before a dot,
                       and we do need to skip all whitespaces up to the token,
                       not just check that the token is present but stay at the current position.
                     */
-                    atAnyOfTokens(PyTokenTypes.STATEMENT_BREAK, *indentationTokenSet.types) -> {
+                    atAnyOfTokens(PyTokenTypes.STATEMENT_BREAK, *indentationTokenSet.types) ->
                         myBuilder.remapCurrentToken(PyTokenTypes.SPACE)
-                    }
+
                     else -> myBuilder.advanceLexer()
                 }
             }
@@ -483,8 +441,13 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         }
     }
 
-    private fun skipDedents(incorrectUnindentHandler: () -> Unit) {
-        loop@ while (indents > 0 && !myBuilder.eof()) {
+    private fun skipDedents(
+            indentLimit: Int = 0,
+            incorrectUnindentHandler: () -> Unit
+    ) {
+        // IMPORTANT: note that myBuilder.eof() could apply filter to lexemes
+        // which is why it must be evaluated second
+        loop@ while (indents > indentLimit && !myBuilder.eof()) {
             when {
                 atAnyOfTokensSafe(PyTokenTypes.DEDENT) -> {
                     nextToken()
