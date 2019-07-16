@@ -221,11 +221,24 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+
     fun testRuleMultipleSingleLineWithRuleSectionIndent() {
         doTest()
     }
 
     fun testRuleParamsListArgsStringMultilineIncorrectUnindent() {
+        doTest()
+    }
+
+    fun testFormattedStringArgument() {
+        doTest()
+    }
+
+    fun testRuleMultilineStringArgumentsWithCallsAndExplicitConcatenation() {
+        doTest()
+    }
+
+    fun testRuleStringCallExpressionArgument() {
         doTest()
     }
 

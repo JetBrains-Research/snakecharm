@@ -5,6 +5,7 @@ import com.intellij.lang.impl.PsiBuilderImpl
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
+import com.intellij.util.containers.concat
 import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
@@ -332,19 +333,27 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         // in order for python call expression parsing to work properly
         var dotOccurred = false
 
-        while (atStringNodeOrFormattedString()) {
-            if (atAnyOfTokensSafe(PyTokenTypes.FSTRING_START)) {
-                val parseFunction = ExpressionParsing::class.java.getDeclaredMethod("parseFormattedStringNode")
-                parseFunction.isAccessible = true
-                try {
-                    parseFunction.invoke(this)
-                } catch (e: InvocationTargetException) {
-                    if (e.cause is ProcessCanceledException) {
-                        throw (e.cause as ProcessCanceledException)
+        loop@while (atStringNodeOrFormattedString() || atAnyOfTokensSafe(PyTokenTypes.DOT)) {
+            when {
+                atAnyOfTokensSafe(PyTokenTypes.FSTRING_START) -> {
+                    val parseFunction = ExpressionParsing::class.java.getDeclaredMethod("parseFormattedStringNode")
+                    parseFunction.isAccessible = true
+                    try {
+                        parseFunction.invoke(this)
+                    } catch (e: InvocationTargetException) {
+                        if (e.cause is ProcessCanceledException) {
+                            throw (e.cause as ProcessCanceledException)
+                        }
                     }
                 }
-            } else {
-                nextToken()
+                atAnyOfTokensSafe(PyTokenTypes.DOT) -> {
+                    dotOccurred = true
+                    statementEndPosition = myBuilder.rawTokenIndex()
+                    break@loop
+                }
+                else -> {
+                    nextToken()
+                }
             }
 
             if (incorrectUnindentMarker != null) {
@@ -377,7 +386,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 nextToken()
                 indents++
             } else {
-                loop@ while (indents > 0 && !myBuilder.eof()) {
+                indent_loop@ while (indents > 0 && !myBuilder.eof()) {
                     when {
                         atToken(PyTokenTypes.DEDENT) -> {
                             nextToken()
@@ -387,7 +396,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                             incorrectUnindentMarker = myBuilder.mark()
                             nextToken()
                         }
-                        else -> break@loop
+                        else -> break@indent_loop
                     }
                 }
                 if (incorrectUnindentMarker == null && indents == 0) {
@@ -399,39 +408,39 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         // second pass to replace all necessary statement breaks with line breaks
         // it has to be done on the 2nd pass when it is already known which position signifies the end of the expression
         if (dotOccurred) {
-            myBuilder.setTokenTypeRemapper { source, _, _, _ ->
-                if (source == PyTokenTypes.INDENT || source == PyTokenTypes.DEDENT) {
-                    PyTokenTypes.SPACE
-                } else {
-                    source
-                }
-            }
             stringLiteralMarker.rollbackTo()
             if (statementEndPosition == -1) {
-                return parseSingleExpression(false)
+                return parseMemberExpression(false)
             }
             stringLiteralMarker = myBuilder.mark()
             while (myBuilder.rawTokenIndex() < statementEndPosition) {
-                if (atStringNodeOrFormattedString()) {
-                    nextToken()
-                    incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
-                    incorrectUnindentMarker = null
-                    continue
+                when {
+                    atStringNodeOrFormattedString() -> {
+                        nextToken()
+                        incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
+                        incorrectUnindentMarker = null
+                    }
+                    atToken(PyTokenTypes.STATEMENT_BREAK) -> {
+                        myBuilder.remapCurrentToken(PyTokenTypes.SPACE)
+                        /*
+                          atAnyOfTokens is safe to use because no keywords/anything else that is filtered
+                          should appear in a string literal before a dot,
+                          and we do need to skip all whitespaces up to the token,
+                          not just check that the token is present but stay at the current position.
+                        */
+                        if (atAnyOfTokens(PyTokenTypes.INDENT, PyTokenTypes.DEDENT)) {
+                            myBuilder.remapCurrentToken(PyTokenTypes.SPACE)
+                        }
+                    }
+                    atToken(PyTokenTypes.INCONSISTENT_DEDENT) -> {
+                        incorrectUnindentMarker = myBuilder.mark()
+                    }
+                    else -> myBuilder.advanceLexer()
                 }
-                while (atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK, PyTokenTypes.INDENT, PyTokenTypes.DEDENT)) {
-                    myBuilder.remapCurrentToken(PyTokenTypes.SPACE)
-                    myBuilder.advanceLexer()
-                }
-                if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
-                    incorrectUnindentMarker = myBuilder.mark()
-                }
-                nextToken()
             }
             stringLiteralMarker.rollbackTo()
-            myBuilder.setTokenTypeRemapper { source, _, _, _ -> source }
             // third pass, this time to parse everything including the dot
-            return parseSingleExpression(false)
-
+            return parseMemberExpression(false)
         } else if (!atAnyOfTokensSafe(PyTokenTypes.PLUS)) {
             statementBreakMarker?.rollbackTo()
         } else {

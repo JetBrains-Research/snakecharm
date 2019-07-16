@@ -1,0 +1,28 @@
+SnakemakeFile: RuleStringCallExpressionArgument.smk
+  SMKRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('NAME')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SMKRuleParameterListStatement
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: 'command {} {}'.format
+            PyReferenceExpression: format
+              PyStringLiteralExpression: command {} {}
+                PsiElement(Py:SINGLE_QUOTED_STRING)(''command {} {}'')
+              PsiElement(Py:DOT)('.')
+              PsiElement(Py:IDENTIFIER)('format')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyNumericLiteralExpression
+                PsiElement(Py:INTEGER_LITERAL)('1')
+              PsiElement(Py:COMMA)(',')
+              PsiWhiteSpace(' ')
+              PyNumericLiteralExpression
+                PsiElement(Py:INTEGER_LITERAL)('2')
+              PsiElement(Py:RPAR)(')')
