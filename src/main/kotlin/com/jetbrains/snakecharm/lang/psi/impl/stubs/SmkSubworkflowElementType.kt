@@ -7,7 +7,9 @@ import com.jetbrains.snakecharm.lang.psi.impl.SmkSubworkflowImpl
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkSubworkflowStub
 
 class SmkSubworkflowElementType
-    : SmkRuleLikeElementType<SmkSubworkflowStub, SmkSubworkflow>("SMK_SUBWORKFLOW_DECLARATION", null) {
+    : SmkRuleLikeElementType<SmkSubworkflowStub, SmkSubworkflow>(
+        "SMK_SUBWORKFLOW_DECLARATION_STATEMENT", null
+) {
 
     override fun createPsi(stub: SmkSubworkflowStub) = SmkSubworkflowImpl(stub)
 

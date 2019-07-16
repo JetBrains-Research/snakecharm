@@ -115,10 +115,10 @@ Feature: Resolve implicitly imported python names
       | <symbol_name> | <file> | <times> | <class> |
 
     Examples:
-      | rule_like  | text       | symbol_name | file    | times | class                         |
-      | rule       | threads: 1 | threads: 1  | foo.smk | 1     | SMKRuleParameterListStatement |
-      | rule       | log: ""    | NAME        | foo.smk | 1     | SMKRuleImpl                   |
-      | checkpoint | log: ""    | NAME        | foo.smk | 1     | SMKCheckPointImpl             |
+      | rule_like  | text       | symbol_name | file    | times | class                              |
+      | rule       | threads: 1 | threads: 1  | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | rule       | log: ""    | NAME        | foo.smk | 1     | SmkRuleImpl                        |
+      | checkpoint | log: ""    | NAME        | foo.smk | 1     | SmkCheckPointImpl                  |
 
   Scenario Outline: Not-resolved threads if part of reference
     Given a snakemake project

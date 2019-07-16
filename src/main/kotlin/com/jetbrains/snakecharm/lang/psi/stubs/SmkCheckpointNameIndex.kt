@@ -6,19 +6,19 @@ import com.intellij.psi.search.ProjectScope
 import com.intellij.psi.stubs.StringStubIndexExtension
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
-import com.jetbrains.snakecharm.lang.psi.SMKCheckPoint
+import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
 
-class SmkCheckpointNameIndex: StringStubIndexExtension<SMKCheckPoint>() {
+class SmkCheckpointNameIndex: StringStubIndexExtension<SmkCheckPoint>() {
     override fun getKey() = KEY
 
     companion object {
-        val KEY = StubIndexKey.createIndexKey<String, SMKCheckPoint>("Smk.checkpoint.shortName")
+        val KEY = StubIndexKey.createIndexKey<String, SmkCheckPoint>("Smk.checkpoint.shortName")
 
         fun find(
                 name: String,
                 project: Project,
                 scope: GlobalSearchScope = ProjectScope.getAllScope(project)
-        ): Collection<SMKCheckPoint> =
-                StubIndex.getElements(KEY, name, project, scope, SMKCheckPoint::class.java)
+        ): Collection<SmkCheckPoint> =
+                StubIndex.getElements(KEY, name, project, scope, SmkCheckPoint::class.java)
     }
 }

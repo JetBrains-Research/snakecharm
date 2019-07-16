@@ -103,8 +103,8 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       | foo | foo.smk | 2 | <class> |
     Examples:
       | rule_like  | class             |
-      | rule       | SMKRuleImpl       |
-      | checkpoint | SMKCheckPointImpl |
+      | rule       | SmkRuleImpl       |
+      | checkpoint | SmkCheckPointImpl |
 
   Scenario Outline: Resolve for rule/checkpoint names from different files
     Given a snakemake project
@@ -153,14 +153,14 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       | <symbol_name> | <file> | <usages> | <class> |
     Examples:
       | rule_like  | symbol_name | file     | usages | class             |
-      | rule       | foo         | foo.smk  | 2      | SMKRuleImpl       |
-      | rule       | foo         | boo1.smk | 1      | SMKRuleImpl       |
-      | rule       | boo1        | boo1.smk | 1      | SMKRuleImpl       |
-      | rule       | boo2        | boo2.smk | 2      | SMKRuleImpl       |
-      | checkpoint | foo         | foo.smk  | 2      | SMKCheckPointImpl |
-      | checkpoint | foo         | boo1.smk | 1      | SMKCheckPointImpl |
-      | checkpoint | boo1        | boo1.smk | 1      | SMKCheckPointImpl |
-      | checkpoint | boo2        | boo2.smk | 2      | SMKCheckPointImpl |
+      | rule       | foo         | foo.smk  | 2      | SmkRuleImpl       |
+      | rule       | foo         | boo1.smk | 1      | SmkRuleImpl       |
+      | rule       | boo1        | boo1.smk | 1      | SmkRuleImpl       |
+      | rule       | boo2        | boo2.smk | 2      | SmkRuleImpl       |
+      | checkpoint | foo         | foo.smk  | 2      | SmkCheckPointImpl |
+      | checkpoint | foo         | boo1.smk | 1      | SmkCheckPointImpl |
+      | checkpoint | boo1        | boo1.smk | 1      | SmkCheckPointImpl |
+      | checkpoint | boo2        | boo2.smk | 2      | SmkCheckPointImpl |
 
   Scenario Outline: No resolve for subworkflow nam instead fo rule/checkpoint names from different files
     Given a snakemake project
@@ -185,3 +185,21 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       | rule       | subworkflow2 |
       | checkpoint | subworkflow1 |
       | checkpoint | subworkflow2 |
+
+
+  Scenario Outline: No resolve for long reference with rules/checkpoints last part
+     Given a snakemake project
+     Given I open a file "foo1.smk" with text
+        """
+        <rule_like> boo:
+          input: "s"
+
+        <rule_like> foo:
+          input: roo.too.<rule_like>s.<symbol_name>
+        """
+     When I put the caret after <rule_like>s.
+     Then reference should not resolve
+     Examples:
+       | rule_like  | symbol_name  |
+       | rule       | boo |
+       | checkpoint | boo |

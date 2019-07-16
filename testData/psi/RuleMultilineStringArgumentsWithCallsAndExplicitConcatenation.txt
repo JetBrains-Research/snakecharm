@@ -1,12 +1,12 @@
 SnakemakeFile: RuleMultilineStringArgumentsWithCallsAndExplicitConcatenation.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('NAME')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('shell')
         PyArgumentList
           PsiElement(Py:COLON)(':')

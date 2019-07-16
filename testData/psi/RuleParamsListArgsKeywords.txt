@@ -1,12 +1,12 @@
 SnakemakeFile: RuleParamsListArgsKeywords.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('foo1')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -14,7 +14,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: iii
             PsiElement(Py:SINGLE_QUOTED_STRING)('"iii"')
       PsiWhiteSpace('\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -22,7 +22,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: ooo
             PsiElement(Py:SINGLE_QUOTED_STRING)('"ooo"')
       PsiWhiteSpace('\n\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('params')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -30,7 +30,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: ppp
             PsiElement(Py:SINGLE_QUOTED_STRING)('"ppp"')
       PsiWhiteSpace('\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('log')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -38,7 +38,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: logs/abc.log
             PsiElement(Py:SINGLE_QUOTED_STRING)('"logs/abc.log"')
       PsiWhiteSpace('\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('resources')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -49,7 +49,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
             PyNumericLiteralExpression
               PsiElement(Py:INTEGER_LITERAL)('100')
       PsiWhiteSpace('\n\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('threads')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -57,7 +57,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyNumericLiteralExpression
             PsiElement(Py:INTEGER_LITERAL)('50')
       PsiWhiteSpace('\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('priority')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -65,7 +65,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyNumericLiteralExpression
             PsiElement(Py:INTEGER_LITERAL)('50')
       PsiWhiteSpace('\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('version')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -73,7 +73,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: 1.0
             PsiElement(Py:SINGLE_QUOTED_STRING)('"1.0"')
       PsiWhiteSpace('\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('message')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -81,7 +81,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: Executing somecommand with {threads} threads on the following files {input}.
             PsiElement(Py:SINGLE_QUOTED_STRING)('"Executing somecommand with {threads} threads on the following files {input}."')
       PsiWhiteSpace('\n\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('conda')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -89,7 +89,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: envs/ggplot.yaml
             PsiElement(Py:SINGLE_QUOTED_STRING)('"envs/ggplot.yaml"')
       PsiWhiteSpace('\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('benchmark')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -107,7 +107,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
                 PsiElement(Py:INTEGER_LITERAL)('3')
               PsiElement(Py:RPAR)(')')
       PsiWhiteSpace('\n\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('group')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -115,7 +115,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: mygroup
             PsiElement(Py:SINGLE_QUOTED_STRING)('"mygroup"')
       PsiWhiteSpace('\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('shadow')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -123,7 +123,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: shallow
             PsiElement(Py:SINGLE_QUOTED_STRING)('"shallow"')
       PsiWhiteSpace('\n\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('singularity')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -131,7 +131,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: docker://continuumio/miniconda3:4.4.10
             PsiElement(Py:SINGLE_QUOTED_STRING)('"docker://continuumio/miniconda3:4.4.10"')
       PsiWhiteSpace('\n\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('wildcard_constraints')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -142,7 +142,7 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
             PyStringLiteralExpression: \d+
               PsiElement(Py:SINGLE_QUOTED_STRING)('"\d+"')
       PsiWhiteSpace('\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('shell')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -150,14 +150,14 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: somecommand --group {wildcards.group}  < {input}  > {output}
             PsiElement(Py:SINGLE_QUOTED_STRING)('"somecommand --group {wildcards.group}  < {input}  > {output}"')
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('foo2')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('wrapper')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -165,14 +165,14 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: 0.15.3/bio/bwa/mem
             PsiElement(Py:SINGLE_QUOTED_STRING)('"0.15.3/bio/bwa/mem"')
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('foo3')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('script')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -180,14 +180,14 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
           PyStringLiteralExpression: path/to/script.py
             PsiElement(Py:SINGLE_QUOTED_STRING)('"path/to/script.py"')
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('foo4')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n  ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('cwl')
         PyArgumentList
           PsiElement(Py:COLON)(':')

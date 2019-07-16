@@ -3,7 +3,7 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.psi.SMKSubworkflowParameterListStatement
+import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
 
 class SmkSubworkflowMultipleArgsInspection  : SnakemakeInspection() {
     override fun buildVisitor(
@@ -12,7 +12,7 @@ class SmkSubworkflowMultipleArgsInspection  : SnakemakeInspection() {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
-        override fun visitSMKSubworkflowParameterListStatement(st: SMKSubworkflowParameterListStatement) {
+        override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
             val args = st.argumentList?.arguments ?: emptyArray()
             if (args.size > 1) {
                 args.forEach {

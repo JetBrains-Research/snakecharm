@@ -12,6 +12,25 @@ class SnakemakeVisitorFilter: PythonVisitorFilter {
             ReturnAnnotator::class.java,
             // [HACK] See https://github.com/JetBrains-Research/snakecharm/issues/14
             PyUnreachableCodeInspection::class.java
+
+// other possible candidates to disable             
+//            //inspections
+//           PyCallByClassInspection.class,
+//           PyCallingNonCallableInspection.class,
+//           PyTypeCheckerInspection.class,
+//           PyUnboundLocalVariableInspection.class,
+//           PyUnusedLocalInspection.class,
+//           PyOldStyleClassesInspection.class,
+//           PyClassHasNoInitInspection.class,
+//           PyArgumentListInspection.class,
+//           PyRedeclarationInspection.class,
+//           PyShadowingNamesInspection.class,
+//           PyMethodMayBeStaticInspection.class,
+//           PyNoneFunctionAssignmentInspection.class,
+//           PyCompatibilityInspection.class,
+//           //annotators
+//           ParameterListAnnotator.class,
+//           UnsupportedFeatures.class
     )
 
     override fun isSupported(visitorClass: Class<out PyElementVisitor>, file: PsiFile) = !unsupportedClasses

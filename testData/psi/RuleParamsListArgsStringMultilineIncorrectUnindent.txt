@@ -1,12 +1,12 @@
 SnakemakeFile: RuleParamsListArgsStringMultilineIncorrectUnindent.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('rule1')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -32,14 +32,14 @@ SnakemakeFile: RuleParamsListArgsStringMultilineIncorrectUnindent.smk
             PsiWhiteSpace('\n                  ')
             PsiElement(Py:SINGLE_QUOTED_STRING)('".txt"')
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('rule2')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')

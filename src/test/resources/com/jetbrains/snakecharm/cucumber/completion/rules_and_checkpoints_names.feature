@@ -141,3 +141,21 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       | checkpoint | checkpoint2 | rule2       |
 
 
+  Scenario Outline: No completion for long reference with rules/checkpoints last part
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> boo:
+        input: ""
+
+      <rule_like> foo:
+        input: roo.too.<rule_like>s.
+      """
+    When I put the caret after too.<rule_like>s.
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+    | boo |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |

@@ -1,12 +1,12 @@
 SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all1')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -18,14 +18,14 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
           PyReferenceExpression: foo0
             PsiElement(Py:IDENTIFIER)('foo0')
   PsiWhiteSpace('\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all2')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -37,14 +37,14 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
           PyReferenceExpression: foo0
             PsiElement(Py:IDENTIFIER)('foo0')
   PsiWhiteSpace('\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all3')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -57,14 +57,14 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
             PsiElement(Py:IDENTIFIER)('foo0')
           PsiElement(Py:COMMA)(',')
   PsiWhiteSpace('\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all4')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -77,14 +77,14 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
           PsiErrorElement:expression expected
             <empty list>
   PsiWhiteSpace('\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all5')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -96,14 +96,14 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
           PyReferenceExpression: rule
             PsiElement(Py:IDENTIFIER)('rule')
   PsiWhiteSpace('\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all6')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -115,14 +115,14 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
           PyReferenceExpression: rule
             PsiElement(Py:IDENTIFIER)('rule')
   PsiWhiteSpace('\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all7')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -135,14 +135,14 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
             PsiElement(Py:IDENTIFIER)('rule')
           PsiElement(Py:COMMA)(',')
   PsiWhiteSpace('\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all8')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -155,14 +155,14 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
           PsiErrorElement:expression expected
             <empty list>
   PsiWhiteSpace('\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all9')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -184,14 +184,14 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
       PyNumericLiteralExpression
         PsiElement(Py:INTEGER_LITERAL)('5')
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all10')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -203,7 +203,7 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
           PyReferenceExpression: foo0
             PsiElement(Py:IDENTIFIER)('foo0')
   PsiWhiteSpace('\n')
-  SMKWorkflowPythonBlockParameter
+  SmkWorkflowPythonBlockSection
     PsiElement(Py:WORKFLOW_ONSUCCESS_KEYWORD)('onsuccess')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('\n    ')
@@ -217,14 +217,14 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
         PyNumericLiteralExpression
           PsiElement(Py:INTEGER_LITERAL)('2')
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all11')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -236,7 +236,7 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
           PyReferenceExpression: foo0
             PsiElement(Py:IDENTIFIER)('foo0')
   PsiWhiteSpace('\n')
-  SMKWorkflowParameterListStatement
+  SmkWorkflowArgsSection
     PsiElement(Py:WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD)('wildcard_constraints')
     PyArgumentList
       PsiElement(Py:COLON)(':')

@@ -2,7 +2,7 @@ package com.jetbrains.snakecharm
 
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.testFramework.PlatformTestCase
-import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
+import com.jetbrains.snakecharm.lang.psi.SmkFile
 import junit.framework.TestCase
 
 /**
@@ -28,7 +28,7 @@ class SnakeFileTypeTest: PlatformTestCase() {
         val virtualFile = PlatformTestCase.getVirtualFile(file)
         TestCase.assertNotNull(virtualFile)
         val psi = psiManager.findFile(virtualFile)
-        TestCase.assertTrue(psi is SnakemakeFile)
-        assertEquals(SnakemakeFileType, virtualFile.fileType)
+        TestCase.assertTrue(psi is SmkFile)
+        assertEquals(SmkFileType, virtualFile.fileType)
     }
 }

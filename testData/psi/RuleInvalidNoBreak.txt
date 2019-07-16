@@ -1,5 +1,5 @@
 SnakemakeFile: RuleInvalidNoBreak.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all1')
@@ -7,7 +7,7 @@ SnakemakeFile: RuleInvalidNoBreak.smk
     PsiErrorElement:End of statement expected
       <empty list>
     PsiWhiteSpace(' ')
-    SMKRuleParameterListStatement
+    SmkRuleOrCheckpointArgsSection
       PsiElement(Py:IDENTIFIER)('input')
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')

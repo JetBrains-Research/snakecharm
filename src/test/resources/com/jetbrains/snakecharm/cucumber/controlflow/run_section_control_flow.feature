@@ -40,8 +40,8 @@ Feature: PyCharm Control flow in snakemake file
     """
     Examples:
       | rule_like  | class         |
-      | rule       | SMKRule       |
-      | checkpoint | SMKCheckPoint |
+      | rule       | SmkRule       |
+      | checkpoint | SmkCheckPoint |
 
   Scenario Outline: Control flow in workflow section
     Given a snakemake project

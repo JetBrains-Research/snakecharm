@@ -1,0 +1,98 @@
+SnakemakeFile: KeywordLikeIdentifiersAsKeywords.smk
+  PyIfStatement
+    PyIfPartIf
+      PsiElement(Py:IF_KEYWORD)('if')
+      PsiWhiteSpace(' ')
+      PyBoolLiteralExpression
+        PsiElement(Py:TRUE_KEYWORD)('True')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      PyStatementList
+        SmkWorkflowArgsSection
+          PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+          PyArgumentList
+            PsiElement(Py:COLON)(':')
+            PsiWhiteSpace(' ')
+            PyStringLiteralExpression: ss1
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"ss1"')
+    PsiWhiteSpace('\n')
+    PyIfPartElif
+      PsiElement(Py:ELIF_KEYWORD)('elif')
+      PsiWhiteSpace(' ')
+      PyBoolLiteralExpression
+        PsiElement(Py:TRUE_KEYWORD)('True')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      PyStatementList
+        SmkWorkflowArgsSection
+          PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+          PyArgumentList
+            PsiElement(Py:COLON)(':')
+            PsiWhiteSpace(' ')
+            PyStringLiteralExpression: ss2
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"ss2"')
+    PsiWhiteSpace('\n')
+    PyElsePart
+      PsiElement(Py:ELSE_KEYWORD)('else')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      PyStatementList
+        SmkWorkflowArgsSection
+          PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+          PyArgumentList
+            PsiElement(Py:COLON)(':')
+            PsiWhiteSpace(' ')
+            PyStringLiteralExpression: ss3
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"ss3"')
+  PsiWhiteSpace('\n\n')
+  PyTryExceptStatement
+    PyTryPart
+      PsiElement(Py:TRY_KEYWORD)('try')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      PyStatementList
+        SmkWorkflowArgsSection
+          PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+          PyArgumentList
+            PsiElement(Py:COLON)(':')
+            PsiWhiteSpace(' ')
+            PyStringLiteralExpression: ss4
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"ss4"')
+    PsiWhiteSpace('\n')
+    PyExceptPart
+      PsiElement(Py:EXCEPT_KEYWORD)('except')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      PyStatementList
+        SmkWorkflowArgsSection
+          PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+          PyArgumentList
+            PsiElement(Py:COLON)(':')
+            PsiWhiteSpace(' ')
+            PyStringLiteralExpression: ss5
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"ss5"')
+  PsiWhiteSpace('\n\n')
+  PyFunction('foo')
+    PsiElement(Py:DEF_KEYWORD)('def')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PyParameterList
+      PsiElement(Py:LPAR)('(')
+      PsiElement(Py:RPAR)(')')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    PyStatementList
+      SmkRule
+        PsiElement(Py:RULE_KEYWORD)('rule')
+        PsiWhiteSpace(' ')
+        PsiElement(Py:IDENTIFIER)('boo')
+        PsiElement(Py:COLON)(':')
+        PyStatementList
+          PsiWhiteSpace('\n        ')
+          SmkRuleOrCheckpointArgsSection
+            PsiElement(Py:IDENTIFIER)('input')
+            PyArgumentList
+              PsiElement(Py:COLON)(':')
+              PsiWhiteSpace(' ')
+              PyStringLiteralExpression: in
+                PsiElement(Py:SINGLE_QUOTED_STRING)('"in"')

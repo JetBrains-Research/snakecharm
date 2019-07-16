@@ -1,5 +1,5 @@
 SnakemakeFile: RuleIncomplete2.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('foo')
@@ -9,14 +9,14 @@ SnakemakeFile: RuleIncomplete2.smk
       PsiErrorElement:Indent expected...
         <empty list>
   PsiWhiteSpace('\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('my_rule')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
           PsiElement(Py:COLON)(':')

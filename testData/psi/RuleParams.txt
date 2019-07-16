@@ -1,12 +1,12 @@
 SnakemakeFile: RuleParams.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -14,7 +14,7 @@ SnakemakeFile: RuleParams.smk
           PyStringLiteralExpression: iiii
             PsiElement(Py:SINGLE_QUOTED_STRING)(''iiii'')
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -22,14 +22,14 @@ SnakemakeFile: RuleParams.smk
           PyStringLiteralExpression: ooooo
             PsiElement(Py:SINGLE_QUOTED_STRING)(''ooooo'')
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('ddd')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')

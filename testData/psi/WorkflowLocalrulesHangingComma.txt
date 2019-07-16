@@ -1,5 +1,5 @@
 SnakemakeFile: WorkflowLocalrulesHangingComma.smk
-  SMKWorkflowLocalRulesStatement
+  SmkWorkflowLocalrulesSection
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
     PyArgumentList
       PsiElement(Py:COLON)(':')
@@ -8,7 +8,7 @@ SnakemakeFile: WorkflowLocalrulesHangingComma.smk
         PsiElement(Py:IDENTIFIER)('foo0')
       PsiElement(Py:COMMA)(',')
   PsiWhiteSpace('\n\n')
-  SMKWorkflowLocalRulesStatement
+  SmkWorkflowLocalrulesSection
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
     PyArgumentList
       PsiElement(Py:COLON)(':')
@@ -21,7 +21,7 @@ SnakemakeFile: WorkflowLocalrulesHangingComma.smk
         PsiElement(Py:IDENTIFIER)('foo2')
       PsiElement(Py:COMMA)(',')
   PsiWhiteSpace('\n\n')
-  SMKWorkflowLocalRulesStatement
+  SmkWorkflowLocalrulesSection
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
     PyArgumentList
       PsiElement(Py:COLON)(':')

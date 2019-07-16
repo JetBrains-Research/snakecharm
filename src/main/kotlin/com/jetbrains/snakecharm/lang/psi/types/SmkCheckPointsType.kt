@@ -1,17 +1,17 @@
 package com.jetbrains.snakecharm.lang.psi.types
 
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_CHECKPOINTS
-import com.jetbrains.snakecharm.lang.psi.SMKCheckPoint
-import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
+import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
+import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex.Companion.KEY
 
 class SmkCheckPointsType(
-        containingRule: SMKCheckPoint?,
-        smkFile: SnakemakeFile
-) : AbstractSmkRuleOrCheckpointType<SMKCheckPoint>(
-        containingRule, SMK_VARS_CHECKPOINTS, KEY, SMKCheckPoint::class.java
+        containingRule: SmkCheckPoint?,
+        smkFile: SmkFile
+) : AbstractSmkRuleOrCheckpointType<SmkCheckPoint>(
+        containingRule, SMK_VARS_CHECKPOINTS, KEY, SmkCheckPoint::class.java
 ) {
-    override val currentFileDeclarations: List<SMKCheckPoint> by lazy {
+    override val currentFileDeclarations: List<SmkCheckPoint> by lazy {
         smkFile.collectCheckPoints().map { it.second }
     }
 

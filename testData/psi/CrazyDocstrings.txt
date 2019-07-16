@@ -1,5 +1,5 @@
 SnakemakeFile: CrazyDocstrings.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('NAME')
@@ -17,7 +17,7 @@ SnakemakeFile: CrazyDocstrings.smk
       PyStringLiteralExpression: Docstring 4
         PsiElement(Py:TRIPLE_QUOTED_STRING)('"""Docstring 4"""')
       PsiWhiteSpace(' ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -27,7 +27,7 @@ SnakemakeFile: CrazyDocstrings.smk
       PsiWhiteSpace('\n    ')
       PyStringLiteralExpression: Docstring 5
         PsiElement(Py:TRIPLE_QUOTED_STRING)('"""Docstring 5"""')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
           PsiElement(Py:COLON)(':')

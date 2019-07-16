@@ -27,6 +27,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 .put(SnakemakeNames.WORKFLOW_ONSTART_KEYWORD, SnakemakeTokenTypes.WORKFLOW_ONSTART_KEYWORD)
                 .put(SnakemakeNames.SUBWORKFLOW_KEYWORD, SnakemakeTokenTypes.SUBWORKFLOW_KEYWORD)
                 .build()!!
+
+        val KEYWORDS_2_TEXT = KEYWORDS.map { it.value to it.key }.toMap()
     }
 
     override fun getTokenType() = KEYWORDS[tokenText] ?: super.getTokenType()

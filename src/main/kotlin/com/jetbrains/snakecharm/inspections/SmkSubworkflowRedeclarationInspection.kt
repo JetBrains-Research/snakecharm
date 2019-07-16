@@ -12,9 +12,9 @@ class SmkSubworkflowRedeclarationInspection : SnakemakeInspection() {
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
-        private val subworkflowsNameAndPsi = (session.file as? SnakemakeFile)?.collectSubworkflows() ?: emptyList()
+        private val subworkflowsNameAndPsi = (session.file as? SmkFile)?.collectSubworkflows() ?: emptyList()
 
-        override fun visitSMKSubworkflow(subworkflow: SmkSubworkflow) {
+        override fun visitSmkSubworkflow(subworkflow: SmkSubworkflow) {
             val name = subworkflow.name ?: return
 
             if (subworkflow !== subworkflowsNameAndPsi.findLast { it.first == name }?.second) {
