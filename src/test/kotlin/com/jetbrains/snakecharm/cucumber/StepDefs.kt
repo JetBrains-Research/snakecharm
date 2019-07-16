@@ -82,7 +82,7 @@ class StepDefs {
             "Rule Section After Execution Section" ->
                 fixture.enableInspections(SmkRuleSectionAfterExecutionInspection::class.java)
             "Section Redeclaration" -> fixture.enableInspections(SmkSectionRedeclarationInspection::class.java)
-            "Subworkflow Multiple Args" -> fixture.enableInspections(SmkSubworkflowMultipleArgsInspection::class.java)
+            "Section Multiple Args" -> fixture.enableInspections(SmkSectionMultipleArgsInspection::class.java)
             "Subworkflow Redeclaration" -> fixture.enableInspections(SmkSubworkflowRedeclarationInspection::class.java)
             "Unreachable Code" -> fixture.enableInspections(PyUnreachableCodeInspection::class.java)
             "Rule or Checkpoint Name yet undefined" -> fixture.enableInspections(SmkRuleOrCheckpointNameYetUndefinedInspection::class.java)
