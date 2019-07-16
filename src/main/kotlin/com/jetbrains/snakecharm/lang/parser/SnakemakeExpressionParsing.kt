@@ -312,6 +312,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         }
                     }
                 }
+                // method call on a new line
                 atAnyOfTokensSafe(PyTokenTypes.DOT) -> {
                     dotOccurred = true
                     statementEndPosition = myBuilder.rawTokenIndex()
@@ -320,6 +321,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 else -> nextToken()
             }
 
+            // wraps the current string together with its possible indent
             incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
             incorrectUnindentMarker = null
 
@@ -401,9 +403,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         } else {
             while (atToken(PyTokenTypes.PLUS)) {
                 myBuilder.advanceLexer()
-
                 skipStatementBreaksUpToTokens(*stringLiteralTokenSet.types)
-
                 if (!parseMultilineStringTwoPasses()) {
                     myBuilder.error(message("PARSE.expected.expression"))
                 }
@@ -428,9 +428,9 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 nextToken()
             } else {
                 skipDedents { myBuilder.error(SnakemakeBundle.message("PARSE.incorrect.unindent")) }
-            }
-            if (indents == 0) {
-                break
+                if (indents == 0) {
+                    break
+                }
             }
         }
         if (atAnyOfTokensSafe(*tokenTypes)) {
