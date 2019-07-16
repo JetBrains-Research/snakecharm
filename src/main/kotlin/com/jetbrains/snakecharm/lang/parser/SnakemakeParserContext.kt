@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.parser
 
 import com.intellij.lang.PsiBuilder
+import com.intellij.lang.impl.PsiBuilderImpl
 import com.jetbrains.python.parsing.ParsingContext
 import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.python.psi.LanguageLevel
@@ -14,6 +15,13 @@ class SnakemakeParserContext(
         languageLevel: LanguageLevel,
         futureFlag: StatementParsing.FUTURE?
 ): ParsingContext(builder, languageLevel, futureFlag) {
+
+    init {
+        require(builder is PsiBuilderImpl) {
+            "Parser must be PsiBuilderImpl in order for Snakemake parser to work properly"
+        }
+
+    }
 
     private val stmtParser = SnakemakeStatementParsing(this, futureFlag)
     private val exprParser = SnakemakeExpressionParsing(this)

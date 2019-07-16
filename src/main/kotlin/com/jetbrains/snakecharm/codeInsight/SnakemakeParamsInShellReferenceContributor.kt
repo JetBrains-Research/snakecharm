@@ -8,22 +8,22 @@ import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyStringLiteralExpression
-import com.jetbrains.snakecharm.codeInsight.completion.SMKKeywordCompletionContributor
+import com.jetbrains.snakecharm.codeInsight.completion.SmkKeywordCompletionContributor
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SMKParamsReference
-import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
-import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkRunSection
+import com.jetbrains.snakecharm.lang.psi.impl.refs.SmkParamsReference
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
     private val insideRuleSection = PlatformPatterns.psiElement()
-            .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
-            .inside(SMKRuleParameterListStatement::class.java)
+            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+            .inside(SmkRuleOrCheckpointArgsSection::class.java)
     private val insideCallExpressionInRuleRunParameter = PlatformPatterns.psiElement()
-            .inFile(SMKKeywordCompletionContributor.IN_SNAKEMAKE)
+            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
             .inside(PyCallExpression::class.java)
-            .inside(SMKRuleRunParameter::class.java)
+            .inside(SmkRunSection::class.java)
 
 
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
@@ -43,13 +43,12 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
 
                         if (insideRuleSection.accepts(element)) {
                             val isShellCommand = element
-                                    .parentOfType(SMKRuleParameterListStatement::class)
-                                    ?.section?.textMatches(SnakemakeNames.SECTION_SHELL) == true
+                                    .parentOfType(SmkRuleOrCheckpointArgsSection::class)
+                                    ?.sectionKeyword == SnakemakeNames.SECTION_SHELL
                             if (isShellCommand) {
                                 addParamsReferences(element, paramsMatcher, paramReferences)
                             }
-                        }
-                        else {
+                        } else {
                             val isShellCallExpression =
                                     PsiTreeUtil.getParentOfType(element, PyCallExpression::class.java)!!
                                             .callee?.name == SnakemakeNames.SECTION_SHELL
@@ -60,7 +59,8 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
 
                         return paramReferences.toTypedArray()
                     }
-        })
+                }
+        )
     }
 
     private fun addParamsReferences(
@@ -69,7 +69,7 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
             paramReferences: MutableList<PsiReference>
     ) {
         while (paramsMatcher.find()) {
-            paramReferences.add(SMKParamsReference(element as PyStringLiteralExpression,
+            paramReferences.add(SmkParamsReference(element as PyStringLiteralExpression,
                     TextRange(paramsMatcher.start(1), paramsMatcher.end(1))))
         }
     }

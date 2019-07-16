@@ -6,7 +6,7 @@ SnakemakeFile: SingleSubworkflow.smk
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SMKSubworkflowParameterListStatement
+      SmkSubworkflowArgsSection
         PsiElement(Py:IDENTIFIER)('workdir')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -14,7 +14,7 @@ SnakemakeFile: SingleSubworkflow.smk
           PyStringLiteralExpression: ../path/to/otherworkflow
             PsiElement(Py:SINGLE_QUOTED_STRING)('"../path/to/otherworkflow"')
       PsiWhiteSpace('\n    ')
-      SMKSubworkflowParameterListStatement
+      SmkSubworkflowArgsSection
         PsiElement(Py:IDENTIFIER)('snakefile')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -22,7 +22,7 @@ SnakemakeFile: SingleSubworkflow.smk
           PyStringLiteralExpression: ../path/to/otherworkflow/Snakefile
             PsiElement(Py:SINGLE_QUOTED_STRING)('"../path/to/otherworkflow/Snakefile"')
       PsiWhiteSpace('\n    ')
-      SMKSubworkflowParameterListStatement
+      SmkSubworkflowArgsSection
         PsiElement(Py:IDENTIFIER)('configfile')
         PyArgumentList
           PsiElement(Py:COLON)(':')

@@ -1,12 +1,17 @@
 package com.jetbrains.snakecharm.lang.psi.types
 
-import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SMKRule
-import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_RULES
+import com.jetbrains.snakecharm.lang.psi.SmkRule
+import com.jetbrains.snakecharm.lang.psi.SmkFile
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex.Companion.KEY
 
 class SmkRulesType(
-        containingRule: SMKRule?,
-        smkFile: SnakemakeFile
-) : AbstractSmkRuleOrCheckpointType<SMKRule>(
-        containingRule, smkFile.collectRules(), SnakemakeNames.SMK_VARS_RULES
-)
+        containingRule: SmkRule?,
+        smkFile: SmkFile
+) : AbstractSmkRuleOrCheckpointType<SmkRule>(
+        containingRule, SMK_VARS_RULES, KEY, SmkRule::class.java
+) {
+    override val currentFileDeclarations: List<SmkRule> by lazy {
+        smkFile.collectRules().map { it.second }
+    }
+}

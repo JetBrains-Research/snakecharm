@@ -1,5 +1,5 @@
 SnakemakeFile: WorkflowLocalrulesInvalid.smk
-  SMKWorkflowLocalRulesStatement
+  SmkWorkflowLocalrulesSection
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
     PyArgumentList
       PsiElement(Py:COLON)(':')
@@ -11,7 +11,7 @@ SnakemakeFile: WorkflowLocalrulesInvalid.smk
       SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('foo2')
   PsiWhiteSpace('\n\n')
-  SMKWorkflowLocalRulesStatement
+  SmkWorkflowLocalrulesSection
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
     PyArgumentList
       PsiElement(Py:COLON)(':')
@@ -22,23 +22,18 @@ SnakemakeFile: WorkflowLocalrulesInvalid.smk
       PsiErrorElement:',' expected
         PsiElement(Py:IDENTIFIER)('foo4')
   PsiWhiteSpace('\n\n')
-  SMKWorkflowLocalRulesStatement
+  SmkWorkflowLocalrulesSection
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace('\n  ')
       SmkReferenceExpression
         PsiElement(Py:IDENTIFIER)('foo5')
-      PsiErrorElement:Dedent expected
-        <empty list>
-  PsiWhiteSpace('\n  ')
-  PyExpressionStatement
-    PyReferenceExpression: foo6
-      PsiElement(Py:IDENTIFIER)('foo6')
-  PsiErrorElement:Statement expected, found Py:DEDENT
-    <empty list>
+      PsiWhiteSpace('\n  ')
+      PsiErrorElement:',' expected
+        PsiElement(Py:IDENTIFIER)('foo6')
   PsiWhiteSpace('\n\n')
-  SMKWorkflowLocalRulesStatement
+  SmkWorkflowLocalrulesSection
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
     PyArgumentList
       PsiElement(Py:COLON)(':')

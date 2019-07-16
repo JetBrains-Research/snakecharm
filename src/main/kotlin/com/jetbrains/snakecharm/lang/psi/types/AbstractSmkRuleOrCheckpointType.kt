@@ -3,9 +3,15 @@ package com.jetbrains.snakecharm.lang.psi.types
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiInvalidElementAccessException
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.stubs.StubIndex
+import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.util.ProcessingContext
+import com.intellij.util.Processors
+import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.python.codeInsight.completion.PythonCompletionWeigher
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PyExpression
@@ -18,9 +24,12 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
 abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
         private val containingRule: T?,
-        private val nameAndDeclarationElement: List<Pair<String, T>>,
-        private val typeName: String
+        private val typeName: String,
+        private val indexKey: StubIndexKey<String, T>,
+        private val clazz: Class<T>
 ) : PyType {
+
+    abstract val currentFileDeclarations: List<T>
 
     override fun getName() = typeName
 
@@ -33,21 +42,61 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
             return emptyArray()
         }
 
-        return nameAndDeclarationElement
-                .filter { (_, elem) -> elem != containingRule }
-                .map { (name, elem) ->
-                    createRuleLikeLookupItem(name, elem)
-                }.toTypedArray()
+        val results = ArrayList<T>()
+
+        val module = ModuleUtilCore.findModuleForPsiElement(location.originalElement)
+        if (module != null) {
+            addVariantFromIndex(indexKey, module, results, clazz, searchScope(module))
+        }
+
+        if (results.isEmpty()) {
+            // show at list current file:
+            results.addAll(currentFileDeclarations)
+        }
+
+        return results.stream()
+                .filter { it.name != null && it != containingRule }
+                .map { createRuleLikeLookupItem(it.name!!, it) }
+                .toArray()
+    }
+
+    fun <Psi: SmkRuleOrCheckpoint> addVariantFromIndex(
+            indexKey: StubIndexKey<String, Psi>,
+            module: Module,
+            results: MutableList<Psi>,
+            clazz: Class<Psi>,
+            scope: GlobalSearchScope
+    ) {
+        val project = module.project
+        val stubIndex = StubIndex.getInstance()
+        val allKeys = ContainerUtil.newTroveSet<String>()
+        stubIndex.processAllKeys(
+                indexKey, Processors.cancelableCollectProcessor<String>(allKeys), scope, null
+        )
+
+        for (key in allKeys) {
+            results.addAll(StubIndex.getElements(indexKey, key, project, scope, clazz))
+        }
+    }
+
+    private fun searchScope(module: Module): GlobalSearchScope {
+        // module content root and all dependent modules:
+        val scope = GlobalSearchScope.moduleWithDependentsScope(module)
+
+        // all project w/o tests from project sdk roots
+        // PyProjectScopeBuilder.excludeSdkTestsScope(targetFile);
+
+        //Returns module scope including sources, tests, and dependencies, excluding libraries:
+        // * if files in content root, not in source root - not visible in scope
+        // GlobalSearchScope.moduleWithDependenciesScope(module)
+
+        // project with all modules and libs:
+        // GlobalSearchScope.allScope(project)
+        return scope
     }
 
     override fun assertValid(message: String?) {
         // [romeo] Not sure is our type always valid or check whether any element is invalid
-
-        val invalidItem = nameAndDeclarationElement.firstOrNull { (_, elem) -> !elem.isValid }?.second
-        if (invalidItem != null) {
-            throw PsiInvalidElementAccessException(invalidItem, invalidItem.javaClass.toString() + ": " + message)
-        }
-
     }
 
     override fun resolveMember(
@@ -60,14 +109,22 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
             return emptyList()
         }
 
-        val elementsWithSameName = nameAndDeclarationElement.filter { (ruleName, _) ->
-            ruleName == name
+        val module = location?.let {  ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
+        val results = if (module != null) {
+            val scope = searchScope(module)
+            StubIndex.getElements(indexKey, name, module.project, scope, clazz)
+        } else {
+            // try local resolve
+            currentFileDeclarations.filter { elem ->
+                elem.name == name
+            }
         }
-        if (elementsWithSameName.isEmpty()) {
+
+        if (results.isEmpty()) {
             return emptyList()
         }
 
-        return elementsWithSameName.map { (_, element) ->
+        return results.map { element ->
             RatedResolveResult(RatedResolveResult.RATE_NORMAL, element)
         }
     }

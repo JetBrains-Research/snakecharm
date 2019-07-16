@@ -1,5 +1,5 @@
 SnakemakeFile: WorkflowPythonCodeBlockKeywords.smk
-  SMKWorkflowPythonBlockParameter
+  SmkWorkflowPythonBlockSection
     PsiElement(Py:WORKFLOW_ONSTART_KEYWORD)('onstart')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('\n    ')
@@ -14,7 +14,7 @@ SnakemakeFile: WorkflowPythonCodeBlockKeywords.smk
               PsiElement(Py:SINGLE_QUOTED_STRING)('"Workflow started, no error"')
             PsiElement(Py:RPAR)(')')
   PsiWhiteSpace('\n\n')
-  SMKWorkflowPythonBlockParameter
+  SmkWorkflowPythonBlockSection
     PsiElement(Py:WORKFLOW_ONSUCCESS_KEYWORD)('onsuccess')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('\n    ')
@@ -29,7 +29,7 @@ SnakemakeFile: WorkflowPythonCodeBlockKeywords.smk
               PsiElement(Py:SINGLE_QUOTED_STRING)('"Workflow finished, no error"')
             PsiElement(Py:RPAR)(')')
   PsiWhiteSpace('\n\n')
-  SMKWorkflowPythonBlockParameter
+  SmkWorkflowPythonBlockSection
     PsiElement(Py:WORKFLOW_ONERROR_KEYWORD)('onerror')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('\n    ')
@@ -54,7 +54,7 @@ SnakemakeFile: WorkflowPythonCodeBlockKeywords.smk
               PsiElement(Py:SINGLE_QUOTED_STRING)('"mail -s \"an error occurred\" youremail@provider.com < {log}"')
             PsiElement(Py:RPAR)(')')
   PsiWhiteSpace('\n\n')
-  SMKWorkflowPythonBlockParameter
+  SmkWorkflowPythonBlockSection
     PsiElement(Py:WORKFLOW_ONSTART_KEYWORD)('onstart')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('  ')
@@ -88,7 +88,7 @@ SnakemakeFile: WorkflowPythonCodeBlockKeywords.smk
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('\n  ')
     PyStatementList
-      SMKWorkflowPythonBlockParameter
+      SmkWorkflowPythonBlockSection
         PsiElement(Py:WORKFLOW_ONSUCCESS_KEYWORD)('onsuccess')
         PsiElement(Py:COLON)(':')
         PsiWhiteSpace('\n      ')

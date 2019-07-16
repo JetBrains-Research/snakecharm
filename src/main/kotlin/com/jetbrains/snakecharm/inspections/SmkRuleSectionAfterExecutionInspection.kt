@@ -11,23 +11,23 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
-        override fun visitSMKRule(rule: SMKRule) {
+        override fun visitSmkRule(rule: SmkRule) {
             visitSMKRuleLike(rule)
         }
 
-        override fun visitSMKCheckPoint(checkPoint: SMKCheckPoint) {
+        override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
             visitSMKRuleLike(checkPoint)
         }
 
-        private fun visitSMKRuleLike(rule: SmkRuleLike<SmkSectionStatement>) {
+        private fun visitSMKRuleLike(rule: SmkRuleLike<SmkArgsSection>) {
             var executionSectionOccurred = false
             var executionSectionName: String? = null
 
             val sections = rule.getSections()
             for (st in sections) {
-                if (st is SMKRuleParameterListStatement) {
-                    val sectionName = st.section?.text ?: return
-                    val isExecutionSection = sectionName in SMKRuleParameterListStatement.EXECUTION_KEYWORDS
+                if (st is SmkRuleOrCheckpointArgsSection) {
+                    val sectionName = st.sectionKeyword ?: return
+                    val isExecutionSection = sectionName in SmkRuleOrCheckpointArgsSection.EXECUTION_KEYWORDS
                     if (isExecutionSection) {
                         executionSectionOccurred = true
                         executionSectionName = sectionName

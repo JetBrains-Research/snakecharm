@@ -1,12 +1,12 @@
 SnakemakeFile: RuleMultipleSingleLineNoBreak.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all1')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -14,14 +14,14 @@ SnakemakeFile: RuleMultipleSingleLineNoBreak.smk
           PyStringLiteralExpression: foo1
             PsiElement(Py:SINGLE_QUOTED_STRING)(''foo1'')
   PsiWhiteSpace('\n\n')
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('all2')
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace(' ')
     PyStatementList
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
           PsiElement(Py:COLON)(':')

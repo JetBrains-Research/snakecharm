@@ -9,7 +9,7 @@ import com.jetbrains.python.PythonLanguage
  * @date 2018-12-31
  */
 object SnakemakeLanguageDialect : Language(PythonLanguage.getInstance(), "Snakemake") {
-     val fileElementType = SnakemakeFileElementType(this)
+     val fileElementType = SmkFileElementType(this)
 
      /**
       * Used as a check to find all the code that knows about Snake.
