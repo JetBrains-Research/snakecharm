@@ -104,10 +104,9 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-    // fails because `rule` after python decorator is parsed as an identifier, not a keyword
-    /*fun testRuleParamsListArgsStringMultiline() {
+    fun testRuleParamsListArgsStringMultiline() {
         doTest()
-    }*/
+    }
 
     fun testRuleParamsListArgsHangingComma() {
         doTest()
