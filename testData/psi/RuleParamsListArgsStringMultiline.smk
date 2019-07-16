@@ -1,4 +1,4 @@
-print(
+@workflow.input(
     "{dataset}/inputfile"
     "fff"
 )

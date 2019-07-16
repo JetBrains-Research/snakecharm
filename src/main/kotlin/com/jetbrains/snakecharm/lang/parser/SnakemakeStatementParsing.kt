@@ -92,6 +92,14 @@ class SnakemakeStatementParsing(
             if (startPyOnlyScope) {
                 context.popScope()
             }
+
+            if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER) {
+                val actualToken = SnakemakeTokenTypes.stringToTokenType[myBuilder.tokenText]
+                if (actualToken != null) {
+                    myBuilder.remapCurrentToken(actualToken)
+                }
+            }
+
             return
         }
         when {

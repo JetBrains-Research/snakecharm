@@ -1,18 +1,29 @@
 SnakemakeFile: RuleParamsListArgsStringMultiline.smk
-  PyExpressionStatement
-    PyCallExpression: print
-      PyReferenceExpression: print
-        PsiElement(Py:IDENTIFIER)('print')
-      PyArgumentList
-        PsiElement(Py:LPAR)('(')
-        PsiWhiteSpace('\n    ')
-        PyStringLiteralExpression: {dataset}/inputfilefff
-          PsiElement(Py:SINGLE_QUOTED_STRING)('"{dataset}/inputfile"')
+  PyFunction('null')
+    PyDecoratorList
+      PyDecorator: @workflow.input
+        PsiElement(Py:AT)('@')
+        PyReferenceExpression: input
+          PyReferenceExpression: workflow
+            PsiElement(Py:IDENTIFIER)('workflow')
+          PsiElement(Py:DOT)('.')
+          PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:LPAR)('(')
           PsiWhiteSpace('\n    ')
-          PsiElement(Py:SINGLE_QUOTED_STRING)('"fff"')
-        PsiWhiteSpace('\n')
-        PsiElement(Py:RPAR)(')')
-  PsiWhiteSpace('\n\n')
+          PyStringLiteralExpression: {dataset}/inputfilefff
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"{dataset}/inputfile"')
+            PsiWhiteSpace('\n    ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"fff"')
+          PsiWhiteSpace('\n')
+          PsiElement(Py:RPAR)(')')
+    PsiErrorElement:'@' or 'def' expected
+      <empty list>
+    PsiWhiteSpace('\n\n')
+    PyParameterList
+      <empty list>
+    PyStatementList
+      <empty list>
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
