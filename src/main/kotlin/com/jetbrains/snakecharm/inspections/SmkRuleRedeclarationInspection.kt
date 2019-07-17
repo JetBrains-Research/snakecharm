@@ -1,7 +1,9 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
+import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
+import com.jetbrains.python.inspections.quickfix.PyRenameElementQuickFix
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
@@ -27,8 +29,14 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
         private fun visitSMKRuleLike(rule: SmkRuleLike<SmkArgsSection>) {
             val ruleName = rule.name ?: return
             if (ruleNames.contains(ruleName)) {
-                registerProblem(rule.nameIdentifier,
-                        SnakemakeBundle.message("INSP.NAME.rule.redeclaration"))
+                val problemElement = rule.nameIdentifier ?: return
+                registerProblem(
+                        problemElement,
+                        SnakemakeBundle.message("INSP.NAME.rule.redeclaration"),
+                        ProblemHighlightType.ERROR,
+                        null,
+                        PyRenameElementQuickFix(problemElement)
+                )
             } else {
                 ruleNames.add(ruleName)
             }
