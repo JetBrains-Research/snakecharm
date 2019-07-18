@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.cucumber
 
 import com.intellij.codeInsight.documentation.DocumentationManager
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.ide.util.gotoByName.GotoSymbolModel2
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
@@ -12,6 +13,7 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.findPsiElementUnderCaret
+import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.fixture
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.myGeneratedDocPopupText
 import cucumber.api.DataTable
 import cucumber.api.java.en.Given
@@ -123,6 +125,21 @@ class ActionsSteps {
         ApplicationManager.getApplication().invokeAndWait {
                 SnakemakeWorld.fixture().renameElementAtCaret(newName)
         }
+    }
+
+    /*@When("^I invoke quick fix ([^\\]]+)$")
+    fun iInvokeQuickFix(quickFixName: String) {
+
+    }*/
+
+    @Then("^I invoke quick fix ([^\\]]+) and see text:")
+    fun iInvokeQuickFixAndSeeText(quickFixName: String, text: String) {
+        val fixture = SnakemakeWorld.fixture()
+        val quickFix = fixture.getAllQuickFixes().first { it.familyName == quickFixName }
+        ApplicationManager.getApplication().invokeAndWait {
+            fixture.launchAction(quickFix)
+        }
+        fixture.checkResult(text)
     }
 
     @Then("^go to symbol should contain:$")
