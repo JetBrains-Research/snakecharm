@@ -74,26 +74,20 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
         override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
             val document = editor?.document ?: return
             val startOffset1 = firstSection.textOffset
-            val endOffset1 = firstSection.textOffset + firstSection.textLength
-            val startOffset2 = secondSection.textOffset
-            val endOffset2 = secondSection.textOffset + firstSection.textLength
-            val secondSectionIndent = startOffset2 - endOffset1 - 1
+            val endOffset1 = firstSection.textRange.endOffset
+            val initialStartOffset2 = secondSection.textOffset
+            val initialEndOffset2 = secondSection.textRange.endOffset
             val text1 = firstSection.text
-            // TODO what happens to multiline sections on Windows, where string separators are different?
+            val text2 = secondSection.text
             WriteCommandAction.runWriteCommandAction(project) {
-                document.replaceString(startOffset1, endOffset1, secondSection.text)
-                if (text1.length > secondSection.textLength) {
-                    val endOffset = if (endOffset1 < document.textLength) endOffset1 else document.textLength
-                    document.replaceString(startOffset1 + secondSection.textLength, endOffset, "")
+                document.replaceString(startOffset1, endOffset1, text2)
+                if (text1.length > text2.length) {
+                    val endOffset = startOffset1 + text2.length
+                    document.replaceString(startOffset1 + text2.length, endOffset, "")
                 }
-                if (startOffset2 < document.textLength) {
-                    document.replaceString(startOffset2, endOffset2, "")
-                    document.insertString(startOffset2, text1)
-                } else {
-                    document.insertString(document.textLength, "\n")
-                    document.insertString(document.textLength, " ".repeat(secondSectionIndent))
-                    document.insertString(document.textLength, text1)
-                }
+                val startOffset2 = initialStartOffset2 + (text2.length - text1.length)
+                val endOffset2 = initialEndOffset2 + (text2.length - text1.length)
+                document.replaceString(startOffset2, endOffset2, text1)
             }
         }
     }
