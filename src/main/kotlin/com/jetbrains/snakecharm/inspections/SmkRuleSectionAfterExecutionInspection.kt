@@ -1,14 +1,14 @@
 package com.jetbrains.snakecharm.inspections
 
-import com.intellij.codeInspection.HintAction
-import com.intellij.codeInspection.LocalInspectionToolSession
-import com.intellij.codeInspection.ProblemHighlightType
-import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.codeInspection.*
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.problems.Problem
 import com.intellij.psi.PsiFile
+import com.intellij.psi.SmartPointerManager
+import com.intellij.psi.SmartPsiElementPointer
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.*
@@ -49,7 +49,8 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
                                         executionSection.name!!
                                 ),
                                 ProblemHighlightType.ERROR,
-                                SwapTwoSectionsHintAction(executionSection, st)
+                                null,
+                                SwapTwoSectionsQuickFix(SmartPointerManager.createPointer(executionSection))
                         )
                     }
                 }
@@ -57,22 +58,13 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
         }
     }
 
-    private class SwapTwoSectionsHintAction(
-            private val firstSection: SmkRuleOrCheckpointArgsSection,
-            private val secondSection: SmkRuleOrCheckpointArgsSection
-    ) : HintAction {
-        override fun startInWriteAction() = false
-
+    private class SwapTwoSectionsQuickFix(private val precedingSectionPointer: SmartPsiElementPointer<SmkSection>) : LocalQuickFix {
         override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.move.rule.section.upwards.family")
 
-        override fun getText(): String = SnakemakeBundle.message("INSP.INTN.move.rule.section.upwards.text")
-
-        override fun showHint(editor: Editor) = true
-
-        override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?) = true
-
-        override fun invoke(project: Project, editor: Editor?, file: PsiFile?) {
-            val document = editor?.document ?: return
+        override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
+            val firstSection = precedingSectionPointer.element ?: return
+            val secondSection = descriptor.psiElement
+            val document = FileEditorManager.getInstance(project).selectedTextEditor?.document ?: return
             val startOffset1 = firstSection.textOffset
             val endOffset1 = firstSection.textRange.endOffset
             val initialStartOffset2 = secondSection.textOffset

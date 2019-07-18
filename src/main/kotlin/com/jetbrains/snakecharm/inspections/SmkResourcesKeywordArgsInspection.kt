@@ -2,7 +2,9 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInsight.FileModificationService
 import com.intellij.codeInspection.*
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.*
 import com.jetbrains.python.psi.PyKeywordArgument
@@ -23,13 +25,11 @@ class SmkResourcesKeywordArgsInspection : SnakemakeInspection() {
 
             st.argumentList?.arguments?.forEach {
                 if (it !is PyKeywordArgument) {
-                    val action = MoveCaretAndInsertEqualsSignAction(SmartPointerManager.createPointer(it))
                     registerProblem(
                             it,
                             SnakemakeBundle.message("INSP.NAME.resources.unnamed.args"),
                             ProblemHighlightType.ERROR,
-                            action,
-                            action
+                            null, MoveCaretAndInsertEqualsSignQuickFix()
                     )
                 }
             }
@@ -38,29 +38,12 @@ class SmkResourcesKeywordArgsInspection : SnakemakeInspection() {
 
     override fun getDisplayName(): String = SnakemakeBundle.message("INSP.NAME.resources.unnamed.args")
 
-    private class MoveCaretAndInsertEqualsSignAction(
-            private val elementPointer: SmartPsiElementPointer<PsiElement>
-    ) : HintAction, LocalQuickFixAndIntentionActionOnPsiElement(elementPointer.element) {
-        override fun startInWriteAction() = true
+    private class MoveCaretAndInsertEqualsSignQuickFix : LocalQuickFix {
+        override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.name.resource.family")
 
-        override fun getFamilyName(): String = SnakemakeBundle.message("INSP.INTN.name.resource.family")
-
-        override fun showHint(editor: Editor) = true
-
-        override fun getText(): String = SnakemakeBundle.message("INSP.INTN.name.resource.text")
-
-        override fun invoke(
-                project: Project,
-                file: PsiFile,
-                editor: Editor?,
-                startElement: PsiElement,
-                endElement: PsiElement
-        ) {
-            if (!FileModificationService.getInstance().prepareFileForWrite(file)) {
-                return
-            }
-
-            val offset = elementPointer.element?.textOffset ?: return
+        override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
+            val offset = descriptor.psiElement.textOffset
+            val editor = FileEditorManager.getInstance(project).selectedTextEditor
             editor?.caretModel?.moveToOffset(offset)
             if (editor?.document?.isWritable == true) {
                 editor.document.insertString(offset, "=")
