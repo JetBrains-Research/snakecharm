@@ -9,14 +9,16 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
-    private val wildcardsLambdaParameterName = "wildcards"
-    private val allowedInParams = listOf(
-            wildcardsLambdaParameterName,
-            SnakemakeNames.SECTION_INPUT,
-            SnakemakeNames.SECTION_OUTPUT,
-            SnakemakeNames.SECTION_RESOURCES,
-            SnakemakeNames.SECTION_THREADS
-    )
+    companion object {
+        const val WILDCARDS_LAMBDA_PARAMETER = "wildcards"
+        val ALLOWED_IN_PARAMS = listOf(
+                WILDCARDS_LAMBDA_PARAMETER,
+                SnakemakeNames.SECTION_INPUT,
+                SnakemakeNames.SECTION_OUTPUT,
+                SnakemakeNames.SECTION_RESOURCES,
+                SnakemakeNames.SECTION_THREADS
+        )
+    }
 
     override fun buildVisitor(
             holder: ProblemsHolder,
@@ -40,12 +42,12 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
                                         )
                                 )
                             }
-                            if (pyParameter.name != wildcardsLambdaParameterName) {
+                            if (pyParameter.name != WILDCARDS_LAMBDA_PARAMETER) {
                                 registerProblem(
                                         pyParameter,
                                         SnakemakeBundle.message(
                                                 "INSP.NAME.only.these.parameters.in.section",
-                                                wildcardsLambdaParameterName,
+                                                WILDCARDS_LAMBDA_PARAMETER,
                                                 SnakemakeNames.SECTION_INPUT
                                         )
                                 )
@@ -63,28 +65,28 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
 
                     allLambdas.forEach { lambda ->
                         lambda.parameterList.parameters.forEachIndexed { index, pyParameter ->
-                            if (index == 0 && pyParameter.name != wildcardsLambdaParameterName) {
+                            if (index == 0 && pyParameter.name != WILDCARDS_LAMBDA_PARAMETER) {
                                 registerProblem(
                                         pyParameter,
                                         SnakemakeBundle.message("INSP.NAME.wildcards.first.argument")
                                 )
                             }
-                            if (index >= allowedInParams.size) {
+                            if (index >= ALLOWED_IN_PARAMS.size) {
                                 registerProblem(
                                         pyParameter,
                                         SnakemakeBundle.message(
                                                 "INSP.NAME.only.n.parameters.in.section",
-                                                allowedInParams.size,
+                                                ALLOWED_IN_PARAMS.size,
                                                 SnakemakeNames.SECTION_PARAMS
                                         )
                                 )
                             }
-                            if (pyParameter.name !in allowedInParams) {
+                            if (pyParameter.name !in ALLOWED_IN_PARAMS) {
                                 registerProblem(
                                         pyParameter,
                                         SnakemakeBundle.message(
                                                 "INSP.NAME.only.these.parameters.in.section",
-                                                allowedInParams.joinToString("/"),
+                                                ALLOWED_IN_PARAMS.joinToString("/"),
                                                 SnakemakeNames.SECTION_PARAMS
                                         )
                                 )
