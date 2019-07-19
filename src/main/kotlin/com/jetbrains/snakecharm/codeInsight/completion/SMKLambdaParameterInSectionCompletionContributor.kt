@@ -7,12 +7,11 @@ import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.PyTokenTypes
-import com.jetbrains.python.codeInsight.completion.PythonLookupElement
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.python.psi.PyParameterList
 import com.jetbrains.snakecharm.inspections.SmkLambdaRuleParamsInspection
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SmkSection
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SMKLambdaParameterInSectionCompletionContributor : CompletionContributor() {
     init {
@@ -29,11 +28,11 @@ object SMKLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
             .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
             .inside(PyParameterList::class.java)
             .inside(PyLambdaExpression::class.java)
-            .inside(SmkSection::class.java)!!
+            .inside(SmkRuleOrCheckpointArgsSection::class.java)!!
 
     override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
         val element = parameters.position
-        val section = element.parentOfType(SmkSection::class) ?: return
+        val section = element.parentOfType(SmkRuleOrCheckpointArgsSection::class) ?: return
         when (section.name) {
             SnakemakeNames.SECTION_INPUT -> {
                 result.addElement(
@@ -44,17 +43,22 @@ object SMKLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
                 )
             }
             SnakemakeNames.SECTION_PARAMS -> {
-                result.addElement(
-                        PrioritizedLookupElement.withPriority(
-                                LookupElementBuilder
-                                        .create(SmkLambdaRuleParamsInspection.WILDCARDS_LAMBDA_PARAMETER)
-                                , 0.1 // TODO what should be the actual value here?
+                val lambdaExpression = element.parentOfType<PyLambdaExpression>()!!
+                val presentParameters = lambdaExpression.parameterList.parameters.map { it.name }
+                if (SmkLambdaRuleParamsInspection.WILDCARDS_LAMBDA_PARAMETER !in presentParameters) {
+                    result.addElement(
+                            PrioritizedLookupElement.withPriority(
+                                    LookupElementBuilder
+                                            .create(SmkLambdaRuleParamsInspection.WILDCARDS_LAMBDA_PARAMETER)
+                                    , 0.1 // TODO what should be the actual value here? just need this to be prioritized over all other variants
 
-                        )
-                )
+                            )
+                    )
+                }
                 result.addAllElements(
                         SmkLambdaRuleParamsInspection.ALLOWED_IN_PARAMS
                                 .filterNot { it == SmkLambdaRuleParamsInspection.WILDCARDS_LAMBDA_PARAMETER }
+                                .filterNot { it in presentParameters }
                                 .map { LookupElementBuilder.create(it) }
                 )
             }
