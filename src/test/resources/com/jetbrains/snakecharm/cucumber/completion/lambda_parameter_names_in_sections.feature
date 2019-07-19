@@ -5,9 +5,11 @@ Feature: Completion for lambda parameter names in specific sections
     Given I open a file "foo.smk" with text
     """
     rule rule1:
-      params: lambda
+      input: lambda w
     """
-    When I put the caret after lambda
-    And I invoke autocompletion popup
-    Then completion list should contain:
-      | wildcards       |
+    When I put the caret after lambda w
+    Then I invoke autocompletion popup, select "wildcards" lookup item and see a text:
+    """
+    rule rule1:
+      input: lambda wildcards: 
+    """
