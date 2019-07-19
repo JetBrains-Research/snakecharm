@@ -13,3 +13,19 @@ Feature: Completion for lambda parameter names in specific sections
     rule rule1:
       input: lambda wildcards: 
     """
+
+  Scenario: Completion in params section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule rule1:
+      params: lambda # purely for this test because I can't insert space into a step definition
+    """
+    When I put the caret at #
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | wildcards |
+      | input     |
+      | output    |
+      | threads   |
+      | resources |
