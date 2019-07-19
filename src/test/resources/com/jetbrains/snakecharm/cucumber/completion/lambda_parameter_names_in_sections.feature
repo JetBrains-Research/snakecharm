@@ -5,7 +5,7 @@ Feature: Completion for lambda parameter names in specific sections
     Given I open a file "foo.smk" with text
     """
     rule rule1:
-      params: lambda 
+      params: lambda
     """
     When I put the caret after lambda
     And I invoke autocompletion popup
