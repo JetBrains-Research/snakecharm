@@ -12,7 +12,9 @@ import com.intellij.psi.PsiReferenceBase
 import com.jetbrains.python.psi.PyStringLiteralExpression
 
 open class SmkFileReference(
-        element: SMKWorkflowParameterListStatement, textRange: TextRange, val path: String
+        element: SMKWorkflowParameterListStatement,
+        textRange: TextRange,
+        val path: String
 ) : PsiReferenceBase<SMKWorkflowParameterListStatement>(element, textRange) {
     protected fun collectFilesLike(predicate: (file: PsiFile) -> Boolean): Array<Any> {
         val parentDir = (element.parent as? PsiFile)?.originalFile?.virtualFile?.parent
@@ -51,7 +53,9 @@ open class SmkFileReference(
 }
 
 class SmkIncludeReference(
-        element: SMKWorkflowParameterListStatement, textRange: TextRange, path: String
+        element: SMKWorkflowParameterListStatement,
+        textRange: TextRange,
+        path: String
 ) : SmkFileReference(element, textRange, path) {
     override fun getVariants() = collectFilesLike {
         it is SnakemakeFile && it.name != element.containingFile.name
@@ -59,7 +63,9 @@ class SmkIncludeReference(
 }
 
 class SmkConfigfileReference(
-        element: SMKWorkflowParameterListStatement, textRange: TextRange, path: String
+        element: SMKWorkflowParameterListStatement,
+        textRange: TextRange,
+        path: String
 ) : SmkFileReference(element, textRange, path) {
     override fun getVariants() = collectFilesLike {
         it.name.endsWith(".yaml") || it.name.endsWith(".yml")
@@ -67,7 +73,9 @@ class SmkConfigfileReference(
 }
 
 class SmkReportReference(
-        element: SMKWorkflowParameterListStatement, textRange: TextRange, path: String
+        element: SMKWorkflowParameterListStatement,
+        textRange: TextRange,
+        path: String
 ) : SmkFileReference(element, textRange, path) {
     override fun getVariants() = collectFilesLike {
         it.name.endsWith(".html")

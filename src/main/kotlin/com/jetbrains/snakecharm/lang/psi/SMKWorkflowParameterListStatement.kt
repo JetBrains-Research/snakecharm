@@ -17,8 +17,11 @@ import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
  */
 class SMKWorkflowParameterListStatement(node: ASTNode) : PyElementImpl(node), PyStatement { // PyNamedElementContainer
     companion object {
-        val WORKFLOWS_WITH_FILE_REFERENCES = setOf(SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD,
-                SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD, SnakemakeNames.WORKFLOW_REPORT_KEYWORD)
+        val WORKFLOWS_WITH_FILE_REFERENCES = setOf(
+                SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD,
+                SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD,
+                SnakemakeNames.WORKFLOW_REPORT_KEYWORD
+        )
     }
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
