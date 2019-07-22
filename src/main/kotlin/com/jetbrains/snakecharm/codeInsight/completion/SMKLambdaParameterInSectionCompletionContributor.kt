@@ -50,17 +50,23 @@ object SMKLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
                             PrioritizedLookupElement.withPriority(
                                     LookupElementBuilder
                                             .create(SmkLambdaRuleParamsInspection.WILDCARDS_LAMBDA_PARAMETER)
-                                    , 0.1 // TODO what should be the actual value here? just need this to be prioritized over all other variants
+                                    , Double.MAX_VALUE // as this should always be the 1st completion list element
 
                             )
                     )
                 }
-                result.addAllElements(
-                        SmkLambdaRuleParamsInspection.ALLOWED_IN_PARAMS
-                                .filterNot { it == SmkLambdaRuleParamsInspection.WILDCARDS_LAMBDA_PARAMETER }
-                                .filterNot { it in presentParameters }
-                                .map { LookupElementBuilder.create(it) }
-                )
+
+                val variants = SmkLambdaRuleParamsInspection.ALLOWED_IN_PARAMS
+                        .filterNot { it == SmkLambdaRuleParamsInspection.WILDCARDS_LAMBDA_PARAMETER }
+                        .filterNot { it in presentParameters }
+                if (variants.size == 1) {
+                    result.addElement(TailTypeDecorator.withTail(
+                            LookupElementBuilder.create(variants.first()),
+                            ColonAndWhiteSpaceTail
+                    ))
+                } else {
+                    result.addAllElements(variants.map { LookupElementBuilder.create(it) })
+                }
             }
         }
     }
