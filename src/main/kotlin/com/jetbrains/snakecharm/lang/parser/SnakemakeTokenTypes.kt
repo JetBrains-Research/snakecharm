@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.parser
 
 import com.intellij.psi.tree.TokenSet
+import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyElementType
 
 /**
@@ -57,4 +58,25 @@ object SnakemakeTokenTypes {
             WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE,
             RULE_LIKE
     )
+
+    /**
+     * Parser converts all [WORKFLOW_TOPLEVEL_DECORATORS] tokens to identifiers if token doesn't
+     * start expression mentioned here.
+     *
+     * P.S: This behaviour differs from snakemake runtime and not all valid smk code will be parsed
+     * by our parser, but difference seems only in some `synthetic` cases which likely don't not happen
+     * in real life examples.
+     *
+     * Alternative is to do lookup and look for ':' after most of keywords + some workaround for rule/checkpoint/
+     * subworkflow/etc. Or look how it is made in snakemake
+     */
+    val PY_EXPRESSIONS_ALLOWING_SNAKEMAKE_KEYWORDS = TokenSet.create(
+            // in if .. elif .. else ..
+            PyTokenTypes.IF_KEYWORD, PyTokenTypes.ELIF_KEYWORD, PyTokenTypes.ELSE_KEYWORD,
+            // in try .. except ..
+            PyTokenTypes.TRY_KEYWORD, PyTokenTypes.EXCEPT_KEYWORD,
+            // in method body
+            PyTokenTypes.DEF_KEYWORD
+    )
+
 }

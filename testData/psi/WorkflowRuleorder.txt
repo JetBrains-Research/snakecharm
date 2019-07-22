@@ -1,0 +1,128 @@
+SnakemakeFile: WorkflowRuleorder.smk
+  SmkWorkflowRuleorderSection
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('rule1')
+  PsiWhiteSpace('\n\n')
+  SmkWorkflowRuleorderSection
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('rule1')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('rule2')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('rule3')
+  PsiWhiteSpace('\n\n')
+  SmkWorkflowRuleorderSection
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n  ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('rule1')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('rule2')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('doo')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace('\n  ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('roo')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('ho')
+  PsiWhiteSpace('\n\n')
+  SmkWorkflowRuleorderSection
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('rule1')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('rule2')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('doo')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace('\n  ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('roo')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('ho')
+  PsiWhiteSpace('\n\n')
+  SmkWorkflowRuleorderSection
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('rule1')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('rule2')
+      PsiWhiteSpace('\n        ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('rule3')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('rule4')
+  PsiWhiteSpace('\n\n')
+  PyFunction('foo')
+    PsiElement(Py:DEF_KEYWORD)('def')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PyParameterList
+      PsiElement(Py:LPAR)('(')
+      PsiElement(Py:RPAR)(')')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n  ')
+    PyStatementList
+      SmkWorkflowRuleorderSection
+        PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          SmkReferenceExpression
+            PsiElement(Py:IDENTIFIER)('tex2pdf_with_bib')
+          PsiWhiteSpace(' ')
+          PsiElement(Py:GT)('>')
+          PsiWhiteSpace(' ')
+          SmkReferenceExpression
+            PsiElement(Py:IDENTIFIER)('tex2pdf_without_bib')

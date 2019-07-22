@@ -1,12 +1,15 @@
 package com.jetbrains.snakecharm.lang.parser
 
-import com.jetbrains.python.PyBundle
+import com.intellij.lang.PsiBuilder
+import com.intellij.lang.impl.PsiBuilderImpl
+import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.ExpressionParsing
 import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.psi.PyElementType
+import com.jetbrains.snakecharm.SnakemakeBundle
 
 /**
  * @author Roman.Chernyatchik
@@ -15,21 +18,57 @@ import com.jetbrains.python.psi.PyElementType
 class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionParsing(context) {
     override fun getParsingContext() = myContext as SnakemakeParserContext
 
-    fun parseRuleParamArgumentList(): Boolean {
+    fun parseRuleLikeSectionArgumentList() = parseArgumentList(
+            ",", PyTokenTypes.COMMA,
+            message("PARSE.expected.expression"),
+            this::parseRuleParamArgument
+    )
+
+    fun parseArgumentList(
+            separatorTokenText: String,
+            separatorTokenType: PyElementType,
+            errorMessage: String,
+            parsingFunction: () -> Boolean
+    ): Boolean {
         val context = myContext
         val scope = context.scope as SnakemakeParsingScope
         myContext.pushScope(scope.withParamsArgsList())
-        val result = doParseRuleParamArgumentList()
+        val result = doParseRuleParamArgumentList(separatorTokenText, separatorTokenType) {
+            parseArgumentAndReportErrors(errorMessage, separatorTokenType, parsingFunction)
+        }
         context.popScope()
         return result
     }
 
-    private fun doParseRuleParamArgumentList(): Boolean {
+    /**
+     * XXX -------------------------------------------------------------------
+     * XXX IMPORTANT! PLEASE READ BEFORE MODIFYING PARSER CODE OR DEBUGGING!
+     * XXX -------------------------------------------------------------------
+     *
+     * Due to [SnakemakeStatementParsing] utilizing filter method when the parser has entered a rule section,
+     * behaviour in debug and at runtime could differ.
+     * Be careful when using any method which calls [PsiBuilder.getTokenType]
+     * (such as [Parsing.atToken], [Parsing.matchToken], etc.),
+     * as [PsiBuilder.getTokenType] skips whitespace tokens and applies filter,
+     * substituting tokenTypes in myBuilder.myLexTypes.
+     * Meanwhile [Parsing.nextToken] only advances lexer by one lexeme and does not look at the current token.
+     * [PsiBuilder.getTokenType] might be called during debug and apply filter, while it would not be called at runtime,
+     * thus the different behaviour.
+     *
+     * If you need to check the current token type, best to avoid debugging in IDE and to use debug print.
+     * One can get the current token type without filter via a call to [PsiBuilder.rawLookup] with steps = 0.
+     * However, it's best to keep [PsiBuilder.rawLookup] calls to a minimum.
+     */
+    private fun doParseRuleParamArgumentList(
+            separatorTokenText: String,
+            separatorTokenType: PyElementType,
+            parseArgumentFunction: () -> Unit
+    ): Boolean {
         // let's make ':' part of arg list, similar as '(', ')' are parts of arg list
         // helps with formatting, e.g. enter handler
         val hasColon = myBuilder.tokenType == PyTokenTypes.COLON
         if (!hasColon) {
-            myBuilder.error(PyBundle.message("PARSE.expected.colon"))
+            myBuilder.error(message("PARSE.expected.colon"))
         }
         val argList = myBuilder.mark()
         if (hasColon) {
@@ -39,21 +78,69 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         val argsOnNextLine = myBuilder.tokenType === PyTokenTypes.STATEMENT_BREAK
         if (argsOnNextLine) {
             nextToken()
-            if (!checkMatches(PyTokenTypes.INDENT, "Indent expected...")) { // bundle
+            if (!checkMatches(PyTokenTypes.INDENT, SnakemakeBundle.message("PARSE.expected.indent"))) {
                 argList.done(PyElementTypes.ARGUMENT_LIST)
                 return false
             }
         }
         var indents = if (argsOnNextLine) 1 else 0
         var argNumber = 0
-        while (!myBuilder.eof() && !atToken(PyTokenTypes.STATEMENT_BREAK)) {
+        var incorrectUnindentMarker: PsiBuilder.Marker? = null
+        while (!myBuilder.eof()) {
+            if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
+                nextToken()
+                /* It's important to use rawLookup() inside atAnyOfTokensSage() here
+                   to avoid accidentally applying a filter to the current token. */
+                if (indents == 0 &&
+                        !atAnyOfTokensSafe(
+                                separatorTokenType,
+                                PyTokenTypes.INDENT,
+                                PyTokenTypes.INCONSISTENT_DEDENT,
+                                PyTokenTypes.DEDENT
+                        )
+                ) {
+                    break
+                }
+
+                /*
+                 * If an indent/dedent/inconsistent dedent/separator token was found,
+                 * it's ok to match it, no filters will be applied
+                 */
+                if (indents > 0 && atToken(separatorTokenType)) {
+                    continue
+                }
+
+                if (matchToken(PyTokenTypes.INDENT)) {
+                    indents++
+                } else {
+                    // IMPORTANT: note that myBuilder.eof() could apply filter to lexemes
+                    // which is why it must be evaluated second
+                    while (indents > 0 && !myBuilder.eof()) {
+                        // IMPORTANT: keep this check inside the loop body
+                        /* atToken() uses getTokenType() which might apply a filter to the current token
+                           whether or not this token is actually DEDENT,
+                           which is why it's best not to invoke this method unless necessary. */
+                        if (atToken(PyTokenTypes.DEDENT)) {
+                            nextToken()
+                            indents--
+                        } else {
+                            break
+                        }
+                    }
+                    // leave this section
+                    if (indents == 0 || myBuilder.eof()) {
+                        break
+                    }
+                }
+            }
+
             argNumber++
 
-            // comma if several args:
+            // separator if several args:
             if (argNumber > 1) {
-                if (matchToken(PyTokenTypes.COMMA)) {
-                    val commaMarker = myBuilder.mark()
-                    val commMarkerIndents = indents
+                if (matchToken(separatorTokenType)) {
+                    val separatorMarker = myBuilder.mark()
+                    val separatorMarkerIndents = indents
 
                     // skip indents/dedents:
                     if (matchToken(PyTokenTypes.STATEMENT_BREAK)) {
@@ -63,9 +150,18 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         } else {
                             // skip dedents while matched, we could have several dedent tokens in a raw
                             // skip dedent while inside current block (indents > 1)
-                            while (!myBuilder.eof() && atToken(PyTokenTypes.DEDENT) && indents > 1) {
-                                indents--
-                                nextToken()
+
+                            while (indents > 1 && !myBuilder.eof()) {
+                                if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
+                                    incorrectUnindentMarker = myBuilder.mark()
+                                    nextToken()
+                                }
+                                if (atToken(PyTokenTypes.DEDENT)) {
+                                    indents--
+                                    nextToken()
+                                } else {
+                                    break
+                                }
                             }
                         }
 
@@ -75,102 +171,131 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                             // game over, let's go to next section
 
                             // rollback because after loop we expected to be at statement break
-                            indents = commMarkerIndents
-                            commaMarker.rollbackTo()
+                            indents = separatorMarkerIndents
+                            separatorMarker.rollbackTo()
                             break
                         }
                     }
 
                     if (myBuilder.tokenType === PyTokenTypes.DEDENT) {
-                        indents = commMarkerIndents
-                        commaMarker.rollbackTo()
+                        indents = separatorMarkerIndents
+                        separatorMarker.rollbackTo()
                         break
                     } else {
-                        commaMarker.drop()
+                        separatorMarker.drop()
                     }
 
                     if (myBuilder.eof()) {
                         break
                     }
                 } else {
-                    myBuilder.error(message("PARSE.expected.comma.or.rpar"))
-                    break
-                }
-
-            }
-
-            // *args or **kw
-            if (myBuilder.tokenType === PyTokenTypes.MULT || myBuilder.tokenType === PyTokenTypes.EXP) {
-                val starArgMarker = myBuilder.mark()
-                myBuilder.advanceLexer()
-                if (!parseSingleExpression(false)) {
-                    myBuilder.error(message("PARSE.expected.expression"))
-                }
-                starArgMarker.done(PyElementTypes.STAR_ARGUMENT_EXPRESSION)
-            } else {
-                // arg or named arg:
-                if (Parsing.isIdentifier(myBuilder)) {
-                    val keywordArgMarker = myBuilder.mark()
-                    Parsing.advanceIdentifierLike(myBuilder)
-                    if (myBuilder.tokenType === PyTokenTypes.EQ) {
-                        myBuilder.advanceLexer()
-                        if (!parseSingleExpression(false)) {
-                            myBuilder.error(message("PARSE.expected.expression"))
-                        }
-                        keywordArgMarker.done(PyElementTypes.KEYWORD_ARGUMENT_EXPRESSION)
-                        continue
-                    }
-                    keywordArgMarker.rollbackTo()
-                }
-                if (!parseSingleExpression(false)) {
-                    myBuilder.error(message("PARSE.expected.expression"))
-                    break
+                    recoverUntilMatches(
+                            SnakemakeBundle.message("PARSE.expected.separator.message", separatorTokenText),
+                            separatorTokenType,
+                            PyTokenTypes.STATEMENT_BREAK
+                    )
                 }
             }
+
+            parseArgumentFunction()
+            // mark everything that was incorrectly unindented
+            incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
+            incorrectUnindentMarker = null
         }
-        nextToken()
 
-        // Eat all matching dedents
-        while (indents > 0 && !myBuilder.eof()) {
-            if (checkMatches(PyTokenTypes.DEDENT, "Dedent expected")) { // bundle
-                indents--
-            } else {
-                break
+        // safe check is important here, be wary of that while modifying/debugging
+        if (checkCurrentTokenSafe(PyTokenTypes.STATEMENT_BREAK)) {
+            nextToken()
+            while (indents > 0 && !myBuilder.eof()) {
+                if (checkMatches(PyTokenTypes.DEDENT, SnakemakeBundle.message("PARSE.expected.dedent"))) {
+                    indents--
+                } else {
+                    break
+                }
             }
         }
         argList.done(PyElementTypes.ARGUMENT_LIST)
-
         return true
     }
 
-    fun parseRulesList(
+    private fun parseArgumentAndReportErrors(
+            errorMessage: String,
             separatorToken: PyElementType,
-            separatorMissingMsg: String,
-            ruleMissingMsg: String
-    ): Boolean {
-        val argList = myBuilder.mark()
+            parseArgumentFunction: () -> Boolean
+    ) {
+        if (!parseArgumentFunction()) {
+            recoverUntilMatches(errorMessage, separatorToken, PyTokenTypes.STATEMENT_BREAK)
+        }
+    }
 
-        var result = true
-        var argsNumber = 0
-        while (!myBuilder.eof() && !atToken(PyTokenTypes.STATEMENT_BREAK)) {
-            argsNumber++
-            if (argsNumber > 1) {
-                if (!checkMatches(separatorToken, separatorMissingMsg)) { // bundle
-                    result = false
-                    nextToken()
-                }
-                if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
-                    break
-                }
+    private fun parseRuleParamArgument(): Boolean {
+        // *args or **kw
+        if (myBuilder.tokenType === PyTokenTypes.MULT || myBuilder.tokenType === PyTokenTypes.EXP) {
+            val starArgMarker = myBuilder.mark()
+            myBuilder.advanceLexer()
+            if (!parseSingleExpression(false)) {
+                myBuilder.error(message("PARSE.expected.expression"))
             }
-            if (!checkMatches(PyTokenTypes.IDENTIFIER, ruleMissingMsg)) {
-                result = false
-                nextToken()
+            starArgMarker.done(PyElementTypes.STAR_ARGUMENT_EXPRESSION)
+        } else {
+            // arg or named arg:
+            if (Parsing.isIdentifier(myBuilder)) {
+                val keywordArgMarker = myBuilder.mark()
+                Parsing.advanceIdentifierLike(myBuilder)
+                if (myBuilder.tokenType === PyTokenTypes.EQ) {
+                    myBuilder.advanceLexer()
+                    if (!parseSingleExpression(false)) {
+                        myBuilder.error(message("PARSE.expected.expression"))
+                    }
+                    keywordArgMarker.done(PyElementTypes.KEYWORD_ARGUMENT_EXPRESSION)
+                    return true
+                }
+                keywordArgMarker.rollbackTo()
+            }
+            if (!parseSingleExpression(false)) {
+                myBuilder.error(message("PARSE.expected.expression"))
+                return false
             }
         }
-
-        argList.done(PyElementTypes.ARGUMENT_LIST)
-
-        return result
+        return true
     }
+
+
+    /**
+     * Skips tokens until token from expected set and marks it with error
+     */
+    private fun recoverUntilMatches(errorMessage: String, vararg types: IElementType) {
+        val errorMarker = myBuilder.mark()
+        var hasNonWhitespaceTokens = false
+        while (!(atAnyOfTokens(*types) || myBuilder.eof())) {
+            // Regular whitespace tokens are already skipped by atToken()
+            if (!atToken(PyTokenTypes.STATEMENT_BREAK)) {
+                hasNonWhitespaceTokens = true
+            }
+            myBuilder.advanceLexer()
+        }
+        if (hasNonWhitespaceTokens) {
+            errorMarker.error(errorMessage)
+        } else {
+            errorMarker.drop()
+        }
+    }
+
+    /**
+     * Skips whitespace tokens and checks the first non-whitespace token type against [tokenTypes]
+     * without applying filters.
+     */
+    private fun atAnyOfTokensSafe(vararg tokenTypes: IElementType): Boolean {
+        var steps = 0
+        while (myBuilder.rawLookup(steps) != null &&
+                (myBuilder as PsiBuilderImpl).whitespaceOrComment(myBuilder.rawLookup(steps))) {
+            steps++
+        }
+        return tokenTypes.contains(myBuilder.rawLookup(steps))
+    }
+
+    /**
+     * Compares the current token against [tokenType] without applying filters.
+     */
+    private fun checkCurrentTokenSafe(tokenType: IElementType) = myBuilder.rawLookup(0) == tokenType
 }

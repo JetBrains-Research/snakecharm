@@ -3,16 +3,21 @@ package com.jetbrains.snakecharm.lang.parser
 import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyBundle
-import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
+import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.python.psi.PyElementType
+import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.PY_EXPRESSIONS_ALLOWING_SNAKEMAKE_KEYWORDS
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.RULE_OR_CHECKPOINT
-import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
-import com.jetbrains.snakecharm.lang.psi.SMKRuleRunParameter
-import com.jetbrains.snakecharm.lang.psi.SMKSubworkflowParameterListStatement
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SnakemakeElementTypes
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.RULE_DECLARATION_STATEMENT
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.SUBWORKFLOW_DECLARATION_STATEMENT
 
 
 /**
@@ -25,7 +30,7 @@ class SnakemakeStatementParsing(
 ) : StatementParsing(context, futureFlag) {
 
     private data class SectionParsingData(
-            val declaration: PyElementType,
+            val declaration: IElementType,
             val name: String,
             val parameterListStatement: PyElementType,
             val parameters: Set<String>,
@@ -33,26 +38,26 @@ class SnakemakeStatementParsing(
 
 
     private val ruleSectionParsingData = SectionParsingData(
-            declaration = SnakemakeElementTypes.RULE_DECLARATION,
+            declaration = RULE_DECLARATION_STATEMENT,
             name = "rule",
-            parameterListStatement = SnakemakeElementTypes.RULE_PARAMETER_LIST_STATEMENT,
-            parameters = SMKRuleParameterListStatement.PARAMS_NAMES,
+            parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
+            parameters = SmkRuleOrCheckpointArgsSection.PARAMS_NAMES,
             sectionKeyword= SnakemakeTokenTypes.RULE_KEYWORD
     )
 
     private val checkpointSectionParsingData = SectionParsingData(
-            declaration = SnakemakeElementTypes.CHECKPOINT_DECLARATION,
+            declaration = CHECKPOINT_DECLARATION_STATEMENT,
             name = "checkpoint",
-            parameterListStatement = SnakemakeElementTypes.RULE_PARAMETER_LIST_STATEMENT,
-            parameters = SMKRuleParameterListStatement.PARAMS_NAMES,
+            parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
+            parameters = SmkRuleOrCheckpointArgsSection.PARAMS_NAMES,
             sectionKeyword= SnakemakeTokenTypes.CHECKPOINT_KEYWORD
     )
 
     private val subworkflowSectionParsingData = SectionParsingData(
-            declaration = SnakemakeElementTypes.SUBWORKFLOW_DECLARATION,
+            declaration = SUBWORKFLOW_DECLARATION_STATEMENT,
             name = "subworkflow",
-            parameterListStatement = SnakemakeElementTypes.SUBWORKFLOW_PARAMETER_LIST_STATEMENT,
-            parameters = SMKSubworkflowParameterListStatement.PARAMS_NAMES,
+            parameterListStatement = SmkElementTypes.SUBWORKFLOW_ARGS_SECTION_STATEMENT,
+            parameters = SmkSubworkflowArgsSection.PARAMS_NAMES,
             sectionKeyword= SnakemakeTokenTypes.SUBWORKFLOW_KEYWORD
     )
 
@@ -74,64 +79,67 @@ class SnakemakeStatementParsing(
         val context = parsingContext
         val scope = context.scope
 
-        // myBuilder.setDebugMode(true)
-
+        myBuilder.setDebugMode(false)
         val tt = myBuilder.tokenType
 
         if (tt !in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS || scope.inParamArgsList) {
+            val startPyOnlyScope = tt !in PY_EXPRESSIONS_ALLOWING_SNAKEMAKE_KEYWORDS
+            if (startPyOnlyScope) {
+                context.pushScope(scope.withNoSmkKeywordsAllowed())
+            }
             super.parseStatement()
-            // TODO: context?
+
+            if (startPyOnlyScope) {
+                context.popScope()
+            }
             return
         }
         when {
-            tt in SnakemakeTokenTypes.RULE_LIKE -> parseRuleDeclaration(getSectionParsingData(tt!!))
+            tt in SnakemakeTokenTypes.RULE_LIKE -> parseRuleLikeDeclaration(getSectionParsingData(tt!!))
             tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
-                parsingContext.expressionParser.parseRuleParamArgumentList()
-                workflowParam.done(SnakemakeElementTypes.WORKFLOW_PARAMETER_LIST_STATEMENT)
+                parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
+                workflowParam.done(SmkElementTypes.WORKFLOW_ARGS_SECTION_STATEMENT)
             }
             tt === SnakemakeTokenTypes.WORKFLOW_LOCALRULES_KEYWORD -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
-                checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))
 
-                val res = parsingContext.expressionParser.parseRulesList(
-                        PyTokenTypes.COMMA,
-                        "',' expected",
-                        "Expected a rule name identifier." // bundle
+                val res = parsingContext.expressionParser.parseArgumentList(
+                        ",", PyTokenTypes.COMMA,
+                        SnakemakeBundle.message("PARSE.expected.identifier"),
+                        this::parseIdentifier
                 )
+
                 if (!res) {
-                    myBuilder.error("Expected a comma separated list of rules that shall not be" +
-                            " executed by the cluster command.") // bundle
+                    myBuilder.error(SnakemakeBundle.message("PARSE.expected.localrules"))
                 }
 
-                nextToken()
-                workflowParam.done(SnakemakeElementTypes.WORKFLOW_LOCALRULES_STATEMENT)
+                workflowParam.done(SmkElementTypes.WORKFLOW_LOCALRULES_SECTION_STATEMENT)
             }
             tt === SnakemakeTokenTypes.WORKFLOW_RULEORDER_KEYWORD  -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
-                checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))
 
-                val res = parsingContext.expressionParser.parseRulesList(
-                        PyTokenTypes.GT,
-                        "'>' expected",
-                        "Expected a rule name identifier" // bundle
+                val res = parsingContext.expressionParser.parseArgumentList(
+                        ">", PyTokenTypes.GT,
+                        SnakemakeBundle.message("PARSE.expected.identifier"),
+                        this::parseIdentifier
                 )
+
                 if (!res) {
-                    myBuilder.error("Expected a descending order of rule names, e.g. rule1 > rule2 > rule3 ...") // bundle
+                    myBuilder.error(SnakemakeBundle.message("PARSE.expected.ruleorder"))
                 }
 
-                nextToken()
-                workflowParam.done(SnakemakeElementTypes.WORKFLOW_RULESREORDER_STATEMENT)
+                workflowParam.done(SmkElementTypes.WORKFLOW_RULEORDER_SECTION_STATEMENT)
             }
             tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS -> {
                 val decoratorMarker = myBuilder.mark()
                 nextToken()
-                checkMatches(PyTokenTypes.COLON, message("PARSE.expected.colon"))
+                checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
                 parseSuite()
-                decoratorMarker.done(SnakemakeElementTypes.WORKFLOW_PYTHON_BLOCK_PARAMETER)
+                decoratorMarker.done(SmkElementTypes.WORKFLOW_PY_BLOCK_SECTION_STATEMENT)
             }
             else -> {
                 myBuilder.error("Unexpected token type: $tt with text: '${myBuilder.tokenText}'") // bundle
@@ -144,11 +152,11 @@ class SnakemakeStatementParsing(
         }
     }
 
-    private fun parseRuleDeclaration(section: SectionParsingData) {
+    private fun parseRuleLikeDeclaration(section: SectionParsingData) {
         val context = parsingContext
         val scope = context.scope
 
-        val ruleMarker: PsiBuilder.Marker = myBuilder.mark()
+        val ruleLikeMarker: PsiBuilder.Marker = myBuilder.mark()
         nextToken()
 
         // rule name
@@ -172,33 +180,34 @@ class SnakemakeStatementParsing(
 
         // in rule scopes helps to parse toplevel keywords as identifiers
         // see #com.jetbrains.snakecharm.lang.parser.SnakemakeStatementParsing.filter
-        var inRuleScope: SnakemakeParsingScope? = scope.withRule()
+        var inRuleLikeScope: SnakemakeParsingScope? = scope.withRuleLike()
 
         val multiline = atToken(PyTokenTypes.STATEMENT_BREAK)
         if (!multiline) {
-            context.pushScope(inRuleScope!!)
+            context.pushScope(inRuleLikeScope!!)
             parseRuleParameter(section)
         } else {
             nextToken()
             incompleteRule = !checkMatches(PyTokenTypes.INDENT, "Indent expected...")
             if (incompleteRule) {
-                inRuleScope = null
+                inRuleLikeScope = null
             } else {
-                context.pushScope(inRuleScope!!)
+                context.pushScope(inRuleLikeScope!!)
                 while (!atToken(PyTokenTypes.DEDENT)) {
                     if (!parseRuleParameter(section)) {
                         break
                     }
                 }
+
             }
         }
 
-        if (inRuleScope != null) {
+        if (inRuleLikeScope != null) {
             context.popScope()
         }
 
         ruleStatements.done(PyElementTypes.STATEMENT_LIST)
-        ruleMarker.done(section.declaration)
+        ruleLikeMarker.done(section.declaration)
 
         if (incompleteRule && atAnyOfTokens(*SnakemakeTokenTypes.RULE_LIKE.types)) {
             // inside rule scope, we remap some snakemake keywords to identifiers
@@ -245,13 +254,13 @@ class SnakemakeStatementParsing(
             keyword in section.parameters -> {
                 // TODO: probably do this parsing behaviour by default and show inspection error
                 // for keyword not in `section.parameters` instead of parsing errors..
-                result = parsingContext.expressionParser.parseRuleParamArgumentList()
+                result = parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
                 ruleParam.done(section.parameterListStatement)
             }
-            section.sectionKeyword in RULE_OR_CHECKPOINT && keyword == SMKRuleRunParameter.PARAM_NAME -> {
+            section.sectionKeyword in RULE_OR_CHECKPOINT && keyword == SnakemakeNames.SECTION_RUN -> {
                 checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
                 statementParser.parseSuite()
-                ruleParam.done(SnakemakeElementTypes.RULE_RUN_STATEMENT)
+                ruleParam.done(SmkElementTypes.RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT)
             }
             else -> {
                 // error
@@ -275,36 +284,28 @@ class SnakemakeStatementParsing(
         if (source in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
             val scope = myContext.scope as SnakemakeParsingScope
             return when {
-                //XXX: breaks rule keyword!!!!
-                scope.inRuleSectionsList -> PyTokenTypes.IDENTIFIER
+                scope.inRuleLikeSectionsList || scope.inNoSmkKeywordsAllowed -> PyTokenTypes.IDENTIFIER
                 else -> source
             }
         }
         return super.filter(source, start, end, text, checkLanguageLevel)
     }
+
     // TODO: cleanup
 //    override fun getFunctionParser(): FunctionParsing {
 //        return super.getFunctionParser()
 //    }
 
-    /**
-     * Skips tokens until token from expected set and marks it with error
-     */
-    private fun recoverUntilMatches(errorMessage: String, vararg types: IElementType) {
-        val errorMarker = myBuilder.mark()
-        var hasNonWhitespaceTokens = false
-        while (!(atAnyOfTokens(*types) || myBuilder.eof())) {
-            // Regular whitespace tokens are already skipped by advancedLexer()
-            if (!atToken(PyTokenTypes.STATEMENT_BREAK)) {
-                hasNonWhitespaceTokens = true
-            }
-            myBuilder.advanceLexer()
+
+    private fun parseIdentifier(): Boolean {
+        val referenceMarker = myBuilder.mark()
+        if (Parsing.isIdentifier(myBuilder)) {
+            Parsing.advanceIdentifierLike(myBuilder)
+            referenceMarker.done(SmkElementTypes.REFERENCE_EXPRESSION)
+            return true
         }
-        if (hasNonWhitespaceTokens) {
-            errorMarker.error(errorMessage)
-        } else {
-            errorMarker.drop()
-        }
+        referenceMarker.drop()
+        return false
     }
 }
 

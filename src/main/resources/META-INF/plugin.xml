@@ -25,7 +25,7 @@
   <depends optional="true">com.intellij.modules.python</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <fileTypeFactory implementation="com.jetbrains.snakecharm.SnakemakeFileTypeFactory"/>
+    <fileTypeFactory implementation="com.jetbrains.snakecharm.SmkFileTypeFactory"/>
     <lang.parserDefinition
             language="Snakemake"
             implementationClass="com.jetbrains.snakecharm.lang.parser.SnakemakeParserDefinition"
@@ -34,10 +34,16 @@
     <lang.syntaxHighlighterFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterFactory"/>
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkDumbAwareAnnotatorManager"/>
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkStandardAnnotatorManager"/>
-    <lang.foldingBuilder language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.SnakeMakeFoldingBuilder"/>
+    <lang.foldingBuilder language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.SmkMakeFoldingBuilder"/>
     <!--<enterBetweenBracesDelegate language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.editorActions.EnterInRuleParamsListDelegate"/>-->
-    <!--<codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>-->
+    <codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>
     <lang.documentationProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.documentation.SmkShadowSettingsDocumentation"/>
+    <lang.psiStructureViewFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.structureView.SmkStructureViewFactory"/>
+
+    <stubElementTypeHolder class="com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes"/>
+    <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex"/>
+    <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex"/>
+    <gotoSymbolContributor implementation="com.jetbrains.snakecharm.actions.SmkGotoSymbolContributor"/>
 
     <completion.contributor
         language="Python"
@@ -45,16 +51,11 @@
     />
     <completion.contributor
         language="Python"
-        implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKKeywordCompletionContributor"
+        implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkKeywordCompletionContributor"
     />
     <completion.contributor
             language="Python"
             implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKShadowSettingsCompletionContributor"
-    />
-
-    <moduleService
-        serviceInterface="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
-        serviceImplementation="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache"
     />
 
     <localInspection
@@ -146,6 +147,17 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkSubworkflowRedeclarationInspection"
     />
 
+    <localInspection
+            language="Snakemake" shortName="SmkRuleOrCheckpointNameYetUndefinedInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkRuleOrCheckpointNameYetUndefinedInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.rule.or.checkpoint.name.yet.undefined"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkRuleOrCheckpointNameYetUndefinedInspection"
+    />
+
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
 
     <findUsagesHandlerFactory
@@ -162,7 +174,7 @@
 
 
   <extensions defaultExtensionNs="Pythonid">
-    <dialectsTokenSetContributor implementation="com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor"/>
+    <dialectsTokenSetContributor implementation="com.jetbrains.snakecharm.lang.SmkTokenSetContributor"/>
     <pyReferenceResolveProvider
         implementation="com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider"
     />

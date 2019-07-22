@@ -5,7 +5,8 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.completion.ShadowSectionSettingsProvider
-import com.jetbrains.snakecharm.lang.psi.SMKRuleParameterListStatement
+import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkShadowSettingsInspection : SnakemakeInspection()  {
     override fun buildVisitor(
@@ -14,8 +15,8 @@ class SmkShadowSettingsInspection : SnakemakeInspection()  {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
-        override fun visitSMKRuleParameterListStatement(st: SMKRuleParameterListStatement) {
-            if (st.name != SMKRuleParameterListStatement.SHADOW) {
+        override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
+            if (st.name != SnakemakeNames.SECTION_SHADOW) {
                 return
             }
 

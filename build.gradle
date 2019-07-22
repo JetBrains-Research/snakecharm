@@ -19,7 +19,7 @@ apply plugin: 'kotlin'
 
 def hasPythonPlugin = project.hasProperty('pythonPlugin')
 
-version '0.4.2018.3'
+version "${project.version}.${project.buildCounter}.${project.sincePlatform}"
 
 intellij {
     pluginName 'snakecharm'
@@ -52,8 +52,8 @@ publishPlugin {
 patchPluginXml {
     // Use change notes on github
     //changeNotes """ """
-    sinceBuild "183.4284.36"
-    untilBuild "192.*"
+    sinceBuild "${project.sinceBuild}"
+    untilBuild "${project.untilBuild}"
 }
 
 sourceCompatibility = javaVersion
@@ -64,15 +64,8 @@ compileTestKotlin { kotlinOptions.jvmTarget = sourceCompatibility }
 repositories {
     mavenCentral()
 }
-
+                       
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
-    implementation "org.jetbrains.kotlin:kotlin-reflect"
-    implementation 'log4j:log4j:1.2.17'
-
-    testCompile 'junit:junit:4.12'
-    testCompile "org.jetbrains.kotlin:kotlin-test"
-
 //    testImplementation 'io.cucumber:cucumber-java:4.2.6'
 //    testImplementation 'io.cucumber:cucumber-junit:4.2.6'
     testImplementation 'info.cukes:cucumber-java:1.2.4'

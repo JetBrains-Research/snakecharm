@@ -1,26 +1,72 @@
 SnakemakeFile: WorkflowLocalrules.smk
-  SMKWorkflowLocalRulesStatement
+  SmkWorkflowLocalrulesSection
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
-    PsiElement(Py:COLON)(':')
-    PsiWhiteSpace(' ')
     PyArgumentList
-      PsiElement(Py:IDENTIFIER)('foo0')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('foo0')
   PsiWhiteSpace('\n\n')
-  SMKWorkflowLocalRulesStatement
+  SmkWorkflowLocalrulesSection
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
-    PsiElement(Py:COLON)(':')
-    PsiWhiteSpace(' ')
     PyArgumentList
-      PsiElement(Py:IDENTIFIER)('foo1')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('foo1')
       PsiElement(Py:COMMA)(',')
       PsiWhiteSpace(' ')
-      PsiElement(Py:IDENTIFIER)('foo2')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('foo2')
   PsiWhiteSpace('\n\n')
-  SMKWorkflowLocalRulesStatement
+  SmkWorkflowLocalrulesSection
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
-    PsiElement(Py:COLON)(':')
     PyArgumentList
-
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('rule1')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('boo')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('doo')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace('\n    ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('soo')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('goo')
+  PsiWhiteSpace('\n\n')
+  SmkWorkflowLocalrulesSection
+    PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('rule1')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('boo')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('doo')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace('\n    ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('soo')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression
+        PsiElement(Py:IDENTIFIER)('goo')
+  PsiWhiteSpace('\n\n')
   PyFunction('foo')
     PsiElement(Py:DEF_KEYWORD)('def')
     PsiWhiteSpace(' ')
@@ -31,12 +77,14 @@ SnakemakeFile: WorkflowLocalrules.smk
     PsiElement(Py:COLON)(':')
     PsiWhiteSpace('\n  ')
     PyStatementList
-      SMKWorkflowLocalRulesStatement
+      SmkWorkflowLocalrulesSection
         PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
-        PsiElement(Py:COLON)(':')
-        PsiWhiteSpace(' ')
         PyArgumentList
-          PsiElement(Py:IDENTIFIER)('boo1')
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          SmkReferenceExpression
+            PsiElement(Py:IDENTIFIER)('boo1')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace(' ')
-          PsiElement(Py:IDENTIFIER)('boo2')
+          SmkReferenceExpression
+            PsiElement(Py:IDENTIFIER)('boo2')

@@ -1,22 +1,27 @@
 package com.jetbrains.snakecharm.cucumber
 
 import com.intellij.codeInsight.documentation.DocumentationManager
+import com.intellij.ide.util.gotoByName.GotoSymbolModel2
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.findPsiElementUnderCaret
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.myGeneratedDocPopupText
+import cucumber.api.DataTable
 import cucumber.api.java.en.Given
 import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
-import junit.framework.Assert.*
 import java.io.File.separator
 import java.util.regex.Pattern
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
+import kotlin.test.fail
 
 
 class ActionsSteps {
@@ -33,7 +38,8 @@ class ActionsSteps {
 
     @Given("^I expect inspection (error|warning|info|TYPO|weak warning) with message \"(.*)\" on")
     fun iExpectInspectionWithMessageOn(level: String, message: String, signature: String) {
-        iExpectInspectionOnIn(level, signature, signature, message)
+        val fixedSignature = signature.replace("\r", "")
+        iExpectInspectionOnIn(level, fixedSignature, fixedSignature, message)
     }
 
     @Given("^I expect inspection (error|warning|info|TYPO|weak warning) on <([^>]+)> in <(.+)> with message$")
@@ -49,7 +55,11 @@ class ActionsSteps {
         val project = psiFile.project
         val document = PsiDocumentManager.getInstance(fixture.project).getDocument(fixture.file)!!
         val pos = document.text.indexOf(signature)
-        assertTrue(pos >= 0)
+        assertTrue(
+                pos >= 0,
+                "Signature <$signature> wasn't found in the file ${psiFile.name}."
+
+        )
 
         val posInSignature = signature.indexOf(text)
         assertTrue(posInSignature >= 0)
@@ -103,8 +113,8 @@ class ActionsSteps {
         val docPopupText = myGeneratedDocPopupText
         assertNotNull(docPopupText)
         assertTrue(
-                "Expected <$text> to be in <$docPopupText>",
-                text in docPopupText!!
+                text in docPopupText,
+                "Expected <$text> to be in <$docPopupText>"
         )
     }
 
@@ -114,6 +124,17 @@ class ActionsSteps {
                 SnakemakeWorld.fixture().renameElementAtCaret(newName)
         }
     }
+
+    @Then("^go to symbol should contain:$")
+    fun completionListShouldContain(table: DataTable) {
+        val names = ApplicationManager.getApplication().runReadAction(Computable {
+            val model = GotoSymbolModel2(SnakemakeWorld.fixture().project)
+            model.getNames(false).toList()
+        })
+        val expected = table.asList(String::class.java)
+        assertHasElements(names, expected)
+    }
+
 
     private fun findTargetElementFor(element: PsiElement, editor: Editor) =
             DocumentationManager.getInstance(element.project)

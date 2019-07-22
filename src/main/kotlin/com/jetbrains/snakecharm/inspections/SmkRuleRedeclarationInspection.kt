@@ -3,10 +3,10 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.psi.SMKCheckPoint
-import com.jetbrains.snakecharm.lang.psi.SMKRule
+import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
+import com.jetbrains.snakecharm.lang.psi.SmkRule
 import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
-import com.jetbrains.snakecharm.lang.psi.SmkSectionStatement
 
 class SmkRuleRedeclarationInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -16,15 +16,15 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         private val ruleNames = mutableSetOf<String>()
 
-        override fun visitSMKRule(rule: SMKRule) {
+        override fun visitSmkRule(rule: SmkRule) {
             visitSMKRuleLike(rule)
         }
 
-        override fun visitSMKCheckPoint(checkPoint: SMKCheckPoint) {
+        override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
             visitSMKRuleLike(checkPoint)
         }
 
-        private fun visitSMKRuleLike(rule: SmkRuleLike<SmkSectionStatement>) {
+        private fun visitSMKRuleLike(rule: SmkRuleLike<SmkArgsSection>) {
             val ruleName = rule.name ?: return
             if (ruleNames.contains(ruleName)) {
                 registerProblem(rule.nameIdentifier,

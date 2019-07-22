@@ -24,10 +24,10 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
      <rule_like> bbbb:
        input: <rule_like>s.aaaa
      """
-  Examples:
-    | rule_like    |
-    | rule       |
-    | checkpoint |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
   Scenario Outline: Complete rule/checkpoint names in input section (multiple declarations)
     Given a snakemake project
@@ -49,11 +49,12 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
     When I put the caret after input: <rule_like>s.
     And I invoke autocompletion popup
     Then completion list should contain:
-      | aaaa    |
-      | bbbb    |
-      | cccc    |
+      | aaaa |
+      | bbbb |
+    And completion list shouldn't contain:
+      | cccc |
     Examples:
-      | rule_like    |
+      | rule_like  |
       | rule       |
       | checkpoint |
 
@@ -76,14 +77,85 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
     When I put the caret after <rule_like>s.
     And I invoke autocompletion popup
     Then completion list should contain:
-      | aaaa    |
-      | bbbb    |
+      | aaaa |
+      | bbbb |
     Examples:
-      | rule_like    |
+      | rule_like  |
       | rule       |
       | checkpoint |
 
 
+  Scenario Outline: Complete rule/checkpoint names from different files (multiple declarations)
+    Given a snakemake project
+    And a file "boo1.smk" with text
+     """
+     <rule_like> boo11:
+       input: "path/to/input"
+
+     <rule_like> boo12:
+       input: "path/to/input"
+     """
+    And a file "boo2.smk" with text
+     """
+     <rule_like> boo2:
+       input: "path/to/input"
+
+     rule rule2:
+       input: "path/to/input"
+
+     checkpoint checkpoint2:
+       input: "path/to/input"
+
+     subworkflow subworkflow2:
+       snakefile: "s"
+     """
+
+    And I open a file "foo.smk" with text
+     """
+     <rule_like> aaaa:
+       input: "path/to/input"
+
+     <rule_like> bbbb:
+       input: "path/to/input"
+
+     <rule_like> cccc:
+       input: <rule_like>s.
+     """
+    When I put the caret after input: <rule_like>s.
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | aaaa          |
+      | bbbb          |
+      | boo11         |
+      | boo12         |
+      | boo2          |
+      | <ok_example>  |
+    And completion list shouldn't contain:
+      | cccc |
+      | subworkflow |
+      | <neg_example> |
+
+    Examples:
+      | rule_like  | ok_example  | neg_example |
+      | rule       | rule2       | checkpoint2 |
+      | checkpoint | checkpoint2 | rule2       |
 
 
+  Scenario Outline: No completion for long reference with rules/checkpoints last part
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> boo:
+        input: ""
 
+      <rule_like> foo:
+        input: roo.too.<rule_like>s.
+      """
+    When I put the caret after too.<rule_like>s.
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+    | boo |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |

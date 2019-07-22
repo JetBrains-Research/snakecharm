@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.FileViewProvider
 import com.jetbrains.python.PythonParserDefinition
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
-import com.jetbrains.snakecharm.lang.psi.SnakemakeFile
+import com.jetbrains.snakecharm.lang.psi.SmkFile
 
 /**
  * @author Roman.Chernyatchik
@@ -18,5 +18,5 @@ class SnakemakeParserDefinition: PythonParserDefinition() {
 
     override fun getFileNodeType() = SnakemakeLanguageDialect.fileElementType
 
-    override fun createFile(viewProvider: FileViewProvider) = SnakemakeFile(viewProvider)
+    override fun createFile(viewProvider: FileViewProvider) = SmkFile(viewProvider)
 }

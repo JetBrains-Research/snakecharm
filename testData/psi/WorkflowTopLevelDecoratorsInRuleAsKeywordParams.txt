@@ -1,12 +1,12 @@
 SnakemakeFile: WorkflowTopLevelDecoratorsInRuleAsKeywordParams.smk
-  SMKRule
+  SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('aaa')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('output')
         PyArgumentList
           PsiElement(Py:COLON)(':')
@@ -14,7 +14,7 @@ SnakemakeFile: WorkflowTopLevelDecoratorsInRuleAsKeywordParams.smk
           PyStringLiteralExpression: foo
             PsiElement(Py:SINGLE_QUOTED_STRING)('"foo"')
       PsiWhiteSpace('\n    ')
-      SMKRuleParameterListStatement
+      SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('params')
         PyArgumentList
           PsiElement(Py:COLON)(':')

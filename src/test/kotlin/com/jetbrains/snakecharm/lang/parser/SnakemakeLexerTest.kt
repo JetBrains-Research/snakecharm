@@ -2,7 +2,7 @@ package com.jetbrains.snakecharm.lang.parser
 
 import com.jetbrains.python.PythonDialectsTokenSetContributor
 import com.jetbrains.python.PythonDialectsTokenSetProvider
-import com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor
+import com.jetbrains.snakecharm.lang.SmkTokenSetContributor
 
 /**
  * @author Roman.Chernyatchik
@@ -11,7 +11,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeTokenSetContributor
 class SnakemakeLexerTest : PyLexerTestCase() {
     override fun setUp() {
         super.setUp()
-        registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SnakemakeTokenSetContributor())
+        registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SmkTokenSetContributor())
         PythonDialectsTokenSetProvider.reset()
     }
 

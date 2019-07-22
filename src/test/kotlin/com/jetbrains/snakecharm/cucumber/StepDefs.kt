@@ -11,12 +11,13 @@ import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.codeInsight.controlflow.ControlFlowCache
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.inspections.PyUnreachableCodeInspection
+import com.jetbrains.python.inspections.unresolvedReference.PyUnresolvedReferencesInspection
 import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.inspections.*
 import cucumber.api.java.en.Given
-import junit.framework.Assert.fail
+import kotlin.test.fail
 
 
 /**
@@ -67,7 +68,7 @@ class StepDefs {
             val flow = ControlFlowCache.getControlFlow(SnakemakeWorld.fixture().file as PyFile)
             flow.instructions.joinToString(separator = "\n")
         })
-        UsefulTestCase.assertSameLines(expectedCFG.trim(), actualCFG.trim())
+        UsefulTestCase.assertSameLines(expectedCFG.replace("\r", "").trim(), actualCFG.trim())
     }
 
     @Given("^([^\\]]+) inspection is enabled$")
@@ -84,6 +85,8 @@ class StepDefs {
             "Subworkflow Multiple Args" -> fixture.enableInspections(SmkSubworkflowMultipleArgsInspection::class.java)
             "Subworkflow Redeclaration" -> fixture.enableInspections(SmkSubworkflowRedeclarationInspection::class.java)
             "Unreachable Code" -> fixture.enableInspections(PyUnreachableCodeInspection::class.java)
+            "Rule or Checkpoint Name yet undefined" -> fixture.enableInspections(SmkRuleOrCheckpointNameYetUndefinedInspection::class.java)
+            "Unresolved reference" -> fixture.enableInspections(PyUnresolvedReferencesInspection::class.java)
             else -> {
                 for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {
                     val o = provider.instance
