@@ -59,7 +59,7 @@
     />
     <completion.contributor
             language="Python"
-            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKLambdaParameterInSectionCompletionContributor"
+            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkLambdaParameterInSectionCompletionContributor"
     />
 
     <localInspection

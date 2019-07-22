@@ -13,7 +13,7 @@ import com.jetbrains.snakecharm.inspections.SmkLambdaRuleParamsInspection
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
-class SMKLambdaParameterInSectionCompletionContributor : CompletionContributor() {
+class SmkLambdaParameterInSectionCompletionContributor : CompletionContributor() {
     init {
         extend(
                 CompletionType.BASIC,
