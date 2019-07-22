@@ -59,3 +59,39 @@ Feature: Resolve workflow file names to their corresponding declaration
       | include    |
       | configfile |
       | report     |
+
+  Scenario Outline: Resolve for strings in different quotes
+    Given a snakemake project
+    Given a file "boo.smk" with text
+    """
+    rule NAME:
+    """
+    Given I open a file "foo.smk" with text
+    """
+    include: <quote>boo.smk<quote>
+    """
+    When I put the caret after boo
+    Then reference should resolve to "rule" in "boo.smk"
+    Examples:
+      | quote |
+      | "     |
+      | '     |
+      | """   |
+
+  Scenario Outline: Resolve for fstrings in different quotes
+    Given a snakemake project
+    Given a file "boo.smk" with text
+    """
+    rule NAME:
+    """
+    Given I open a file "foo.smk" with text
+    """
+    include: f<quote>boo.smk<quote>
+    """
+    When I put the caret after boo
+    Then reference should resolve to "rule" in "boo.smk"
+    Examples:
+      | quote |
+      | "     |
+      | '     |
+      | """   |

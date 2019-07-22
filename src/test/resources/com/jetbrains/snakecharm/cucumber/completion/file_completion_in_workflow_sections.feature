@@ -20,6 +20,44 @@ Feature: Complete file names in workflow sections
     | configfile | yml       |
     | report     | html      |
 
+  Scenario Outline: Completion list for strings in different quotes
+    Given a snakemake project
+    Given a file "boo.smk" with text
+    """
+    """
+    Given I open a file "foo.smk" with text
+    """
+    include: <quote>boo.smk<quote>
+    """
+    When I put the caret after boo
+    And I invoke autocompletion popup
+    Then completion list should contain:
+    |boo.smk|
+    Examples:
+    | quote |
+    | "     |
+    | '     |
+    | """   |
+
+  Scenario Outline: Completion list for fstrings in different quotes
+    Given a snakemake project
+    Given a file "boo.smk" with text
+    """
+    """
+    Given I open a file "foo.smk" with text
+    """
+    include: f<quote>boo.smk<quote>
+    """
+    When I put the caret after boo
+    And I invoke autocompletion popup
+    Then completion list should contain:
+    |boo.smk|
+    Examples:
+    | quote |
+    | "     |
+    | '     |
+    | """   |
+
   Scenario Outline: Complete in sections
     Given a snakemake project
     Given a file "a.<file_type>" with text

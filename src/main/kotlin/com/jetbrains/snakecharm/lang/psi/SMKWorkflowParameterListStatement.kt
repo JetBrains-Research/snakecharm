@@ -26,26 +26,27 @@ class SMKWorkflowParameterListStatement(node: ASTNode) : PyElementImpl(node), Py
         else -> super.acceptPyVisitor(pyVisitor)
     }
 
-    private fun createReference(textRange: TextRange) =
+    private fun createReference(textRange: TextRange, path: String) =
             when (keywordName) {
-                SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD -> SmkConfigfileReference(this, textRange)
-                SnakemakeNames.WORKFLOW_REPORT_KEYWORD -> SmkReportReference(this, textRange)
-                else -> SmkIncludeReference(this, textRange)
-            } as PsiReference
+                SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD -> SmkConfigfileReference(this, textRange, path)
+                SnakemakeNames.WORKFLOW_REPORT_KEYWORD -> SmkReportReference(this, textRange, path)
+                else -> SmkIncludeReference(this, textRange, path)
+            }
 
     override fun getReferences(): Array<PsiReference> {
         if (keywordName !in WORKFLOWS_WITH_FILE_REFERENCES) {
             return emptyArray()
         }
 
-        val stringLiteralArgs = this.argumentList?.arguments?.filter {
-            it is PyStringLiteralExpression
-        }
+        val stringLiteralArgs = argumentList?.arguments?.filter {
+                it is PyStringLiteralExpression
+        } ?: return emptyArray()
 
-        return stringLiteralArgs?.map {
-            val offset = keywordName!!.length + it.startOffsetInParent
-            createReference(TextRange(offset + 1, offset + it.textLength - 1))
-        }?.toTypedArray() ?: emptyArray()
+        return stringLiteralArgs.map {
+            val path = (it as PyStringLiteralExpression).stringValue
+            val offset = keywordName!!.length + it.startOffsetInParent + it.text.indexOf(path)
+            createReference(TextRange(offset, offset + path.length), path)
+        }.toTypedArray()
     }
 
     private val keywordName: String?
