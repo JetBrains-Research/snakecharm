@@ -130,14 +130,14 @@
     />
 
     <localInspection
-            language="Snakemake" shortName="SmkSubworkflowMultipleArgsInspection"
+            language="Snakemake" shortName="SmkSectionMultipleArgsInspection"
             enabledByDefault="true"
             level="ERROR"
-            suppressId="SmkSubworkflowMultipleArgsInspection"
+            suppressId="SmkSectionMultipleArgsInspection"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.subworkflow.multiple.args"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkSubworkflowMultipleArgsInspection"
+            key="INSP.NAME.section.multiple.args"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionMultipleArgsInspection"
     />
 
     <localInspection
