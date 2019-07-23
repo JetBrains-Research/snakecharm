@@ -5,28 +5,27 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiManager
-import com.intellij.psi.PsiReferenceBase
+import com.intellij.psi.*
 import com.jetbrains.python.psi.PyStringLiteralExpression
+import com.jetbrains.snakecharm.lang.psi.impl.SmkWorkflowArgsSectionImpl
 
 open class SmkFileReference(
-        element: SMKWorkflowParameterListStatement,
+        element: SmkWorkflowArgsSectionImpl,
         textRange: TextRange,
         val path: String
-) : PsiReferenceBase<SMKWorkflowParameterListStatement>(element, textRange) {
-    protected fun collectFilesLike(predicate: (file: PsiFile) -> Boolean): Array<Any> {
-        val parentDir = (element.parent as? PsiFile)?.originalFile?.virtualFile?.parent
-                ?: return emptyArray()
+) : PsiReferenceBase<SmkWorkflowArgsSectionImpl>(element, textRange) {
+    // Reference caching can be implemented with the 'ResolveCache' class if needed
+
+    protected fun collectFilesLike(predicate: (file: PsiFileSystemItem) -> Boolean): Array<Any> {
+        val parentDirVFile = getParendDirForCompletion()?.virtualFile ?: return emptyArray()
         val psiManager = PsiManager.getInstance(element.project)
-        return VfsUtil.collectChildrenRecursively(parentDir)
+        return VfsUtil.collectChildrenRecursively(parentDirVFile)
                 .asSequence()
                 .mapNotNull { psiManager.findFile(it) }
                 .filter(predicate)
                 .map {
                     LookupElementBuilder
-                            .create(VfsUtil.getRelativeLocation(it.virtualFile, parentDir)!!)
+                            .create(VfsUtil.getRelativeLocation(it.virtualFile, parentDirVFile)!!)
                             .withIcon(it.getIcon(0))
                 }
                 .toList()
@@ -50,20 +49,24 @@ open class SmkFileReference(
 
         return virtualFile?.let { PsiManager.getInstance(stringLiteral.project).findFile(it) }
     }
+
+    // This function is supposed to get parent dir of 'IntelliJIdeaRulezzz' fake element
+    // when autocompletion is invoked
+    protected fun getParendDirForCompletion() = (element.parent as? PsiFile)?.originalFile?.containingDirectory
 }
 
 class SmkIncludeReference(
-        element: SMKWorkflowParameterListStatement,
+        element: SmkWorkflowArgsSectionImpl,
         textRange: TextRange,
         path: String
 ) : SmkFileReference(element, textRange, path) {
     override fun getVariants() = collectFilesLike {
-        it is SnakemakeFile && it.name != element.containingFile.name
+        it is SmkFile && it.name != element.containingFile.name
     }
 }
 
 class SmkConfigfileReference(
-        element: SMKWorkflowParameterListStatement,
+        element: SmkWorkflowArgsSectionImpl,
         textRange: TextRange,
         path: String
 ) : SmkFileReference(element, textRange, path) {
@@ -73,11 +76,29 @@ class SmkConfigfileReference(
 }
 
 class SmkReportReference(
-        element: SMKWorkflowParameterListStatement,
+        element: SmkWorkflowArgsSectionImpl,
         textRange: TextRange,
         path: String
 ) : SmkFileReference(element, textRange, path) {
     override fun getVariants() = collectFilesLike {
         it.name.endsWith(".html")
+    }
+}
+
+class SmkWorkDirReference(
+        element: SmkWorkflowArgsSectionImpl,
+        textRange: TextRange,
+        path: String
+) : SmkFileReference(element, textRange, path) {
+    override fun getVariants(): Array<Any>  {
+        val parentDir = getParendDirForCompletion() ?: return emptyArray()
+        val psiManager = PsiManager.getInstance(element.project)
+        return VfsUtil.collectChildrenRecursively(parentDir.virtualFile)
+                .asSequence()
+                .mapNotNull {
+                    psiManager.findDirectory(it)
+                }
+                .toList()
+                .toTypedArray()
     }
 }
