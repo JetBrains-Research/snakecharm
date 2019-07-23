@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyArgumentList
-import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
@@ -31,9 +30,13 @@ class SmkSectionMultipleArgsInspection : SnakemakeInspection() {
         ) {
             val args = argumentList?.arguments ?: emptyArray()
             if (args.size > 1) {
-                args.forEach {
-                    registerProblem(it,
-                            SnakemakeBundle.message("INSP.NAME.section.multiple.args.message", sectionName))
+                args.forEachIndexed { i, arg ->
+                    if (i > 0) {
+                        registerProblem(
+                                arg,
+                                SnakemakeBundle.message("INSP.NAME.section.multiple.args.message", sectionName)
+                        )
+                    }
                 }
             }
         }

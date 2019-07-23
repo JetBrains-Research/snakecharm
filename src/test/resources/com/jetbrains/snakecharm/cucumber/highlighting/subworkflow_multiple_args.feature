@@ -4,14 +4,14 @@ Feature: Inspection for multiple arguments in various sections
     Given I open a file "foo.smk" with text
     """
     subworkflow NAME:
-        <section>: "a", "b"
+        <section>: "a", "b", "c"
     """
     And Section Multiple Args inspection is enabled
-    Then I expect inspection error on <"a"> with message
+    Then I expect inspection error on <"b"> with message
     """
     Only one argument is allowed for 'subworkflow' section.
     """
-    And I expect inspection error on <"b"> with message
+    And I expect inspection error on <"c"> with message
     """
     Only one argument is allowed for 'subworkflow' section.
     """
@@ -27,14 +27,14 @@ Feature: Inspection for multiple arguments in various sections
     Given I open a file "foo.smk" with text
     """
     rule NAME:
-        <section>: "a", "b"
+        <section>: "a", "b", "c"
     """
     And Section Multiple Args inspection is enabled
-    Then I expect inspection error on <"a"> with message
+    Then I expect inspection error on <"b"> with message
     """
     Only one argument is allowed for '<section>' section.
     """
-    And I expect inspection error on <"b"> with message
+    And I expect inspection error on <"c"> with message
     """
     Only one argument is allowed for '<section>' section.
     """
