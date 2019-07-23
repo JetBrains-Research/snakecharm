@@ -94,6 +94,7 @@ class SnakemakeStatementParsing(
             }
 
             if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER) {
+                // XXX: workaround/fix for #130:
                 val actualToken = SnakemakeTokenTypes.stringToTokenType[myBuilder.tokenText]
                 if (actualToken != null) {
                     myBuilder.remapCurrentToken(actualToken)
