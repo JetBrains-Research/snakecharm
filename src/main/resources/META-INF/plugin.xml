@@ -57,6 +57,10 @@
             language="Python"
             implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKShadowSettingsCompletionContributor"
     />
+    <completion.contributor
+            language="Python"
+            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkLambdaParameterInSectionCompletionContributor"
+    />
 
     <localInspection
         language="Snakemake"
@@ -156,6 +160,17 @@
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.rule.or.checkpoint.name.yet.undefined"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkRuleOrCheckpointNameYetUndefinedInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkLambdaRuleParamsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkRuleOrCheckpointNameYetUndefinedInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.only.specific.lambda.params"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkLambdaRuleParamsInspection"
     />
 
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>

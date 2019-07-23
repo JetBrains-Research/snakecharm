@@ -87,6 +87,7 @@ class StepDefs {
             "Unreachable Code" -> fixture.enableInspections(PyUnreachableCodeInspection::class.java)
             "Rule or Checkpoint Name yet undefined" -> fixture.enableInspections(SmkRuleOrCheckpointNameYetUndefinedInspection::class.java)
             "Unresolved reference" -> fixture.enableInspections(PyUnresolvedReferencesInspection::class.java)
+            "Lambda Parameter Names" -> fixture.enableInspections(SmkLambdaRuleParamsInspection::class.java)
             else -> {
                 for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {
                     val o = provider.instance
