@@ -80,6 +80,13 @@ class SnakemakeStatementParsing(
         val scope = context.scope
 
         myBuilder.setDebugMode(false)
+        if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER && !scope.inNoSmkKeywordsAllowed) {
+            // XXX: workaround/fix for #130:
+            val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText]
+            if (actualToken != null) {
+                myBuilder.remapCurrentToken(actualToken)
+            }
+        }
         val tt = myBuilder.tokenType
 
         if (tt !in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS || scope.inParamArgsList) {
@@ -159,7 +166,17 @@ class SnakemakeStatementParsing(
         val ruleLikeMarker: PsiBuilder.Marker = myBuilder.mark()
         nextToken()
 
+        if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
+            myBuilder.error("${section.name.capitalize()} name identifier or ':' expected")
+            val ruleStatements = myBuilder.mark()
+            ruleStatements.done(PyElementTypes.STATEMENT_LIST)
+            ruleLikeMarker.done(section.declaration)
+            nextToken()
+            return
+        }
+
         // rule name
+        //val ruleNameMarker: PsiBuilder.Marker = myBuilder.mark()
         if (atToken(PyTokenTypes.IDENTIFIER)) {
             nextToken()
         }
@@ -217,7 +234,14 @@ class SnakemakeStatementParsing(
             // XXX probably recover until some useful token, see recoverUntilMatches() method
             // XXX at the moment it seems any complex behaviour isn't needed
         } else if (multiline && !myBuilder.eof()) {
-            nextToken() // probably check toke type
+            if (atToken(PyTokenTypes.IDENTIFIER)) {
+                val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText]
+                if (actualToken != null) {
+                    myBuilder.remapCurrentToken(actualToken)
+                    return
+                }
+            }
+            nextToken() // probably check token type
         }
     }
 
@@ -258,9 +282,12 @@ class SnakemakeStatementParsing(
                 ruleParam.done(section.parameterListStatement)
             }
             section.sectionKeyword in RULE_OR_CHECKPOINT && keyword == SnakemakeNames.SECTION_RUN -> {
+                val scope = myContext.scope as SnakemakeParsingScope
+                myContext.pushScope(scope.withNoSmkKeywordsAllowed())
                 checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
                 statementParser.parseSuite()
                 ruleParam.done(SmkElementTypes.RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT)
+                myContext.popScope()
             }
             else -> {
                 // error
@@ -284,7 +311,7 @@ class SnakemakeStatementParsing(
         if (source in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
             val scope = myContext.scope as SnakemakeParsingScope
             return when {
-                scope.inRuleLikeSectionsList || scope.inNoSmkKeywordsAllowed -> PyTokenTypes.IDENTIFIER
+                scope.inNoSmkKeywordsAllowed -> PyTokenTypes.IDENTIFIER
                 else -> source
             }
         }

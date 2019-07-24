@@ -89,7 +89,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         while (!myBuilder.eof()) {
             if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
                 nextToken()
-                /* It's important to use rawLookup() inside atAnyOfTokensSage() here
+                /* It's important to use rawLookup() inside atAnyOfTokensSafe() here
                    to avoid accidentally applying a filter to the current token. */
                 if (indents == 0 &&
                         !atAnyOfTokensSafe(
@@ -189,6 +189,23 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         break
                     }
                 } else {
+                    if (atToken(PyTokenTypes.IDENTIFIER)) {
+                        val identifierMarker = myBuilder.mark()
+                        // keyword argument
+                        if (!matchToken(PyTokenTypes.EQ))  {
+                            identifierMarker.drop()
+                            val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText]
+                            if (actualToken != null && indents < 1) {
+                                // we have encountered a toplevel keyword, which means we are no longer inside an argument section
+                                myBuilder.remapCurrentToken(actualToken)
+                                break
+                            }
+                        } else {
+                            identifierMarker.rollbackTo()
+                        }
+
+                    }
+
                     recoverUntilMatches(
                             SnakemakeBundle.message("PARSE.expected.separator.message", separatorTokenText),
                             separatorTokenType,

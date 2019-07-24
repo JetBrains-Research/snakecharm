@@ -78,5 +78,4 @@ object SnakemakeTokenTypes {
             // in method body
             PyTokenTypes.DEF_KEYWORD
     )
-
 }
