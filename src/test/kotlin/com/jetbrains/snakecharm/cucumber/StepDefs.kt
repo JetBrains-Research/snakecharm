@@ -85,8 +85,11 @@ class StepDefs {
             "Section Multiple Args" -> fixture.enableInspections(SmkSectionMultipleArgsInspection::class.java)
             "Subworkflow Redeclaration" -> fixture.enableInspections(SmkSubworkflowRedeclarationInspection::class.java)
             "Unreachable Code" -> fixture.enableInspections(PyUnreachableCodeInspection::class.java)
-            "Rule or Checkpoint Name yet undefined" -> fixture.enableInspections(SmkRuleOrCheckpointNameYetUndefinedInspection::class.java)
+            "Rule or Checkpoint Name yet undefined" ->
+                fixture.enableInspections(SmkRuleOrCheckpointNameYetUndefinedInspection::class.java)
             "Unresolved reference" -> fixture.enableInspections(PyUnresolvedReferencesInspection::class.java)
+            "Repeated Rule in Localrules or Ruleorder" ->
+                fixture.enableInspections(SmkLocalrulesRuleorderRepeatedRuleInspection::class.java)
             "Lambda Parameter Names" -> fixture.enableInspections(SmkLambdaRuleParamsInspection::class.java)
             else -> {
                 for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {
