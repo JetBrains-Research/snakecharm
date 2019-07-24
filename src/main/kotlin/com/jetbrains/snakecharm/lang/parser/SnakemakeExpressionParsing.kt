@@ -354,7 +354,11 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 nextToken()
                 indents++
             } else {
-                skipDedents { incorrectUnindentMarker = myBuilder.mark() }
+                skipDedents {
+                    if (incorrectUnindentMarker == null) {
+                        incorrectUnindentMarker = myBuilder.mark()
+                    }
+                }
                 if (incorrectUnindentMarker == null && indents == 0) {
                     break
                 }
@@ -390,6 +394,9 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         } else if (!atAnyOfTokensSafe(PyTokenTypes.PLUS)) {
             statementBreakMarker?.rollbackTo()
         } else {
+            if (incorrectUnindentMarker != null) {
+                incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
+            }
             statementBreakMarker?.drop()
         }
 
