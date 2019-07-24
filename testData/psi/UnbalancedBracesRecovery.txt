@@ -9,7 +9,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
           PsiElement(Py:IDENTIFIER)('fo')
         PsiErrorElement:',' or ')' expected
           <empty list>
-    PsiWhiteSpace('\n\n')
+  PsiWhiteSpace('\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
@@ -31,14 +31,14 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 PsiElement(Py:IDENTIFIER)('fo')
               PsiErrorElement:',' or ')' expected
                 <empty list>
-          PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('ffff')
     PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
     PyStatementList
-      PsiWhiteSpace('\n    ')
       SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
@@ -53,14 +53,14 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 PsiElement(Py:IDENTIFIER)('fo')
               PsiErrorElement:',' or ')' expected
                 <empty list>
-          PsiWhiteSpace('\n\n')
+  PsiWhiteSpace('\n\n')
   SmkCheckPoint
     PsiElement(Py:CHECKPOINT_KEYWORD)('checkpoint')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('ffff')
     PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
     PyStatementList
-      PsiWhiteSpace('\n    ')
       SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('input')
         PyArgumentList
@@ -75,14 +75,14 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 PsiElement(Py:IDENTIFIER)('fo')
               PsiErrorElement:',' or ')' expected
                 <empty list>
-          PsiWhiteSpace('\n\n')
+  PsiWhiteSpace('\n\n')
   SmkSubworkflow
     PsiElement(Py:SUBWORKFLOW_KEYWORD)('subworkflow')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('ffff')
     PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
     PyStatementList
-      PsiWhiteSpace('\n    ')
       SmkSubworkflowArgsSection
         PsiElement(Py:IDENTIFIER)('snakefile')
         PyArgumentList
@@ -97,7 +97,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 PsiElement(Py:IDENTIFIER)('fo')
               PsiErrorElement:',' or ')' expected
                 <empty list>
-          PsiWhiteSpace('\n\n')
+  PsiWhiteSpace('\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
@@ -119,7 +119,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 PsiElement(Py:IDENTIFIER)('fo')
               PsiErrorElement:',' or ')' expected
                 <empty list>
-          PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
     PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
     PyArgumentList
@@ -149,7 +149,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 PsiElement(Py:IDENTIFIER)('fo')
               PsiErrorElement:',' or ')' expected
                 <empty list>
-          PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
     PsiElement(Py:WORKFLOW_WORKDIR_KEYWORD)('workdir')
     PyArgumentList
@@ -179,7 +179,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 PsiElement(Py:IDENTIFIER)('fo')
               PsiErrorElement:',' or ')' expected
                 <empty list>
-          PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
     PsiElement(Py:WORKFLOW_SINGULARITY_KEYWORD)('singularity')
     PyArgumentList
@@ -209,7 +209,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 PsiElement(Py:IDENTIFIER)('fo')
               PsiErrorElement:',' or ')' expected
                 <empty list>
-          PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
     PsiElement(Py:WORKFLOW_REPORT_KEYWORD)('report')
     PyArgumentList
@@ -239,7 +239,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 PsiElement(Py:IDENTIFIER)('fo')
               PsiErrorElement:',' or ')' expected
                 <empty list>
-          PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
     PsiElement(Py:WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD)('wildcard_constraints')
     PyArgumentList
@@ -272,7 +272,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 PsiElement(Py:IDENTIFIER)('fo')
               PsiErrorElement:',' or ')' expected
                 <empty list>
-          PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n')
   SmkWorkflowRuleorderSection
     PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
     PyArgumentList
@@ -307,7 +307,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 PsiElement(Py:IDENTIFIER)('fo')
               PsiErrorElement:',' or ')' expected
                 <empty list>
-          PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n')
   SmkWorkflowLocalrulesSection
     PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
     PyArgumentList
@@ -334,7 +334,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
               PsiElement(Py:IDENTIFIER)('fo')
             PsiErrorElement:',' or ')' expected
               <empty list>
-        PsiWhiteSpace('\n\n')
+  PsiWhiteSpace('\n\n')
   SmkWorkflowPythonBlockSection
     PsiElement(Py:WORKFLOW_ONSUCCESS_KEYWORD)('onsuccess')
     PsiElement(Py:COLON)(':')
@@ -350,7 +350,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
               PsiElement(Py:IDENTIFIER)('fo')
             PsiErrorElement:',' or ')' expected
               <empty list>
-        PsiWhiteSpace('\n\n')
+  PsiWhiteSpace('\n\n')
   SmkWorkflowPythonBlockSection
     PsiElement(Py:WORKFLOW_ONERROR_KEYWORD)('onerror')
     PsiElement(Py:COLON)(':')

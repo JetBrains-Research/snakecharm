@@ -4,11 +4,15 @@ SnakemakeFile: RuleInvalid.smk
     PsiErrorElement:Rule name identifier or ':' expected
       <empty list>
     PyStatementList
-      PsiWhiteSpace('\n    ')
-      SmkRuleOrCheckpointArgsSection
-        PsiElement(Py:IDENTIFIER)('input')
-        PyArgumentList
-          PsiElement(Py:COLON)(':')
-          PsiWhiteSpace(' ')
-          PyStringLiteralExpression: foo
-            PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')
+      <empty list>
+  PsiWhiteSpace('\n    ')
+  PsiErrorElement:Unexpected indent
+    <empty list>
+  PyTypeDeclarationStatement
+    PyTargetExpression: input
+      PsiElement(Py:IDENTIFIER)('input')
+    PyAnnotation
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyStringLiteralExpression: foo
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''foo'')
