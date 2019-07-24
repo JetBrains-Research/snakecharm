@@ -14,7 +14,6 @@ class SmkLocalrulesRuleorderRepeatedRuleInspection  : SnakemakeInspection() {
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
-        private val ruleNames = mutableSetOf<String>()
 
         override fun visitSmkWorkflowLocalrulesSection(st: SmkWorkflowLocalrulesSection) {
             checkArgumentRepetition(st.argumentList)
@@ -25,6 +24,7 @@ class SmkLocalrulesRuleorderRepeatedRuleInspection  : SnakemakeInspection() {
         }
 
         private fun checkArgumentRepetition(argumentList: PyArgumentList?) {
+            val ruleNames = mutableSetOf<String>()
             argumentList?.arguments?.forEach {
                 val name = it.name ?: return
                 if (!ruleNames.add(name)) {

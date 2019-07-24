@@ -1,4 +1,25 @@
 Feature: localrules/ruleorder repeated rule inspection
+  Scenario: no false positives for same rule in localrules and ruleorder
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule rule1:
+        input: "input.txt"
+        output: "output.txt"
+
+    rule rule2:
+        output: touch("file.txt")
+
+    rule rule3:
+        output: touch("output.txt")
+
+    localrules: rule1, rule2, rule3
+    ruleorder: rule1 > rule2 > rule3
+    """
+    And Repeated Rule in Localrules or Ruleorder inspection is enabled
+    Then I expect no inspection warning
+    When I check highlighting warnings
+
   Scenario Outline: No repeated rules in localrules/ruleorder
     Given a snakemake project
     Given I open a file "foo.smk" with text
