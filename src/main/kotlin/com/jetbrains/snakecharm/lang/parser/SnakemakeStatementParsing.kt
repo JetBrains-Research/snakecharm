@@ -142,11 +142,13 @@ class SnakemakeStatementParsing(
                 workflowParam.done(SmkElementTypes.WORKFLOW_RULEORDER_SECTION_STATEMENT)
             }
             tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS -> {
+                myContext.pushScope(scope.withNoSmkKeywordsAllowed())
                 val decoratorMarker = myBuilder.mark()
                 nextToken()
                 checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
                 parseSuite()
                 decoratorMarker.done(SmkElementTypes.WORKFLOW_PY_BLOCK_SECTION_STATEMENT)
+                myContext.popScope()
             }
             else -> {
                 myBuilder.error("Unexpected token type: $tt with text: '${myBuilder.tokenText}'") // bundle
@@ -184,6 +186,7 @@ class SnakemakeStatementParsing(
         // XXX at the moment we continue parsing rule even if colon missed, probably better
         // XXX to drop rule and scroll up to next STATEMENT_BREAK/RULE/CHECKPOINT/other toplevel keyword or eof()
         checkMatches(PyTokenTypes.COLON, "${section.name.capitalize()} name identifier or ':' expected") // bundle
+
         val ruleStatements = myBuilder.mark()
 
         // Skipping a docstring
@@ -214,6 +217,10 @@ class SnakemakeStatementParsing(
                     if (!parseRuleParameter(section)) {
                         break
                     }
+
+                    if (atAnyOfTokens(*SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.types)) {
+                        break
+                    }
                 }
 
             }
@@ -241,7 +248,9 @@ class SnakemakeStatementParsing(
                     return
                 }
             }
-            nextToken() // probably check token type
+            if (!atAnyOfTokens(*SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.types)) {
+                nextToken() // probably check token type
+            }
         }
     }
 

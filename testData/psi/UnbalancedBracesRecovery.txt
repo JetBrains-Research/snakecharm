@@ -53,6 +53,15 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 PsiElement(Py:IDENTIFIER)('fo')
               PsiErrorElement:',' or ')' expected
                 <empty list>
+          PsiWhiteSpace('\n    ')
+          PsiErrorElement:',' expected
+            PsiElement(Py:IDENTIFIER)('run')
+            PsiElement(Py:COLON)(':')
+            PsiWhiteSpace('\n      ')
+            PsiElement(Py:IDENTIFIER)('print')
+            PsiElement(Py:LPAR)('(')
+            PsiElement(Py:INTEGER_LITERAL)('30')
+            PsiElement(Py:RPAR)(')')
   PsiWhiteSpace('\n\n')
   SmkCheckPoint
     PsiElement(Py:CHECKPOINT_KEYWORD)('checkpoint')

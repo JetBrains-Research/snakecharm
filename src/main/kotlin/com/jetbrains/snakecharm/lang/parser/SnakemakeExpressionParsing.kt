@@ -86,6 +86,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         var indents = if (argsOnNextLine) 1 else 0
         var argNumber = 0
         var incorrectUnindentMarker: PsiBuilder.Marker? = null
+        var afterArgumentMarker: PsiBuilder.Marker? = null
         while (!myBuilder.eof()) {
             if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
                 nextToken()
@@ -135,6 +136,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             }
 
             argNumber++
+
 
             // separator if several args:
             if (argNumber > 1) {
@@ -190,18 +192,15 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                     }
                 } else {
                     if (atToken(PyTokenTypes.IDENTIFIER)) {
-                        val identifierMarker = myBuilder.mark()
                         // keyword argument
                         if (!matchToken(PyTokenTypes.EQ))  {
-                            identifierMarker.drop()
                             val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText]
                             if (actualToken != null && indents < 1) {
                                 // we have encountered a toplevel keyword, which means we are no longer inside an argument section
                                 myBuilder.remapCurrentToken(actualToken)
+                                afterArgumentMarker?.rollbackTo()
                                 break
                             }
-                        } else {
-                            identifierMarker.rollbackTo()
                         }
 
                     }
@@ -211,10 +210,19 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                             separatorTokenType,
                             PyTokenTypes.STATEMENT_BREAK
                     )
+
+                    if (atAnyOfTokens(*SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.types)) {
+                        break
+                    }
                 }
             }
 
             parseArgumentFunction()
+
+            if (atToken(PyTokenTypes.IDENTIFIER) && afterArgumentMarker != null) {
+                afterArgumentMarker = myBuilder.mark()
+            }
+
             // mark everything that was incorrectly unindented
             incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
             incorrectUnindentMarker = null
@@ -289,6 +297,16 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             if (!atToken(PyTokenTypes.STATEMENT_BREAK)) {
                 hasNonWhitespaceTokens = true
             }
+
+            if (myBuilder.lookAhead(1) == PyTokenTypes.IDENTIFIER) {
+                nextToken()
+                val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText]
+                if (actualToken != null) {
+                    myBuilder.remapCurrentToken(actualToken)
+                    break
+                }
+            }
+
             myBuilder.advanceLexer()
         }
         if (hasNonWhitespaceTokens) {
