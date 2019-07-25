@@ -2,8 +2,7 @@ package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.AbstractElementManipulator
-import com.intellij.psi.PsiReference
+import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyElementGenerator
 import com.jetbrains.python.psi.PyElementVisitor
@@ -57,9 +56,17 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
 
         return stringLiteralArgs.map {
             val path = (it as PyStringLiteralExpression).stringValue
-            val offset = keywordName!!.length + it.startOffsetInParent + it.text.indexOf(path)
-            createReference(TextRange(offset, offset + path.length), path)
+            val offsetInParent = keywordName!!.length + it.startOffsetInParent
+            createReference(getReferenceRange(it).shiftRight(offsetInParent), path)
         }.toTypedArray()
+    }
+
+    // This function is meant to get correct reference range in string literal
+    // even in some weird cases like:
+    // include: "f" "o" "o" ".s" "m" """k"""
+    private fun getReferenceRange(stringLiteral: PyStringLiteralExpression): TextRange {
+        val decodedFragments = stringLiteral.decodedFragments
+        return TextRange(decodedFragments.first().first.startOffset, decodedFragments.last().first.endOffset)
     }
 
     private val keywordName: String?
@@ -74,13 +81,16 @@ class SmkWorkflowArgsSectionManipulator : AbstractElementManipulator<SmkWorkflow
             element: SmkWorkflowArgsSectionImpl,
             range: TextRange,
             newContent: String): SmkWorkflowArgsSectionImpl? {
-        val replacedText = element.findElementAt(range.startOffset) ?: return element
+        val replacedElem = element.findElementAt(range.startOffset) ?: return element
 
-        val stringLiteral =  PsiTreeUtil.getParentOfType(replacedText, PyStringLiteralExpression::class.java)!!
+        val stringLiteral =  PsiTreeUtil.getParentOfType(replacedElem, PyStringLiteralExpression::class.java)!!
+        val relativePathToSelf = "(.+)/".toRegex().find(stringLiteral.stringValue)?.value ?: ""
+
         val elementGenerator = PyElementGenerator.getInstance(element.project)
-        val newStringLiteral = elementGenerator.createStringLiteral(stringLiteral, newContent)
+        val newStringLiteral =
+                elementGenerator.createStringLiteral(stringLiteral, relativePathToSelf + newContent)
 
-        stringLiteral.replace(newStringLiteral)
+            stringLiteral.replace(newStringLiteral)
 
         return element
     }

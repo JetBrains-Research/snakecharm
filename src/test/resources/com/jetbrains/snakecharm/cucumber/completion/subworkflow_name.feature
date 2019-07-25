@@ -17,7 +17,7 @@ Feature: Completion for subworkflow name
           othe#here
     """
     When I put the caret at #here
-    Then I invoke autocompletion popup, select "otherworkflow" lookup item and see a text:
+    Then I invoke autocompletion popup and see a text:
     """
     subworkflow otherworkflow:
     workdir:
