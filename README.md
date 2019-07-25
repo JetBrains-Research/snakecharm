@@ -14,6 +14,10 @@ Features available in `*.smk`, `*.rule` and `Snakefile` files:
 * Snakemake specific syntax highlighting
 * Limited resolve and code completion for python code
 * Rules folding
+* Code completion for rules names after `rules.`
+* Code completion for params keywords in `shell` section, e.g. in  `shell: "echo {params.<caret>}"`
+* File structure view with rules
+* Different inspections for possible errors in snakemake file.
 
 # Installation
 
