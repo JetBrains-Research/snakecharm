@@ -22,8 +22,8 @@ If you've already configured custom file type for `Snakefile` or `*.smk` files p
 In PyCharm (or other `IntelliJ Platfrom` based IDE with `Python Community Edition` plugin installed) open `Preferences|Plugins|Marketplace|SnakeCharm` and press `Install` button.
 
 At the moment the plugin is tested with:
-* IDEA CI 2018.3-2019.1.3, Python Community Edition Plugin: 2018.3.183.4284.36-2019.1.191.7479.19
-* PyCharm 2018.3.1-2019.1.3 (Professional & Community Editions)
+* IDEA CI 2018.3-2019.2, Python Community Edition Plugin: 2018.3.183.4284.36-2019.1.191.7479.19
+* PyCharm 2018.3.1-2019.2 (Professional & Community Editions)
 
 # IntelliJ Plugins Repository
 Plugin is available in IntelliJ Plugins Repository, see [SnakeCharm](https://plugins.jetbrains.com/plugin/11947-snakecharm).
