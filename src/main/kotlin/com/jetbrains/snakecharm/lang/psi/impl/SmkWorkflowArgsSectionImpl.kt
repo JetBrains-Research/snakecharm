@@ -34,8 +34,8 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
     override fun getSectionKeywordNode()= node
             .findChildByType(SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
 
-    override fun getPresentation() = super<SmkWorkflowArgsSection>.getPresentation()
-    override fun getIcon(flags: Int) = super<SmkWorkflowArgsSection>.getIcon(flags)
+    override fun getPresentation() = getPresentation(this)
+    override fun getIcon(flags: Int) = getIcon(this, flags)
 
     private fun createReference(textRange: TextRange, path: String) =
             when (keywordName) {
@@ -90,7 +90,7 @@ class SmkWorkflowArgsSectionManipulator : AbstractElementManipulator<SmkWorkflow
         val newStringLiteral =
                 elementGenerator.createStringLiteral(stringLiteral, relativePathToSelf + newContent)
 
-            stringLiteral.replace(newStringLiteral)
+        stringLiteral.replace(newStringLiteral)
 
         return element
     }
