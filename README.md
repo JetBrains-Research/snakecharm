@@ -47,26 +47,26 @@ Now EAP build will be also available as updates
 # Support
 Contact me at roman.chernyatchik@jetbrains.com or post issues in [Issue Tracker](https://github.com/JetBrains-Research/snakecharm/issues)
 
-# FAQ:
-* If you get "Unimplemented substep definition" in all `*.feature` files, ensure:
-  * Not installed or disabled: `Substeps IntelliJ Plugin` 
-  * Plugins installed: `Cucumber Java`, `Gherkin`
-  
 # Development
 
 Pull requests are welcome. It is my side project, so I appreciate your help implementing plugin desired features.
 
-Build plugin from sources:
+### Build plugin from sources:
 * Run `./gradlew assemble`
 * Plugin bundle is located in ` build/distributions/snakecharm-*.zip`
 
-Install plugin from *.zip bundle:
+### Install plugin from *.zip bundle:
 * Open IDEA/PyCharm Preferences
 * Choose `Plugins` section
 * Press gear icon and choose `Install Plugin from Disk...`
 * Use `*.zip` bundle download from Plugin Manager or built from sources 
 
-Release plugin:
+### Tests are written in [Gherkin](https://cucumber.io/docs/gherkin):
+If you get "Unimplemented substep definition" in all `*.feature` files, ensure:
+  * Not installed or disabled: `Substeps IntelliJ Plugin` 
+  * Plugins installed: `Cucumber Java`, `Gherkin`
+  
+### Release plugin:
 * Fix version in `build.gradle`
 * Fix since/until build versions in `build.gradle`
 * Fix change notes in `CHANGES` file
