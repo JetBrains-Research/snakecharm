@@ -99,6 +99,7 @@ class SnakemakeStatementParsing(
             if (startPyOnlyScope) {
                 context.popScope()
             }
+
             return
         }
         when {

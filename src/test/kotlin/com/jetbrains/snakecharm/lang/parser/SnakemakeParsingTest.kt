@@ -76,7 +76,6 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-
     fun testRuleInvalidNoParamBody() {
         doTest()
     }
@@ -105,15 +104,9 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-    /* TODO #16
     fun testRuleParamsListArgsStringMultiline() {
-        Assume.assumeFalse(
-                "Feature Not Implemented Yet, see: See issue" +
-                        " https://github.com/JetBrains-Research/snakecharm/issues/16",
-                true
-        )
         doTest()
-    } */
+    }
 
     fun testRuleParamsListArgsHangingComma() {
         doTest()
@@ -231,6 +224,21 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testRuleParamsListArgsStringMultilineIncorrectUnindent() {
+        doTest()
+    }
+
+    fun testFormattedStringArgument() {
+        doTest()
+    }
+
+    fun testRuleMultilineStringArgumentsWithCallsAndExplicitConcatenation() {
+        doTest()
+    }
+
+    fun testRuleStringCallExpressionArgument() {
+        doTest()
+    }
     fun testUnbalancedBracesRecovery() {
         doTest()
     }
