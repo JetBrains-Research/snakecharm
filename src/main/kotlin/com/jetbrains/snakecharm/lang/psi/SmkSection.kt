@@ -1,8 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.ASTNode
-import com.intellij.navigation.ItemPresentation
-import com.intellij.psi.util.parentOfType
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.PlatformIcons
 import com.jetbrains.python.PyNames
 import com.jetbrains.python.psi.PyStatement
@@ -19,19 +18,20 @@ interface SmkSection: PyStatement {
 
     fun getSectionKeywordNode(): ASTNode?
 
-    override fun getPresentation(): ItemPresentation? {
-        return object: PyElementPresentation(this) {
-            override fun getPresentableText() = sectionKeyword ?: PyNames.UNNAMED_ELEMENT
-            override fun getLocationString(): String {
-                val containingRuleLike = parentOfType<SmkRuleLike<*>>()
-                if (containingRuleLike != null) {
-                    val ruleLikeName = containingRuleLike.name ?: PyNames.UNNAMED_ELEMENT
-                    return "($ruleLikeName in ${containingFile.name})"
-                }
-                return "(${containingFile.name})"
-            }
-        }
-    }
+    // override fun getPresentation() = getPresentation(this) // XXX see #145:
+    //override fun getIcon(flags: Int) = PlatformIcons.PROPERTY_ICON!! // XXX see #145:
+}
 
-    override fun getIcon(flags: Int) = PlatformIcons.PROPERTY_ICON!!
+fun getIcon(section: SmkSection, flags: Int) = PlatformIcons.PROPERTY_ICON!!
+
+fun getPresentation(section: SmkSection) = object : PyElementPresentation(section) {
+    override fun getPresentableText() = section.sectionKeyword ?: PyNames.UNNAMED_ELEMENT
+    override fun getLocationString(): String {
+        val containingRuleLike = PsiTreeUtil.getParentOfType(section, SmkRuleLike::class.java)
+        if (containingRuleLike != null) {
+            val ruleLikeName = containingRuleLike.name ?: PyNames.UNNAMED_ELEMENT
+            return "($ruleLikeName in ${section.containingFile.name})"
+        }
+        return "(${section.containingFile.name})"
+    }
 }

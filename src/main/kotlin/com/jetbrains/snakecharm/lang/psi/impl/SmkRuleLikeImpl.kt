@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
-import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.stubs.NamedStub
@@ -74,12 +73,10 @@ abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT: SmkRuleLike<S>, ou
         return SnakemakeIcons.FILE
     }
 
-    override fun getPresentation(): ItemPresentation? {
-        return object: PyElementPresentation(this) {
-            override fun getPresentableText() =
-                    "${SnakemakeLexer.KEYWORDS_2_TEXT[sectionTokenType]}: ${name ?: UNNAMED_ELEMENT}"
+    override fun getPresentation() = object: PyElementPresentation(this) {
+        override fun getPresentableText() =
+                "${SnakemakeLexer.KEYWORDS_2_TEXT[sectionTokenType]}: ${name ?: UNNAMED_ELEMENT}"
 
-            override fun getLocationString() = "(${containingFile.name})"
-        }
+        override fun getLocationString() = "(${containingFile.name})"
     }
 }

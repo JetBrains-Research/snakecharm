@@ -9,6 +9,8 @@ import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
+import com.jetbrains.snakecharm.lang.psi.getIcon
+import com.jetbrains.snakecharm.lang.psi.getPresentation
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil.getIdentifierNode
 
 class SmkRunSectionImpl(node: ASTNode): PyElementImpl(node), SmkRunSection {
@@ -25,8 +27,8 @@ class SmkRunSectionImpl(node: ASTNode): PyElementImpl(node), SmkRunSection {
         else -> super.acceptPyVisitor(pyVisitor)
     }
 
-    override fun getPresentation() = super<SmkRunSection>.getPresentation()
-    override fun getIcon(flags: Int) = super<SmkRunSection>.getIcon(flags)
+    override fun getPresentation() = getPresentation(this)
+    override fun getIcon(flags: Int) = getIcon(this, flags)
 
     /**
      * TODO: Think should we use [CachedStructuredDocStringProvider] like in PyFunctionImpl
