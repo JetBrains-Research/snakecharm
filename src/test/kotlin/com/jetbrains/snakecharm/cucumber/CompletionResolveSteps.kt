@@ -258,7 +258,7 @@ class CompletionResolveSteps {
                         assertNotNull(
                                 lookupElements,
                                 message = "Completion resulted in a single possible variant, so it was impossible " +
-                                        "to check whether $lookupText was in the completion list. " +
+                                        "to check whether \"$lookupText\" was in the completion list. " +
                                         "Try using this step: Then I invoke autocompletion popup and see a text")
                         assertTrue(!lookupElements.isEmpty(), message = "Completion list was empty")
 
