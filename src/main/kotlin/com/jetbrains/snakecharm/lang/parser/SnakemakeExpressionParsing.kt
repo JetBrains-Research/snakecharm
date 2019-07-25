@@ -202,7 +202,6 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                                 break
                             }
                         }
-
                     }
 
                     recoverUntilMatches(

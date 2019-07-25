@@ -168,15 +168,6 @@ class SnakemakeStatementParsing(
         val ruleLikeMarker: PsiBuilder.Marker = myBuilder.mark()
         nextToken()
 
-        if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
-            myBuilder.error("${section.name.capitalize()} name identifier or ':' expected")
-            val ruleStatements = myBuilder.mark()
-            ruleStatements.done(PyElementTypes.STATEMENT_LIST)
-            ruleLikeMarker.done(section.declaration)
-            nextToken()
-            return
-        }
-
         // rule name
         //val ruleNameMarker: PsiBuilder.Marker = myBuilder.mark()
         if (atToken(PyTokenTypes.IDENTIFIER)) {
@@ -217,12 +208,7 @@ class SnakemakeStatementParsing(
                     if (!parseRuleParameter(section)) {
                         break
                     }
-
-                    if (atAnyOfTokens(*SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.types)) {
-                        break
-                    }
                 }
-
             }
         }
 

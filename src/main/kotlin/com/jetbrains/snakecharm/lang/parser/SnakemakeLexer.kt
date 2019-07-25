@@ -36,8 +36,6 @@ class SnakemakeLexer : PythonIndentingLexer() {
         val KEYWORDS_2_TEXT = KEYWORDS.map { it.value to it.key }.toMap()
     }
 
-    //override fun getTokenType() = KEYWORDS[tokenText] ?: super.getTokenType()
-
     override fun advance() {
         if (tokenType === PyTokenTypes.LINE_BREAK) {
             val text = tokenText

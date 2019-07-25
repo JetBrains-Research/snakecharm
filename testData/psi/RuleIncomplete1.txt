@@ -4,7 +4,8 @@ SnakemakeFile: RuleIncomplete1.smk
     PsiErrorElement:Rule name identifier or ':' expected
       <empty list>
     PyStatementList
-      <empty list>
+      PsiErrorElement:Indent expected...
+        <empty list>
   PsiWhiteSpace('\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
