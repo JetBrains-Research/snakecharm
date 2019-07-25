@@ -25,6 +25,12 @@ At the moment the plugin is tested with:
 * IDEA CI 2018.3-2019.2, Python Community Edition Plugin: 2018.3.183.4284.36-2019.1.191.7479.19
 * PyCharm 2018.3.1-2019.2 (Professional & Community Editions)
 
+# Setup Snakemake support
+
+To enable all code insight features (e.g. code completion for `directory`, `touch` etc methods) please configure Python SDK with installed snakemake package.
+
+https://github.com/JetBrains-Research/snakecharm/wiki#setup-snakemake-support
+
 # IntelliJ Plugins Repository
 Plugin is available in IntelliJ Plugins Repository, see [SnakeCharm](https://plugins.jetbrains.com/plugin/11947-snakecharm).
 
