@@ -141,7 +141,11 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         } else {
                             // skip dedents while matched, we could have several dedent tokens in a raw
                             // skip dedent while inside current block (indents > 1)
-                            skipDedents(1) { incorrectUnindentMarker = myBuilder.mark() }
+                            skipDedents(1) {
+                                if (incorrectUnindentMarker == null) {
+                                    incorrectUnindentMarker = myBuilder.mark()
+                                }
+                            }
                         }
 
                         // Case: hanging 'comma', next statement is another rule param block
