@@ -1,0 +1,42 @@
+SnakemakeFile: FormattedStringArgument.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('NAME')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n           ')
+          PyStringLiteralExpression: multiline{30 + 42}stringarg{25}
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"multiline"')
+            PsiWhiteSpace('\n           ')
+            PyFormattedStringElement
+              PsiElement(Py:FSTRING_START)('f"')
+              PyFStringFragment
+                PsiElement(Py:FSTRING_FRAGMENT_START)('{')
+                PyBinaryExpression
+                  PyNumericLiteralExpression
+                    PsiElement(Py:INTEGER_LITERAL)('30')
+                  PsiWhiteSpace(' ')
+                  PsiElement(Py:PLUS)('+')
+                  PsiWhiteSpace(' ')
+                  PyNumericLiteralExpression
+                    PsiElement(Py:INTEGER_LITERAL)('42')
+                PsiElement(Py:FSTRING_FRAGMENT_END)('}')
+              PsiElement(Py:FSTRING_END)('"')
+            PsiWhiteSpace('\n           ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"string"')
+            PsiWhiteSpace('\n               ')
+            PyFormattedStringElement
+              PsiElement(Py:FSTRING_START)('f"')
+              PsiElement(Py:FSTRING_TEXT)('arg')
+              PyFStringFragment
+                PsiElement(Py:FSTRING_FRAGMENT_START)('{')
+                PyNumericLiteralExpression
+                  PsiElement(Py:INTEGER_LITERAL)('25')
+                PsiElement(Py:FSTRING_FRAGMENT_END)('}')
+              PsiElement(Py:FSTRING_END)('"')
