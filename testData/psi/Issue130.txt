@@ -1,0 +1,134 @@
+SnakemakeFile: Issue130.smk
+  PyWithStatement
+    PsiElement(Py:WITH_KEYWORD)('with')
+    PsiWhiteSpace(' ')
+    PyWithItem
+      PyCallExpression: open
+        PyReferenceExpression: open
+          PsiElement(Py:IDENTIFIER)('open')
+        PyArgumentList
+          PsiElement(Py:LPAR)('(')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('""')
+          PsiElement(Py:RPAR)(')')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:AS_KEYWORD)('as')
+      PsiWhiteSpace(' ')
+      PyTargetExpression: f
+        PsiElement(Py:IDENTIFIER)('f')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    PyStatementList
+      PyPassStatement
+        PsiElement(Py:PASS_KEYWORD)('pass')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('r1')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: i1
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"i1"')
+  PsiWhiteSpace('\n\n')
+  PyWhileStatement
+    PyWhilePart
+      PsiElement(Py:WHILE_KEYWORD)('while')
+      PsiWhiteSpace(' ')
+      PyBoolLiteralExpression
+        PsiElement(Py:TRUE_KEYWORD)('True')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      PyStatementList
+        PyPassStatement
+          PsiElement(Py:PASS_KEYWORD)('pass')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('r2')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: i2
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"i2"')
+  PsiWhiteSpace('\n\n')
+  PyForStatement
+    PyForPart
+      PsiElement(Py:FOR_KEYWORD)('for')
+      PsiWhiteSpace(' ')
+      PyTargetExpression: i
+        PsiElement(Py:IDENTIFIER)('i')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:IN_KEYWORD)('in')
+      PsiWhiteSpace(' ')
+      PyCallExpression: range
+        PyReferenceExpression: range
+          PsiElement(Py:IDENTIFIER)('range')
+        PyArgumentList
+          PsiElement(Py:LPAR)('(')
+          PyNumericLiteralExpression
+            PsiElement(Py:INTEGER_LITERAL)('5')
+          PsiElement(Py:RPAR)(')')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      PyStatementList
+        PyPassStatement
+          PsiElement(Py:PASS_KEYWORD)('pass')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('r3')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: i3
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"i3"')
+  PsiWhiteSpace('\n\n')
+  PyForStatement
+    PyForPart
+      PsiElement(Py:FOR_KEYWORD)('for')
+      PsiWhiteSpace(' ')
+      PyTargetExpression: i
+        PsiElement(Py:IDENTIFIER)('i')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:IN_KEYWORD)('in')
+      PsiWhiteSpace(' ')
+      PyCallExpression: range
+        PyReferenceExpression: range
+          PsiElement(Py:IDENTIFIER)('range')
+        PyArgumentList
+          PsiElement(Py:LPAR)('(')
+          PyNumericLiteralExpression
+            PsiElement(Py:INTEGER_LITERAL)('5')
+          PsiElement(Py:RPAR)(')')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      PyStatementList
+        PyPassStatement
+          PsiElement(Py:PASS_KEYWORD)('pass')
+  PsiWhiteSpace('\n\n')
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_WORKDIR_KEYWORD)('workdir')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyStringLiteralExpression: foo
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"foo"')

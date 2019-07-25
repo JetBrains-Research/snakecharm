@@ -58,6 +58,10 @@
             language="Python"
             implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKShadowSettingsCompletionContributor"
     />
+    <completion.contributor
+            language="Python"
+            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkLambdaParameterInSectionCompletionContributor"
+    />
 
     <localInspection
         language="Snakemake"
@@ -127,14 +131,14 @@
     />
 
     <localInspection
-            language="Snakemake" shortName="SmkSubworkflowMultipleArgsInspection"
+            language="Snakemake" shortName="SmkSectionMultipleArgsInspection"
             enabledByDefault="true"
             level="ERROR"
-            suppressId="SmkSubworkflowMultipleArgsInspection"
+            suppressId="SmkSectionMultipleArgsInspection"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.subworkflow.multiple.args"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkSubworkflowMultipleArgsInspection"
+            key="INSP.NAME.section.multiple.args"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionMultipleArgsInspection"
     />
 
     <localInspection
@@ -157,6 +161,28 @@
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.rule.or.checkpoint.name.yet.undefined"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkRuleOrCheckpointNameYetUndefinedInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkLocalrulesRuleorderRepeatedRuleInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkLocalrulesRuleoderRepeatedRuleInspectoin"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.localrules.ruleorder.repeated.rule"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkLocalrulesRuleorderRepeatedRuleInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkLambdaRuleParamsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkRuleOrCheckpointNameYetUndefinedInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.only.specific.lambda.params"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkLambdaRuleParamsInspection"
     />
 
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>

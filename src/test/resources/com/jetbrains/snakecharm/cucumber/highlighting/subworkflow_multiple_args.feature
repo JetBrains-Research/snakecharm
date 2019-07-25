@@ -1,19 +1,19 @@
-Feature: Inspection for multiple arguments in 'subworkflow' sections
-  Scenario Outline: Multiple settings
+Feature: Inspection for multiple arguments in various sections
+  Scenario Outline: Multiple arguments in subworkflow section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
     subworkflow NAME:
-        <section>: "a", "b"
+        <section>: "a", "b", "c"
     """
-    And Subworkflow Multiple Args inspection is enabled
-    Then I expect inspection error on <"a"> with message
+    And Section Multiple Args inspection is enabled
+    Then I expect inspection error on <"b"> with message
     """
-    Only one argument is allowed for subworkflow sections
+    Only one argument is allowed for 'subworkflow' section.
     """
-    And I expect inspection error on <"b"> with message
+    And I expect inspection error on <"c"> with message
     """
-    Only one argument is allowed for subworkflow sections
+    Only one argument is allowed for 'subworkflow' section.
     """
     When I check highlighting errors
     Examples:
@@ -21,3 +21,27 @@ Feature: Inspection for multiple arguments in 'subworkflow' sections
     | workdir    |
     | snakefile  |
     | configfile |
+
+  Scenario Outline: Multiple arguments in execution sections
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule NAME:
+        <section>: "a", "b", "c"
+    """
+    And Section Multiple Args inspection is enabled
+    Then I expect inspection error on <"b"> with message
+    """
+    Only one argument is allowed for '<section>' section.
+    """
+    And I expect inspection error on <"c"> with message
+    """
+    Only one argument is allowed for '<section>' section.
+    """
+    When I check highlighting errors
+    Examples:
+      | section    |
+      | shell      |
+      | script     |
+      | wrapper    |
+      | cwl        |

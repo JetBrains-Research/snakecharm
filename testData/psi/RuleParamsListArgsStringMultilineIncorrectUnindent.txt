@@ -1,0 +1,67 @@
+SnakemakeFile: RuleParamsListArgsStringMultilineIncorrectUnindent.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('rule1')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n            ')
+          PyStringLiteralExpression: file15_copy1
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file"')
+            PsiWhiteSpace('\n                    ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"15"')
+            PsiWhiteSpace('\n            ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"_copy"')
+            PsiWhiteSpace('\n                 ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"1"')
+            PsiErrorElement:Unindent does not match any outer indentation level.
+              PsiWhiteSpace('\n              ')
+              PsiElement(Py:SINGLE_QUOTED_STRING)('".txt"')
+          PsiWhiteSpace('\n            ')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: anotherfile.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"another"')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file"')
+            PsiWhiteSpace('\n                  ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('".txt"')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('rule2')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: file151
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file"')
+            PsiWhiteSpace('\n                    ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"15"')
+            PsiErrorElement:Unindent does not match any outer indentation level.
+              PsiWhiteSpace('\n           ')
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"_copy"')
+            PsiWhiteSpace('\n                 ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"1"')
+            PsiErrorElement:Unindent does not match any outer indentation level.
+              PsiWhiteSpace('\n              ')
+              PsiElement(Py:SINGLE_QUOTED_STRING)('".txt"')
+          PsiWhiteSpace('\n           ')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: anotherfile.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"another"')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file"')
+            PsiWhiteSpace('\n                  ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('".txt"')

@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.lang.parser
 
+import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyElementType
@@ -79,4 +80,19 @@ object SnakemakeTokenTypes {
             PyTokenTypes.DEF_KEYWORD
     )
 
+    val stringToTokenType = mapOf<String, IElementType>(
+            "rule" to RULE_KEYWORD,
+            "checkpoint" to CHECKPOINT_KEYWORD,
+            "subworkflow" to SUBWORKFLOW_KEYWORD,
+            "localrules" to WORKFLOW_LOCALRULES_KEYWORD,
+            "ruleorder" to WORKFLOW_RULEORDER_KEYWORD,
+            "configfile" to WORKFLOW_CONFIGFILE_KEYWORD,
+            "report" to WORKFLOW_REPORT_KEYWORD,
+            "wildcard_constraints" to WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD,
+            "singularity" to WORKFLOW_SINGULARITY_KEYWORD,
+            "workdir" to WORKFLOW_WORKDIR_KEYWORD,
+            "onsuccess" to WORKFLOW_ONSUCCESS_KEYWORD,
+            "onerror" to WORKFLOW_ONERROR_KEYWORD,
+            "onstart" to WORKFLOW_ONSTART_KEYWORD
+    )
 }
