@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
+import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
@@ -21,6 +22,7 @@ import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
 import java.io.File.separator
 import java.util.regex.Pattern
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.test.fail
@@ -43,6 +45,30 @@ class ActionsSteps {
         val fixedSignature = signature.replace("\r", "")
         iExpectInspectionOnIn(level, fixedSignature, fixedSignature, message)
     }
+
+    @Given("^I expect reference highlighting on \"(.+)\"")
+    fun iExpectReferenceHighlighting(signature: String) {
+        ApplicationManager.getApplication().invokeAndWait {
+            val fixture = SnakemakeWorld.fixture()
+            val psiFile = fixture.file
+            val document = PsiDocumentManager.getInstance(fixture.project).getDocument(psiFile)!!
+            val pos = document.text.indexOf(signature)
+            assertTrue(
+                    pos >= 0,
+                    "Signature <$signature> wasn't found in the file ${psiFile.name}."
+
+            )
+            val reference = fixture.getReferenceAtCaretPosition()
+            assertNotNull(reference, message = "There is no reference at the caret position")
+            val signatureRange = TextRange(pos, pos + signature.length)
+            assertEquals(
+                    reference.rangeInElement,
+                    signatureRange,
+                    message = "Expected highlighted text wasn't equal to the actual one. " +
+                            "Expected highlighting on: $signature, actually highlighted: ${reference.canonicalText}")
+        }
+    }
+
 
     @Given("^I expect inspection (error|warning|info|TYPO|weak warning) on <([^>]+)> in <(.+)> with message$")
     fun iExpectInspectionOnIn(level: String, text: String, signature: String, message: String) {

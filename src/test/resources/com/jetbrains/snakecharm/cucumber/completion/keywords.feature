@@ -163,7 +163,7 @@ Feature: Completion for snakemake keyword-like things
       <str>#here
     """
     When I put the caret at #here
-    Then I invoke autocompletion popup, select "<result>" lookup item and see a text:
+    Then I invoke autocompletion popup and see a text:
     """
     subworkflow NAME:
       <result>: #here
@@ -198,7 +198,7 @@ Feature: Completion for snakemake keyword-like things
         <str>
       """
     When I put the caret after <str>
-    Then I invoke autocompletion popup, select "<result>" lookup item and see a text:
+    Then I invoke autocompletion popup and see a text:
       """
       <rule_like> NAME:
         <result>: 
@@ -213,38 +213,54 @@ Feature: Completion for snakemake keyword-like things
       | checkpoint | par | params               |
       | rule       | lo  | log                  |
       | checkpoint | lo  | log                  |
-      | rule       | re  | resources            |
-      | checkpoint | re  | resources            |
       | rule       | be  | benchmark            |
       | checkpoint | be  | benchmark            |
       | rule       | ve  | version              |
       | checkpoint | ve  | version              |
       | rule       | me  | message              |
       | checkpoint | me  | message              |
-      | rule       | th  | threads              |
-      | checkpoint | th  | threads              |
-      | rule       | si  | singularity          |
-      | checkpoint | si  | singularity          |
       | rule       | pr  | priority             |
       | checkpoint | pr  | priority             |
-      | rule       | wi  | wildcard_constraints |
-      | checkpoint | wi  | wildcard_constraints |
       | rule       | gr  | group                |
       | checkpoint | gr  | group                |
-      | rule       | sh  | shadow               |
-      | checkpoint | sh  | shadow               |
-      | rule       | co  | conda                |
-      | checkpoint | co  | conda                |
       | rule       | cw  | cwl                  |
       | checkpoint | cw  | cwl                  |
       | rule       | sc  | script               |
       | checkpoint | sc  | script               |
-      | rule       | sh  | shell                |
-      | checkpoint | sh  | shell                |
       | rule       | run | run                  |
       | checkpoint | run | run                  |
       | rule       | wr  | wrapper              |
       | checkpoint | wr  | wrapper              |
+
+  Scenario Outline: Complete at rule/checkpoint level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        <str>
+      """
+    When I put the caret after <str>
+    Then I invoke autocompletion popup, select "<result>" lookup item and see a text:
+      """
+      <rule_like> NAME:
+        <result>: 
+      """
+    Examples:
+      | rule_like  | str | result               |
+      | rule       | re  | resources            |
+      | checkpoint | re  | resources            |
+      | rule       | th  | threads              |
+      | checkpoint | th  | threads              |
+      | rule       | si  | singularity          |
+      | checkpoint | si  | singularity          |
+      | rule       | wi  | wildcard_constraints |
+      | checkpoint | wi  | wildcard_constraints |
+      | rule       | sh  | shadow               |
+      | checkpoint | sh  | shadow               |
+      | rule       | co  | conda                |
+      | checkpoint | co  | conda                |
+      | rule       | sh  | shell                |
+      | checkpoint | sh  | shell                |
 
   Scenario Outline: Complete and replace at rule/checkpoint level
     Given a snakemake project

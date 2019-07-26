@@ -14,7 +14,7 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
        input: <rule_like>s.aaa
      """
     When I put the caret after input: <rule_like>s.aaa
-    Then I invoke autocompletion popup, select "aaaa" lookup item and see a text:
+    Then I invoke autocompletion popup and see a text:
      """
      <rule_like> aaaa:
        input: "path/to/input"
