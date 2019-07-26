@@ -3,21 +3,39 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
-Version 0.4.2018.3
+Version 0.4
 -------------
-Released on <...> (eap channel)
-- sinceBuild "183.4284"
-- untilBuild "192.*"
+Released on July 25th 2019
+- sinceBuild "183.4284" (2018.3)
+- untilBuild "192.*" (2019.2)
 
 Features:
 - Completion for `shadow` level values, see #12
-- Inspection for `shadow` level values, see #65
+- Shadow settings documentation popup, see #73
+- Code completion for subworkflow sections names, see #11
+- Resolve/Completion for subworflows names, see #60
+- Subworkflows support, see #90
+- Snakecharm incompatible with current PyCharm version, see #143
+- Support method lines separators for snakemake rules, see #149
+
+- Inspection: `shadow` level values, see #65
+- Inspection: trailing comma at the end of Snakefile major parsing, see #58
+- Inspection: Multiple declarations of the same section inspections, see #71
+- Inspection: Keyword arguments duplication inspections, see #72
+- Inspection: Subworflow redeclaration, see #88
+- Inspection: subworkflow 'workdir', 'snakefile', 'configfile' could accept only single arg, see #83
+- Inspection: Warn if rule mentioned more than 1 time in ruleorder / localrule, see #107
+
 
 Fixed:
 - NoClassDefFoundError: com/intellij/psi/util/PsiTreeUtilKt, see #70
 - Rule docstrings trigger a syntax error, see #31
-
-
+- ClassCastException: kotlin.jvm.internal.ClassReference cannot be cast to
+ kotlin.jvm.internal.ClassBasedDeclarationContainer, see #68
+- 'input' section name autocompletion results in ": input" insertion, see #69
+- Subworkflow parsing errors major parsing subtask, see #66
+- Parsing error when new line begins with a separator in argument list, see #96
+- Multiline strings declaration support, see #16
 
 Version 0.3.2018.3
 -------------

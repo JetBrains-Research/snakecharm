@@ -6,6 +6,7 @@ import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.codeInsight.daemon.impl.LineMarkersPass
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
 
 /**
@@ -13,21 +14,24 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
  * @date 2019-02-03
  */
 class SnakemakeMethodLineMarkerProvider : LineMarkerProvider {
-    override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
-        if (DaemonCodeAnalyzerSettings.getInstance().SHOW_METHOD_SEPARATORS) {
-            if (isSeparatorAllowed(element)) {
-                return LineMarkersPass.createMethodSeparatorLineMarker(
-                        element,
+    override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<PsiElement>? =
+            if (DaemonCodeAnalyzerSettings.getInstance().SHOW_METHOD_SEPARATORS && isSeparatorAllowed(element)) {
+                LineMarkersPass.createMethodSeparatorLineMarker(
+                        PsiTreeUtil.getDeepestFirst(element),
                         EditorColorsManager.getInstance()
                 )
+            } else {
+                null
             }
-        }
-        return null
-    }
 
     override fun collectSlowLineMarkers(elements: MutableList<PsiElement>, result: MutableCollection<LineMarkerInfo<PsiElement>>) {
         // Do nothing
     }
 
-    private fun isSeparatorAllowed(element: PsiElement) = element is SmkRuleLike<*>
+    private fun isSeparatorAllowed(element: PsiElement?): Boolean {
+        if (element is SmkRuleLike<*>)  {
+            return true
+        }
+        return element?.firstChild == null && element?.parent is SmkRuleLike<*>
+    }
 }

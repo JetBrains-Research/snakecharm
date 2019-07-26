@@ -8,7 +8,7 @@ import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.parentOfType
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.PyTokenTypes
@@ -61,14 +61,19 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
             context: ProcessingContext,
             result: CompletionResultSet
     ) {
-        val expression = parameters.position.parentOfType<PyExpression>() as? PyReferenceExpression ?: return
-        val statement = expression.parentOfType<PyStatement>()
+        val expression = PsiTreeUtil.getParentOfType(
+                parameters.position, PyExpression::class.java
+        ) as? PyReferenceExpression ?: return
+
+        val statement = PsiTreeUtil.getParentOfType(expression, PyStatement::class.java)
         if (statement is PyImportStatementBase) {
             return
         }
-        if (statement?.parent !is SmkFile && statement?.parentOfType<PyStatementListContainer>() !is PyStatementPart) {
+
+        if (statement?.parent !is SmkFile && PsiTreeUtil.getParentOfType(statement, PyStatementListContainer::class.java) !is PyStatementPart) {
             return
         }
+
         if (partOfSomeComplexReference(parameters.position)) {
             return
         }

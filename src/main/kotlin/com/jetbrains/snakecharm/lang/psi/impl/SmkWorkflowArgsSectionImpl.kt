@@ -6,6 +6,8 @@ import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
 import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
+import com.jetbrains.snakecharm.lang.psi.getIcon
+import com.jetbrains.snakecharm.lang.psi.getPresentation
 
 /**
  * @author Roman.Chernyatchik
@@ -20,6 +22,6 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
     override fun getSectionKeywordNode()= node
             .findChildByType(SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
 
-    override fun getPresentation() = super<SmkWorkflowArgsSection>.getPresentation()
-    override fun getIcon(flags: Int) = super<SmkWorkflowArgsSection>.getIcon(flags)
+    override fun getPresentation() = getPresentation(this)
+    override fun getIcon(flags: Int) = getIcon(this, flags)
 }

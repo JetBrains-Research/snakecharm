@@ -9,6 +9,8 @@ import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkWorkflowPythonBlockSection
+import com.jetbrains.snakecharm.lang.psi.getIcon
+import com.jetbrains.snakecharm.lang.psi.getPresentation
 
 class SmkWorkflowPythonBlockSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkflowPythonBlockSection {
 
@@ -22,8 +24,8 @@ class SmkWorkflowPythonBlockSectionImpl(node: ASTNode) : PyElementImpl(node), Sm
         else -> super.acceptPyVisitor(pyVisitor)
     }
 
-    override fun getPresentation() = super<SmkWorkflowPythonBlockSection>.getPresentation()
-    override fun getIcon(flags: Int) = super<SmkWorkflowPythonBlockSection>.getIcon(flags)
+    override fun getPresentation() = getPresentation(this)
+    override fun getIcon(flags: Int) = getIcon(this, flags)
 
     /**
      * TODO: Think should we use [CachedStructuredDocStringProvider] like in PyFunctionImpl

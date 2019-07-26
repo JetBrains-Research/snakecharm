@@ -4,7 +4,6 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyStringLiteralExpression
@@ -42,9 +41,10 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
                         val paramsMatcher = paramsPattern.matcher(element.text)
 
                         if (insideRuleSection.accepts(element)) {
-                            val isShellCommand = element
-                                    .parentOfType(SmkRuleOrCheckpointArgsSection::class)
-                                    ?.sectionKeyword == SnakemakeNames.SECTION_SHELL
+                            val isShellCommand = PsiTreeUtil.getParentOfType(
+                                    element, SmkRuleOrCheckpointArgsSection::class.java
+                            )?.sectionKeyword == SnakemakeNames.SECTION_SHELL
+
                             if (isShellCommand) {
                                 addParamsReferences(element, paramsMatcher, paramReferences)
                             }

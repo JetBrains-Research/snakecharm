@@ -1,7 +1,7 @@
 package com.jetbrains.snakecharm.codeInsight
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.parentOfType
+import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
 
 enum class SmkCodeInsightScope {
@@ -15,7 +15,7 @@ enum class SmkCodeInsightScope {
 
     companion object {
         operator fun get(anchor: PsiElement) = when {
-            anchor.parentOfType<SmkRunSection>() != null -> RULELIKE_RUN_SECTION
+            PsiTreeUtil.getParentOfType(anchor, SmkRunSection::class.java) != null -> RULELIKE_RUN_SECTION
             else -> TOP_LEVEL
         }
     }

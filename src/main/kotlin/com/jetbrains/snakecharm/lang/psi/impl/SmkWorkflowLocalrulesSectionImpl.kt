@@ -6,6 +6,8 @@ import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
 import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkWorkflowLocalrulesSection
+import com.jetbrains.snakecharm.lang.psi.getIcon
+import com.jetbrains.snakecharm.lang.psi.getPresentation
 
 class SmkWorkflowLocalrulesSectionImpl(node: ASTNode): PyElementImpl(node), SmkWorkflowLocalrulesSection {
     override fun getSectionKeywordNode() = node.findChildByType(SnakemakeTokenTypes.WORKFLOW_LOCALRULES_KEYWORD)
@@ -15,6 +17,6 @@ class SmkWorkflowLocalrulesSectionImpl(node: ASTNode): PyElementImpl(node), SmkW
         else -> super.acceptPyVisitor(pyVisitor)
     }
 
-    override fun getPresentation() = super<SmkWorkflowLocalrulesSection>.getPresentation()
-    override fun getIcon(flags: Int) = super<SmkWorkflowLocalrulesSection>.getIcon(flags)
+    override fun getPresentation() = getPresentation(this)
+    override fun getIcon(flags: Int) = getIcon(this, flags)
 }
