@@ -11,6 +11,7 @@ rule foo: run:
     configfile = 2
     report = 3
     wildcard_constraints = 4
-    print(rule)
+    print(rule,
+checkpoint)
 
 print(singularity)

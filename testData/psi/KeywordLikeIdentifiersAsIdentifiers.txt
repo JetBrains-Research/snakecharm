@@ -115,6 +115,10 @@ SnakemakeFile: KeywordLikeIdentifiersAsIdentifiers.smk
                 PsiElement(Py:LPAR)('(')
                 PyReferenceExpression: rule
                   PsiElement(Py:IDENTIFIER)('rule')
+                PsiElement(Py:COMMA)(',')
+                PsiWhiteSpace('\n')
+                PyReferenceExpression: checkpoint
+                  PsiElement(Py:IDENTIFIER)('checkpoint')
                 PsiElement(Py:RPAR)(')')
   PsiWhiteSpace('\n\n')
   PyExpressionStatement
