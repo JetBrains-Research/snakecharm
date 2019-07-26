@@ -36,7 +36,7 @@ To enable all code insight features (e.g. code completion for `directory`, `touc
 https://github.com/JetBrains-Research/snakecharm/wiki#setup-snakemake-support
 
 # IntelliJ Plugins Repository
-Plugin is available in IntelliJ Plugins Repository, see [SnakeCharm](https://plugins.jetbrains.com/plugin/11947-snakecharm).
+Plugin is available in IntelliJ Plugins Repository, see [SnakeCharm Plugin](https://plugins.jetbrains.com/plugin/11947-snakecharm).
 
 # EAP Updates
 Early builds of coming releases are available in EAP channel. To receive this updates add EAP repository:
