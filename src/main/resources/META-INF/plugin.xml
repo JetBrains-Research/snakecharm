@@ -39,8 +39,6 @@
     <codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>
     <lang.documentationProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.documentation.SmkShadowSettingsDocumentation"/>
     <lang.psiStructureViewFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.structureView.SmkStructureViewFactory"/>
-    <lang.elementManipulator forClass="com.jetbrains.snakecharm.lang.psi.impl.SmkWorkflowArgsSectionImpl"
-                             implementationClass="com.jetbrains.snakecharm.lang.psi.impl.SmkWorkflowArgsSectionManipulator"/>
     <stubElementTypeHolder class="com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes"/>
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex"/>
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex"/>

@@ -7,15 +7,32 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.*
+import com.intellij.psi.util.PsiTreeUtil
+import com.jetbrains.python.psi.PyElementGenerator
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.lang.psi.impl.SmkWorkflowArgsSectionImpl
 
 open class SmkFileReference(
         element: SmkWorkflowArgsSectionImpl,
-        textRange: TextRange,
-        val path: String
+        private val textRange: TextRange,
+        private val path: String
 ) : PsiReferenceBase<SmkWorkflowArgsSectionImpl>(element, textRange) {
     // Reference caching can be implemented with the 'ResolveCache' class if needed
+
+    override fun handleElementRename(newElementName: String): PsiElement {
+        val replacedElem = element.findElementAt(textRange.startOffset) ?: return element
+
+        val stringLiteral =  PsiTreeUtil.getParentOfType(replacedElem, PyStringLiteralExpression::class.java)!!
+        val relativePathToSelf = "(.+)/".toRegex().find(stringLiteral.stringValue)?.value ?: ""
+
+        val elementGenerator = PyElementGenerator.getInstance(element.project)
+        val newStringLiteral =
+                elementGenerator.createStringLiteral(stringLiteral, relativePathToSelf + newElementName)
+
+        stringLiteral.replace(newStringLiteral)
+
+        return element
+    }
 
     protected fun collectFileSystemItemLike(
             collectFiles: Boolean,

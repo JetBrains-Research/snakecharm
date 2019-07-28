@@ -2,9 +2,7 @@ package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.*
-import com.intellij.psi.util.PsiTreeUtil
-import com.jetbrains.python.psi.PyElementGenerator
+import com.intellij.psi.PsiReference
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.python.psi.impl.PyElementImpl
@@ -73,25 +71,4 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
         get() = getKeywordNode()?.text
 
     private fun getKeywordNode() = node.findChildByType(SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
-}
-
-
-class SmkWorkflowArgsSectionManipulator : AbstractElementManipulator<SmkWorkflowArgsSectionImpl>() {
-    override fun handleContentChange(
-            element: SmkWorkflowArgsSectionImpl,
-            range: TextRange,
-            newContent: String): SmkWorkflowArgsSectionImpl? {
-        val replacedElem = element.findElementAt(range.startOffset) ?: return element
-
-        val stringLiteral =  PsiTreeUtil.getParentOfType(replacedElem, PyStringLiteralExpression::class.java)!!
-        val relativePathToSelf = "(.+)/".toRegex().find(stringLiteral.stringValue)?.value ?: ""
-
-        val elementGenerator = PyElementGenerator.getInstance(element.project)
-        val newStringLiteral =
-                elementGenerator.createStringLiteral(stringLiteral, relativePathToSelf + newContent)
-
-        stringLiteral.replace(newStringLiteral)
-
-        return element
-    }
 }
