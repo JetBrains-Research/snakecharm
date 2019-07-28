@@ -19,7 +19,7 @@ class SmkSectionMultipleArgsInspection : SnakemakeInspection() {
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            if (st.name in SmkRuleOrCheckpointArgsSection.EXECUTION_KEYWORDS) {
+            if (st.name in SmkRuleOrCheckpointArgsSection.SINGLE_ARGUMENT_KEYWORDS) {
                 checkArgumentList(st.argumentList, st.name!!)
             }
         }
