@@ -169,6 +169,19 @@ class ActionsSteps {
         generateDocumentation(true)
     }
 
+    @Then("^Documentation text should be equal to (.*)")
+    fun documentationTextShouldBeEqualTo(str: String) {
+        documentationTextShouldBeEqual(str)
+    }
+
+    @Then("^Documentation text should be equal to$")
+    fun documentationTextShouldBeEqual(str: String) {
+        val text = StringUtil.convertLineSeparators(str)
+        val docPopupText = myGeneratedDocPopupText
+        assertNotNull(docPopupText)
+        assertEquals(text, docPopupText, "Expected <$text> to be equal to  <$docPopupText>")
+    }
+
     @Then("^Documentation text should contain (.*)$")
     fun documentationShouldContain(text: String) {
         documentationTextShouldContain(text)

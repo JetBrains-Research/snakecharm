@@ -16,30 +16,32 @@ class SmkShadowSettingsDocumentation : AbstractDocumentationProvider() {
     override fun generateDoc(
             element: PsiElement,
             originalElement: PsiElement?): String? {
-        if (!SnakemakeLanguageDialect.isInsideSmkFile(element) ||
-            !element.isInShadowSection() || element.parent !is PyStringLiteralExpression) {
-            return null
-        }
-
-        return getDocumentation(element)
+        return if (element.isStringLiteralInShadowSection()) getDocumentation(element) else null
     }
 
-    private fun getDocumentation(element: PsiElement): String? =
-            when (element.text) {
-                "\"full\"" -> SnakemakeBundle.message("INSP.NAME.shadow.settings.full")
-                "\"shallow\"" -> SnakemakeBundle.message("INSP.NAME.shadow.settings.shallow")
-                "\"minimal\"" -> SnakemakeBundle.message("INSP.NAME.shadow.settings.minimal")
-                else -> null
-            }
+    private fun getDocumentation(element: PsiElement): String? {
+        val stringLiteral = PsiTreeUtil.getParentOfType(element, PyStringLiteralExpression::class.java)!!
+        return when (stringLiteral.stringValue) {
+            "full" -> SnakemakeBundle.message("INSP.NAME.shadow.settings.full")
+            "shallow" -> SnakemakeBundle.message("INSP.NAME.shadow.settings.shallow")
+            "minimal" -> SnakemakeBundle.message("INSP.NAME.shadow.settings.minimal")
+            else -> null
+        }
+    }
 
     override fun getCustomDocumentationElement(
             editor: Editor,
             file: PsiFile,
             contextElement: PsiElement?): PsiElement? {
-        return contextElement
+        return if (contextElement.isStringLiteralInShadowSection()) contextElement else null
     }
-  
-    private fun PsiElement.isInShadowSection(): Boolean =
+
+    private fun PsiElement?.isStringLiteralInShadowSection() =
+            SnakemakeLanguageDialect.isInsideSmkFile(this) &&
+                    this.isInShadowSection() &&
+                    PsiTreeUtil.getParentOfType(this, PyStringLiteralExpression::class.java) != null
+
+    private fun PsiElement?.isInShadowSection() =
             PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpointArgsSection::class.java)?.name ==
                     SnakemakeNames.SECTION_SHADOW
 }
