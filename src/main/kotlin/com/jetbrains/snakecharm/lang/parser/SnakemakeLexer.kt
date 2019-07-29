@@ -17,9 +17,10 @@ class SnakemakeLexer : PythonIndentingLexer() {
     private val recoveryTokens = PythonDialectsTokenSetProvider.INSTANCE.unbalancedBracesRecoveryTokens
     private var myCurrentNewlineIndent = 0
     private var previousToken: IElementType? = null
+    // used to differentiate between 'rule all: input: "text"' and 'rule: input: "text" '
+    private var topLevelSectionColonOccurred = false
     /*
      The following tokens can be considered top-level sections:
-     0. identifies
      1. text is present in the KEYWORDS map
      2. text is immediately followed by a colon or a whitespace character, an identifier and a colon
      3. topLevelSectionIndent is equal to -1, meaning there is no top-level section nesting the current section
@@ -77,7 +78,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
     }
 
     override fun advance() {
-        if (topLevelSectionIndent <= myCurrentNewlineIndent && KEYWORDS[tokenText] != null) {
+        if (topLevelSectionIndent == -1 && KEYWORDS[tokenText] != null) {
             val possibleToplevelSectionKeyword = tokenText
             val isToplevelSection = isToplevelKeywordSection()
             if (isToplevelSection) {
@@ -88,8 +89,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
             }
         } else if (topLevelSectionIndent > -1 &&
                 myCurrentNewlineIndent >= topLevelSectionIndent &&
-                ruleLikeSectionIndent <= myCurrentNewlineIndent &&
-                tokenType == PyTokenTypes.IDENTIFIER) {
+                ruleLikeSectionIndent == -1 &&
+                tokenType == PyTokenTypes.IDENTIFIER && topLevelSectionColonOccurred) {
             val identifierPosition = currentPosition
             val identifierText = tokenText
             // look ahead and update rule-like section indent if an identifier is followed by a colon
@@ -101,6 +102,15 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 isInPythonSection = identifierText == SnakemakeNames.SECTION_RUN
             }
             restore(identifierPosition)
+        } else if (myCurrentNewlineIndent < ruleLikeSectionIndent || myCurrentNewlineIndent < topLevelSectionIndent) {
+            // we left the previous section and didn't end up in a new one
+            topLevelSectionIndent = -1
+            ruleLikeSectionIndent = -1
+            topLevelSectionColonOccurred = false
+        }
+
+        if (tokenType == PyTokenTypes.COLON && topLevelSectionIndent > -1 && ruleLikeSectionIndent == -1) {
+            topLevelSectionColonOccurred = true
         }
 
         if (tokenType === PyTokenTypes.LINE_BREAK) {
@@ -175,10 +185,15 @@ class SnakemakeLexer : PythonIndentingLexer() {
         var isToplevelSection = (tokenType == PyTokenTypes.COLON || tokenType == null) &&
                 (previousToken == null || previousToken == PyTokenTypes.LINE_BREAK)
         if (!isToplevelSection) {
-            if (possibleToplevelSectionKeyword in RULE_LIKE_KEYWORDS && tokenType in PyTokenTypes.WHITESPACE) {
-                advanceBase()
+            if (possibleToplevelSectionKeyword in RULE_LIKE_KEYWORDS) {
+                while (tokenType in PyTokenTypes.WHITESPACE) {
+                    advanceBase()
+                }
                 if (tokenType == PyTokenTypes.IDENTIFIER) {
                     advanceBase()
+                    while (tokenType in PyTokenTypes.WHITESPACE) {
+                        advanceBase()
+                    }
                     if (tokenType == PyTokenTypes.COLON) {
                         isToplevelSection = true
                     }
@@ -188,4 +203,18 @@ class SnakemakeLexer : PythonIndentingLexer() {
         restore(possibleKeywordPosition)
         return isToplevelSection
     }
+
+    /*override fun processLineBreak(startPos: Int) {
+        val pos = currentPosition
+        val hasSignificantTokens = myLineHasSignificantTokens
+        val indent = nextLineIndent
+        myLineHasSignificantTokens = hasSignificantTokens
+        restore(pos)
+
+        if (indent > ruleLikeSectionIndent) {
+            processInsignificantLineBreak(startPos, false)
+        } else {
+            super.processLineBreak(startPos)
+        }
+    }*/
 }
