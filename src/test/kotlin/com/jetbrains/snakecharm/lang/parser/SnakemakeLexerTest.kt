@@ -8,7 +8,7 @@ import com.jetbrains.snakecharm.lang.SmkTokenSetContributor
  * @author Roman.Chernyatchik
  * @date 2018-12-31
  */
-// TODO rewrite lexer tests to expect identifiers or try to insert keywords instead of identifiers in lexer
+
 class SnakemakeLexerTest : PyLexerTestCase() {
     override fun setUp() {
         super.setUp()
