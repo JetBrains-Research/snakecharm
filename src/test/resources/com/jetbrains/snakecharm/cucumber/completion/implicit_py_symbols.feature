@@ -160,7 +160,7 @@ Feature: Completion in python part of snakemake file
      expa
      """
      When I put the caret after expa
-     Then I invoke autocompletion popup, select "expand" lookup item and see a text:
+     Then I invoke autocompletion popup and see a text:
      """
      expand()
      """

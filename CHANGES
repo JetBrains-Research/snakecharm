@@ -3,6 +3,19 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
+Version 0.5
+-------------
+Released on <...>
+- sinceBuild "183.4284" (2018.3)
+- untilBuild "192.*" (2019.2)
+
+Features:
+-
+
+Fixed:
+-
+
+
 Version 0.4
 -------------
 Released on July 25th 2019
@@ -25,7 +38,6 @@ Features:
 - Inspection: Subworflow redeclaration, see #88
 - Inspection: subworkflow 'workdir', 'snakefile', 'configfile' could accept only single arg, see #83
 - Inspection: Warn if rule mentioned more than 1 time in ruleorder / localrule, see #107
-
 
 Fixed:
 - NoClassDefFoundError: com/intellij/psi/util/PsiTreeUtilKt, see #70

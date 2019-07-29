@@ -8,7 +8,7 @@ Feature: Completion for lambda parameter names in specific sections
       input: lambda w
     """
     When I put the caret after lambda w
-    Then I invoke autocompletion popup, select "wildcards" lookup item and see a text:
+    Then I invoke autocompletion popup and see a text:
     """
     <rule_like> rule1:
       input: lambda wildcards: 

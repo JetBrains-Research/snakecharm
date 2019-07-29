@@ -19,6 +19,15 @@ class FilesSteps {
         }, ModalityState.NON_MODAL)
     }
 
+    @Given("^a directory \"(.+)\"")
+    fun aDirectory(name: String) {
+        ApplicationManager.getApplication().invokeAndWait({
+            ApplicationManager.getApplication().runWriteAction {
+                SnakemakeWorld.fixture().tempDirFixture.findOrCreateDir(name)
+            }
+        }, ModalityState.NON_MODAL)
+    }
+
     @Given("^I open a file \"(.+)\" with text$")
     fun iOpenAFile(name: String, text: String) {
         createAndAddFile(name, text)
