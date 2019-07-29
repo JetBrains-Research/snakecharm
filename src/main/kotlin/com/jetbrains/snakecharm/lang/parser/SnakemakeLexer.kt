@@ -77,16 +77,14 @@ class SnakemakeLexer : PythonIndentingLexer() {
     }
 
     override fun advance() {
-        if (topLevelSectionIndent <= myCurrentNewlineIndent) {
-            if (KEYWORDS[tokenText] != null) {
-                val possibleToplevelSectionKeyword = tokenText
-                val isToplevelSection = isToplevelKeywordSection()
-                if (isToplevelSection) {
-                    // if it's the first token in the file, it's 0, as it should be
-                    topLevelSectionIndent = myCurrentNewlineIndent
-                    ruleLikeSectionIndent = -1
-                    isInPythonSection = possibleToplevelSectionKeyword in PYTHON_BLOCK_KEYWORDS
-                }
+        if (topLevelSectionIndent <= myCurrentNewlineIndent && KEYWORDS[tokenText] != null) {
+            val possibleToplevelSectionKeyword = tokenText
+            val isToplevelSection = isToplevelKeywordSection()
+            if (isToplevelSection) {
+                // if it's the first token in the file, it's 0, as it should be
+                topLevelSectionIndent = myCurrentNewlineIndent
+                ruleLikeSectionIndent = -1
+                isInPythonSection = possibleToplevelSectionKeyword in PYTHON_BLOCK_KEYWORDS
             }
         } else if (topLevelSectionIndent > -1 &&
                 myCurrentNewlineIndent >= topLevelSectionIndent &&
