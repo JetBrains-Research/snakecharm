@@ -41,8 +41,9 @@ SnakemakeFile: KeywordIdentifiersAtToplevelWithPrecedingOpenBrace.smk
                 PsiWhiteSpace('\n')
                 PyReferenceExpression: checkpoint
                   PsiElement(Py:IDENTIFIER)('checkpoint')
-                PsiElement(Py:RPAR)(')')
-  PsiWhiteSpace('\n\n')
+                PsiErrorElement:',' or ')' expected
+                  <empty list>
+            PsiWhiteSpace('\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')

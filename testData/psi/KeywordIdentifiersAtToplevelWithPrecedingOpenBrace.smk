@@ -3,7 +3,7 @@ rule foo1:
         rule = 1
         checkpoint = 2
         print(rule,
-checkpoint)
+checkpoint
 
 rule foo2:
     run:
