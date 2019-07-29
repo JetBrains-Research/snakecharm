@@ -21,7 +21,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
      The following tokens can be considered top-level sections:
      0. identifies
      1. text is present in the KEYWORDS map
-     2. topLevelSectionIndent is equal to -1, meaning there is no top-level section nesting the current section
+     2. text is immediately followed by a colon or a whitespace character, an identifier and a colon
+     3. topLevelSectionIndent is equal to -1, meaning there is no top-level section nesting the current section
     */
     private var topLevelSectionIndent = -1
     /*
@@ -30,16 +31,16 @@ class SnakemakeLexer : PythonIndentingLexer() {
      1. topLevelSectionIndent is greater than -1, meaning the current section is nested inside a top-level section
      2. there is a colon token following this token immediately
      Should always be not less than topLevelSectionIndent
-    * */
+    */
     private var ruleLikeSectionIndent = -1
     /*
      Is true for:
-      - inside onsuccess/onerror/onstart top-level sections
+      - `onsuccess`/`onerror`/`onstart` top-level sections
         (and topLevelSectionIndent is greater than -1, ruleLikeSectionIndent is equal to -1)
-      - inside run rule-like section (both variables above are greater than -1)
+      - `run` rule-like section (both variables above are greater than -1)
      Is not true for:
       - python toplevel code, including conditional statements, loops and the like, because that's not a section
-    * */
+    */
     private var isInPythonSection = true
 
     companion object {
@@ -140,15 +141,15 @@ class SnakemakeLexer : PythonIndentingLexer() {
         } else if (PyTokenTypes.CLOSE_BRACES.contains(tokenType)) {
             myBraceLevel--
         } else if (myBraceLevel != 0) {
-            val inPythonArgList = isInPythonSection && recoveryTokens.contains(tokenType)
             val leftPreviousSection = myCurrentNewlineIndent <= ruleLikeSectionIndent ||
                     ruleLikeSectionIndent == -1 && myCurrentNewlineIndent <= topLevelSectionIndent
             val isInPythonCode = isInPythonSection || topLevelSectionIndent == -1
             val isToplevelSectionKeyword = (leftPreviousSection && !isInPythonSection || isInPythonCode) &&
                     isToplevelKeywordSection()
-            if (!inPythonArgList && !isToplevelSectionKeyword) {
+            if (!recoveryTokens.contains(tokenType) && !isToplevelSectionKeyword) {
                 return
             }
+
             myBraceLevel = 0
             val pos = tokenStart
             pushToken(PyTokenTypes.STATEMENT_BREAK, pos, pos)
@@ -172,6 +173,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         val possibleToplevelSectionKeyword = tokenText
 
         advanceBase()
+        // is currently the last word in the file or is followed by a colon or a whitespace, an identifier and a colon
         var isToplevelSection = (tokenType == PyTokenTypes.COLON || tokenType == null) &&
                 (previousToken == null || previousToken == PyTokenTypes.LINE_BREAK)
         if (!isToplevelSection) {
