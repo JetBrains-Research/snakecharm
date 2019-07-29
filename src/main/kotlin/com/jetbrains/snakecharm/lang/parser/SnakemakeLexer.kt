@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.lang.parser
 
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
+import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.lexer.PythonIndentingLexer
@@ -15,6 +16,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 class SnakemakeLexer : PythonIndentingLexer() {
     private val recoveryTokens = PythonDialectsTokenSetProvider.INSTANCE.unbalancedBracesRecoveryTokens
     private var myCurrentNewlineIndent = 0
+    private var previousToken: IElementType? = null
     /*
      The following tokens can be considered top-level sections:
      0. identifies
@@ -74,14 +76,16 @@ class SnakemakeLexer : PythonIndentingLexer() {
     }
 
     override fun advance() {
-        if (topLevelSectionIndent <= myCurrentNewlineIndent && KEYWORDS[tokenText] != null) {
-            val possibleToplevelSectionKeyword = tokenText
-            val isToplevelSection = isToplevelKeywordSection()
-            if (isToplevelSection) {
-                // if it's the first token in the file, it's 0, as it should be
-                topLevelSectionIndent = myCurrentNewlineIndent
-                ruleLikeSectionIndent = -1
-                isInPythonSection = possibleToplevelSectionKeyword in PYTHON_BLOCK_KEYWORDS
+        if (topLevelSectionIndent <= myCurrentNewlineIndent) {
+            if (KEYWORDS[tokenText] != null) {
+                val possibleToplevelSectionKeyword = tokenText
+                val isToplevelSection = isToplevelKeywordSection()
+                if (isToplevelSection) {
+                    // if it's the first token in the file, it's 0, as it should be
+                    topLevelSectionIndent = myCurrentNewlineIndent
+                    ruleLikeSectionIndent = -1
+                    isInPythonSection = possibleToplevelSectionKeyword in PYTHON_BLOCK_KEYWORDS
+                }
             }
         } else if (topLevelSectionIndent > -1 &&
                 myCurrentNewlineIndent >= topLevelSectionIndent &&
@@ -114,6 +118,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         } else if (tokenType === PyTokenTypes.TAB) {
             myCurrentNewlineIndent += 8
         }
+
         if (myTokenQueue.size > 0) {
             myTokenQueue.removeAt(0)
             if (myProcessSpecialTokensPending) {
@@ -125,6 +130,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             processSpecialTokens()
         }
         adjustBraceLevel()
+        previousToken = tokenType
     }
 
     private fun adjustBraceLevel() {
@@ -135,11 +141,11 @@ class SnakemakeLexer : PythonIndentingLexer() {
             myBraceLevel--
         } else if (myBraceLevel != 0) {
             val inPythonArgList = isInPythonSection && recoveryTokens.contains(tokenType)
-            val leftPreviousSection = myCurrentNewlineIndent < ruleLikeSectionIndent ||
-                    ruleLikeSectionIndent == -1 && myCurrentNewlineIndent < topLevelSectionIndent
-            // compare two cases in KeywordIdentifiersAtToplevelWithPrecedingOpenBrace.smk
-            val isToplevelSectionKeyword =
-                    leftPreviousSection && ((isInPythonSection && isToplevelKeywordSection()) || !isInPythonSection)
+            val leftPreviousSection = myCurrentNewlineIndent <= ruleLikeSectionIndent ||
+                    ruleLikeSectionIndent == -1 && myCurrentNewlineIndent <= topLevelSectionIndent
+            val isInPythonCode = isInPythonSection || topLevelSectionIndent == -1
+            val isToplevelSectionKeyword = (leftPreviousSection && !isInPythonSection || isInPythonCode) &&
+                    isToplevelKeywordSection()
             if (!inPythonArgList && !isToplevelSectionKeyword) {
                 return
             }
@@ -166,7 +172,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
         val possibleToplevelSectionKeyword = tokenText
 
         advanceBase()
-        var isToplevelSection = tokenType == PyTokenTypes.COLON
+        var isToplevelSection = (tokenType == PyTokenTypes.COLON || tokenType == null) &&
+                (previousToken == null || previousToken == PyTokenTypes.LINE_BREAK)
         if (!isToplevelSection) {
             if (possibleToplevelSectionKeyword in RULE_LIKE_KEYWORDS && tokenType in PyTokenTypes.WHITESPACE) {
                 advanceBase()
