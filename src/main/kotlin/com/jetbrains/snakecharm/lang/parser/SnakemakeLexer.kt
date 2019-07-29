@@ -102,11 +102,6 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 isInPythonSection = identifierText == SnakemakeNames.SECTION_RUN
             }
             restore(identifierPosition)
-        } else if (myCurrentNewlineIndent < ruleLikeSectionIndent || myCurrentNewlineIndent < topLevelSectionIndent) {
-            // we left the previous section and didn't end up in a new one
-            topLevelSectionIndent = -1
-            ruleLikeSectionIndent = -1
-            topLevelSectionColonOccurred = false
         }
 
         if (tokenType == PyTokenTypes.COLON && topLevelSectionIndent > -1 && ruleLikeSectionIndent == -1) {
@@ -124,6 +119,12 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 }
             }
             myCurrentNewlineIndent = spaces
+            if (myCurrentNewlineIndent < ruleLikeSectionIndent || myCurrentNewlineIndent < topLevelSectionIndent) {
+                // we left the previous section and didn't end up in a new one
+                topLevelSectionIndent = -1
+                ruleLikeSectionIndent = -1
+                topLevelSectionColonOccurred = false
+            }
         } else if (tokenType === PyTokenTypes.TAB) {
             myCurrentNewlineIndent += 8
         }
@@ -203,18 +204,4 @@ class SnakemakeLexer : PythonIndentingLexer() {
         restore(possibleKeywordPosition)
         return isToplevelSection
     }
-
-    /*override fun processLineBreak(startPos: Int) {
-        val pos = currentPosition
-        val hasSignificantTokens = myLineHasSignificantTokens
-        val indent = nextLineIndent
-        myLineHasSignificantTokens = hasSignificantTokens
-        restore(pos)
-
-        if (indent > ruleLikeSectionIndent) {
-            processInsignificantLineBreak(startPos, false)
-        } else {
-            super.processLineBreak(startPos)
-        }
-    }*/
 }

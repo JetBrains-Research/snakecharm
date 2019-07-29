@@ -263,10 +263,6 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-    fun testDoNotCommit() {
-        doTest()
-    }
-
     private fun doTest() {
         // Actually snakemake requires python 3.x and no need to have it working with python 2.x
         //doTest(LanguageLevel.fromPythonVersion("2"))
