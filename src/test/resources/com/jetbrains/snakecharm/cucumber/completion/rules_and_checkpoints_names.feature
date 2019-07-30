@@ -5,8 +5,6 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
     Given a snakemake project
     Given I open a file "foo.smk" with text
      """
-
-     constant = 1
      <rule_like> aaaa:
        input: "path/to/input"
        output: "path/to/output"
