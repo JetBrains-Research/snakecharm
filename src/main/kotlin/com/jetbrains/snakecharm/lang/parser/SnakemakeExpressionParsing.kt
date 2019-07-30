@@ -259,18 +259,13 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 }
                 keywordArgMarker.rollbackTo()
             }
-            if (!parseSingleExpressionOrStringExpression()) {
+            if (!parseSingleExpression(false)) {
                 myBuilder.error(message("PARSE.expected.expression"))
                 return false
             }
         }
         return true
     }
-
-    private fun parseSingleExpressionOrStringExpression() =
-            if (!parseStringAdditiveExpression()) parseSingleExpression(false) else true
-
-    private fun atStringNodeOrFormattedString() = atAnyOfTokensSafe(*stringLiteralTokenSet.types)
 
     /**
      * Skips tokens until token from expected set and marks it with error
@@ -319,179 +314,6 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
      * Compares the current token against [tokenType] without applying filters.
      */
     private fun checkCurrentTokenSafe(tokenType: IElementType) = myBuilder.rawLookup(0) == tokenType
-
-    /**
-     * Parse multiline strings and method calls on strings.
-     * This method is necessary as the lexer adds statement breaks,
-     * preventing multiline strings from being correctly parsed by the Python parser.
-     */
-    private fun parseMultilineString(): Boolean {
-        if (!atStringNodeOrFormattedString()) {
-            return false
-        }
-
-        var stringLiteralMarker = myBuilder.mark()
-        var statementEndPosition = -1
-        var statementBreakMarker: PsiBuilder.Marker? = null // still necessary as we might need to rollback to this
-        var incorrectUnindentMarker: PsiBuilder.Marker? = null
-        var previousIndents = indents
-
-        // if true, we need a second pass to replace statement breaks with line breaks
-        // and do call expression parsing on this multiline string
-        // in order for python call expression parsing to work properly
-        var dotOccurred = false
-
-        loop@while (atStringNodeOrFormattedString() || atAnyOfTokensSafe(PyTokenTypes.DOT)) {
-            when {
-                atAnyOfTokensSafe(PyTokenTypes.FSTRING_START) -> {
-                    // will be replaced with call to Python API when it becomes public
-                    val parseFunction = ExpressionParsing::class.java.getDeclaredMethod("parseFormattedStringNode")
-                    parseFunction.isAccessible = true
-                    try {
-                        parseFunction.invoke(this)
-                    } catch (e: InvocationTargetException) {
-                        if (e.cause is ProcessCanceledException) {
-                            throw (e.cause as ProcessCanceledException)
-                        }
-                    }
-                }
-                // method call on a new line
-                atAnyOfTokensSafe(PyTokenTypes.DOT) -> {
-                    dotOccurred = true
-                    statementEndPosition = myBuilder.rawTokenIndex()
-                    break@loop
-                }
-                else -> nextToken()
-            }
-
-            // wraps the current string together with its possible indent
-            incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
-            incorrectUnindentMarker = null
-
-            if (!atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
-                when {
-                    // when lines are separated with '\' symbol or there are two strings in a row like this: "1" "2"
-                    atStringNodeOrFormattedString() -> continue@loop
-                    atAnyOfTokensSafe(PyTokenTypes.PLUS) -> statementEndPosition = myBuilder.rawTokenIndex()
-                    atAnyOfTokensSafe(PyTokenTypes.DOT) -> {
-                        // call expression
-                        statementEndPosition = myBuilder.rawTokenIndex()
-                        dotOccurred = true
-                    }
-                    else -> break@loop
-                }
-            } else {
-                statementBreakMarker?.drop()
-                statementBreakMarker = myBuilder.mark()
-                statementEndPosition = myBuilder.rawTokenIndex()
-                previousIndents = indents
-                nextToken()
-            }
-
-            if (atAnyOfTokensSafe(PyTokenTypes.INDENT)) {
-                nextToken()
-                indents++
-            } else {
-                skipDedents {
-                    if (incorrectUnindentMarker == null) {
-                        incorrectUnindentMarker = myBuilder.mark()
-                    }
-                }
-                if (incorrectUnindentMarker == null && indents == 0) {
-                    break
-                }
-            }
-        }
-
-        // second pass to replace all necessary statement breaks with line breaks
-        // it has to be done on the 2nd pass when it is already known which position signifies the end of the expression
-        if (dotOccurred) {
-            stringLiteralMarker.rollbackTo()
-            if (statementEndPosition == -1) { // single line statement
-                return parseMemberExpression(false)
-            }
-            stringLiteralMarker = myBuilder.mark()
-            while (myBuilder.rawTokenIndex() < statementEndPosition) {
-                when {
-                    atStringNodeOrFormattedString() -> nextToken()
-                    /*
-                      atAnyOfTokens is safe to use because no keywords/anything else that is filtered
-                      should appear in a string literal before a dot,
-                      and we do need to skip all whitespaces up to the token,
-                      not just check that the token is present but stay at the current position.
-                    */
-                    atAnyOfTokens(PyTokenTypes.STATEMENT_BREAK, *indentationTokenSet.types) ->
-                        myBuilder.remapCurrentToken(PyTokenTypes.SPACE)
-
-                    else -> myBuilder.advanceLexer()
-                }
-            }
-            stringLiteralMarker.rollbackTo()
-            // third pass, this time to parse everything including the dot
-            return parseMemberExpression(false)
-        } else if (!atAnyOfTokensSafe(PyTokenTypes.PLUS)) {
-            statementBreakMarker?.rollbackTo()
-        } else {
-            incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
-            statementBreakMarker?.drop()
-        }
-
-        indents = previousIndents
-        stringLiteralMarker.done(PyElementTypes.STRING_LITERAL_EXPRESSION)
-        return true
-    }
-
-    private fun parseStringAdditiveExpression(): Boolean {
-        var expr = myBuilder.mark()
-        if (!parseMultilineString()) {
-            expr.drop()
-            return false
-        } else {
-            while (atToken(PyTokenTypes.PLUS)) {
-                myBuilder.advanceLexer()
-                skipStatementBreaksUpToTokens(*stringLiteralTokenSet.types)
-                if (!parseMultilineString()) {
-                    myBuilder.error(message("PARSE.expected.expression"))
-                }
-
-                expr.done(PyElementTypes.BINARY_EXPRESSION)
-                expr = expr.precede()
-                skipStatementBreaksUpToTokens(PyTokenTypes.PLUS)
-            }
-
-            expr.drop()
-            return true
-        }
-    }
-
-    /**
-     * Skips statement breaks, indents, and dedents until another token occurs.
-     * If this token is one of [tokenTypes],
-     * we leave the method at this token with everything up to it parsed correctly,
-     * otherwise we roll back to statement break and restore the previous indent balance.
-     */
-    private fun skipStatementBreaksUpToTokens(vararg tokenTypes: IElementType) {
-        val marker = myBuilder.mark()
-        val previousIndents = indents
-        while (atAnyOfTokensSafe(PyTokenTypes.STATEMENT_BREAK)) {
-            nextToken()
-            if (atAnyOfTokensSafe(PyTokenTypes.INDENT)) {
-                indents++
-                nextToken()
-            } else {
-                skipDedents { myBuilder.error(SnakemakeBundle.message("PARSE.incorrect.unindent")) }
-                if (indents == 0) {
-                    break
-                }
-            }
-        }
-        if (atAnyOfTokensSafe(*tokenTypes)) {
-            marker.drop()
-        } else {
-            indents = previousIndents
-            marker.rollbackTo()
-        }
-    }
 
     /**
      * Skips dedents while keeping the indent balance correct until reaches [indentLimit].

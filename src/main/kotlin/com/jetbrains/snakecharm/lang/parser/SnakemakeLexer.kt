@@ -17,8 +17,12 @@ class SnakemakeLexer : PythonIndentingLexer() {
     private val recoveryTokens = PythonDialectsTokenSetProvider.INSTANCE.unbalancedBracesRecoveryTokens
     private var myCurrentNewlineIndent = 0
     private var previousToken: IElementType? = null
+
     // used to differentiate between 'rule all: input: "text"' and 'rule: input: "text" '
     private var topLevelSectionColonOccurred = false
+
+    // used to insert statement break before the first argument bun only line breaks between section arguments
+    private var firstArgumentInSection = false
     /*
      The following tokens can be considered top-level sections:
      1. text is present in the KEYWORDS map
@@ -100,6 +104,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             if (baseTokenType == PyTokenTypes.COLON) {
                 ruleLikeSectionIndent = myCurrentNewlineIndent
                 isInPythonSection = identifierText == SnakemakeNames.SECTION_RUN
+                firstArgumentInSection = true
             }
             restore(identifierPosition)
         }
@@ -119,7 +124,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 }
             }
             myCurrentNewlineIndent = spaces
-            if (myCurrentNewlineIndent < ruleLikeSectionIndent || myCurrentNewlineIndent < topLevelSectionIndent) {
+            if (myCurrentNewlineIndent <= ruleLikeSectionIndent || myCurrentNewlineIndent <= topLevelSectionIndent) {
                 // we left the previous section and didn't end up in a new one
                 topLevelSectionIndent = -1
                 ruleLikeSectionIndent = -1
@@ -141,6 +146,10 @@ class SnakemakeLexer : PythonIndentingLexer() {
         }
         adjustBraceLevel()
         previousToken = tokenType
+
+        if (ruleLikeSectionIndent > -1 && firstArgumentInSection && tokenType !in PyTokenTypes.WHITESPACE && tokenType != PyTokenTypes.COLON) {
+            firstArgumentInSection = false
+        }
     }
 
     private fun adjustBraceLevel() {
@@ -203,5 +212,22 @@ class SnakemakeLexer : PythonIndentingLexer() {
         }
         restore(possibleKeywordPosition)
         return isToplevelSection
+    }
+
+    override fun processLineBreak(startPos: Int) {
+        if (ruleLikeSectionIndent > -1 && !isInPythonSection && !firstArgumentInSection) {
+            val indentPos = currentPosition
+            val hasSignificantTokens = myLineHasSignificantTokens
+            val indent = nextLineIndent
+            restore(indentPos)
+            myLineHasSignificantTokens = hasSignificantTokens
+            if (indent > ruleLikeSectionIndent) {
+                processInsignificantLineBreak(startPos, false)
+            } else {
+                super.processLineBreak(startPos)
+            }
+        } else {
+            super.processLineBreak(startPos)
+        }
     }
 }

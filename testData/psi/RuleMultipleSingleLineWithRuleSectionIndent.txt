@@ -149,11 +149,14 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
           PsiWhiteSpace(' ')
           PyReferenceExpression: rule
             PsiElement(Py:IDENTIFIER)('rule')
-          PsiWhiteSpace('\n                          ')
-          PsiErrorElement:',' expected
-            PsiElement(Py:IDENTIFIER)('rule')
-          PsiErrorElement:expression expected
-            <empty list>
+  PsiWhiteSpace('\n                          ')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiErrorElement:Rule name identifier or ':' expected
+      <empty list>
+    PyStatementList
+      PsiErrorElement:Indent expected...
+        <empty list>
   PsiWhiteSpace('\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
