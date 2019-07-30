@@ -16,6 +16,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 class SnakemakeLexer : PythonIndentingLexer() {
     private val recoveryTokens = PythonDialectsTokenSetProvider.INSTANCE.unbalancedBracesRecoveryTokens
     private var myCurrentNewlineIndent = 0
+    private var currentToken: IElementType? = null
     private var previousToken: IElementType? = null
 
     // used to differentiate between 'rule all: input: "text"' and 'rule: input: "text" '
@@ -47,6 +48,11 @@ class SnakemakeLexer : PythonIndentingLexer() {
       - python toplevel code, including conditional statements, loops and the like, because that's not a section
     */
     private var isInPythonSection = true
+
+    /*
+    Is true for: rule, checkpoint, subworkflow
+    */
+    private var isInToplevelSectionWithoutSubsections = false
 
     companion object {
         val RULE_LIKE_KEYWORDS = ImmutableSet.Builder<String>()
@@ -82,6 +88,10 @@ class SnakemakeLexer : PythonIndentingLexer() {
     }
 
     override fun advance() {
+        if ((ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections) && firstArgumentInSection && tokenType !in PyTokenTypes.WHITESPACE && tokenType != PyTokenTypes.COLON) {
+            firstArgumentInSection = false
+        }
+
         if (topLevelSectionIndent == -1 && KEYWORDS[tokenText] != null) {
             val possibleToplevelSectionKeyword = tokenText
             val isToplevelSection = isToplevelKeywordSection()
@@ -129,10 +139,14 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 topLevelSectionIndent = -1
                 ruleLikeSectionIndent = -1
                 topLevelSectionColonOccurred = false
+                isInToplevelSectionWithoutSubsections = false
+                isInPythonSection = false
             }
         } else if (tokenType === PyTokenTypes.TAB) {
             myCurrentNewlineIndent += 8
         }
+
+        previousToken = tokenType
 
         if (myTokenQueue.size > 0) {
             myTokenQueue.removeAt(0)
@@ -145,11 +159,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             processSpecialTokens()
         }
         adjustBraceLevel()
-        previousToken = tokenType
-
-        if (ruleLikeSectionIndent > -1 && firstArgumentInSection && tokenType !in PyTokenTypes.WHITESPACE && tokenType != PyTokenTypes.COLON) {
-            firstArgumentInSection = false
-        }
+        currentToken = tokenType
     }
 
     private fun adjustBraceLevel() {
@@ -190,10 +200,22 @@ class SnakemakeLexer : PythonIndentingLexer() {
         val possibleKeywordPosition = currentPosition
         val possibleToplevelSectionKeyword = tokenText
 
+        if (KEYWORDS[possibleToplevelSectionKeyword] == null) {
+            return false
+        }
+
         advanceBase()
         // is currently the last word in the file or is followed by a colon or a whitespace, an identifier and a colon
         var isToplevelSection = (tokenType == PyTokenTypes.COLON || tokenType == null) &&
                 (previousToken == null || previousToken == PyTokenTypes.LINE_BREAK)
+
+        if (isToplevelSection && possibleToplevelSectionKeyword !in RULE_LIKE_KEYWORDS) {
+            restore(possibleKeywordPosition)
+            isInToplevelSectionWithoutSubsections = true
+            firstArgumentInSection = true
+            return true
+        }
+
         if (!isToplevelSection) {
             if (possibleToplevelSectionKeyword in RULE_LIKE_KEYWORDS) {
                 while (tokenType in PyTokenTypes.WHITESPACE) {
@@ -211,17 +233,19 @@ class SnakemakeLexer : PythonIndentingLexer() {
             }
         }
         restore(possibleKeywordPosition)
+
         return isToplevelSection
     }
 
     override fun processLineBreak(startPos: Int) {
-        if (ruleLikeSectionIndent > -1 && !isInPythonSection && !firstArgumentInSection) {
+        if ((ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections)
+                && !isInPythonSection && !firstArgumentInSection) {
             val indentPos = currentPosition
             val hasSignificantTokens = myLineHasSignificantTokens
             val indent = nextLineIndent
             restore(indentPos)
             myLineHasSignificantTokens = hasSignificantTokens
-            if (indent > ruleLikeSectionIndent) {
+            if (indent > ruleLikeSectionIndent && ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections && indent > topLevelSectionIndent) {
                 processInsignificantLineBreak(startPos, false)
             } else {
                 super.processLineBreak(startPos)

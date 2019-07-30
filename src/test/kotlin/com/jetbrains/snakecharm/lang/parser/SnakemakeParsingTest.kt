@@ -239,6 +239,7 @@ class SnakemakeParsingTest : ParsingTestCase(
     fun testRuleStringCallExpressionArgument() {
         doTest()
     }
+
     fun testUnbalancedBracesRecovery() {
         doTest()
     }

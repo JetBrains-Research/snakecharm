@@ -66,23 +66,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         var indents = if (argsOnNextLine) 1 else 0
         var argNumber = 0
         var incorrectUnindentMarker: PsiBuilder.Marker? = null
-        while (!myBuilder.eof()) {
-            if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
-                nextToken()
-                if (matchToken(PyTokenTypes.INDENT)) {
-                    indents++
-                } else {
-                    while (indents > 0 && atToken(PyTokenTypes.DEDENT)) {
-                        nextToken()
-                        indents--
-                    }
-                    // leave this section
-                    if (indents == 0 || myBuilder.eof()) {
-                        break
-                    }
-                }
-            }
-
+        while (!myBuilder.eof() && !atToken(PyTokenTypes.STATEMENT_BREAK)) {
             argNumber++
 
             // separator if several args:
