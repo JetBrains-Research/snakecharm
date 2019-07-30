@@ -1,0 +1,20 @@
+SnakemakeFile: DocstringAtEndOfFile.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('boo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: echo hello
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"echo hello"')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: world
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"world"')
+      PsiErrorElement:Unexpected EOF while parsing
+        <empty list>

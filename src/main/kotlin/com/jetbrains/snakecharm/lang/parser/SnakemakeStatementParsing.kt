@@ -243,6 +243,10 @@ class SnakemakeStatementParsing(
                 nextToken()
             }
 
+            if (myBuilder.eof()) {
+                myBuilder.error(SnakemakeBundle.message("PARSE.unexpected.eof"))
+            }
+
             return true
         }
 
