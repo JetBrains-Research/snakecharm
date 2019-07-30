@@ -2,9 +2,7 @@ package com.jetbrains.snakecharm.lang.parser
 
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.impl.PsiBuilderImpl
-import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.psi.tree.IElementType
-import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PyBundle.message
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
@@ -12,28 +10,19 @@ import com.jetbrains.python.parsing.ExpressionParsing
 import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
-import java.lang.reflect.InvocationTargetException
 
 /**
  * @author Roman.Chernyatchik
  * @date 2019-01-04
  */
 class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionParsing(context) {
-    private val stringLiteralTokenSet = TokenSet.create(PyTokenTypes.FSTRING_START, *PyTokenTypes.STRING_NODES.types)
-    private val indentationTokenSet = TokenSet.create(
-            PyTokenTypes.INDENT,
-            PyTokenTypes.DEDENT,
-            PyTokenTypes.INCONSISTENT_DEDENT
-    )
-
-    private var indents = 0
-
     override fun getParsingContext() = myContext as SnakemakeParserContext
 
     fun parseRuleLikeSectionArgumentList() = parseArgumentList(
             ",", PyTokenTypes.COMMA,
-            message("PARSE.expected.expression")
-    ) { parseRuleParamArgument() }
+            message("PARSE.expected.expression"),
+            this::parseRuleParamArgument
+    )
 
     fun parseArgumentList(
             separatorTokenText: String,
@@ -94,16 +83,22 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 return false
             }
         }
-        indents = if (argsOnNextLine) 1 else 0
+        var indents = if (argsOnNextLine) 1 else 0
         var argNumber = 0
         var incorrectUnindentMarker: PsiBuilder.Marker? = null
-        var afterArgumentMarker: PsiBuilder.Marker? = null
         while (!myBuilder.eof()) {
             if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
                 nextToken()
-                /* It's important to use rawLookup() inside atAnyOfTokensSafe() here
+                /* It's important to use rawLookup() inside atAnyOfTokensSage() here
                    to avoid accidentally applying a filter to the current token. */
-                if (indents == 0 && !atAnyOfTokensSafe(separatorTokenType, *indentationTokenSet.types)) {
+                if (indents == 0 &&
+                        !atAnyOfTokensSafe(
+                                separatorTokenType,
+                                PyTokenTypes.INDENT,
+                                PyTokenTypes.INCONSISTENT_DEDENT,
+                                PyTokenTypes.DEDENT
+                        )
+                ) {
                     break
                 }
 
@@ -118,8 +113,21 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 if (matchToken(PyTokenTypes.INDENT)) {
                     indents++
                 } else {
-                    skipDedents { myBuilder.error(SnakemakeBundle.message("PARSE.incorrect.unindent")) }
-                    // leave this rule section
+                    // IMPORTANT: note that myBuilder.eof() could apply filter to lexemes
+                    // which is why it must be evaluated second
+                    while (indents > 0 && !myBuilder.eof()) {
+                        // IMPORTANT: keep this check inside the loop body
+                        /* atToken() uses getTokenType() which might apply a filter to the current token
+                           whether or not this token is actually DEDENT,
+                           which is why it's best not to invoke this method unless necessary. */
+                        if (atToken(PyTokenTypes.DEDENT)) {
+                            nextToken()
+                            indents--
+                        } else {
+                            break
+                        }
+                    }
+                    // leave this section
                     if (indents == 0 || myBuilder.eof()) {
                         break
                     }
@@ -127,7 +135,6 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             }
 
             argNumber++
-
 
             // separator if several args:
             if (argNumber > 1) {
@@ -143,9 +150,17 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         } else {
                             // skip dedents while matched, we could have several dedent tokens in a raw
                             // skip dedent while inside current block (indents > 1)
-                            skipDedents(1) {
-                                if (incorrectUnindentMarker == null) {
+
+                            while (indents > 1 && !myBuilder.eof()) {
+                                if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
                                     incorrectUnindentMarker = myBuilder.mark()
+                                    nextToken()
+                                }
+                                if (atToken(PyTokenTypes.DEDENT)) {
+                                    indents--
+                                    nextToken()
+                                } else {
+                                    break
                                 }
                             }
                         }
@@ -174,37 +189,15 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         break
                     }
                 } else {
-                    if (atToken(PyTokenTypes.IDENTIFIER)) {
-                        // keyword argument
-                        if (!matchToken(PyTokenTypes.EQ))  {
-                            val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText]
-                            if (actualToken != null && indents < 1) {
-                                // we have encountered a toplevel keyword, which means we are no longer inside an argument section
-                                myBuilder.remapCurrentToken(actualToken)
-                                afterArgumentMarker?.rollbackTo()
-                                break
-                            }
-                        }
-                    }
-
                     recoverUntilMatches(
                             SnakemakeBundle.message("PARSE.expected.separator.message", separatorTokenText),
                             separatorTokenType,
                             PyTokenTypes.STATEMENT_BREAK
                     )
-
-                    if (atAnyOfTokens(*SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.types)) {
-                        break
-                    }
                 }
             }
 
             parseArgumentFunction()
-
-            if (atToken(PyTokenTypes.IDENTIFIER) && afterArgumentMarker != null) {
-                afterArgumentMarker = myBuilder.mark()
-            }
-
             // mark everything that was incorrectly unindented
             incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
             incorrectUnindentMarker = null
@@ -267,6 +260,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         return true
     }
 
+
     /**
      * Skips tokens until token from expected set and marks it with error
      */
@@ -278,16 +272,6 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             if (!atToken(PyTokenTypes.STATEMENT_BREAK)) {
                 hasNonWhitespaceTokens = true
             }
-
-            if (myBuilder.lookAhead(1) == PyTokenTypes.IDENTIFIER) {
-                nextToken()
-                val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText]
-                if (actualToken != null) {
-                    myBuilder.remapCurrentToken(actualToken)
-                    break
-                }
-            }
-
             myBuilder.advanceLexer()
         }
         if (hasNonWhitespaceTokens) {
@@ -314,29 +298,4 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
      * Compares the current token against [tokenType] without applying filters.
      */
     private fun checkCurrentTokenSafe(tokenType: IElementType) = myBuilder.rawLookup(0) == tokenType
-
-    /**
-     * Skips dedents while keeping the indent balance correct until reaches [indentLimit].
-     * Incorrect dedents are handled by [incorrectUnindentHandler].
-     */
-    private fun skipDedents(
-            indentLimit: Int = 0,
-            incorrectUnindentHandler: () -> Unit
-    ) {
-        // IMPORTANT: note that myBuilder.eof() could apply filter to lexemes
-        // which is why it must be evaluated second
-        loop@ while (indents > indentLimit && !myBuilder.eof()) {
-            when {
-                atAnyOfTokensSafe(PyTokenTypes.DEDENT) -> {
-                    nextToken()
-                    indents--
-                }
-                atAnyOfTokensSafe(PyTokenTypes.INCONSISTENT_DEDENT) -> {
-                    incorrectUnindentHandler()
-                    nextToken()
-                }
-                else -> break@loop
-            }
-        }
-    }
 }
