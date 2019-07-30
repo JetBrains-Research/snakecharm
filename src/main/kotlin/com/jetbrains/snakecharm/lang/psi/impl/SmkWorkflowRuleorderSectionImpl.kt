@@ -6,6 +6,8 @@ import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
 import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkWorkflowRuleorderSection
+import com.jetbrains.snakecharm.lang.psi.getIcon
+import com.jetbrains.snakecharm.lang.psi.getPresentation
 
 class SmkWorkflowRuleorderSectionImpl(node: ASTNode): PyElementImpl(node), SmkWorkflowRuleorderSection {
     override fun getSectionKeywordNode() = node.findChildByType(SnakemakeTokenTypes.WORKFLOW_RULEORDER_KEYWORD)
@@ -15,6 +17,6 @@ class SmkWorkflowRuleorderSectionImpl(node: ASTNode): PyElementImpl(node), SmkWo
         else -> super.acceptPyVisitor(pyVisitor)
     }
 
-    override fun getPresentation() = super<SmkWorkflowRuleorderSection>.getPresentation()
-    override fun getIcon(flags: Int) = super<SmkWorkflowRuleorderSection>.getIcon(flags)
+    override fun getPresentation() = getPresentation(this)
+    override fun getIcon(flags: Int) = getIcon(this, flags)
 }

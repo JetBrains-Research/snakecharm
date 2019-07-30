@@ -1,41 +1,49 @@
 SnakemakeFile: RuleParamsListArgsStringMultiline.smk
-  PyFunction('null')
-    PyDecoratorList
-      PyDecorator: @workflow.input
-        PsiElement(Py:AT)('@')
-        PyReferenceExpression: input
-          PyReferenceExpression: workflow
-            PsiElement(Py:IDENTIFIER)('workflow')
-          PsiElement(Py:DOT)('.')
-          PsiElement(Py:IDENTIFIER)('input')
-        PyArgumentList
-          PsiElement(Py:LPAR)('(')
+  PyExpressionStatement
+    PyCallExpression: print
+      PyReferenceExpression: print
+        PsiElement(Py:IDENTIFIER)('print')
+      PyArgumentList
+        PsiElement(Py:LPAR)('(')
+        PsiWhiteSpace('\n    ')
+        PyStringLiteralExpression: {dataset}/inputfilefff
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"{dataset}/inputfile"')
           PsiWhiteSpace('\n    ')
-          PyStringLiteralExpression: 
-            PsiElement(Py:SINGLE_QUOTED_STRING)('"{dataset}/inputfile"')
-            PsiWhiteSpace('\n    ')
-            PsiElement(Py:SINGLE_QUOTED_STRING)('"fff"')
-          PsiWhiteSpace('\n')
-          PsiElement(Py:RPAR)(')')
-    PsiErrorElement:'@' or 'def' expected
-      <empty list>
-    PsiWhiteSpace('\n\n')
-    PyParameterList
-      <empty list>
-    PyStatementList
-      <empty list>
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"fff"')
+        PsiWhiteSpace('\n')
+        PsiElement(Py:RPAR)(')')
+  PsiWhiteSpace('\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('samtools_sort')
     PsiElement(Py:COLON)(':')
-    PsiWhiteSpace('\n    ')
-    SmkRuleOrCheckpointArgsSection
-      PsiElement(Py:IDENTIFIER)('input')
-      PsiElement(Py:COLON)(':')
-      PyArgumentList
-        PsiWhiteSpace('\n        ')
-        PyStringLiteralExpression: 
-          PsiElement(Py:SINGLE_QUOTED_STRING)('"foo"')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
           PsiWhiteSpace('\n        ')
-          PsiElement(Py:SINGLE_QUOTED_STRING)('"boo"')
+          PyStringLiteralExpression: fooboo
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"foo"')
+            PsiWhiteSpace('\n        ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"boo"')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('samtools_sort')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PyStringLiteralExpression: fooboo
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"foo"')
+            PsiWhiteSpace(' \')
+            PsiWhiteSpace('\n        ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"boo"')

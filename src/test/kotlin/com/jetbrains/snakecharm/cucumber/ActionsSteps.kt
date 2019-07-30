@@ -4,12 +4,15 @@ import com.intellij.codeInsight.documentation.DocumentationManager
 import com.intellij.ide.util.gotoByName.GotoSymbolModel2
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
+import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.findPsiElementUnderCaret
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.myGeneratedDocPopupText
@@ -19,6 +22,7 @@ import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
 import java.io.File.separator
 import java.util.regex.Pattern
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.test.fail
@@ -42,34 +46,104 @@ class ActionsSteps {
         iExpectInspectionOnIn(level, fixedSignature, fixedSignature, message)
     }
 
+    @Given("^I expect reference highlighting on \"(.+)\"")
+    fun iExpectReferenceHighlighting(signature: String) {
+        ApplicationManager.getApplication().invokeAndWait {
+            val fixture = SnakemakeWorld.fixture()
+            val psiFile = fixture.file
+            val document = PsiDocumentManager.getInstance(fixture.project).getDocument(psiFile)!!
+            val pos = document.text.indexOf(signature)
+            assertTrue(
+                    pos >= 0,
+                    "Signature <$signature> wasn't found in the file ${psiFile.name}."
+
+            )
+            val reference = fixture.getReferenceAtCaretPosition()
+            assertNotNull(reference, message = "There is no reference at the caret position")
+            val signatureRange = TextRange(pos, pos + signature.length)
+            assertEquals(
+                    reference.rangeInElement,
+                    signatureRange,
+                    message = "Expected highlighted text wasn't equal to the actual one. " +
+                            "Expected highlighting on: $signature, actually highlighted: ${reference.canonicalText}")
+        }
+    }
+
+
     @Given("^I expect inspection (error|warning|info|TYPO|weak warning) on <([^>]+)> in <(.+)> with message$")
     fun iExpectInspectionOnIn(level: String, text: String, signature: String, message: String) {
+        wrapTextInHighlightingTags(level, text, signature, message)
+    }
+
+    @When("^I expect inspection (error|warning|info|TYPO|weak warning) on <([^>]+)> with messages$")
+    fun iExpectInspectionsOnWithMessages(level: String, signature: String, messages: List<String>) {
+        iExpectInspectionsOnInWithMessages(level, signature, signature, messages)
+    }
+
+    @Given("^I expect inspection (error|warning|info|TYPO|weak warning) on <([^>]+)> in <(.+)> with messages$")
+    fun iExpectInspectionsOnInWithMessages(level: String, text: String, signature: String, messages: List<String>) {
+        messages.forEach { message ->
+            wrapTextInHighlightingTags(level, text, signature, message, true)
+        }
+    }
+
+    private fun wrapTextInHighlightingTags(
+            highlightingLevel: String,
+            text: String,
+            signature: String,
+            message: String,
+            searchInTags: Boolean = false
+    ) {
         require(!Pattern.compile("(^|[^\\\\])\"").matcher(message).find()) {
             "Quotes should be escaped in message: $message"
         }
 
-        val tag = level.replace(' ', '_')
+        val tag = highlightingLevel.replace(' ', '_')
         val newText = "<$tag descr=\"$message\">$text</$tag>"
         val fixture = SnakemakeWorld.fixture()
         val psiFile = fixture.file
         val project = psiFile.project
         val document = PsiDocumentManager.getInstance(fixture.project).getDocument(fixture.file)!!
+
+        val posInsideTags = if (searchInTags) findTextPositionInsideTags(tag, text, document.text) else -1
+        val startPos = if (posInsideTags == -1) {
+            findTextPositionWithSignature(text, signature, document, psiFile)
+        } else {
+            posInsideTags
+        }
+
+        ApplicationManager.getApplication().invokeAndWait {
+            performAction(project, Runnable {
+                fixture.editor.document.replaceString(startPos, startPos + text.length, newText)
+            })
+        }
+    }
+
+    private fun findTextPositionInsideTags(
+            tag: String,
+            text: String,
+            fullText: String
+    ): Int {
+        val textInsideTagsPattern = Pattern.compile("<$tag descr=.+?>([^<>]+)</$tag>")
+        val matcher = textInsideTagsPattern.matcher(fullText)
+        return if (matcher.find() && matcher.group(1) == text) matcher.start(1) else -1
+    }
+
+    private fun findTextPositionWithSignature(
+            text: String,
+            signature: String,
+            document: Document,
+            psiFile: PsiFile
+    ): Int {
         val pos = document.text.indexOf(signature)
         assertTrue(
                 pos >= 0,
                 "Signature <$signature> wasn't found in the file ${psiFile.name}."
-
         )
 
         val posInSignature = signature.indexOf(text)
         assertTrue(posInSignature >= 0)
-
-        ApplicationManager.getApplication().invokeAndWait {
-            performAction(project, Runnable {
-                val startPos = pos + posInSignature
-                fixture.editor.document.replaceString(startPos, startPos + text.length, newText)
-            })
-        }
+        return pos + posInSignature
     }
 
     @When("^I check highlighting (errors|warnings|infos|weak warnings)$")
@@ -93,6 +167,19 @@ class ActionsSteps {
     fun iInvokeQuickNavigationInfo() {
         // On: Ctrl + hover
         generateDocumentation(true)
+    }
+
+    @Then("^Documentation text should be equal to (.*)")
+    fun documentationTextShouldBeEqualTo(str: String) {
+        documentationTextShouldBeEqual(str)
+    }
+
+    @Then("^Documentation text should be equal to$")
+    fun documentationTextShouldBeEqual(str: String) {
+        val text = StringUtil.convertLineSeparators(str)
+        val docPopupText = myGeneratedDocPopupText
+        assertNotNull(docPopupText)
+        assertEquals(text, docPopupText, "Expected <$text> to be equal to  <$docPopupText>")
     }
 
     @Then("^Documentation text should contain (.*)$")
