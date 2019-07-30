@@ -136,7 +136,6 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             incorrectUnindentMarker = null
         }
 
-        // safe check is important here, be wary of that while modifying/debugging
         if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
             nextToken()
             while (indents > 0 && !myBuilder.eof()) {

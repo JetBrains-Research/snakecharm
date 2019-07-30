@@ -88,7 +88,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
     }
 
     override fun advance() {
-        if ((ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections) && firstArgumentInSection && tokenType !in PyTokenTypes.WHITESPACE && tokenType != PyTokenTypes.COLON) {
+        if ((ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections) &&
+                firstArgumentInSection && tokenType !in PyTokenTypes.WHITESPACE && tokenType != PyTokenTypes.COLON) {
             firstArgumentInSection = false
         }
 
@@ -245,7 +246,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
             val indent = nextLineIndent
             restore(indentPos)
             myLineHasSignificantTokens = hasSignificantTokens
-            if (indent > ruleLikeSectionIndent && ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections && indent > topLevelSectionIndent) {
+            if (indent > ruleLikeSectionIndent && ruleLikeSectionIndent > -1 ||
+                    isInToplevelSectionWithoutSubsections && indent > topLevelSectionIndent) {
                 processInsignificantLineBreak(startPos, false)
             } else {
                 super.processLineBreak(startPos)
