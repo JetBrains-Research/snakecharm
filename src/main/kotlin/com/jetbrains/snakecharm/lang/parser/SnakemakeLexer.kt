@@ -22,8 +22,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
     // used to differentiate between 'rule all: input: "text"' and 'rule: input: "text" '
     private var topLevelSectionColonOccurred = false
 
-    // used to insert statement break before the first argument bun only line breaks between section arguments
-    private var firstArgumentInSection = false
+    // used to insert statement break before the first argument but only line breaks between section arguments
+    private var beforeFirstArgumentInSection = false
     /*
      The following tokens can be considered top-level sections:
      1. text is present in the KEYWORDS map
@@ -49,9 +49,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
     */
     private var isInPythonSection = true
 
-    /*
-    Is true for: rule, checkpoint, subworkflow
-    */
+    // Is true for: rule, checkpoint, subworkflow
     private var isInToplevelSectionWithoutSubsections = false
 
     companion object {
@@ -88,9 +86,14 @@ class SnakemakeLexer : PythonIndentingLexer() {
     }
 
     override fun advance() {
+        // a colon or a whitespace and then a colon follows a section keyword
+        // if anything else occurred (e.g. statement break, identifier),
+        // we are already inside the section, and then statement breaks should not occur,
+        // so this variable is set to false
         if ((ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections) &&
-                firstArgumentInSection && tokenType !in PyTokenTypes.WHITESPACE && tokenType != PyTokenTypes.COLON) {
-            firstArgumentInSection = false
+                beforeFirstArgumentInSection &&
+                tokenType !in PyTokenTypes.WHITESPACE && tokenType != PyTokenTypes.COLON) {
+            beforeFirstArgumentInSection = false
         }
 
         if (topLevelSectionIndent == -1 && KEYWORDS[tokenText] != null) {
@@ -115,7 +118,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             if (baseTokenType == PyTokenTypes.COLON) {
                 ruleLikeSectionIndent = myCurrentNewlineIndent
                 isInPythonSection = identifierText == SnakemakeNames.SECTION_RUN
-                firstArgumentInSection = true
+                beforeFirstArgumentInSection = true
             }
             restore(identifierPosition)
         }
@@ -213,7 +216,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         if (isToplevelSection && possibleToplevelSectionKeyword !in RULE_LIKE_KEYWORDS) {
             restore(possibleKeywordPosition)
             isInToplevelSectionWithoutSubsections = true
-            firstArgumentInSection = true
+            beforeFirstArgumentInSection = true
             return true
         }
 
@@ -240,7 +243,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
     override fun processLineBreak(startPos: Int) {
         if ((ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections)
-                && !isInPythonSection && !firstArgumentInSection) {
+                && !isInPythonSection && !beforeFirstArgumentInSection) {
             val indentPos = currentPosition
             val hasSignificantTokens = myLineHasSignificantTokens
             val indent = nextLineIndent
