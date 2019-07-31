@@ -80,6 +80,7 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
                                     ?: emptyList())
 
                     allLambdas.forEach { lambda ->
+
                         lambda.parameterList.parameters.forEachIndexed { index, pyParameter ->
                             if (index == 0 && pyParameter.name != WILDCARDS_LAMBDA_PARAMETER) {
                                 if (pyParameter.name in ALLOWED_IN_PARAMS) {
@@ -96,7 +97,13 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
                                             PyRenameArgumentQuickFix()
                                     )
                                 }
-                                return
+                            }
+                            println("$index ${pyParameter.name}")
+                            if (index != 0 && pyParameter.name == WILDCARDS_LAMBDA_PARAMETER) {
+                                registerProblem(
+                                        pyParameter,
+                                        SnakemakeBundle.message("INSP.NAME.wildcards.first.argument")
+                                )
                             }
                             if (index >= ALLOWED_IN_PARAMS.size) {
                                 registerProblem(
@@ -108,7 +115,7 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
                                         )
                                 )
                             }
-                            if (pyParameter.name !in ALLOWED_IN_PARAMS) {
+                            if (index != 0 && pyParameter.name !in ALLOWED_IN_PARAMS) {
                                 registerProblem(
                                         pyParameter,
                                         SnakemakeBundle.message(

@@ -122,7 +122,11 @@ Feature: Inspection checking lambda parameter names in various sections
         "somecommand -o {params.prefix}"
     """
     And Lambda Parameter Names inspection is enabled
-    Then I expect inspection error on <output> with message
+    Then I expect inspection error on <wildcards> with message
+    """
+    'wildcards' has to be the first lambda parameter.
+    """
+    And I expect inspection error on <output> with message
     """
     'wildcards' has to be the first lambda parameter.
     """
