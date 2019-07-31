@@ -207,5 +207,41 @@ Feature: Resolve for rules in localrules and ruleorder
       | ptn             | text      | symbol_name | file         |
       | > ddd           | dddd      | dddd        | boo.smk      |
 
+  Scenario Outline: Resolve in ruleorder section for rules from files included in other files
+    Given a snakemake project
+    Given a file "boo.smk" with text
+    """
+    rule dddd:
+      input: "path/to/input"
+    """
+    Given a file "soo.smk" with text
+    """
+    include: "boo.smk"
+    """
+    Given a file "goo.smk" with text
+    """
+    include: "soo.smk"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    ruleorder: aaaa > <text>
+
+    include: "goo.smk"
+
+    rule aaaa:
+      input: "input.txt"
+
+    rule bbbb:
+      output: touch("output.txt")
+
+    checkpoint cccc:
+      output: touch("_output.txt")
+    """
+    When I put the caret after <ptn>
+    Then reference should resolve to "<symbol_name>" in "<file>"
+    Examples:
+      | ptn             | text      | symbol_name | file         |
+      | > ddd           | dddd      | dddd        | boo.smk      |
+
 
 
