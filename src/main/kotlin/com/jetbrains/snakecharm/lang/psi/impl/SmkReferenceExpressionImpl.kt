@@ -9,11 +9,12 @@ import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
-import com.jetbrains.snakecharm.lang.psi.SmkFile
-import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil.getIdentifierNode
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
+
 
 class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferenceExpression {
     override fun getName() = getNameNode()?.text
@@ -42,11 +43,22 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
         override fun resolve(): PsiElement? =
                 multiResolve(false).firstOrNull()?.element
 
-        override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> =
-                (getRules() + getCheckpoints())
-                        .filter { (name, _) -> name == key }
-                        .map { (_, psi) -> RatedResolveResult(RatedResolveResult.RATE_NORMAL, psi) }
-                        .toTypedArray()
+        override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
+
+            val rules = AbstractSmkRuleOrCheckpointType
+                    .findAvailableRuleLikeElementByName(element, key, SmkRuleNameIndex.KEY, SmkRule::class.java)
+                    { getRules().map{ (_, psi) -> psi }}
+            val checkpoints = AbstractSmkRuleOrCheckpointType
+                    .findAvailableRuleLikeElementByName(element, key, SmkCheckpointNameIndex.KEY, SmkCheckPoint::class.java)
+                    { getCheckpoints().map{ (_, psi) -> psi }}
+
+            val includedFiles = getIncludedFiles()
+
+            return (rules + checkpoints)
+                    .filter { it.containingFile == element.containingFile || it.containingFile in includedFiles }
+                    .map { RatedResolveResult(RatedResolveResult.RATE_NORMAL, it) }
+                    .toTypedArray()
+        }
 
         override fun getVariants(): Array<Any> =
                 (getRules() + getCheckpoints()).map { (name, elem) ->
@@ -62,6 +74,12 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
         private fun getCheckpoints() = PsiTreeUtil.getParentOfType(element, SmkFile::class.java)
                 ?.collectCheckPoints()
                 ?: emptyList()
+
+        private fun getIncludedFiles() = (element.containingFile as SmkFile)
+                .collectIncludes()
+                .flatMap { it.references.toList() }
+                .map { it.resolve() }
+                .filterIsInstance<SmkFile>()
     }
 }
 

@@ -153,5 +153,59 @@ Feature: Resolve for rules in localrules and ruleorder
       | localrules: aa |
       | localrules: aa |
 
+  Scenario Outline: No resolve for declarations from files present but not included for ruleorder section
+    Given a snakemake project
+    Given a file "boo.smk" with text
+    """
+    rule dddd:
+      input: "path/to/input"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    ruleorder: aaaa > <text>
+
+    rule aaaa:
+      input: "input.txt"
+
+    rule bbbb:
+      output: touch("output.txt")
+
+    checkpoint cccc:
+      output: touch("_output.txt")
+    """
+    When I put the caret after <ptn>
+    Then reference should not resolve
+    Examples:
+      | ptn             | text      |
+      | > ddd           | dddd      |
+
+  Scenario Outline: Resolve in ruleorder section for rules from included files
+    Given a snakemake project
+    Given a file "boo.smk" with text
+    """
+    rule dddd:
+      input: "path/to/input"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    ruleorder: aaaa > <text>
+
+    include: "boo.smk"
+
+    rule aaaa:
+      input: "input.txt"
+
+    rule bbbb:
+      output: touch("output.txt")
+
+    checkpoint cccc:
+      output: touch("_output.txt")
+    """
+    When I put the caret after <ptn>
+    Then reference should resolve to "<symbol_name>" in "<file>"
+    Examples:
+      | ptn             | text      | symbol_name | file         |
+      | > ddd           | dddd      | dddd        | boo.smk      |
+
 
 

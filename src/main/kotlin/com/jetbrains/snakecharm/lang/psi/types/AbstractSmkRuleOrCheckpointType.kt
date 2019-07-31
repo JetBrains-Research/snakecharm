@@ -19,7 +19,9 @@ import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 
 abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
@@ -79,22 +81,6 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
         }
     }
 
-    private fun searchScope(module: Module): GlobalSearchScope {
-        // module content root and all dependent modules:
-        val scope = GlobalSearchScope.moduleWithDependentsScope(module)
-
-        // all project w/o tests from project sdk roots
-        // PyProjectScopeBuilder.excludeSdkTestsScope(targetFile);
-
-        //Returns module scope including sources, tests, and dependencies, excluding libraries:
-        // * if files in content root, not in source root - not visible in scope
-        // GlobalSearchScope.moduleWithDependenciesScope(module)
-
-        // project with all modules and libs:
-        // GlobalSearchScope.allScope(project)
-        return scope
-    }
-
     override fun assertValid(message: String?) {
         // [romeo] Not sure is our type always valid or check whether any element is invalid
     }
@@ -105,20 +91,11 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
             direction: AccessDirection,
             resolveContext: PyResolveContext
     ): List<RatedResolveResult> {
-        if (!SnakemakeLanguageDialect.isInsideSmkFile(location)) {
+        if (!SnakemakeLanguageDialect.isInsideSmkFile(location) || location == null) {
             return emptyList()
         }
 
-        val module = location?.let {  ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
-        val results = if (module != null) {
-            val scope = searchScope(module)
-            StubIndex.getElements(indexKey, name, module.project, scope, clazz)
-        } else {
-            // try local resolve
-            currentFileDeclarations.filter { elem ->
-                elem.name == name
-            }
-        }
+        val results = findAvailableRuleLikeElementByName(location.originalElement, name, indexKey, clazz) { currentFileDeclarations }
 
         if (results.isEmpty()) {
             return emptyList()
@@ -141,6 +118,41 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
                         ,
                         PythonCompletionWeigher.WEIGHT_DELTA.toDouble()
                 )
+
+        fun <T: SmkRuleOrCheckpoint> findAvailableRuleLikeElementByName(
+                location: PsiElement,
+                name: String,
+                indexKey: StubIndexKey<String, T>,
+                clazz: Class<T>,
+                getCurrentFileDeclarationsFunction: () -> List<T>
+        ): Collection<PsiElement> {
+            val module = location.let {  ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
+            return if (module != null) {
+                val scope = searchScope(module)
+                StubIndex.getElements(indexKey, name, module.project, scope, clazz)
+            } else {
+                // try local resolve
+                getCurrentFileDeclarationsFunction().filter { elem ->
+                    elem.name == name
+                }
+            }
+        }
+
+        private fun searchScope(module: Module): GlobalSearchScope {
+            // module content root and all dependent modules:
+            val scope = GlobalSearchScope.moduleWithDependentsScope(module)
+
+            // all project w/o tests from project sdk roots
+            // PyProjectScopeBuilder.excludeSdkTestsScope(targetFile);
+
+            //Returns module scope including sources, tests, and dependencies, excluding libraries:
+            // * if files in content root, not in source root - not visible in scope
+            // GlobalSearchScope.moduleWithDependenciesScope(module)
+
+            // project with all modules and libs:
+            // GlobalSearchScope.allScope(project)
+            return scope
+        }
 
     }
 }
