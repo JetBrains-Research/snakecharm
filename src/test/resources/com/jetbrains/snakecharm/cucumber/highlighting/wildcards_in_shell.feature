@@ -124,3 +124,31 @@ Feature: Wildcard usage without 'wildcards.' prefix in shell section
       | checkpoint |
       | checkpoint |
 
+  Scenario Outline: Variable from a file included in an included file
+    Given a snakemake project
+    Given a file "file.smk" with text
+    """
+    b = 2
+    """
+    Given a file "boo.smk" with text
+    """
+    include: "file.smk"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    a = 1
+
+    include: "boo.smk"
+
+    <rule_like> rule1:
+      shell: "echo {a} {b}"
+    """
+    And Wildcards in Shell Section inspection is enabled
+    Then I expect no inspection error
+    When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+      | checkpoint |
+

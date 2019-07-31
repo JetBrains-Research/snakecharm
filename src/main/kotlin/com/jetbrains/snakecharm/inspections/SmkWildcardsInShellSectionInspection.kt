@@ -31,17 +31,7 @@ class SmkWildcardsInShellSectionInspection : SnakemakeInspection() {
             }
 
             val availableVariables = mutableListOf<PyTargetExpression>()
-            availableVariables.addAll((st.containingFile as PyFile).topLevelAttributes)
-
-            val includeStatements = (st.containingFile as SmkFile)
-                    .findChildrenByClass(SmkWorkflowArgsSection::class.java)
-                    .filter { it.sectionKeyword == SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD }
-            for (statement in includeStatements) {
-                for (reference in statement.references) {
-                    val resolvedFile = reference.resolve() as PyFile
-                    availableVariables.addAll(resolvedFile.topLevelAttributes)
-                }
-            }
+            collectToplevelAttributesFromFile(st.containingFile as SmkFile, mutableSetOf(), availableVariables)
 
             val shellCommand = st.argumentList?.arguments?.firstOrNull { it is PyStringLiteralExpression } ?: return
             val wildcardMatcher = wildcardPattern.matcher(shellCommand.text)
@@ -57,6 +47,26 @@ class SmkWildcardsInShellSectionInspection : SnakemakeInspection() {
                             TextRange(wildcardMatcher.start(1), wildcardMatcher.end(1)),
                             InsertWildcardsPrefixQuickFix()
                     )
+                }
+            }
+        }
+
+        private fun collectToplevelAttributesFromFile(
+                file: SmkFile,
+                visitedFiles: MutableSet<SmkFile>,
+                availableVariables: MutableList<PyTargetExpression>
+        ) {
+            visitedFiles.add(file)
+            availableVariables.addAll(file.topLevelAttributes)
+            val includeStatements = file
+                    .findChildrenByClass(SmkWorkflowArgsSection::class.java)
+                    .filter { it.sectionKeyword == SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD }
+            for (statement in includeStatements) {
+                for (reference in statement.references) {
+                    val resolvedFile = reference.resolve() as SmkFile
+                    if (resolvedFile !in visitedFiles) {
+                        collectToplevelAttributesFromFile(resolvedFile, visitedFiles, availableVariables)
+                    }
                 }
             }
         }
