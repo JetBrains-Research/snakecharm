@@ -5,7 +5,6 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
-import com.jetbrains.python.psi.PyFile
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.python.psi.PyTargetExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -58,9 +57,7 @@ class SmkWildcardsInShellSectionInspection : SnakemakeInspection() {
         ) {
             visitedFiles.add(file)
             availableVariables.addAll(file.topLevelAttributes)
-            val includeStatements = file
-                    .findChildrenByClass(SmkWorkflowArgsSection::class.java)
-                    .filter { it.sectionKeyword == SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD }
+            val includeStatements = file.collectIncludes()
             for (statement in includeStatements) {
                 for (reference in statement.references) {
                     val resolvedFile = reference.resolve() as SmkFile
