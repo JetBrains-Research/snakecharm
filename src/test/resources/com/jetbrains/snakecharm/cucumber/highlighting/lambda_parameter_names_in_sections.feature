@@ -32,11 +32,11 @@ Feature: Inspection checking lambda parameter names in various sections
         "output.txt"
     """
     And Lambda Parameter Names inspection is enabled
-    Then I expect inspection error on <a> in <a:> with message
+    Then I expect inspection warning on <a> in <a:> with message
     """
     Only use 'wildcards' as lambda parameter in 'input' section.
     """
-    When I check highlighting errors
+    When I check highlighting warnings
     Examples:
       | rule_like  |
       | rule       |
@@ -58,7 +58,7 @@ Feature: Inspection checking lambda parameter names in various sections
       | Only use 'wildcards' as lambda parameter in 'input' section. |
       | Don't use more than 1 lambda parameters in 'input' section.  |
 
-    When I check highlighting errors
+    When I check highlighting warnings
     Examples:
       | rule_like  |
       | rule       |
@@ -131,6 +131,7 @@ Feature: Inspection checking lambda parameter names in various sections
       | rule_like  |
       | rule       |
       | checkpoint |
+
 
   Scenario Outline: Too many lambda parameters in params section
     Given a snakemake project
