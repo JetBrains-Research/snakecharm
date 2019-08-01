@@ -38,14 +38,14 @@ class SnakemakeSectionsInShellReferenceContributor : PsiReferenceContributor() {
                         .psiElement(PyStringLiteralExpression::class.java)
                         .andOr(insideRuleSection, insideCallExpressionInRuleRunParameter),
                 object : PsiReferenceProvider() {
-                    private val paramsPattern = Pattern.compile("\\{([a-z]+)\\.([_a-zA-Z]\\w*)")
+                    private val sectionPattern = Pattern.compile("\\{([a-z]+)\\.([_a-zA-Z]\\w*)")
 
                     override fun getReferencesByElement(
                             element: PsiElement,
                             context: ProcessingContext
                     ): Array<PsiReference> {
                         val sectionReferences = mutableListOf<PsiReference>()
-                        val paramsMatcher = paramsPattern.matcher(element.text)
+                        val sectionMatcher = sectionPattern.matcher(element.text)
 
                         if (insideRuleSection.accepts(element)) {
                             val isShellCommand = PsiTreeUtil.getParentOfType(
@@ -53,14 +53,14 @@ class SnakemakeSectionsInShellReferenceContributor : PsiReferenceContributor() {
                             )?.sectionKeyword == SnakemakeNames.SECTION_SHELL
 
                             if (isShellCommand) {
-                                addSectionReferences(element, paramsMatcher, sectionReferences)
+                                addSectionReferences(element, sectionMatcher, sectionReferences)
                             }
                         } else {
                             val isShellCallExpression =
                                     PsiTreeUtil.getParentOfType(element, PyCallExpression::class.java)!!
                                             .callee?.name == SnakemakeNames.SECTION_SHELL
                             if (isShellCallExpression) {
-                                addSectionReferences(element, paramsMatcher, sectionReferences)
+                                addSectionReferences(element, sectionMatcher, sectionReferences)
                             }
                         }
 
