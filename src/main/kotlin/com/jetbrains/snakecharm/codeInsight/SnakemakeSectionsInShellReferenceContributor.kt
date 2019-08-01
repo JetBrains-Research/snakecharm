@@ -11,11 +11,11 @@ import com.jetbrains.snakecharm.codeInsight.completion.SmkKeywordCompletionContr
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
-import com.jetbrains.snakecharm.lang.psi.impl.refs.SmkParamsReference
+import com.jetbrains.snakecharm.lang.psi.impl.refs.SmkSectionReference
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
+class SnakemakeSectionsInShellReferenceContributor : PsiReferenceContributor() {
     private val insideRuleSection = PlatformPatterns.psiElement()
             .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
             .inside(SmkRuleOrCheckpointArgsSection::class.java)
@@ -24,6 +24,14 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
             .inside(PyCallExpression::class.java)
             .inside(SmkRunSection::class.java)
 
+    private val allowedInShellWithKeywords = setOf(
+            SnakemakeNames.SECTION_PARAMS,
+            SnakemakeNames.SECTION_INPUT,
+            SnakemakeNames.SECTION_OUTPUT,
+            SnakemakeNames.SECTION_RESOURCES,
+            SnakemakeNames.SECTION_LOG
+    )
+    private val allowedInShellWithoutKeywords = setOf(SnakemakeNames.SECTION_THREADS, SnakemakeNames.SECTION_VERSION)
 
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
         registrar.registerReferenceProvider(
@@ -31,13 +39,13 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
                         .psiElement(PyStringLiteralExpression::class.java)
                         .andOr(insideRuleSection, insideCallExpressionInRuleRunParameter),
                 object : PsiReferenceProvider() {
-                    private val paramsPattern = Pattern.compile("\\{params\\.([_a-zA-Z]\\w*)")
+                    private val paramsPattern = Pattern.compile("\\{([a-z]+)\\.([_a-zA-Z]\\w*)")
 
                     override fun getReferencesByElement(
                             element: PsiElement,
                             context: ProcessingContext
                     ): Array<PsiReference> {
-                        val paramReferences = mutableListOf<PsiReference>()
+                        val sectionReferences = mutableListOf<PsiReference>()
                         val paramsMatcher = paramsPattern.matcher(element.text)
 
                         if (insideRuleSection.accepts(element)) {
@@ -46,31 +54,34 @@ class SnakemakeParamsInShellReferenceContributor : PsiReferenceContributor() {
                             )?.sectionKeyword == SnakemakeNames.SECTION_SHELL
 
                             if (isShellCommand) {
-                                addParamsReferences(element, paramsMatcher, paramReferences)
+                                addSectionReferences(element, paramsMatcher, sectionReferences)
                             }
                         } else {
                             val isShellCallExpression =
                                     PsiTreeUtil.getParentOfType(element, PyCallExpression::class.java)!!
                                             .callee?.name == SnakemakeNames.SECTION_SHELL
                             if (isShellCallExpression) {
-                                addParamsReferences(element, paramsMatcher, paramReferences)
+                                addSectionReferences(element, paramsMatcher, sectionReferences)
                             }
                         }
 
-                        return paramReferences.toTypedArray()
+                        return sectionReferences.toTypedArray()
                     }
                 }
         )
     }
 
-    private fun addParamsReferences(
+    private fun addSectionReferences(
             element: PsiElement,
-            paramsMatcher: Matcher,
-            paramReferences: MutableList<PsiReference>
+            sectionMatcher: Matcher,
+            sectionReferences: MutableList<PsiReference>
     ) {
-        while (paramsMatcher.find()) {
-            paramReferences.add(SmkParamsReference(element as PyStringLiteralExpression,
-                    TextRange(paramsMatcher.start(1), paramsMatcher.end(1))))
+        while (sectionMatcher.find()) {
+            val sectionName = sectionMatcher.group(1)
+            if (sectionName in allowedInShellWithKeywords && sectionMatcher.groupCount() > 1) {
+                sectionReferences.add(SmkSectionReference(element as PyStringLiteralExpression,
+                        TextRange(sectionMatcher.start(2), sectionMatcher.end(2)), sectionName))
+            }
         }
     }
 }

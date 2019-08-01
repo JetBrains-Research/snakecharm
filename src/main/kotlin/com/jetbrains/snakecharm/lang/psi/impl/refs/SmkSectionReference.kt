@@ -6,13 +6,13 @@ import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.PlatformIcons
 import com.jetbrains.python.psi.PyStringLiteralExpression
-import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
 
-class SmkParamsReference(
+class SmkSectionReference(
         element: PyStringLiteralExpression,
-        textRange: TextRange
+        textRange: TextRange,
+        private val sectionName: String
 ) : PsiReferenceBase<PyStringLiteralExpression>(element, textRange) {
     private val key: String = element.text.substring(textRange.startOffset, textRange.endOffset)
 
@@ -27,10 +27,10 @@ class SmkParamsReference(
                     }
                     .toTypedArray()
 
-    private fun getParamsSection() =
+    private fun getSection() =
             PsiTreeUtil.getParentOfType(element, SmkRuleOrCheckpoint::class.java)
-            ?.getSectionByName(SnakemakeNames.SECTION_PARAMS)
+            ?.getSectionByName(sectionName)
 
     private fun getKeywordArguments() =
-            getParamsSection()?.keywordArguments ?: emptyList()
+            getSection()?.keywordArguments ?: emptyList()
 }

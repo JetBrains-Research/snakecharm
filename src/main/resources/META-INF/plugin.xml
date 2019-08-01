@@ -183,7 +183,7 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkLambdaRuleParamsInspection"
     />
 
-    <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
+    <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeSectionsInShellReferenceContributor"/>
 
     <findUsagesHandlerFactory
             implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"
