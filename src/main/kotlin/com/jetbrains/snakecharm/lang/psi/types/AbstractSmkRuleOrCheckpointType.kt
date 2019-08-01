@@ -19,9 +19,7 @@ import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
-import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 
 abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
@@ -60,25 +58,6 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
                 .filter { it.name != null && it != containingRule }
                 .map { createRuleLikeLookupItem(it.name!!, it) }
                 .toArray()
-    }
-
-    fun <Psi: SmkRuleOrCheckpoint> addVariantFromIndex(
-            indexKey: StubIndexKey<String, Psi>,
-            module: Module,
-            results: MutableList<Psi>,
-            clazz: Class<Psi>,
-            scope: GlobalSearchScope
-    ) {
-        val project = module.project
-        val stubIndex = StubIndex.getInstance()
-        val allKeys = ContainerUtil.newTroveSet<String>()
-        stubIndex.processAllKeys(
-                indexKey, Processors.cancelableCollectProcessor<String>(allKeys), scope, null
-        )
-
-        for (key in allKeys) {
-            results.addAll(StubIndex.getElements(indexKey, key, project, scope, clazz))
-        }
     }
 
     override fun assertValid(message: String?) {
@@ -135,6 +114,25 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
                 getCurrentFileDeclarationsFunction().filter { elem ->
                     elem.name == name
                 }
+            }
+        }
+
+        fun <Psi: SmkRuleOrCheckpoint> addVariantFromIndex(
+                indexKey: StubIndexKey<String, Psi>,
+                module: Module,
+                results: MutableList<Psi>,
+                clazz: Class<Psi>,
+                scope: GlobalSearchScope = searchScope(module)
+        ) {
+            val project = module.project
+            val stubIndex = StubIndex.getInstance()
+            val allKeys = ContainerUtil.newTroveSet<String>()
+            stubIndex.processAllKeys(
+                    indexKey, Processors.cancelableCollectProcessor<String>(allKeys), scope, null
+            )
+
+            for (key in allKeys) {
+                results.addAll(StubIndex.getElements(indexKey, key, project, scope, clazz))
             }
         }
 

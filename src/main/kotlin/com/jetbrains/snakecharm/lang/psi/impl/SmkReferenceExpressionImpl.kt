@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
+import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
@@ -60,10 +61,28 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
                     .toTypedArray()
         }
 
-        override fun getVariants(): Array<Any> =
-                (getRules() + getCheckpoints()).map { (name, elem) ->
-                    AbstractSmkRuleOrCheckpointType.createRuleLikeLookupItem(name, elem as SmkRuleOrCheckpoint)
-                }.toTypedArray()
+        override fun getVariants(): Array<Any> {
+            val results = mutableListOf<Pair<String, SmkRuleOrCheckpoint>>()
+
+            val module = ModuleUtilCore.findModuleForPsiElement(element)
+            if (module != null) {
+                val ruleResults = mutableListOf<SmkRule>()
+                val checkpointResults = mutableListOf<SmkCheckPoint>()
+                AbstractSmkRuleOrCheckpointType.addVariantFromIndex(SmkRuleNameIndex.KEY, module, ruleResults, SmkRule::class.java)
+                AbstractSmkRuleOrCheckpointType.addVariantFromIndex(SmkCheckpointNameIndex.KEY, module, checkpointResults, SmkCheckPoint::class.java)
+                results.addAll((ruleResults + checkpointResults).filter { (it as SmkRuleOrCheckpoint).name != null }.map { (it as SmkRuleOrCheckpoint).name!! to it })
+            } else {
+                results.addAll(getRules() + getCheckpoints())
+            }
+
+            val includedFiles = getIncludedFiles().map { it.originalFile }
+
+            return results
+                    .filter { it.second.containingFile.originalFile == element.containingFile.originalFile || it.second.containingFile.originalFile in includedFiles }
+                    .map { (name, elem) ->
+                AbstractSmkRuleOrCheckpointType.createRuleLikeLookupItem(name, elem)
+            }.toTypedArray()
+        }
 
         override fun handleElementRename(newElementName: String): PsiElement =
                 element.setName(newElementName)

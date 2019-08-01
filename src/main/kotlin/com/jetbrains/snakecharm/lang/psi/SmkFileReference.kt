@@ -60,7 +60,7 @@ open class SmkFileReference(
             it is PyStringLiteralExpression && it.stringValue == path
         } ?: return null
 
-        val parentFolder = element.containingFile.virtualFile?.parent ?: return null
+        val parentFolder = element.containingFile.originalFile.virtualFile?.parent ?: return null
 
         val filePath = (stringLiteral as? PyStringLiteralExpression)?.stringValue
         val vfm = VirtualFileManager.getInstance()

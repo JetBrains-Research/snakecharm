@@ -48,12 +48,11 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
             return emptyArray()
         }
 
-        val stringLiteralArgs = argumentList?.arguments?.filter {
-            it is PyStringLiteralExpression
-        } ?: return emptyArray()
+        val stringLiteralArgs = argumentList?.arguments?.filterIsInstance<PyStringLiteralExpression>()
+                ?: return emptyArray()
 
         return stringLiteralArgs.map {
-            val path = (it as PyStringLiteralExpression).stringValue
+            val path = it.stringValue
             val offsetInParent = keywordName!!.length + it.startOffsetInParent
             createReference(getReferenceRange(it).shiftRight(offsetInParent), path)
         }.toTypedArray()
