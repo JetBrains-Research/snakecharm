@@ -31,7 +31,6 @@ class SnakemakeSectionsInShellReferenceContributor : PsiReferenceContributor() {
             SnakemakeNames.SECTION_RESOURCES,
             SnakemakeNames.SECTION_LOG
     )
-    private val allowedInShellWithoutKeywords = setOf(SnakemakeNames.SECTION_THREADS, SnakemakeNames.SECTION_VERSION)
 
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
         registrar.registerReferenceProvider(
