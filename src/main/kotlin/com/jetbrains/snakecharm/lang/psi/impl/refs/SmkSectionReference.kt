@@ -39,7 +39,7 @@ class SmkSectionReference(
                             LookupElementBuilder.create(keyword).withIcon(PlatformIcons.PARAMETER_ICON)
                         }
                         .toTypedArray()
-            } else if (sectionName == element.text.substring(textRange.startOffset, textRange.endOffset)) {
+            } else if (sectionName in SnakemakeSectionsInShellReferenceContributor.ALLOWED_IN_SHELL_WITHOUT_KEYWORDS) {
                 emptyArray()
             } else {
                 SnakemakeSectionsInShellReferenceContributor.ALLOWED_IN_SHELL_WITHOUT_KEYWORDS

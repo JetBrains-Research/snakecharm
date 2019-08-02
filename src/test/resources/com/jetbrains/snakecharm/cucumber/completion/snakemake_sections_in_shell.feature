@@ -274,3 +274,69 @@ Feature: Completion for params in shell section
       | text    |
       | threads |
       | version |
+
+  Scenario Outline: completion for incomplete section names in shell section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      <section>: fa="text"
+      shell: "{<substring>}"
+    """
+    When I put the caret after "{<substring>
+    Then I invoke autocompletion popup and see a text:
+    """
+    <rule_like> NAME:
+      <section>: fa="text"
+      shell: "{<section>}"
+    """
+    Examples:
+      | rule_like  | section   | substring |
+      | rule       | input     | inp       |
+      | rule       | output    | out       |
+      | rule       | resources | res       |
+      | rule       | params    | par       |
+      | rule       | threads   | thr       |
+      | rule       | version   | ver       |
+      | rule       | log       | lo        |
+      | checkpoint | input     | inp       |
+      | checkpoint | output    | out       |
+      | checkpoint | resources | res       |
+      | checkpoint | params    | par       |
+      | checkpoint | threads   | thr       |
+      | checkpoint | version   | ver       |
+      | checkpoint | log       | lo        |
+
+  Scenario Outline: completion for incomplete section names in run section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      <section>: fa="text"
+      run:
+        shell("{<substring>}")
+    """
+    When I put the caret after "{<substring>
+    Then I invoke autocompletion popup and see a text:
+    """
+    <rule_like> NAME:
+      <section>: fa="text"
+      run:
+        shell("{<section>}")
+    """
+    Examples:
+      | rule_like  | section   | substring |
+      | rule       | input     | inp       |
+      | rule       | output    | out       |
+      | rule       | resources | res       |
+      | rule       | params    | par       |
+      | rule       | threads   | thr       |
+      | rule       | version   | ver       |
+      | rule       | log       | lo        |
+      | checkpoint | input     | inp       |
+      | checkpoint | output    | out       |
+      | checkpoint | resources | res       |
+      | checkpoint | params    | par       |
+      | checkpoint | threads   | thr       |
+      | checkpoint | version   | ver       |
+      | checkpoint | log       | lo        |
