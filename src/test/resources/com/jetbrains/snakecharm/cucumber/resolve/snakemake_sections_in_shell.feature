@@ -234,3 +234,45 @@ Feature: Resolve for params in shell section
       | checkpoint | .path    | log       |
       | checkpoint | [path]   | log       |
       | checkpoint | {'path'} | log       |
+
+  Scenario Outline: resolve for sections without keyword arguments
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      input: fa="text"
+      threads: 4
+      shell: "command {<text>}"
+    """
+    When I put the caret after <ptn>
+    Then reference should resolve to "<symbol_name>" in "<file>"
+    Examples:
+      | rule_like  | ptn   | text    | symbol_name | file    |
+      | rule       | {inp  | input   | input       | foo.smk |
+      | rule       | {thre | threads | threads     | foo.smk |
+      | checkpoint | {inp  | input   | input       | foo.smk |
+      | checkpoint | {thre | threads | threads     | foo.smk |
+
+  Scenario Outline: no resolve for sections without keyword arguments not present in rule
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      input: fa="text"
+      threads: 4
+      shell: "command {<text>}"
+    """
+    When I put the caret after <ptn>
+    Then reference should not resolve
+    Examples:
+      | rule_like  | ptn  | text      |
+      | rule       | {out | output    |
+      | rule       | {lo  | log       |
+      | rule       | {ver | version   |
+      | rule       | {res | resources |
+      | rule       | {par | params    |
+      | checkpoint | {out | output    |
+      | checkpoint | {lo  | log       |
+      | checkpoint | {ver | version   |
+      | checkpoint | {res | resources |
+      | checkpoint | {par | params    |

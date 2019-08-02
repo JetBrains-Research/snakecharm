@@ -16,6 +16,22 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 class SnakemakeSectionsInShellReferenceContributor : PsiReferenceContributor() {
+    companion object {
+        val ALLOWED_IN_SHELL_WITH_KEYWORDS = setOf(
+                SnakemakeNames.SECTION_PARAMS,
+                SnakemakeNames.SECTION_INPUT,
+                SnakemakeNames.SECTION_OUTPUT,
+                SnakemakeNames.SECTION_RESOURCES,
+                SnakemakeNames.SECTION_LOG
+        )
+
+        val ALLOWED_IN_SHELL_WITHOUT_KEYWORDS = setOf(
+                SnakemakeNames.SECTION_THREADS,
+                SnakemakeNames.SECTION_VERSION,
+                *ALLOWED_IN_SHELL_WITH_KEYWORDS.toTypedArray()
+        )
+    }
+
     private val insideRuleSection = PlatformPatterns.psiElement()
             .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
             .inside(SmkRuleOrCheckpointArgsSection::class.java)
@@ -24,28 +40,22 @@ class SnakemakeSectionsInShellReferenceContributor : PsiReferenceContributor() {
             .inside(PyCallExpression::class.java)
             .inside(SmkRunSection::class.java)
 
-    private val allowedInShellWithKeywords = setOf(
-            SnakemakeNames.SECTION_PARAMS,
-            SnakemakeNames.SECTION_INPUT,
-            SnakemakeNames.SECTION_OUTPUT,
-            SnakemakeNames.SECTION_RESOURCES,
-            SnakemakeNames.SECTION_LOG
-    )
-
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
         registrar.registerReferenceProvider(
                 PlatformPatterns
                         .psiElement(PyStringLiteralExpression::class.java)
                         .andOr(insideRuleSection, insideCallExpressionInRuleRunParameter),
                 object : PsiReferenceProvider() {
-                    private val sectionPattern = Pattern.compile("\\{([a-z]+)\\.([_a-zA-Z]\\w*)")
+                    private val sectionWithKeywordArgumentsPattern = Pattern.compile("\\{([a-z]+)\\.([_a-zA-Z]\\w*)")
+                    private val sectionStartPattern = Pattern.compile("\\{([a-z]*)([^.a-z]|\\z)")
 
                     override fun getReferencesByElement(
                             element: PsiElement,
                             context: ProcessingContext
                     ): Array<PsiReference> {
                         val sectionReferences = mutableListOf<PsiReference>()
-                        val sectionMatcher = sectionPattern.matcher(element.text)
+                        val sectionWithKeywordsMatcher = sectionWithKeywordArgumentsPattern.matcher(element.text)
+                        val sectionWithoutKeywordsMatcher = sectionStartPattern.matcher(element.text)
 
                         if (insideRuleSection.accepts(element)) {
                             val isShellCommand = PsiTreeUtil.getParentOfType(
@@ -53,14 +63,16 @@ class SnakemakeSectionsInShellReferenceContributor : PsiReferenceContributor() {
                             )?.sectionKeyword == SnakemakeNames.SECTION_SHELL
 
                             if (isShellCommand) {
-                                addSectionReferences(element, sectionMatcher, sectionReferences)
+                                addSectionWithKeywordArgumentsReferences(element, sectionWithKeywordsMatcher, sectionReferences)
+                                addSectionWithoutKeywordArgumentsReferences(element, sectionWithoutKeywordsMatcher, sectionReferences)
                             }
                         } else {
                             val isShellCallExpression =
                                     PsiTreeUtil.getParentOfType(element, PyCallExpression::class.java)!!
                                             .callee?.name == SnakemakeNames.SECTION_SHELL
                             if (isShellCallExpression) {
-                                addSectionReferences(element, sectionMatcher, sectionReferences)
+                                addSectionWithKeywordArgumentsReferences(element, sectionWithKeywordsMatcher, sectionReferences)
+                                addSectionWithoutKeywordArgumentsReferences(element, sectionWithoutKeywordsMatcher, sectionReferences)
                             }
                         }
 
@@ -70,17 +82,32 @@ class SnakemakeSectionsInShellReferenceContributor : PsiReferenceContributor() {
         )
     }
 
-    private fun addSectionReferences(
+    private fun addSectionWithKeywordArgumentsReferences(
             element: PsiElement,
             sectionMatcher: Matcher,
             sectionReferences: MutableList<PsiReference>
     ) {
         while (sectionMatcher.find()) {
             val sectionName = sectionMatcher.group(1)
-            if (sectionName in allowedInShellWithKeywords && sectionMatcher.groupCount() > 1) {
+            if (sectionName in ALLOWED_IN_SHELL_WITH_KEYWORDS && sectionMatcher.groupCount() > 1) {
                 sectionReferences.add(SmkSectionReference(element as PyStringLiteralExpression,
                         TextRange(sectionMatcher.start(2), sectionMatcher.end(2)), sectionName))
             }
+        }
+    }
+
+    private fun addSectionWithoutKeywordArgumentsReferences(
+            element: PsiElement,
+            sectionMatcher: Matcher,
+            sectionReferences: MutableList<PsiReference>
+    ) {
+        while (sectionMatcher.find()) {
+            val sectionName = if (sectionMatcher.group(1) in ALLOWED_IN_SHELL_WITHOUT_KEYWORDS) {
+                sectionMatcher.group(1)
+            } else {
+                null
+            }
+            sectionReferences.add(SmkSectionReference(element as PyStringLiteralExpression, TextRange(sectionMatcher.start(1), sectionMatcher.end(1)), sectionName))
         }
     }
 }

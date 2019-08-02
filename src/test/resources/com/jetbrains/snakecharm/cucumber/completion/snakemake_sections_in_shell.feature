@@ -209,3 +209,43 @@ Feature: Completion for params in shell section
       | output    | checkpoint |
       | resources | checkpoint |
       | log       | checkpoint |
+
+
+  Scenario Outline: completion for sections without arguments
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      input: fa="text"
+      threads: 4
+      shell: "command {}"
+    """
+    When I put the caret after command {
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | input   |
+      | threads |
+    And completion list shouldn't contain:
+      | output               |
+      | version              |
+      | log                  |
+      | resources            |
+      | params               |
+      | shadow               |
+      | group                |
+      | singularity          |
+      | wildcard_constraints |
+      | conda                |
+      | benchmark            |
+      | message              |
+      | priority             |
+      | run                  |
+      | script               |
+      | shell                |
+      | wrapper              |
+      | cwl                  |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
