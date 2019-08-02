@@ -249,3 +249,28 @@ Feature: Completion for params in shell section
       | rule       |
       | checkpoint |
 
+
+  Scenario Outline: no completion for dot after sections not allowing or having keyword arguments
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule NAME:
+      input: fa="text"
+      output: "no_keyword_arguments.txt"
+      threads: 4
+      version: 2
+      shell: "command {<text>.}"
+    """
+    When I put the caret after command {<text>.
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | threads   |
+      | version   |
+      | input     |
+      | output    |
+      | resources |
+      | params    |
+    Examples:
+      | text    |
+      | threads |
+      | version |

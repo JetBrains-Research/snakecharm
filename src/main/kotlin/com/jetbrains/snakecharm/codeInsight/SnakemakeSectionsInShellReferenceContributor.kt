@@ -17,7 +17,7 @@ import java.util.regex.Pattern
 
 class SnakemakeSectionsInShellReferenceContributor : PsiReferenceContributor() {
     companion object {
-        val ALLOWED_IN_SHELL_WITH_KEYWORDS = setOf(
+        private val ALLOWED_IN_SHELL_WITH_KEYWORDS = setOf(
                 SnakemakeNames.SECTION_PARAMS,
                 SnakemakeNames.SECTION_INPUT,
                 SnakemakeNames.SECTION_OUTPUT,
@@ -46,16 +46,14 @@ class SnakemakeSectionsInShellReferenceContributor : PsiReferenceContributor() {
                         .psiElement(PyStringLiteralExpression::class.java)
                         .andOr(insideRuleSection, insideCallExpressionInRuleRunParameter),
                 object : PsiReferenceProvider() {
-                    private val sectionWithKeywordArgumentsPattern = Pattern.compile("\\{([a-z]+)\\.([_a-zA-Z]\\w*)")
-                    private val sectionStartPattern = Pattern.compile("\\{([a-z]*)([^.a-z]|\\z)")
+                    private val sectionPattern = Pattern.compile("\\{([a-z]*)(\\.([_a-zA-Z]\\w*)?)?")
 
                     override fun getReferencesByElement(
                             element: PsiElement,
                             context: ProcessingContext
                     ): Array<PsiReference> {
                         val sectionReferences = mutableListOf<PsiReference>()
-                        val sectionWithKeywordsMatcher = sectionWithKeywordArgumentsPattern.matcher(element.text)
-                        val sectionWithoutKeywordsMatcher = sectionStartPattern.matcher(element.text)
+                        val sectionMatcher = sectionPattern.matcher(element.text)
 
                         if (insideRuleSection.accepts(element)) {
                             val isShellCommand = PsiTreeUtil.getParentOfType(
@@ -63,16 +61,14 @@ class SnakemakeSectionsInShellReferenceContributor : PsiReferenceContributor() {
                             )?.sectionKeyword == SnakemakeNames.SECTION_SHELL
 
                             if (isShellCommand) {
-                                addSectionWithKeywordArgumentsReferences(element, sectionWithKeywordsMatcher, sectionReferences)
-                                addSectionWithoutKeywordArgumentsReferences(element, sectionWithoutKeywordsMatcher, sectionReferences)
+                                addSectionReferences(element, sectionMatcher, sectionReferences)
                             }
                         } else {
                             val isShellCallExpression =
                                     PsiTreeUtil.getParentOfType(element, PyCallExpression::class.java)!!
                                             .callee?.name == SnakemakeNames.SECTION_SHELL
                             if (isShellCallExpression) {
-                                addSectionWithKeywordArgumentsReferences(element, sectionWithKeywordsMatcher, sectionReferences)
-                                addSectionWithoutKeywordArgumentsReferences(element, sectionWithoutKeywordsMatcher, sectionReferences)
+                                addSectionReferences(element, sectionMatcher, sectionReferences)
                             }
                         }
 
@@ -82,32 +78,28 @@ class SnakemakeSectionsInShellReferenceContributor : PsiReferenceContributor() {
         )
     }
 
-    private fun addSectionWithKeywordArgumentsReferences(
+    private fun addSectionReferences(
             element: PsiElement,
             sectionMatcher: Matcher,
             sectionReferences: MutableList<PsiReference>
     ) {
         while (sectionMatcher.find()) {
             val sectionName = sectionMatcher.group(1)
-            if (sectionName in ALLOWED_IN_SHELL_WITH_KEYWORDS && sectionMatcher.groupCount() > 1) {
-                sectionReferences.add(SmkSectionReference(element as PyStringLiteralExpression,
-                        TextRange(sectionMatcher.start(2), sectionMatcher.end(2)), sectionName))
-            }
-        }
-    }
+            val argumentName = sectionMatcher.group(3)
+            sectionReferences.add(SmkSectionReference(
+                    element as PyStringLiteralExpression,
+                    TextRange(sectionMatcher.start(1), sectionMatcher.end(1)),
+                    if (sectionName.isEmpty()) null else sectionName
+            ))
 
-    private fun addSectionWithoutKeywordArgumentsReferences(
-            element: PsiElement,
-            sectionMatcher: Matcher,
-            sectionReferences: MutableList<PsiReference>
-    ) {
-        while (sectionMatcher.find()) {
-            val sectionName = if (sectionMatcher.group(1) in ALLOWED_IN_SHELL_WITHOUT_KEYWORDS) {
-                sectionMatcher.group(1)
-            } else {
-                null
+            if (argumentName != null) {
+                sectionReferences.add(SmkSectionReference(
+                        element,
+                        TextRange(sectionMatcher.start(3), sectionMatcher.end(3)),
+                        sectionName
+                ))
             }
-            sectionReferences.add(SmkSectionReference(element as PyStringLiteralExpression, TextRange(sectionMatcher.start(1), sectionMatcher.end(1)), sectionName))
         }
+
     }
 }

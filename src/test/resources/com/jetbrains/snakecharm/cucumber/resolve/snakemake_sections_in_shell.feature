@@ -235,7 +235,7 @@ Feature: Resolve for params in shell section
       | checkpoint | [path]   | log       |
       | checkpoint | {'path'} | log       |
 
-  Scenario Outline: resolve for sections without keyword arguments
+  Scenario Outline: resolve for sections without keyword arguments in shell section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -253,7 +253,26 @@ Feature: Resolve for params in shell section
       | checkpoint | {inp  | input   | input       | foo.smk |
       | checkpoint | {thre | threads | threads     | foo.smk |
 
-  Scenario Outline: no resolve for sections without keyword arguments not present in rule
+  Scenario Outline: resolve for sections without keyword arguments in run section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      input: fa="text"
+      threads: 4
+      run:
+        shell("command {<text>}")
+    """
+    When I put the caret after <ptn>
+    Then reference should resolve to "<symbol_name>" in "<file>"
+    Examples:
+      | rule_like  | ptn   | text    | symbol_name | file    |
+      | rule       | {inp  | input   | input       | foo.smk |
+      | rule       | {thre | threads | threads     | foo.smk |
+      | checkpoint | {inp  | input   | input       | foo.smk |
+      | checkpoint | {thre | threads | threads     | foo.smk |
+
+  Scenario Outline: no resolve for sections without keyword arguments not present in rule in shell section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -276,3 +295,96 @@ Feature: Resolve for params in shell section
       | checkpoint | {ver | version   |
       | checkpoint | {res | resources |
       | checkpoint | {par | params    |
+
+  Scenario Outline: no resolve for sections without keyword arguments not present in rule in run section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      input: fa="text"
+      threads: 4
+      run:
+        shell("command {<text>}")
+    """
+    When I put the caret after <ptn>
+    Then reference should not resolve
+    Examples:
+      | rule_like  | ptn  | text      |
+      | rule       | {out | output    |
+      | rule       | {lo  | log       |
+      | rule       | {ver | version   |
+      | rule       | {res | resources |
+      | rule       | {par | params    |
+      | checkpoint | {out | output    |
+      | checkpoint | {lo  | log       |
+      | checkpoint | {ver | version   |
+      | checkpoint | {res | resources |
+      | checkpoint | {par | params    |
+
+  Scenario Outline: resolve for shell section with a dot after section name
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      input: fa="text"
+      output: "output"
+      resources: a=1
+      log: "file.txt", another="another_file.txt"
+      params: b="b", c="c"
+      version: "1.0"
+      threads: 8
+      shell: "{<section>.}"
+    """
+    When I put the caret after <ptn>
+    Then reference should resolve to "<symbol_name>" in "<file>"
+    Examples:
+      | rule_like  | ptn   | section   | symbol_name | file    |
+      | rule       | "{in  | input     | input       | foo.smk |
+      | rule       | "{out | output    | output      | foo.smk |
+      | rule       | "{res | resources | resources   | foo.smk |
+      | rule       | "{lo  | log       | log         | foo.smk |
+      | rule       | "{par | params    | params      | foo.smk |
+      | rule       | "{ver | version   | version     | foo.smk |
+      | rule       | "{thr | threads   | threads     | foo.smk |
+      | checkpoint | "{in  | input     | input       | foo.smk |
+      | checkpoint | "{out | output    | output      | foo.smk |
+      | checkpoint | "{res | resources | resources   | foo.smk |
+      | checkpoint | "{lo  | log       | log         | foo.smk |
+      | checkpoint | "{par | params    | params      | foo.smk |
+      | checkpoint | "{ver | version   | version     | foo.smk |
+      | checkpoint | "{thr | threads   | threads     | foo.smk |
+
+  Scenario Outline: resolve for run section with a dot after section name
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      input: fa="text"
+      output: "output"
+      resources: a=1
+      log: "file.txt", another="another_file.txt"
+      params: b="b", c="c"
+      version: "1.0"
+      threads: 8
+      run:
+        shell("{<section>.}")
+    """
+    When I put the caret after <ptn>
+    Then reference should resolve to "<symbol_name>" in "<file>"
+    Examples:
+      | rule_like  | ptn   | section   | symbol_name | file    |
+      | rule       | "{in  | input     | input       | foo.smk |
+      | rule       | "{out | output    | output      | foo.smk |
+      | rule       | "{res | resources | resources   | foo.smk |
+      | rule       | "{lo  | log       | log         | foo.smk |
+      | rule       | "{par | params    | params      | foo.smk |
+      | rule       | "{ver | version   | version     | foo.smk |
+      | rule       | "{thr | threads   | threads     | foo.smk |
+      | checkpoint | "{in  | input     | input       | foo.smk |
+      | checkpoint | "{out | output    | output      | foo.smk |
+      | checkpoint | "{res | resources | resources   | foo.smk |
+      | checkpoint | "{lo  | log       | log         | foo.smk |
+      | checkpoint | "{par | params    | params      | foo.smk |
+      | checkpoint | "{ver | version   | version     | foo.smk |
+      | checkpoint | "{thr | threads   | threads     | foo.smk |
+
