@@ -46,12 +46,17 @@ class SnakemakeSectionsInShellReferenceContributor : PsiReferenceContributor() {
                         .psiElement(PyStringLiteralExpression::class.java)
                         .andOr(insideRuleSection, insideCallExpressionInRuleRunParameter),
                 object : PsiReferenceProvider() {
-                    private val sectionPattern = Pattern.compile("\\{([a-z]*)(\\.([_a-zA-Z]\\w*)?)?")
+                    private val sectionPattern =
+                            Pattern.compile("\\{([a-z]*)(\\.([_a-zA-Z]\\w*)?|([^.a-z_]|\\z))")
 
                     override fun getReferencesByElement(
                             element: PsiElement,
                             context: ProcessingContext
                     ): Array<PsiReference> {
+                        if (element !is PyStringLiteralExpression) {
+                            return emptyArray()
+                        }
+
                         val sectionReferences = mutableListOf<PsiReference>()
                         val sectionMatcher = sectionPattern.matcher(element.text)
 
@@ -79,18 +84,20 @@ class SnakemakeSectionsInShellReferenceContributor : PsiReferenceContributor() {
     }
 
     private fun addSectionReferences(
-            element: PsiElement,
+            element: PyStringLiteralExpression,
             sectionMatcher: Matcher,
             sectionReferences: MutableList<PsiReference>
     ) {
         while (sectionMatcher.find()) {
             val sectionName = sectionMatcher.group(1)
             val argumentName = sectionMatcher.group(3)
-            sectionReferences.add(SmkSectionReference(
-                    element as PyStringLiteralExpression,
-                    TextRange(sectionMatcher.start(1), sectionMatcher.end(1)),
-                    if (sectionName.isEmpty()) null else sectionName
-            ))
+            if (sectionName.isEmpty() || ALLOWED_IN_SHELL_WITHOUT_KEYWORDS.any { it.startsWith(sectionName) }) {
+                sectionReferences.add(SmkSectionReference(
+                        element,
+                        TextRange(sectionMatcher.start(1), sectionMatcher.end(1)),
+                        if (sectionName.isEmpty()) null else sectionName
+                ))
+            }
 
             if (argumentName != null) {
                 sectionReferences.add(SmkSectionReference(
