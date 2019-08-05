@@ -388,3 +388,26 @@ Feature: Resolve for params in shell section
       | checkpoint | "{ver | version   | version     | foo.smk |
       | checkpoint | "{thr | threads   | threads     | foo.smk |
 
+  Scenario Outline: resolve for toplevel variables used in shell section
+    Given a snakemake project
+    Given a file "boo.smk" with text
+    """
+    symbol = 1
+    """
+    Given I open a file "foo.smk" with text
+    """
+    include: "boo.smk"
+
+    inp = 30
+    <rule_like> NAME:
+      shell: "{<text>}"
+    """
+    When I put the caret after <ptn>
+    Then reference should resolve to "<symbol_name>" in "<file>"
+    Examples:
+      | rule_like  | ptn   | text   | symbol_name | file    |
+      | rule       | "{in  | inp    | inp         | foo.smk |
+      | rule       | "{sym | symbol | symbol      | boo.smk |
+      | checkpoint | "{in  | inp    | inp         | foo.smk |
+      | checkpoint | "{sym | symbol | symbol      | boo.smk |
+
