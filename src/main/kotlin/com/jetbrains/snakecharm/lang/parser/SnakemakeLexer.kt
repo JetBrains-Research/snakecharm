@@ -128,7 +128,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         }
 
         if (tokenType === PyTokenTypes.LINE_BREAK) {
-            val text = tokenText
+            val text = tokenText.substringAfterLast(System.lineSeparator())
             var spaces = 0
             for (i in text.length - 1 downTo 0) {
                 if (text[i] == ' ') {
@@ -138,10 +138,12 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 }
             }
             myCurrentNewlineIndent = spaces
-            if (myCurrentNewlineIndent <= ruleLikeSectionIndent || myCurrentNewlineIndent <= topLevelSectionIndent) {
-                // we left the previous section and didn't end up in a new one
-                topLevelSectionIndent = -1
+            if (!isInToplevelSectionWithoutSubsections && topLevelSectionIndent > -1 && myCurrentNewlineIndent <= ruleLikeSectionIndent) {
                 ruleLikeSectionIndent = -1
+                isInPythonSection = false
+            }
+            if (ruleLikeSectionIndent == -1 && myCurrentNewlineIndent <= topLevelSectionIndent) {
+                topLevelSectionIndent = -1
                 topLevelSectionColonOccurred = false
                 isInToplevelSectionWithoutSubsections = false
                 isInPythonSection = false
@@ -259,4 +261,6 @@ class SnakemakeLexer : PythonIndentingLexer() {
             super.processLineBreak(startPos)
         }
     }
+
+
 }
