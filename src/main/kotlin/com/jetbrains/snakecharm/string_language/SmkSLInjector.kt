@@ -9,6 +9,7 @@ import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyFormattedStringElement
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkSLInjector : LanguageInjector {
@@ -39,7 +40,7 @@ class SmkSLInjector : LanguageInjector {
     private fun PsiElement.isInValidArgsSection(): Boolean {
         val parentSection =
                 PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpointArgsSection::class.java)
-        return parentSection != null && parentSection.name != "shadow"
+        return parentSection != null && parentSection.name != SnakemakeNames.SECTION_SHADOW
     }
 
     private fun PsiElement.isValidForInjection() =
