@@ -22,10 +22,7 @@ import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
 import java.io.File.separator
 import java.util.regex.Pattern
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
-import kotlin.test.fail
+import kotlin.test.*
 
 
 class ActionsSteps {
@@ -222,6 +219,25 @@ class ActionsSteps {
         assertHasElements(names, expected)
     }
 
+
+    @Then("^I expect language injection on \"(.+)\"")
+    fun iExpectLanguageInjectionOn(str: String) {
+        ApplicationManager.getApplication().invokeAndWait {
+            val fixture = SnakemakeWorld.injectionFixture()
+            val injectedFile = fixture.injectedElement?.containingFile
+            assertNotNull(injectedFile, "No language was injected at caret position")
+            assertEquals(str, injectedFile.text)
+        }
+    }
+
+    @Then("^I expect no language injection")
+    fun iExpectNoLanguageInjection() {
+        ApplicationManager.getApplication().invokeAndWait {
+            val fixture = SnakemakeWorld.injectionFixture()
+            val element = fixture.injectedElement
+            assertNull(element, "${element?.language} language was injected at caret position")
+        }
+    }
 
     private fun findTargetElementFor(element: PsiElement, editor: Editor) =
             DocumentationManager.getInstance(element.project)

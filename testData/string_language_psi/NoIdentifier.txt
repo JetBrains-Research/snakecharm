@@ -1,0 +1,8 @@
+FILE
+  SmkSLElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    SmkSLElement(EXPRESSION_STATEMENT)
+      SmkSLElement(REFERENCE_EXPRESSION)
+        PsiErrorElement:Expected identifier name
+          <empty list>
+    PsiElement(RBRACE)('}')

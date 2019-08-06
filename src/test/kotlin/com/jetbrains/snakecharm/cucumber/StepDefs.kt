@@ -6,6 +6,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Computable
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
+import com.intellij.testFramework.fixtures.InjectionTestFixture
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.codeInsight.controlflow.ControlFlowCache
@@ -59,7 +60,14 @@ class StepDefs {
 
         SnakemakeWorld.fixture().setUp()
         SnakemakeWorld.fixture().testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
+
         PythonDialectsTokenSetProvider.reset()
+    }
+
+    @Given("^a snakemake project with language injection$")
+    fun configureSnakemakeProjectWithLanguageInjection() {
+        configureSnakemakeProject("snakemake")
+        SnakemakeWorld.myInjectionFixture = InjectionTestFixture(SnakemakeWorld.fixture())
     }
 
     @Given("^I expect controlflow")
