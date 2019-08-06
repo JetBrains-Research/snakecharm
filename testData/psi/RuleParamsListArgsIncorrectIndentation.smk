@@ -5,7 +5,7 @@ rule rule1:
                   , "file3.txt",
            "file4.txt",
            "file5.txt" # correct indentation
-    shell: ""
+    shell: "text"
 
 rule rule2:
     input:
@@ -14,7 +14,7 @@ rule rule2:
                   , "file3.txt"
            "file4.txt",
         "file5.txt" # incorrect indentation
-    shell: ""
+    shell: "text"
 
 
 rule rule3:
@@ -24,7 +24,7 @@ rule rule3:
                   , "file3.txt"
            "file4.txt",
     "file5.txt" # parsed as a docstring
-    shell: ""
+    shell: "text"
 
 rule rule4:
     input:
@@ -33,4 +33,4 @@ rule rule4:
                   , "file3.txt"
            "file4.txt",
 "file5.txt" # incorrect indentation
-    shell: ""
+    shell: "text"

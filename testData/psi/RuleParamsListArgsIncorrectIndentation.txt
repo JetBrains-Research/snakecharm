@@ -38,8 +38,8 @@ SnakemakeFile: RuleParamsListArgsIncorrectIndentation.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression:
-            PsiElement(Py:SINGLE_QUOTED_STRING)('""')
+          PyStringLiteralExpression: text
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
   PsiWhiteSpace('\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
@@ -83,8 +83,8 @@ SnakemakeFile: RuleParamsListArgsIncorrectIndentation.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression:
-            PsiElement(Py:SINGLE_QUOTED_STRING)('""')
+          PyStringLiteralExpression: text
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
   PsiWhiteSpace('\n\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
@@ -123,8 +123,8 @@ SnakemakeFile: RuleParamsListArgsIncorrectIndentation.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression:
-            PsiElement(Py:SINGLE_QUOTED_STRING)('""')
+          PyStringLiteralExpression: text
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
   PsiWhiteSpace('\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
@@ -167,5 +167,5 @@ SnakemakeFile: RuleParamsListArgsIncorrectIndentation.smk
     PyAnnotation
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      PyStringLiteralExpression:
-        PsiElement(Py:SINGLE_QUOTED_STRING)('""')
+      PyStringLiteralExpression: text
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
