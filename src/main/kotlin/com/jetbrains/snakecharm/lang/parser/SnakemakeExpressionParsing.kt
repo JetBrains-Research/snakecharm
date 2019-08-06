@@ -67,63 +67,37 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
         var argNumber = 0
         var incorrectUnindentMarker: PsiBuilder.Marker? = null
         while (!myBuilder.eof() && !atToken(PyTokenTypes.STATEMENT_BREAK)) {
-            // skip indents
-            if (matchToken(PyTokenTypes.INDENT)) {
-                indents++
-            } else {
-                // skip dedents while matched, we could have several dedent tokens in a raw
-                // skip dedent while inside current block (indents > 1)
-
-                while (indents > 1 && !myBuilder.eof()) {
-                    if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
-                        incorrectUnindentMarker = myBuilder.mark()
-                        nextToken()
-                    }
-                    if (atToken(PyTokenTypes.DEDENT)) {
-                        indents--
-                        nextToken()
-                    } else {
-                        break
-                    }
-                }
-            }
-
-
-
             argNumber++
 
             // separator if several args:
             if (argNumber > 1) {
                 if (matchToken(separatorTokenType)) {
-                    if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
-                        break
-                    }
-
                     val separatorMarker = myBuilder.mark()
                     val separatorMarkerIndents = indents
 
-                    // skip indents
-                    if (matchToken(PyTokenTypes.INDENT)) {
-                        indents++
-                    } else {
-                        // skip dedents while matched, we could have several dedent tokens in a raw
-                        // skip dedent while inside current block (indents > 1)
+                    // skip indents/dedents:
+                    if (matchToken(PyTokenTypes.STATEMENT_BREAK)) {
+                        // skip indents
+                        if (matchToken(PyTokenTypes.INDENT)) {
+                            indents++
+                        } else {
+                            // skip dedents while matched, we could have several dedent tokens in a raw
+                            // skip dedent while inside current block (indents > 1)
 
-                        while (indents > 1 && !myBuilder.eof()) {
-                            if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
-                                incorrectUnindentMarker = myBuilder.mark()
-                                nextToken()
-                            }
-                            if (atToken(PyTokenTypes.DEDENT)) {
-                                indents--
-                                nextToken()
-                            } else {
-                                break
+                            while (indents > 1 && !myBuilder.eof()) {
+                                if (atToken(PyTokenTypes.INCONSISTENT_DEDENT)) {
+                                    incorrectUnindentMarker = myBuilder.mark()
+                                    nextToken()
+                                }
+                                if (atToken(PyTokenTypes.DEDENT)) {
+                                    indents--
+                                    nextToken()
+                                } else {
+                                    break
+                                }
                             }
                         }
-                    }
 
-                    if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
                         // Case: hanging 'comma', next statement is another rule param block
                         // statement break after comma, if 'indents == 0' => we just left arg list
                         if (indents == 0) {
