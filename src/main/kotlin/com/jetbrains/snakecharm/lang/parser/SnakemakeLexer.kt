@@ -18,6 +18,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
     private var myCurrentNewlineIndent = 0
     private var currentToken: IElementType? = null
     private var previousToken: IElementType? = null
+    private var insertedIndentsCount = 0
 
     // used to differentiate between 'rule all: input: "text"' and 'rule: input: "text" '
     private var topLevelSectionColonOccurred = false
@@ -138,7 +139,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 }
             }
             myCurrentNewlineIndent = spaces
-            if (!isInToplevelSectionWithoutSubsections && topLevelSectionIndent > -1 && myCurrentNewlineIndent <= ruleLikeSectionIndent) {
+            if (!isInToplevelSectionWithoutSubsections && topLevelSectionIndent > -1 &&
+                    myCurrentNewlineIndent <= ruleLikeSectionIndent) {
                 ruleLikeSectionIndent = -1
                 isInPythonSection = false
             }
@@ -254,11 +256,64 @@ class SnakemakeLexer : PythonIndentingLexer() {
             if (indent > ruleLikeSectionIndent && ruleLikeSectionIndent > -1 ||
                     isInToplevelSectionWithoutSubsections && indent > topLevelSectionIndent) {
                 processInsignificantLineBreak(startPos, false)
+                val whiteSpaceEnd = if (baseTokenType == null) super.getBufferEnd() else baseTokenStart
+                if (ruleLikeSectionIndent > -1 && indent < ruleLikeSectionIndent
+                        || isInToplevelSectionWithoutSubsections && indent < topLevelSectionIndent) {
+                    // report error
+                    closeDanglingSuites(indent, startPos)
+                    myTokenQueue.add(PendingToken(PyTokenTypes.LINE_BREAK, startPos, whiteSpaceEnd))
+                } else if (indent < myIndentStack.peek()) {
+                    var lastIndent = myIndentStack.peek()
+                    var insertIndex = myTokenQueue.size
+                    // handle incorrect unindents if necessary
+                    while (indent < lastIndent) {
+                        myIndentStack.pop()
+                        insertedIndentsCount--
+                        lastIndent = myIndentStack.peek()
+                        if (indent > lastIndent) {
+                            myTokenQueue.add(PendingToken(PyTokenTypes.INCONSISTENT_DEDENT, startPos, startPos))
+                            insertIndex = myTokenQueue.size
+                        }
+                        ++insertIndex
+                    }
+                    myTokenQueue.add(PendingToken(PyTokenTypes.LINE_BREAK, startPos, whiteSpaceEnd))
+                } else if (indent > myIndentStack.peek()) {
+                    myIndentStack.push(indent)
+                    insertedIndentsCount++
+                }
             } else {
+                while (insertedIndentsCount > 0) {
+                    myIndentStack.pop()
+                    insertedIndentsCount--
+                }
                 super.processLineBreak(startPos)
             }
         } else {
             super.processLineBreak(startPos)
+        }
+    }
+
+    private fun closeDanglingSuites(indent: Int, whiteSpaceStart: Int) {
+        var lastIndent = myIndentStack.peek()
+
+        var insertIndex = myTokenQueue.size
+        while (indent < lastIndent) {
+            val lastSuiteIndent = myIndentStack.pop()
+            lastIndent = myIndentStack.peek()
+            var dedentOffset = whiteSpaceStart
+            insertIndex = if (indent > lastIndent) {
+                myTokenQueue.add(PendingToken(PyTokenTypes.INCONSISTENT_DEDENT, whiteSpaceStart, whiteSpaceStart))
+                myTokenQueue.size
+            } else {
+                skipPrecedingCommentsWithSameIndentOnSuiteClose(lastSuiteIndent, insertIndex)
+            }
+
+            if (insertIndex != myTokenQueue.size) {
+                dedentOffset = (myTokenQueue[insertIndex] as PendingToken).start
+            }
+
+            myTokenQueue.add(insertIndex, PendingToken(PyTokenTypes.DEDENT, dedentOffset, dedentOffset))
+            ++insertIndex
         }
     }
 

@@ -11,7 +11,7 @@ SnakemakeFile: RuleParamsListArgsStringMultilineIncorrectUnindent.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace('\n            ')
-          PyStringLiteralExpression: file15_copy1.txt
+          PyStringLiteralExpression: file15_copy1
             PsiElement(Py:SINGLE_QUOTED_STRING)('"file"')
             PsiWhiteSpace('\n                    ')
             PsiElement(Py:SINGLE_QUOTED_STRING)('"15"')
@@ -19,8 +19,11 @@ SnakemakeFile: RuleParamsListArgsStringMultilineIncorrectUnindent.smk
             PsiElement(Py:SINGLE_QUOTED_STRING)('"_copy"')
             PsiWhiteSpace('\n                 ')
             PsiElement(Py:SINGLE_QUOTED_STRING)('"1"')
+          PsiErrorElement:',' expected
             PsiWhiteSpace('\n              ')
             PsiElement(Py:SINGLE_QUOTED_STRING)('".txt"')
+          PsiErrorElement:expression expected
+            <empty list>
           PsiWhiteSpace('\n            ')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace(' ')
@@ -43,16 +46,19 @@ SnakemakeFile: RuleParamsListArgsStringMultilineIncorrectUnindent.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: file15_copy1.txt
+          PyStringLiteralExpression: file15
             PsiElement(Py:SINGLE_QUOTED_STRING)('"file"')
             PsiWhiteSpace('\n                    ')
             PsiElement(Py:SINGLE_QUOTED_STRING)('"15"')
+          PsiErrorElement:',' expected
             PsiWhiteSpace('\n           ')
             PsiElement(Py:SINGLE_QUOTED_STRING)('"_copy"')
             PsiWhiteSpace('\n                 ')
             PsiElement(Py:SINGLE_QUOTED_STRING)('"1"')
             PsiWhiteSpace('\n              ')
             PsiElement(Py:SINGLE_QUOTED_STRING)('".txt"')
+          PsiErrorElement:expression expected
+            <empty list>
           PsiWhiteSpace('\n           ')
           PsiElement(Py:COMMA)(',')
           PsiWhiteSpace(' ')
