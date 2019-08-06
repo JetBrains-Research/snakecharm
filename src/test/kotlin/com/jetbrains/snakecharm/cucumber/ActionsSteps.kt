@@ -13,6 +13,7 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.testFramework.fixtures.injectionForHost
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.findPsiElementUnderCaret
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.myGeneratedDocPopupText
@@ -147,10 +148,10 @@ class ActionsSteps {
     fun iCheckHighlighting(type: String) {
         val fixture = SnakemakeWorld.fixture()
         when (type) {
-            "errors" -> fixture.checkHighlighting(false, false, false)
-            "warnings" -> fixture.checkHighlighting(true, false, false)
-            "infos" -> fixture.checkHighlighting(false, true, false)
-            "weak warnings" -> fixture.checkHighlighting(false, false, true)
+            "errors" -> fixture.checkHighlighting(false, false, false, true)
+            "warnings" -> fixture.checkHighlighting(true, false, false, true)
+            "infos" -> fixture.checkHighlighting(false, true, false, true)
+            "weak warnings" -> fixture.checkHighlighting(false, false, true, true)
             else -> fail("Unknown highlighting type: $type")
         }
     }

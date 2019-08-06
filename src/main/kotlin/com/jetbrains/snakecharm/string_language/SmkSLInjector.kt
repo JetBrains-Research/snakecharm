@@ -9,14 +9,13 @@ import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyFormattedStringElement
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
-import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkSLInjector : LanguageInjector {
     override fun getLanguagesToInject(
             host: PsiLanguageInjectionHost,
             injectionPlacesRegistrar: InjectedLanguagePlaces) {
-        if (!host.isStringLiteralInsideArgsSection()) {
+        if (!host.isValidForInjection()) {
             return
         }
 
@@ -37,9 +36,15 @@ class SmkSLInjector : LanguageInjector {
         }
     }
 
-    private fun PsiElement.isStringLiteralInsideArgsSection() =
-            SnakemakeLanguageDialect.isInsideSmkFile(this) &&
-            this is PyStringLiteralExpression &&
-            PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpointArgsSection::class.java) != null &&
-            PsiTreeUtil.getParentOfType(this, PyCallExpression::class.java) == null
+    private fun PsiElement.isInValidArgsSection(): Boolean {
+        val parentSection =
+                PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpointArgsSection::class.java)
+        return parentSection != null && parentSection.name != "shadow"
+    }
+
+    private fun PsiElement.isValidForInjection() =
+        SnakemakeLanguageDialect.isInsideSmkFile(this) &&
+        this is PyStringLiteralExpression &&
+        PsiTreeUtil.getParentOfType(this, PyCallExpression::class.java) == null &&
+        isInValidArgsSection()
 }
