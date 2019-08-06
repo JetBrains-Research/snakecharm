@@ -1,22 +1,22 @@
 SnakeCharm Changelog
 ====================
-
+                             
 Here you can see the full list of changes between each big release.
 
-Version 0.5
+Version 0.4 build #42
 -------------
-Released on <...>
+Released on July 30th 2019
 - sinceBuild "183.4284" (2018.3)
 - untilBuild "192.*" (2019.2)
 
 Features:
--
+-  Resolve/Completion for paths in after "include:", see #20
 
 Fixed:
--
+- Minor bug fixes
 
 
-Version 0.4
+Version 0.4 build #35
 -------------
 Released on July 25th 2019
 - sinceBuild "183.4284" (2018.3)
