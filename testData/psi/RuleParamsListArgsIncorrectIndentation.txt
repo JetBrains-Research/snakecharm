@@ -1,0 +1,170 @@
+SnakemakeFile: RuleParamsListArgsIncorrectIndentation.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('rule1')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n           ')
+          PyStringLiteralExpression: file1.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file1.txt"')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace('\n                  ')
+          PyStringLiteralExpression: file2.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file2.txt"')
+          PsiWhiteSpace('\n                  ')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: file3.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file3.txt"')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace('\n           ')
+          PyStringLiteralExpression: file4.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file4.txt"')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace('\n           ')
+          PyStringLiteralExpression: file5.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file5.txt"')
+          PsiWhiteSpace(' ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# correct indentation')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression:
+            PsiElement(Py:SINGLE_QUOTED_STRING)('""')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('rule2')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n           ')
+          PyStringLiteralExpression: file1.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file1.txt"')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace('\n                  ')
+          PyStringLiteralExpression: file2.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file2.txt"')
+          PsiWhiteSpace('\n                  ')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: file3.txtfile4.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file3.txt"')
+            PsiWhiteSpace('\n           ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file4.txt"')
+          PsiElement(Py:COMMA)(',')
+          PsiErrorElement:expression expected
+            <empty list>
+          PsiErrorElement:expression expected
+            PsiWhiteSpace('\n        ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file5.txt"')
+          PsiWhiteSpace(' ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# incorrect indentation')
+          PsiErrorElement:Dedent expected
+            <empty list>
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression:
+            PsiElement(Py:SINGLE_QUOTED_STRING)('""')
+  PsiWhiteSpace('\n\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('rule3')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n           ')
+          PyStringLiteralExpression: file1.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file1.txt"')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace('\n                  ')
+          PyStringLiteralExpression: file2.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file2.txt"')
+          PsiWhiteSpace('\n                  ')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: file3.txtfile4.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file3.txt"')
+            PsiWhiteSpace('\n           ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file4.txt"')
+          PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: file5.txt
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"file5.txt"')
+      PsiWhiteSpace(' ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# parsed as a docstring')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression:
+            PsiElement(Py:SINGLE_QUOTED_STRING)('""')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('rule4')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n           ')
+          PyStringLiteralExpression: file1.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file1.txt"')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace('\n                  ')
+          PyStringLiteralExpression: file2.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file2.txt"')
+          PsiWhiteSpace('\n                  ')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: file3.txtfile4.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file3.txt"')
+            PsiWhiteSpace('\n           ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file4.txt"')
+          PsiElement(Py:COMMA)(',')
+  PsiWhiteSpace('\n')
+  PyExpressionStatement
+    PyStringLiteralExpression: file5.txt
+      PsiElement(Py:SINGLE_QUOTED_STRING)('"file5.txt"')
+    PsiWhiteSpace(' ')
+    PsiComment(Py:END_OF_LINE_COMMENT)('# incorrect indentation')
+  PsiWhiteSpace('\n    ')
+  PsiErrorElement:Unexpected indent
+    <empty list>
+  PyTypeDeclarationStatement
+    PyTargetExpression: shell
+      PsiElement(Py:IDENTIFIER)('shell')
+    PyAnnotation
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyStringLiteralExpression:
+        PsiElement(Py:SINGLE_QUOTED_STRING)('""')
