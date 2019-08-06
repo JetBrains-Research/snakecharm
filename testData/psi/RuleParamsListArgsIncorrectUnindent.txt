@@ -18,11 +18,12 @@ SnakemakeFile: RuleParamsListArgsIncorrectUnindent.smk
           PyReferenceExpression: arg2
             PsiElement(Py:IDENTIFIER)('arg2')
           PsiElement(Py:COMMA)(',')
-          PsiErrorElement:expression expected
-            <empty list>
-          PsiErrorElement:expression expected
-            PsiWhiteSpace('\n                ')
-            PsiElement(Py:IDENTIFIER)('arg3')
+          PsiErrorElement:Unindent does not match any outer indentation level.
+            PsiErrorElement:expression expected
+              <empty list>
+            PsiErrorElement:expression expected
+              PsiWhiteSpace('\n                ')
+              PsiElement(Py:IDENTIFIER)('arg3')
           PsiWhiteSpace(' ')
           PsiComment(Py:END_OF_LINE_COMMENT)('# incorrect unindent')
   PsiWhiteSpace('\n\n')
@@ -76,11 +77,12 @@ SnakemakeFile: RuleParamsListArgsIncorrectUnindent.smk
             PsiElement(Py:PLUS)('+')
             PsiErrorElement:expression expected
               <empty list>
-          PsiErrorElement:',' expected
-            PsiWhiteSpace('\n                 ')
-            PsiElement(Py:IDENTIFIER)('arg3')
-          PsiErrorElement:expression expected
-            <empty list>
+          PsiErrorElement:Unindent does not match any outer indentation level.
+            PsiErrorElement:expression expected
+              <empty list>
+            PsiErrorElement:expression expected
+              PsiWhiteSpace('\n                 ')
+              PsiElement(Py:IDENTIFIER)('arg3')
           PsiWhiteSpace(' ')
           PsiComment(Py:END_OF_LINE_COMMENT)('# incorrect unindent')
   PsiWhiteSpace('\n\n')
@@ -133,13 +135,14 @@ SnakemakeFile: RuleParamsListArgsIncorrectUnindent.smk
             PsiWhiteSpace('\n                    ')
             PyReferenceExpression: arg2
               PsiElement(Py:IDENTIFIER)('arg2')
-          PsiErrorElement:',' expected
-            PsiWhiteSpace('\n                 ')
-            PsiElement(Py:PLUS)('+')
-            PsiWhiteSpace(' ')
-            PsiElement(Py:IDENTIFIER)('arg3')
-          PsiErrorElement:expression expected
-            <empty list>
+          PsiErrorElement:Unindent does not match any outer indentation level.
+            PsiErrorElement:expression expected
+              <empty list>
+            PsiErrorElement:expression expected
+              PsiWhiteSpace('\n                 ')
+              PsiElement(Py:PLUS)('+')
+              PsiWhiteSpace(' ')
+              PsiElement(Py:IDENTIFIER)('arg3')
           PsiWhiteSpace(' ')
           PsiComment(Py:END_OF_LINE_COMMENT)('# incorrect unindent')
   PsiWhiteSpace('\n\n')
@@ -197,15 +200,16 @@ SnakemakeFile: RuleParamsListArgsIncorrectUnindent.smk
               PsiElement(Py:OR_KEYWORD)('or')
               PsiErrorElement:expression expected
                 <empty list>
-          PsiErrorElement:',' expected
-            PsiWhiteSpace('\n               ')
-            PsiElement(Py:IDENTIFIER)('condition2')
-            PsiWhiteSpace(' ')
-            PsiElement(Py:ELSE_KEYWORD)('else')
-            PsiWhiteSpace(' ')
-            PsiElement(Py:IDENTIFIER)('arg2')
-          PsiErrorElement:expression expected
-            <empty list>
+          PsiErrorElement:Unindent does not match any outer indentation level.
+            PsiErrorElement:expression expected
+              <empty list>
+            PsiErrorElement:expression expected
+              PsiWhiteSpace('\n               ')
+              PsiElement(Py:IDENTIFIER)('condition2')
+              PsiWhiteSpace(' ')
+              PsiElement(Py:ELSE_KEYWORD)('else')
+              PsiWhiteSpace(' ')
+              PsiElement(Py:IDENTIFIER)('arg2')
           PsiWhiteSpace(' ')
           PsiComment(Py:END_OF_LINE_COMMENT)('# incorrect unindent')
   PsiWhiteSpace('\n\n')

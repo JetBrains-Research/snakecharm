@@ -122,14 +122,21 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                         break
                     }
                 } else {
-                    recoverUntilMatches(
-                            SnakemakeBundle.message("PARSE.expected.separator.message", separatorTokenText),
-                            separatorTokenType,
-                            PyTokenTypes.STATEMENT_BREAK
-                    )
+                    if (atToken(PyTokenTypes.INCONSISTENT_DEDENT) && incorrectUnindentMarker == null) {
+                        incorrectUnindentMarker = myBuilder.mark()
+                    } else {
+                        recoverUntilMatches(
+                                SnakemakeBundle.message("PARSE.expected.separator.message", separatorTokenText),
+                                separatorTokenType,
+                                PyTokenTypes.STATEMENT_BREAK
+                        )
+                    }
                 }
             }
 
+            if (atToken(PyTokenTypes.INCONSISTENT_DEDENT) && incorrectUnindentMarker == null) {
+                incorrectUnindentMarker = myBuilder.mark()
+            }
             parseArgumentFunction()
             // mark everything that was incorrectly unindented
             incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))

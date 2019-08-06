@@ -67,11 +67,12 @@ SnakemakeFile: RuleParamsListArgsIncorrectIndentation.smk
             PsiWhiteSpace('\n           ')
             PsiElement(Py:SINGLE_QUOTED_STRING)('"file4.txt"')
           PsiElement(Py:COMMA)(',')
-          PsiErrorElement:expression expected
-            <empty list>
-          PsiErrorElement:expression expected
-            PsiWhiteSpace('\n        ')
-            PsiElement(Py:SINGLE_QUOTED_STRING)('"file5.txt"')
+          PsiErrorElement:Unindent does not match any outer indentation level.
+            PsiErrorElement:expression expected
+              <empty list>
+            PsiErrorElement:expression expected
+              PsiWhiteSpace('\n        ')
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"file5.txt"')
           PsiWhiteSpace(' ')
           PsiComment(Py:END_OF_LINE_COMMENT)('# incorrect indentation')
           PsiErrorElement:Dedent expected
