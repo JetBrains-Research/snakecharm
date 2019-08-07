@@ -5,8 +5,8 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
@@ -22,6 +22,7 @@ import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import java.io.File
+import java.lang.IllegalArgumentException
 
 
 abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
@@ -58,7 +59,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
 
         return results.stream()
                 .filter { it.name != null && it != containingRule }
-                .map { createRuleLikeLookupItem(it.name!!, it, location.containingFile) }
+                .map { createRuleLikeLookupItem(it.name!!, it) }
                 .toArray()
     }
 
@@ -134,14 +135,20 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
     override fun isBuiltin() = false
 
     companion object {
-        fun <T: SmkRuleOrCheckpoint> createRuleLikeLookupItem(name: String, elem: T, currentFile: PsiFile): LookupElement {
+        fun <T: SmkRuleOrCheckpoint> createRuleLikeLookupItem(name: String, elem: T): LookupElement {
             val containingFileName = elem.containingFile.name
+            val elementFile = File(elem.containingFile.virtualFile?.presentableUrl ?: containingFileName)
+            val currentDirectory = File(
+                    ProjectRootManager.getInstance(elem.project)
+                            .fileIndex
+                            .getContentRootForFile(elem.containingFile.originalFile.virtualFile)
+                            ?.presentableUrl
+                            ?: elementFile.parent
+            )
             val displayPath = try {
-                val elementFile = File(elem.containingFile.originalFile.virtualFile?.presentableUrl ?: containingFileName)
-                val currentDirectory = File(currentFile.originalFile.virtualFile?.presentableUrl ?: currentFile.name).parentFile
                 elementFile.toRelativeString(currentDirectory)
             } catch (e: IllegalArgumentException) {
-                containingFileName
+                ""
             }
             return PrioritizedLookupElement.withPriority(
                     LookupElementBuilder

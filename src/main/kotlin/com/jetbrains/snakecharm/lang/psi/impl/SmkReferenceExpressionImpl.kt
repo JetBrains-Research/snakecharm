@@ -52,8 +52,7 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
                 (getRules() + getCheckpoints()).map { (name, elem) ->
                     AbstractSmkRuleOrCheckpointType.createRuleLikeLookupItem(
                             name,
-                            elem as SmkRuleOrCheckpoint,
-                            element.containingFile
+                            elem as SmkRuleOrCheckpoint
                     )
                 }.toTypedArray()
 
