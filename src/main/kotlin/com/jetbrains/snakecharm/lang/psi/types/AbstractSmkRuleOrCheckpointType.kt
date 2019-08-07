@@ -6,6 +6,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
@@ -57,7 +58,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
 
         return results.stream()
                 .filter { it.name != null && it != containingRule }
-                .map { createRuleLikeLookupItem(it.name!!, it) }
+                .map { createRuleLikeLookupItem(it.name!!, it, location.containingFile) }
                 .toArray()
     }
 
@@ -133,13 +134,11 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
     override fun isBuiltin() = false
 
     companion object {
-        fun <T: SmkRuleOrCheckpoint> createRuleLikeLookupItem(name: String, elem: T): LookupElement {
+        fun <T: SmkRuleOrCheckpoint> createRuleLikeLookupItem(name: String, elem: T, currentFile: PsiFile): LookupElement {
             val containingFileName = elem.containingFile.name
             val displayPath = try {
-                val elementFilePath = elem.containingFile.originalFile.virtualFile?.presentableUrl ?: containingFileName
-                val elementFile = File(elementFilePath)
-                val module = ModuleUtilCore.findModuleForPsiElement(elem.originalElement)
-                val currentDirectory = File(module?.moduleFilePath ?: elementFilePath).parentFile
+                val elementFile = File(elem.containingFile.originalFile.virtualFile?.presentableUrl ?: containingFileName)
+                val currentDirectory = File(currentFile.originalFile.virtualFile?.presentableUrl ?: currentFile.name).parentFile
                 elementFile.toRelativeString(currentDirectory)
             } catch (e: IllegalArgumentException) {
                 containingFileName
