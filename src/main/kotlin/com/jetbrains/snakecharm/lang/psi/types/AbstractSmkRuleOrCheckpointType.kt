@@ -20,6 +20,7 @@ import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import java.io.File
 
 
 abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
@@ -132,15 +133,27 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
     override fun isBuiltin() = false
 
     companion object {
-        fun <T: SmkRuleOrCheckpoint> createRuleLikeLookupItem(name: String, elem: T): LookupElement =
-                PrioritizedLookupElement.withPriority(
-                        LookupElementBuilder
-                                .createWithSmartPointer(name, elem)
-                                .withTypeText(elem.containingFile.name)
-                                .withIcon(elem.getIcon(0))
-                        ,
-                        PythonCompletionWeigher.WEIGHT_DELTA.toDouble()
-                )
+        fun <T: SmkRuleOrCheckpoint> createRuleLikeLookupItem(name: String, elem: T): LookupElement {
+            val containingFileName = elem.containingFile.name
+            val displayPath = try {
+                val elementFilePath = elem.containingFile.originalFile.virtualFile?.presentableUrl ?: containingFileName
+                val elementFile = File(elementFilePath)
+                val module = ModuleUtilCore.findModuleForPsiElement(elem.originalElement)
+                val currentDirectory = File(module?.moduleFilePath ?: elementFilePath).parentFile
+                elementFile.toRelativeString(currentDirectory)
+            } catch (e: IllegalArgumentException) {
+                containingFileName
+            }
+            return PrioritizedLookupElement.withPriority(
+                    LookupElementBuilder
+                            .createWithSmartPointer(name, elem)
+                            .withTypeText(displayPath)
+                            .withIcon(elem.getIcon(0))
+                    ,
+                    PythonCompletionWeigher.WEIGHT_DELTA.toDouble()
+            )
+        }
+
 
     }
 }
