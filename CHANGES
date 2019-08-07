@@ -3,6 +3,16 @@ SnakeCharm Changelog
                              
 Here you can see the full list of changes between each big release.
 
+Version 0.4 build #44
+-------------
+Released on August 7th 2019
+- sinceBuild "183.4284" (2018.3)
+- untilBuild "192.*" (2019.2)
+
+Fixed:
+- NoSuchMethodException: com.jetbrains.python.parsing.ExpressionParsing.parseFormattedStringNode()
+    when using PyCharm Professional or IntelliJ IDEA Ultimate, see #168 (thanks to @winni2k)
+
 Version 0.4 build #42
 -------------
 Released on July 30th 2019
