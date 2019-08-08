@@ -250,12 +250,16 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 && !isInPythonSection && !beforeFirstArgumentInSection) {
             val indentPos = currentPosition
             val hasSignificantTokens = myLineHasSignificantTokens
-            val indent = nextLineIndent
+            var indent = nextLineIndent
+            if (baseTokenType == commentTokenType) {
+                indent = myIndentStack.peek()
+            }
             restore(indentPos)
             myLineHasSignificantTokens = hasSignificantTokens
             if (indent > ruleLikeSectionIndent && ruleLikeSectionIndent > -1 ||
                     isInToplevelSectionWithoutSubsections && indent > topLevelSectionIndent) {
                 processInsignificantLineBreak(startPos, false)
+
                 val whiteSpaceEnd = if (baseTokenType == null) super.getBufferEnd() else baseTokenStart
                 if (ruleLikeSectionIndent > -1 && indent < ruleLikeSectionIndent
                         || isInToplevelSectionWithoutSubsections && indent < topLevelSectionIndent) {
@@ -264,6 +268,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                     myTokenQueue.add(PendingToken(PyTokenTypes.LINE_BREAK, startPos, whiteSpaceEnd))
                 } else if (indent < myIndentStack.peek()) {
                     var lastIndent = myIndentStack.peek()
+
                     var insertIndex = myTokenQueue.size
                     // handle incorrect unindents if necessary
                     while (indent < lastIndent) {
@@ -291,6 +296,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         } else {
             super.processLineBreak(startPos)
         }
+
     }
 
     private fun closeDanglingSuites(indent: Int, whiteSpaceStart: Int) {
@@ -316,6 +322,4 @@ class SnakemakeLexer : PythonIndentingLexer() {
             ++insertIndex
         }
     }
-
-
 }
