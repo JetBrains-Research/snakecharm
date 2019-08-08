@@ -24,3 +24,23 @@ rule soo:
 
 rule doo:
     shell: "echo doo"
+
+rule foo:
+    input:
+           "echo foo"
+           # comment
+                    # comment
+          # comment
+           , "text"
+    # comment
+               # comment
+# comment
+           , "text" # comment
+           # comment
+    # comment
+        # comment
+  # comment
+                           # comment
+# comment
+rule boo:
+    shell: "echo boo"

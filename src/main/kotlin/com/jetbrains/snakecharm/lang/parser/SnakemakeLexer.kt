@@ -142,8 +142,20 @@ class SnakemakeLexer : PythonIndentingLexer() {
             myCurrentNewlineIndent = spaces
             if (!isInToplevelSectionWithoutSubsections && topLevelSectionIndent > -1 &&
                     myCurrentNewlineIndent <= ruleLikeSectionIndent) {
-                ruleLikeSectionIndent = -1
-                isInPythonSection = false
+                val currentLineBreakIndex = myTokenQueue.indexOfFirst {
+                    it.type == PyTokenTypes.LINE_BREAK && it.start == tokenStart
+                }
+                val isAtComment = if (currentLineBreakIndex != -1) {
+                    var i = currentLineBreakIndex + 1
+                    while (i < myTokenQueue.size && myTokenQueue[i].type in PyTokenTypes.WHITESPACE_OR_LINEBREAK) {
+                        i++
+                    }
+                    i < myTokenQueue.size && myTokenQueue[i].type == commentTokenType
+                } else false
+                if (!isAtComment) {
+                    ruleLikeSectionIndent = -1
+                    isInPythonSection = false
+                }
             }
             if (ruleLikeSectionIndent == -1 && myCurrentNewlineIndent <= topLevelSectionIndent) {
                 topLevelSectionIndent = -1
@@ -314,7 +326,6 @@ class SnakemakeLexer : PythonIndentingLexer() {
         } else {
             super.processLineBreak(startPos)
         }
-
     }
 
     private fun closeDanglingSuites(indent: Int, whiteSpaceStart: Int) {
@@ -339,5 +350,19 @@ class SnakemakeLexer : PythonIndentingLexer() {
             myTokenQueue.add(insertIndex, PendingToken(PyTokenTypes.DEDENT, dedentOffset, dedentOffset))
             ++insertIndex
         }
+    }
+
+    override fun skipPrecedingCommentsWithSameIndentOnSuiteClose(indent: Int, anchorIndex: Int): Int {
+        if (!(ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections && topLevelSectionIndent > -1)) {
+            return super.skipPrecedingCommentsWithSameIndentOnSuiteClose(indent, anchorIndex)
+        }
+
+        var result = anchorIndex
+        for (i in anchorIndex until myTokenQueue.size) {
+            if (myTokenQueue[i].type == commentTokenType) {
+                result = i + 1
+            }
+        }
+        return result
     }
 }

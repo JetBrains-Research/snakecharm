@@ -91,3 +91,69 @@ SnakemakeFile: RuleParamsListArgsLineComments.smk
           PsiWhiteSpace(' ')
           PyStringLiteralExpression: echo doo
             PsiElement(Py:SINGLE_QUOTED_STRING)('"echo doo"')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n           ')
+          PyStringLiteralExpression: echo foo
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"echo foo"')
+          PsiWhiteSpace('\n           ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n                    ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n          ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n           ')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: text
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
+          PsiWhiteSpace('\n    ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n               ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n           ')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: text
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
+          PsiWhiteSpace(' ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n           ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n    ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n        ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n  ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n                           ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+  PsiWhiteSpace('\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('boo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: echo boo
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"echo boo"')
