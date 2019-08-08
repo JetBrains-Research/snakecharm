@@ -265,6 +265,11 @@ class SnakemakeLexer : PythonIndentingLexer() {
             val hasSignificantTokens = myLineHasSignificantTokens
             var indent = nextLineIndent
             if (baseTokenType == commentTokenType) {
+                if (myCurrentNewlineIndent == ruleLikeSectionIndent) {
+                    restore(indentPos)
+                    processInsignificantLineBreak(startPos, false)
+                    return
+                }
                 indent = myIndentStack.peek()
                 lineCommentInSectionEncountered = true
             }

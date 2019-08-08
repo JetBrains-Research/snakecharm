@@ -44,3 +44,17 @@ rule foo:
 # comment
 rule boo:
     shell: "echo boo"
+
+rule boo:
+    params: a = 30,
+          #comment
+            b = "text",
+                        c = print(30)
+    shell: "echo boo" # comment
+
+rule boo:
+    params: a = 30,
+              #comment
+            b = "text",
+                        c = print(30)
+    shell: "echo boo" # comment
