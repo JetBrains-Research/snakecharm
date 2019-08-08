@@ -1,0 +1,93 @@
+SnakemakeFile: RuleParamsListArgsLineComments.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PyStringLiteralExpression: echo foo
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"echo foo"')
+          PsiWhiteSpace('\n        ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# tod')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('boo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: echo boo
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"echo boo"')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('soo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n          ')
+          PyStringLiteralExpression: arg
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"arg"')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace('\n          ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n             ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n       ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n          ')
+          PyStringLiteralExpression: arg
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"arg"')
+          PsiWhiteSpace(' ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n          ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n          ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n     ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n          ')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: arg
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"arg"')
+          PsiWhiteSpace('\n          ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n               ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n    ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('doo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: echo doo
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"echo doo"')

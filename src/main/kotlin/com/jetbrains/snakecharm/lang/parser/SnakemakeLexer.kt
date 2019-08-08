@@ -19,6 +19,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
     private var currentToken: IElementType? = null
     private var previousToken: IElementType? = null
     private var insertedIndentsCount = 0
+    private var lineCommentInSectionEncountered = false
 
     // used to differentiate between 'rule all: input: "text"' and 'rule: input: "text" '
     private var topLevelSectionColonOccurred = false
@@ -253,6 +254,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             var indent = nextLineIndent
             if (baseTokenType == commentTokenType) {
                 indent = myIndentStack.peek()
+                lineCommentInSectionEncountered = true
             }
             restore(indentPos)
             myLineHasSignificantTokens = hasSignificantTokens
@@ -290,6 +292,22 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 while (insertedIndentsCount > 0) {
                     myIndentStack.pop()
                     insertedIndentsCount--
+                }
+                if (lineCommentInSectionEncountered) {
+                    val firstLineCommentPosition = myTokenQueue.indexOfFirst { it.type == commentTokenType }
+                    if (firstLineCommentPosition > 0) {
+                        val firstLineCommentPrecedingToken = myTokenQueue[firstLineCommentPosition - 1]
+                        myTokenQueue.add(
+                                firstLineCommentPosition - 1,
+                                PendingToken(
+                                        PyTokenTypes.STATEMENT_BREAK,
+                                        firstLineCommentPrecedingToken.start,
+                                        firstLineCommentPrecedingToken.start
+                                )
+                        )
+                        myLineHasSignificantTokens = false
+                    }
+
                 }
                 super.processLineBreak(startPos)
             }
