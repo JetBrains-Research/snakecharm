@@ -263,6 +263,11 @@ class SnakemakeLexer : PythonIndentingLexer() {
     override fun processLineBreak(startPos: Int) {
         if ((ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections)
                 && !isInPythonSection && !beforeFirstArgumentInSection) {
+            if (myBraceLevel != 0) {
+                processInsignificantLineBreak(startPos, false)
+                return
+            }
+
             val indentPos = currentPosition
             val hasSignificantTokens = myLineHasSignificantTokens
             val indent = nextLineIndent
@@ -286,13 +291,6 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 super.processLineBreak(startPos)
             }
         } else {
-            /*val pos = currentPosition
-            advanceBase()
-            val isAtComment = baseTokenType == commentTokenType
-            restore(pos)
-            if (isAtComment) {
-                processComments()
-            }*/
             super.processLineBreak(startPos)
         }
     }
