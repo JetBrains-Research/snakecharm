@@ -23,7 +23,7 @@ SnakemakeFile: RuleParamsListArgsStringMultilineIncorrectUnindent.smk
             PsiErrorElement:expression expected
               <empty list>
             PsiErrorElement:expression expected
-              PsiWhiteSpace('\n              ')
+              PsiElement(Py:INCONSISTENT_DEDENT)('\n              ')
               PsiElement(Py:SINGLE_QUOTED_STRING)('".txt"')
           PsiWhiteSpace('\n            ')
           PsiElement(Py:COMMA)(',')
@@ -55,11 +55,11 @@ SnakemakeFile: RuleParamsListArgsStringMultilineIncorrectUnindent.smk
             PsiErrorElement:expression expected
               <empty list>
             PsiErrorElement:expression expected
-              PsiWhiteSpace('\n           ')
+              PsiElement(Py:INCONSISTENT_DEDENT)('\n           ')
               PsiElement(Py:SINGLE_QUOTED_STRING)('"_copy"')
               PsiWhiteSpace('\n                 ')
               PsiElement(Py:SINGLE_QUOTED_STRING)('"1"')
-              PsiWhiteSpace('\n              ')
+              PsiElement(Py:INCONSISTENT_DEDENT)('\n              ')
               PsiElement(Py:SINGLE_QUOTED_STRING)('".txt"')
           PsiWhiteSpace('\n           ')
           PsiElement(Py:COMMA)(',')

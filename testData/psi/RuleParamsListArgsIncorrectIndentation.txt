@@ -71,12 +71,10 @@ SnakemakeFile: RuleParamsListArgsIncorrectIndentation.smk
             PsiErrorElement:expression expected
               <empty list>
             PsiErrorElement:expression expected
-              PsiWhiteSpace('\n        ')
+              PsiElement(Py:INCONSISTENT_DEDENT)('\n        ')
               PsiElement(Py:SINGLE_QUOTED_STRING)('"file5.txt"')
           PsiWhiteSpace(' ')
           PsiComment(Py:END_OF_LINE_COMMENT)('# incorrect indentation')
-          PsiErrorElement:Dedent expected
-            <empty list>
       PsiWhiteSpace('\n    ')
       SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('shell')

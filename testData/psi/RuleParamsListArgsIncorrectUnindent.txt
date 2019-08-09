@@ -22,7 +22,7 @@ SnakemakeFile: RuleParamsListArgsIncorrectUnindent.smk
             PsiErrorElement:expression expected
               <empty list>
             PsiErrorElement:expression expected
-              PsiWhiteSpace('\n                ')
+              PsiElement(Py:INCONSISTENT_DEDENT)('\n                ')
               PsiElement(Py:IDENTIFIER)('arg3')
           PsiWhiteSpace(' ')
           PsiComment(Py:END_OF_LINE_COMMENT)('# incorrect unindent')
@@ -81,7 +81,7 @@ SnakemakeFile: RuleParamsListArgsIncorrectUnindent.smk
             PsiErrorElement:expression expected
               <empty list>
             PsiErrorElement:expression expected
-              PsiWhiteSpace('\n                 ')
+              PsiElement(Py:INCONSISTENT_DEDENT)('\n                 ')
               PsiElement(Py:IDENTIFIER)('arg3')
           PsiWhiteSpace(' ')
           PsiComment(Py:END_OF_LINE_COMMENT)('# incorrect unindent')
@@ -139,7 +139,7 @@ SnakemakeFile: RuleParamsListArgsIncorrectUnindent.smk
             PsiErrorElement:expression expected
               <empty list>
             PsiErrorElement:expression expected
-              PsiWhiteSpace('\n                 ')
+              PsiElement(Py:INCONSISTENT_DEDENT)('\n                 ')
               PsiElement(Py:PLUS)('+')
               PsiWhiteSpace(' ')
               PsiElement(Py:IDENTIFIER)('arg3')
@@ -204,7 +204,7 @@ SnakemakeFile: RuleParamsListArgsIncorrectUnindent.smk
             PsiErrorElement:expression expected
               <empty list>
             PsiErrorElement:expression expected
-              PsiWhiteSpace('\n               ')
+              PsiElement(Py:INCONSISTENT_DEDENT)('\n               ')
               PsiElement(Py:IDENTIFIER)('condition2')
               PsiWhiteSpace(' ')
               PsiElement(Py:ELSE_KEYWORD)('else')

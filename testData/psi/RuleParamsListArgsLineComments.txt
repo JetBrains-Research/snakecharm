@@ -15,7 +15,7 @@ SnakemakeFile: RuleParamsListArgsLineComments.smk
             PsiElement(Py:SINGLE_QUOTED_STRING)('"echo foo"')
           PsiWhiteSpace('\n        ')
           PsiComment(Py:END_OF_LINE_COMMENT)('# tod')
-  PsiWhiteSpace('\n\n')
+          PsiWhiteSpace('\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
@@ -76,7 +76,7 @@ SnakemakeFile: RuleParamsListArgsLineComments.smk
           PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
           PsiWhiteSpace('\n')
           PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
-  PsiWhiteSpace('\n\n')
+          PsiWhiteSpace('\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
@@ -142,7 +142,7 @@ SnakemakeFile: RuleParamsListArgsLineComments.smk
           PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
           PsiWhiteSpace('\n')
           PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
-  PsiWhiteSpace('\n')
+          PsiWhiteSpace('\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
