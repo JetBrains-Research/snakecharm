@@ -58,3 +58,7 @@ rule boo:
             b = "text",
                         c = print(30)
     shell: "echo boo" # comment
+
+rule doo:
+    shell: "echo foo"
+    # end of file comment

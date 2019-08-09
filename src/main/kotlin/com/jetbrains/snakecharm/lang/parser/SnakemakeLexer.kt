@@ -20,6 +20,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
     private var previousToken: IElementType? = null
     private var insertedIndentsCount = 0
     private var lineCommentInSectionEncountered = false
+    private var addedStatementBreakAtEOF = false
 
     // used to differentiate between 'rule all: input: "text"' and 'rule: input: "text" '
     private var topLevelSectionColonOccurred = false
@@ -51,7 +52,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
     */
     private var isInPythonSection = true
 
-    // Is true for: rule, checkpoint, subworkflow
+    // Is false for: rule, checkpoint, subworkflow, true for other toplevel sections, e.g. include
     private var isInToplevelSectionWithoutSubsections = false
 
     companion object {
@@ -265,8 +266,10 @@ class SnakemakeLexer : PythonIndentingLexer() {
             val hasSignificantTokens = myLineHasSignificantTokens
             var indent = nextLineIndent
             if (baseTokenType == commentTokenType) {
-                if (myCurrentNewlineIndent == ruleLikeSectionIndent) {
+                if (myCurrentNewlineIndent >= ruleLikeSectionIndent ||
+                        isInToplevelSectionWithoutSubsections && myCurrentNewlineIndent >= topLevelSectionIndent) {
                     restore(indentPos)
+                    lineCommentInSectionEncountered = true
                     processInsignificantLineBreak(startPos, false)
                     return
                 }
@@ -358,7 +361,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
     }
 
     override fun skipPrecedingCommentsWithSameIndentOnSuiteClose(indent: Int, anchorIndex: Int): Int {
-        if (!(ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections && topLevelSectionIndent > -1)) {
+        if (!(ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections)) {
             return super.skipPrecedingCommentsWithSameIndentOnSuiteClose(indent, anchorIndex)
         }
 
@@ -369,5 +372,37 @@ class SnakemakeLexer : PythonIndentingLexer() {
             }
         }
         return result
+    }
+
+    override fun processSpecialTokens() {
+        if (!(ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections || isInPythonSection)) {
+            super.processSpecialTokens()
+            return
+        }
+
+        super.processSpecialTokens()
+        if (baseTokenType == null && !addedStatementBreakAtEOF) {
+            val firstLineCommentPosition = myTokenQueue.indexOfFirst { it.type == commentTokenType }
+            if (firstLineCommentPosition > 0) {
+                val firstLineCommentPrecedingToken = myTokenQueue[firstLineCommentPosition - 1]
+                myTokenQueue.add(
+                        firstLineCommentPosition - 1,
+                        PendingToken(
+                                PyTokenTypes.STATEMENT_BREAK,
+                                firstLineCommentPrecedingToken.start,
+                                firstLineCommentPrecedingToken.start
+                        )
+                )
+                addedStatementBreakAtEOF = true
+                val lastCommentTokenIndex = myTokenQueue.indexOfLast { it.type == commentTokenType }
+                val extraStatementBreakIndex = myTokenQueue.indexOfFirst {
+                    myTokenQueue.indexOf(it) > lastCommentTokenIndex &&
+                            it.type == PyTokenTypes.STATEMENT_BREAK
+                }
+                if (extraStatementBreakIndex > 0 && extraStatementBreakIndex <= myTokenQueue.lastIndex) {
+                    myTokenQueue.removeAt(extraStatementBreakIndex)
+                }
+            }
+        }
     }
 }

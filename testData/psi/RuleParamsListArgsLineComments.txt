@@ -269,3 +269,20 @@ SnakemakeFile: RuleParamsListArgsLineComments.smk
             PsiElement(Py:SINGLE_QUOTED_STRING)('"echo boo"')
           PsiWhiteSpace(' ')
           PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('doo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: echo foo
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"echo foo"')
+  PsiWhiteSpace('\n    ')
+  PsiComment(Py:END_OF_LINE_COMMENT)('# end of file comment')
