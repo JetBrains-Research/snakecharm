@@ -64,4 +64,8 @@ class SmkStringLanguageParsingTest : ParsingTestCase(
     fun testLbraceIncompleteSubscription2() {
         doTest(true)
     }
+
+    fun testBadIdentifierName() {
+        doTest(true)
+    }
 }

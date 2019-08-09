@@ -51,7 +51,7 @@
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex"/>
     <gotoSymbolContributor implementation="com.jetbrains.snakecharm.actions.SmkGotoSymbolContributor"/>
 
-    <languageInjector implementation="com.jetbrains.snakecharm.string_language.SmkSLInjector"/>
+    <multiHostInjector implementation="com.jetbrains.snakecharm.string_language.SmkSLInjector"/>
 
     <completion.contributor
         language="Python"

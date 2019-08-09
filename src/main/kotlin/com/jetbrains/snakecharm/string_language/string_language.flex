@@ -15,7 +15,8 @@ import com.jetbrains.snakecharm.string_language.SmkSLTokenTypes;
 %function advance
 %type IElementType
 
-IDENTIFIER=[^\}\.\[\,]+
+ID_LETTER=[:letter:]|\_
+IDENTIFIER={ID_LETTER}({ID_LETTER}|[:digit:])*
 STRING_CONTENT=([^\{]|\{\{)+
 REGEXP=([^{}]+ | \{\d+(,\d+)?\})*
 ACCESS_KEY=[^\]]+

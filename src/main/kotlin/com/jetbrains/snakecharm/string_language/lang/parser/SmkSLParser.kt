@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.PsiParser
 import com.intellij.psi.tree.IElementType
+import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.string_language.SmkSLTokenTypes
 
 class SmkSLParser : PsiParser {
@@ -40,7 +41,8 @@ class SmkSLParser : PsiParser {
             builder.advanceLexer()
 
             val regexMarker = builder.mark()
-            builder.checkMatches(SmkSLTokenTypes.REGEXP, "Expected regular expression")
+            builder.checkMatches(SmkSLTokenTypes.REGEXP,
+                    SnakemakeBundle.message("SMKSL.PARSE.expected.regexp"))
             regexMarker.done(SmkSLTokenTypes.REGEXP)
         }
 
@@ -48,7 +50,7 @@ class SmkSLParser : PsiParser {
         if (!builder.eof()) {
             builder.advanceLexer()
         } else {
-            builder.error("Expected '}'")
+            builder.error(SnakemakeBundle.message("SMKSL.PARSE.expected.rbrace"))
         }
 
         languageMarker.done(SmkSLTokenTypes.LANGUAGE)
@@ -57,21 +59,40 @@ class SmkSLParser : PsiParser {
     // Returns true if parsing ended on token 'COMMA', and
     // regexp has to be parsed
     private fun parseIdentifierExpr(builder: PsiBuilder): Boolean {
+        fun endParsing(marker: PsiBuilder.Marker, identifierExpected: Boolean) {
+            if (identifierExpected) {
+                builder.error(SnakemakeBundle.message("SMKSL.PARSE.expected.identifier.name"))
+            }
+            marker.drop()
+        }
+
         var exprMarker = builder.mark()
-
-        // Parse first identifier
-        builder.checkMatches(SmkSLTokenTypes.IDENTIFIER, "Expected identifier name")
-        exprMarker.done(SmkSLTokenTypes.REFERENCE_EXPRESSION)
-        exprMarker = exprMarker.precede()
-
+        var identifierExpected = true
         while(true) {
             val tt = builder.tokenType
             when {
-                tt === SmkSLTokenTypes.UNEXPECTED_TOKEN ||
+                tt === SmkSLTokenTypes.IDENTIFIER -> {
+                    builder.advanceLexer()
+                    exprMarker.done(SmkSLTokenTypes.REFERENCE_EXPRESSION)
+                    exprMarker = exprMarker.precede()
+                    identifierExpected = false
+                }
+                tt === SmkSLTokenTypes.UNEXPECTED_TOKEN -> {
+                    exprMarker.done(SmkSLTokenTypes.REFERENCE_EXPRESSION)
+
+                    exprMarker = builder.mark()
+                    builder.advanceLexer()
+                    exprMarker.error(SnakemakeBundle.message("SMKSL.PARSE.unexpected.character"))
+
+                    exprMarker = builder.mark()
+                }
                 tt === SmkSLTokenTypes.DOT -> {
                     builder.advanceLexer()
-
-                    builder.checkMatches(SmkSLTokenTypes.IDENTIFIER, "Expected identifier name")
+                    if (builder.tokenType === SmkSLTokenTypes.IDENTIFIER) {
+                        builder.advanceLexer()
+                    } else {
+                        identifierExpected = true
+                    }
                     exprMarker.done(SmkSLTokenTypes.REFERENCE_EXPRESSION)
                     exprMarker = exprMarker.precede()
                 }
@@ -79,20 +100,22 @@ class SmkSLParser : PsiParser {
                     builder.advanceLexer()
 
                     val marker = builder.mark()
-                    builder.checkMatches(SmkSLTokenTypes.ACCESS_KEY, "Expected key")
+                    builder.checkMatches(SmkSLTokenTypes.ACCESS_KEY,
+                            SnakemakeBundle.message("SMKSL.PARSE.expected.key"))
                     marker.done(SmkSLTokenTypes.ACCESS_KEY)
 
-                    builder.checkMatches(SmkSLTokenTypes.RBRACKET, "Expected ']'")
+                    builder.checkMatches(SmkSLTokenTypes.RBRACKET,
+                            SnakemakeBundle.message("SMKSL.PARSE.expected.rbracket"))
                     exprMarker.done(SmkSLTokenTypes.SUBSCRIPTION_EXPRESSION)
 
                     exprMarker = exprMarker.precede()
                 }
                 tt === SmkSLTokenTypes.COMMA -> {
-                    exprMarker.drop()
+                    endParsing(exprMarker, identifierExpected)
                     return true
                 }
                 else -> {
-                    exprMarker.drop()
+                    endParsing(exprMarker, identifierExpected)
                     return false
                 }
             }

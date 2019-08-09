@@ -6,5 +6,5 @@ FILE
         SmkSLElement(REFERENCE_EXPRESSION)
           PsiElement(IDENTIFIER)('foo')
         PsiElement(DOT)('.')
-        PsiErrorElement:Expected identifier name
-          <empty list>
+      PsiErrorElement:Expected identifier name
+        <empty list>

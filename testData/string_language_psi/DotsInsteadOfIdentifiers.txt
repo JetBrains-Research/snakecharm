@@ -3,24 +3,24 @@ FILE
     PsiElement(LBRACE)('{')
     SmkSLElement(EXPRESSION_STATEMENT)
       SmkSLElement(REFERENCE_EXPRESSION)
+        <empty list>
+      PsiErrorElement:Unexpected character
+        PsiElement(UNEXPECTED_TOKEN)('.')
+      SmkSLElement(REFERENCE_EXPRESSION)
+        <empty list>
+      PsiErrorElement:Unexpected character
+        PsiElement(UNEXPECTED_TOKEN)('[')
+      SmkSLElement(REFERENCE_EXPRESSION)
         SmkSLElement(REFERENCE_EXPRESSION)
           SmkSLElement(REFERENCE_EXPRESSION)
-            SmkSLElement(REFERENCE_EXPRESSION)
-              SmkSLElement(REFERENCE_EXPRESSION)
-                SmkSLElement(REFERENCE_EXPRESSION)
-                  PsiErrorElement:Expected identifier name
-                    <empty list>
-                PsiElement(UNEXPECTED_TOKEN)('.')
-                PsiErrorElement:Expected identifier name
-                  <empty list>
-              PsiElement(UNEXPECTED_TOKEN)('[')
-              PsiElement(IDENTIFIER)('foo')
-            PsiElement(DOT)('.')
-            PsiErrorElement:Expected identifier name
-              <empty list>
-          PsiElement(UNEXPECTED_TOKEN)('.')
+            PsiElement(IDENTIFIER)('foo')
+          PsiElement(DOT)('.')
+      PsiErrorElement:Unexpected character
+        PsiElement(UNEXPECTED_TOKEN)('.')
+      SmkSLElement(REFERENCE_EXPRESSION)
+        SmkSLElement(REFERENCE_EXPRESSION)
           PsiElement(IDENTIFIER)('boo')
         PsiElement(DOT)('.')
-        PsiErrorElement:Expected identifier name
-          <empty list>
+      PsiErrorElement:Expected identifier name
+        <empty list>
     PsiElement(RBRACE)('}')

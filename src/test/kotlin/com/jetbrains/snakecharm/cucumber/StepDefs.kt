@@ -61,13 +61,9 @@ class StepDefs {
         SnakemakeWorld.fixture().setUp()
         SnakemakeWorld.fixture().testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
 
-        PythonDialectsTokenSetProvider.reset()
-    }
-
-    @Given("^a snakemake project with language injection$")
-    fun configureSnakemakeProjectWithLanguageInjection() {
-        configureSnakemakeProject("snakemake")
         SnakemakeWorld.myInjectionFixture = InjectionTestFixture(SnakemakeWorld.fixture())
+
+        PythonDialectsTokenSetProvider.reset()
     }
 
     @Given("^I expect controlflow")

@@ -73,6 +73,18 @@ class SmkStringLanguageLexerTest : PyLexerTestCase() {
                 "LBRACE", "COMMA", "RBRACE")
     }
 
+    fun testCorrectIdentifierName() {
+        doTest("{_correct_identifier_name10}",
+                "LBRACE", "IDENTIFIER", "RBRACE")
+    }
+
+    fun testBadIdentifierName() {
+        doTest("{f*o&o?}",
+                "LBRACE", "IDENTIFIER", "UNEXPECTED_TOKEN",
+                "IDENTIFIER", "UNEXPECTED_TOKEN", "IDENTIFIER",
+                "UNEXPECTED_TOKEN", "RBRACE")
+    }
+
     private fun doTest(text: String, vararg expectedTokens: String) {
         doLexerTest(text, SmkSLLexerAdapter(), *expectedTokens)
     }
