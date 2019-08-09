@@ -59,6 +59,15 @@ rule boo:
                         c = print(30)
     shell: "echo boo" # comment
 
+rule foo2:
+    input: # comment
+# comment
+         "echo foo",
+        "incorrectly unindented text"
+# end of rule comment
+rule foo:
+    input: "text"
+
 rule doo:
     shell: "echo foo"
     # end of file comment

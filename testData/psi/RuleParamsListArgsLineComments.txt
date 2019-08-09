@@ -273,6 +273,49 @@ SnakemakeFile: RuleParamsListArgsLineComments.smk
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo2')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+          PsiWhiteSpace('\n         ')
+          PyStringLiteralExpression: echo foo
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"echo foo"')
+          PsiElement(Py:COMMA)(',')
+          PsiErrorElement:Unindent does not match any outer indentation level.
+            PsiErrorElement:expression expected
+              <empty list>
+            PsiErrorElement:expression expected
+              PsiElement(Py:INCONSISTENT_DEDENT)('\n        ')
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"incorrectly unindented text"')
+          PsiWhiteSpace('\n')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# end of rule comment')
+          PsiWhiteSpace('\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: text
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('doo')
     PsiElement(Py:COLON)(':')
     PyStatementList

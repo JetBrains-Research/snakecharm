@@ -93,7 +93,9 @@ class SnakemakeLexer : PythonIndentingLexer() {
         // so this variable is set to false
         if ((ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections) &&
                 beforeFirstArgumentInSection &&
-                tokenType !in PyTokenTypes.WHITESPACE && tokenType != PyTokenTypes.COLON) {
+                tokenType !in PyTokenTypes.WHITESPACE_OR_LINEBREAK &&
+                tokenType != commentTokenType &&
+                tokenType != PyTokenTypes.COLON) {
             beforeFirstArgumentInSection = false
         }
 
@@ -264,52 +266,11 @@ class SnakemakeLexer : PythonIndentingLexer() {
             val indentPos = currentPosition
             val hasSignificantTokens = myLineHasSignificantTokens
             val indent = nextLineIndent
-            if (baseTokenType == commentTokenType) {
-                restore(indentPos)
-                while (baseTokenType in PyTokenTypes.WHITESPACE_OR_LINEBREAK) {
-                    val whitespaceOrLinebreakPosition = currentPosition
-                    processInsignificantLineBreak(baseTokenStart, false)
-                    if (baseTokenType == commentTokenType) {
-                        myTokenQueue.add(PendingToken(baseTokenType, baseTokenStart, baseTokenEnd))
-                        advanceBase()
-                    } else {
-                        restore(whitespaceOrLinebreakPosition)
-                        break
-                    }
-                }
-                val position = currentPosition
-                val ind = nextLineIndent
-                if (ind < ruleLikeSectionIndent) {
-                    val firstCommentQueueIndex = myTokenQueue.indexOfFirst { it.type == commentTokenType }
-                    if (firstCommentQueueIndex > 0) {
-                        val precedingToken = myTokenQueue[firstCommentQueueIndex - 1]
-                        if (precedingToken.type == PyTokenTypes.LINE_BREAK) {
-                            myTokenQueue.add(firstCommentQueueIndex - 1,
-                                    PendingToken(
-                                            PyTokenTypes.STATEMENT_BREAK,
-                                            precedingToken.start,
-                                            precedingToken.start
-                                    ))
-
-                        }
-                        myLineHasSignificantTokens = false
-                        while (insertedIndentsCount > 0) {
-                            myIndentStack.pop()
-                            insertedIndentsCount--
-                        }
-                        super.processIndent(myTokenQueue.last().end, PyTokenTypes.LINE_BREAK)
-                        return
-                    }
-                }
-                if (ind <= ruleLikeSectionIndent || isInToplevelSectionWithoutSubsections && ind <= topLevelSectionIndent) {
-                    restore(position)
-                    super.processLineBreak(baseTokenStart)
-                } else {
-                    processIndentsInsideSection(ind, baseTokenStart)
-                }
+            val isAtComment = baseTokenType == commentTokenType
+            restore(indentPos)
+            if (isAtComment) {
+                processComments()
                 return
-            } else {
-                restore(indentPos)
             }
             myLineHasSignificantTokens = hasSignificantTokens
             if ((indent > ruleLikeSectionIndent) && ruleLikeSectionIndent > -1 ||
@@ -325,6 +286,13 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 super.processLineBreak(startPos)
             }
         } else {
+            /*val pos = currentPosition
+            advanceBase()
+            val isAtComment = baseTokenType == commentTokenType
+            restore(pos)
+            if (isAtComment) {
+                processComments()
+            }*/
             super.processLineBreak(startPos)
         }
     }
@@ -396,6 +364,50 @@ class SnakemakeLexer : PythonIndentingLexer() {
         } else if (indent > myIndentStack.peek()) {
             myIndentStack.push(indent)
             insertedIndentsCount++
+        }
+    }
+
+    private fun processComments() {
+        while (baseTokenType in PyTokenTypes.WHITESPACE_OR_LINEBREAK) {
+            val whitespaceOrLinebreakPosition = currentPosition
+            processInsignificantLineBreak(baseTokenStart, false)
+            if (baseTokenType == commentTokenType) {
+                myTokenQueue.add(PendingToken(baseTokenType, baseTokenStart, baseTokenEnd))
+                advanceBase()
+            } else {
+                restore(whitespaceOrLinebreakPosition)
+                break
+            }
+        }
+        val position = currentPosition
+        val ind = nextLineIndent
+        if (ind < ruleLikeSectionIndent) {
+            val firstCommentQueueIndex = myTokenQueue.indexOfFirst { it.type == commentTokenType }
+            if (firstCommentQueueIndex > 0) {
+                val precedingToken = myTokenQueue[firstCommentQueueIndex - 1]
+                if (precedingToken.type == PyTokenTypes.LINE_BREAK) {
+                    myTokenQueue.add(firstCommentQueueIndex - 1,
+                            PendingToken(
+                                    PyTokenTypes.STATEMENT_BREAK,
+                                    precedingToken.start,
+                                    precedingToken.start
+                            ))
+
+                }
+                myLineHasSignificantTokens = false
+                while (insertedIndentsCount > 0) {
+                    myIndentStack.pop()
+                    insertedIndentsCount--
+                }
+                super.processIndent(myTokenQueue.last().end, PyTokenTypes.LINE_BREAK)
+                return
+            }
+        }
+        if (ind <= ruleLikeSectionIndent || isInToplevelSectionWithoutSubsections && ind <= topLevelSectionIndent) {
+            restore(position)
+            super.processLineBreak(baseTokenStart)
+        } else {
+            processIndentsInsideSection(ind, baseTokenStart)
         }
     }
 }
