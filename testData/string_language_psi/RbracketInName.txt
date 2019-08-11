@@ -1,0 +1,13 @@
+FILE
+  SmkSLElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    SmkSLElement(EXPRESSION_STATEMENT)
+      SmkSLElement(REFERENCE_EXPRESSION)
+        SmkSLElement(REFERENCE_EXPRESSION)
+          PsiElement(IDENTIFIER)('foo')
+      PsiErrorElement:Unexpected character
+        PsiElement(UNEXPECTED_TOKEN)(']')
+    PsiElement(COMMA)(',')
+    SmkSLElement(REGEXP)
+      PsiElement(REGEXP)('\d+')
+    PsiElement(RBRACE)('}')
