@@ -68,4 +68,8 @@ class SmkStringLanguageParsingTest : ParsingTestCase(
     fun testBadIdentifierName() {
         doTest(true)
     }
+
+    fun testRbracketInName() {
+        doTest(true)
+    }
 }

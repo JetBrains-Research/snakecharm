@@ -47,6 +47,7 @@ ACCESS_KEY=[^\]]+
 
 <WAITING_REGEXP> {REGEXP}         { yybegin(WAITING_LANGUAGE_CLOSURE); return tokenTypes.getREGEXP(); }
 
+<WAITING_ACCESS_KEY, WAITING_ACCESS_CLOSURE>
     \]                            { yybegin(WAITING_AFTER_IDENTIFIER); return tokenTypes.getRBRACKET(); }
 
     \}                            { yybegin(YYINITIAL); return tokenTypes.getRBRACE(); }
