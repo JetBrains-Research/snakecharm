@@ -22,9 +22,16 @@ object SmkPsiUtil {
 
     // This function is meant to get correct reference range in string literal
     // even in some weird cases like:
-    // <section>: "f" "o" "o" ".s" "m" """k"""
+    // include: "f" "o" "o" ".s" "m" """k"""
     fun getReferenceRange(stringLiteral: PyStringLiteralExpression): TextRange {
         val decodedFragments = stringLiteral.decodedFragments
+
+        // It can happen for example in this case:
+        // include: f""
+        if (decodedFragments.isEmpty()) {
+            return TextRange.EMPTY_RANGE
+        }
+
         return TextRange(decodedFragments.first().first.startOffset, decodedFragments.last().first.endOffset)
     }
 }
