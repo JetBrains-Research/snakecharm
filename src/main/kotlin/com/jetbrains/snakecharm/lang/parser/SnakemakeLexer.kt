@@ -99,7 +99,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             beforeFirstArgumentInSection = false
         }
 
-        if (topLevelSectionIndent == -1 && KEYWORDS[tokenText] != null) {
+        if (topLevelSectionIndent == -1 && tokenText in KEYWORDS) {
             val possibleToplevelSectionKeyword = tokenText
             val isToplevelSection = isToplevelKeywordSection()
             if (isToplevelSection) {
@@ -227,7 +227,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         val possibleKeywordPosition = currentPosition
         val possibleToplevelSectionKeyword = tokenText
 
-        if (KEYWORDS[possibleToplevelSectionKeyword] == null) {
+        if (possibleToplevelSectionKeyword !in KEYWORDS) {
             return false
         }
 
