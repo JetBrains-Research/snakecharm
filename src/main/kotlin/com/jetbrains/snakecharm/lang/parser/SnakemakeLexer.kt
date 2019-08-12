@@ -94,15 +94,14 @@ class SnakemakeLexer : PythonIndentingLexer() {
         if ((ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections) &&
                 beforeFirstArgumentInSection &&
                 tokenType !in PyTokenTypes.WHITESPACE_OR_LINEBREAK &&
-                tokenType != commentTokenType &&
-                tokenType != PyTokenTypes.COLON) {
+                !atToken(commentTokenType) &&
+                !atToken(PyTokenTypes.COLON)) {
             beforeFirstArgumentInSection = false
         }
 
         if (topLevelSectionIndent == -1 && tokenText in KEYWORDS) {
             val possibleToplevelSectionKeyword = tokenText
-            val isToplevelSection = isToplevelKeywordSection()
-            if (isToplevelSection) {
+            if (isToplevelKeywordSection()) {
                 // if it's the first token in the file, it's 0, as it should be
                 topLevelSectionIndent = myCurrentNewlineIndent
                 ruleLikeSectionIndent = -1
@@ -111,14 +110,14 @@ class SnakemakeLexer : PythonIndentingLexer() {
         } else if (topLevelSectionIndent > -1 &&
                 myCurrentNewlineIndent >= topLevelSectionIndent &&
                 ruleLikeSectionIndent == -1 &&
-                tokenType == PyTokenTypes.IDENTIFIER && topLevelSectionColonOccurred) {
+                atToken(PyTokenTypes.IDENTIFIER) && topLevelSectionColonOccurred) {
             val identifierPosition = currentPosition
             val identifierText = tokenText
             // look ahead and update rule-like section indent if an identifier is followed by a colon
             // this allows to avoid hardcoding section names and ensures correct lexing/parsing
             // of new snakemake sections should they be introduced in future releases
             advanceBase()
-            if (baseTokenType == PyTokenTypes.COLON) {
+            if (atBaseToken(PyTokenTypes.COLON)) {
                 ruleLikeSectionIndent = myCurrentNewlineIndent
                 isInPythonSection = identifierText == SnakemakeNames.SECTION_RUN
                 beforeFirstArgumentInSection = true
@@ -126,11 +125,11 @@ class SnakemakeLexer : PythonIndentingLexer() {
             restore(identifierPosition)
         }
 
-        if (tokenType == PyTokenTypes.COLON && topLevelSectionIndent > -1 && ruleLikeSectionIndent == -1) {
+        if (atToken(PyTokenTypes.COLON) && topLevelSectionIndent > -1 && ruleLikeSectionIndent == -1) {
             topLevelSectionColonOccurred = true
         }
 
-        if (tokenType === PyTokenTypes.LINE_BREAK) {
+        if (atToken(PyTokenTypes.LINE_BREAK)) {
             val text = tokenText.substringAfterLast(System.lineSeparator())
             var spaces = 0
             for (i in text.length - 1 downTo 0) {
@@ -144,7 +143,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             if (insideSnakemakeArgumentList(myCurrentNewlineIndent)
                     { currentIndent, sectionIndent -> currentIndent <= sectionIndent }) {
                 val currentLineBreakIndex = myTokenQueue.indexOfFirst {
-                    it.type == PyTokenTypes.LINE_BREAK && it.start == tokenStart
+                    it.type === PyTokenTypes.LINE_BREAK && it.start == tokenStart
                 }
 
                 val isAtComment = if (currentLineBreakIndex != -1) {
@@ -152,10 +151,9 @@ class SnakemakeLexer : PythonIndentingLexer() {
                     while (i < myTokenQueue.size && myTokenQueue[i].type in PyTokenTypes.WHITESPACE_OR_LINEBREAK) {
                         i++
                     }
-                    i < myTokenQueue.size && myTokenQueue[i].type == commentTokenType ||
-                            baseTokenType == commentTokenType
+                    i < myTokenQueue.size && myTokenQueue[i].type === commentTokenType || atBaseToken(commentTokenType)
                 } else {
-                    baseTokenType == commentTokenType
+                    atBaseToken(commentTokenType)
                 }
 
                 if (!isAtComment) {
@@ -169,7 +167,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 isInToplevelSectionWithoutSubsections = false
                 isInPythonSection = false
             }
-        } else if (tokenType === PyTokenTypes.TAB) {
+        } else if (atToken(PyTokenTypes.TAB)) {
             myCurrentNewlineIndent += 8
         }
 
@@ -191,35 +189,36 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
     private fun adjustBraceLevel() {
         val tokenType = tokenType
-        if (PyTokenTypes.OPEN_BRACES.contains(tokenType)) {
-            myBraceLevel++
-        } else if (PyTokenTypes.CLOSE_BRACES.contains(tokenType)) {
-            myBraceLevel--
-        } else if (myBraceLevel != 0) {
-            val leftPreviousSection = myCurrentNewlineIndent <= ruleLikeSectionIndent ||
-                    ruleLikeSectionIndent == -1 && myCurrentNewlineIndent <= topLevelSectionIndent
-            val isInPythonCode = isInPythonSection || topLevelSectionIndent == -1
-            val isToplevelSectionKeyword = (leftPreviousSection && !isInPythonSection || isInPythonCode) &&
-                    isToplevelKeywordSection()
-            if (!recoveryTokens.contains(tokenType) && !isToplevelSectionKeyword) {
-                return
-            }
 
-            myBraceLevel = 0
-            val pos = tokenStart
-            pushToken(PyTokenTypes.STATEMENT_BREAK, pos, pos)
-            val indents = myIndentStack.size()
-            for (i in 0 until indents - 1) {
-                val indent = myIndentStack.peek()
-                if (myCurrentNewlineIndent >= indent) {
-                    break
+        when {
+            tokenType in PyTokenTypes.OPEN_BRACES -> myBraceLevel++
+            tokenType in PyTokenTypes.CLOSE_BRACES -> myBraceLevel--
+            myBraceLevel != 0 -> {
+                val leftPreviousSection = myCurrentNewlineIndent <= ruleLikeSectionIndent ||
+                        ruleLikeSectionIndent == -1 && myCurrentNewlineIndent <= topLevelSectionIndent
+                val isInPythonCode = isInPythonSection || topLevelSectionIndent == -1
+                val isToplevelSectionKeyword = (leftPreviousSection && !isInPythonSection || isInPythonCode) &&
+                        isToplevelKeywordSection()
+                if (tokenType !in recoveryTokens && !isToplevelSectionKeyword) {
+                    return
                 }
-                if (myIndentStack.size() > 1) {
-                    myIndentStack.pop()
-                    pushToken(PyTokenTypes.DEDENT, pos, pos)
+
+                myBraceLevel = 0
+                val pos = tokenStart
+                pushToken(PyTokenTypes.STATEMENT_BREAK, pos, pos)
+                val indents = myIndentStack.size()
+                for (i in 0 until indents - 1) {
+                    val indent = myIndentStack.peek()
+                    if (myCurrentNewlineIndent >= indent) {
+                        break
+                    }
+                    if (myIndentStack.size() > 1) {
+                        myIndentStack.pop()
+                        pushToken(PyTokenTypes.DEDENT, pos, pos)
+                    }
                 }
+                pushToken(PyTokenTypes.LINE_BREAK, pos, pos)
             }
-            pushToken(PyTokenTypes.LINE_BREAK, pos, pos)
         }
     }
 
@@ -275,7 +274,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             val indentPos = currentPosition
             val hasSignificantTokens = myLineHasSignificantTokens
             val indent = nextLineIndent
-            val isAtComment = baseTokenType == commentTokenType
+            val isAtComment = atBaseToken(commentTokenType)
             restore(indentPos)
             if (isAtComment) {
                 processComments()
@@ -345,10 +344,10 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
     // consumes comments and line breaks and processes the next line depending on the current section
     private fun processComments() {
-        while (baseTokenType == PyTokenTypes.LINE_BREAK) {
+        while (atBaseToken(PyTokenTypes.LINE_BREAK)) {
             val linebreakPosition = currentPosition
             processInsignificantLineBreak(baseTokenStart, false)
-            if (baseTokenType == commentTokenType) {
+            if (atBaseToken(commentTokenType)) {
                 myTokenQueue.add(PendingToken(baseTokenType, baseTokenStart, baseTokenEnd))
                 advanceBase()
             } else {
@@ -394,4 +393,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
     private fun insideSnakemakeArgumentList(indent: Int, comparator: (Int, Int) -> Boolean) =
             ruleLikeSectionIndent > -1 && comparator(indent, ruleLikeSectionIndent) ||
                     isInToplevelSectionWithoutSubsections && comparator(indent, topLevelSectionIndent)
+
+    private fun atToken(token: IElementType) = tokenType === token
+    private fun atBaseToken(token: IElementType) = baseTokenType === token
 }
