@@ -141,7 +141,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 }
             }
             myCurrentNewlineIndent = spaces
-            if (insideSnakemakeArgumentList(myCurrentNewlineIndent) { arg1, arg2 -> arg1 <= arg2}) {
+            if (insideSnakemakeArgumentList(myCurrentNewlineIndent)
+                    { currentIndent, sectionIndent -> currentIndent <= sectionIndent }) {
                 val currentLineBreakIndex = myTokenQueue.indexOfFirst {
                     it.type == PyTokenTypes.LINE_BREAK && it.start == tokenStart
                 }
@@ -281,7 +282,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 return
             }
             myLineHasSignificantTokens = hasSignificantTokens
-            if (insideSnakemakeArgumentList(indent) { arg1, arg2 -> arg1 > arg2}) {
+            if (insideSnakemakeArgumentList(indent) { currentIndent, sectionIndent -> currentIndent > sectionIndent}) {
                 processInsignificantLineBreak(startPos, false)
                 processIndentsInsideSection(indent, startPos)
             } else {
@@ -313,7 +314,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
     private fun processIndentsInsideSection(indent: Int, startPos: Int) {
         val whiteSpaceEnd = if (baseTokenType == null) super.getBufferEnd() else baseTokenStart
-        if (insideSnakemakeArgumentList(indent) { arg1, arg2 -> arg1 < arg2}) {
+        if (insideSnakemakeArgumentList(indent) { currentIndent, sectionIndent -> currentIndent < sectionIndent}) {
             closeDanglingSuites(indent, startPos)
             myTokenQueue.add(PendingToken(PyTokenTypes.LINE_BREAK, startPos, whiteSpaceEnd))
         } else if (indent < myIndentStack.peek()) {
@@ -364,7 +365,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         }
 
         // insert statement break on section exit
-        if (insideSnakemakeArgumentList(indent) { arg1, arg2 -> arg1 <= arg2}) {
+        if (insideSnakemakeArgumentList(indent) { currentIndent, sectionIndent -> currentIndent <= sectionIndent}) {
             restore(position)
             val firstCommentQueueIndex = myTokenQueue.indexOfFirst { it.type == commentTokenType }
             val precedingToken = myTokenQueue[firstCommentQueueIndex - 1]
@@ -378,11 +379,13 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
             }
             myLineHasSignificantTokens = false
-            while (insertedIndentsCount > 0) {
-                myIndentStack.pop()
-                insertedIndentsCount--
+            if (insideSnakemakeArgumentList(indent) { currentIndent, sectionIndent -> currentIndent < sectionIndent }) {
+                while (insertedIndentsCount > 0) {
+                    myIndentStack.pop()
+                    insertedIndentsCount--
+                }
+                super.processIndent(myTokenQueue.last().end, PyTokenTypes.LINE_BREAK)
             }
-            super.processIndent(myTokenQueue.last().end, PyTokenTypes.LINE_BREAK)
         } else {
             processIndentsInsideSection(indent, baseTokenStart)
         }
