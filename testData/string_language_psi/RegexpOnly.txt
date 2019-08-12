@@ -6,5 +6,11 @@ FILE
         <empty list>
     PsiElement(COMMA)(',')
     SmkSLElement(REGEXP)
-      PsiElement(REGEXP)('\d+')
+      RegExpPatternImpl: <\d+>
+        RegExpBranchImpl: <\d+>
+          RegExpClosureImpl: <\d+>
+            RegExpSimpleClassImpl: <\d>
+              PsiElement(CHAR_CLASS)('\d')
+            RegExpQuantifierImpl: <+>
+              PsiElement(PLUS)('+')
     PsiElement(RBRACE)('}')

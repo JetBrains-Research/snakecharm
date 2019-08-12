@@ -22,7 +22,7 @@ class SmkSLInjector : PyInjectorBase() {
                 SnakemakeNames.SECTION_PRIORITY, SnakemakeNames.SECTION_SINGULARITY)
     }
 
-    override fun getInjectedLanguage(element: PsiElement) = SmkStringLanguage
+    override fun getInjectedLanguage(element: PsiElement) = SmkSL
 
     override fun elementsToInjectIn() = listOf(PyStringLiteralExpression::class.java)
 

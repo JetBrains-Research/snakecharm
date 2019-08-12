@@ -5,6 +5,5 @@ FILE
       PsiErrorElement:Expected identifier name
         <empty list>
     PsiElement(COMMA)(',')
-    SmkSLElement(REGEXP)
-      PsiErrorElement:Expected regular expression
-        <empty list>
+    PsiErrorElement:Expected regular expression
+      <empty list>

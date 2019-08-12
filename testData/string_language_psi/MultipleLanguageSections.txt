@@ -14,7 +14,15 @@ FILE
         PsiElement(IDENTIFIER)('doo')
     PsiElement(COMMA)(',')
     SmkSLElement(REGEXP)
-      PsiElement(REGEXP)(' \d+')
+      RegExpPatternImpl: < \d+>
+        RegExpBranchImpl: < \d+>
+          RegExpCharImpl: < >
+            PsiElement(CHARACTER)(' ')
+          RegExpClosureImpl: <\d+>
+            RegExpSimpleClassImpl: <\d>
+              PsiElement(CHAR_CLASS)('\d')
+            RegExpQuantifierImpl: <+>
+              PsiElement(PLUS)('+')
     PsiElement(RBRACE)('}')
   SmkSLElement(STRING_CONTENT)
     PsiElement(STRING_CONTENT)(' some text ')
@@ -44,5 +52,17 @@ FILE
         PsiElement(IDENTIFIER)('too')
     PsiElement(COMMA)(',')
     SmkSLElement(REGEXP)
-      PsiElement(REGEXP)('a{3,5}')
+      RegExpPatternImpl: <a{3,5}>
+        RegExpBranchImpl: <a{3,5}>
+          RegExpClosureImpl: <a{3,5}>
+            RegExpCharImpl: <a>
+              PsiElement(CHARACTER)('a')
+            RegExpQuantifierImpl: <{3,5}>
+              PsiElement(LBRACE)('{')
+              RegExpNumberImpl: <3>
+                PsiElement(NUMBER)('3')
+              PsiElement(COMMA)(',')
+              RegExpNumberImpl: <5>
+                PsiElement(NUMBER)('5')
+              PsiElement(RBRACE)('}')
     PsiElement(RBRACE)('}')

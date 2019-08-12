@@ -1,17 +1,8 @@
 package com.jetbrains.snakecharm.lang.parser
 
-import com.jetbrains.python.PythonDialectsTokenSetContributor
-import com.jetbrains.python.PythonDialectsTokenSetProvider
-import com.jetbrains.snakecharm.lang.SmkTokenSetContributor
 import com.jetbrains.snakecharm.string_language.lang.parser.SmkSLLexerAdapter
 
 class SmkStringLanguageLexerTest : PyLexerTestCase() {
-    override fun setUp() {
-        super.setUp()
-        registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SmkTokenSetContributor())
-        PythonDialectsTokenSetProvider.reset()
-    }
-
     fun testOrdinaryString() {
         doTest("just ordinary string with escaped {{ brackets }}",
                 "STRING_CONTENT")

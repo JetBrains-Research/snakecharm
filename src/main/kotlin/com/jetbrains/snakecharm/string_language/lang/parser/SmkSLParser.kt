@@ -28,8 +28,8 @@ class SmkSLParser : PsiParser {
     private fun parseLanguage(builder: PsiBuilder) {
         val languageMarker = builder.mark()
 
-        // Skipping '{'
-        builder.advanceLexer()
+        builder.checkMatches(SmkSLTokenTypes.LBRACE,
+                SnakemakeBundle.message("SMKSL.PARSE.expected.lbrace"))
 
         val expressionMarker = builder.mark()
         val doParseRegExp = parseIdentifierExpr(builder)
@@ -37,13 +37,13 @@ class SmkSLParser : PsiParser {
 
         // Parsing regex
         if (doParseRegExp) {
-            // Skipping ','
-            builder.advanceLexer()
-
-            val regexMarker = builder.mark()
+            builder.checkMatches(SmkSLTokenTypes.COMMA,
+                    SnakemakeBundle.message("SMKSL.PARSE.expected.comma"))
             builder.checkMatches(SmkSLTokenTypes.REGEXP,
                     SnakemakeBundle.message("SMKSL.PARSE.expected.regexp"))
-            regexMarker.done(SmkSLTokenTypes.REGEXP)
+
+            // RegExp will be parsed automatically, because its token
+            // type extends ILazyParseableElementType
         }
 
         // Skipping '}'
@@ -59,11 +59,11 @@ class SmkSLParser : PsiParser {
     // Returns true if parsing ended on token 'COMMA', and
     // regexp has to be parsed
     private fun parseIdentifierExpr(builder: PsiBuilder): Boolean {
-        fun endParsing(marker: PsiBuilder.Marker, identifierExpected: Boolean) {
+        fun PsiBuilder.Marker.drop(identifierExpected: Boolean) {
             if (identifierExpected) {
                 builder.error(SnakemakeBundle.message("SMKSL.PARSE.expected.identifier.name"))
             }
-            marker.drop()
+            drop()
         }
 
         var exprMarker = builder.mark()
@@ -111,11 +111,11 @@ class SmkSLParser : PsiParser {
                     exprMarker = exprMarker.precede()
                 }
                 tt === SmkSLTokenTypes.COMMA -> {
-                    endParsing(exprMarker, identifierExpected)
+                    exprMarker.drop(identifierExpected)
                     return true
                 }
                 else -> {
-                    endParsing(exprMarker, identifierExpected)
+                    exprMarker.drop(identifierExpected)
                     return false
                 }
             }

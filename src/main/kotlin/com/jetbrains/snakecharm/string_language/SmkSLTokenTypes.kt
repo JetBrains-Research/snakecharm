@@ -1,10 +1,38 @@
 package com.jetbrains.snakecharm.string_language
 
+import com.intellij.lang.*
+import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
+import com.intellij.psi.tree.ILazyParseableElementType
+import org.intellij.lang.regexp.RegExpLanguage
+import org.intellij.lang.regexp.RegExpParserDefinition
 
-class SmkSLTokenType(debugName: String) : IElementType(debugName, SmkStringLanguage)
+class SmkSLTokenType(debugName: String) : IElementType(debugName, SmkSL)
+
+class RegExpElementType(debugName: String) : ILazyParseableElementType(debugName, SmkSL) {
+    override fun parseLight(chameleon: ASTNode): PsiBuilder {
+        val project = chameleon.psi.project
+        val regExpLanguage = RegExpLanguage.INSTANCE
+        val definition =
+                LanguageParserDefinitions.INSTANCE.forLanguage(regExpLanguage) as RegExpParserDefinition
+        val capabilities =
+                definition.defaultCapabilities
+        val lexer = definition.createLexer(project, capabilities)
+        val parser = definition.createParser(project, capabilities)
+        val builder = PsiBuilderFactory.getInstance().createBuilder(project, chameleon, lexer, regExpLanguage, chameleon.chars)
+        (parser as LightPsiParser).parseLight(this, builder)
+
+        return builder
+    }
+
+    override fun doParseContents(chameleon: ASTNode, psi: PsiElement): ASTNode? =
+        parseLight(chameleon).treeBuilt.firstChildNode
+}
+
 
 object SmkSLTokenTypes {
+    val REGEXP = RegExpElementType("REGEXP")
+
     val DOT = SmkSLTokenType("DOT")
 
     val LBRACE = SmkSLTokenType("LBRACE")
@@ -20,8 +48,6 @@ object SmkSLTokenTypes {
     val RBRACKET = SmkSLTokenType("RBRACKET")
 
     val COMMA = SmkSLTokenType("COMMA")
-
-    val REGEXP = SmkSLTokenType("REGEXP")
 
     val ACCESS_KEY = SmkSLTokenType("ACCESS_KEY")
 
