@@ -6,6 +6,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Computable
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
+import com.intellij.testFramework.fixtures.InjectionTestFixture
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.codeInsight.controlflow.ControlFlowCache
@@ -59,6 +60,9 @@ class StepDefs {
 
         SnakemakeWorld.fixture().setUp()
         SnakemakeWorld.fixture().testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
+
+        SnakemakeWorld.myInjectionFixture = InjectionTestFixture(SnakemakeWorld.fixture())
+
         PythonDialectsTokenSetProvider.reset()
     }
 

@@ -1,0 +1,9 @@
+FILE
+  SmkSLElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    SmkSLElement(EXPRESSION_STATEMENT)
+      PsiErrorElement:Expected identifier name
+        <empty list>
+    PsiElement(COMMA)(',')
+    PsiErrorElement:Expected regular expression
+      <empty list>
