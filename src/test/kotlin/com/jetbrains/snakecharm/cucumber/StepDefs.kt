@@ -76,7 +76,6 @@ class StepDefs {
         val fixture = SnakemakeWorld.fixture()
         when (inspectionName) {
             "Shadow Settings" -> fixture.enableInspections(SmkShadowSettingsInspection::class.java)
-            "Shadow Multiple Settings" -> fixture.enableInspections(SmkShadowMultipleSettingsInspection::class.java)
             "Resources Keyword Arguments" -> fixture.enableInspections(SmkResourcesKeywordArgsInspection::class.java)
             "Rule Redeclaration" -> fixture.enableInspections(SmkRuleRedeclarationInspection::class.java)
             "Rule Section After Execution Section" ->

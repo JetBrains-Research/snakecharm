@@ -23,6 +23,6 @@ Feature: 'shadow:' section related inspections
         shadow: "full"
     """
     And Shadow Settings inspection is enabled
-    And Shadow Multiple Settings inspection is enabled
+    And Section Multiple Args inspection is enabled
     Then I expect no inspection warning
     When I check highlighting warnings

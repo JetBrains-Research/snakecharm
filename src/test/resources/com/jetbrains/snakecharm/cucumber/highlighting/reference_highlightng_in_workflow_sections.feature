@@ -70,3 +70,37 @@ Feature: This feature checks reference highlighting in workflow sections
       | include    | smk       |
       | configfile | yaml      |
       | report     | html      |
+
+  Scenario Outline: Reference highlighting in conda section
+    Given a snakemake project
+    Given a file "boo.yaml" with text
+    """
+    """
+    Given I open a file "foo.smk" with text
+    """
+    <section>:
+      conda: "boo.yaml"
+    """
+    When I put the caret at b
+    Then I expect reference highlighting on "boo.yaml"
+    Examples:
+      | section    |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Reference highlighting in conda section when string is divided
+    Given a snakemake project
+    Given a file "boo.yaml" with text
+    """
+    """
+    Given I open a file "foo.smk" with text
+    """
+    <section>:
+      conda: '' "b" 'o' f"o" f'.yaml' ""
+    """
+    When I put the caret at b
+    Then I expect reference highlighting on "' "b" 'o' f"o" f'.yaml' ""
+    Examples:
+      | section    |
+      | rule       |
+      | checkpoint |

@@ -48,23 +48,16 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
             return emptyArray()
         }
 
-        val stringLiteralArgs = argumentList?.arguments?.filter {
-            it is PyStringLiteralExpression
-        } ?: return emptyArray()
+        val stringLiteralArgs =
+                argumentList?.arguments?.filterIsInstance<PyStringLiteralExpression>() ?: return emptyArray()
 
         return stringLiteralArgs.map {
-            val path = (it as PyStringLiteralExpression).stringValue
             val offsetInParent = keywordName!!.length + it.startOffsetInParent
-            createReference(getReferenceRange(it).shiftRight(offsetInParent), path)
+            createReference(
+                    SmkPsiUtil.getReferenceRange(it).shiftRight(offsetInParent),
+                    it.stringValue
+            )
         }.toTypedArray()
-    }
-
-    // This function is meant to get correct reference range in string literal
-    // even in some weird cases like:
-    // include: "f" "o" "o" ".s" "m" """k"""
-    private fun getReferenceRange(stringLiteral: PyStringLiteralExpression): TextRange {
-        val decodedFragments = stringLiteral.decodedFragments
-        return TextRange(decodedFragments.first().first.startOffset, decodedFragments.last().first.endOffset)
     }
 
     private val keywordName: String?
