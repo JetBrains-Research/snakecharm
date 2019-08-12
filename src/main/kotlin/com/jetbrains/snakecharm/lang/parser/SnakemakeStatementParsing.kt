@@ -10,7 +10,6 @@ import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.PY_EXPRESSIONS_ALLOWING_SNAKEMAKE_KEYWORDS
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.RULE_OR_CHECKPOINT
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
@@ -80,7 +79,7 @@ class SnakemakeStatementParsing(
         val scope = context.scope
 
         myBuilder.setDebugMode(false)
-        if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER && !scope.inNoSmkKeywordsAllowed) {
+        if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER && !scope.inPythonicSection) {
             // XXX: workaround/fix for #130:
             val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText]
             if (actualToken != null) {
@@ -89,17 +88,8 @@ class SnakemakeStatementParsing(
         }
         val tt = myBuilder.tokenType
 
-        if (tt !in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS || scope.inParamArgsList) {
-            val startPyOnlyScope = tt !in PY_EXPRESSIONS_ALLOWING_SNAKEMAKE_KEYWORDS
-            if (startPyOnlyScope) {
-                context.pushScope(scope.withNoSmkKeywordsAllowed())
-            }
+        if (tt !in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
             super.parseStatement()
-
-            if (startPyOnlyScope) {
-                context.popScope()
-            }
-
             return
         }
         when {
@@ -143,7 +133,7 @@ class SnakemakeStatementParsing(
                 workflowParam.done(SmkElementTypes.WORKFLOW_RULEORDER_SECTION_STATEMENT)
             }
             tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS -> {
-                myContext.pushScope(scope.withNoSmkKeywordsAllowed())
+                myContext.pushScope(scope.withPythonicSection())
                 val decoratorMarker = myBuilder.mark()
                 nextToken()
                 checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
@@ -163,9 +153,6 @@ class SnakemakeStatementParsing(
     }
 
     private fun parseRuleLikeDeclaration(section: SectionParsingData) {
-        val context = parsingContext
-        val scope = context.scope
-
         val ruleLikeMarker: PsiBuilder.Marker = myBuilder.mark()
         nextToken()
 
@@ -190,31 +177,19 @@ class SnakemakeStatementParsing(
         // no sections after current rule before next rule
         var incompleteRule = false
 
-        // in rule scopes helps to parse toplevel keywords as identifiers
-        // see #com.jetbrains.snakecharm.lang.parser.SnakemakeStatementParsing.filter
-        var inRuleLikeScope: SnakemakeParsingScope? = scope.withRuleLike()
-
         val multiline = atToken(PyTokenTypes.STATEMENT_BREAK)
         if (!multiline) {
-            context.pushScope(inRuleLikeScope!!)
             parseRuleParameter(section)
         } else {
             nextToken()
             incompleteRule = !checkMatches(PyTokenTypes.INDENT, "Indent expected...")
-            if (incompleteRule) {
-                inRuleLikeScope = null
-            } else {
-                context.pushScope(inRuleLikeScope!!)
+            if (!incompleteRule) {
                 while (!atToken(PyTokenTypes.DEDENT)) {
                     if (!parseRuleParameter(section)) {
                         break
                     }
                 }
             }
-        }
-
-        if (inRuleLikeScope != null) {
-            context.popScope()
         }
 
         ruleStatements.done(PyElementTypes.STATEMENT_LIST)
@@ -279,7 +254,7 @@ class SnakemakeStatementParsing(
             }
             section.sectionKeyword in RULE_OR_CHECKPOINT && keyword == SnakemakeNames.SECTION_RUN -> {
                 val scope = myContext.scope as SnakemakeParsingScope
-                myContext.pushScope(scope.withNoSmkKeywordsAllowed())
+                myContext.pushScope(scope.withPythonicSection())
                 checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
                 statementParser.parseSuite()
                 ruleParam.done(SmkElementTypes.RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT)

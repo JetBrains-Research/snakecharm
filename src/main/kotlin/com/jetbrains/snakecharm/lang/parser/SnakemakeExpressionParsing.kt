@@ -29,14 +29,9 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             errorMessage: String,
             parsingFunction: () -> Boolean
     ): Boolean {
-        val context = myContext
-        val scope = context.scope as SnakemakeParsingScope
-        myContext.pushScope(scope.withParamsArgsList())
-        val result = doParseRuleParamArgumentList(separatorTokenText, separatorTokenType) {
+        return doParseRuleParamArgumentList(separatorTokenText, separatorTokenType) {
             parseArgumentAndReportErrors(errorMessage, separatorTokenType, parsingFunction)
         }
-        context.popScope()
-        return result
     }
 
     private fun doParseRuleParamArgumentList(
