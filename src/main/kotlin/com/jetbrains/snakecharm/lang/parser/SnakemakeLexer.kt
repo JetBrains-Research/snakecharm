@@ -130,6 +130,12 @@ class SnakemakeLexer : PythonIndentingLexer() {
         }
 
         if (atToken(PyTokenTypes.LINE_BREAK)) {
+            /** IDEA uses a [com.intellij.openapi.editor.Document] object
+             * which replaces all line separators with '\n'.
+             * Even if the original file had CRLF for line separator,
+             * tokenText will never contain CR, only LF.
+             * Thus only '\n' can be used as a delimiter here, but [System.lineSeparator] cannot.
+             */
             val text = tokenText.substringAfterLast('\n')
             var spaces = 0
             for (i in text.length - 1 downTo 0) {
