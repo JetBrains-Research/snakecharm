@@ -82,6 +82,12 @@ class SmkStringLanguageLexerTest : PyLexerTestCase() {
                 "UNEXPECTED_TOKEN", "RBRACE")
     }
 
+    fun testEscapedBracket() {
+        doTest("{foo,\\}+}",
+                "LBRACE", "IDENTIFIER",
+                "COMMA", "REGEXP", "RBRACE")
+    }
+
     private fun doTest(text: String, vararg expectedTokens: String) {
         doLexerTest(text, SmkSLLexerAdapter(), *expectedTokens)
     }

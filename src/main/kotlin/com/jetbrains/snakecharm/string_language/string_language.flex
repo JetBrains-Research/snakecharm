@@ -18,7 +18,7 @@ import com.jetbrains.snakecharm.string_language.SmkSLTokenTypes;
 ID_LETTER=[:letter:]|\_
 IDENTIFIER={ID_LETTER}({ID_LETTER}|[:digit:])*
 STRING_CONTENT=([^\{]|\{\{)+
-REGEXP=([^{}]+ | \{\d+(,\d+)?\})*
+REGEXP=([^{}]+ | \{\d+(,\d+)?\} | \\\} | \\\{)*
 ACCESS_KEY=[^\]]+
 
 %state WAITING_IDENTIFIER
