@@ -32,12 +32,12 @@
     />
     <fileTypeFactory implementation="com.jetbrains.snakecharm.string_language.SmkSLFileTypeFactory"/>
     <lang.parserDefinition
-            language="SmkStringLanguage"
+            language="SnakemakeSL"
             implementationClass="com.jetbrains.snakecharm.string_language.lang.parser.SmkSLParserDefinition"
     />
     <!--<colorSettingsPage implementation="com.jetbrains.snakemake.lang.highlighter.SnakemakeColorsPage"/>-->
     <lang.syntaxHighlighterFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterFactory"/>
-    <lang.syntaxHighlighterFactory language="SmkStringLanguage"
+    <lang.syntaxHighlighterFactory language="SnakemakeSL"
      implementationClass="com.jetbrains.snakecharm.string_language.lang.highlighter.SmkSLSyntaxHighlighterFactory"/>
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkDumbAwareAnnotatorManager"/>
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkStandardAnnotatorManager"/>
