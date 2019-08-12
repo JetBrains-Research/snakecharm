@@ -377,10 +377,16 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 break
             }
         }
+
         val position = currentPosition
-        val ind = nextLineIndent
-        restore(position)
-        if (ind < ruleLikeSectionIndent) {
+        val indent = nextLineIndent
+
+        if (baseTokenType == null) {
+            return
+        }
+
+        if (indent < ruleLikeSectionIndent || isInToplevelSectionWithoutSubsections && indent < topLevelSectionIndent) {
+            restore(position)
             val firstCommentQueueIndex = myTokenQueue.indexOfFirst { it.type == commentTokenType }
             if (firstCommentQueueIndex > 0) {
                 val precedingToken = myTokenQueue[firstCommentQueueIndex - 1]
@@ -402,10 +408,11 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 return
             }
         }
-        if (ind <= ruleLikeSectionIndent || isInToplevelSectionWithoutSubsections && ind <= topLevelSectionIndent) {
+        if (indent <= ruleLikeSectionIndent || isInToplevelSectionWithoutSubsections && indent <= topLevelSectionIndent) {
+            restore(position)
             super.processLineBreak(baseTokenStart)
         } else {
-            processIndentsInsideSection(ind, baseTokenStart)
+            processIndentsInsideSection(indent, baseTokenStart)
         }
     }
 }

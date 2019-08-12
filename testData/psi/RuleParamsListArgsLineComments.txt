@@ -327,5 +327,5 @@ SnakemakeFile: RuleParamsListArgsLineComments.smk
           PsiWhiteSpace(' ')
           PyStringLiteralExpression: echo foo
             PsiElement(Py:SINGLE_QUOTED_STRING)('"echo foo"')
-  PsiWhiteSpace('\n    ')
-  PsiComment(Py:END_OF_LINE_COMMENT)('# end of file comment')
+          PsiWhiteSpace('\n    ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# end of file comment')
