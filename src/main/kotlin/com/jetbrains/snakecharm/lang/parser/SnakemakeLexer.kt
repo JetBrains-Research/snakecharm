@@ -146,6 +146,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 val currentLineBreakIndex = myTokenQueue.indexOfFirst {
                     it.type == PyTokenTypes.LINE_BREAK && it.start == tokenStart
                 }
+
                 val isAtComment = if (currentLineBreakIndex != -1) {
                     var i = currentLineBreakIndex + 1
                     while (i < myTokenQueue.size && myTokenQueue[i].type in PyTokenTypes.WHITESPACE_OR_LINEBREAK) {
@@ -153,7 +154,10 @@ class SnakemakeLexer : PythonIndentingLexer() {
                     }
                     i < myTokenQueue.size && myTokenQueue[i].type == commentTokenType ||
                             baseTokenType == commentTokenType
-                } else baseTokenType == commentTokenType
+                } else {
+                    baseTokenType == commentTokenType
+                }
+
                 if (!isAtComment) {
                     ruleLikeSectionIndent = -1
                     isInPythonSection = false
@@ -319,20 +323,6 @@ class SnakemakeLexer : PythonIndentingLexer() {
         }
     }
 
-    override fun skipPrecedingCommentsWithSameIndentOnSuiteClose(indent: Int, anchorIndex: Int): Int {
-        if (!(ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections)) {
-            return super.skipPrecedingCommentsWithSameIndentOnSuiteClose(indent, anchorIndex)
-        }
-
-        var result = anchorIndex
-        for (i in anchorIndex until myTokenQueue.size) {
-            if (myTokenQueue[i].type == commentTokenType) {
-                result = i + 1
-            }
-        }
-        return result
-    }
-
     private fun processIndentsInsideSection(indent: Int, startPos: Int) {
         val whiteSpaceEnd = if (baseTokenType == null) super.getBufferEnd() else baseTokenStart
         if (ruleLikeSectionIndent > -1 && indent < ruleLikeSectionIndent
@@ -408,7 +398,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 return
             }
         }
-        if (indent <= ruleLikeSectionIndent || isInToplevelSectionWithoutSubsections && indent <= topLevelSectionIndent) {
+        if (indent <= ruleLikeSectionIndent ||
+                isInToplevelSectionWithoutSubsections && indent <= topLevelSectionIndent) {
             restore(position)
             super.processLineBreak(baseTokenStart)
         } else {
