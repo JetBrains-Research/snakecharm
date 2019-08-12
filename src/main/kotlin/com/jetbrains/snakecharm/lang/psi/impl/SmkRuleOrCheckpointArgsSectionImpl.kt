@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
+import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.PsiReference
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStringLiteralExpression
@@ -26,6 +27,12 @@ open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode): SmkArgsSectionImpl
                 argumentList?.arguments
                         ?.firstOrNull { it is PyStringLiteralExpression }
                         as? PyStringLiteralExpression ?: return null
+
+        // No reference if language is injected
+        val languageManager = InjectedLanguageManager.getInstance(project)
+        if (languageManager.getInjectedPsiFiles(stringLiteral) != null) {
+            return null
+        }
 
         val offsetInParent = SnakemakeNames.SECTION_CONDA.length + stringLiteral.startOffsetInParent
         return SmkConfigfileReference(
