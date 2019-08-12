@@ -141,8 +141,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 }
             }
             myCurrentNewlineIndent = spaces
-            if (!isInToplevelSectionWithoutSubsections && topLevelSectionIndent > -1 &&
-                    myCurrentNewlineIndent <= ruleLikeSectionIndent) {
+            if (insideSnakemakeArgumentList(myCurrentNewlineIndent) { arg1, arg2 -> arg1 <= arg2}) {
                 val currentLineBreakIndex = myTokenQueue.indexOfFirst {
                     it.type == PyTokenTypes.LINE_BREAK && it.start == tokenStart
                 }
@@ -282,8 +281,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 return
             }
             myLineHasSignificantTokens = hasSignificantTokens
-            if (indent > ruleLikeSectionIndent && ruleLikeSectionIndent > -1 ||
-                    isInToplevelSectionWithoutSubsections && indent > topLevelSectionIndent) {
+            if (insideSnakemakeArgumentList(indent) { arg1, arg2 -> arg1 > arg2}) {
                 processInsignificantLineBreak(startPos, false)
                 processIndentsInsideSection(indent, startPos)
             } else {
@@ -315,9 +313,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
     private fun processIndentsInsideSection(indent: Int, startPos: Int) {
         val whiteSpaceEnd = if (baseTokenType == null) super.getBufferEnd() else baseTokenStart
-        if (ruleLikeSectionIndent > -1 && indent < ruleLikeSectionIndent
-                || isInToplevelSectionWithoutSubsections && indent < topLevelSectionIndent) {
-            // report error
+        if (insideSnakemakeArgumentList(indent) { arg1, arg2 -> arg1 < arg2}) {
             closeDanglingSuites(indent, startPos)
             myTokenQueue.add(PendingToken(PyTokenTypes.LINE_BREAK, startPos, whiteSpaceEnd))
         } else if (indent < myIndentStack.peek()) {
@@ -336,6 +332,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                     }
                 }
             }
+            // to avoid breaking the token sequence
             if (myTokenQueue.find { it.start >= startPos } == null) {
                 myTokenQueue.add(PendingToken(PyTokenTypes.LINE_BREAK, startPos, whiteSpaceEnd))
             }
@@ -345,7 +342,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         }
     }
 
-    // consumes comments and line breaks/whitespaces and processes the next line depending on the current section
+    // consumes comments and line breaks and processes the next line depending on the current section
     private fun processComments() {
         while (baseTokenType == PyTokenTypes.LINE_BREAK) {
             val linebreakPosition = currentPosition
@@ -367,8 +364,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         }
 
         // insert statement break on section exit
-        if (indent <= ruleLikeSectionIndent ||
-                isInToplevelSectionWithoutSubsections && indent <= topLevelSectionIndent) {
+        if (insideSnakemakeArgumentList(indent) { arg1, arg2 -> arg1 <= arg2}) {
             restore(position)
             val firstCommentQueueIndex = myTokenQueue.indexOfFirst { it.type == commentTokenType }
             val precedingToken = myTokenQueue[firstCommentQueueIndex - 1]
@@ -391,4 +387,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
             processIndentsInsideSection(indent, baseTokenStart)
         }
     }
+
+    private fun insideSnakemakeArgumentList(indent: Int, comparator: (Int, Int) -> Boolean) =
+            ruleLikeSectionIndent > -1 && comparator(indent, ruleLikeSectionIndent) ||
+                    isInToplevelSectionWithoutSubsections && comparator(indent, topLevelSectionIndent)
 }
