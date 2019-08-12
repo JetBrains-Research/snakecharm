@@ -40,8 +40,17 @@ Feature: Inspection for multiple arguments in various sections
     """
     When I check highlighting errors
     Examples:
-      | section    |
-      | shell      |
-      | script     |
-      | wrapper    |
-      | cwl        |
+      | section     |
+      | shell       |
+      | script      |
+      | wrapper     |
+      | cwl         |
+      | conda       |
+      | singularity |
+      | priority    |
+      | version     |
+      | group       |
+      | message     |
+      | benchmark   |
+      | threads     |
+      | shadow      |
