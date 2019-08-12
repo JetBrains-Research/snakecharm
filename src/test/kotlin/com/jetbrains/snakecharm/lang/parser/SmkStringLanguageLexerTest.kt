@@ -85,7 +85,7 @@ class SmkStringLanguageLexerTest : PyLexerTestCase() {
     fun testEscapedBracket() {
         doTest("{foo,\\}+}",
                 "LBRACE", "IDENTIFIER",
-                "COMMA", "REGEXP", "RBRACE")
+                "COMMA", "REGEXP", "RBRACE", "STRING_CONTENT")
     }
 
     private fun doTest(text: String, vararg expectedTokens: String) {
