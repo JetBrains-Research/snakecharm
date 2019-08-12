@@ -137,18 +137,24 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
     companion object {
         fun <T: SmkRuleOrCheckpoint> createRuleLikeLookupItem(name: String, elem: T): LookupElement {
             val containingFileName = elem.containingFile.name
-            val elementFile = File(elem.containingFile.virtualFile?.presentableUrl ?: containingFileName)
-            val currentDirectory = File(
+            /*
+              it is important to use originalFile to access virtualFile
+              because a light copy of the file is created during code completion
+              and containingFile.virtualFile returns null for that copy
+            */
+            val virtualFile = elem.containingFile.originalFile.virtualFile
+            val elementFile = File(virtualFile?.presentableUrl ?: containingFileName)
+            val fileContentRootDirectory = File(
                     ProjectRootManager.getInstance(elem.project)
                             .fileIndex
-                            .getContentRootForFile(elem.containingFile.originalFile.virtualFile)
+                            .getContentRootForFile(virtualFile)
                             ?.presentableUrl
                             ?: elementFile.parent
             )
             val displayPath = try {
-                elementFile.toRelativeString(currentDirectory)
-            } catch (e: IllegalArgumentException) {
-                ""
+                elementFile.toRelativeString(fileContentRootDirectory)
+            } catch (e: IllegalArgumentException) { // thrown by toRelativeString if paths have different roots
+                elementFile.name
             }
             return PrioritizedLookupElement.withPriority(
                     LookupElementBuilder
