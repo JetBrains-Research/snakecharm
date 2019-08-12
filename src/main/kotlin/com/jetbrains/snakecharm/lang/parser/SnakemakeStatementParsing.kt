@@ -80,7 +80,6 @@ class SnakemakeStatementParsing(
 
         myBuilder.setDebugMode(false)
         if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER && !scope.inPythonicSection) {
-            // XXX: workaround/fix for #130:
             val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText]
             if (actualToken != null) {
                 myBuilder.remapCurrentToken(actualToken)
