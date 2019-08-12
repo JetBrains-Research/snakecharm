@@ -282,12 +282,12 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 return
             }
             myLineHasSignificantTokens = hasSignificantTokens
-            if ((indent > ruleLikeSectionIndent) && ruleLikeSectionIndent > -1 ||
+            if (indent > ruleLikeSectionIndent && ruleLikeSectionIndent > -1 ||
                     isInToplevelSectionWithoutSubsections && indent > topLevelSectionIndent) {
                 processInsignificantLineBreak(startPos, false)
-
                 processIndentsInsideSection(indent, startPos)
             } else {
+                // section exit
                 while (insertedIndentsCount > 0) {
                     myIndentStack.pop()
                     insertedIndentsCount--
@@ -295,30 +295,20 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 super.processLineBreak(startPos)
             }
         } else {
+            // inside python section/not inside snakemake section
             super.processLineBreak(startPos)
         }
     }
 
+    /** Adds dedents where necessary. A simplified version of [closeDanglingSuitesWithComments] */
     private fun closeDanglingSuites(indent: Int, whiteSpaceStart: Int) {
         var lastIndent = myIndentStack.peek()
 
         var insertIndex = myTokenQueue.size
         while (indent < lastIndent) {
-            val lastSuiteIndent = myIndentStack.pop()
+            myIndentStack.pop()
             lastIndent = myIndentStack.peek()
-            var dedentOffset = whiteSpaceStart
-            insertIndex = if (indent > lastIndent) {
-                myTokenQueue.add(PendingToken(PyTokenTypes.INCONSISTENT_DEDENT, whiteSpaceStart, whiteSpaceStart))
-                myTokenQueue.size
-            } else {
-                skipPrecedingCommentsWithSameIndentOnSuiteClose(lastSuiteIndent, insertIndex)
-            }
-
-            if (insertIndex != myTokenQueue.size) {
-                dedentOffset = (myTokenQueue[insertIndex] as PendingToken).start
-            }
-
-            myTokenQueue.add(insertIndex, PendingToken(PyTokenTypes.DEDENT, dedentOffset, dedentOffset))
+            myTokenQueue.add(insertIndex, PendingToken(PyTokenTypes.DEDENT, whiteSpaceStart, whiteSpaceStart))
             ++insertIndex
         }
     }
@@ -355,15 +345,16 @@ class SnakemakeLexer : PythonIndentingLexer() {
         }
     }
 
+    // consumes comments and line breaks/whitespaces and processes the next line depending on the current section
     private fun processComments() {
-        while (baseTokenType in PyTokenTypes.WHITESPACE_OR_LINEBREAK) {
-            val whitespaceOrLinebreakPosition = currentPosition
+        while (baseTokenType == PyTokenTypes.LINE_BREAK) {
+            val linebreakPosition = currentPosition
             processInsignificantLineBreak(baseTokenStart, false)
             if (baseTokenType == commentTokenType) {
                 myTokenQueue.add(PendingToken(baseTokenType, baseTokenStart, baseTokenEnd))
                 advanceBase()
             } else {
-                restore(whitespaceOrLinebreakPosition)
+                restore(linebreakPosition)
                 break
             }
         }
@@ -375,33 +366,27 @@ class SnakemakeLexer : PythonIndentingLexer() {
             return
         }
 
-        if (indent < ruleLikeSectionIndent || isInToplevelSectionWithoutSubsections && indent < topLevelSectionIndent) {
-            restore(position)
-            val firstCommentQueueIndex = myTokenQueue.indexOfFirst { it.type == commentTokenType }
-            if (firstCommentQueueIndex > 0) {
-                val precedingToken = myTokenQueue[firstCommentQueueIndex - 1]
-                if (precedingToken.type == PyTokenTypes.LINE_BREAK) {
-                    myTokenQueue.add(firstCommentQueueIndex - 1,
-                            PendingToken(
-                                    PyTokenTypes.STATEMENT_BREAK,
-                                    precedingToken.start,
-                                    precedingToken.start
-                            ))
-
-                }
-                myLineHasSignificantTokens = false
-                while (insertedIndentsCount > 0) {
-                    myIndentStack.pop()
-                    insertedIndentsCount--
-                }
-                super.processIndent(myTokenQueue.last().end, PyTokenTypes.LINE_BREAK)
-                return
-            }
-        }
+        // insert statement break on section exit
         if (indent <= ruleLikeSectionIndent ||
                 isInToplevelSectionWithoutSubsections && indent <= topLevelSectionIndent) {
             restore(position)
-            super.processLineBreak(baseTokenStart)
+            val firstCommentQueueIndex = myTokenQueue.indexOfFirst { it.type == commentTokenType }
+            val precedingToken = myTokenQueue[firstCommentQueueIndex - 1]
+            if (precedingToken.type == PyTokenTypes.LINE_BREAK) {
+                myTokenQueue.add(firstCommentQueueIndex - 1,
+                        PendingToken(
+                                PyTokenTypes.STATEMENT_BREAK,
+                                precedingToken.start,
+                                precedingToken.start
+                        ))
+
+            }
+            myLineHasSignificantTokens = false
+            while (insertedIndentsCount > 0) {
+                myIndentStack.pop()
+                insertedIndentsCount--
+            }
+            super.processIndent(myTokenQueue.last().end, PyTokenTypes.LINE_BREAK)
         } else {
             processIndentsInsideSection(indent, baseTokenStart)
         }
