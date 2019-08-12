@@ -130,7 +130,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         }
 
         if (atToken(PyTokenTypes.LINE_BREAK)) {
-            val text = tokenText.substringAfterLast(System.lineSeparator())
+            val text = tokenText.substringAfterLast('\n')
             var spaces = 0
             for (i in text.length - 1 downTo 0) {
                 if (text[i] == ' ') {
