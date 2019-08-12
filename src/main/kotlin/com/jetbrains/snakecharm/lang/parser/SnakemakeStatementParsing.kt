@@ -298,22 +298,6 @@ class SnakemakeStatementParsing(
         return result
     }
 
-    override fun filter(
-            source: IElementType,
-            start: Int, end: Int,
-            text: CharSequence,
-            checkLanguageLevel: Boolean
-    ): IElementType {
-        if (source in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
-            val scope = myContext.scope as SnakemakeParsingScope
-            return when {
-                scope.inNoSmkKeywordsAllowed -> PyTokenTypes.IDENTIFIER
-                else -> source
-            }
-        }
-        return super.filter(source, start, end, text, checkLanguageLevel)
-    }
-
     // TODO: cleanup
 //    override fun getFunctionParser(): FunctionParsing {
 //        return super.getFunctionParser()
