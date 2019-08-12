@@ -8,7 +8,6 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
-import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
@@ -58,12 +57,11 @@ class ActionsSteps {
             )
             val reference = fixture.getReferenceAtCaretPosition()
             assertNotNull(reference, message = "There is no reference at the caret position")
-            val signatureRange = TextRange(pos, pos + signature.length)
             assertEquals(
-                    reference.rangeInElement,
-                    signatureRange,
-                    message = "Expected highlighted text wasn't equal to the actual one. " +
-                            "Expected highlighting on: $signature, actually highlighted: ${reference.canonicalText}")
+                    signature,
+                    reference.canonicalText,
+                    message = "Expected highlighted text wasn't equal to the actual one."
+            )
         }
     }
 

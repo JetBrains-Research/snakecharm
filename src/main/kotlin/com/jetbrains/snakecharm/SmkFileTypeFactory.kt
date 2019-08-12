@@ -16,7 +16,8 @@ class SmkFileTypeFactory: FileTypeFactory() {
                 ExactFileNameMatcher("Snakefile", true),
                 ExtensionFileNameMatcher(SmkFileType.defaultExtension),
                 ExtensionFileNameMatcher("rule"),
-                ExtensionFileNameMatcher("rules")
+                ExtensionFileNameMatcher("rules"),
+                ExtensionFileNameMatcher("Snakefile") // weird use-case from a real project
         )
     }
 }

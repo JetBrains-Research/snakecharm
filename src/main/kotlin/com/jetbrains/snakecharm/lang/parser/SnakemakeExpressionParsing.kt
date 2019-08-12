@@ -2,7 +2,6 @@ package com.jetbrains.snakecharm.lang.parser
 
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.impl.PsiBuilderImpl
-import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PyBundle.message
@@ -12,7 +11,6 @@ import com.jetbrains.python.parsing.ExpressionParsing
 import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
-import java.lang.reflect.InvocationTargetException
 
 /**
  * @author Roman.Chernyatchik
@@ -311,15 +309,7 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
             when {
                 atAnyOfTokensSafe(PyTokenTypes.FSTRING_START) -> {
                     // will be replaced with call to Python API when it becomes public
-                    val parseFunction = ExpressionParsing::class.java.getDeclaredMethod("parseFormattedStringNode")
-                    parseFunction.isAccessible = true
-                    try {
-                        parseFunction.invoke(this)
-                    } catch (e: InvocationTargetException) {
-                        if (e.cause is ProcessCanceledException) {
-                            throw (e.cause as ProcessCanceledException)
-                        }
-                    }
+                    parseFormattedStringNode()
                 }
                 // method call on a new line
                 atAnyOfTokensSafe(PyTokenTypes.DOT) -> {
@@ -481,6 +471,98 @@ class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionPa
                 }
                 else -> break@loop
             }
+        }
+    }
+
+    private fun parseFormattedStringNode() {
+        val builder = myContext.builder
+        if (atToken(PyTokenTypes.FSTRING_START)) {
+            val prefixThenQuotes = builder.tokenText!!
+            val openingQuotes = prefixThenQuotes.replaceFirst("^[UuBbCcRrFf]*".toRegex(), "")
+            val marker = builder.mark()
+            nextToken()
+            while (true) {
+                if (atToken(PyTokenTypes.FSTRING_TEXT)) {
+                    nextToken()
+                } else if (atToken(PyTokenTypes.FSTRING_FRAGMENT_START)) {
+                    parseFStringFragment()
+                } else if (atToken(PyTokenTypes.FSTRING_END)) {
+                    if (builder.tokenText == openingQuotes) {
+                        nextToken()
+                    } else {
+                        builder.mark().error("$openingQuotes expected")
+                    }// Can be the end of an enclosing f-string, so leave it in the stream
+                    break
+                } else if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
+                    builder.mark().error("$openingQuotes expected")
+                    break
+                } else {
+                    builder.error("unexpected f-string token")
+                    break
+                }
+            }
+            marker.done(PyElementTypes.FSTRING_NODE)
+        }
+    }
+
+    private fun parseFStringFragment() {
+        val builder = myContext.builder
+        if (atToken(PyTokenTypes.FSTRING_FRAGMENT_START)) {
+            val marker = builder.mark()
+            nextToken()
+            var recoveryMarker: PsiBuilder.Marker = builder.mark()
+            val parsedExpression = myContext.expressionParser.parseExpressionOptional()
+            if (parsedExpression) {
+                recoveryMarker.drop()
+                recoveryMarker = builder.mark()
+            }
+            var recovery = !parsedExpression
+            while (!builder.eof() && !atAnyOfTokens(PyTokenTypes.FSTRING_FRAGMENT_TYPE_CONVERSION,
+                            PyTokenTypes.FSTRING_FRAGMENT_FORMAT_START,
+                            PyTokenTypes.FSTRING_FRAGMENT_END,
+                            PyTokenTypes.FSTRING_END,
+                            PyTokenTypes.STATEMENT_BREAK)) {
+                nextToken()
+                recovery = true
+            }
+            if (recovery) {
+                recoveryMarker.error(if (parsedExpression) "unexpected expression part" else "expression expected")
+                recoveryMarker.setCustomEdgeTokenBinders(null, ExpressionParsing.CONSUME_COMMENTS_AND_SPACES_TO_LEFT)
+            } else {
+                recoveryMarker.drop()
+            }
+            val hasTypeConversion = matchToken(PyTokenTypes.FSTRING_FRAGMENT_TYPE_CONVERSION)
+            val hasFormatPart = atToken(PyTokenTypes.FSTRING_FRAGMENT_FORMAT_START)
+            if (hasFormatPart) {
+                parseFStringFragmentFormatPart()
+            }
+            var errorMessage = "} expected"
+            if (!hasFormatPart && !atToken(PyTokenTypes.FSTRING_END)) {
+                errorMessage = ": or $errorMessage"
+                if (!hasTypeConversion) {
+                    errorMessage = "type conversion, $errorMessage"
+                }
+            }
+            checkMatches(PyTokenTypes.FSTRING_FRAGMENT_END, errorMessage)
+            marker.setCustomEdgeTokenBinders(null, ExpressionParsing.CONSUME_COMMENTS_AND_SPACES_TO_LEFT)
+            marker.done(PyElementTypes.FSTRING_FRAGMENT)
+        }
+    }
+
+    private fun parseFStringFragmentFormatPart() {
+        if (atToken(PyTokenTypes.FSTRING_FRAGMENT_FORMAT_START)) {
+            val marker = myContext.builder.mark()
+            nextToken()
+            while (true) {
+                if (atToken(PyTokenTypes.FSTRING_TEXT)) {
+                    nextToken()
+                } else if (atToken(PyTokenTypes.FSTRING_FRAGMENT_START)) {
+                    parseFStringFragment()
+                } else {
+                    break
+                }
+            }
+            marker.done(PyElementTypes.FSTRING_FRAGMENT_FORMAT_PART)
         }
     }
 }

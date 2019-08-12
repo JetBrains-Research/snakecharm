@@ -117,17 +117,6 @@
     />
 
     <localInspection
-            language="Snakemake" shortName="SmkShadowMultipleSettingsInspection"
-            enabledByDefault="true"
-            level="ERROR"
-            suppressId="SmkShadowMultipleSettingsInspection"
-            bundle="SnakemakeBundle"
-            groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.shadow.multiple.settings"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkShadowMultipleSettingsInspection"
-    />
-
-    <localInspection
             language="Snakemake" shortName="SmkSectionRedeclarationInspection"
             enabledByDefault="true"
             level="WEAK WARNING"
