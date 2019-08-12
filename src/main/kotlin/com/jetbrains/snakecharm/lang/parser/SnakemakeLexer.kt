@@ -379,6 +379,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         }
         val position = currentPosition
         val ind = nextLineIndent
+        restore(position)
         if (ind < ruleLikeSectionIndent) {
             val firstCommentQueueIndex = myTokenQueue.indexOfFirst { it.type == commentTokenType }
             if (firstCommentQueueIndex > 0) {
@@ -402,7 +403,6 @@ class SnakemakeLexer : PythonIndentingLexer() {
             }
         }
         if (ind <= ruleLikeSectionIndent || isInToplevelSectionWithoutSubsections && ind <= topLevelSectionIndent) {
-            restore(position)
             super.processLineBreak(baseTokenStart)
         } else {
             processIndentsInsideSection(ind, baseTokenStart)
