@@ -214,6 +214,13 @@ class CompletionResolveSteps {
         assertHasOnlyElements(SnakemakeWorld.completionList(), lookupItems)
     }
 
+    @Then("^completion list should contain these items with type text:$")
+    fun completionListShouldContainWithTypeText(table: DataTable) {
+        val actualLookupItems = getCompletionListWithTypeText()
+        val expectedLookupItems = table.asLists(String::class.java).filter { it.size >= 2 }.map { it[0] to it[1] }
+        assertHasElements(actualLookupItems, expectedLookupItems)
+    }
+
     @Then("^completion list should contain items (.+)$")
     fun completionListShouldContainMethods(lookupItems: List<String>) {
         assertHasElements(SnakemakeWorld.completionList(), lookupItems)
@@ -268,7 +275,7 @@ class CompletionResolveSteps {
                                 message = "Completion resulted in a single possible variant, so it was impossible " +
                                         "to check whether \"$lookupText\" was in the completion list. " +
                                         "Try using this step: Then I invoke autocompletion popup and see a text")
-                        assertTrue(!lookupElements.isEmpty(), message = "Completion list was empty")
+                        assertTrue(lookupElements.isNotEmpty(), message = "Completion list was empty")
 
                         selectItem(LookupFilter.create(lookupText).findElement(lookupElements), ch, fixture.project)
                     }
@@ -331,6 +338,19 @@ class CompletionResolveSteps {
         fixture.complete(CompletionType.BASIC)
         SnakemakeWorld.myCompletionList = fixture.lookupElementStrings
     }
+
+    private fun getCompletionItemsPresentation(): List<LookupElementPresentation> {
+        val fixture = SnakemakeWorld.fixture()
+        fixture.complete(CompletionType.BASIC)
+        val completionList = fixture.lookupElements
+        return completionList?.map {
+            val presentation = LookupElementPresentation()
+            it.renderElement(presentation)
+            presentation
+        } ?: emptyList()
+    }
+
+    private fun getCompletionListWithTypeText() = getCompletionItemsPresentation().map { it.itemText to it.typeText }
 
 
     private fun assertUnresolvedReference(ref: PsiReference) {
@@ -501,11 +521,11 @@ class LookupFilter private constructor(
 }
 
 
-fun assertHasElements(
-        actualLookupItems: List<String>,
-        expectedVariants: List<String>
+fun <T> assertHasElements(
+        actualLookupItems: List<T>,
+        expectedVariants: List<T>
 ) {
-    val unmetElements = ArrayList<String>()
+    val unmetElements = ArrayList<T>()
 
     for (variant in expectedVariants) {
         if (!actualLookupItems.contains(variant)) {

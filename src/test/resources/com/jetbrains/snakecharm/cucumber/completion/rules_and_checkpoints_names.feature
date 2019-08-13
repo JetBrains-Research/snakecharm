@@ -159,3 +159,32 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       | rule_like  |
       | rule       |
       | checkpoint |
+
+  Scenario Outline: Display file path in type text: simple file name
+    Given a snakemake project
+    Given a file "boo.smk" with text
+    """
+    <rule_like> boo1:
+      input: "file.txt"
+      shell: "echo boo"
+    <rule_like> boo2:
+      input: "file2.txt"
+    """
+    Given I open a file "foo.smk" with text
+    """
+      <rule_like> foo0:
+        input: "foo0.txt"
+
+      <rule_like> foo:
+        input: <rule_like>s.
+    """
+    When I put the caret after <rule_like>s.
+    And I invoke autocompletion popup
+    Then completion list should contain these items with type text:
+      | boo1 | boo.smk |
+      | boo2 | boo.smk |
+      | foo0 | foo.smk |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
