@@ -5,7 +5,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.codeInsight.PyInjectionUtil.InjectionResult
 import com.jetbrains.python.codeInsight.PyInjectorBase
-import com.jetbrains.python.psi.PyBinaryExpression
 import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor
@@ -34,8 +33,8 @@ class SmkSLInjector : PyInjectorBase() {
             else
                 InjectionResult.EMPTY
 
-    private fun PyStringLiteralExpression.containsBraces() =
-            stringValue.contains('{') && stringValue.contains('}')
+    private fun PyStringLiteralExpression.containsRBrace() =
+            stringValue.contains('{')
 
     private fun PsiElement.isInValidCallExpression(): Boolean {
         val parentCallExpression =
@@ -54,7 +53,6 @@ class SmkSLInjector : PyInjectorBase() {
     private fun PsiElement.isValidForInjection() =
             SnakemakeLanguageDialect.isInsideSmkFile(this) &&
             isInValidArgsSection() &&
-            PsiTreeUtil.getParentOfType(this, PyBinaryExpression::class.java) == null &&
             isInValidCallExpression() &&
-            (this as PyStringLiteralExpression).containsBraces()
+            (this as PyStringLiteralExpression).containsRBrace()
 }
