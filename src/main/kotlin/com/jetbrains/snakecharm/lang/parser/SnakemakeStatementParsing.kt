@@ -244,7 +244,7 @@ class SnakemakeStatementParsing(
             }
 
             if (myBuilder.eof()) {
-                myBuilder.error(SnakemakeBundle.message("PARSE.unexpected.eof"))
+                myBuilder.error(SnakemakeBundle.message("PARSE.eof.docstring"))
             }
 
             return true

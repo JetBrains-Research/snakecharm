@@ -16,5 +16,5 @@ SnakemakeFile: DocstringAtEndOfFile.smk
       PsiWhiteSpace('\n    ')
       PyStringLiteralExpression: world
         PsiElement(Py:SINGLE_QUOTED_STRING)('"world"')
-      PsiErrorElement:Unexpected EOF while parsing
+      PsiErrorElement:Docstring at end of file does not precede any statement
         <empty list>
