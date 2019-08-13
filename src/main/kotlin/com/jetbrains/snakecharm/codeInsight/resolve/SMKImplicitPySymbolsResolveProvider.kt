@@ -1,7 +1,7 @@
 package com.jetbrains.snakecharm.codeInsight.resolve
 
 import com.intellij.openapi.module.ModuleUtilCore
-import com.intellij.psi.util.parentOfType
+import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyQualifiedExpression
 import com.jetbrains.python.psi.resolve.PyReferenceResolveProvider
 import com.jetbrains.python.psi.resolve.RatedResolveResult
@@ -10,8 +10,8 @@ import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
     override fun resolveName(
@@ -33,10 +33,14 @@ class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
 
                 if (contextScope == SmkCodeInsightScope.RULELIKE_RUN_SECTION) {
                     if (element.referencedName == SnakemakeNames.SECTION_THREADS) {
-                        val ruleOrCheckpoint = element.parentOfType<SmkRuleOrCheckpoint>()!!
+                        val ruleOrCheckpoint = PsiTreeUtil.getParentOfType(
+                                element, SmkRuleOrCheckpoint::class.java
+                        )!!
+
                         val threadsSection = ruleOrCheckpoint.statementList.statements.asSequence()
                                 .filterIsInstance<SmkRuleOrCheckpointArgsSection>()
                                 .filter { it.name == SnakemakeNames.SECTION_THREADS }.firstOrNull()
+
                          items.add(RatedResolveResult(RatedResolveResult.RATE_NORMAL, threadsSection ?: ruleOrCheckpoint))
                     }
                 }

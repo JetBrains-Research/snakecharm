@@ -15,6 +15,7 @@ import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.util.text.StringUtil
+import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiReference
@@ -27,16 +28,23 @@ import cucumber.api.DataTable
 import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
 import junit.framework.TestCase
+import java.io.File
 import java.util.*
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 /**
  * @author Roman.Chernyatchik
  * @date 2019-05-09
  */
 class CompletionResolveSteps {
+    @Then("^there should be no reference$")
+    fun referenceShouldBeNull() {
+        ApplicationManager.getApplication().invokeAndWait({
+            val ref = getReferenceAtOffset()
+            assertNull(ref)
+        }, ModalityState.NON_MODAL)
+    }
+
     @Then("^reference should not resolve$")
     fun referenceShouldNotResolve() {
         ApplicationManager.getApplication().invokeAndWait({
@@ -65,6 +73,17 @@ class CompletionResolveSteps {
         }, ModalityState.NON_MODAL)
     }
 
+
+    @Then("^reference should resolve to \"(.+)\" directory")
+    fun referenceShouldResolveToDirectory(name: String) {
+        ApplicationManager.getApplication().runReadAction {
+            val ref = getReferenceAtOffset()
+            assertNotNull(ref)
+            val result = resolve(ref) as? PsiDirectory
+            assertNotNull(result)
+            assertEquals(result.name, name)
+        }
+    }
 
     @Then("^reference should resolve to \"(.+)\" in \"(.+)\"$")
     fun referenceShouldResolveToIn(marker: String, file: String) {
@@ -186,6 +205,23 @@ class CompletionResolveSteps {
         completionListShouldContainMethods(table.asList(String::class.java))
     }
 
+    @Then("^completion list should only contain:$")
+    fun completionListShouldOnlyContain(table: DataTable) {
+        completionListShouldOnlyContainMethods(table.asList(String::class.java))
+    }
+
+    @Then("^completion list should only contain items (.+)$")
+    fun completionListShouldOnlyContainMethods(lookupItems: List<String>) {
+        assertHasOnlyElements(SnakemakeWorld.completionList(), lookupItems)
+    }
+
+    @Then("^completion list should contain these items with type text:$")
+    fun completionListShouldContainWithTypeText(table: DataTable) {
+        val actualLookupItems = getCompletionListWithTypeText()
+        val expectedLookupItems = table.asLists(String::class.java).filter { it.size >= 2 }.map { it[0] to it[1] }
+        assertHasElements(actualLookupItems, expectedLookupItems)
+    }
+
     @Then("^completion list should contain items (.+)$")
     fun completionListShouldContainMethods(lookupItems: List<String>) {
         assertHasElements(SnakemakeWorld.completionList(), lookupItems)
@@ -202,6 +238,11 @@ class CompletionResolveSteps {
         autoCompleteAndCheck(lookupText, text, Lookup.NORMAL_SELECT_CHAR)
     }
 
+    @Then("^I invoke autocompletion popup and see a text:")
+    fun iInvokeAutocompletionPopupAndSelectNoItem(text: String) {
+        autoCompleteAndCheck(null, text, Lookup.NORMAL_SELECT_CHAR)
+    }
+
     @Then("^I invoke autocompletion popup, select \"([^\"]+)\" lookup item in (normal|replace|statement|auto) mode and see a text:$")
     fun iInvokeAutocompletionPopupAndSelectItemWithChar(lookupText: String, mode: String, text: String) {
         val ch = when (mode) {
@@ -215,20 +256,35 @@ class CompletionResolveSteps {
         autoCompleteAndCheck(lookupText, text, ch)
     }
 
-    private fun autoCompleteAndCheck(lookupText: String, text: String, ch: Char) {
+    private fun autoCompleteAndCheck(lookupText: String?, text: String, ch: Char) {
         iInvokeAutocompletionPopup()
 
         val fixture = SnakemakeWorld.fixture()
         val lookupElements = fixture.lookupElements?.filterNotNull()?.toTypedArray()
 
-
         ApplicationManager.getApplication().invokeAndWait(
                 {
+                    if (lookupText == null) {
+                        assertNull(
+                                lookupElements,
+                                message = "Autocompletion to a single possible variant didn't happen " +
+                                        "because either the completion list was not empty, or given" +
+                                        "prefix didn't match any variants")
+                    } else {
+                        assertNotNull(
+                                lookupElements,
+                                message = "Completion resulted in a single possible variant, so it was impossible " +
+                                        "to check whether \"$lookupText\" was in the completion list. " +
+                                        "Try using this step: Then I invoke autocompletion popup and see a text")
+                        assertTrue(lookupElements.isNotEmpty(), message = "Completion list was empty")
+
+                        selectItem(LookupFilter.create(lookupText).findElement(lookupElements), ch, fixture.project)
+                    }
+
                     checkCompletionResult(
-                            LookupFilter.create(lookupText), lookupElements,
-                            fixture, false,
-                            StringUtil.convertLineSeparators(text),
-                            ch
+                            fixture,
+                            false,
+                            StringUtil.convertLineSeparators(text)
                     )
                 },
                 ModalityState.NON_MODAL)
@@ -284,6 +340,19 @@ class CompletionResolveSteps {
         SnakemakeWorld.myCompletionList = fixture.lookupElementStrings
     }
 
+    private fun getCompletionItemsPresentation(): List<LookupElementPresentation> {
+        val fixture = SnakemakeWorld.fixture()
+        fixture.complete(CompletionType.BASIC)
+        val completionList = fixture.lookupElements
+        return completionList?.map {
+            val presentation = LookupElementPresentation()
+            it.renderElement(presentation)
+            presentation
+        } ?: emptyList()
+    }
+
+    private fun getCompletionListWithTypeText() = getCompletionItemsPresentation().map { it.itemText to it.typeText }
+
 
     private fun assertUnresolvedReference(ref: PsiReference) {
         when (ref) {
@@ -334,6 +403,18 @@ class CompletionResolveSteps {
     }
 
     private fun checkCompletionResult(
+            fixture: CodeInsightTestFixture,
+            checkByFilePath: Boolean,
+            completionResultTextOrFileRelativePath: String
+    ) {
+        if (checkByFilePath) {
+            fixture.checkResultByFile(completionResultTextOrFileRelativePath)
+        } else {
+            fixture.checkResult(completionResultTextOrFileRelativePath)
+        }
+    }
+
+    /*private fun checkCompletionResult(
             lookupFilter: LookupFilter,
             lookupElements: Array<LookupElement>?,
             fixture: CodeInsightTestFixture,
@@ -353,7 +434,7 @@ class CompletionResolveSteps {
         }
 
         // zero or several variants
-        assertNotNull(lookupElements)
+        assertNotNull(lookupElements, message= "Well, this assertion happened")
 
         selectItem(lookupFilter.findElement(lookupElements), completionSelectChar, fixture.project)
         if (checkByFilePath) {
@@ -362,7 +443,7 @@ class CompletionResolveSteps {
             fixture.checkResult(completionResultTextOrFileRelativePath)
         }
 
-    }
+    }*/
 
     private fun selectItem(item: LookupElement, ch: Char, project: Project) {
         val lookup = LookupManager.getInstance(project).activeLookup as LookupImpl?
@@ -441,11 +522,11 @@ class LookupFilter private constructor(
 }
 
 
-fun assertHasElements(
-        actualLookupItems: List<String>,
-        expectedVariants: List<String>
+fun <T> assertHasElements(
+        actualLookupItems: List<T>,
+        expectedVariants: List<T>
 ) {
-    val unmetElements = ArrayList<String>()
+    val unmetElements = ArrayList<T>()
 
     for (variant in expectedVariants) {
         if (!actualLookupItems.contains(variant)) {
@@ -457,6 +538,29 @@ fun assertHasElements(
                 """
             "Not all elements were found in real collection. Following elements were missed :[
             ${UsefulTestCase.toString(unmetElements)}] in collection:[
+            ${UsefulTestCase.toString(actualLookupItems)}]
+            """.trimIndent()
+        )
+    }
+}
+
+fun assertHasOnlyElements(
+        actualLookupItems: List<String>,
+        expectedVariants: List<String>
+) {
+    val extraElements = ArrayList<String>()
+
+    for (item in actualLookupItems) {
+        if (!expectedVariants.contains(item)) {
+            extraElements.add(item)
+        }
+    }
+
+    if (extraElements.isNotEmpty()) {
+        org.junit.Assert.fail(
+                """
+            "Real collection contains unwanted elements. Following elements were extra :[
+            ${UsefulTestCase.toString(extraElements)}] in collection:[
             ${UsefulTestCase.toString(actualLookupItems)}]
             """.trimIndent()
         )

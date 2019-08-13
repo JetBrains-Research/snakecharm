@@ -62,16 +62,14 @@ Feature: Inspection quick fixes
       output: "output.txt"
     """
 
-    # multiple arguments for 'shell' section are not allowed at runtime,
-    # this section will be modified when Issue 16 is fixed
   Scenario: Swap execution section and rule section below fix test
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
     rule name1:
       input: "input1"
-      shell: "command",
-             "multiline",
+      shell: "command"
+             "multiline"
              "string"
       resources: a=4
 
@@ -89,8 +87,8 @@ Feature: Inspection quick fixes
     rule name1:
       input: "input1"
       resources: a=4
-      shell: "command",
-             "multiline",
+      shell: "command"
+             "multiline"
              "string"
 
     rule name2:

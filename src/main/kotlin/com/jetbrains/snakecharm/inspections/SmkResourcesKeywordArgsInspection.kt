@@ -19,7 +19,7 @@ class SmkResourcesKeywordArgsInspection : SnakemakeInspection() {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            if(st.sectionKeyword != SnakemakeNames.SECTION_RESOURCES) {
+            if (st.sectionKeyword != SnakemakeNames.SECTION_RESOURCES) {
                 return
             }
 

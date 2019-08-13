@@ -1,0 +1,68 @@
+SnakemakeFile: RuleMultilineStringArgumentsWithCallsAndExplicitConcatenation.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('NAME')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n           ')
+          PyBinaryExpression
+            PyBinaryExpression
+              PyBinaryExpression
+                PyStringLiteralExpression: mkdir -p
+                  PsiElement(Py:SINGLE_QUOTED_STRING)('"mkdir -p"')
+                PsiWhiteSpace(' ')
+                PsiElement(Py:PLUS)('+')
+                PsiWhiteSpace('\n           ')
+                PyCallExpression: "multiline "
+                  PyReferenceExpression: join
+                    PyStringLiteralExpression: multiline string
+                      PsiElement(Py:SINGLE_QUOTED_STRING)('"multiline "')
+                      PsiWhiteSpace('\n                     ')
+                      PsiElement(Py:SINGLE_QUOTED_STRING)('"string"')
+                    PsiWhiteSpace('\n                          ')
+                    PsiElement(Py:DOT)('.')
+                    PsiElement(Py:IDENTIFIER)('join')
+                  PyArgumentList
+                    PsiElement(Py:LPAR)('(')
+                    PyListLiteralExpression
+                      PsiElement(Py:LBRACKET)('[')
+                      PyStringLiteralExpression: a
+                        PsiElement(Py:SINGLE_QUOTED_STRING)(''a'')
+                      PsiElement(Py:COMMA)(',')
+                      PsiWhiteSpace(' ')
+                      PyStringLiteralExpression: b
+                        PsiElement(Py:SINGLE_QUOTED_STRING)(''b'')
+                      PsiElement(Py:COMMA)(',')
+                      PsiWhiteSpace(' ')
+                      PyStringLiteralExpression: c
+                        PsiElement(Py:SINGLE_QUOTED_STRING)(''c'')
+                      PsiElement(Py:RBRACKET)(']')
+                    PsiElement(Py:RPAR)(')')
+              PsiWhiteSpace('\n           ')
+              PsiElement(Py:PLUS)('+')
+              PsiWhiteSpace(' ')
+              PyCallExpression: "string".join
+                PyReferenceExpression: join
+                  PyStringLiteralExpression: string
+                    PsiElement(Py:SINGLE_QUOTED_STRING)('"string"')
+                  PsiElement(Py:DOT)('.')
+                  PsiElement(Py:IDENTIFIER)('join')
+                PyArgumentList
+                  PsiElement(Py:LPAR)('(')
+                  PyListLiteralExpression
+                    PsiElement(Py:LBRACKET)('[')
+                    PsiElement(Py:RBRACKET)(']')
+                  PsiElement(Py:RPAR)(')')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:PLUS)('+')
+            PsiWhiteSpace(' ')
+            PyStringLiteralExpression: textnewline
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
+              PsiWhiteSpace('\n           ')
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"newline"')

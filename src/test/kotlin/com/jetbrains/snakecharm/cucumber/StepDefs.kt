@@ -6,6 +6,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Computable
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
+import com.intellij.testFramework.fixtures.InjectionTestFixture
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.codeInsight.controlflow.ControlFlowCache
@@ -59,6 +60,9 @@ class StepDefs {
 
         SnakemakeWorld.fixture().setUp()
         SnakemakeWorld.fixture().testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
+
+        SnakemakeWorld.myInjectionFixture = InjectionTestFixture(SnakemakeWorld.fixture())
+
         PythonDialectsTokenSetProvider.reset()
     }
 
@@ -76,17 +80,20 @@ class StepDefs {
         val fixture = SnakemakeWorld.fixture()
         when (inspectionName) {
             "Shadow Settings" -> fixture.enableInspections(SmkShadowSettingsInspection::class.java)
-            "Shadow Multiple Settings" -> fixture.enableInspections(SmkShadowMultipleSettingsInspection::class.java)
             "Resources Keyword Arguments" -> fixture.enableInspections(SmkResourcesKeywordArgsInspection::class.java)
             "Rule Redeclaration" -> fixture.enableInspections(SmkRuleRedeclarationInspection::class.java)
             "Rule Section After Execution Section" ->
                 fixture.enableInspections(SmkRuleSectionAfterExecutionInspection::class.java)
             "Section Redeclaration" -> fixture.enableInspections(SmkSectionRedeclarationInspection::class.java)
-            "Subworkflow Multiple Args" -> fixture.enableInspections(SmkSubworkflowMultipleArgsInspection::class.java)
+            "Section Multiple Args" -> fixture.enableInspections(SmkSectionMultipleArgsInspection::class.java)
             "Subworkflow Redeclaration" -> fixture.enableInspections(SmkSubworkflowRedeclarationInspection::class.java)
             "Unreachable Code" -> fixture.enableInspections(PyUnreachableCodeInspection::class.java)
-            "Rule or Checkpoint Name yet undefined" -> fixture.enableInspections(SmkRuleOrCheckpointNameYetUndefinedInspection::class.java)
+            "Rule or Checkpoint Name yet undefined" ->
+                fixture.enableInspections(SmkRuleOrCheckpointNameYetUndefinedInspection::class.java)
             "Unresolved reference" -> fixture.enableInspections(PyUnresolvedReferencesInspection::class.java)
+            "Repeated Rule in Localrules or Ruleorder" ->
+                fixture.enableInspections(SmkLocalrulesRuleorderRepeatedRuleInspection::class.java)
+            "Lambda Parameter Names" -> fixture.enableInspections(SmkLambdaRuleParamsInspection::class.java)
             else -> {
                 for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {
                     val o = provider.instance

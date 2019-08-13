@@ -1,0 +1,26 @@
+FILE
+  SmkSLElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    SmkSLElement(EXPRESSION_STATEMENT)
+      SmkSLElement(REFERENCE_EXPRESSION)
+        <empty list>
+      PsiErrorElement:Unexpected character
+        PsiElement(UNEXPECTED_TOKEN)('.')
+      SmkSLElement(REFERENCE_EXPRESSION)
+        <empty list>
+      PsiErrorElement:Unexpected character
+        PsiElement(UNEXPECTED_TOKEN)('[')
+      SmkSLElement(REFERENCE_EXPRESSION)
+        SmkSLElement(REFERENCE_EXPRESSION)
+          SmkSLElement(REFERENCE_EXPRESSION)
+            PsiElement(IDENTIFIER)('foo')
+          PsiElement(DOT)('.')
+      PsiErrorElement:Unexpected character
+        PsiElement(UNEXPECTED_TOKEN)('.')
+      SmkSLElement(REFERENCE_EXPRESSION)
+        SmkSLElement(REFERENCE_EXPRESSION)
+          PsiElement(IDENTIFIER)('boo')
+        PsiElement(DOT)('.')
+      PsiErrorElement:Expected identifier name
+        <empty list>
+    PsiElement(RBRACE)('}')

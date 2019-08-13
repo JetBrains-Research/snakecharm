@@ -76,7 +76,6 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-
     fun testRuleInvalidNoParamBody() {
         doTest()
     }
@@ -105,15 +104,9 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-    /* TODO #16
     fun testRuleParamsListArgsStringMultiline() {
-        Assume.assumeFalse(
-                "Feature Not Implemented Yet, see: See issue" +
-                        " https://github.com/JetBrains-Research/snakecharm/issues/16",
-                true
-        )
         doTest()
-    } */
+    }
 
     fun testRuleParamsListArgsHangingComma() {
         doTest()
@@ -231,6 +224,22 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testRuleParamsListArgsStringMultilineIncorrectUnindent() {
+        doTest()
+    }
+
+    fun testFormattedStringArgument() {
+        doTest()
+    }
+
+    fun testRuleMultilineStringArgumentsWithCallsAndExplicitConcatenation() {
+        doTest()
+    }
+
+    fun testRuleStringCallExpressionArgument() {
+        doTest()
+    }
+
     fun testUnbalancedBracesRecovery() {
         doTest()
     }
@@ -240,6 +249,42 @@ class SnakemakeParsingTest : ParsingTestCase(
     }
 
     fun testKeywordLikeIdentifiersAsKeywords() {
+        doTest()
+    }
+
+    fun testIssue130() {
+        doTest()
+    }
+
+    fun testDocstringAtEndOfFile() {
+        doTest()
+    }
+
+    fun testKeywordIdentifiersAtToplevelWithPrecedingOpenBrace() {
+        doTest()
+    }
+
+    fun testKeywordIdentifierWithNoIndent() {
+        doTest()
+    }
+
+    fun testRuleParamsListArgsIncorrectUnindent() {
+        doTest()
+    }
+
+    fun testRuleParamsListArgsIncorrectIndentation() {
+        doTest()
+    }
+
+    fun testRuleParamsListArgsLineComments() {
+        doTest()
+    }
+
+    fun testRuleParamsListArgsIndentationInsideBraces() {
+        doTest()
+    }
+
+    fun testRuleParamsListArgsIncorrectRuleSectionLevelIndentation() {
         doTest()
     }
 

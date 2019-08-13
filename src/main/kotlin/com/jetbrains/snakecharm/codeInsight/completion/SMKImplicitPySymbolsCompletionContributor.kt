@@ -6,19 +6,22 @@ import com.intellij.patterns.PatternCondition
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.resolve.CompletionVariantsProcessor
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
     companion object {
         val IN_PY_REF = psiElement().inside(PyReferenceExpression::class.java)
+
+        val FUNCTIONS_VALID_FOR_INJECTION = setOf(
+                "ancient", "directory", "temp", "pipe", "temporary", "protected",
+                "dynamic", "touch", "repeat", "report", "local", "expand", "shell")
 
         private val REF_CAPTURE = psiElement()
                 .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
@@ -66,7 +69,7 @@ class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
                     }
 
             if (contextScope == SmkCodeInsightScope.RULELIKE_RUN_SECTION) {
-                val ruleOrCheckpoint = contextElement.parentOfType<SmkRuleOrCheckpoint>()!!
+                val ruleOrCheckpoint = PsiTreeUtil.getParentOfType(contextElement, SmkRuleOrCheckpoint::class.java)!!
                 val threadsSection = ruleOrCheckpoint.statementList.statements.asSequence()
                         .filterIsInstance<SmkRuleOrCheckpointArgsSection>()
                         .filter { it.name == SnakemakeNames.SECTION_THREADS }.firstOrNull()
