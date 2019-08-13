@@ -6,6 +6,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
@@ -143,18 +144,17 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
               and containingFile.virtualFile returns null for that copy
             */
             val virtualFile = elem.containingFile.originalFile.virtualFile
-            val elementFile = File(virtualFile?.presentableUrl ?: containingFileName)
-            val fileContentRootDirectory = File(
-                    ProjectRootManager.getInstance(elem.project)
-                            .fileIndex
-                            .getContentRootForFile(virtualFile)
-                            ?.presentableUrl
-                            ?: elementFile.parent
-            )
-            val displayPath = try {
-                elementFile.toRelativeString(fileContentRootDirectory)
-            } catch (e: IllegalArgumentException) { // thrown by toRelativeString if paths have different roots
-                elementFile.name
+            val displayPath = if (virtualFile == null) {
+                containingFileName
+            } else {
+                val fileContentRootDirectory = ProjectRootManager.getInstance(elem.project)
+                        .fileIndex
+                        .getContentRootForFile(virtualFile)
+                if (fileContentRootDirectory == null) {
+                    containingFileName
+                } else {
+                    VfsUtil.getRelativePath(virtualFile, fileContentRootDirectory)
+                }
             }
             return PrioritizedLookupElement.withPriority(
                     LookupElementBuilder
