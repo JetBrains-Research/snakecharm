@@ -1,0 +1,30 @@
+SnakemakeFile: RuleParamsListArgsIncorrectRuleSectionLevelIndentation.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n         ')
+          PyStringLiteralExpression: file.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file.txt"')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace('\n         ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+      PsiErrorElement:Rule parameter identifier is expected
+        <empty list>
+      PsiWhiteSpace('\n  ')
+  PyExpressionStatement
+    PyStringLiteralExpression: txt
+      PsiElement(Py:SINGLE_QUOTED_STRING)('"txt"')
+    PsiWhiteSpace(' ')
+    PsiComment(Py:END_OF_LINE_COMMENT)('# incorrect rule section level indentation for an argument')
+  PsiWhiteSpace('\n    ')
+  PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
