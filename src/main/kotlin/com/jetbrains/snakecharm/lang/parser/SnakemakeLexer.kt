@@ -19,6 +19,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
     private var currentToken: IElementType? = null
     private var previousToken: IElementType? = null
     private var insertedIndentsCount = 0
+    private var linebreakBeforeFirstComment = -1
 
     // used to differentiate between 'rule all: input: "text"' and 'rule: input: "text" '
     private var topLevelSectionColonOccurred = false
@@ -352,9 +353,16 @@ class SnakemakeLexer : PythonIndentingLexer() {
     private fun processComments() {
         while (atBaseToken(PyTokenTypes.LINE_BREAK)) {
             val linebreakPosition = currentPosition
+            val hasSignificantTokens = myLineHasSignificantTokens
+            val indent = nextLineIndent
+            myLineHasSignificantTokens = hasSignificantTokens
+            restore(linebreakPosition)
             processInsignificantLineBreak(baseTokenStart, false)
             if (atBaseToken(commentTokenType)) {
-                myTokenQueue.add(PendingToken(baseTokenType, baseTokenStart, baseTokenEnd))
+                if (linebreakBeforeFirstComment == -1) {
+                    linebreakBeforeFirstComment = myTokenQueue.size - 1
+                }
+                myTokenQueue.add(PendingCommentToken(commentTokenType, baseTokenStart, baseTokenEnd, indent))
                 advanceBase()
             } else {
                 restore(linebreakPosition)
@@ -381,6 +389,9 @@ class SnakemakeLexer : PythonIndentingLexer() {
                                 precedingToken.start,
                                 precedingToken.start
                         ))
+                if (linebreakBeforeFirstComment != -1) {
+                    linebreakBeforeFirstComment++
+                }
 
             }
             myLineHasSignificantTokens = false
@@ -394,6 +405,26 @@ class SnakemakeLexer : PythonIndentingLexer() {
         } else {
             processIndentsInsideSection(indent, baseTokenStart)
         }
+
+        linebreakBeforeFirstComment = -1
+    }
+
+    override fun skipPrecedingCommentsWithSameIndentOnSuiteClose(indent: Int, anchorIndex: Int): Int {
+        val anchor = if (linebreakBeforeFirstComment != -1) linebreakBeforeFirstComment else anchorIndex
+        var result = anchor
+
+        for (i in anchor until myTokenQueue.size) {
+            val token = myTokenQueue[i] as PendingToken
+            if (token is PendingCommentToken) {
+                if (token.indent < indent) {
+                    break
+                }
+
+                result = i + 1
+            }
+        }
+
+        return result
     }
 
     private fun insideSnakemakeArgumentList(indent: Int, comparator: (Int, Int) -> Boolean) =
@@ -402,4 +433,11 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
     private fun atToken(token: IElementType) = tokenType === token
     private fun atBaseToken(token: IElementType) = baseTokenType === token
+
+    private class PendingCommentToken (
+            type: IElementType,
+            start: Int,
+            end: Int,
+            val indent: Int
+    ) : PendingToken(type, start, end)
 }

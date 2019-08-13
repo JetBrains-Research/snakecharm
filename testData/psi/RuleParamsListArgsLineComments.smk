@@ -63,7 +63,7 @@ rule foo2:
     input: # comment
 # comment
          "echo foo",
-        "incorrectly unindented text"
+         "incorrectly unindented text"
 # end of rule comment
 rule foo:
     input: "text"
