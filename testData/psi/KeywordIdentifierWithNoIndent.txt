@@ -1,0 +1,84 @@
+SnakemakeFile: KeywordIdentifierWithNoIndent.smk
+  SmkCheckPoint
+    PsiElement(Py:CHECKPOINT_KEYWORD)('checkpoint')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('NAME')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: text
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
+  PsiWhiteSpace('\n\n')
+  PyFunction('foo')
+    PsiElement(Py:DEF_KEYWORD)('def')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PyParameterList
+      PsiElement(Py:LPAR)('(')
+      PyNamedParameter('rule')
+        PsiElement(Py:IDENTIFIER)('rule')
+      PsiElement(Py:RPAR)(')')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    PyStatementList
+      PyPassStatement
+        PsiElement(Py:PASS_KEYWORD)('pass')
+  PsiWhiteSpace('\n\n')
+  PyIfStatement
+    PyIfPartIf
+      PsiElement(Py:IF_KEYWORD)('if')
+      PsiWhiteSpace(' ')
+      PyBoolLiteralExpression
+        PsiElement(Py:TRUE_KEYWORD)('True')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      PyStatementList
+        PyExpressionStatement
+          PyCallExpression: foo
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PsiWhiteSpace('\n')
+              PyKeywordArgumentImpl: rule
+                PsiElement(Py:IDENTIFIER)('rule')
+                PsiWhiteSpace(' ')
+                PsiElement(Py:EQ)('=')
+                PsiWhiteSpace(' ')
+                PyNumericLiteralExpression
+                  PsiElement(Py:INTEGER_LITERAL)('1')
+              PsiErrorElement:',' or ')' expected
+                <empty list>
+          PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('boo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: foo
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PsiErrorElement:expression expected
+                <empty list>
+          PsiWhiteSpace('\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiErrorElement:Rule name identifier or ':' expected
+      <empty list>
+    PyStatementList
+      PsiErrorElement:Indent expected...
+        <empty list>

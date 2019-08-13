@@ -3,6 +3,8 @@ foo(fo
 rule ffff: input: foo(fo
 rule ffff:
     input: foo(fo
+    run:
+      print(30
 
 checkpoint ffff:
     input: foo(fo
