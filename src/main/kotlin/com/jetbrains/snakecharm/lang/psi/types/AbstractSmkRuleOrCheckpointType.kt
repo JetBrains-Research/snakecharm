@@ -153,7 +153,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
                 if (fileContentRootDirectory == null) {
                     containingFileName
                 } else {
-                    VfsUtil.getRelativePath(virtualFile, fileContentRootDirectory)
+                    VfsUtil.getRelativePath(virtualFile, fileContentRootDirectory) ?: virtualFile.presentableUrl
                 }
             }
             return PrioritizedLookupElement.withPriority(
