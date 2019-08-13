@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.cucumber
 
 import com.intellij.codeInsight.documentation.DocumentationManager
+import com.intellij.codeInsight.highlighting.BraceMatchingUtil
 import com.intellij.ide.util.gotoByName.GotoSymbolModel2
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
@@ -218,6 +219,30 @@ class ActionsSteps {
         assertHasElements(names, expected)
     }
 
+
+    @Then("^I expect backward brace matching before \"(.+)\"")
+    fun iExpectBraceMatchingBefore(str: String) {
+        iExpectBraceMatchingAt(str, false)
+    }
+
+    @Then("^I expect forward brace matching after \"(.+)\"")
+    fun iExpectBraceMatchingAfter(str: String) {
+        iExpectBraceMatchingAt(str, true)
+    }
+
+    private fun iExpectBraceMatchingAt(str: String, forward: Boolean) {
+        ApplicationManager.getApplication().invokeAndWait {
+            val fixture = SnakemakeWorld.fixture()
+            var offset = fixture.file.text.indexOf(str)
+
+            if (forward) {
+                offset += str.length - 1
+            }
+
+            val matchOffset = BraceMatchingUtil.getMatchedBraceOffset(fixture.editor, forward, fixture.file)
+            assertEquals(offset, matchOffset)
+        }
+    }
 
     @Then("^I expect language injection on \"(.+)\"")
     fun iExpectLanguageInjectionOn(str: String) {
