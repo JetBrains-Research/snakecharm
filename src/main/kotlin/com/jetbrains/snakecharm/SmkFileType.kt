@@ -11,5 +11,5 @@ object SmkFileType: PythonFileType(SnakemakeLanguageDialect) {
     override fun getIcon() = SnakemakeIcons.FILE
     override fun getName() = "Snakemake"
     override fun getDefaultExtension() = "smk"
-    override fun getDescription() = "Snakemake pipeline file"
+    override fun getDescription() = "Snakemake Pipeline"
 }

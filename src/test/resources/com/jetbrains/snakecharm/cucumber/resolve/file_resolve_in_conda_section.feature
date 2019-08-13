@@ -125,3 +125,20 @@ Feature: Resolve file in conda section
       | section    |
       | rule       |
       | checkpoint |
+
+  Scenario Outline: Resolve when language is injected
+    Given a snakemake project
+    Given a file "boo.yaml" with text
+    """
+    """
+    Given I open a file "foo.smk" with text
+    """
+    <section> NAME:
+      conda: "{boo}.yaml"
+    """
+    When I put the caret at b
+    Then there should be no reference
+    Examples:
+      | section    |
+      | rule       |
+      | checkpoint |
