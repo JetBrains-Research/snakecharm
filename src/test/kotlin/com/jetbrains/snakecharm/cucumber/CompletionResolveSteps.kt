@@ -222,15 +222,6 @@ class CompletionResolveSteps {
         assertHasElements(actualLookupItems, expectedLookupItems)
     }
 
-    @Then("^completion list should contain these items where type text for each item is a file path:$")
-    fun completionListShouldContainWithTypeTextFilePaths(table: DataTable) {
-        val actualLookupItems = getCompletionListWithTypeText()
-        val expectedLookupItems = table.asLists(String::class.java)
-                .filter { it.size >= 2 }
-                .map { it[0] to it[1].replace("/", File.separator) }
-        assertHasElements(actualLookupItems, expectedLookupItems)
-    }
-
     @Then("^completion list should contain items (.+)$")
     fun completionListShouldContainMethods(lookupItems: List<String>) {
         assertHasElements(SnakemakeWorld.completionList(), lookupItems)
