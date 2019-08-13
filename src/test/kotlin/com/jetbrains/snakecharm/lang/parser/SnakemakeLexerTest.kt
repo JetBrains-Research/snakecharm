@@ -8,6 +8,7 @@ import com.jetbrains.snakecharm.lang.SmkTokenSetContributor
  * @author Roman.Chernyatchik
  * @date 2018-12-31
  */
+
 class SnakemakeLexerTest : PyLexerTestCase() {
     override fun setUp() {
         super.setUp()
@@ -27,7 +28,7 @@ class SnakemakeLexerTest : PyLexerTestCase() {
         doTest("""
             |rule all:
             |""".trimMargin().trimStart(),
-                "Py:RULE_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
                 "Py:STATEMENT_BREAK")
     }
@@ -36,24 +37,22 @@ class SnakemakeLexerTest : PyLexerTestCase() {
         doTest("""
             |subworkflow otherworkflow:
             |""".trimMargin().trimStart(),
-                "Py:SUBWORKFLOW_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
                 "Py:STATEMENT_BREAK")
     }
 
-    /*
     fun testRuleWithParams() {
         doTest("""
             |rule all:
             |    input: 'foo'
             |""".trimMargin().trimStart(),
-                "Py:RULE_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
                 "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
                 "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
                 "Py:STATEMENT_BREAK")
     }
-    */
     /* TODO #16
     fun testRuleParamStringLiteralWithLineBreak() {
         Assume.assumeFalse(
@@ -81,11 +80,11 @@ class SnakemakeLexerTest : PyLexerTestCase() {
             |    foo = ".*"
             |report: "foo.rst"
             |""".trimMargin().trimStart(),
-                "Py:WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD", "Py:COLON",
+                "Py:IDENTIFIER", "Py:COLON",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
                 "Py:INDENT", "Py:IDENTIFIER", "Py:SPACE", "Py:EQ", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
                 "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
-                "Py:WORKFLOW_REPORT_KEYWORD", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+                "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
                 "Py:STATEMENT_BREAK")
     }
@@ -99,17 +98,17 @@ class SnakemakeLexerTest : PyLexerTestCase() {
             |    singularity:
             |       "docker://continuumio/miniconda3:4.4.10"
             |""".trimMargin().trimStart(),
-                "Py:RULE_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:INDENT", "Py:WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD", "Py:COLON",
+                "Py:INDENT", "Py:IDENTIFIER", "Py:COLON",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
                 "Py:INDENT", "Py:IDENTIFIER", "Py:SPACE", "Py:EQ", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
                 "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
                 "Py:IDENTIFIER", "Py:COLON",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:INDENT", "Py:WORKFLOW_REPORT_KEYWORD", "Py:LPAR", "Py:SINGLE_QUOTED_STRING", "Py:RPAR",
+                "Py:INDENT", "Py:IDENTIFIER", "Py:LPAR", "Py:SINGLE_QUOTED_STRING", "Py:RPAR",
                 "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
-                "Py:WORKFLOW_SINGULARITY_KEYWORD", "Py:COLON",
+                "Py:IDENTIFIER", "Py:COLON",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
                 "Py:INDENT", "Py:SINGLE_QUOTED_STRING",
                 "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:DEDENT", "Py:LINE_BREAK",
@@ -157,11 +156,11 @@ class SnakemakeLexerTest : PyLexerTestCase() {
             |rule last:
             |    output: 'boo'
             |""".trimMargin().trimStart(),
-                "Py:RULE_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
                 "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
                 "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
-                "Py:RULE_KEYWORD",  "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:IDENTIFIER",  "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
                 "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
                 "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
@@ -174,9 +173,9 @@ class SnakemakeLexerTest : PyLexerTestCase() {
             |rule last:
             |    output: 'boo'
             |""".trimMargin().trimStart(),
-                "Py:RULE_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:RULE_KEYWORD",  "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:IDENTIFIER",  "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
                 "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
                 "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
@@ -190,9 +189,9 @@ class SnakemakeLexerTest : PyLexerTestCase() {
             |rule last:
             |    output: 'boo'
             |""".trimMargin().trimStart(),
-                "Py:RULE_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:RULE_KEYWORD",  "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+                "Py:IDENTIFIER",  "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
                 "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
                 "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",

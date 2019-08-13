@@ -239,6 +239,7 @@ class SnakemakeParsingTest : ParsingTestCase(
     fun testRuleStringCallExpressionArgument() {
         doTest()
     }
+
     fun testUnbalancedBracesRecovery() {
         doTest()
     }
@@ -256,6 +257,34 @@ class SnakemakeParsingTest : ParsingTestCase(
     }
 
     fun testDocstringAtEndOfFile() {
+        doTest()
+    }
+
+    fun testKeywordIdentifiersAtToplevelWithPrecedingOpenBrace() {
+        doTest()
+    }
+
+    fun testKeywordIdentifierWithNoIndent() {
+        doTest()
+    }
+
+    fun testRuleParamsListArgsIncorrectUnindent() {
+        doTest()
+    }
+
+    fun testRuleParamsListArgsIncorrectIndentation() {
+        doTest()
+    }
+
+    fun testRuleParamsListArgsLineComments() {
+        doTest()
+    }
+
+    fun testRuleParamsListArgsIndentationInsideBraces() {
+        doTest()
+    }
+
+    fun testRuleParamsListArgsIncorrectRuleSectionLevelIndentation() {
         doTest()
     }
 

@@ -40,6 +40,16 @@ SnakemakeFile: KeywordLikeIdentifiersAsIdentifiers.smk
       PyReferenceExpression: report
         PsiElement(Py:IDENTIFIER)('report')
   PsiWhiteSpace('\n\n')
+  PyExpressionStatement
+    PyCallExpression: print
+      PyReferenceExpression: print
+        PsiElement(Py:IDENTIFIER)('print')
+      PyArgumentList
+        PsiElement(Py:LPAR)('(')
+        PyReferenceExpression: rule
+          PsiElement(Py:IDENTIFIER)('rule')
+        PsiElement(Py:RPAR)(')')
+  PsiWhiteSpace('\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
@@ -96,3 +106,27 @@ SnakemakeFile: KeywordLikeIdentifiersAsIdentifiers.smk
             PsiWhiteSpace(' ')
             PyNumericLiteralExpression
               PsiElement(Py:INTEGER_LITERAL)('4')
+          PsiWhiteSpace('\n    ')
+          PyExpressionStatement
+            PyCallExpression: print
+              PyReferenceExpression: print
+                PsiElement(Py:IDENTIFIER)('print')
+              PyArgumentList
+                PsiElement(Py:LPAR)('(')
+                PyReferenceExpression: rule
+                  PsiElement(Py:IDENTIFIER)('rule')
+                PsiElement(Py:COMMA)(',')
+                PsiWhiteSpace('\n')
+                PyReferenceExpression: checkpoint
+                  PsiElement(Py:IDENTIFIER)('checkpoint')
+                PsiElement(Py:RPAR)(')')
+  PsiWhiteSpace('\n\n')
+  PyExpressionStatement
+    PyCallExpression: print
+      PyReferenceExpression: print
+        PsiElement(Py:IDENTIFIER)('print')
+      PyArgumentList
+        PsiElement(Py:LPAR)('(')
+        PyReferenceExpression: singularity
+          PsiElement(Py:IDENTIFIER)('singularity')
+        PsiElement(Py:RPAR)(')')
