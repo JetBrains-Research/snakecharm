@@ -36,6 +36,14 @@ import kotlin.test.*
  * @date 2019-05-09
  */
 class CompletionResolveSteps {
+    @Then("^there should be no reference$")
+    fun referenceShouldBeNull() {
+        ApplicationManager.getApplication().invokeAndWait({
+            val ref = getReferenceAtOffset()
+            assertNull(ref)
+        }, ModalityState.NON_MODAL)
+    }
+
     @Then("^reference should not resolve$")
     fun referenceShouldNotResolve() {
         ApplicationManager.getApplication().invokeAndWait({

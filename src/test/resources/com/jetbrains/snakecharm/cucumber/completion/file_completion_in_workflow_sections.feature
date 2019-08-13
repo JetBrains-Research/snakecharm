@@ -230,3 +230,23 @@ Feature: Complete file names in workflow sections
       | "     |
       | '     |
       | """   |
+
+  Scenario Outline: Completion in empty fstring
+    Given a snakemake project
+    Given a file "boo.<file_type>" with text
+    """
+    """
+    Given I open a file "foo.smk" with text
+    """
+    <section>: f""
+    """
+    When I put the caret after f"
+    Then I invoke autocompletion popup and see a text:
+    """
+    <section>: f"boo.<file_type>"
+    """
+    Examples:
+      | section    | file_type |
+      | include    | smk       |
+      | configfile | yaml      |
+      | report     | html      |

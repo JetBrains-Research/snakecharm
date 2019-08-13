@@ -1,0 +1,77 @@
+SnakemakeFile: RuleParamsListArgsIndentationInsideBraces.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PyCallExpression: expand
+            PyReferenceExpression: expand
+              PsiElement(Py:IDENTIFIER)('expand')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyStringLiteralExpression: plots/cycle-scores.{covariate}.pdf
+                PsiElement(Py:SINGLE_QUOTED_STRING)('"plots/cycle-scores.{covariate}.pdf"')
+              PsiElement(Py:COMMA)(',')
+              PsiWhiteSpace('\n               ')
+              PyKeywordArgumentImpl: covariate
+                PsiElement(Py:IDENTIFIER)('covariate')
+                PsiElement(Py:EQ)('=')
+                PySliceExpression
+                  PyReferenceExpression: columns
+                    PyReferenceExpression: cells
+                      PsiElement(Py:IDENTIFIER)('cells')
+                    PsiElement(Py:DOT)('.')
+                    PsiElement(Py:IDENTIFIER)('columns')
+                  PsiElement(Py:LBRACKET)('[')
+                  PySliceItem
+                    PyNumericLiteralExpression
+                      PsiElement(Py:INTEGER_LITERAL)('1')
+                    PsiElement(Py:COLON)(':')
+                    PyEmptyExpression
+                      <empty list>
+                  PsiElement(Py:RBRACKET)(']')
+              PsiElement(Py:RPAR)(')')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace('\n        ')
+          PyCallExpression: expand
+            PyReferenceExpression: expand
+              PsiElement(Py:IDENTIFIER)('expand')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyListLiteralExpression
+                PsiElement(Py:LBRACKET)('[')
+                PyStringLiteralExpression: tables/diffexp.{test}.tsv
+                  PsiElement(Py:SINGLE_QUOTED_STRING)('"tables/diffexp.{test}.tsv"')
+                PsiElement(Py:COMMA)(',')
+                PsiWhiteSpace('\n                ')
+                PyStringLiteralExpression: plots/diffexp.{test}.bcv.pdf
+                  PsiElement(Py:SINGLE_QUOTED_STRING)('"plots/diffexp.{test}.bcv.pdf"')
+                PsiElement(Py:COMMA)(',')
+                PsiWhiteSpace('\n                ')
+                PyStringLiteralExpression: plots/diffexp.{test}.md.pdf
+                  PsiElement(Py:SINGLE_QUOTED_STRING)('"plots/diffexp.{test}.md.pdf"')
+                PsiElement(Py:COMMA)(',')
+                PsiWhiteSpace('\n                ')
+                PyStringLiteralExpression: plots/diffexp.{test}.disp.pdf
+                  PsiElement(Py:SINGLE_QUOTED_STRING)('"plots/diffexp.{test}.disp.pdf"')
+                PsiElement(Py:RBRACKET)(']')
+              PsiElement(Py:COMMA)(',')
+              PsiWhiteSpace('\n               ')
+              PyKeywordArgumentImpl: test
+                PsiElement(Py:IDENTIFIER)('test')
+                PsiElement(Py:EQ)('=')
+                PySubscriptionExpression
+                  PyReferenceExpression: config
+                    PsiElement(Py:IDENTIFIER)('config')
+                  PsiElement(Py:LBRACKET)('[')
+                  PyStringLiteralExpression: diffexp
+                    PsiElement(Py:SINGLE_QUOTED_STRING)('"diffexp"')
+                  PsiElement(Py:RBRACKET)(']')
+              PsiElement(Py:RPAR)(')')

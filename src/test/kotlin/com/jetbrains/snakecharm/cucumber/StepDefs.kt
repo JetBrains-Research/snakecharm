@@ -6,6 +6,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Computable
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
+import com.intellij.testFramework.fixtures.InjectionTestFixture
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.codeInsight.controlflow.ControlFlowCache
@@ -59,6 +60,9 @@ class StepDefs {
 
         SnakemakeWorld.fixture().setUp()
         SnakemakeWorld.fixture().testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
+
+        SnakemakeWorld.myInjectionFixture = InjectionTestFixture(SnakemakeWorld.fixture())
+
         PythonDialectsTokenSetProvider.reset()
     }
 
@@ -76,7 +80,6 @@ class StepDefs {
         val fixture = SnakemakeWorld.fixture()
         when (inspectionName) {
             "Shadow Settings" -> fixture.enableInspections(SmkShadowSettingsInspection::class.java)
-            "Shadow Multiple Settings" -> fixture.enableInspections(SmkShadowMultipleSettingsInspection::class.java)
             "Resources Keyword Arguments" -> fixture.enableInspections(SmkResourcesKeywordArgsInspection::class.java)
             "Rule Redeclaration" -> fixture.enableInspections(SmkRuleRedeclarationInspection::class.java)
             "Rule Section After Execution Section" ->

@@ -10,11 +10,11 @@ Feature: Annotate syntax errors
       checkpoint NAME2:
           params: b="value", b1="value1", b="_value"
       """
-      Then I expect inspection error on <a="_value"> with message
+      Then I expect inspection error on <a> in <a="_value"> with message
       """
       Keyword argument already provided: a=\"value\".
       """
-      And I expect inspection error on <b="_value"> with message
+      And I expect inspection error on <b> in <b="_value"> with message
       """
       Keyword argument already provided: b=\"value\".
       """

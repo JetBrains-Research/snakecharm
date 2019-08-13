@@ -1,0 +1,18 @@
+FILE
+  SmkSLElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    SmkSLElement(EXPRESSION_STATEMENT)
+      SmkSLElement(REFERENCE_EXPRESSION)
+        PsiElement(IDENTIFIER)('foo')
+    PsiElement(COMMA)(',')
+    SmkSLElement(REGEXP)
+      RegExpPatternImpl: < \d+>
+        RegExpBranchImpl: < \d+>
+          RegExpCharImpl: < >
+            PsiElement(CHARACTER)(' ')
+          RegExpClosureImpl: <\d+>
+            RegExpSimpleClassImpl: <\d>
+              PsiElement(CHAR_CLASS)('\d')
+            RegExpQuantifierImpl: <+>
+              PsiElement(PLUS)('+')
+    PsiElement(RBRACE)('}')

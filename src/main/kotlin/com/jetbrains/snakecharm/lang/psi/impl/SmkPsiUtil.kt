@@ -1,9 +1,11 @@
 package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.TokenType
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonDialectsTokenSetProvider
+import com.jetbrains.python.psi.PyStringLiteralExpression
 
 object SmkPsiUtil {
     fun getIdentifierNode(node: ASTNode): ASTNode? {
@@ -16,5 +18,20 @@ object SmkPsiUtil {
             }
         }
         return id
+    }
+
+    // This function is meant to get correct reference range in string literal
+    // even in some weird cases like:
+    // include: "f" "o" "o" ".s" "m" """k"""
+    fun getReferenceRange(stringLiteral: PyStringLiteralExpression): TextRange {
+        val decodedFragments = stringLiteral.decodedFragments
+
+        // It can happen for example in this case:
+        // include: f""
+        if (decodedFragments.isEmpty()) {
+            return TextRange.EMPTY_RANGE
+        }
+
+        return TextRange(decodedFragments.first().first.startOffset, decodedFragments.last().first.endOffset)
     }
 }

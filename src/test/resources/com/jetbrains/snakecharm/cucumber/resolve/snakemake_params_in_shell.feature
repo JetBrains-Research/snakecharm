@@ -1,3 +1,4 @@
+@ignore
 Feature: Resolve for params in shell section
   Resolve params arguments in shell section
 

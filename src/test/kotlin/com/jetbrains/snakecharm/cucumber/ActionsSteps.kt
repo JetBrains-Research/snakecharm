@@ -8,11 +8,11 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
-import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.testFramework.fixtures.injectionForHost
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.findPsiElementUnderCaret
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.myGeneratedDocPopupText
@@ -22,10 +22,7 @@ import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
 import java.io.File.separator
 import java.util.regex.Pattern
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
-import kotlin.test.fail
+import kotlin.test.*
 
 
 class ActionsSteps {
@@ -60,12 +57,11 @@ class ActionsSteps {
             )
             val reference = fixture.getReferenceAtCaretPosition()
             assertNotNull(reference, message = "There is no reference at the caret position")
-            val signatureRange = TextRange(pos, pos + signature.length)
             assertEquals(
-                    reference.rangeInElement,
-                    signatureRange,
-                    message = "Expected highlighted text wasn't equal to the actual one. " +
-                            "Expected highlighting on: $signature, actually highlighted: ${reference.canonicalText}")
+                    signature,
+                    reference.canonicalText,
+                    message = "Expected highlighted text wasn't equal to the actual one."
+            )
         }
     }
 
@@ -150,10 +146,10 @@ class ActionsSteps {
     fun iCheckHighlighting(type: String) {
         val fixture = SnakemakeWorld.fixture()
         when (type) {
-            "errors" -> fixture.checkHighlighting(false, false, false)
-            "warnings" -> fixture.checkHighlighting(true, false, false)
-            "infos" -> fixture.checkHighlighting(false, true, false)
-            "weak warnings" -> fixture.checkHighlighting(false, false, true)
+            "errors" -> fixture.checkHighlighting(false, false, false, true)
+            "warnings" -> fixture.checkHighlighting(true, false, false, true)
+            "infos" -> fixture.checkHighlighting(false, true, false, true)
+            "weak warnings" -> fixture.checkHighlighting(false, false, true, true)
             else -> fail("Unknown highlighting type: $type")
         }
     }
@@ -222,6 +218,25 @@ class ActionsSteps {
         assertHasElements(names, expected)
     }
 
+
+    @Then("^I expect language injection on \"(.+)\"")
+    fun iExpectLanguageInjectionOn(str: String) {
+        ApplicationManager.getApplication().invokeAndWait {
+            val fixture = SnakemakeWorld.injectionFixture()
+            val injectedFile = fixture.injectedElement?.containingFile
+            assertNotNull(injectedFile, "No language was injected at caret position")
+            assertEquals(str, injectedFile.text)
+        }
+    }
+
+    @Then("^I expect no language injection")
+    fun iExpectNoLanguageInjection() {
+        ApplicationManager.getApplication().invokeAndWait {
+            val fixture = SnakemakeWorld.injectionFixture()
+            val element = fixture.injectedElement
+            assertNull(element, "${element?.language} language was injected at caret position")
+        }
+    }
 
     private fun findTargetElementFor(element: PsiElement, editor: Editor) =
             DocumentationManager.getInstance(element.project)
