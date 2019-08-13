@@ -12,8 +12,8 @@ Feature: Inspection checking lambda parameter names in various sections
         "output.txt"
     """
     And Lambda Parameter Names inspection is enabled
-    Then I expect no inspection error
-    When I check highlighting errors
+    Then I expect no inspection weak warning
+    When I check highlighting weak warnings
     Examples:
       | rule_like  |
       | rule       |
@@ -32,11 +32,11 @@ Feature: Inspection checking lambda parameter names in various sections
         "output.txt"
     """
     And Lambda Parameter Names inspection is enabled
-    Then I expect inspection warning on <a> in <a:> with message
+    Then I expect inspection weak warning on <a> in <a:> with message
     """
-    Only use 'wildcards' as lambda parameter in 'input' section.
+    Snakemake documentation suggests it's preferable to name the first parameter 'wildcards'.
     """
-    When I check highlighting warnings
+    When I check highlighting weak warnings
     Examples:
       | rule_like  |
       | rule       |
@@ -56,9 +56,9 @@ Feature: Inspection checking lambda parameter names in various sections
     And Lambda Parameter Names inspection is enabled
     Then I expect inspection error on <a> in <, a:> with messages
       | Only use 'wildcards' as lambda parameter in 'input' section. |
-      | Don't use more than 1 lambda parameters in 'input' section.  |
+      | Don't use more than 1 lambda parameter(s) in 'input' section.  |
 
-    When I check highlighting warnings
+    When I check highlighting weak warnings
     Examples:
       | rule_like  |
       | rule       |
@@ -78,8 +78,8 @@ Feature: Inspection checking lambda parameter names in various sections
         "somecommand -o {params.prefix}"
     """
     And Lambda Parameter Names inspection is enabled
-    Then I expect no inspection error
-    When I check highlighting errors
+    Then I expect no inspection weak warning
+    When I check highlighting weak warnings
     Examples:
       | rule_like  |
       | rule       |
@@ -103,7 +103,7 @@ Feature: Inspection checking lambda parameter names in various sections
     """
     Only use 'wildcards/input/output/resources/threads' as lambda parameter in 'params' section.
     """
-    When I check highlighting errors
+    When I check highlighting weak warnings
     Examples:
       | rule_like  |
       | rule       |
@@ -128,9 +128,9 @@ Feature: Inspection checking lambda parameter names in various sections
     """
     And I expect inspection error on <output> with message
     """
-    'wildcards' has to be the first lambda parameter.
+    'output' cannot be the first lambda parameter in 'params' section.
     """
-    When I check highlighting errors
+    When I check highlighting weak warnings
     Examples:
       | rule_like  |
       | rule       |
@@ -151,9 +151,9 @@ Feature: Inspection checking lambda parameter names in various sections
     And Lambda Parameter Names inspection is enabled
     Then I expect inspection error on <log> with messages
       | Only use 'wildcards/input/output/resources/threads' as lambda parameter in 'params' section. |
-      | Don't use more than 5 lambda parameters in 'params' section.                                 |
+      | Don't use more than 5 lambda parameter(s) in 'params' section.                                 |
 
-    When I check highlighting errors
+    When I check highlighting weak warnings
     Examples:
       | rule_like  |
       | rule       |

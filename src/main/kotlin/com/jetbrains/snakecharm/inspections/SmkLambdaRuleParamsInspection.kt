@@ -49,11 +49,9 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
                                     registerProblem(
                                             pyParameter,
                                             SnakemakeBundle.message(
-                                                    "INSP.NAME.only.these.parameters.in.section",
-                                                    WILDCARDS_LAMBDA_PARAMETER,
-                                                    SnakemakeNames.SECTION_INPUT
+                                                    "INSP.NAME.wildcards.first.parameter.preferable"
                                             ),
-                                            ProblemHighlightType.WARNING,
+                                            ProblemHighlightType.WEAK_WARNING,
                                             null,
                                             PyRenameArgumentQuickFix()
                                     )
@@ -86,23 +84,26 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
                                 if (pyParameter.name in ALLOWED_IN_PARAMS) {
                                     registerProblem(
                                             pyParameter,
-                                            SnakemakeBundle.message("INSP.NAME.wildcards.first.argument")
+                                            SnakemakeBundle.message(
+                                                    "INSP.NAME.non.wildcards.param.first.parameter",
+                                                    pyParameter.name!!,
+                                                    SnakemakeNames.SECTION_PARAMS
+                                            )
                                     )
                                 } else {
                                     registerProblem(
                                             pyParameter,
-                                            SnakemakeBundle.message("INSP.NAME.wildcards.first.argument"),
-                                            ProblemHighlightType.WARNING,
+                                            SnakemakeBundle.message("INSP.NAME.wildcards.first.parameter.preferable"),
+                                            ProblemHighlightType.WEAK_WARNING,
                                             null,
                                             PyRenameArgumentQuickFix()
                                     )
                                 }
                             }
-                            println("$index ${pyParameter.name}")
                             if (index != 0 && pyParameter.name == WILDCARDS_LAMBDA_PARAMETER) {
                                 registerProblem(
                                         pyParameter,
-                                        SnakemakeBundle.message("INSP.NAME.wildcards.first.argument")
+                                        SnakemakeBundle.message("INSP.NAME.wildcards.first.parameter")
                                 )
                             }
                             if (index >= ALLOWED_IN_PARAMS.size) {
