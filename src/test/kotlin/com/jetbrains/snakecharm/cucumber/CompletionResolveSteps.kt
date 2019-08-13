@@ -28,6 +28,7 @@ import cucumber.api.DataTable
 import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
 import junit.framework.TestCase
+import java.io.File
 import java.util.*
 import kotlin.test.*
 
@@ -218,6 +219,15 @@ class CompletionResolveSteps {
     fun completionListShouldContainWithTypeText(table: DataTable) {
         val actualLookupItems = getCompletionListWithTypeText()
         val expectedLookupItems = table.asLists(String::class.java).filter { it.size >= 2 }.map { it[0] to it[1] }
+        assertHasElements(actualLookupItems, expectedLookupItems)
+    }
+
+    @Then("^completion list should contain these items where type text for each item is a file path:$")
+    fun completionListShouldContainWithTypeTextFilePaths(table: DataTable) {
+        val actualLookupItems = getCompletionListWithTypeText()
+        val expectedLookupItems = table.asLists(String::class.java)
+                .filter { it.size >= 2 }
+                .map { it[0] to it[1].replace("/", File.separator) }
         assertHasElements(actualLookupItems, expectedLookupItems)
     }
 

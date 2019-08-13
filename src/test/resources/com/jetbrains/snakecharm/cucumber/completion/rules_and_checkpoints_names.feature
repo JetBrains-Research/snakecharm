@@ -222,7 +222,7 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
     """
     When I put the caret after <rule_like>s.
     And I invoke autocompletion popup
-    Then completion list should contain these items with type text:
+    Then completion list should contain these items where type text for each item is a file path:
       | boo  | dir1/dir2/boo.smk      |
       | doo  | dir1/dir3/dir4/doo.smk |
       | goo  | goo.smk                |
