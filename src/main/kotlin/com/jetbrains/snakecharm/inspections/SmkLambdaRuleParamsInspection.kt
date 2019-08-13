@@ -1,7 +1,9 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
+import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
+import com.jetbrains.python.inspections.quickfix.PyRenameArgumentQuickFix
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -43,14 +45,26 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
                                 )
                             }
                             if (pyParameter.name != WILDCARDS_LAMBDA_PARAMETER) {
-                                registerProblem(
-                                        pyParameter,
-                                        SnakemakeBundle.message(
-                                                "INSP.NAME.only.these.parameters.in.section",
-                                                WILDCARDS_LAMBDA_PARAMETER,
-                                                SnakemakeNames.SECTION_INPUT
-                                        )
-                                )
+                                if (index == 0) {
+                                    registerProblem(
+                                            pyParameter,
+                                            SnakemakeBundle.message(
+                                                    "INSP.NAME.wildcards.first.parameter.preferable"
+                                            ),
+                                            ProblemHighlightType.WEAK_WARNING,
+                                            null,
+                                            PyRenameArgumentQuickFix()
+                                    )
+                                } else {
+                                    registerProblem(
+                                            pyParameter,
+                                            SnakemakeBundle.message(
+                                                    "INSP.NAME.only.these.parameters.in.section",
+                                                    WILDCARDS_LAMBDA_PARAMETER,
+                                                    SnakemakeNames.SECTION_INPUT
+                                            )
+                                    )
+                                }
                             }
                         }
                     }
@@ -64,11 +78,32 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
                                     ?: emptyList())
 
                     allLambdas.forEach { lambda ->
+
                         lambda.parameterList.parameters.forEachIndexed { index, pyParameter ->
                             if (index == 0 && pyParameter.name != WILDCARDS_LAMBDA_PARAMETER) {
+                                if (pyParameter.name in ALLOWED_IN_PARAMS) {
+                                    registerProblem(
+                                            pyParameter,
+                                            SnakemakeBundle.message(
+                                                    "INSP.NAME.non.wildcards.param.first.parameter",
+                                                    pyParameter.name!!,
+                                                    SnakemakeNames.SECTION_PARAMS
+                                            )
+                                    )
+                                } else {
+                                    registerProblem(
+                                            pyParameter,
+                                            SnakemakeBundle.message("INSP.NAME.wildcards.first.parameter.preferable"),
+                                            ProblemHighlightType.WEAK_WARNING,
+                                            null,
+                                            PyRenameArgumentQuickFix()
+                                    )
+                                }
+                            }
+                            if (index != 0 && pyParameter.name == WILDCARDS_LAMBDA_PARAMETER) {
                                 registerProblem(
                                         pyParameter,
-                                        SnakemakeBundle.message("INSP.NAME.wildcards.first.argument")
+                                        SnakemakeBundle.message("INSP.NAME.wildcards.first.parameter")
                                 )
                             }
                             if (index >= ALLOWED_IN_PARAMS.size) {
@@ -81,7 +116,7 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
                                         )
                                 )
                             }
-                            if (pyParameter.name !in ALLOWED_IN_PARAMS) {
+                            if (index != 0 && pyParameter.name !in ALLOWED_IN_PARAMS) {
                                 registerProblem(
                                         pyParameter,
                                         SnakemakeBundle.message(
