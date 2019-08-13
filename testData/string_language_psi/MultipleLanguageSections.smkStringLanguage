@@ -1,0 +1,1 @@
+some text {foo.boo.doo, \d+} some text {foo[0].boo[0].doo.too,a{3,5}}

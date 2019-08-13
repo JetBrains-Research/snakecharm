@@ -1,3 +1,4 @@
+@ignore
 Feature: Completion for params in shell section
   Complete params section arguments in shell section
 
@@ -22,7 +23,6 @@ Feature: Completion for params in shell section
       | rule_like   |
       | rule        |
       | checkpoint  |
-
 
   Scenario Outline: Not completed in wrapper section
     Given a snakemake project
