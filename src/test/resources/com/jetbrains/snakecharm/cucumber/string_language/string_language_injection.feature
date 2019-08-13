@@ -84,7 +84,6 @@ Feature: Tests on snakemake string language injection
     | content |
     | text    |
     |         |
-    | text {  |
     | text }  |
 
   Scenario Outline: No injection in top-level workflow sections
@@ -102,7 +101,17 @@ Feature: Tests on snakemake string language injection
     | configfile |
     | report     |
 
-  Scenario: No injection in concatenated strings
+  Scenario: Injection in concatenated strings
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule NAME:
+      input: "{foo}" + "{boo}" + "{doo}"
+    """
+    When I put the caret after foo
+    Then I expect language injection on "{foo}{boo}{doo}"
+
+  Scenario: Injection in concatenated strings with divided braces
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -110,7 +119,7 @@ Feature: Tests on snakemake string language injection
       input: "{foo" + "}"
     """
     When I put the caret after foo
-    Then I expect no language injection
+    Then I expect language injection on "{foo}"
 
   Scenario Outline: No injection in some sections
     Given a snakemake project
