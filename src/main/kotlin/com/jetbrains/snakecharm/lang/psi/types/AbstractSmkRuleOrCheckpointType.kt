@@ -165,7 +165,5 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
                     PythonCompletionWeigher.WEIGHT_DELTA.toDouble()
             )
         }
-
-
     }
 }
