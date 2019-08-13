@@ -7,15 +7,15 @@ import com.intellij.psi.tree.IElementType
 
 class SmkSLBraceMatcher : PairedBraceMatcher {
     companion object {
-        val myBraces = BracePair(
-                SmkSLTokenTypes.LBRACE,
-                SmkSLTokenTypes.RBRACE,
-                true)
+        val myBraces = arrayOf(
+                BracePair(SmkSLTokenTypes.LBRACE, SmkSLTokenTypes.RBRACE, true),
+                BracePair(SmkSLTokenTypes.LBRACKET, SmkSLTokenTypes.RBRACKET, true)
+        )
     }
 
     override fun getCodeConstructStart(file: PsiFile?, openingBraceOffset: Int) = openingBraceOffset
 
-    override fun getPairs() = arrayOf(myBraces)
+    override fun getPairs() = myBraces
 
     override fun isPairedBracesAllowedBeforeType(
             lbraceType: IElementType,
