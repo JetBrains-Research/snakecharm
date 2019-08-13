@@ -256,6 +256,10 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testDocstringAtEndOfFile() {
+        doTest()
+    }
+
     fun testKeywordIdentifiersAtToplevelWithPrecedingOpenBrace() {
         doTest()
     }
