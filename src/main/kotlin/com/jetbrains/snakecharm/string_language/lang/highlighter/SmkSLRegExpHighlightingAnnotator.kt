@@ -19,10 +19,13 @@ class SmkSLRegExpHighlightingAnnotator : Annotator {
             return
         }
 
-        val annotation = holder.createAnnotation(
-                HighlightSeverity.INFORMATION,
-                element.textRange,
-                null)
-        annotation.textAttributes = REGEXP_HIGHLIGHTER.getTokenHighlights(element.node.elementType).first()
+        val highlights = REGEXP_HIGHLIGHTER.getTokenHighlights(element.node.elementType)
+        if (highlights.isNotEmpty()) {
+            val annotation = holder.createAnnotation(
+                    HighlightSeverity.INFORMATION,
+                    element.textRange,
+                    null)
+            annotation.textAttributes = highlights.first()
+        }
     }
 }
