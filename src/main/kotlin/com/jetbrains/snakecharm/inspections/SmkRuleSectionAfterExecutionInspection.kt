@@ -2,14 +2,12 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.*
 import com.intellij.openapi.command.WriteCommandAction
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
-import com.intellij.problems.Problem
-import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.SmartPointerManager
 import com.intellij.psi.SmartPsiElementPointer
-import com.jetbrains.python.psi.PyUtil
+import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.*
 
@@ -50,7 +48,7 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
                                 ),
                                 ProblemHighlightType.ERROR,
                                 null,
-                                SwapTwoSectionsQuickFix(SmartPointerManager.createPointer(executionSection))
+                                MoveExecutionSectionToEndOfRuleQuickFix(SmartPointerManager.createPointer(executionSection))
                         )
                     }
                 }
@@ -58,28 +56,28 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
         }
     }
 
-    private class SwapTwoSectionsQuickFix(private val precedingSectionPointer: SmartPsiElementPointer<SmkSection>) : LocalQuickFix {
-        override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.move.rule.section.upwards.family")
+    private class MoveExecutionSectionToEndOfRuleQuickFix(
+            private val executionSectionPointer: SmartPsiElementPointer<SmkSection>
+    ) : LocalQuickFix {
+        override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.move.execution.section.down.family")
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
-            val firstSection = precedingSectionPointer.element ?: return
-            val secondSection = descriptor.psiElement
+            val executionSection = executionSectionPointer.element ?: return
+            val executionSectionWhitespace = executionSection.prevSibling as? PsiWhiteSpace ?: return
+            val containingRule = PsiTreeUtil.getParentOfType(executionSection, SmkRuleOrCheckpoint::class.java)!!
             val document = FileEditorManager.getInstance(project).selectedTextEditor?.document ?: return
-            val startOffset1 = firstSection.textOffset
-            val endOffset1 = firstSection.textRange.endOffset
-            val initialStartOffset2 = secondSection.textOffset
-            val initialEndOffset2 = secondSection.textRange.endOffset
-            val text1 = firstSection.text
-            val text2 = secondSection.text
+            val containingRuleEndOffset =
+                    containingRule.textRange.startOffset + containingRule.textLength -
+                            (executionSection.textLength + executionSectionWhitespace.textLength)
             WriteCommandAction.runWriteCommandAction(project) {
-                document.replaceString(startOffset1, endOffset1, text2)
-                if (text1.length > text2.length) {
-                    val endOffset = startOffset1 + text2.length
-                    document.replaceString(startOffset1 + text2.length, endOffset, "")
-                }
-                val startOffset2 = initialStartOffset2 + (text2.length - text1.length)
-                val endOffset2 = initialEndOffset2 + (text2.length - text1.length)
-                document.replaceString(startOffset2, endOffset2, text1)
+                document.deleteString(
+                        executionSectionWhitespace.textRange.startOffset,
+                        executionSection.textRange.endOffset
+                )
+                document.insertString(
+                        containingRuleEndOffset,
+                        "${executionSectionWhitespace.text}${executionSection.text}"
+                )
             }
         }
     }

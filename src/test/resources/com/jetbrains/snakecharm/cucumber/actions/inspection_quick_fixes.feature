@@ -1,10 +1,10 @@
 Feature: Inspection quick fixes
 
-  Scenario: Name an unnamed (positional) resources section argument
+  Scenario Outline: Name an unnamed (positional) resources section argument
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
-      rule NAME:
+      <rule_like> NAME:
         resources: 4
       """
     And Resources Keyword Arguments inspection is enabled
@@ -15,40 +15,48 @@ Feature: Inspection quick fixes
     When I check highlighting errors
     And I invoke quick fix Name resource and see text:
     """
-    rule NAME:
+    <rule_like> NAME:
       resources: =4
     """
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
-  Scenario: Rule redeclaration rename fix
+  Scenario Outline: Rule redeclaration rename fix
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule name1:
+    <rule_like> name1:
       input: "input1"
 
-    rule name1: # duplicate
+    <rule_like> name1: # duplicate
       input: "input2"
     """
     And Rule Redeclaration inspection is enabled
-    Then I expect inspection error on <name1> in <rule name1: # duplicate> with message
+    Then I expect inspection error on <name1> in <<rule_like> name1: # duplicate> with message
     """
     This rule name is already used by another rule.
     """
     When I check highlighting errors
     And I invoke quick fix Rename element and see text:
     """
-    rule name1:
+    <rule_like> name1:
       input: "input1"
 
-    rule NAME1: # duplicate
+    <rule_like> NAME1: # duplicate
       input: "input2"
     """
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
-  Scenario: Section redeclaration element removal fix test
+  Scenario Outline: Section redeclaration element removal fix test
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule name1:
+    <rule_like> name1:
       input: "input1"
       input: "input2"
       output: "output.txt"
@@ -57,23 +65,29 @@ Feature: Inspection quick fixes
     Then I check highlighting errors
     And I invoke quick fix Remove section and see text:
     """
-    rule name1:
+    <rule_like> name1:
       input: "input1"
       output: "output.txt"
     """
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
-  Scenario: Swap execution section and rule section below fix test
+  Scenario Outline: Swap execution section and rule section below fix test
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    rule name1:
+    <rule_like> name1:
       input: "input1"
+      # comment
       shell: "command"
              "multiline"
              "string"
       resources: a=4
+      version: 2.0
 
-    rule name2:
+    <rule_like> name2:
       input: "input2"
     """
     And Rule Section After Execution Section inspection is enabled
@@ -81,16 +95,26 @@ Feature: Inspection quick fixes
     """
     Rule section 'resources' isn't allowed after 'shell' section.
     """
-    When I check highlighting errors
-    And I invoke quick fix Move rule section upwards and see text:
+    And I expect inspection error on <version: 2.0> with message
     """
-    rule name1:
+    Rule section 'version' isn't allowed after 'shell' section.
+    """
+    When I check highlighting errors
+    And I invoke quick fix Move execution section to the end of the rule and see text:
+    """
+    <rule_like> name1:
       input: "input1"
+      # comment
       resources: a=4
+      version: 2.0
       shell: "command"
              "multiline"
              "string"
 
-    rule name2:
+    <rule_like> name2:
       input: "input2"
     """
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
