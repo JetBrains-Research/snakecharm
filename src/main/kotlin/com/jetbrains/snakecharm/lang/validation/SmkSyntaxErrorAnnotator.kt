@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.lang.validation
 
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.inspections.quickfix.MoveCaretAndInsertEqualsSignQuickFix
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.*
 
@@ -35,7 +36,7 @@ object SmkSyntaxErrorAnnotator : SmkAnnotator() {
                     holder.createErrorAnnotation(
                             arg,
                             SnakemakeBundle.message("ANN.positional.argument.after.keyword.argument")
-                    )
+                    ).registerFix(MoveCaretAndInsertEqualsSignQuickFix(arg))
                 }
             }
         }

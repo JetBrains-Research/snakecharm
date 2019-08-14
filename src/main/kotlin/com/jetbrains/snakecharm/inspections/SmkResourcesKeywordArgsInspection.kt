@@ -1,14 +1,11 @@
 package com.jetbrains.snakecharm.inspections
 
-import com.intellij.codeInsight.FileModificationService
-import com.intellij.codeInspection.*
-import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.project.Project
-import com.intellij.psi.*
+import com.intellij.codeInspection.LocalInspectionToolSession
+import com.intellij.codeInspection.ProblemHighlightType
+import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.inspections.quickfix.MoveCaretAndInsertEqualsSignQuickFix
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
@@ -29,7 +26,7 @@ class SmkResourcesKeywordArgsInspection : SnakemakeInspection() {
                             it,
                             SnakemakeBundle.message("INSP.NAME.resources.unnamed.args"),
                             ProblemHighlightType.GENERIC_ERROR,
-                            null, MoveCaretAndInsertEqualsSignQuickFix()
+                            null, MoveCaretAndInsertEqualsSignQuickFix(it)
                     )
                 }
             }
@@ -38,16 +35,4 @@ class SmkResourcesKeywordArgsInspection : SnakemakeInspection() {
 
     override fun getDisplayName(): String = SnakemakeBundle.message("INSP.NAME.resources.unnamed.args")
 
-    private class MoveCaretAndInsertEqualsSignQuickFix : LocalQuickFix {
-        override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.name.resource.family")
-
-        override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
-            val offset = descriptor.psiElement.textOffset
-            val editor = FileEditorManager.getInstance(project).selectedTextEditor
-            editor?.caretModel?.moveToOffset(offset)
-            if (editor?.document?.isWritable == true) {
-                editor.document.insertString(offset, "=")
-            }
-        }
-    }
 }
