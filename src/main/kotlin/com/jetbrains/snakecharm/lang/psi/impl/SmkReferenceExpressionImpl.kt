@@ -45,7 +45,6 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
                 multiResolve(false).firstOrNull()?.element
 
         override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
-
             val rules = AbstractSmkRuleOrCheckpointType
                     .findAvailableRuleLikeElementByName(element, key, SmkRuleNameIndex.KEY, SmkRule::class.java)
                     { getRules().map{ (_, psi) -> psi }}
@@ -68,9 +67,22 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
             if (module != null) {
                 val ruleResults = mutableListOf<SmkRule>()
                 val checkpointResults = mutableListOf<SmkCheckPoint>()
-                AbstractSmkRuleOrCheckpointType.addVariantFromIndex(SmkRuleNameIndex.KEY, module, ruleResults, SmkRule::class.java)
-                AbstractSmkRuleOrCheckpointType.addVariantFromIndex(SmkCheckpointNameIndex.KEY, module, checkpointResults, SmkCheckPoint::class.java)
-                results.addAll((ruleResults + checkpointResults).filter { (it as SmkRuleOrCheckpoint).name != null }.map { (it as SmkRuleOrCheckpoint).name!! to it })
+                AbstractSmkRuleOrCheckpointType.addVariantFromIndex(
+                        SmkRuleNameIndex.KEY,
+                        module,
+                        ruleResults,
+                        SmkRule::class.java
+                )
+                AbstractSmkRuleOrCheckpointType.addVariantFromIndex(
+                        SmkCheckpointNameIndex.KEY,
+                        module,
+                        checkpointResults,
+                        SmkCheckPoint::class.java
+                )
+                results.addAll(
+                        (ruleResults + checkpointResults)
+                                .filter { (it as SmkRuleOrCheckpoint).name != null }
+                                .map { (it as SmkRuleOrCheckpoint).name!! to it })
             } else {
                 results.addAll(getRules() + getCheckpoints())
             }
@@ -78,10 +90,13 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
             val includedFiles = getIncludedFiles().map { it.originalFile }
 
             return results
-                    .filter { it.second.containingFile.originalFile == element.containingFile.originalFile || it.second.containingFile.originalFile in includedFiles }
+                    .filter {
+                        it.second.containingFile.originalFile == element.containingFile.originalFile ||
+                                it.second.containingFile.originalFile in includedFiles
+                    }
                     .map { (name, elem) ->
-                AbstractSmkRuleOrCheckpointType.createRuleLikeLookupItem(name, elem)
-            }.toTypedArray()
+                        AbstractSmkRuleOrCheckpointType.createRuleLikeLookupItem(name, elem)
+                    }.toTypedArray()
         }
 
         override fun handleElementRename(newElementName: String): PsiElement =
