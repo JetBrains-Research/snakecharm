@@ -33,7 +33,7 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
                 registerProblem(
                         problemElement,
                         SnakemakeBundle.message("INSP.NAME.rule.redeclaration"),
-                        ProblemHighlightType.ERROR,
+                        ProblemHighlightType.GENERIC_ERROR,
                         null,
                         PyRenameElementQuickFix(problemElement)
                 )

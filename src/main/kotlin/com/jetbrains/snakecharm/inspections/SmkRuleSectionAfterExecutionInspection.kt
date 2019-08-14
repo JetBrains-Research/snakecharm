@@ -46,7 +46,7 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
                                         sectionName,
                                         executionSection.name!!
                                 ),
-                                ProblemHighlightType.ERROR,
+                                ProblemHighlightType.GENERIC_ERROR,
                                 null,
                                 MoveExecutionSectionToEndOfRuleQuickFix(SmartPointerManager.createPointer(executionSection))
                         )

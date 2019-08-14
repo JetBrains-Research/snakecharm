@@ -28,7 +28,7 @@ class SmkResourcesKeywordArgsInspection : SnakemakeInspection() {
                     registerProblem(
                             it,
                             SnakemakeBundle.message("INSP.NAME.resources.unnamed.args"),
-                            ProblemHighlightType.ERROR,
+                            ProblemHighlightType.GENERIC_ERROR,
                             null, MoveCaretAndInsertEqualsSignQuickFix()
                     )
                 }
