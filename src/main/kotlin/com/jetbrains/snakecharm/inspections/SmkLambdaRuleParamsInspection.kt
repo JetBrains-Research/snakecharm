@@ -3,7 +3,7 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
-import com.jetbrains.python.inspections.quickfix.PyRenameElementQuickFix
+import com.jetbrains.python.inspections.quickfix.RenameParameterQuickFix
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -53,7 +53,7 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
                                             ),
                                             ProblemHighlightType.WEAK_WARNING,
                                             null,
-                                            PyRenameElementQuickFix(pyParameter)
+                                            RenameParameterQuickFix(WILDCARDS_LAMBDA_PARAMETER)
                                     )
                                 } else {
                                     registerProblem(
@@ -96,7 +96,7 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
                                             SnakemakeBundle.message("INSP.NAME.wildcards.first.parameter.preferable"),
                                             ProblemHighlightType.WEAK_WARNING,
                                             null,
-                                            PyRenameElementQuickFix(pyParameter)
+                                            RenameParameterQuickFix(WILDCARDS_LAMBDA_PARAMETER)
                                     )
                                 }
                             }
