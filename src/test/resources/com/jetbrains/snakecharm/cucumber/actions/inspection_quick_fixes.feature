@@ -39,13 +39,60 @@ Feature: Inspection quick fixes
     This rule name is already used by another rule.
     """
     When I check highlighting errors
-    And I invoke quick fix Rename element and see text:
+    And I invoke quick fix Rename rule and see text:
     """
     <rule_like> name1:
       input: "input1"
 
-    <rule_like> NAME1: # duplicate
+    <rule_like> DEFAULT_SNAKEMAKE_RULE_NAME: # duplicate
       input: "input2"
+    """
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: rule redeclaration rename does not rename rule usages
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    ruleorder: boo > foo1
+    localrules: boo
+
+    <rule_like> boo:
+      output: "aa"
+
+    rule foo1:
+      input: rules.boo
+
+    <rule_like> boo: # duplicate
+      input: "aa"
+
+    rule foo2:
+      input: rules.boo
+    """
+    And Rule Redeclaration inspection is enabled
+    Then I expect inspection error on <boo> in <boo: # duplicate> with message
+    """
+    This rule name is already used by another rule.
+    """
+    When I check highlighting errors
+    And I invoke quick fix Rename rule and see text:
+    """
+    ruleorder: boo > foo1
+    localrules: boo
+
+    <rule_like> boo:
+      output: "aa"
+
+    rule foo1:
+      input: rules.boo
+
+    <rule_like> DEFAULT_SNAKEMAKE_RULE_NAME: # duplicate
+      input: "aa"
+
+    rule foo2:
+      input: rules.boo
     """
     Examples:
       | rule_like  |
