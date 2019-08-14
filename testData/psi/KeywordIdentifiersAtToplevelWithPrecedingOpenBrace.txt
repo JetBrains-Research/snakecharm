@@ -1,0 +1,105 @@
+SnakemakeFile: KeywordIdentifiersAtToplevelWithPrecedingOpenBrace.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo1')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRunSection
+        PsiElement(Py:IDENTIFIER)('run')
+        PsiElement(Py:COLON)(':')
+        PsiWhiteSpace('\n        ')
+        PyStatementList
+          PyAssignmentStatement
+            PyTargetExpression: rule
+              PsiElement(Py:IDENTIFIER)('rule')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:EQ)('=')
+            PsiWhiteSpace(' ')
+            PyNumericLiteralExpression
+              PsiElement(Py:INTEGER_LITERAL)('1')
+          PsiWhiteSpace('\n        ')
+          PyAssignmentStatement
+            PyTargetExpression: checkpoint
+              PsiElement(Py:IDENTIFIER)('checkpoint')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:EQ)('=')
+            PsiWhiteSpace(' ')
+            PyNumericLiteralExpression
+              PsiElement(Py:INTEGER_LITERAL)('2')
+          PsiWhiteSpace('\n        ')
+          PyExpressionStatement
+            PyCallExpression: print
+              PyReferenceExpression: print
+                PsiElement(Py:IDENTIFIER)('print')
+              PyArgumentList
+                PsiElement(Py:LPAR)('(')
+                PyReferenceExpression: rule
+                  PsiElement(Py:IDENTIFIER)('rule')
+                PsiElement(Py:COMMA)(',')
+                PsiWhiteSpace('\n')
+                PyReferenceExpression: checkpoint
+                  PsiElement(Py:IDENTIFIER)('checkpoint')
+                PsiErrorElement:',' or ')' expected
+                  <empty list>
+            PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo2')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRunSection
+        PsiElement(Py:IDENTIFIER)('run')
+        PsiElement(Py:COLON)(':')
+        PsiWhiteSpace('\n        ')
+        PyStatementList
+          PyAssignmentStatement
+            PyTargetExpression: rule
+              PsiElement(Py:IDENTIFIER)('rule')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:EQ)('=')
+            PsiWhiteSpace(' ')
+            PyNumericLiteralExpression
+              PsiElement(Py:INTEGER_LITERAL)('1')
+          PsiWhiteSpace('\n        ')
+          PyAssignmentStatement
+            PyTargetExpression: checkpoint
+              PsiElement(Py:IDENTIFIER)('checkpoint')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:EQ)('=')
+            PsiWhiteSpace(' ')
+            PyNumericLiteralExpression
+              PsiElement(Py:INTEGER_LITERAL)('2')
+          PsiWhiteSpace('\n        ')
+          PyExpressionStatement
+            PyCallExpression: print
+              PyReferenceExpression: print
+                PsiElement(Py:IDENTIFIER)('print')
+              PyArgumentList
+                PsiElement(Py:LPAR)('(')
+                PyReferenceExpression: rule
+                  PsiElement(Py:IDENTIFIER)('rule')
+                PsiErrorElement:',' or ')' expected
+                  <empty list>
+            PsiWhiteSpace('\n')
+  SmkCheckPoint
+    PsiElement(Py:CHECKPOINT_KEYWORD)('checkpoint')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: touch
+            PyReferenceExpression: touch
+              PsiElement(Py:IDENTIFIER)('touch')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyStringLiteralExpression: output.txt
+                PsiElement(Py:SINGLE_QUOTED_STRING)('"output.txt"')
+              PsiElement(Py:RPAR)(')')

@@ -1,0 +1,68 @@
+FILE
+  SmkSLElement(STRING_CONTENT)
+    PsiElement(STRING_CONTENT)('some text ')
+  SmkSLElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    SmkSLElement(EXPRESSION_STATEMENT)
+      SmkSLElement(REFERENCE_EXPRESSION)
+        SmkSLElement(REFERENCE_EXPRESSION)
+          SmkSLElement(REFERENCE_EXPRESSION)
+            PsiElement(IDENTIFIER)('foo')
+          PsiElement(DOT)('.')
+          PsiElement(IDENTIFIER)('boo')
+        PsiElement(DOT)('.')
+        PsiElement(IDENTIFIER)('doo')
+    PsiElement(COMMA)(',')
+    SmkSLElement(REGEXP)
+      RegExpPatternImpl: < \d+>
+        RegExpBranchImpl: < \d+>
+          RegExpCharImpl: < >
+            PsiElement(CHARACTER)(' ')
+          RegExpClosureImpl: <\d+>
+            RegExpSimpleClassImpl: <\d>
+              PsiElement(CHAR_CLASS)('\d')
+            RegExpQuantifierImpl: <+>
+              PsiElement(PLUS)('+')
+    PsiElement(RBRACE)('}')
+  SmkSLElement(STRING_CONTENT)
+    PsiElement(STRING_CONTENT)(' some text ')
+  SmkSLElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    SmkSLElement(EXPRESSION_STATEMENT)
+      SmkSLElement(REFERENCE_EXPRESSION)
+        SmkSLElement(REFERENCE_EXPRESSION)
+          SmkSLElement(SUBSCRIPTION_EXPRESSION)
+            SmkSLElement(REFERENCE_EXPRESSION)
+              SmkSLElement(SUBSCRIPTION_EXPRESSION)
+                SmkSLElement(REFERENCE_EXPRESSION)
+                  PsiElement(IDENTIFIER)('foo')
+                PsiElement(LBRACKET)('[')
+                SmkSLElement(ACCESS_KEY)
+                  PsiElement(ACCESS_KEY)('0')
+                PsiElement(RBRACKET)(']')
+              PsiElement(DOT)('.')
+              PsiElement(IDENTIFIER)('boo')
+            PsiElement(LBRACKET)('[')
+            SmkSLElement(ACCESS_KEY)
+              PsiElement(ACCESS_KEY)('0')
+            PsiElement(RBRACKET)(']')
+          PsiElement(DOT)('.')
+          PsiElement(IDENTIFIER)('doo')
+        PsiElement(DOT)('.')
+        PsiElement(IDENTIFIER)('too')
+    PsiElement(COMMA)(',')
+    SmkSLElement(REGEXP)
+      RegExpPatternImpl: <a{3,5}>
+        RegExpBranchImpl: <a{3,5}>
+          RegExpClosureImpl: <a{3,5}>
+            RegExpCharImpl: <a>
+              PsiElement(CHARACTER)('a')
+            RegExpQuantifierImpl: <{3,5}>
+              PsiElement(LBRACE)('{')
+              RegExpNumberImpl: <3>
+                PsiElement(NUMBER)('3')
+              PsiElement(COMMA)(',')
+              RegExpNumberImpl: <5>
+                PsiElement(NUMBER)('5')
+              PsiElement(RBRACE)('}')
+    PsiElement(RBRACE)('}')

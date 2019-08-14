@@ -5,6 +5,8 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
@@ -88,15 +90,35 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
     override fun isBuiltin() = false
 
     companion object {
-        fun <T: SmkRuleOrCheckpoint> createRuleLikeLookupItem(name: String, elem: T): LookupElement =
-                PrioritizedLookupElement.withPriority(
-                        LookupElementBuilder
-                                .createWithSmartPointer(name, elem)
-                                .withTypeText(elem.containingFile.name)
-                                .withIcon(elem.getIcon(0))
-                        ,
-                        PythonCompletionWeigher.WEIGHT_DELTA.toDouble()
-                )
+        fun <T: SmkRuleOrCheckpoint> createRuleLikeLookupItem(name: String, elem: T): LookupElement {
+            val containingFileName = elem.containingFile.name
+            /*
+              it is important to use originalFile to access virtualFile
+              because a light copy of the file is created during code completion
+              and containingFile.virtualFile returns null for that copy
+            */
+            val virtualFile = elem.containingFile.originalFile.virtualFile
+            val displayPath = if (virtualFile == null) {
+                containingFileName
+            } else {
+                val fileContentRootDirectory = ProjectRootManager.getInstance(elem.project)
+                        .fileIndex
+                        .getContentRootForFile(virtualFile)
+                if (fileContentRootDirectory == null) {
+                    containingFileName
+                } else {
+                    VfsUtil.getRelativePath(virtualFile, fileContentRootDirectory) ?: virtualFile.presentableUrl
+                }
+            }
+            return PrioritizedLookupElement.withPriority(
+                    LookupElementBuilder
+                            .createWithSmartPointer(name, elem)
+                            .withTypeText(displayPath)
+                            .withIcon(elem.getIcon(0))
+                    ,
+                    PythonCompletionWeigher.WEIGHT_DELTA.toDouble()
+            )
+        }
 
         fun <T: SmkRuleOrCheckpoint> findAvailableRuleLikeElementByName(
                 location: PsiElement,
@@ -151,6 +173,5 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
             // GlobalSearchScope.allScope(project)
             return scope
         }
-
     }
 }

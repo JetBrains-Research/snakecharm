@@ -25,6 +25,14 @@ interface SmkRuleOrCheckpointArgsSection : SmkArgsSection { // PyNamedElementCon
                 SnakemakeNames.SECTION_WRAPPER, SnakemakeNames.SECTION_CWL
         )
 
+        val SINGLE_ARGUMENT_KEYWORDS = setOf(
+                SnakemakeNames.SECTION_SHELL, SnakemakeNames.SECTION_SCRIPT, SnakemakeNames.SECTION_WRAPPER,
+                SnakemakeNames.SECTION_CWL, SnakemakeNames.SECTION_BENCHMARK, SnakemakeNames.SECTION_VERSION,
+                SnakemakeNames.SECTION_MESSAGE, SnakemakeNames.SECTION_THREADS, SnakemakeNames.SECTION_SINGULARITY,
+                SnakemakeNames.SECTION_PRIORITY, SnakemakeNames.SECTION_CONDA, SnakemakeNames.SECTION_GROUP,
+                SnakemakeNames.SECTION_SHADOW
+        )
+
         val PARAMS_NAMES = setOf(
                 SnakemakeNames.SECTION_OUTPUT, SnakemakeNames.SECTION_INPUT, SnakemakeNames.SECTION_PARAMS, SnakemakeNames.SECTION_LOG, SnakemakeNames.SECTION_RESOURCES,
                 SnakemakeNames.SECTION_BENCHMARK, SnakemakeNames.SECTION_VERSION, SnakemakeNames.SECTION_MESSAGE, SnakemakeNames.SECTION_SHELL, SnakemakeNames.SECTION_THREADS, SnakemakeNames.SECTION_SINGULARITY,

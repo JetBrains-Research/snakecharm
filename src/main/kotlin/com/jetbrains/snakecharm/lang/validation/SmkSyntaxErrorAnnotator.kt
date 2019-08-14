@@ -24,7 +24,7 @@ object SmkSyntaxErrorAnnotator : SmkAnnotator() {
                             seenKeywords2Value[keyword] = arg.text
                         } else {
                             holder.createErrorAnnotation(
-                                    arg.textRange,
+                                    arg.keywordNode?.textRange!!,
                                     SnakemakeBundle.message("ANN.keyword.argument.already.provided", keywordValue)
                             )
                         }

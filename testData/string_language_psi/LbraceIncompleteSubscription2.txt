@@ -1,0 +1,12 @@
+FILE
+  SmkSLElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    SmkSLElement(EXPRESSION_STATEMENT)
+      SmkSLElement(SUBSCRIPTION_EXPRESSION)
+        SmkSLElement(REFERENCE_EXPRESSION)
+          PsiElement(IDENTIFIER)('foo')
+        PsiElement(LBRACKET)('[')
+        SmkSLElement(ACCESS_KEY)
+          PsiElement(ACCESS_KEY)('0')
+        PsiErrorElement:Expected ']'
+          <empty list>

@@ -13,10 +13,10 @@ import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.lang.psi.impl.SmkWorkflowArgsSectionImpl
 
 open class SmkFileReference(
-        element: SmkWorkflowArgsSectionImpl,
+        element: SmkArgsSection,
         private val textRange: TextRange,
         private val path: String
-) : PsiReferenceBase<SmkWorkflowArgsSectionImpl>(element, textRange) {
+) : PsiReferenceBase<SmkArgsSection>(element, textRange) {
     // Reference caching can be implemented with the 'ResolveCache' class if needed
 
     override fun handleElementRename(newElementName: String): PsiElement {
@@ -83,11 +83,12 @@ open class SmkFileReference(
 
     // This function is supposed to get parent dir of 'IntelliJIdeaRulezzz' fake element
     // when autocompletion is invoked
-    private fun getParendDirForCompletion() = (element.parent as? PsiFile)?.originalFile?.containingDirectory
+    private fun getParendDirForCompletion() =
+            PsiTreeUtil.getParentOfType(element, PsiFile::class.java)?.originalFile?.containingDirectory
 }
 
 class SmkIncludeReference(
-        element: SmkWorkflowArgsSectionImpl,
+        element: SmkArgsSection,
         textRange: TextRange,
         path: String
 ) : SmkFileReference(element, textRange, path) {
@@ -97,7 +98,7 @@ class SmkIncludeReference(
 }
 
 class SmkConfigfileReference(
-        element: SmkWorkflowArgsSectionImpl,
+        element: SmkArgsSection,
         textRange: TextRange,
         path: String
 ) : SmkFileReference(element, textRange, path) {
@@ -107,7 +108,7 @@ class SmkConfigfileReference(
 }
 
 class SmkReportReference(
-        element: SmkWorkflowArgsSectionImpl,
+        element: SmkArgsSection,
         textRange: TextRange,
         path: String
 ) : SmkFileReference(element, textRange, path) {
@@ -117,7 +118,7 @@ class SmkReportReference(
 }
 
 class SmkWorkDirReference(
-        element: SmkWorkflowArgsSectionImpl,
+        element: SmkArgsSection,
         textRange: TextRange,
         path: String
 ) : SmkFileReference(element, textRange, path) {

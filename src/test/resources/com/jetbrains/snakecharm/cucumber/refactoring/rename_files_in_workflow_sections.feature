@@ -77,3 +77,51 @@ Feature: Rename files in workflow sections
     workdir: "Folder"
     """
     And reference should resolve to "Folder" directory
+
+  Scenario Outline: Rename in conda section
+    Given a snakemake project
+    Given a file "boo.yaml" with text
+    """
+    TEXT
+    """
+    Given I open a file "foo.smk" with text
+    """
+    <section>:
+      conda: "boo.yaml"
+    """
+    When I put the caret after boo
+    When I invoke rename with name "foo.yaml"
+    Then the file "foo.smk" should have text
+    """
+    <section>:
+      conda: "foo.yaml"
+    """
+    And reference should resolve to "TEXT" in "foo.yaml"
+    Examples:
+      | section    |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Rename in conda section for file in subdirectory
+    Given a snakemake project
+    Given a file "Dir/boo.yaml" with text
+    """
+    TEXT
+    """
+    Given I open a file "foo.smk" with text
+    """
+    <section>:
+      conda: "Dir/boo.yaml"
+    """
+    When I put the caret after boo
+    When I invoke rename with name "foo.yaml"
+    Then the file "foo.smk" should have text
+    """
+    <section>:
+      conda: "Dir/foo.yaml"
+    """
+    And reference should resolve to "TEXT" in "foo.yaml"
+    Examples:
+      | section    |
+      | rule       |
+      | checkpoint |

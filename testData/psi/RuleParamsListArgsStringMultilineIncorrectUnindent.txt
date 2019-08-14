@@ -19,8 +19,11 @@ SnakemakeFile: RuleParamsListArgsStringMultilineIncorrectUnindent.smk
             PsiElement(Py:SINGLE_QUOTED_STRING)('"_copy"')
             PsiWhiteSpace('\n                 ')
             PsiElement(Py:SINGLE_QUOTED_STRING)('"1"')
-            PsiErrorElement:Unindent does not match any outer indentation level.
-              PsiWhiteSpace('\n              ')
+          PsiErrorElement:Unindent does not match any outer indentation level.
+            PsiErrorElement:expression expected
+              <empty list>
+            PsiErrorElement:expression expected
+              PsiElement(Py:INCONSISTENT_DEDENT)('\n              ')
               PsiElement(Py:SINGLE_QUOTED_STRING)('".txt"')
           PsiWhiteSpace('\n            ')
           PsiElement(Py:COMMA)(',')
@@ -44,17 +47,19 @@ SnakemakeFile: RuleParamsListArgsStringMultilineIncorrectUnindent.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: file151
+          PyStringLiteralExpression: file15
             PsiElement(Py:SINGLE_QUOTED_STRING)('"file"')
             PsiWhiteSpace('\n                    ')
             PsiElement(Py:SINGLE_QUOTED_STRING)('"15"')
-            PsiErrorElement:Unindent does not match any outer indentation level.
-              PsiWhiteSpace('\n           ')
+          PsiErrorElement:Unindent does not match any outer indentation level.
+            PsiErrorElement:expression expected
+              <empty list>
+            PsiErrorElement:expression expected
+              PsiElement(Py:INCONSISTENT_DEDENT)('\n           ')
               PsiElement(Py:SINGLE_QUOTED_STRING)('"_copy"')
-            PsiWhiteSpace('\n                 ')
-            PsiElement(Py:SINGLE_QUOTED_STRING)('"1"')
-            PsiErrorElement:Unindent does not match any outer indentation level.
-              PsiWhiteSpace('\n              ')
+              PsiWhiteSpace('\n                 ')
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"1"')
+              PsiElement(Py:INCONSISTENT_DEDENT)('\n              ')
               PsiElement(Py:SINGLE_QUOTED_STRING)('".txt"')
           PsiWhiteSpace('\n           ')
           PsiElement(Py:COMMA)(',')
