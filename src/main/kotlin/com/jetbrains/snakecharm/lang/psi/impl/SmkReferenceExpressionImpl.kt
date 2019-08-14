@@ -36,11 +36,8 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
     private class SmkRuleOrCheckpointNameReference(
             element: PsiNamedElement,
             textRange: TextRange
-    ) : PsiReferenceBase<PsiNamedElement>(element, textRange), PsiPolyVariantReference {
+    ) : PsiReferenceBase.Poly<PsiNamedElement>(element, textRange, true) {
         private val key: String = element.text
-
-        override fun resolve(): PsiElement? =
-                multiResolve(false).firstOrNull()?.element
 
         override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> =
                 (getRules() + getCheckpoints())
