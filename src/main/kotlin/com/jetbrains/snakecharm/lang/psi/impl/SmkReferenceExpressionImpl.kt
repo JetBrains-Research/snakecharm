@@ -35,14 +35,11 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
 
     private fun getNameNode() = getIdentifierNode(node)
 
-    private class SmkRuleOrCheckpointNameReference(
+    class SmkRuleOrCheckpointNameReference(
             element: PsiNamedElement,
             textRange: TextRange
-    ) : PsiReferenceBase<PsiNamedElement>(element, textRange), PsiPolyVariantReference {
+    ) : PsiReferenceBase.Poly<PsiNamedElement>(element, textRange, true) {
         private val key: String = element.text
-
-        override fun resolve(): PsiElement? =
-                multiResolve(false).firstOrNull()?.element
 
         override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
             val rules = AbstractSmkRuleOrCheckpointType
@@ -52,51 +49,9 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
                     .findAvailableRuleLikeElementByName(element, key, SmkCheckpointNameIndex.KEY, SmkCheckPoint::class.java)
                     { getCheckpoints().map{ (_, psi) -> psi }}
 
-            val includedFiles = getIncludedFiles()
-
             return (rules + checkpoints)
-                    .filter { it.containingFile == element.containingFile || it.containingFile in includedFiles }
                     .map { RatedResolveResult(RatedResolveResult.RATE_NORMAL, it) }
                     .toTypedArray()
-        }
-
-        override fun getVariants(): Array<Any> {
-            val results = mutableListOf<Pair<String, SmkRuleOrCheckpoint>>()
-
-            val module = ModuleUtilCore.findModuleForPsiElement(element)
-            if (module != null) {
-                val ruleResults = mutableListOf<SmkRule>()
-                val checkpointResults = mutableListOf<SmkCheckPoint>()
-                AbstractSmkRuleOrCheckpointType.addVariantFromIndex(
-                        SmkRuleNameIndex.KEY,
-                        module,
-                        ruleResults,
-                        SmkRule::class.java
-                )
-                AbstractSmkRuleOrCheckpointType.addVariantFromIndex(
-                        SmkCheckpointNameIndex.KEY,
-                        module,
-                        checkpointResults,
-                        SmkCheckPoint::class.java
-                )
-                results.addAll(
-                        (ruleResults + checkpointResults)
-                                .filter { (it as SmkRuleOrCheckpoint).name != null }
-                                .map { (it as SmkRuleOrCheckpoint).name!! to it })
-            } else {
-                results.addAll(getRules() + getCheckpoints())
-            }
-
-            val includedFiles = getIncludedFiles().map { it.originalFile }
-
-            return results
-                    .filter {
-                        it.second.containingFile.originalFile == element.containingFile.originalFile ||
-                                it.second.containingFile.originalFile in includedFiles
-                    }
-                    .map { (name, elem) ->
-                        AbstractSmkRuleOrCheckpointType.createRuleLikeLookupItem(name, elem)
-                    }.toTypedArray()
         }
 
         override fun handleElementRename(newElementName: String): PsiElement =
@@ -108,30 +63,6 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
         private fun getCheckpoints() = PsiTreeUtil.getParentOfType(element, SmkFile::class.java)
                 ?.collectCheckPoints()
                 ?: emptyList()
-
-        private fun getIncludedFiles(): List<SmkFile> {
-            val includedFiles = mutableListOf<SmkFile>()
-            getIncludedFilesForFile(element.containingFile as SmkFile, includedFiles, mutableSetOf())
-            return includedFiles
-        }
-
-        private fun getIncludedFilesForFile(
-                file: SmkFile,
-                includedFiles: MutableList<SmkFile>,
-                visitedFiles: MutableSet<SmkFile>
-        ) {
-            visitedFiles.add(file)
-            val currentIncludes = file.collectIncludes()
-                    .flatMap { it.references.toList() }
-                    .map { it.resolve() }
-                    .filterIsInstance<SmkFile>()
-            includedFiles.addAll(currentIncludes)
-            currentIncludes.forEach {
-                if (it !in visitedFiles) {
-                    getIncludedFilesForFile(it, includedFiles, visitedFiles)
-                }
-            }
-        }
     }
 }
 

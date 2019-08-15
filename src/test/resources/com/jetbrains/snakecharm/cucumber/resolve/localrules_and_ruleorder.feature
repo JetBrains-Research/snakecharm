@@ -153,7 +153,7 @@ Feature: Resolve for rules in localrules and ruleorder
       | localrules: aa |
       | localrules: aa |
 
-  Scenario Outline: No resolve for declarations from files present but not included for localrules/ruleorder section
+  Scenario Outline: Resolve even for declarations from files present but not included for localrules/ruleorder section
     Given a snakemake project
     Given a file "boo.smk" with text
     """
@@ -174,11 +174,11 @@ Feature: Resolve for rules in localrules and ruleorder
       output: touch("_output.txt")
     """
     When I put the caret after <ptn>
-    Then reference should not resolve
+    Then reference should resolve to "<symbol_name>" in "<file>"
     Examples:
-      | ptn             | text | section    | separator |
-      | <separator> ddd | dddd | localrules | ,         |
-      | <separator> ddd | dddd | ruleorder  | >         |
+      | ptn             | text | section    | separator | symbol_name | file    |
+      | <separator> ddd | dddd | localrules | ,         | dddd        | boo.smk |
+      | <separator> ddd | dddd | ruleorder  | >         | dddd        | boo.smk |
 
   Scenario Outline: Resolve in localrules/ruleorder section for rules from included files
     Given a snakemake project
