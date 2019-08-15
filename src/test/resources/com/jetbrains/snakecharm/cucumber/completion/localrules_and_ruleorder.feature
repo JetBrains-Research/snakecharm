@@ -89,3 +89,40 @@ Feature: Completion for rule names in localrules and ruleorder sections
       | section    | separator |
       | localrules | ,         |
       | ruleorder  | >         |
+
+  Scenario Outline: second completion popup invocation produces all indexed rules
+    Given a snakemake project
+    Given a file "boo.smk" with text
+    """
+    rule boo1: input: "file.txt"
+
+    rule boo2: input: "file1.txt"
+    """
+    Given a file "soo.smk" with text
+    """
+    rule soo: input: "soo.txt"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    include: "soo.smk"
+
+    rule foo1:
+      input: "file.txt"
+
+    rule foo2:
+      input: "file.txt"
+
+    <section>: foo1 <separator>
+    """
+    When I put the caret after foo1 <separator>
+    And I invoke autocompletion popup 2 times
+    Then completion list should contain:
+      | foo2 |
+      | soo  |
+      | boo1 |
+      | boo2 |
+    Examples:
+      | section    | separator |
+      | localrules | ,         |
+      | ruleorder  | >         |
+

@@ -200,6 +200,12 @@ class CompletionResolveSteps {
         doComplete()
     }
 
+    @When("^I invoke autocompletion popup (\\d+) times$")
+    fun iInvokeAutocompletionPopupNTimes(invocationCount: String) {
+        Registry.get("ide.completion.variant.limit").setValue(10000)
+        doComplete(invocationCount.toInt())
+    }
+
     @Then("^completion list should contain:$")
     fun completionListShouldContain(table: DataTable) {
         completionListShouldContainMethods(table.asList(String::class.java))
@@ -334,9 +340,9 @@ class CompletionResolveSteps {
         else -> listOf(ref.resolve())
     }
 
-    private fun doComplete() {
+    private fun doComplete(invocationCount: Int = 1) {
         val fixture = SnakemakeWorld.fixture()
-        fixture.complete(CompletionType.BASIC)
+        fixture.complete(CompletionType.BASIC, invocationCount)
         SnakemakeWorld.myCompletionList = fixture.lookupElementStrings
     }
 
