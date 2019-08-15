@@ -32,7 +32,11 @@ private class SmkRulesAndCheckpointsCompletionProvider : CompletionProvider<Comp
                         .withParent(SmkReferenceExpression::class.java)!!
     }
 
-    override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
+    override fun addCompletions(
+            parameters: CompletionParameters,
+            context: ProcessingContext,
+            result: CompletionResultSet
+    ) {
         val results = mutableListOf<Pair<String, SmkRuleOrCheckpoint>>()
 
         val element = parameters.position
