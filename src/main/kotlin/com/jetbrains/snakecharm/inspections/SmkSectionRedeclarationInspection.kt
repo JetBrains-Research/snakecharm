@@ -2,11 +2,9 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.*
 import com.intellij.openapi.command.WriteCommandAction
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiFile
-import com.jetbrains.python.inspections.quickfix.PyRemoveArgumentQuickFix
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.inspections.quickfix.RenameElementWithoutUsagesQuickFix
 import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkSectionRedeclarationInspection : SnakemakeInspection() {
@@ -33,11 +31,27 @@ class SmkSectionRedeclarationInspection : SnakemakeInspection() {
             rule.getSections().forEach {
                 val name = it.name ?: return
                 if (sectionNamesSet.contains(name)) {
+                    val sectionElement = it.getSectionKeywordNode()?.psi
+                    val fixes =
+                            arrayOf(
+                                    RemoveSectionQuickFix(),
+                                    if (sectionElement != null) {
+                                        RenameElementWithoutUsagesQuickFix(
+                                                it,
+                                                sectionElement.textRangeInParent.startOffset,
+                                                sectionElement.textRangeInParent.endOffset
+                                        )
+                                    } else {
+                                        null
+                                    }
+                            )
+
                     registerProblem(
                             it,
                             SnakemakeBundle.message("INSP.NAME.section.redeclaration.message", name),
                             ProblemHighlightType.LIKE_UNUSED_SYMBOL,
-                            null, RemoveSectionQuickFix()
+                            null,
+                            *fixes
                     )
                 }
                 sectionNamesSet.add(name)

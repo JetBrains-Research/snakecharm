@@ -61,12 +61,12 @@ Feature: Inspection quick fixes
     This rule name is already used by another rule.
     """
     When I check highlighting errors
-    And I invoke quick fix Rename rule and see text:
+    And I invoke quick fix Rename element and see text:
     """
     <rule_like> name1:
       input: "input1"
 
-    <rule_like> DEFAULT_SNAKEMAKE_RULE_NAME: # duplicate
+    <rule_like> SNAKEMAKE_IDENTIFIER: # duplicate
       input: "input2"
     """
     Examples:
@@ -99,7 +99,7 @@ Feature: Inspection quick fixes
     This rule name is already used by another rule.
     """
     When I check highlighting errors
-    And I invoke quick fix Rename rule and see text:
+    And I invoke quick fix Rename element and see text:
     """
     ruleorder: boo > foo1
     localrules: boo
@@ -110,7 +110,7 @@ Feature: Inspection quick fixes
     rule foo1:
       input: rules.boo
 
-    <rule_like> DEFAULT_SNAKEMAKE_RULE_NAME: # duplicate
+    <rule_like> SNAKEMAKE_IDENTIFIER: # duplicate
       input: "aa"
 
     rule foo2:
@@ -143,7 +143,30 @@ Feature: Inspection quick fixes
       | rule       |
       | checkpoint |
 
-  Scenario Outline: Swap execution section and rule section below fix test
+  Scenario Outline: Section redeclaration rename fix test
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> name1:
+      input: "input1"
+      input: "input2"
+      output: "output.txt"
+    """
+    And Section Redeclaration inspection is enabled
+    Then I check highlighting errors
+    And I invoke quick fix Rename element and see text:
+    """
+    <rule_like> name1:
+      input: "input1"
+      SNAKEMAKE_IDENTIFIER: "input2"
+      output: "output.txt"
+    """
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Move execution section to the end of the rule fix test
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
