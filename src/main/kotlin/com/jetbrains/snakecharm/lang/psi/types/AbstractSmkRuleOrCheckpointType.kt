@@ -20,6 +20,7 @@ import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
+import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
@@ -110,13 +111,13 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
                     VfsUtil.getRelativePath(virtualFile, fileContentRootDirectory) ?: virtualFile.presentableUrl
                 }
             }
+
             return PrioritizedLookupElement.withPriority(
                     LookupElementBuilder
                             .createWithSmartPointer(name, elem)
                             .withTypeText(displayPath)
-                            .withIcon(elem.getIcon(0))
-                    ,
-                    PythonCompletionWeigher.WEIGHT_DELTA.toDouble()
+                            .withIcon(elem.getIcon(0)),
+                    SmkCompletionUtil.RULES_AND_CHECKPOINTS_PRIORITY
             )
         }
 
