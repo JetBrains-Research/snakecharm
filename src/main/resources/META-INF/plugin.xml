@@ -187,28 +187,6 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkLambdaRuleParamsInspection"
     />
 
-    <localInspection
-            language="Snakemake" shortName="SmkLambdaRuleParamsInspection"
-            enabledByDefault="true"
-            level="ERROR"
-            suppressId="SmkRuleOrCheckpointNameYetUndefinedInspection"
-            bundle="SnakemakeBundle"
-            groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.only.specific.lambda.params"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkLambdaRuleParamsInspection"
-    />
-
-    <localInspection
-            language="Snakemake" shortName="SmkUnavailableRuleReferenceInspection"
-            enabledByDefault="true"
-            level="ERROR"
-            suppressId="SmkUnavailableRuleReferenceInspection"
-            bundle="SnakemakeBundle"
-            groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.rule.not.included"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkUnavailableRuleReferenceInspection"
-    />
-
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
 
     <findUsagesHandlerFactory
