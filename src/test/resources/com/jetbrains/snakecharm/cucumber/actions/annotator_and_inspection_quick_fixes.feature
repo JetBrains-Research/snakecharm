@@ -16,7 +16,7 @@ Feature: Inspection quick fixes
     And I invoke quick fix Name argument and see text:
     """
     <rule_like> NAME:
-      resources: =4
+      resources: arg=4
     """
     Examples:
       | rule_like  |
@@ -38,7 +38,7 @@ Feature: Inspection quick fixes
     And I invoke quick fix Name argument and see text:
     """
     <rule_like> NAME:
-      params: a="a", ="b", c="c"
+      params: a="a", arg="b", c="c"
     """
     Examples:
       | rule_like  |
