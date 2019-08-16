@@ -180,7 +180,7 @@
             language="Snakemake" shortName="SmkLambdaRuleParamsInspection"
             enabledByDefault="true"
             level="ERROR"
-            suppressId="SmkRuleOrCheckpointNameYetUndefinedInspection"
+            suppressId="SmkLambdaRuleParamsInspection"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.only.specific.lambda.params"
