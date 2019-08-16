@@ -8,8 +8,7 @@ Feature: Completion for rule names in localrules and ruleorder sections
       input: "input.txt"
 
     rule rule2:
-      output: touch("output.txt")
-
+      output: touch("output.txt"mamm
     rule rule3:
       output: touch("_output.txt")
 
@@ -18,8 +17,10 @@ Feature: Completion for rule names in localrules and ruleorder sections
     When I put the caret after rule1,
     And I invoke autocompletion popup
     Then completion list should contain:
-      | rule2       |
-      | rule3       |
+      | rule2 |
+      | rule3 |
+    And completion list shouldn't contain:
+      | rule1 |
 
   Scenario: Complete in ruleorder section
     Given a snakemake project
@@ -39,8 +40,10 @@ Feature: Completion for rule names in localrules and ruleorder sections
     When I put the caret after rule3 >
     And I invoke autocompletion popup
     Then completion list should contain:
-      | rule1       |
-      | rule2       |
+      | rule1 |
+      | rule2 |
+    And completion list shouldn't contain:
+      | rule3 |
 
   Scenario Outline: Complete in localrules/ruleorder section from included files
     Given a snakemake project
