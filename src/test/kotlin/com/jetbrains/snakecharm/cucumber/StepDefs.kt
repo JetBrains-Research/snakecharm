@@ -94,7 +94,6 @@ class StepDefs {
             "Repeated Rule in Localrules or Ruleorder" ->
                 fixture.enableInspections(SmkLocalrulesRuleorderRepeatedRuleInspection::class.java)
             "Lambda Parameter Names" -> fixture.enableInspections(SmkLambdaRuleParamsInspection::class.java)
-            "Unavailable Rule References" -> fixture.enableInspections(SmkUnavailableRuleReferenceInspection::class.java)
             else -> {
                 for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {
                     val o = provider.instance
