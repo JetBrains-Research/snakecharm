@@ -1,13 +1,12 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.*
-import com.intellij.openapi.command.WriteCommandAction
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.SmartPointerManager
 import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.psi.util.PsiTreeUtil
+import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.*
 
@@ -63,22 +62,13 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val executionSection = executionSectionPointer.element ?: return
-            val executionSectionWhitespace = executionSection.prevSibling as? PsiWhiteSpace ?: return
-            val containingRule = PsiTreeUtil.getParentOfType(executionSection, SmkRuleOrCheckpoint::class.java)!!
-            val document = FileEditorManager.getInstance(project).selectedTextEditor?.document ?: return
-            val containingRuleEndOffset =
-                    containingRule.textRange.startOffset + containingRule.textLength -
-                            (executionSection.textLength + executionSectionWhitespace.textLength)
-            WriteCommandAction.runWriteCommandAction(project) {
-                document.deleteString(
-                        executionSectionWhitespace.textRange.startOffset,
-                        executionSection.textRange.endOffset
-                )
-                document.insertString(
-                        containingRuleEndOffset,
-                        "${executionSectionWhitespace.text}${executionSection.text}"
-                )
-            }
+            // a whitespace token always precedes a rule section in a rule with multiple sections
+            val precedingWhitespace = (executionSection.prevSibling as PsiWhiteSpace).copy()
+            val executionSectionCopy = executionSection.copy()
+            val statementList = PsiTreeUtil.getParentOfType(executionSection, PyStatementList::class.java)!!
+            executionSection.delete()
+            statementList.addAfter(precedingWhitespace, statementList.lastChild)
+            statementList.addAfter(executionSectionCopy, statementList.lastChild)
         }
     }
 }
