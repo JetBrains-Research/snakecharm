@@ -9,11 +9,11 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyElementGenerator
+import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.PyKeywordArgument
-import com.jetbrains.python.psi.impl.PyPsiUtils
 import com.jetbrains.snakecharm.SnakemakeBundle
 
-class IntroduceArgument(element: PsiElement) : LocalQuickFixAndIntentionActionOnPsiElement(element) {
+class IntroduceKeywordArgument(element: PyExpression) : LocalQuickFixAndIntentionActionOnPsiElement(element) {
     private val defaultArgumentName = "arg"
 
     override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.name.argument")
@@ -27,8 +27,11 @@ class IntroduceArgument(element: PsiElement) : LocalQuickFixAndIntentionActionOn
             startElement: PsiElement,
             endElement: PsiElement
     ) {
+        if (editor == null) {
+            return
+        }
+
         var element = startElement
-        PyPsiUtils.assertValid(element)
         if (element.isValid) {
             val elementGenerator = PyElementGenerator.getInstance(project)
             val argument = elementGenerator.createKeywordArgument(
@@ -38,13 +41,12 @@ class IntroduceArgument(element: PsiElement) : LocalQuickFixAndIntentionActionOn
             )
 
             element = element.replace(argument)
-            if (element == null) return
             element = CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(element)
             if (element == null) return
             val builder = TemplateBuilderFactory.getInstance().createTemplateBuilder(element)
-            val keywordArgument = (element as PyKeywordArgument).keywordNode?.psi!!
+            val keywordArgument = (element as PyKeywordArgument).keywordNode!!.psi
             builder.replaceElement(keywordArgument, defaultArgumentName)
-            builder.run(editor!!, false)
+            builder.run(editor, false)
         }
     }
 }

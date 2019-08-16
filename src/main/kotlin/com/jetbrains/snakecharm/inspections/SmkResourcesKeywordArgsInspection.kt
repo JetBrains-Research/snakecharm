@@ -5,7 +5,7 @@ import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.inspections.quickfix.IntroduceArgument
+import com.jetbrains.snakecharm.inspections.quickfix.IntroduceKeywordArgument
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
@@ -26,7 +26,7 @@ class SmkResourcesKeywordArgsInspection : SnakemakeInspection() {
                             it,
                             SnakemakeBundle.message("INSP.NAME.resources.unnamed.args"),
                             ProblemHighlightType.GENERIC_ERROR,
-                            null, IntroduceArgument(it)
+                            null, IntroduceKeywordArgument(it)
                     )
                 }
             }
