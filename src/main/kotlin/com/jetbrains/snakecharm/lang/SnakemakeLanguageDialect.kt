@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.lang
 import com.intellij.lang.Language
 import com.intellij.psi.PsiElement
 import com.jetbrains.python.PythonLanguage
+import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
 /**
  * @author Roman.Chernyatchik
@@ -18,11 +19,6 @@ object SnakemakeLanguageDialect : Language(PythonLanguage.getInstance(), "Snakem
       * @return `true` if the `foothold` element is inside a SnakeMake file.
       *
       */
-    fun isInsideSmkFile(foothold: PsiElement?): Boolean {
-          if (foothold == null) {
-               return false
-          }
-          return foothold.isValid && foothold.containingFile?.language === SnakemakeLanguageDialect
-    }
-
+    fun isInsideSmkFile(foothold: PsiElement?) =
+             SmkPsiUtil.isInsideFileWithLanguage(foothold, SnakemakeLanguageDialect)
 }

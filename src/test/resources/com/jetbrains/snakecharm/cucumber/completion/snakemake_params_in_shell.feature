@@ -1,4 +1,3 @@
-@ignore
 Feature: Completion for params in shell section
   Complete params section arguments in shell section
 

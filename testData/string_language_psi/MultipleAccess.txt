@@ -2,15 +2,15 @@ FILE
   SmkSLElement(LANGUAGE)
     PsiElement(LBRACE)('{')
     SmkSLElement(EXPRESSION_STATEMENT)
-      SmkSLElement(REFERENCE_EXPRESSION)
-        SmkSLElement(REFERENCE_EXPRESSION)
-          SmkSLElement(REFERENCE_EXPRESSION)
-            SmkSLElement(REFERENCE_EXPRESSION)
-              PsiElement(IDENTIFIER)('foo')
+      PyReferenceExpression: too
+        PyReferenceExpression: doo
+          PyReferenceExpression: boo
+            PyReferenceExpression: foo
+              PsiElement(Py:IDENTIFIER)('foo')
             PsiElement(DOT)('.')
-            PsiElement(IDENTIFIER)('boo')
+            PsiElement(Py:IDENTIFIER)('boo')
           PsiElement(DOT)('.')
-          PsiElement(IDENTIFIER)('doo')
+          PsiElement(Py:IDENTIFIER)('doo')
         PsiElement(DOT)('.')
-        PsiElement(IDENTIFIER)('too')
+        PsiElement(Py:IDENTIFIER)('too')
     PsiElement(RBRACE)('}')

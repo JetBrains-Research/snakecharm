@@ -2,9 +2,9 @@ FILE
   SmkSLElement(LANGUAGE)
     PsiElement(LBRACE)('{')
     SmkSLElement(EXPRESSION_STATEMENT)
-      SmkSLElement(REFERENCE_EXPRESSION)
-        SmkSLElement(REFERENCE_EXPRESSION)
-          PsiElement(IDENTIFIER)('foo')
+      PyReferenceExpression: null
+        PyReferenceExpression: foo
+          PsiElement(Py:IDENTIFIER)('foo')
         PsiElement(DOT)('.')
       PsiErrorElement:Expected identifier name
         <empty list>

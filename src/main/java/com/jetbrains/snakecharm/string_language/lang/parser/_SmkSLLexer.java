@@ -164,10 +164,11 @@ class _SmkSLLexer implements FlexLexer {
 
   private static final String ZZ_ACTION_PACKED_0 =
     "\2\0\1\1\4\0\1\2\1\3\1\4\1\5\1\6"+
-    "\1\7\1\1\1\4\1\10\1\11\1\12\1\13\5\0";
+    "\1\7\1\1\1\4\1\10\1\11\2\12\1\13\3\0"+
+    "\1\14\2\0";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[24];
+    int [] result = new int[26];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -194,10 +195,11 @@ class _SmkSLLexer implements FlexLexer {
   private static final String ZZ_ROWMAP_PACKED_0 =
     "\0\0\0\11\0\22\0\33\0\44\0\55\0\66\0\77"+
     "\0\110\0\121\0\132\0\121\0\121\0\143\0\154\0\121"+
-    "\0\121\0\165\0\121\0\110\0\154\0\176\0\207\0\220";
+    "\0\121\0\165\0\176\0\121\0\110\0\154\0\207\0\121"+
+    "\0\220\0\231";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[24];
+    int [] result = new int[26];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -222,15 +224,16 @@ class _SmkSLLexer implements FlexLexer {
   private static final String ZZ_TRANS_PACKED_0 =
     "\3\10\1\11\5\10\1\12\1\13\2\12\1\14\1\15"+
     "\3\12\3\16\1\17\1\14\4\16\4\12\1\14\1\15"+
-    "\1\12\1\20\1\21\6\22\1\23\2\22\4\12\1\14"+
-    "\1\15\1\23\6\12\1\14\1\15\3\12\3\10\1\24"+
-    "\5\10\3\0\1\10\17\0\2\13\6\0\3\16\1\25"+
-    "\1\0\4\16\2\0\1\26\6\0\6\22\1\0\2\22"+
-    "\2\0\1\26\1\0\1\16\1\27\5\0\1\30\10\0"+
-    "\1\30\1\0\1\16\4\0";
+    "\1\12\1\20\1\21\2\22\1\23\3\22\1\24\2\22"+
+    "\4\12\1\14\1\15\1\24\6\12\1\14\1\15\3\12"+
+    "\3\10\1\25\5\10\3\0\1\10\17\0\2\13\6\0"+
+    "\3\16\1\26\1\0\4\16\2\0\1\27\6\0\6\22"+
+    "\1\0\4\22\1\23\3\22\1\30\2\22\2\0\1\27"+
+    "\1\0\1\16\1\31\5\0\1\32\10\0\1\32\1\0"+
+    "\1\16\4\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[153];
+    int [] result = new int[162];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -269,10 +272,10 @@ class _SmkSLLexer implements FlexLexer {
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
     "\2\0\1\1\4\0\2\1\1\11\1\1\2\11\2\1"+
-    "\2\11\1\1\1\11\5\0";
+    "\2\11\2\1\1\11\3\0\1\11\2\0";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[24];
+    int [] result = new int[26];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -579,57 +582,62 @@ class _SmkSLLexer implements FlexLexer {
             { yybegin(WAITING_LANGUAGE_CLOSURE); return tokenTypes.getREGEXP();
             } 
             // fall through
-          case 12: break;
+          case 13: break;
           case 2: 
             { yybegin(YYINITIAL); return tokenTypes.getSTRING_CONTENT();
             } 
             // fall through
-          case 13: break;
+          case 14: break;
           case 3: 
             { yybegin(WAITING_IDENTIFIER); return tokenTypes.getLBRACE();
             } 
             // fall through
-          case 14: break;
+          case 15: break;
           case 4: 
             { yybegin(WAITING_IDENTIFIER); return tokenTypes.getUNEXPECTED_TOKEN();
             } 
             // fall through
-          case 15: break;
+          case 16: break;
           case 5: 
             { yybegin(WAITING_AFTER_IDENTIFIER); return tokenTypes.getIDENTIFIER();
             } 
             // fall through
-          case 16: break;
+          case 17: break;
           case 6: 
             { yybegin(YYINITIAL); return tokenTypes.getRBRACE();
             } 
             // fall through
-          case 17: break;
+          case 18: break;
           case 7: 
             { yybegin(WAITING_REGEXP); return tokenTypes.getCOMMA();
             } 
             // fall through
-          case 18: break;
+          case 19: break;
           case 8: 
             { yybegin(WAITING_IDENTIFIER); return tokenTypes.getDOT();
             } 
             // fall through
-          case 19: break;
+          case 20: break;
           case 9: 
             { yybegin(WAITING_ACCESS_KEY); return tokenTypes.getLBRACKET();
             } 
             // fall through
-          case 20: break;
+          case 21: break;
           case 10: 
-            { yybegin(WAITING_ACCESS_CLOSURE); return tokenTypes.getACCESS_KEY();
+            { yybegin(WAITING_ACCESS_CLOSURE); return tokenTypes.getIDENTIFIER();
             } 
             // fall through
-          case 21: break;
+          case 22: break;
           case 11: 
             { yybegin(WAITING_AFTER_IDENTIFIER); return tokenTypes.getRBRACKET();
             } 
             // fall through
-          case 22: break;
+          case 23: break;
+          case 12: 
+            { yybegin(WAITING_ACCESS_CLOSURE); yypushback(1); return tokenTypes.getNUMBER();
+            } 
+            // fall through
+          case 24: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }

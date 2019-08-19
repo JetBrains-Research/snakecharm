@@ -2,35 +2,35 @@ FILE
   SmkSLElement(LANGUAGE)
     PsiElement(LBRACE)('{')
     SmkSLElement(EXPRESSION_STATEMENT)
-      SmkSLElement(REFERENCE_EXPRESSION)
-        SmkSLElement(SUBSCRIPTION_EXPRESSION)
-          SmkSLElement(SUBSCRIPTION_EXPRESSION)
-            SmkSLElement(SUBSCRIPTION_EXPRESSION)
-              SmkSLElement(REFERENCE_EXPRESSION)
-                SmkSLElement(REFERENCE_EXPRESSION)
-                  SmkSLElement(SUBSCRIPTION_EXPRESSION)
-                    SmkSLElement(REFERENCE_EXPRESSION)
-                      PsiElement(IDENTIFIER)('foo')
+      PyReferenceExpression: too
+        SmkSLSubscriptionExpression
+          SmkSLSubscriptionExpression
+            SmkSLSubscriptionExpression
+              PyReferenceExpression: doo
+                PyReferenceExpression: boo
+                  SmkSLSubscriptionExpression
+                    PyReferenceExpression: foo
+                      PsiElement(Py:IDENTIFIER)('foo')
                     PsiElement(LBRACKET)('[')
-                    SmkSLElement(ACCESS_KEY)
-                      PsiElement(ACCESS_KEY)('0')
+                    PyNumericLiteralExpression
+                      PsiElement(Py:INTEGER_LITERAL)('0')
                     PsiElement(RBRACKET)(']')
                   PsiElement(DOT)('.')
-                  PsiElement(IDENTIFIER)('boo')
+                  PsiElement(Py:IDENTIFIER)('boo')
                 PsiElement(DOT)('.')
-                PsiElement(IDENTIFIER)('doo')
+                PsiElement(Py:IDENTIFIER)('doo')
               PsiElement(LBRACKET)('[')
-              SmkSLElement(ACCESS_KEY)
-                PsiElement(ACCESS_KEY)('0')
+              PyNumericLiteralExpression
+                PsiElement(Py:INTEGER_LITERAL)('0')
               PsiElement(RBRACKET)(']')
             PsiElement(LBRACKET)('[')
-            SmkSLElement(ACCESS_KEY)
-              PsiElement(ACCESS_KEY)('0')
+            PyNumericLiteralExpression
+              PsiElement(Py:INTEGER_LITERAL)('0')
             PsiElement(RBRACKET)(']')
           PsiElement(LBRACKET)('[')
-          SmkSLElement(ACCESS_KEY)
-            PsiElement(ACCESS_KEY)('0')
+          PyNumericLiteralExpression
+            PsiElement(Py:INTEGER_LITERAL)('0')
           PsiElement(RBRACKET)(']')
         PsiElement(DOT)('.')
-        PsiElement(IDENTIFIER)('too')
+        PsiElement(Py:IDENTIFIER)('too')
     PsiElement(RBRACE)('}')

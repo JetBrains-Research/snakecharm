@@ -1,33 +1,37 @@
 Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
   (e.g. there's a rule named 'aaaa', then 'rules.aa' completes to 'rules.aaaa', similar for checkpoints)
 
+
   Scenario Outline: Complete rule/checkpoint names in input section (single declaration)
     Given a snakemake project
     Given I open a file "foo.smk" with text
-     """
-     <rule_like> aaaa:
-       input: "path/to/input"
-       output: "path/to/output"
-       shell: "shell command"
+    """
+    <rule_like> aaaa:
+      input: "path/to/input"
+      output: "path/to/output"
+      shell: "shell command"
 
-     <rule_like> bbbb:
-       input: <rule_like>s.aaa
-     """
-    When I put the caret after input: <rule_like>s.aaa
+    <rule_like> bbbb:
+      input: <injection_left><rule_like>s.aaa<injection_right>
+    """
+    When I put the caret after <rule_like>s.aaa
     Then I invoke autocompletion popup and see a text:
-     """
-     <rule_like> aaaa:
-       input: "path/to/input"
-       output: "path/to/output"
-       shell: "shell command"
+    """
+    <rule_like> aaaa:
+      input: "path/to/input"
+      output: "path/to/output"
+      shell: "shell command"
 
-     <rule_like> bbbb:
-       input: <rule_like>s.aaaa
-     """
+    <rule_like> bbbb:
+      input: <injection_left><rule_like>s.aaaa<injection_right>
+    """
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | injection_left | injection_right |
+      | rule       |                |                 |
+      | checkpoint |                |                 |
+      | rule       | "{             | }"              |
+      | checkpoint | "{             | }"              |
+
 
   Scenario Outline: Complete rule/checkpoint names in input section (multiple declarations)
     Given a snakemake project
@@ -44,14 +48,83 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       script: "script.py"
 
     <rule_like> cccc:
-      input: <rule_like>s.
+      input: <injection_left><rule_like>s.<injection_right>
     """
-    When I put the caret after input: <rule_like>s.
+    When I put the caret after <rule_like>s.
     And I invoke autocompletion popup
     Then completion list should contain:
       | aaaa |
       | bbbb |
-    And completion list shouldn't contain:
+    Examples:
+      | rule_like  | injection_left | injection_right |
+      | rule       |                |                 |
+      | checkpoint |                |                 |
+      | rule       | "{             | }"              |
+      | checkpoint | "{             | }"              |
+
+
+  Scenario Outline: No completion for parent rule in top level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> aaaa:
+      input: "path/to/input"
+      output: "path/to/output"
+      shell: "shell command"
+
+    <rule_like> bbbb:
+      input: "path/to/input"
+      output: "path/to/output"
+      script: "script.py"
+
+    <rule_like> cccc:
+      input: <rule_like>s.
+    """
+    When I put the caret after <rule_like>s.
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | cccc |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Completion for parent rule in run section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> aaaa:
+      input: "path/to/input"
+      output: "path/to/output"
+      shell: "shell command"
+
+    <rule_like> cccc:
+      run: <rule_like>s.
+    """
+    When I put the caret after <rule_like>s.
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | cccc |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Completion for parent rule in injection
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> aaaa:
+      input: "path/to/input"
+      output: "path/to/output"
+      shell: "shell command"
+
+    <rule_like> cccc:
+      input: "{<rule_like>s.}"
+    """
+    When I put the caret after <rule_like>s.
+    And I invoke autocompletion popup
+    Then completion list should contain:
       | cccc |
     Examples:
       | rule_like  |
@@ -140,7 +213,6 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       | rule       | rule2       | checkpoint2 |
       | checkpoint | checkpoint2 | rule2       |
 
-
   Scenario Outline: No completion for long reference with rules/checkpoints last part
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -149,16 +221,18 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
         input: ""
 
       <rule_like> foo:
-        input: roo.too.<rule_like>s.
+        input: <injection_left>roo.too.<rule_like>s.<injection_right>
       """
     When I put the caret after too.<rule_like>s.
     And I invoke autocompletion popup
     Then completion list shouldn't contain:
     | boo |
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | injection_left | injection_right |
+      | rule       |                |                 |
+      | checkpoint |                |                 |
+      | rule       | "{             | }"              |
+      | checkpoint | "{             | }"              |
 
   Scenario Outline: Display file path in type text: simple file name
     Given a snakemake project
@@ -176,7 +250,7 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
         input: "foo0.txt"
 
       <rule_like> foo:
-        input: <rule_like>s.
+        input: <injection_left><rule_like>s.<injection_right>
     """
     When I put the caret after <rule_like>s.
     And I invoke autocompletion popup
@@ -185,9 +259,11 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       | boo2 | boo.smk |
       | foo0 | foo.smk |
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | injection_left | injection_right |
+      | rule       |                |                 |
+      | checkpoint |                |                 |
+      | rule       | "{             | }"              |
+      | checkpoint | "{             | }"              |
 
   Scenario Outline: display file path in type text: relative paths
     Given a snakemake project
@@ -218,7 +294,7 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       input: "soo.smk"
 
     <rule_like> foo:
-      input: <rule_like>s.
+      input: <injection_left><rule_like>s.<injection_right>
     """
     When I put the caret after <rule_like>s.
     And I invoke autocompletion popup
@@ -229,6 +305,8 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       | soo  | dir1/soo.smk           |
       | NAME | dir1/dir2/foo.smk      |
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | injection_left | injection_right |
+      | rule       |                |                 |
+      | checkpoint |                |                 |
+      | rule       | "{             | }"              |
+      | checkpoint | "{             | }"              |

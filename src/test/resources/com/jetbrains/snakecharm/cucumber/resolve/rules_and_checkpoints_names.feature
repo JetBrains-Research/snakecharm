@@ -17,8 +17,34 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
     <target> cccc:
       input: <rule_like>s.aaaa
     """
-    When I put the caret after input: <rule_like>s.aa
+    When I put the caret after <rule_like>s.aa
     Then reference should resolve to "aaaa" in "foo.smk"
+    Examples:
+      | target     | rule_like  |
+      | rule       | rule       |
+      | checkpoint | rule       |
+      | rule       | checkpoint |
+      | checkpoint | checkpoint |
+
+  Scenario Outline: Resolve for rule/checkpoint name when inside an injection
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> aaaa:
+      input: "path/to/input"
+      output: "path/to/output"
+      shell: "shell command"
+
+    <rule_like> bbbb:
+      input: "path/to/input"
+      output: "path/to/output"
+      script: "script.py"
+
+    <target> cccc:
+      input: "{<rule_like>s.aaaa}"
+    """
+    When I put the caret after <rule_like>s.aa
+    Then reference in injection should resolve to "aaaa" in "foo.smk"
     Examples:
       | target     | rule_like  |
       | rule       | rule       |
@@ -44,16 +70,43 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       input: <rule_like>s.<symbol_name>
     """
     When I put the caret after <rule_like>s.<ptn>
-    Then reference should resolve to "<symbol_name>" in "<file>"
-
+    Then reference should resolve to "<symbol_name>" in "foo.smk"
     Examples:
-      | ptn | symbol_name | file    | rule_like  |
-      | aa  | aaaa        | foo.smk | rule       |
-      | bbb | bbbb        | foo.smk | rule       |
-      | c   | cccc        | foo.smk | rule       |
-      | aa  | aaaa        | foo.smk | checkpoint |
-      | bbb | bbbb        | foo.smk | checkpoint |
-      | c   | cccc        | foo.smk | checkpoint |
+      | ptn | symbol_name | rule_like  |
+      | aa  | aaaa        | rule       |
+      | bbb | bbbb        | rule       |
+      | c   | cccc        | rule       |
+      | aa  | aaaa        | checkpoint |
+      | bbb | bbbb        | checkpoint |
+      | c   | cccc        | checkpoint |
+
+  Scenario Outline: Resolve for different declarations of rule/checkpoint in language injection
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> aaaa:
+      input: "path/to/input"
+      output: "path/to/output"
+      shell: "shell command"
+
+    <rule_like> bbbb:
+      input: "path/to/input"
+      output: "path/to/output"
+      script: "script.py"
+
+    <rule_like> cccc:
+      input: "{<rule_like>s.<symbol_name>}"
+    """
+    When I put the caret after <rule_like>s.<ptn>
+    Then reference in injection should resolve to "<symbol_name>" in "foo.smk"
+    Examples:
+      | ptn | symbol_name | rule_like  |
+      | aa  | aaaa        | rule       |
+      | bbb | bbbb        | rule       |
+      | c   | cccc        | rule       |
+      | aa  | aaaa        | checkpoint |
+      | bbb | bbbb        | checkpoint |
+      | c   | cccc        | checkpoint |
 
   Scenario Outline: Resolve for all rule/checkpoint names at top level
     Given a snakemake project
@@ -72,14 +125,13 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
     <rule_like>s.<symbol_name>
     """
     When I put the caret after <rule_like>s.<ptn>
-    Then reference should resolve to "<symbol_name>" in "<file>"
-
+    Then reference should resolve to "<symbol_name>" in "foo.smk"
     Examples:
-      | rule_like  | ptn | symbol_name | file    |
-      | rule       | aa  | aaaa        | foo.smk |
-      | rule       | bbb | bbbb        | foo.smk |
-      | checkpoint | aa  | aaaa        | foo.smk |
-      | checkpoint | bbb | bbbb        | foo.smk |
+      | rule_like  | ptn | symbol_name |
+      | rule       | aa  | aaaa        |
+      | rule       | bbb | bbbb        |
+      | checkpoint | aa  | aaaa        |
+      | checkpoint | bbb | bbbb        |
 
 
   Scenario Outline: Multi resolve for rule/checkpoint with same name
@@ -162,7 +214,7 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       | checkpoint | boo1        | boo1.smk | 1      | SmkCheckPointImpl |
       | checkpoint | boo2        | boo2.smk | 2      | SmkCheckPointImpl |
 
-  Scenario Outline: No resolve for subworkflow nam instead fo rule/checkpoint names from different files
+  Scenario Outline: No resolve for subworkflow name instead fo rule/checkpoint names from different files
     Given a snakemake project
     And a file "foo2.smk" with text
        """
@@ -186,6 +238,29 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       | checkpoint | subworkflow1 |
       | checkpoint | subworkflow2 |
 
+  Scenario Outline: No resolve for subworkflow name in injection
+    Given a snakemake project
+    And a file "foo2.smk" with text
+       """
+       subworkflow subworkflow2:
+         snakefile: "s"
+       """
+    Given I open a file "foo1.smk" with text
+       """
+       subworkflow subworkflow1:
+         snakefile: "s"
+
+       <rule_like> foo:
+         input: "{<rule_like>s.<symbol_name>}"
+       """
+    When I put the caret after <rule_like>s.
+    Then reference in injection should not resolve
+    Examples:
+      | rule_like  | symbol_name  |
+      | rule       | subworkflow1 |
+      | rule       | subworkflow2 |
+      | checkpoint | subworkflow1 |
+      | checkpoint | subworkflow2 |
 
   Scenario Outline: No resolve for long reference with rules/checkpoints last part
      Given a snakemake project
@@ -201,5 +276,22 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
      Then reference should not resolve
      Examples:
        | rule_like  | symbol_name  |
-       | rule       | boo |
-       | checkpoint | boo |
+       | rule       | boo          |
+       | checkpoint | boo          |
+
+  Scenario Outline: No resolve for long reference with rules/checkpoints last part in injection
+    Given a snakemake project
+    Given I open a file "foo1.smk" with text
+        """
+        <rule_like> boo:
+          input: "s"
+
+        <rule_like> foo:
+          input: "{roo.too.<rule_like>s.<symbol_name>}"
+        """
+    When I put the caret after <rule_like>s.
+    Then reference in injection should not resolve
+    Examples:
+      | rule_like  | symbol_name  |
+      | rule       | boo          |
+      | checkpoint | boo          |

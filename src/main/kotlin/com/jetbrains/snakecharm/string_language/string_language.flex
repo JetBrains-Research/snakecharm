@@ -19,6 +19,7 @@ ID_LETTER=[:letter:]|\_
 IDENTIFIER={ID_LETTER}({ID_LETTER}|[:digit:])*
 STRING_CONTENT=([^\{]|\{\{)+
 REGEXP=([^{}]+ | \{\d+(,\d+)?\})*
+NUMBER=([:digit:]+)\]
 ACCESS_KEY=[^\]]+
 
 %state WAITING_IDENTIFIER
@@ -43,7 +44,9 @@ ACCESS_KEY=[^\]]+
     \[                            { yybegin(WAITING_ACCESS_KEY); return tokenTypes.getLBRACKET(); }
 }
 
-<WAITING_ACCESS_KEY> {ACCESS_KEY} { yybegin(WAITING_ACCESS_CLOSURE); return tokenTypes.getACCESS_KEY(); }
+<WAITING_ACCESS_KEY> {NUMBER}    { yybegin(WAITING_ACCESS_CLOSURE); yypushback(1); return tokenTypes.getNUMBER(); }
+
+<WAITING_ACCESS_KEY> {ACCESS_KEY} { yybegin(WAITING_ACCESS_CLOSURE); return tokenTypes.getIDENTIFIER(); }
 
 <WAITING_REGEXP> {REGEXP}         { yybegin(WAITING_LANGUAGE_CLOSURE); return tokenTypes.getREGEXP(); }
 

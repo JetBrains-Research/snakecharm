@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.lang.psi.types
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.roots.ProjectRootManager
@@ -11,6 +12,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.intellij.util.Processors
 import com.intellij.util.containers.ContainerUtil
@@ -20,10 +22,9 @@ import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
-import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
-import java.io.File
-import java.lang.IllegalArgumentException
+import com.jetbrains.snakecharm.lang.psi.SmkRunSection
+import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
 
 abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
@@ -42,7 +43,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
             location: PsiElement,
             context: ProcessingContext?
     ): Array<Any> {
-        if (!SnakemakeLanguageDialect.isInsideSmkFile(location)) {
+        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location)) {
             return emptyArray()
         }
 
@@ -59,9 +60,20 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
         }
 
         return results.stream()
-                .filter { it.name != null && it != containingRule }
+                .filter {
+                    it.name != null &&
+                    isContainingRuleAvailableForCompletion(location) ||
+                    it != containingRule
+                }
                 .map { createRuleLikeLookupItem(it.name!!, it) }
                 .toArray()
+    }
+
+    private fun isContainingRuleAvailableForCompletion(location: PsiElement): Boolean {
+        val languageManager =
+                InjectedLanguageManager.getInstance(location.project)
+        return languageManager.getInjectionHost(location) != null ||
+                PsiTreeUtil.getParentOfType(location, SmkRunSection::class.java) != null
     }
 
     fun <Psi: SmkRuleOrCheckpoint> addVariantFromIndex(
@@ -109,7 +121,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
             direction: AccessDirection,
             resolveContext: PyResolveContext
     ): List<RatedResolveResult> {
-        if (!SnakemakeLanguageDialect.isInsideSmkFile(location)) {
+        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location)) {
             return emptyList()
         }
 
