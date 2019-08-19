@@ -74,7 +74,8 @@
     <completion.contributor
             language="Python"
             implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkRulesAndCheckpointsCompletionContributor"
-    order="first" />
+            order="first" id="SmkRulesAndCheckpointsCompletionContributor"
+    />
 
     <localInspection
         language="Snakemake"
