@@ -89,6 +89,10 @@ Feature: Completion for lambda parameter names in specific sections
       | wildcards |
       | input     |
       | attempt   |
+    And completion list shouldn't contain:
+      | output    |
+      | resources |
+      | threads   |
     Examples:
       | rule_like  |
       | rule       |
@@ -144,6 +148,9 @@ Feature: Completion for lambda parameter names in specific sections
       | input     |
       | threads   |
       | attempt   |
+    And completion list shouldn't contain:
+      | output    |
+      | resources |
     Examples:
       | rule_like  |
       | rule       |
@@ -184,3 +191,46 @@ Feature: Completion for lambda parameter names in specific sections
       | rule_like  |
       | rule       |
       | checkpoint |
+
+  Scenario Outline: No completion for lambda invocations
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> rule1:
+      <section>: (lambda wildcards, : wildcards)("")
+    """
+    When I put the caret after ,
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | wildcards |
+      | input     |
+      | output    |
+      | resources |
+      | threads   |
+      | attempt   |
+    Examples:
+      | section              | rule_like  |
+      | benchmark            | rule       |
+      | conda                | rule       |
+      | output               | rule       |
+      | log                  | rule       |
+      | singularity          | rule       |
+      | priority             | rule       |
+      | wildcard_constraints | rule       |
+      | shell                | rule       |
+      | wrapper              | rule       |
+      | script               | rule       |
+      | cwl                  | rule       |
+      | version              | rule       |
+      | benchmark            | checkpoint |
+      | conda                | checkpoint |
+      | output               | checkpoint |
+      | log                  | checkpoint |
+      | singularity          | checkpoint |
+      | priority             | checkpoint |
+      | wildcard_constraints | checkpoint |
+      | shell                | checkpoint |
+      | wrapper              | checkpoint |
+      | script               | checkpoint |
+      | cwl                  | checkpoint |
+      | version              | checkpoint |
