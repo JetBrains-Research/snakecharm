@@ -77,7 +77,11 @@ private class SmkRulesAndCheckpointsObjectsCompletionProvider : CompletionProvid
                         )
     }
 
-    override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
+    override fun addCompletions(
+            parameters: CompletionParameters,
+            context: ProcessingContext,
+            result: CompletionResultSet
+    ) {
         val variants = collectVariantsForElement(parameters.position)
 
         // we need to obtain containing rule/checkpoint from the original file
@@ -158,6 +162,8 @@ private fun addVariantsToCompletionResultSet(
                 AbstractSmkRuleOrCheckpointType.createRuleLikeLookupItem(name, elem)
             }
     )
+
+    result.runRemainingContributors(parameters, false)
 
     val shortcut = KeymapUtil.getFirstKeyboardShortcutText(ActionManager.getInstance()
             .getAction(IdeActions.ACTION_CODE_COMPLETION))

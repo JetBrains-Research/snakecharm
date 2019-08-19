@@ -16,11 +16,9 @@ Feature: Completion for rule names in localrules and ruleorder sections
     """
     When I put the caret after rule1,
     And I invoke autocompletion popup
-    Then completion list should contain:
+    Then completion list should only contain:
       | rule2 |
       | rule3 |
-    And completion list shouldn't contain:
-      | rule1 |
 
   Scenario: Complete in ruleorder section
     Given a snakemake project
@@ -39,11 +37,9 @@ Feature: Completion for rule names in localrules and ruleorder sections
     """
     When I put the caret after rule3 >
     And I invoke autocompletion popup
-    Then completion list should contain:
+    Then completion list should only contain:
       | rule1 |
       | rule2 |
-    And completion list shouldn't contain:
-      | rule3 |
 
   Scenario Outline: Complete in localrules/ruleorder section from included files
     Given a snakemake project
@@ -81,13 +77,11 @@ Feature: Completion for rule names in localrules and ruleorder sections
     """
     When I put the caret after rule3 <separator>
     And I invoke autocompletion popup
-    Then completion list should contain:
+    Then completion list should only contain:
       | rule1 |
       | rule2 |
       | rule4 |
       | rule5 |
-    And completion list shouldn't contain:
-      | rule6 |
     Examples:
       | section    | separator |
       | localrules | ,         |
@@ -119,7 +113,7 @@ Feature: Completion for rule names in localrules and ruleorder sections
     """
     When I put the caret after foo1 <separator>
     And I invoke autocompletion popup 2 times
-    Then completion list should contain:
+    Then completion list should only contain:
       | foo2 |
       | soo  |
       | boo1 |
