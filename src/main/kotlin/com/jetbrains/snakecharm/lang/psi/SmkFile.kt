@@ -6,6 +6,7 @@ import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.impl.PyFileImpl
 import com.jetbrains.snakecharm.SmkFileType
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 
 /**
  * @author Roman.Chernyatchik
@@ -65,5 +66,21 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
             }
         })
         return ruleNameAndPsi
+    }
+
+    fun collectIncludes(): List<SmkWorkflowArgsSection> {
+        val includeStatements = mutableListOf<SmkWorkflowArgsSection>()
+
+        acceptChildren(object : PyElementVisitor(), SmkElementVisitor {
+            override val pyElementVisitor: PyElementVisitor = this
+
+            override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
+                if (st.sectionKeyword == SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD) {
+                    includeStatements.add(st)
+                }
+            }
+        })
+
+        return includeStatements
     }
 }

@@ -122,7 +122,7 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
        input: <rule_like>s.
      """
     When I put the caret after input: <rule_like>s.
-    And I invoke autocompletion popup
+    And I invoke autocompletion popup 2 times
     Then completion list should contain:
       | aaaa          |
       | bbbb          |
@@ -179,7 +179,7 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
         input: <rule_like>s.
     """
     When I put the caret after <rule_like>s.
-    And I invoke autocompletion popup
+    And I invoke autocompletion popup 2 times
     Then completion list should contain these items with type text:
       | boo1 | boo.smk |
       | boo2 | boo.smk |
@@ -221,7 +221,7 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       input: <rule_like>s.
     """
     When I put the caret after <rule_like>s.
-    And I invoke autocompletion popup
+    And I invoke autocompletion popup 2 times
     Then completion list should contain these items with type text:
       | boo  | dir1/dir2/boo.smk      |
       | doo  | dir1/dir3/dir4/doo.smk |
