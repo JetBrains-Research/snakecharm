@@ -27,26 +27,23 @@ class IntroduceKeywordArgument(element: PyExpression) : LocalQuickFixAndIntentio
             startElement: PsiElement,
             endElement: PsiElement
     ) {
-        if (editor == null) {
+        if (editor == null || !startElement.isValid) {
             return
         }
+        val elementGenerator = PyElementGenerator.getInstance(project)
+        val argument = elementGenerator.createKeywordArgument(
+                LanguageLevel.forElement(startElement),
+                defaultArgumentName,
+                startElement.text
+        )
 
-        var element = startElement
-        if (element.isValid) {
-            val elementGenerator = PyElementGenerator.getInstance(project)
-            val argument = elementGenerator.createKeywordArgument(
-                    LanguageLevel.forElement(element),
-                    defaultArgumentName,
-                    element.text
-            )
+        val newElement = startElement.replace(argument)?.let {
+            CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(it)
+        } ?: return
 
-            element = element.replace(argument)
-            element = CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(element)
-            if (element == null) return
-            val builder = TemplateBuilderFactory.getInstance().createTemplateBuilder(element)
-            val keywordArgument = (element as PyKeywordArgument).keywordNode!!.psi
-            builder.replaceElement(keywordArgument, defaultArgumentName)
-            builder.run(editor, false)
-        }
+        val builder = TemplateBuilderFactory.getInstance().createTemplateBuilder(newElement)
+        val keywordArgument = (newElement as PyKeywordArgument).keywordNode!!.psi
+        builder.replaceElement(keywordArgument, defaultArgumentName)
+        builder.run(editor, false)
     }
 }
