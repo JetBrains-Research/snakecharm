@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
+import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
@@ -9,11 +10,12 @@ import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
-import com.jetbrains.snakecharm.lang.psi.SmkFile
-import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil.getIdentifierNode
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
+
 
 class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferenceExpression {
     override fun getName() = getNameNode()?.text
@@ -33,28 +35,24 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
 
     private fun getNameNode() = getIdentifierNode(node)
 
-    private class SmkRuleOrCheckpointNameReference(
+    class SmkRuleOrCheckpointNameReference(
             element: PsiNamedElement,
             textRange: TextRange
-    ) : PsiReferenceBase<PsiNamedElement>(element, textRange), PsiPolyVariantReference {
+    ) : PsiReferenceBase.Poly<PsiNamedElement>(element, textRange, true) {
         private val key: String = element.text
 
-        override fun resolve(): PsiElement? =
-                multiResolve(false).firstOrNull()?.element
+        override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
+            val rules = AbstractSmkRuleOrCheckpointType
+                    .findAvailableRuleLikeElementByName(element, key, SmkRuleNameIndex.KEY, SmkRule::class.java)
+                    { getRules().map{ (_, psi) -> psi }}
+            val checkpoints = AbstractSmkRuleOrCheckpointType
+                    .findAvailableRuleLikeElementByName(element, key, SmkCheckpointNameIndex.KEY, SmkCheckPoint::class.java)
+                    { getCheckpoints().map{ (_, psi) -> psi }}
 
-        override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> =
-                (getRules() + getCheckpoints())
-                        .filter { (name, _) -> name == key }
-                        .map { (_, psi) -> RatedResolveResult(RatedResolveResult.RATE_NORMAL, psi) }
-                        .toTypedArray()
-
-        override fun getVariants(): Array<Any> =
-                (getRules() + getCheckpoints()).map { (name, elem) ->
-                    AbstractSmkRuleOrCheckpointType.createRuleLikeLookupItem(
-                            name,
-                            elem as SmkRuleOrCheckpoint
-                    )
-                }.toTypedArray()
+            return (rules + checkpoints)
+                    .map { RatedResolveResult(RatedResolveResult.RATE_NORMAL, it) }
+                    .toTypedArray()
+        }
 
         override fun handleElementRename(newElementName: String): PsiElement =
                 element.setName(newElementName)
