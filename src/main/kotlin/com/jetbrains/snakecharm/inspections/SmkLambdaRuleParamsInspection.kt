@@ -47,7 +47,8 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
                             ?.map { it.valueExpression }
                             ?.filterIsInstance<PyLambdaExpression>()
                             ?: emptyList())
-
+            // see https://github.com/JetBrains-Research/snakecharm/issues/187
+            // for more info on which sections are allowed to use callables and why
             when (st.sectionKeyword) {
                 SnakemakeNames.SECTION_INPUT, SnakemakeNames.SECTION_GROUP ->
                     registerParamsProblemsForLambdasWithWildcards(
