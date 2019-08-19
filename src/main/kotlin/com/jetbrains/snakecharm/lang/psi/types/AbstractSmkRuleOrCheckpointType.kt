@@ -14,7 +14,6 @@ import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.util.ProcessingContext
 import com.intellij.util.Processors
 import com.intellij.util.containers.ContainerUtil
-import com.jetbrains.python.codeInsight.completion.PythonCompletionWeigher
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.resolve.PyResolveContext
@@ -40,28 +39,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
             completionPrefix: String?,
             location: PsiElement,
             context: ProcessingContext?
-    ): Array<Any> {
-        if (!SnakemakeLanguageDialect.isInsideSmkFile(location)) {
-            return emptyArray()
-        }
-
-        val results = ArrayList<T>()
-
-        val module = ModuleUtilCore.findModuleForPsiElement(location.originalElement)
-        if (module != null) {
-            addVariantFromIndex(indexKey, module, results, clazz, searchScope(module))
-        }
-
-        if (results.isEmpty()) {
-            // show at list current file:
-            results.addAll(currentFileDeclarations)
-        }
-
-        return results.stream()
-                .filter { it.name != null && it != containingRule }
-                .map { createRuleLikeLookupItem(it.name!!, it) }
-                .toArray()
-    }
+    ): Array<Any> = emptyArray()
 
     override fun assertValid(message: String?) {
         // [romeo] Not sure is our type always valid or check whether any element is invalid

@@ -1,7 +1,11 @@
 package com.jetbrains.snakecharm.codeInsight.completion
 
 import com.intellij.codeInsight.completion.*
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
@@ -154,4 +158,10 @@ private fun addVariantsToCompletionResultSet(
                 AbstractSmkRuleOrCheckpointType.createRuleLikeLookupItem(name, elem)
             }
     )
+
+    val shortcut = KeymapUtil.getFirstKeyboardShortcutText(ActionManager.getInstance()
+            .getAction(IdeActions.ACTION_CODE_COMPLETION))
+    if (StringUtil.isNotEmpty(shortcut)) {
+        result.addLookupAdvertisement("Pressing $shortcut twice would show all rules and checkpoints in the module.")
+    }
 }
