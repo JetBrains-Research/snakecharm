@@ -293,10 +293,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 processIndentsInsideSection(indent, startPos)
             } else {
                 // section exit
-                while (insertedIndentsCount > 0) {
-                    myIndentStack.pop()
-                    insertedIndentsCount--
-                }
+                popIndentStackWhilePossible()
                 super.processLineBreak(startPos)
             }
         } else {
@@ -396,10 +393,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             }
             myLineHasSignificantTokens = false
             if (insideSnakemakeArgumentList(indent) { currentIndent, sectionIndent -> currentIndent < sectionIndent }) {
-                while (insertedIndentsCount > 0) {
-                    myIndentStack.pop()
-                    insertedIndentsCount--
-                }
+                popIndentStackWhilePossible()
                 super.processIndent(myTokenQueue.last().end, PyTokenTypes.LINE_BREAK)
             }
         } else {
@@ -430,6 +424,17 @@ class SnakemakeLexer : PythonIndentingLexer() {
     private fun insideSnakemakeArgumentList(indent: Int, comparator: (Int, Int) -> Boolean) =
             ruleLikeSectionIndent > -1 && comparator(indent, ruleLikeSectionIndent) ||
                     isInToplevelSectionWithoutSubsections && comparator(indent, topLevelSectionIndent)
+
+    private fun popIndentStackWhilePossible() {
+        while (insertedIndentsCount > 0) {
+            if (myIndentStack.size() == 1) { // don't pop the very first indent
+                insertedIndentsCount = 0
+            } else {
+                myIndentStack.pop()
+                insertedIndentsCount--
+            }
+        }
+    }
 
     private fun atToken(token: IElementType) = tokenType === token
     private fun atBaseToken(token: IElementType) = baseTokenType === token
