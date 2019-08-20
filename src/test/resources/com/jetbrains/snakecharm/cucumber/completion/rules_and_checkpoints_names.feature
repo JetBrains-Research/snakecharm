@@ -63,7 +63,7 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       | checkpoint | "{             | }"              |
 
 
-  Scenario Outline: No completion for parent rule in top level
+  Scenario Outline: No completion for parent rule in section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -195,7 +195,7 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
        input: <rule_like>s.
      """
     When I put the caret after input: <rule_like>s.
-    And I invoke autocompletion popup
+    And I invoke autocompletion popup 2 times
     Then completion list should contain:
       | aaaa          |
       | bbbb          |
@@ -253,7 +253,7 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
         input: <injection_left><rule_like>s.<injection_right>
     """
     When I put the caret after <rule_like>s.
-    And I invoke autocompletion popup
+    And I invoke autocompletion popup 2 times
     Then completion list should contain these items with type text:
       | boo1 | boo.smk |
       | boo2 | boo.smk |
@@ -297,7 +297,7 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       input: <injection_left><rule_like>s.<injection_right>
     """
     When I put the caret after <rule_like>s.
-    And I invoke autocompletion popup
+    And I invoke autocompletion popup 2 times
     Then completion list should contain these items with type text:
       | boo  | dir1/dir2/boo.smk      |
       | doo  | dir1/dir3/dir4/doo.smk |

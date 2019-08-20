@@ -12,6 +12,7 @@ import com.jetbrains.python.psi.impl.references.PyQualifiedReference
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.TypeEvalContext
+import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
@@ -30,7 +31,7 @@ class SmkSLInitialReference(
                             LookupElementBuilder
                                     .create(it)
                                     .withIcon(PlatformIcons.PARAMETER_ICON),
-                            PythonCompletionWeigher.WEIGHT_DELTA.toDouble()
+                            SmkCompletionUtil.RULES_AND_CHECKPOINTS_PRIORITY
                     )
                 }
 

@@ -50,7 +50,7 @@ object SMKLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
                             PrioritizedLookupElement.withPriority(
                                     LookupElementBuilder
                                             .create(SmkLambdaRuleParamsInspection.WILDCARDS_LAMBDA_PARAMETER)
-                                    , Double.MAX_VALUE // as this should always be the 1st completion list element
+                                    , SmkCompletionUtil.WILDCARDS_LAMBDA_PARAMETER_PRIORITY
 
                             )
                     )
