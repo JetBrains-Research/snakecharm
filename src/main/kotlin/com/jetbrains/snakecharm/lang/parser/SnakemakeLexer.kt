@@ -20,6 +20,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
     private var previousToken: IElementType? = null
     private var insertedIndentsCount = 0
     private var linebreakBeforeFirstComment = -1
+    private var insideFormattedString = false
 
     // used to differentiate between 'rule all: input: "text"' and 'rule: input: "text" '
     private var topLevelSectionColonOccurred = false
@@ -108,7 +109,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 ruleLikeSectionIndent = -1
                 isInPythonSection = possibleToplevelSectionKeyword in PYTHON_BLOCK_KEYWORDS
             }
-        } else if (!isInPythonSection && topLevelSectionIndent > -1 &&
+        } else if (!insideFormattedString && topLevelSectionIndent > -1 &&
                 myCurrentNewlineIndent >= topLevelSectionIndent &&
                 ruleLikeSectionIndent == -1 &&
                 atToken(PyTokenTypes.IDENTIFIER) && topLevelSectionColonOccurred) {
@@ -179,6 +180,11 @@ class SnakemakeLexer : PythonIndentingLexer() {
         }
 
         previousToken = tokenType
+        insideFormattedString = if (!insideFormattedString) {
+            tokenType == PyTokenTypes.FSTRING_START
+        } else {
+            tokenType != PyTokenTypes.FSTRING_END
+        }
 
         if (myTokenQueue.size > 0) {
             myTokenQueue.removeAt(0)
