@@ -108,7 +108,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 ruleLikeSectionIndent = -1
                 isInPythonSection = possibleToplevelSectionKeyword in PYTHON_BLOCK_KEYWORDS
             }
-        } else if (topLevelSectionIndent > -1 &&
+        } else if (!isInPythonSection && topLevelSectionIndent > -1 &&
                 myCurrentNewlineIndent >= topLevelSectionIndent &&
                 ruleLikeSectionIndent == -1 &&
                 atToken(PyTokenTypes.IDENTIFIER) && topLevelSectionColonOccurred) {

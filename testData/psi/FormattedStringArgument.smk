@@ -4,3 +4,11 @@ rule NAME:
            f"{30 + 42}"
            "string"
                f"arg{25}"
+
+df = []
+
+onstart:
+    print(f"Total files: {len(df)}")
+
+rule a:
+    output: "out"
