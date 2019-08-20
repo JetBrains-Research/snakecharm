@@ -14,13 +14,14 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
  * @date 2018-12-31
  */
 class SnakemakeLexer : PythonIndentingLexer() {
+    private var myCurrentNewlineOffset = 0
     private val recoveryTokens = PythonDialectsTokenSetProvider.INSTANCE.unbalancedBracesRecoveryTokens
     private var myCurrentNewlineIndent = 0
     private var currentToken: IElementType? = null
     private var previousToken: IElementType? = null
     private var insertedIndentsCount = 0
     private var linebreakBeforeFirstComment = -1
-    private var insideFormattedString = false
+    private var twoPrecedingTokens: Pair<IElementType?, IElementType?> = null to null
 
     // used to differentiate between 'rule all: input: "text"' and 'rule: input: "text" '
     private var topLevelSectionColonOccurred = false
@@ -109,10 +110,13 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 ruleLikeSectionIndent = -1
                 isInPythonSection = possibleToplevelSectionKeyword in PYTHON_BLOCK_KEYWORDS
             }
-        } else if (!insideFormattedString && topLevelSectionIndent > -1 &&
+        } else if (topLevelSectionIndent > -1 &&
                 myCurrentNewlineIndent >= topLevelSectionIndent &&
                 ruleLikeSectionIndent == -1 &&
-                atToken(PyTokenTypes.IDENTIFIER) && topLevelSectionColonOccurred) {
+                atToken(PyTokenTypes.IDENTIFIER) &&
+                (tokenStart == myCurrentNewlineOffset ||
+                        twoPrecedingTokens.first == PyTokenTypes.COLON &&
+                        twoPrecedingTokens.second in PyTokenTypes.WHITESPACE)) {
             val identifierPosition = currentPosition
             val identifierText = tokenText
             // look ahead and update rule-like section indent if an identifier is followed by a colon
@@ -148,6 +152,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 }
             }
             myCurrentNewlineIndent = spaces
+            myCurrentNewlineOffset = tokenEnd
             if (insideSnakemakeArgumentList(myCurrentNewlineIndent)
                     { currentIndent, sectionIndent -> currentIndent <= sectionIndent }) {
                 val currentLineBreakIndex = myTokenQueue.indexOfFirst {
@@ -180,11 +185,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         }
 
         previousToken = tokenType
-        insideFormattedString = if (!insideFormattedString) {
-            tokenType == PyTokenTypes.FSTRING_START
-        } else {
-            tokenType != PyTokenTypes.FSTRING_END
-        }
+        twoPrecedingTokens = twoPrecedingTokens.copy(first = twoPrecedingTokens.second, second = previousToken)
 
         if (myTokenQueue.size > 0) {
             myTokenQueue.removeAt(0)
