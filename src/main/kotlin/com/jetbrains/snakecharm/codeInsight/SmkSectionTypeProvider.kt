@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.codeInsight
 
 import com.intellij.lang.injection.InjectedLanguageManager
-import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.types.PyType
@@ -24,25 +23,22 @@ class SmkSectionTypeProvider : PyTypeProviderBase() {
             referenceExpression: PyReferenceExpression,
             context: TypeEvalContext
     ): PyType? {
-        val psiFile: PsiFile?
-        val parentDeclaration: SmkRuleOrCheckpoint?
-        when {
-            SnakemakeLanguageDialect.isInsideSmkFile(referenceExpression) -> {
-                psiFile = referenceExpression.containingFile
-                parentDeclaration = PsiTreeUtil.getParentOfType(referenceExpression, SmkRuleOrCheckpoint::class.java)
-            }
+        val smkExpression = when {
+            SnakemakeLanguageDialect.isInsideSmkFile(referenceExpression) -> referenceExpression
             SmkSL.isInsideSmkSLFile(referenceExpression) -> {
-                val languageManager =
-                        InjectedLanguageManager.getInstance(referenceExpression.project)
-                psiFile = languageManager.getTopLevelFile(referenceExpression)
-
-                val host = languageManager.getInjectionHost(referenceExpression)
-                parentDeclaration = PsiTreeUtil.getParentOfType(host, SmkRuleOrCheckpoint::class.java)
+                val manager = InjectedLanguageManager.getInstance(referenceExpression.project)
+                manager.getInjectionHost(referenceExpression)
             }
             else -> return null
         }
 
-        if (referenceExpression.children.isNotEmpty() || psiFile == null) {
+        val psiFile = smkExpression?.containingFile
+        val parentDeclaration =
+                PsiTreeUtil.getParentOfType(smkExpression, SmkRuleOrCheckpoint::class.java)
+
+        if (referenceExpression.children.isNotEmpty() ||
+                psiFile == null ||
+                psiFile !is SmkFile) {
             return null
         }
 
@@ -51,11 +47,11 @@ class SmkSectionTypeProvider : PyTypeProviderBase() {
         return when (referenceExpression.referencedName) {
             SMK_VARS_RULES -> SmkRulesType(
                     parentDeclaration as? SmkRule,
-                    psiFile as SmkFile
+                    psiFile
             )
             SMK_VARS_CHECKPOINTS -> SmkCheckPointsType(
                     parentDeclaration as? SmkCheckPoint,
-                    psiFile as SmkFile
+                    psiFile
             )
             else -> null
         }
