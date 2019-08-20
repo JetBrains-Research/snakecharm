@@ -37,7 +37,7 @@ class SmkSLInjector : PyInjectorBase() {
 
     private fun PyStringLiteralExpression.containsLBrace(): Boolean {
         stringElements.forEach {
-            if ((it is PyFormattedStringElement && it.content.contains("{{") )||
+            if ((it is PyFormattedStringElement && it.content.contains("{{") ) ||
                 (it !is PyFormattedStringElement && it.content.contains("{"))) {
                 return true
             }
