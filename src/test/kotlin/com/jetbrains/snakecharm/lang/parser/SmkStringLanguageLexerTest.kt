@@ -17,15 +17,15 @@ class SmkStringLanguageLexerTest : PyLexerTestCase() {
     fun testLanguageWithMultipleAccess() {
         doTest("{params.foo[key].boo[0][1]}",
                 "LBRACE", "Py:IDENTIFIER", "DOT", "Py:IDENTIFIER",
-                "LBRACKET", "Py:IDENTIFIER", "RBRACKET", "DOT",
-                "Py:IDENTIFIER", "LBRACKET", "Py:INTEGER_LITERAL", "RBRACKET",
-                "LBRACKET", "Py:INTEGER_LITERAL", "RBRACKET", "RBRACE")
+                "LBRACKET", "ACCESS_KEY", "RBRACKET", "DOT",
+                "Py:IDENTIFIER", "LBRACKET", "ACCESS_KEY", "RBRACKET",
+                "LBRACKET", "ACCESS_KEY", "RBRACKET", "RBRACE")
     }
 
     fun testLanguageWithUnexpectedTokens() {
         doTest("{.[foo[key]..}",
                 "LBRACE", "UNEXPECTED_TOKEN", "UNEXPECTED_TOKEN",
-                "Py:IDENTIFIER", "LBRACKET", "Py:IDENTIFIER", "RBRACKET", "DOT",
+                "Py:IDENTIFIER", "LBRACKET", "ACCESS_KEY", "RBRACKET", "DOT",
                 "UNEXPECTED_TOKEN", "RBRACE")
     }
 

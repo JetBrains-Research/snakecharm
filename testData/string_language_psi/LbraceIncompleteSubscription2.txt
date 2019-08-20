@@ -2,11 +2,11 @@ FILE
   SmkSLElement(LANGUAGE)
     PsiElement(LBRACE)('{')
     SmkSLElement(EXPRESSION_STATEMENT)
-      SmkSLSubscriptionExpression
+      SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
         PyReferenceExpression: foo
           PsiElement(Py:IDENTIFIER)('foo')
         PsiElement(LBRACKET)('[')
-        PyReferenceExpression: 0
-          PsiElement(Py:IDENTIFIER)('0')
+        SmkSLElement(KEY_EXPRESSION)
+          PsiElement(ACCESS_KEY)('0')
         PsiErrorElement:Expected ']'
           <empty list>

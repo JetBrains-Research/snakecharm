@@ -51,9 +51,6 @@ object SmkSLTokenTypes {
     // PyToken for identifier is required for PyReferenceExpression to work properly
     val IDENTIFIER: IElementType = PyTokenTypes.IDENTIFIER
 
-    // PyToken for number is required for PyNumericLiteralExpression to work properly
-    val NUMBER: IElementType = PyTokenTypes.INTEGER_LITERAL
-
     val DOT = SmkSLTokenType("DOT")
 
     val LBRACE = SmkSLTokenType("LBRACE")
@@ -74,13 +71,11 @@ object SmkSLTokenTypes {
 
     val SUBSCRIPTION_EXPRESSION = SmkSLTokenType("SUBSCRIPTION_EXPRESSION")
 
-    val KEY_EXPRESSION = SmkSLTokenType("KEY_EXPRESSION")
-
-    val NUMERIC_LITERAL_EXPRESSION = SmkSLTokenType("NUMERIC_LITERAL_EXPRESSION")
+    val ACCESS_KEY = SmkSLTokenType("ACCESS_KEY")
 
     val REFERENCE_EXPRESSION = SmkSLTokenType("REFERENCE_EXPRESSION")
 
-    val EXPRESSION_STATEMENT = SmkSLTokenType("EXPRESSION_STATEMENT")
+    val KEY_EXPRESSION = SmkSLTokenType("KEY_EXPRESSION")
 
-    val SUBSCRIPTION_KEY_EXPRESSIONS = TokenSet.create(NUMERIC_LITERAL_EXPRESSION, KEY_EXPRESSION)
+    val EXPRESSION_STATEMENT = SmkSLTokenType("EXPRESSION_STATEMENT")
 }

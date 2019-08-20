@@ -14,7 +14,7 @@ class SmkSLHighlighter : SyntaxHighlighterBase() {
         val BRACES = arrayOf(createTextAttributesKey("BRACES", PyHighlighter.PY_FSTRING_FRAGMENT_BRACES))
         val COMMA = arrayOf(createTextAttributesKey("COMMA", PyHighlighter.PY_FSTRING_FRAGMENT_COLON))
         val STRING_CONTENT = arrayOf(createTextAttributesKey("STRING_CONTENT", PyHighlighter.PY_BYTE_STRING))
-        val NUMBER =  arrayOf(createTextAttributesKey("NUMBER", PyHighlighter.PY_NUMBER))
+        val ACCESS_KEY =  arrayOf(createTextAttributesKey("ACCESS_KEY", PyHighlighter.PY_NUMBER))
     }
 
     override fun getTokenHighlights(tokenType: IElementType?): Array<TextAttributesKey> =
@@ -23,7 +23,7 @@ class SmkSLHighlighter : SyntaxHighlighterBase() {
                     tokenType === SmkSLTokenTypes.RBRACE -> BRACES
             tokenType === SmkSLTokenTypes.COMMA -> COMMA
             tokenType === SmkSLTokenTypes.STRING_CONTENT -> STRING_CONTENT
-            tokenType === SmkSLTokenTypes.NUMBER -> NUMBER
+            tokenType === SmkSLTokenTypes.ACCESS_KEY -> ACCESS_KEY
             else -> emptyArray()
         }
 

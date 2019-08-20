@@ -99,7 +99,10 @@ class SmkSLParser : PsiParser {
                 tt === SmkSLTokenTypes.LBRACKET -> {
                     builder.advanceLexer()
 
-                    parseSubscriptionKey(builder)
+                    val keyMarker = builder.mark()
+                    builder.checkMatches(SmkSLTokenTypes.ACCESS_KEY,
+                            SnakemakeBundle.message("SMKSL.PARSE.expected.key"))
+                    keyMarker.done(SmkSLTokenTypes.KEY_EXPRESSION)
 
                     builder.checkMatches(SmkSLTokenTypes.RBRACKET,
                             SnakemakeBundle.message("SMKSL.PARSE.expected.rbracket"))
@@ -115,24 +118,6 @@ class SmkSLParser : PsiParser {
                     exprMarker.drop(identifierExpected)
                     return false
                 }
-            }
-        }
-    }
-
-    private fun parseSubscriptionKey(builder: PsiBuilder) {
-        val marker = builder.mark()
-        when {
-            builder.tokenType == SmkSLTokenTypes.IDENTIFIER -> {
-                builder.advanceLexer()
-                marker.done(SmkSLTokenTypes.KEY_EXPRESSION)
-            }
-            builder.tokenType == SmkSLTokenTypes.NUMBER -> {
-                builder.advanceLexer()
-                marker.done(SmkSLTokenTypes.NUMERIC_LITERAL_EXPRESSION)
-            }
-            else -> {
-                builder.error(SnakemakeBundle.message("SMKSL.PARSE.expected.key"))
-                marker.done(SmkSLTokenTypes.KEY_EXPRESSION)
             }
         }
     }

@@ -31,20 +31,20 @@ FILE
     SmkSLElement(EXPRESSION_STATEMENT)
       PyReferenceExpression: too
         PyReferenceExpression: doo
-          SmkSLSubscriptionExpression
+          SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
             PyReferenceExpression: boo
-              SmkSLSubscriptionExpression
+              SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
                 PyReferenceExpression: foo
                   PsiElement(Py:IDENTIFIER)('foo')
                 PsiElement(LBRACKET)('[')
-                PyNumericLiteralExpression
-                  PsiElement(Py:INTEGER_LITERAL)('0')
+                SmkSLElement(KEY_EXPRESSION)
+                  PsiElement(ACCESS_KEY)('0')
                 PsiElement(RBRACKET)(']')
               PsiElement(DOT)('.')
               PsiElement(Py:IDENTIFIER)('boo')
             PsiElement(LBRACKET)('[')
-            PyNumericLiteralExpression
-              PsiElement(Py:INTEGER_LITERAL)('0')
+            SmkSLElement(KEY_EXPRESSION)
+              PsiElement(ACCESS_KEY)('0')
             PsiElement(RBRACKET)(']')
           PsiElement(DOT)('.')
           PsiElement(Py:IDENTIFIER)('doo')

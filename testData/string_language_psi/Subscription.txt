@@ -3,33 +3,33 @@ FILE
     PsiElement(LBRACE)('{')
     SmkSLElement(EXPRESSION_STATEMENT)
       PyReferenceExpression: too
-        SmkSLSubscriptionExpression
-          SmkSLSubscriptionExpression
-            SmkSLSubscriptionExpression
+        SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
+          SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
+            SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
               PyReferenceExpression: doo
                 PyReferenceExpression: boo
-                  SmkSLSubscriptionExpression
+                  SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
                     PyReferenceExpression: foo
                       PsiElement(Py:IDENTIFIER)('foo')
                     PsiElement(LBRACKET)('[')
-                    PyNumericLiteralExpression
-                      PsiElement(Py:INTEGER_LITERAL)('0')
+                    SmkSLElement(KEY_EXPRESSION)
+                      PsiElement(ACCESS_KEY)('0')
                     PsiElement(RBRACKET)(']')
                   PsiElement(DOT)('.')
                   PsiElement(Py:IDENTIFIER)('boo')
                 PsiElement(DOT)('.')
                 PsiElement(Py:IDENTIFIER)('doo')
               PsiElement(LBRACKET)('[')
-              PyNumericLiteralExpression
-                PsiElement(Py:INTEGER_LITERAL)('0')
+              SmkSLElement(KEY_EXPRESSION)
+                PsiElement(ACCESS_KEY)('0')
               PsiElement(RBRACKET)(']')
             PsiElement(LBRACKET)('[')
-            PyNumericLiteralExpression
-              PsiElement(Py:INTEGER_LITERAL)('0')
+            SmkSLElement(KEY_EXPRESSION)
+              PsiElement(ACCESS_KEY)('0')
             PsiElement(RBRACKET)(']')
           PsiElement(LBRACKET)('[')
-          PyNumericLiteralExpression
-            PsiElement(Py:INTEGER_LITERAL)('0')
+          SmkSLElement(KEY_EXPRESSION)
+            PsiElement(ACCESS_KEY)('0')
           PsiElement(RBRACKET)(']')
         PsiElement(DOT)('.')
         PsiElement(Py:IDENTIFIER)('too')
