@@ -298,6 +298,41 @@ SnakemakeFile: RuleParamsListArgsLineComments.smk
   PsiWhiteSpace('\n')
   PsiComment(Py:END_OF_LINE_COMMENT)('# end of rule comment')
   PsiWhiteSpace('\n')
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyStringLiteralExpression: config.yaml
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"config.yaml"')
+        PsiWhiteSpace('\n\n')
+        PsiComment(Py:END_OF_LINE_COMMENT)('# config['FQ_RELATIVE_PATHS'] = collect_relative_paths(')
+        PsiWhiteSpace('\n    ')
+        PsiElement(Py:SINGLE_QUOTED_STRING)('""')
+  PsiErrorElement:Statement expected, found Py:DEDENT
+    <empty list>
+  PsiWhiteSpace('\n')
+  PsiElement(Py:RPAR)(')')
+  PsiErrorElement:Statement expected, found Py:RPAR
+    <empty list>
+  PsiWhiteSpace('\n\n')
+  PyTypeDeclarationStatement
+    PyTargetExpression: include
+      PsiElement(Py:IDENTIFIER)('include')
+    PyAnnotation
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyStringLiteralExpression: rules/raw_qc.smk
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"rules/raw_qc.smk"')
+  PsiWhiteSpace('\n')
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_INCLUDE_KEYWORD)('include')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyStringLiteralExpression: rules/bismark_align.smk
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"rules/bismark_align.smk"')
+  PsiWhiteSpace('\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')

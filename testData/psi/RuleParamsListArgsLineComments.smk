@@ -65,6 +65,15 @@ rule foo2:
          "echo foo",
         "incorrectly unindented text"
 # end of rule comment
+configfile: "config.yaml"
+
+# config['FQ_RELATIVE_PATHS'] = collect_relative_paths(
+    ""
+)
+
+include: "rules/raw_qc.smk"
+include: "rules/bismark_align.smk"
+
 rule foo:
     input: "text"
 
