@@ -1,11 +1,13 @@
 package com.jetbrains.snakecharm.string_language.lang.highlighter
 
+import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.highlighting.PyHighlighter
 import com.jetbrains.snakecharm.string_language.SmkSLTokenTypes
 import com.jetbrains.snakecharm.string_language.lang.parser.SmkSLLexerAdapter
+import java.awt.font.TextAttribute
 
 class SmkSLHighlighter : SyntaxHighlighterBase() {
     companion object {
@@ -15,7 +17,7 @@ class SmkSLHighlighter : SyntaxHighlighterBase() {
         val ACCESS_KEY =  arrayOf(createTextAttributesKey("ACCESS_KEY", PyHighlighter.PY_NUMBER))
     }
 
-    override fun getTokenHighlights(tokenType: IElementType?) =
+    override fun getTokenHighlights(tokenType: IElementType?): Array<TextAttributesKey> =
         when {
             tokenType === SmkSLTokenTypes.LBRACE ||
                     tokenType === SmkSLTokenTypes.RBRACE -> BRACES

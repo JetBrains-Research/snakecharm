@@ -99,10 +99,10 @@ class SmkSLParser : PsiParser {
                 tt === SmkSLTokenTypes.LBRACKET -> {
                     builder.advanceLexer()
 
-                    val marker = builder.mark()
+                    val keyMarker = builder.mark()
                     builder.checkMatches(SmkSLTokenTypes.ACCESS_KEY,
                             SnakemakeBundle.message("SMKSL.PARSE.expected.key"))
-                    marker.done(SmkSLTokenTypes.ACCESS_KEY)
+                    keyMarker.done(SmkSLTokenTypes.KEY_EXPRESSION)
 
                     builder.checkMatches(SmkSLTokenTypes.RBRACKET,
                             SnakemakeBundle.message("SMKSL.PARSE.expected.rbracket"))

@@ -20,8 +20,8 @@ import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
-import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
 
 abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
@@ -51,7 +51,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
             direction: AccessDirection,
             resolveContext: PyResolveContext
     ): List<RatedResolveResult> {
-        if (!SnakemakeLanguageDialect.isInsideSmkFile(location) || location == null) {
+        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location) || location == null) {
             return emptyList()
         }
 
