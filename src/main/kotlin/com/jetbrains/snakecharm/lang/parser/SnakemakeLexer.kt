@@ -264,7 +264,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         val possibleKeywordPosition = currentPosition
         val possibleToplevelSectionKeyword = tokenText
 
-        if (possibleToplevelSectionKeyword !in KEYWORDS) {
+        if (possibleToplevelSectionKeyword !in KEYWORDS || tokenStart != myCurrentNewlineOffset) {
             return false
         }
 
