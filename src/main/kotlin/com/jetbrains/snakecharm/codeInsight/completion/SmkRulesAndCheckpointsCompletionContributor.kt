@@ -87,10 +87,14 @@ private class SmkRulesAndCheckpointsObjectsCompletionProvider : CompletionProvid
     ) {
         val variants = collectVariantsForElement(parameters.position)
 
+        // position is a leaf psi element, and it's wrapped in a reference, which is what we want to get
         val parentElement = parameters.position.parent
-        val referencedObject = parameters.withPosition(parentElement, parentElement.textOffset).originalPosition?.parent
-        if (referencedObject is PyReferenceExpression) {
-            when (referencedObject.name) {
+        // get parent reference to `rules.` or `checkpoints.`
+        val rulesOrCheckpointsObject = parameters.withPosition(parentElement, parentElement.textOffset)
+                .originalPosition
+                ?.parent
+        if (rulesOrCheckpointsObject is PyReferenceExpression) {
+            when (rulesOrCheckpointsObject.name) {
                 SnakemakeNames.SMK_VARS_RULES -> variants.removeAll { it.second is SmkCheckPoint }
                 SnakemakeNames.SMK_VARS_CHECKPOINTS -> variants.removeAll { it.second is SmkRule }
             }
