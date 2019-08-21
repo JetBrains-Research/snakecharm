@@ -3,10 +3,7 @@ package com.jetbrains.snakecharm.lang.psi
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.StubBasedPsiElement
 import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
-import com.jetbrains.python.psi.PyDocStringOwner
-import com.jetbrains.python.psi.PyExpression
-import com.jetbrains.python.psi.PyStatement
-import com.jetbrains.python.psi.PyStatementListContainer
+import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointStub
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleStub
@@ -18,7 +15,7 @@ interface SmkCheckPoint: SmkRuleOrCheckpoint, StubBasedPsiElement<SmkCheckpointS
 
 interface SmkSubworkflow: SmkRuleLike<SmkSubworkflowArgsSection>, StubBasedPsiElement<SmkSubworkflowStub>
 
-interface SmkRuleOrCheckpointArgsSection : SmkArgsSection { // PyNamedElementContainer
+interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer
     companion object {
         val EXECUTION_KEYWORDS = setOf(
                 SnakemakeNames.SECTION_SHELL, SnakemakeNames.SECTION_SCRIPT,

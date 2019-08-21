@@ -1,3 +1,5 @@
 package com.jetbrains.snakecharm.lang.psi
 
-interface SmkRuleOrCheckpoint : SmkRuleLike<SmkRuleOrCheckpointArgsSection>
+import com.jetbrains.python.psi.PyTypedElement
+
+interface SmkRuleOrCheckpoint : SmkRuleLike<SmkRuleOrCheckpointArgsSection>, PyTypedElement

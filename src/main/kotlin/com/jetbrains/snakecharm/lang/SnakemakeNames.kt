@@ -48,5 +48,5 @@ object SnakemakeNames {
 
     const val SMK_VARS_RULES = "rules"
     const val SMK_VARS_CHECKPOINTS = "checkpoints"
-
+    const val SMK_VARS_WILDCARDS = "wildcards"
 }

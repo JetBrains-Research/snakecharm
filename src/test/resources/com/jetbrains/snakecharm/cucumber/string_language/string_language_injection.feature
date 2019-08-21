@@ -29,7 +29,7 @@ Feature: Tests on snakemake string language injection
       | rule         |
       | checkpoint   |
 
-  Scenario: No injection in fstrings
+  Scenario: No injection in fstrings with unescaped brackets
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -37,6 +37,27 @@ Feature: Tests on snakemake string language injection
       shell: f"{input}"
     """
     When I put the caret after input
+    Then I expect no language injection
+
+  Scenario: Injection in fstrings with escaped brackets
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule NAME:
+      shell: f"{{input}}"
+    """
+    When I put the caret after input
+    Then I expect language injection on "{{input}}"
+
+  Scenario: No injection in lambdas
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule:
+      output: "foo"
+      log: lambda wd, output: "{output}.log"
+    """
+    When I put the caret after {output
     Then I expect no language injection
 
   Scenario: Injection in split string literal
