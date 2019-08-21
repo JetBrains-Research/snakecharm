@@ -1,0 +1,32 @@
+SnakemakeFile: FormattedStringInToplevelStatements.smk
+  PyExpressionStatement
+    PyCallExpression: print
+      PyReferenceExpression: print
+        PsiElement(Py:IDENTIFIER)('print')
+      PyArgumentList
+        PsiElement(Py:LPAR)('(')
+        PyStringLiteralExpression: {rule}
+          PyFormattedStringElement
+            PsiElement(Py:FSTRING_START)('f"')
+            PyFStringFragment
+              PsiElement(Py:FSTRING_FRAGMENT_START)('{')
+              PyReferenceExpression: rule
+                PsiElement(Py:IDENTIFIER)('rule')
+              PsiElement(Py:FSTRING_FRAGMENT_END)('}')
+            PsiElement(Py:FSTRING_END)('"')
+        PsiElement(Py:RPAR)(')')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: echo hello
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"echo hello"')

@@ -288,7 +288,15 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testFormattedStringAfterToplevelSection() {
+        doTest()
+    }
+
     fun testIssue202() {
+        doTest()
+    }
+
+    fun testFormattedStringInToplevelStatements() {
         doTest()
     }
 
