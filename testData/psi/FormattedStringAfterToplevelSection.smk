@@ -13,7 +13,13 @@ rule b:
     output: "out"
 
 rule:
-    f"text {print(30)}" # this is not a correct piece of code; this is a formatted string test
+    f"text {print(30)}" # this is a docstring, snakemake accepts such syntax
 
 rule c:
     output: "out"
+
+rule foo: f"text: { {latitude: a, longitude: b}  }"
+    input: expand(f"sorted_reads/{os.path.join(dir1, dir2, file2)}", sample=config["samples"])
+    shell: "echo hello"
+
+rule foo: input: "fjkd"
