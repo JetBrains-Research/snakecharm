@@ -23,6 +23,7 @@ import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.ui.UIUtil
+import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.getOffsetUnderCaret
 import cucumber.api.DataTable
 import cucumber.api.java.en.Then
@@ -55,6 +56,15 @@ class CompletionResolveSteps {
     }
 
 
+    @Then("^reference in injection should not resolve$")
+    fun referenceInInjectionShouldNotResolve() {
+        ApplicationManager.getApplication().invokeAndWait({
+            val ref = getReferenceInInjectedLanguageAtOffset()
+            assertNotNull(ref)
+            assertUnresolvedReference(ref)
+        }, ModalityState.NON_MODAL)
+    }
+
     @When("^I put the caret at (.+)$")
     fun iPutCaretAt(marker: String) {
         ApplicationManager.getApplication().invokeAndWait({
@@ -85,20 +95,30 @@ class CompletionResolveSteps {
         }
     }
 
+    @Then("^reference in injection should resolve to \"(.+)\" in \"(.+)\"$")
+    fun referenceInInjectionShouldResolveToIn(marker: String, file: String) {
+        ApplicationManager.getApplication().runReadAction {
+            tryToResolveRef(marker, file, getReferenceInInjectedLanguageAtOffset())
+        }
+    }
+
     @Then("^reference should resolve to \"(.+)\" in \"(.+)\"$")
     fun referenceShouldResolveToIn(marker: String, file: String) {
         ApplicationManager.getApplication().runReadAction {
-            val ref = getReferenceAtOffset()
-            assertNotNull(ref)
-            val result = resolve(ref)
-            assertNotNull(result)
-            val containingFile = result.containingFile
-            assertNotNull(containingFile)
-            assertEquals(file, containingFile.name)
-
-            val text = TextRange.from(result.textOffset, marker.length).substring(containingFile.text)
-            assertEquals(marker, text)
+            tryToResolveRef(marker, file, getReferenceAtOffset())
         }
+    }
+
+    private fun tryToResolveRef(marker: String, file: String, ref: PsiReference?) {
+        assertNotNull(ref)
+        val result = resolve(ref)
+        assertNotNull(result)
+        val containingFile = result.containingFile
+        assertNotNull(containingFile)
+        assertEquals(file, containingFile.name)
+
+        val text = TextRange.from(result.textOffset, marker.length).substring(containingFile.text)
+        assertEquals(marker, text)
     }
 
     @Then("^reference should multi resolve to name, file, times\\[, class name\\]$")
@@ -274,7 +294,7 @@ class CompletionResolveSteps {
                         assertNull(
                                 lookupElements,
                                 message = "Autocompletion to a single possible variant didn't happen " +
-                                        "because either the completion list was not empty, or given" +
+                                        "because either the completion list was not empty, or given " +
                                         "prefix didn't match any variants")
                     } else {
                         assertNotNull(
@@ -397,6 +417,14 @@ class CompletionResolveSteps {
 
     private fun getReferenceAtOffset() = SnakemakeWorld.fixture()
             .file.findReferenceAt(getOffsetUnderCaret())
+
+    private fun getReferenceInInjectedLanguageAtOffset(): PsiReference?  {
+        val fixture = SnakemakeWorld.injectionFixture()
+        val element = fixture.injectedElement ?: return null
+        val host = fixture.injectedLanguageManager.getInjectionHost(element) as PyStringLiteralExpression? ?: return null
+        val offset = getOffsetUnderCaret() - (host.stringValueTextRange.startOffset + host.textOffset)
+        return element.containingFile?.findReferenceAt(offset)
+    }
 
     private fun getPositionBySignature(editor: Editor, marker: String, after: Boolean): Int {
         val text = editor.document.text

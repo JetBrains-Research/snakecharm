@@ -1,4 +1,3 @@
-@ignore
 Feature: Resolve for params in shell section
   Resolve params arguments in shell section
 
@@ -17,8 +16,7 @@ Feature: Resolve for params in shell section
       shell: "command {params.<text>}"
     """
     When I put the caret after <ptn>
-    Then reference should resolve to "<symbol_name>" in "<file>"
-
+    Then reference in injection should resolve to "<symbol_name>" in "<file>"
     Examples:
     | rule_like  | ptn         | text          | symbol_name | file         |
     | rule       | {params.out | outdir        | outdir      | foo.smk      |
@@ -43,7 +41,7 @@ Feature: Resolve for params in shell section
         shell: "command {params.xmx<suffix>}"
       """
     When I put the caret after {params.xm
-    Then reference should resolve to "xmx" in "foo.smk"
+    Then reference in injection should resolve to "xmx" in "foo.smk"
     Examples:
     | rule_like  | suffix   |
     | rule       | .path    |
@@ -69,7 +67,7 @@ Feature: Resolve for params in shell section
         shell("command {params.<text>}")
     """
     When I put the caret after <ptn>
-    Then reference should resolve to "<symbol_name>" in "<file>"
+    Then reference in injection should resolve to "<symbol_name>" in "<file>"
 
     Examples:
       | rule_like  | ptn         | text          | symbol_name | file         |
@@ -96,7 +94,7 @@ Feature: Resolve for params in shell section
           shell("command {params.xmx<suffix>}")
       """
     When I put the caret after {params.xm
-    Then reference should resolve to "xmx" in "foo.smk"
+    Then reference in injection should resolve to "xmx" in "foo.smk"
     Examples:
       | rule_like  | suffix   |
       | rule       | .path    |

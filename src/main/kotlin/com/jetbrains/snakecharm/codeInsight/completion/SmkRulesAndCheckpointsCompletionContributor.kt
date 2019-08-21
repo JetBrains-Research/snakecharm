@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.codeInsight.completion
 
 import com.intellij.codeInsight.completion.*
+import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.keymap.KeymapUtil
@@ -12,11 +13,13 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
+import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
+import com.jetbrains.snakecharm.string_language.SmkSL
 
 class SmkRulesAndCheckpointsCompletionContributor : CompletionContributor() {
     init {
@@ -91,14 +94,32 @@ private class SmkRulesAndCheckpointsObjectsCompletionProvider : CompletionProvid
                 PsiTreeUtil.getParentOfType(
                         parameters.withPosition(parentElement, parentElement.textOffset).originalPosition,
                         SmkRuleOrCheckpoint::class.java
-                )
-        variants.removeAll { it.second == originalContainingRuleOrCheckpoint }
+                ) ?: getContainingDeclarationOfInjectedElement(parentElement)
+
+        if (!parentElement.isInLanguageInjection() &&
+                PsiTreeUtil.getParentOfType(parentElement, SmkRunSection::class.java) == null) {
+            variants.removeAll { it.second == originalContainingRuleOrCheckpoint }
+        }
+
         when (originalContainingRuleOrCheckpoint) {
             is SmkRule -> variants.removeAll { it.second is SmkCheckPoint }
             is SmkCheckPoint -> variants.removeAll { it.second is SmkRule }
         }
 
         addVariantsToCompletionResultSet(variants, parameters, result)
+    }
+
+    private fun PsiElement.isInLanguageInjection(): Boolean {
+        val languageManager = InjectedLanguageManager.getInstance(project)
+        return languageManager.getInjectionHost(this) != null
+    }
+
+    private fun getContainingDeclarationOfInjectedElement(element: PsiElement): SmkRuleOrCheckpoint? {
+        val languageManager = InjectedLanguageManager.getInstance(element.project)
+        return  PsiTreeUtil.getParentOfType(
+                languageManager.getInjectionHost(element),
+                SmkRuleOrCheckpoint::class.java
+        )
     }
 }
 
@@ -149,10 +170,21 @@ private fun addVariantsToCompletionResultSet(
       manual invocation once: 1
       manual invocation twice: 2
     */
+    val position = parameters.position
+    val originalFile = when {
+        SmkSL.isInsideSmkSLFile(position) -> {
+            val originalPosition = parameters.originalPosition ?: return
+            val languageManager = InjectedLanguageManager.getInstance(position.project)
+            languageManager.getTopLevelFile(originalPosition)
+        }
+        SnakemakeLanguageDialect.isInsideSmkFile(position) -> parameters.originalFile
+        else -> return
+    }
+
     if (parameters.invocationCount <= 1) {
-        val includedFiles = SmkResolveUtil.getIncludedFiles(parameters.originalFile as SmkFile)
+        val includedFiles = SmkResolveUtil.getIncludedFiles(originalFile as SmkFile)
         variants.retainAll {
-            it.second.containingFile.originalFile == parameters.originalFile ||
+            it.second.containingFile.originalFile == originalFile ||
                     it.second.containingFile.originalFile in includedFiles
         }
     }

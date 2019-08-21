@@ -188,8 +188,6 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkLambdaRuleParamsInspection"
     />
 
-    <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
-
     <findUsagesHandlerFactory
             implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"
             id="Python" order="last, before default"
