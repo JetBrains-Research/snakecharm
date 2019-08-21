@@ -310,3 +310,47 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       | checkpoint |                |                 |
       | rule       | "{             | }"              |
       | checkpoint | "{             | }"              |
+
+
+  Scenario Outline: toplevel rules/checkpoints call
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <section1> A:
+      input: ""
+    <section1> B:
+      input: ""
+    <section1> C:
+      input: ""
+    <section2>s.
+    """
+    When I put the caret after <section2>s.
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | A |
+      | B |
+      | C |
+    Examples:
+      | section1   | section2   |
+      | rule       | checkpoint |
+      | checkpoint | rule       |
+
+  Scenario Outline: rules/checkpoints call inside rule section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <section1> A:
+      input: ""
+
+    <section1> NAME:
+      shell: <section2>s.
+    """
+    When I put the caret after <section2>s.
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | A    |
+      | NAME |
+    Examples:
+      | section1   | section2   |
+      | rule       | checkpoint |
+      | checkpoint | rule       |

@@ -87,9 +87,17 @@ private class SmkRulesAndCheckpointsObjectsCompletionProvider : CompletionProvid
     ) {
         val variants = collectVariantsForElement(parameters.position)
 
+        val parentElement = parameters.position.parent
+        val referencedObject = parameters.withPosition(parentElement, parentElement.textOffset).originalPosition?.parent
+        if (referencedObject is PyReferenceExpression) {
+            when (referencedObject.name) {
+                SnakemakeNames.SMK_VARS_RULES -> variants.removeAll { it.second is SmkCheckPoint }
+                SnakemakeNames.SMK_VARS_CHECKPOINTS -> variants.removeAll { it.second is SmkRule }
+            }
+        }
+
         // we need to obtain containing rule/checkpoint from the original file
         // which is why we obtain it from an element present both in copy and original file
-        val parentElement = parameters.position.parent
         val originalContainingRuleOrCheckpoint =
                 PsiTreeUtil.getParentOfType(
                         parameters.withPosition(parentElement, parentElement.textOffset).originalPosition,
@@ -100,12 +108,6 @@ private class SmkRulesAndCheckpointsObjectsCompletionProvider : CompletionProvid
                 PsiTreeUtil.getParentOfType(parentElement, SmkRunSection::class.java) == null) {
             variants.removeAll { it.second == originalContainingRuleOrCheckpoint }
         }
-
-        when (originalContainingRuleOrCheckpoint) {
-            is SmkRule -> variants.removeAll { it.second is SmkCheckPoint }
-            is SmkCheckPoint -> variants.removeAll { it.second is SmkRule }
-        }
-
         addVariantsToCompletionResultSet(variants, parameters, result)
     }
 
