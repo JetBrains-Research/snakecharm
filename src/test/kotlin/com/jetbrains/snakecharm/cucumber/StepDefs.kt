@@ -93,7 +93,7 @@ class StepDefs {
             "Unresolved reference" -> fixture.enableInspections(PyUnresolvedReferencesInspection::class.java)
             "Repeated Rule in Localrules or Ruleorder" ->
                 fixture.enableInspections(SmkLocalrulesRuleorderRepeatedRuleInspection::class.java)
-            "Lambda Parameter Names" -> fixture.enableInspections(SmkLambdaRuleParamsInspection::class.java)
+            "Lambda Functions in Rule Sections" -> fixture.enableInspections(SmkLambdaRuleParamsInspection::class.java)
             else -> {
                 for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {
                     val o = provider.instance
