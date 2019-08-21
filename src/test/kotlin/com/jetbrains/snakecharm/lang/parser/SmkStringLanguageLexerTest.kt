@@ -88,6 +88,42 @@ class SmkStringLanguageLexerTest : PyLexerTestCase() {
                 "COMMA", "REGEXP", "RBRACE", "STRING_CONTENT")
     }
 
+    fun testWildcardWithSpaces() {
+        doTest("{       sample       }",
+                "LBRACE", "Py:IDENTIFIER", "RBRACE")
+    }
+
+    fun testFormatSpecifier() {
+        doTest("{foo:%Y-%m-%d %H:%M:%S}",
+                "LBRACE", "Py:IDENTIFIER", "FORMAT_SPECIFIER", "RBRACE")
+    }
+
+    fun testFormatSpecifierAndRegexp() {
+        doTest("{foo:%Y-%m-%d %H:%M:%S,.+}",
+                "LBRACE", "Py:IDENTIFIER", "FORMAT_SPECIFIER", "RBRACE")
+    }
+
+    fun testIdentifierNameWithSpacesBefore() {
+        doTest("{   foo}",
+                "LBRACE", "Py:IDENTIFIER", "RBRACE")
+    }
+
+
+    fun testIdentifierNameWithSpacesAfter() {
+        doTest("{foo   }",
+                "LBRACE", "Py:IDENTIFIER", "RBRACE")
+    }
+
+    fun testIdentifierNameWithSpaces() {
+        doTest("{   foo   }",
+                "LBRACE", "Py:IDENTIFIER", "RBRACE")
+    }
+
+    fun testIdentifierNameOnlySpaces() {
+        doTest("{      }",
+                "LBRACE", "Py:IDENTIFIER", "RBRACE")
+    }
+
     private fun doTest(text: String, vararg expectedTokens: String) {
         doLexerTest(text, SmkSLLexerAdapter(), *expectedTokens)
     }
