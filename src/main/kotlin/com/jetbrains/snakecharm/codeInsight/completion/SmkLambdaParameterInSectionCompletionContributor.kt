@@ -6,6 +6,7 @@ import com.intellij.codeInsight.lookup.TailTypeDecorator
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyCallExpression
@@ -44,7 +45,8 @@ object SMKLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
             SnakemakeNames.SECTION_INPUT, SnakemakeNames.SECTION_GROUP -> {
                 result.addElement(
                         TailTypeDecorator.withTail(
-                                LookupElementBuilder.create(SmkLambdaRuleParamsInspection.WILDCARDS_LAMBDA_PARAMETER),
+                                LookupElementBuilder.create(SnakemakeNames.SMK_VARS_WILDCARDS)
+                                        .withIcon(PlatformIcons.PARAMETER_ICON),
                                 ColonAndWhiteSpaceTail
                         )
                 )
@@ -65,27 +67,29 @@ object SMKLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
     ) {
         val lambdaExpression = PsiTreeUtil.getParentOfType(element, PyLambdaExpression::class.java)!!
         val presentParameters = lambdaExpression.parameterList.parameters.map { it.name }
-        if (SmkLambdaRuleParamsInspection.WILDCARDS_LAMBDA_PARAMETER !in presentParameters) {
+        if (SnakemakeNames.SMK_VARS_WILDCARDS !in presentParameters) {
             result.addElement(
                     PrioritizedLookupElement.withPriority(
                             LookupElementBuilder
-                                    .create(SmkLambdaRuleParamsInspection.WILDCARDS_LAMBDA_PARAMETER)
-                            , Double.MAX_VALUE // as this should always be the 1st completion list element
+                                    .create(SnakemakeNames.SMK_VARS_WILDCARDS)
+                                    .withIcon(PlatformIcons.PARAMETER_ICON)
+                            , SmkCompletionUtil.WILDCARDS_LAMBDA_PARAMETER_PRIORITY
 
                     )
             )
         }
 
         val variants = allowedVariants
-                .filterNot { it == SmkLambdaRuleParamsInspection.WILDCARDS_LAMBDA_PARAMETER }
+                .filterNot { it == SnakemakeNames.SMK_VARS_WILDCARDS }
                 .filterNot { it in presentParameters }
         if (variants.size == 1) {
             result.addElement(TailTypeDecorator.withTail(
-                    LookupElementBuilder.create(variants.first()),
+                    LookupElementBuilder.create(variants.first()).withIcon(PlatformIcons.PARAMETER_ICON),
                     ColonAndWhiteSpaceTail
             ))
         } else {
-            result.addAllElements(variants.map { LookupElementBuilder.create(it) })
+            result.addAllElements(variants
+                    .map { LookupElementBuilder.create(it).withIcon(PlatformIcons.PARAMETER_ICON) })
         }
     }
 }

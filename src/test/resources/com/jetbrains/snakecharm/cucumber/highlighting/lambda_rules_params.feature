@@ -407,7 +407,7 @@ Feature: Inspection checking lambda parameter names in various sections
     And Lambda Functions in Rule Sections inspection is enabled
     Then I expect inspection error on <lambda wildcards: wildcards> with message
     """
-    Callables are not allowed in '<section>' section.
+    Function object cannot be used as a value in '<section>' section.
     """
     When I check highlighting weak warnings
     Examples:
