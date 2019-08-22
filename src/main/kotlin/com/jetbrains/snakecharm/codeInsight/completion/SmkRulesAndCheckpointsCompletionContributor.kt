@@ -12,6 +12,8 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyReferenceExpression
+import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionAfterRulesAndCheckpointsObjectProvider.Companion.IN_SMK_RULES_OR_CHECKPOINTS_OBJECT
+import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionInLocalRulesAndRuleOrderSectionsProvider.Companion.IN_SMK_LOCALRULES_OR_RULEORDER_RULE_NAME_REFERENCE
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
@@ -26,18 +28,18 @@ class SmkRulesAndCheckpointsCompletionContributor : CompletionContributor() {
     init {
         extend(
                 CompletionType.BASIC,
-                SmkRuleAndCheckpointNameReferenceCompletionProvider.IN_SMK_LOCALRULES_OR_RULEORDER_RULE_NAME_REFERENCE,
-                SmkRuleAndCheckpointNameReferenceCompletionProvider()
+                IN_SMK_LOCALRULES_OR_RULEORDER_RULE_NAME_REFERENCE,
+                SmkCompletionInLocalRulesAndRuleOrderSectionsProvider()
         )
         extend(
                 CompletionType.BASIC,
-                SmkRulesOrCheckpointsObjectsCompletionProvider.IN_SMK_RULES_OR_CHECKPOINTS_OBJECT,
-                SmkRulesOrCheckpointsObjectsCompletionProvider()
+                IN_SMK_RULES_OR_CHECKPOINTS_OBJECT,
+                SmkCompletionAfterRulesAndCheckpointsObjectProvider()
         )
     }
 }
 
-private class SmkRuleAndCheckpointNameReferenceCompletionProvider : CompletionProvider<CompletionParameters>() {
+private class SmkCompletionInLocalRulesAndRuleOrderSectionsProvider : CompletionProvider<CompletionParameters>() {
     companion object {
         val IN_SMK_LOCALRULES_OR_RULEORDER_RULE_NAME_REFERENCE =
                 psiElement()
@@ -53,26 +55,29 @@ private class SmkRuleAndCheckpointNameReferenceCompletionProvider : CompletionPr
             context: ProcessingContext,
             result: CompletionResultSet
     ) {
-        val variants = (collectVariantsForElement(parameters.position, isCheckPoint = false) +
-                collectVariantsForElement(parameters.position, isCheckPoint = true)).let { rulesAndCheckpoints ->
-            val references =
-                    (PsiTreeUtil.getParentOfType(parameters.position, SmkWorkflowRuleorderSection::class.java)
-                            ?: PsiTreeUtil.getParentOfType(parameters.position, SmkWorkflowLocalrulesSection::class.java))
-                            ?.argumentList
-                            ?.arguments
-                            ?.filterIsInstance<SmkReferenceExpression>()
-                            ?.map { it.name }
-            if (references != null) {
-                rulesAndCheckpoints.filterNot { it.first in references }
-            } else {
-                rulesAndCheckpoints
-            }
+        val rules = collectVariantsForElement(parameters.position, isCheckPoint = false)
+        val checkpoints = collectVariantsForElement(parameters.position, isCheckPoint = true)
+        val elements = rules + checkpoints
+
+        val section = (PsiTreeUtil.getParentOfType(parameters.position, SmkWorkflowRuleorderSection::class.java)
+                ?: PsiTreeUtil.getParentOfType(parameters.position, SmkWorkflowLocalrulesSection::class.java))
+
+        val references = section?.argumentList?.arguments
+                ?.filterIsInstance<SmkReferenceExpression>()
+                ?.map { it.name }
+
+        val variants = if (references != null) {
+            // filter already mentioned `localrules` and `ruleorder` args
+            elements.filterNot { it.first in references }
+        } else {
+            elements
         }
+
         addVariantsToCompletionResultSet(variants, parameters, result)
     }
 }
 
-private class SmkRulesOrCheckpointsObjectsCompletionProvider : CompletionProvider<CompletionParameters>() {
+private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionProvider<CompletionParameters>() {
     companion object {
         val IN_SMK_RULES_OR_CHECKPOINTS_OBJECT =
                 psiElement()
@@ -92,10 +97,12 @@ private class SmkRulesOrCheckpointsObjectsCompletionProvider : CompletionProvide
     ) {
         // position is a leaf psi element, and it's wrapped in a reference, which is what we want to get
         val parentElement = parameters.position.parent
+
         // get parent reference to `rules.` or `checkpoints.`
         val rulesOrCheckpointsObject = parameters.withPosition(parentElement, parentElement.textOffset)
                 .originalPosition
                 ?.parent as? PyReferenceExpression ?: return
+
         val variants = when (rulesOrCheckpointsObject.name) {
             SnakemakeNames.SMK_VARS_RULES -> collectVariantsForElement(parameters.position, isCheckPoint = false)
             SnakemakeNames.SMK_VARS_CHECKPOINTS -> collectVariantsForElement(parameters.position, isCheckPoint = true)
@@ -112,6 +119,7 @@ private class SmkRulesOrCheckpointsObjectsCompletionProvider : CompletionProvide
 
         if (!parentElement.isInLanguageInjection() &&
                 PsiTreeUtil.getParentOfType(parentElement, SmkRunSection::class.java) == null) {
+
             addVariantsToCompletionResultSet(
                     variants.filterNot { it.second == originalContainingRuleOrCheckpoint },
                     parameters,
@@ -120,7 +128,6 @@ private class SmkRulesOrCheckpointsObjectsCompletionProvider : CompletionProvide
         } else {
             addVariantsToCompletionResultSet(variants, parameters, result)
         }
-
     }
 
     private fun PsiElement.isInLanguageInjection(): Boolean {
@@ -146,19 +153,21 @@ private fun collectVariantsForElement(
 ): List<Pair<String, SmkRuleOrCheckpoint>> {
     val module = ModuleUtilCore.findModuleForPsiElement(element)
 
-    if (module != null) {
-        val results = when {
-            isCheckPoint -> getVariantsFromIndex(SmkCheckpointNameIndex.KEY, module, SmkCheckPoint::class.java)
-            else -> getVariantsFromIndex(SmkRuleNameIndex.KEY, module, SmkRule::class.java)
-        }
+    if (module == null) {
+        // if no module is given: try to collect local files
+        val smkFile = element.containingFile.originalFile as SmkFile
+        return if (isCheckPoint) smkFile.collectCheckPoints() else smkFile.collectRules()
 
-        return results
-                .filter { (it as SmkRuleOrCheckpoint).name != null }
-                .map { (it as SmkRuleOrCheckpoint).name!! to it }
+    }
+    val results: List<SmkRuleOrCheckpoint> = when {
+        isCheckPoint -> getVariantsFromIndex(SmkCheckpointNameIndex.KEY, module, SmkCheckPoint::class.java)
+        else -> getVariantsFromIndex(SmkRuleNameIndex.KEY, module, SmkRule::class.java)
     }
 
-    val smkFile = element.containingFile.originalFile as SmkFile
-    return if (isCheckPoint) smkFile.collectCheckPoints() else smkFile.collectRules()
+    return results.mapNotNull { psi ->
+        val name = psi.name
+        if (name != null) name to psi else null
+    }
 }
 
 private fun addVariantsToCompletionResultSet(
