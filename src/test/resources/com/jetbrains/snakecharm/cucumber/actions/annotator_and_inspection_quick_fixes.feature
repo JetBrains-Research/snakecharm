@@ -210,3 +210,26 @@ Feature: Inspection quick fixes
       | rule_like  |
       | rule       |
       | checkpoint |
+
+  Scenario Outline: rename lambda parameter quick fix
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> foo:
+      input: lambda a: a + a.foo
+    """
+    And Lambda Functions in Rule Sections inspection is enabled
+    Then I expect inspection weak warning on <a> in <a:> with message
+    """
+    Snakemake documentation suggests it's preferable to name the first parameter 'wildcards'.
+    """
+    When I check highlighting weak warnings
+    And I invoke quick fix Rename to 'wildcards' and see text:
+    """
+    <rule_like> foo:
+      input: lambda wildcards: wildcards + wildcards.foo
+    """
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
