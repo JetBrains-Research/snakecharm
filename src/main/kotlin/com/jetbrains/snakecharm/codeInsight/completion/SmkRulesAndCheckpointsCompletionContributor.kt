@@ -159,11 +159,9 @@ private fun collectVariantsForElement(
                 .map { (it as SmkRuleOrCheckpoint).name!! to it }
         )
     } else {
-        if (isCheckPoint) {
-            variants.addAll((element.containingFile.originalFile as SmkFile).collectCheckPoints())
-        } else {
-            variants.addAll((element.containingFile.originalFile as SmkFile).collectRules())
-        }
+        val smkFile = element.containingFile.originalFile as SmkFile
+        val elements = if (isCheckPoint) smkFile.collectCheckPoints() else smkFile.collectRules()
+        variants.addAll(elements)
     }
 
     return variants
