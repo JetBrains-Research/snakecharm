@@ -96,6 +96,11 @@ class SmkSLParser : PsiParser {
                     exprMarker.done(SmkSLTokenTypes.REFERENCE_EXPRESSION)
                     exprMarker = exprMarker.precede()
                 }
+                tt === SmkSLTokenTypes.FORMAT_SPECIFIER -> {
+                    builder.advanceLexer()
+                    exprMarker.done(SmkSLTokenTypes.FORMAT_SPECIFIER_EXPRESSION)
+                    exprMarker = exprMarker.precede()
+                }
                 tt === SmkSLTokenTypes.LBRACKET -> {
                     builder.advanceLexer()
 

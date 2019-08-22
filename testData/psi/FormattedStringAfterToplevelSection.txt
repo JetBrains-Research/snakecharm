@@ -1,0 +1,253 @@
+SnakemakeFile: FormattedStringAfterToplevelSection.smk
+  PyAssignmentStatement
+    PyTargetExpression: df
+      PsiElement(Py:IDENTIFIER)('df')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:EQ)('=')
+    PsiWhiteSpace(' ')
+    PyListLiteralExpression
+      PsiElement(Py:LBRACKET)('[')
+      PsiElement(Py:RBRACKET)(']')
+  PsiWhiteSpace('\n\n')
+  SmkWorkflowPythonBlockSection
+    PsiElement(Py:WORKFLOW_ONSTART_KEYWORD)('onstart')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    PyStatementList
+      PyExpressionStatement
+        PyCallExpression: print
+          PyReferenceExpression: print
+            PsiElement(Py:IDENTIFIER)('print')
+          PyArgumentList
+            PsiElement(Py:LPAR)('(')
+            PyStringLiteralExpression: Total files: {len(df)}
+              PyFormattedStringElement
+                PsiElement(Py:FSTRING_START)('f"')
+                PsiElement(Py:FSTRING_TEXT)('Total files: ')
+                PyFStringFragment
+                  PsiElement(Py:FSTRING_FRAGMENT_START)('{')
+                  PyCallExpression: len
+                    PyReferenceExpression: len
+                      PsiElement(Py:IDENTIFIER)('len')
+                    PyArgumentList
+                      PsiElement(Py:LPAR)('(')
+                      PyReferenceExpression: df
+                        PsiElement(Py:IDENTIFIER)('df')
+                      PsiElement(Py:RPAR)(')')
+                  PsiElement(Py:FSTRING_FRAGMENT_END)('}')
+                PsiElement(Py:FSTRING_END)('"')
+            PsiElement(Py:RPAR)(')')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('a')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: out
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"out"')
+  PsiWhiteSpace('\n\n')
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_INCLUDE_KEYWORD)('include')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: {os.path.join(tt1, tt2)}
+        PyFormattedStringElement
+          PsiElement(Py:FSTRING_START)('f"')
+          PyFStringFragment
+            PsiElement(Py:FSTRING_FRAGMENT_START)('{')
+            PyCallExpression: os.path.join
+              PyReferenceExpression: join
+                PyReferenceExpression: path
+                  PyReferenceExpression: os
+                    PsiElement(Py:IDENTIFIER)('os')
+                  PsiElement(Py:DOT)('.')
+                  PsiElement(Py:IDENTIFIER)('path')
+                PsiElement(Py:DOT)('.')
+                PsiElement(Py:IDENTIFIER)('join')
+              PyArgumentList
+                PsiElement(Py:LPAR)('(')
+                PyReferenceExpression: tt1
+                  PsiElement(Py:IDENTIFIER)('tt1')
+                PsiElement(Py:COMMA)(',')
+                PsiWhiteSpace(' ')
+                PyReferenceExpression: tt2
+                  PsiElement(Py:IDENTIFIER)('tt2')
+                PsiElement(Py:RPAR)(')')
+            PsiElement(Py:FSTRING_FRAGMENT_END)('}')
+          PsiElement(Py:FSTRING_END)('"')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('b')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: out
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"out"')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: text {print(30)}
+        PyFormattedStringElement
+          PsiElement(Py:FSTRING_START)('f"')
+          PsiElement(Py:FSTRING_TEXT)('text ')
+          PyFStringFragment
+            PsiElement(Py:FSTRING_FRAGMENT_START)('{')
+            PyCallExpression: print
+              PyReferenceExpression: print
+                PsiElement(Py:IDENTIFIER)('print')
+              PyArgumentList
+                PsiElement(Py:LPAR)('(')
+                PyNumericLiteralExpression
+                  PsiElement(Py:INTEGER_LITERAL)('30')
+                PsiElement(Py:RPAR)(')')
+            PsiElement(Py:FSTRING_FRAGMENT_END)('}')
+          PsiElement(Py:FSTRING_END)('"')
+      PsiWhiteSpace(' ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# this is a docstring, snakemake accepts such syntax')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('c')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: out
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"out"')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      PyStringLiteralExpression: text: { {latitude: a, longitude: b}  }
+        PyFormattedStringElement
+          PsiElement(Py:FSTRING_START)('f"')
+          PsiElement(Py:FSTRING_TEXT)('text: ')
+          PyFStringFragment
+            PsiElement(Py:FSTRING_FRAGMENT_START)('{')
+            PsiWhiteSpace(' ')
+            PyDictLiteralExpression
+              PsiElement(Py:LBRACE)('{')
+              PyKeyValueExpression
+                PyReferenceExpression: latitude
+                  PsiElement(Py:IDENTIFIER)('latitude')
+                PsiElement(Py:COLON)(':')
+                PsiWhiteSpace(' ')
+                PyReferenceExpression: a
+                  PsiElement(Py:IDENTIFIER)('a')
+              PsiElement(Py:COMMA)(',')
+              PsiWhiteSpace(' ')
+              PyKeyValueExpression
+                PyReferenceExpression: longitude
+                  PsiElement(Py:IDENTIFIER)('longitude')
+                PsiElement(Py:COLON)(':')
+                PsiWhiteSpace(' ')
+                PyReferenceExpression: b
+                  PsiElement(Py:IDENTIFIER)('b')
+              PsiElement(Py:RBRACE)('}')
+            PsiWhiteSpace('  ')
+            PsiElement(Py:FSTRING_FRAGMENT_END)('}')
+          PsiElement(Py:FSTRING_END)('"')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: expand
+            PyReferenceExpression: expand
+              PsiElement(Py:IDENTIFIER)('expand')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PyStringLiteralExpression: sorted_reads/{os.path.join(dir1, dir2, file2)}
+                PyFormattedStringElement
+                  PsiElement(Py:FSTRING_START)('f"')
+                  PsiElement(Py:FSTRING_TEXT)('sorted_reads/')
+                  PyFStringFragment
+                    PsiElement(Py:FSTRING_FRAGMENT_START)('{')
+                    PyCallExpression: os.path.join
+                      PyReferenceExpression: join
+                        PyReferenceExpression: path
+                          PyReferenceExpression: os
+                            PsiElement(Py:IDENTIFIER)('os')
+                          PsiElement(Py:DOT)('.')
+                          PsiElement(Py:IDENTIFIER)('path')
+                        PsiElement(Py:DOT)('.')
+                        PsiElement(Py:IDENTIFIER)('join')
+                      PyArgumentList
+                        PsiElement(Py:LPAR)('(')
+                        PyReferenceExpression: dir1
+                          PsiElement(Py:IDENTIFIER)('dir1')
+                        PsiElement(Py:COMMA)(',')
+                        PsiWhiteSpace(' ')
+                        PyReferenceExpression: dir2
+                          PsiElement(Py:IDENTIFIER)('dir2')
+                        PsiElement(Py:COMMA)(',')
+                        PsiWhiteSpace(' ')
+                        PyReferenceExpression: file2
+                          PsiElement(Py:IDENTIFIER)('file2')
+                        PsiElement(Py:RPAR)(')')
+                    PsiElement(Py:FSTRING_FRAGMENT_END)('}')
+                  PsiElement(Py:FSTRING_END)('"')
+              PsiElement(Py:COMMA)(',')
+              PsiWhiteSpace(' ')
+              PyKeywordArgumentImpl: sample
+                PsiElement(Py:IDENTIFIER)('sample')
+                PsiElement(Py:EQ)('=')
+                PySubscriptionExpression
+                  PyReferenceExpression: config
+                    PsiElement(Py:IDENTIFIER)('config')
+                  PsiElement(Py:LBRACKET)('[')
+                  PyStringLiteralExpression: samples
+                    PsiElement(Py:SINGLE_QUOTED_STRING)('"samples"')
+                  PsiElement(Py:RBRACKET)(']')
+              PsiElement(Py:RPAR)(')')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: echo hello
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"echo hello"')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: fjkd
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"fjkd"')
