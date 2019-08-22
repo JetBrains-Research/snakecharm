@@ -19,6 +19,7 @@ import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
+import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType.Companion.getVariantsFromIndex
 import com.jetbrains.snakecharm.string_language.SmkSL
 
 class SmkRulesAndCheckpointsCompletionContributor : CompletionContributor() {
@@ -143,28 +144,21 @@ private fun collectVariantsForElement(
         element: PsiElement,
         isCheckPoint: Boolean
 ): List<Pair<String, SmkRuleOrCheckpoint>> {
-    val variants = mutableListOf<Pair<String, SmkRuleOrCheckpoint>>()
-
     val module = ModuleUtilCore.findModuleForPsiElement(element)
+
     if (module != null) {
-        val results = if (isCheckPoint) {
-            AbstractSmkRuleOrCheckpointType.
-                    getVariantsFromIndex(SmkCheckpointNameIndex.KEY, module, SmkCheckPoint::class.java)
-        } else {
-            AbstractSmkRuleOrCheckpointType.getVariantsFromIndex(SmkRuleNameIndex.KEY, module, SmkRule::class.java)
+        val results = when {
+            isCheckPoint -> getVariantsFromIndex(SmkCheckpointNameIndex.KEY, module, SmkCheckPoint::class.java)
+            else -> getVariantsFromIndex(SmkRuleNameIndex.KEY, module, SmkRule::class.java)
         }
 
-        variants.addAll(results
+        return results
                 .filter { (it as SmkRuleOrCheckpoint).name != null }
                 .map { (it as SmkRuleOrCheckpoint).name!! to it }
-        )
-    } else {
-        val smkFile = element.containingFile.originalFile as SmkFile
-        val elements = if (isCheckPoint) smkFile.collectCheckPoints() else smkFile.collectRules()
-        variants.addAll(elements)
     }
 
-    return variants
+    val smkFile = element.containingFile.originalFile as SmkFile
+    return if (isCheckPoint) smkFile.collectCheckPoints() else smkFile.collectRules()
 }
 
 private fun addVariantsToCompletionResultSet(
