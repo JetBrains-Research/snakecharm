@@ -13,9 +13,9 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.intellij.testFramework.fixtures.injectionForHost
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.findPsiElementUnderCaret
+import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.fixture
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.myGeneratedDocPopupText
 import cucumber.api.DataTable
 import cucumber.api.java.en.Given
@@ -47,7 +47,7 @@ class ActionsSteps {
     @Given("^I expect reference highlighting on \"(.+)\"")
     fun iExpectReferenceHighlighting(signature: String) {
         ApplicationManager.getApplication().invokeAndWait {
-            val fixture = SnakemakeWorld.fixture()
+            val fixture = fixture()
             val psiFile = fixture.file
             val document = PsiDocumentManager.getInstance(fixture.project).getDocument(psiFile)!!
             val pos = document.text.indexOf(signature)
@@ -97,7 +97,7 @@ class ActionsSteps {
 
         val tag = highlightingLevel.replace(' ', '_')
         val newText = "<$tag descr=\"$message\">$text</$tag>"
-        val fixture = SnakemakeWorld.fixture()
+        val fixture = fixture()
         val psiFile = fixture.file
         val project = psiFile.project
         val document = PsiDocumentManager.getInstance(fixture.project).getDocument(fixture.file)!!
@@ -145,7 +145,7 @@ class ActionsSteps {
 
     @When("^I check highlighting (errors|warnings|infos|weak warnings)$")
     fun iCheckHighlighting(type: String) {
-        val fixture = SnakemakeWorld.fixture()
+        val fixture = fixture()
         when (type) {
             "errors" -> fixture.checkHighlighting(false, false, false, true)
             "warnings" -> fixture.checkHighlighting(true, false, false, true)
@@ -205,14 +205,23 @@ class ActionsSteps {
     @When("^I invoke rename with name \"(.+)\"$")
     fun iInvokeRenameWithName(newName: String) {
         ApplicationManager.getApplication().invokeAndWait {
-                SnakemakeWorld.fixture().renameElementAtCaret(newName)
+                fixture().renameElementAtCaret(newName)
         }
+    }
+
+    @Then("^I invoke quick fix ([^\\]]+) and see text:")
+    fun iInvokeQuickFixAndSeeText(quickFixName: String, text: String) {
+        val quickFix = fixture().getAllQuickFixes().first { it.familyName == quickFixName }
+        ApplicationManager.getApplication().invokeAndWait {
+            fixture().launchAction(quickFix)
+        }
+        fixture().checkResult(text)
     }
 
     @Then("^go to symbol should contain:$")
     fun completionListShouldContain(table: DataTable) {
         val names = ApplicationManager.getApplication().runReadAction(Computable {
-            val model = GotoSymbolModel2(SnakemakeWorld.fixture().project)
+            val model = GotoSymbolModel2(fixture().project)
             model.getNames(false).toList()
         })
         val expected = table.asList(String::class.java)
@@ -232,7 +241,7 @@ class ActionsSteps {
 
     private fun iExpectBraceMatchingAt(str: String, forward: Boolean) {
         ApplicationManager.getApplication().invokeAndWait {
-            val fixture = SnakemakeWorld.fixture()
+            val fixture = fixture()
             var offset = fixture.file.text.indexOf(str)
 
             if (forward) {
@@ -272,7 +281,7 @@ class ActionsSteps {
             val element = findPsiElementUnderCaret()
             requireNotNull(element)
 
-            val editor = SnakemakeWorld.fixture().editor
+            val editor = fixture().editor
             val targetElement = findTargetElementFor(element, editor)
             val documentationProvider = DocumentationManager.getProviderFromElement(targetElement)
 

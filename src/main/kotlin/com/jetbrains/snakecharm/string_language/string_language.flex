@@ -16,7 +16,8 @@ import com.jetbrains.snakecharm.string_language.SmkSLTokenTypes;
 %type IElementType
 
 ID_LETTER=[:letter:]|\_
-IDENTIFIER={ID_LETTER}({ID_LETTER}|[:digit:])*
+IDENTIFIER=(\s*)({ID_LETTER}({ID_LETTER}|[:digit:])*)*(\s*)
+FORMAT_SPECIFIER=\:[^}]+
 STRING_CONTENT=([^\{]|\{\{)+
 REGEXP=([^{}]+ | \{\d+(,\d+)?\})*
 ACCESS_KEY=[^\]]+
@@ -41,6 +42,8 @@ ACCESS_KEY=[^\]]+
     \.                            { yybegin(WAITING_IDENTIFIER); return tokenTypes.getDOT(); }
 
     \[                            { yybegin(WAITING_ACCESS_KEY); return tokenTypes.getLBRACKET(); }
+
+    {FORMAT_SPECIFIER}            { yybegin(WAITING_LANGUAGE_CLOSURE); return tokenTypes.getFORMAT_SPECIFIER();}
 }
 
 <WAITING_ACCESS_KEY> {ACCESS_KEY} { yybegin(WAITING_ACCESS_CLOSURE); return tokenTypes.getACCESS_KEY(); }

@@ -10,41 +10,41 @@ class SmkStringLanguageLexerTest : PyLexerTestCase() {
 
     fun testLanguageWithTextAndDots() {
         doTest("some text {params.p1} text",
-                "STRING_CONTENT", "LBRACE", "IDENTIFIER",
-                "DOT", "IDENTIFIER", "RBRACE", "STRING_CONTENT")
+                "STRING_CONTENT", "LBRACE", "Py:IDENTIFIER",
+                "DOT", "Py:IDENTIFIER", "RBRACE", "STRING_CONTENT")
     }
 
     fun testLanguageWithMultipleAccess() {
         doTest("{params.foo[key].boo[0][1]}",
-                "LBRACE", "IDENTIFIER", "DOT", "IDENTIFIER",
+                "LBRACE", "Py:IDENTIFIER", "DOT", "Py:IDENTIFIER",
                 "LBRACKET", "ACCESS_KEY", "RBRACKET", "DOT",
-                "IDENTIFIER", "LBRACKET", "ACCESS_KEY", "RBRACKET",
+                "Py:IDENTIFIER", "LBRACKET", "ACCESS_KEY", "RBRACKET",
                 "LBRACKET", "ACCESS_KEY", "RBRACKET", "RBRACE")
     }
 
     fun testLanguageWithUnexpectedTokens() {
         doTest("{.[foo[key]..}",
                 "LBRACE", "UNEXPECTED_TOKEN", "UNEXPECTED_TOKEN",
-                "IDENTIFIER", "LBRACKET", "ACCESS_KEY", "RBRACKET", "DOT",
+                "Py:IDENTIFIER", "LBRACKET", "ACCESS_KEY", "RBRACKET", "DOT",
                 "UNEXPECTED_TOKEN", "RBRACE")
     }
 
     fun testLanguageWithRegexp() {
         doTest("{foo,\\d+}",
-                "LBRACE", "IDENTIFIER", "COMMA",
+                "LBRACE", "Py:IDENTIFIER", "COMMA",
                 "REGEXP", "RBRACE")
     }
 
     fun testMultipleLanguageInjectionWithRegexp() {
         doTest("{dataset,\\d+} text {input}",
-                "LBRACE", "IDENTIFIER", "COMMA",
+                "LBRACE", "Py:IDENTIFIER", "COMMA",
                 "REGEXP", "RBRACE", "STRING_CONTENT", "LBRACE",
-                "IDENTIFIER", "RBRACE")
+                "Py:IDENTIFIER", "RBRACE")
     }
 
     fun testRegexpWithBraces() {
         doTest("{dataset,a{3,5}}",
-                "LBRACE", "IDENTIFIER", "COMMA",
+                "LBRACE", "Py:IDENTIFIER", "COMMA",
                 "REGEXP", "RBRACE")
     }
 
@@ -55,7 +55,7 @@ class SmkStringLanguageLexerTest : PyLexerTestCase() {
 
     fun testIncompleteRegexp() {
         doTest("{foo, \\d+",
-                "LBRACE", "IDENTIFIER", "COMMA", "REGEXP")
+                "LBRACE", "Py:IDENTIFIER", "COMMA", "REGEXP")
     }
 
 
@@ -66,26 +66,62 @@ class SmkStringLanguageLexerTest : PyLexerTestCase() {
 
     fun testCorrectIdentifierName() {
         doTest("{_correct_identifier_name10}",
-                "LBRACE", "IDENTIFIER", "RBRACE")
+                "LBRACE", "Py:IDENTIFIER", "RBRACE")
     }
 
     fun testBadIdentifierName() {
         doTest("{f*o&o?}",
-                "LBRACE", "IDENTIFIER", "UNEXPECTED_TOKEN",
-                "IDENTIFIER", "UNEXPECTED_TOKEN", "IDENTIFIER",
+                "LBRACE", "Py:IDENTIFIER", "UNEXPECTED_TOKEN",
+                "Py:IDENTIFIER", "UNEXPECTED_TOKEN", "Py:IDENTIFIER",
                 "UNEXPECTED_TOKEN", "RBRACE")
     }
 
     fun testRbracketInName() {
         doTest("{foo]}",
-                "LBRACE", "IDENTIFIER",
+                "LBRACE", "Py:IDENTIFIER",
                 "UNEXPECTED_TOKEN", "RBRACE")
     }
 
     fun testEscapedBracket() {
         doTest("{foo,\\}+}",
-                "LBRACE", "IDENTIFIER",
+                "LBRACE", "Py:IDENTIFIER",
                 "COMMA", "REGEXP", "RBRACE", "STRING_CONTENT")
+    }
+
+    fun testWildcardWithSpaces() {
+        doTest("{       sample       }",
+                "LBRACE", "Py:IDENTIFIER", "RBRACE")
+    }
+
+    fun testFormatSpecifier() {
+        doTest("{foo:%Y-%m-%d %H:%M:%S}",
+                "LBRACE", "Py:IDENTIFIER", "FORMAT_SPECIFIER", "RBRACE")
+    }
+
+    fun testFormatSpecifierAndRegexp() {
+        doTest("{foo:%Y-%m-%d %H:%M:%S,.+}",
+                "LBRACE", "Py:IDENTIFIER", "FORMAT_SPECIFIER", "RBRACE")
+    }
+
+    fun testIdentifierNameWithSpacesBefore() {
+        doTest("{   foo}",
+                "LBRACE", "Py:IDENTIFIER", "RBRACE")
+    }
+
+
+    fun testIdentifierNameWithSpacesAfter() {
+        doTest("{foo   }",
+                "LBRACE", "Py:IDENTIFIER", "RBRACE")
+    }
+
+    fun testIdentifierNameWithSpaces() {
+        doTest("{   foo   }",
+                "LBRACE", "Py:IDENTIFIER", "RBRACE")
+    }
+
+    fun testIdentifierNameOnlySpaces() {
+        doTest("{      }",
+                "LBRACE", "Py:IDENTIFIER", "RBRACE")
     }
 
     private fun doTest(text: String, vararg expectedTokens: String) {

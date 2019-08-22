@@ -71,6 +71,11 @@
             language="Python"
             implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkLambdaParameterInSectionCompletionContributor"
     />
+    <completion.contributor
+            language="Python"
+            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkRulesAndCheckpointsCompletionContributor"
+            order="first" id="SmkRulesAndCheckpointsCompletionContributor"
+    />
 
     <localInspection
         language="Snakemake"
@@ -176,14 +181,12 @@
             language="Snakemake" shortName="SmkLambdaRuleParamsInspection"
             enabledByDefault="true"
             level="ERROR"
-            suppressId="SmkRuleOrCheckpointNameYetUndefinedInspection"
+            suppressId="SmkLambdaRuleParamsInspection"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.only.specific.lambda.params"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkLambdaRuleParamsInspection"
     />
-
-    <psi.referenceContributor implementation="com.jetbrains.snakecharm.codeInsight.SnakemakeParamsInShellReferenceContributor"/>
 
     <findUsagesHandlerFactory
             implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"

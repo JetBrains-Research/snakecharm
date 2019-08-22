@@ -1,9 +1,10 @@
 package com.jetbrains.snakecharm.inspections
 
-import com.intellij.codeInspection.LocalInspectionToolSession
-import com.intellij.codeInspection.ProblemHighlightType
-import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.codeInspection.*
+import com.intellij.openapi.command.WriteCommandAction
+import com.intellij.openapi.project.Project
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.inspections.quickfix.RenameElementWithoutUsagesQuickFix
 import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkSectionRedeclarationInspection : SnakemakeInspection() {
@@ -30,15 +31,39 @@ class SmkSectionRedeclarationInspection : SnakemakeInspection() {
             rule.getSections().forEach {
                 val name = it.name ?: return
                 if (sectionNamesSet.contains(name)) {
+                    val sectionElement = it.getSectionKeywordNode()?.psi
+                    val fixes =
+                            arrayOf(
+                                    RemoveSectionQuickFix(),
+                                    if (sectionElement != null) {
+                                        RenameElementWithoutUsagesQuickFix(
+                                                it,
+                                                sectionElement.textRangeInParent.startOffset,
+                                                sectionElement.textRangeInParent.endOffset
+                                        )
+                                    } else {
+                                        null
+                                    }
+                            )
+
                     registerProblem(
                             it,
                             SnakemakeBundle.message("INSP.NAME.section.redeclaration.message", name),
-                            ProblemHighlightType.LIKE_UNUSED_SYMBOL
+                            ProblemHighlightType.LIKE_UNUSED_SYMBOL,
+                            null,
+                            *fixes
                     )
                 }
                 sectionNamesSet.add(name)
             }
+        }
+    }
 
+    private class RemoveSectionQuickFix : LocalQuickFix {
+        override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.remove.section.family")
+
+        override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
+            WriteCommandAction.runWriteCommandAction(project) { descriptor.psiElement.delete() }
         }
     }
 }

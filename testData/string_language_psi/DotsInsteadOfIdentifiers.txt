@@ -2,24 +2,24 @@ FILE
   SmkSLElement(LANGUAGE)
     PsiElement(LBRACE)('{')
     SmkSLElement(EXPRESSION_STATEMENT)
-      SmkSLElement(REFERENCE_EXPRESSION)
+      PyReferenceExpression: null
         <empty list>
       PsiErrorElement:Unexpected character
         PsiElement(UNEXPECTED_TOKEN)('.')
-      SmkSLElement(REFERENCE_EXPRESSION)
+      PyReferenceExpression: null
         <empty list>
       PsiErrorElement:Unexpected character
         PsiElement(UNEXPECTED_TOKEN)('[')
-      SmkSLElement(REFERENCE_EXPRESSION)
-        SmkSLElement(REFERENCE_EXPRESSION)
-          SmkSLElement(REFERENCE_EXPRESSION)
-            PsiElement(IDENTIFIER)('foo')
+      PyReferenceExpression: null
+        PyReferenceExpression: null
+          PyReferenceExpression: foo
+            PsiElement(Py:IDENTIFIER)('foo')
           PsiElement(DOT)('.')
       PsiErrorElement:Unexpected character
         PsiElement(UNEXPECTED_TOKEN)('.')
-      SmkSLElement(REFERENCE_EXPRESSION)
-        SmkSLElement(REFERENCE_EXPRESSION)
-          PsiElement(IDENTIFIER)('boo')
+      PyReferenceExpression: null
+        PyReferenceExpression: boo
+          PsiElement(Py:IDENTIFIER)('boo')
         PsiElement(DOT)('.')
       PsiErrorElement:Expected identifier name
         <empty list>

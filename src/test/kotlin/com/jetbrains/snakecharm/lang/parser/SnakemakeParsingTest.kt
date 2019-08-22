@@ -288,6 +288,18 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testFormattedStringAfterToplevelSection() {
+        doTest()
+    }
+
+    fun testIssue202() {
+        doTest()
+    }
+
+    fun testFormattedStringInToplevelStatements() {
+        doTest()
+    }
+
     private fun doTest() {
         // Actually snakemake requires python 3.x and no need to have it working with python 2.x
         //doTest(LanguageLevel.fromPythonVersion("2"))

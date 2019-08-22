@@ -5,8 +5,9 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.codeInsight.PyInjectionUtil.InjectionResult
 import com.jetbrains.python.codeInsight.PyInjectorBase
-import com.jetbrains.python.psi.PyBinaryExpression
 import com.jetbrains.python.psi.PyCallExpression
+import com.jetbrains.python.psi.PyFormattedStringElement
+import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
@@ -34,8 +35,16 @@ class SmkSLInjector : PyInjectorBase() {
             else
                 InjectionResult.EMPTY
 
-    private fun PyStringLiteralExpression.containsBraces() =
-            stringValue.contains('{') && stringValue.contains('}')
+    private fun PyStringLiteralExpression.containsLBrace(): Boolean {
+        stringElements.forEach {
+            if ((it is PyFormattedStringElement && it.content.contains("{{") ) ||
+                (it !is PyFormattedStringElement && it.content.contains("{"))) {
+                return true
+            }
+        }
+
+        return false
+    }
 
     private fun PsiElement.isInValidCallExpression(): Boolean {
         val parentCallExpression =
@@ -54,7 +63,7 @@ class SmkSLInjector : PyInjectorBase() {
     private fun PsiElement.isValidForInjection() =
             SnakemakeLanguageDialect.isInsideSmkFile(this) &&
             isInValidArgsSection() &&
-            PsiTreeUtil.getParentOfType(this, PyBinaryExpression::class.java) == null &&
             isInValidCallExpression() &&
-            (this as PyStringLiteralExpression).containsBraces()
+            PsiTreeUtil.getParentOfType(this, PyLambdaExpression::class.java) == null &&
+            (this as PyStringLiteralExpression).containsLBrace()
 }

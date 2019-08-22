@@ -29,7 +29,7 @@ Feature: Tests on snakemake string language injection
       | rule         |
       | checkpoint   |
 
-  Scenario: No injection in fstrings
+  Scenario: No injection in fstrings with unescaped brackets
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -37,6 +37,27 @@ Feature: Tests on snakemake string language injection
       shell: f"{input}"
     """
     When I put the caret after input
+    Then I expect no language injection
+
+  Scenario: Injection in fstrings with escaped brackets
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule NAME:
+      shell: f"{{input}}"
+    """
+    When I put the caret after input
+    Then I expect language injection on "{{input}}"
+
+  Scenario: No injection in lambdas
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule:
+      output: "foo"
+      log: lambda wd, output: "{output}.log"
+    """
+    When I put the caret after {output
     Then I expect no language injection
 
   Scenario: Injection in split string literal
@@ -84,7 +105,6 @@ Feature: Tests on snakemake string language injection
     | content |
     | text    |
     |         |
-    | text {  |
     | text }  |
 
   Scenario Outline: No injection in top-level workflow sections
@@ -102,7 +122,17 @@ Feature: Tests on snakemake string language injection
     | configfile |
     | report     |
 
-  Scenario: No injection in concatenated strings
+  Scenario: Injection in concatenated strings
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule NAME:
+      input: "{foo}" + "{boo}" + "{doo}"
+    """
+    When I put the caret after foo
+    Then I expect language injection on "{foo}{boo}{doo}"
+
+  Scenario: Injection in concatenated strings with divided braces
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -110,7 +140,7 @@ Feature: Tests on snakemake string language injection
       input: "{foo" + "}"
     """
     When I put the caret after foo
-    Then I expect no language injection
+    Then I expect language injection on "{foo}"
 
   Scenario Outline: No injection in some sections
     Given a snakemake project
