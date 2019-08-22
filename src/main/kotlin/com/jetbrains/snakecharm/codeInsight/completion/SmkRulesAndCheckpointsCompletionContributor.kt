@@ -193,9 +193,9 @@ private fun addVariantsToCompletionResultSet(
 
     val variants = if (parameters.invocationCount <= 1) {
         val includedFiles = SmkResolveUtil.getIncludedFiles(originalFile as SmkFile)
-        completionVariants.filter {
-            it.second.containingFile.originalFile == originalFile ||
-                    it.second.containingFile.originalFile in includedFiles
+        completionVariants.filter { (_, ruleLike) ->
+            val psiFile = ruleLike.containingFile.originalFile
+            psiFile == originalFile || psiFile in includedFiles
         }
     } else {
         completionVariants
