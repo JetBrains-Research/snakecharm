@@ -211,20 +211,24 @@ Feature: Inspection quick fixes
       | rule       |
       | checkpoint |
 
-  Scenario Outline: no error highlighting for star arguments
+  Scenario Outline: rename lambda parameter quick fix
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    def dictfunc():
-        return {'foo': 'nowildcards.txt'}
-
-    <rule_like> NAME:
-        output:
-              a = "file.out", **dictfunct()
-        shell: "echo hhh > {output.foo} | echo uuu > {output.a}"
+    <rule_like> foo:
+      input: lambda a: a + a.foo
     """
-    Then I expect no inspection error
-    When I check highlighting errors
+    And Lambda Functions in Rule Sections inspection is enabled
+    Then I expect inspection weak warning on <a> in <a:> with message
+    """
+    Snakemake documentation suggests it's preferable to name the first parameter 'wildcards'.
+    """
+    When I check highlighting weak warnings
+    And I invoke quick fix Rename to 'wildcards' and see text:
+    """
+    <rule_like> foo:
+      input: lambda wildcards: wildcards + wildcards.foo
+    """
     Examples:
       | rule_like  |
       | rule       |
