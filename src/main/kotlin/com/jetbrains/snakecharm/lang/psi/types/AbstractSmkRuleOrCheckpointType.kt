@@ -118,13 +118,13 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
             }
         }
 
-        fun <Psi: SmkRuleOrCheckpoint> addVariantFromIndex(
+        fun <Psi: SmkRuleOrCheckpoint> getVariantsFromIndex(
                 indexKey: StubIndexKey<String, Psi>,
                 module: Module,
-                results: MutableList<Psi>,
                 clazz: Class<Psi>,
                 scope: GlobalSearchScope = searchScope(module)
-        ) {
+        ): List<Psi> {
+            val results = mutableListOf<Psi>()
             val project = module.project
             val stubIndex = StubIndex.getInstance()
             val allKeys = ContainerUtil.newTroveSet<String>()
@@ -135,6 +135,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
             for (key in allKeys) {
                 results.addAll(StubIndex.getElements(indexKey, key, project, scope, clazz))
             }
+            return results
         }
 
         private fun searchScope(module: Module): GlobalSearchScope {
