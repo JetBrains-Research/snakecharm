@@ -210,3 +210,22 @@ Feature: Inspection quick fixes
       | rule_like  |
       | rule       |
       | checkpoint |
+
+  Scenario Outline: no error highlighting for star arguments
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    def dictfunc():
+        return {'foo': 'nowildcards.txt'}
+
+    <rule_like> NAME:
+        output:
+              a = "file.out", **dictfunct()
+        shell: "echo hhh > {output.foo} | echo uuu > {output.a}"
+    """
+    Then I expect no inspection error
+    When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |

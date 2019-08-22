@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.validation
 
 import com.jetbrains.python.psi.PyKeywordArgument
+import com.jetbrains.python.psi.PyStarArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.quickfix.IntroduceKeywordArgument
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
@@ -32,7 +33,7 @@ object SmkSyntaxErrorAnnotator : SmkAnnotator() {
                     }
                     encounteredKeywordArgument = true
                 }
-                else -> if (encounteredKeywordArgument) {
+                !is PyStarArgument -> if (encounteredKeywordArgument) {
                     holder.createErrorAnnotation(
                             arg,
                             SnakemakeBundle.message("ANN.positional.argument.after.keyword.argument")
