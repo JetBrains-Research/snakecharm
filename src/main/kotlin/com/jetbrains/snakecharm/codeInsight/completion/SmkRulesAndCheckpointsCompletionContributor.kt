@@ -9,6 +9,7 @@ import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
+import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyReferenceExpression
@@ -52,7 +53,18 @@ private class SmkRuleNameReferenceCompletionProvider : CompletionProvider<Comple
             context: ProcessingContext,
             result: CompletionResultSet
     ) {
-        val variants = collectVariantsForElement(parameters.position)
+        val variants = collectVariantsForElement(
+                parameters.position,
+                SmkRuleNameIndex.KEY,
+                SmkRule::class.java,
+                SmkFile::collectRules
+        )
+        variants.addAll(collectVariantsForElement(
+                parameters.position,
+                SmkCheckpointNameIndex.KEY,
+                SmkCheckPoint::class.java,
+                SmkFile::collectCheckPoints
+        ))
         val references =
                 (PsiTreeUtil.getParentOfType(parameters.position, SmkWorkflowRuleorderSection::class.java)
                         ?: PsiTreeUtil.getParentOfType(parameters.position, SmkWorkflowLocalrulesSection::class.java))
@@ -85,19 +97,26 @@ private class SmkRulesAndCheckpointsObjectsCompletionProvider : CompletionProvid
             context: ProcessingContext,
             result: CompletionResultSet
     ) {
-        val variants = collectVariantsForElement(parameters.position)
-
         // position is a leaf psi element, and it's wrapped in a reference, which is what we want to get
         val parentElement = parameters.position.parent
         // get parent reference to `rules.` or `checkpoints.`
         val rulesOrCheckpointsObject = parameters.withPosition(parentElement, parentElement.textOffset)
                 .originalPosition
-                ?.parent
-        if (rulesOrCheckpointsObject is PyReferenceExpression) {
-            when (rulesOrCheckpointsObject.name) {
-                SnakemakeNames.SMK_VARS_RULES -> variants.removeAll { it.second is SmkCheckPoint }
-                SnakemakeNames.SMK_VARS_CHECKPOINTS -> variants.removeAll { it.second is SmkRule }
-            }
+                ?.parent as? PyReferenceExpression ?: return
+        val variants = when (rulesOrCheckpointsObject.name) {
+            SnakemakeNames.SMK_VARS_RULES -> collectVariantsForElement(
+                    parameters.position,
+                    SmkRuleNameIndex.KEY,
+                    SmkRule::class.java,
+                    SmkFile::collectRules
+            )
+            SnakemakeNames.SMK_VARS_CHECKPOINTS -> collectVariantsForElement(
+                    parameters.position,
+                    SmkCheckpointNameIndex.KEY,
+                    SmkCheckPoint::class.java,
+                    SmkFile::collectCheckPoints
+            )
+            else -> return
         }
 
         // we need to obtain containing rule/checkpoint from the original file
@@ -132,34 +151,24 @@ private class SmkRulesAndCheckpointsObjectsCompletionProvider : CompletionProvid
 
 // the following functions can be used to implement completion for any section/object referring to rule names
 
-private fun collectVariantsForElement(element: PsiElement): MutableList<Pair<String, SmkRuleOrCheckpoint>> {
+private fun <Psi: SmkRuleOrCheckpoint> collectVariantsForElement(
+        element: PsiElement,
+        indexKey: StubIndexKey<String, Psi>,
+        sectionClass: Class<Psi>,
+        currentFileDeclarationsFunction: (SmkFile) -> List<Pair<String, Psi>>
+): MutableList<Pair<String, SmkRuleOrCheckpoint>> {
     val variants = mutableListOf<Pair<String, SmkRuleOrCheckpoint>>()
 
     val module = ModuleUtilCore.findModuleForPsiElement(element)
     if (module != null) {
-        val ruleResults = mutableListOf<SmkRule>()
-        val checkpointResults = mutableListOf<SmkCheckPoint>()
-        AbstractSmkRuleOrCheckpointType.addVariantFromIndex(
-                SmkRuleNameIndex.KEY,
-                module,
-                ruleResults,
-                SmkRule::class.java
+        val results = mutableListOf<Psi>()
+        AbstractSmkRuleOrCheckpointType.addVariantFromIndex(indexKey, module, results, sectionClass)
+        variants.addAll(results
+                .filter { (it as SmkRuleOrCheckpoint).name != null }
+                .map { (it as SmkRuleOrCheckpoint).name!! to it }
         )
-        AbstractSmkRuleOrCheckpointType.addVariantFromIndex(
-                SmkCheckpointNameIndex.KEY,
-                module,
-                checkpointResults,
-                SmkCheckPoint::class.java
-        )
-        variants.addAll(
-                (ruleResults + checkpointResults)
-                        .filter { (it as SmkRuleOrCheckpoint).name != null }
-                        .map { (it as SmkRuleOrCheckpoint).name!! to it })
     } else {
-        variants.addAll(
-                (element.containingFile.originalFile as SmkFile).collectRules() +
-                        (element.containingFile.originalFile as SmkFile).collectCheckPoints()
-        )
+        variants.addAll(currentFileDeclarationsFunction.invoke(element.containingFile.originalFile as SmkFile))
     }
 
     return variants
