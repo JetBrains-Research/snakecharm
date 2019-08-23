@@ -9,7 +9,7 @@ import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyFormattedStringElement
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.python.psi.PyStringLiteralExpression
-import com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor
+import com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor.Companion.FUNCTIONS_VALID_FOR_INJECTION
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
@@ -29,11 +29,11 @@ class SmkSLInjector : PyInjectorBase() {
 
     override fun registerInjection(
             registrar: MultiHostRegistrar,
-            host: PsiElement): InjectionResult =
-            if (host.isValidForInjection())
-                super.registerInjection(registrar,host)
-            else
-                InjectionResult.EMPTY
+            host: PsiElement
+    ): InjectionResult = when {
+        host.isValidForInjection() -> super.registerInjection(registrar, host)
+        else -> InjectionResult.EMPTY
+    }
 
     private fun PyStringLiteralExpression.containsLBrace(): Boolean {
         stringElements.forEach {
@@ -47,15 +47,13 @@ class SmkSLInjector : PyInjectorBase() {
     }
 
     private fun PsiElement.isInValidCallExpression(): Boolean {
-        val parentCallExpression =
-                PsiTreeUtil.getParentOfType(this, PyCallExpression::class.java)
-        return parentCallExpression == null ||
-               parentCallExpression.firstChild.text in SMKImplicitPySymbolsCompletionContributor.FUNCTIONS_VALID_FOR_INJECTION
+        val parentCallExpr = PsiTreeUtil.getParentOfType(this, PyCallExpression::class.java)
+        return parentCallExpr == null || parentCallExpr.firstChild.text in FUNCTIONS_VALID_FOR_INJECTION
     }
 
     private fun PsiElement.isInValidArgsSection(): Boolean {
-        val parentSection =
-                PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpointArgsSection::class.java)
+        val parentSection = PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpointArgsSection::class.java)
+
         return (parentSection != null && parentSection.name !in SECTIONS_INVALID_FOR_INJECTION) ||
                 PsiTreeUtil.getParentOfType(this, SmkRunSection::class.java) != null
     }
