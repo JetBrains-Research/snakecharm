@@ -75,4 +75,12 @@ class SmkStringLanguageParsingTest : ParsingTestCase(
     fun testRbracketInName() {
         doTest(true)
     }
+
+    fun testSpacesInIdentifierName() {
+        doTest(true)
+    }
+
+    fun testFormatSpecifier() {
+        doTest(true)
+    }
 }

@@ -294,7 +294,4 @@ class SnakemakeStatementParsing(
     }
 }
 
-fun IElementType?.isPythonString() : Boolean {
-    return this === PyTokenTypes.TRIPLE_QUOTED_STRING ||
-            this === PyTokenTypes.SINGLE_QUOTED_STRING
-}
+fun IElementType?.isPythonString() = this in PyTokenTypes.STRING_NODES || this == PyTokenTypes.FSTRING_START
