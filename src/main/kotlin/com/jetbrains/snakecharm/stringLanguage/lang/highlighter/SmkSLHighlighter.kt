@@ -5,15 +5,14 @@ import com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributes
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.highlighting.PyHighlighter
-import com.jetbrains.snakecharm.string_language.SmkSLTokenTypes
-import com.jetbrains.snakecharm.string_language.lang.parser.SmkSLLexerAdapter
+import com.jetbrains.snakecharm.stringLanguage.SmkSLTokenTypes
+import com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLLexerAdapter
 
 class SmkSLHighlighter : SyntaxHighlighterBase() {
     companion object {
         val BRACES = arrayOf(createTextAttributesKey("BRACES", PyHighlighter.PY_FSTRING_FRAGMENT_BRACES))
         val COMMA = arrayOf(createTextAttributesKey("COMMA", PyHighlighter.PY_FSTRING_FRAGMENT_COLON))
         val STRING_CONTENT = arrayOf(createTextAttributesKey("STRING_CONTENT", PyHighlighter.PY_BYTE_STRING))
-        val ACCESS_KEY =  arrayOf(createTextAttributesKey("ACCESS_KEY", PyHighlighter.PY_NUMBER))
         val FORMAT_SPECIFIER =  arrayOf(createTextAttributesKey("FORMAT_SPECIFIER", PyHighlighter.PY_NUMBER))
     }
 
@@ -23,7 +22,6 @@ class SmkSLHighlighter : SyntaxHighlighterBase() {
                     tokenType === SmkSLTokenTypes.RBRACE -> BRACES
             tokenType === SmkSLTokenTypes.COMMA -> COMMA
             tokenType === SmkSLTokenTypes.STRING_CONTENT -> STRING_CONTENT
-            tokenType === SmkSLTokenTypes.ACCESS_KEY -> ACCESS_KEY
             tokenType === SmkSLTokenTypes.FORMAT_SPECIFIER -> FORMAT_SPECIFIER
             else -> emptyArray()
         }

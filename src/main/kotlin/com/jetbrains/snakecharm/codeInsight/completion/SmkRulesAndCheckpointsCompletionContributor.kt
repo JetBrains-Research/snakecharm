@@ -21,7 +21,8 @@ import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
-import com.jetbrains.snakecharm.string_language.SmkSL
+import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType.Companion.getVariantsFromIndex
+import com.jetbrains.snakecharm.stringLanguage.SmkSL
 
 class SmkRulesAndCheckpointsCompletionContributor : CompletionContributor() {
     init {
@@ -110,7 +111,6 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
 
         // we need to obtain containing rule/checkpoint from the original file
         // which is why we obtain it from an element present both in copy and original file
-        val parentElement = parameters.position.parent
         val originalContainingRuleOrCheckpoint =
                 PsiTreeUtil.getParentOfType(
                         parameters.withPosition(parentElement, parentElement.textOffset).originalPosition,
@@ -119,9 +119,6 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
 
         if (!parentElement.isInLanguageInjection() &&
                 PsiTreeUtil.getParentOfType(parentElement, SmkRunSection::class.java) == null) {
-            variants.removeAll { it.second == originalContainingRuleOrCheckpoint }
-        }
-
             addVariantsToCompletionResultSet(
                     variants.filterNot { it.second == originalContainingRuleOrCheckpoint },
                     parameters,
