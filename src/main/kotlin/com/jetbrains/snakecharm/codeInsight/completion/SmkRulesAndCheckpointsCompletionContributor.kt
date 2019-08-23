@@ -22,7 +22,7 @@ import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType.Companion.getVariantsFromIndex
-import com.jetbrains.snakecharm.string_language.SmkSL
+import com.jetbrains.snakecharm.stringLanguage.SmkSL
 
 class SmkRulesAndCheckpointsCompletionContributor : CompletionContributor() {
     init {
@@ -119,7 +119,6 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
 
         if (!parentElement.isInLanguageInjection() &&
                 PsiTreeUtil.getParentOfType(parentElement, SmkRunSection::class.java) == null) {
-
             addVariantsToCompletionResultSet(
                     variants.filterNot { it.second == originalContainingRuleOrCheckpoint },
                     parameters,

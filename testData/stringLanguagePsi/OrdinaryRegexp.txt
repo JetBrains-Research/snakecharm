@@ -1,0 +1,17 @@
+FILE
+  SmkSLLanguageElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    PyReferenceExpression: foo
+      PsiElement(Py:IDENTIFIER)('foo')
+    PsiElement(COMMA)(',')
+    SmkSLElementImpl(REGEXP)
+      RegExpPatternImpl: < \d+>
+        RegExpBranchImpl: < \d+>
+          RegExpCharImpl: < >
+            PsiElement(CHARACTER)(' ')
+          RegExpClosureImpl: <\d+>
+            RegExpSimpleClassImpl: <\d>
+              PsiElement(CHAR_CLASS)('\d')
+            RegExpQuantifierImpl: <+>
+              PsiElement(PLUS)('+')
+    PsiElement(RBRACE)('}')

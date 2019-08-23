@@ -9,13 +9,15 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_CHECKPOINTS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_RULES
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkRule
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckPointsType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
-import com.jetbrains.snakecharm.string_language.SmkSL
+import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
+import com.jetbrains.snakecharm.stringLanguage.SmkSL
 
 class SmkSectionTypeProvider : PyTypeProviderBase() {
 
@@ -53,6 +55,10 @@ class SmkSectionTypeProvider : PyTypeProviderBase() {
                     parentDeclaration as? SmkCheckPoint,
                     psiFile
             )
+
+            SMK_VARS_WILDCARDS -> parentDeclaration?.let {
+                SmkWildcardsType(parentDeclaration)
+            }
             else -> null
         }
     }

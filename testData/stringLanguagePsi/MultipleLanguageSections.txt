@@ -1,0 +1,66 @@
+FILE
+  SmkSLElementImpl(STRING_CONTENT)
+    PsiElement(STRING_CONTENT)('some text ')
+  SmkSLLanguageElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    PyReferenceExpression: doo
+      PyReferenceExpression: boo
+        PyReferenceExpression: foo
+          PsiElement(Py:IDENTIFIER)('foo')
+        PsiElement(DOT)('.')
+        PsiElement(Py:IDENTIFIER)('boo')
+      PsiElement(DOT)('.')
+      PsiElement(Py:IDENTIFIER)('doo')
+    PsiElement(COMMA)(',')
+    SmkSLElementImpl(REGEXP)
+      RegExpPatternImpl: < \d+>
+        RegExpBranchImpl: < \d+>
+          RegExpCharImpl: < >
+            PsiElement(CHARACTER)(' ')
+          RegExpClosureImpl: <\d+>
+            RegExpSimpleClassImpl: <\d>
+              PsiElement(CHAR_CLASS)('\d')
+            RegExpQuantifierImpl: <+>
+              PsiElement(PLUS)('+')
+    PsiElement(RBRACE)('}')
+  SmkSLElementImpl(STRING_CONTENT)
+    PsiElement(STRING_CONTENT)(' some text ')
+  SmkSLLanguageElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    PyReferenceExpression: too
+      PyReferenceExpression: doo
+        SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
+          PyReferenceExpression: boo
+            SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
+              PyReferenceExpression: foo
+                PsiElement(Py:IDENTIFIER)('foo')
+              PsiElement(LBRACKET)('[')
+              SmkSLKeyExpression(KEY_EXPRESSION)
+                PsiElement(Py:IDENTIFIER)('0')
+              PsiElement(RBRACKET)(']')
+            PsiElement(DOT)('.')
+            PsiElement(Py:IDENTIFIER)('boo')
+          PsiElement(LBRACKET)('[')
+          SmkSLKeyExpression(KEY_EXPRESSION)
+            PsiElement(Py:IDENTIFIER)('0')
+          PsiElement(RBRACKET)(']')
+        PsiElement(DOT)('.')
+        PsiElement(Py:IDENTIFIER)('doo')
+      PsiElement(DOT)('.')
+      PsiElement(Py:IDENTIFIER)('too')
+    PsiElement(COMMA)(',')
+    SmkSLElementImpl(REGEXP)
+      RegExpPatternImpl: <a{3,5}>
+        RegExpBranchImpl: <a{3,5}>
+          RegExpClosureImpl: <a{3,5}>
+            RegExpCharImpl: <a>
+              PsiElement(CHARACTER)('a')
+            RegExpQuantifierImpl: <{3,5}>
+              PsiElement(LBRACE)('{')
+              RegExpNumberImpl: <3>
+                PsiElement(NUMBER)('3')
+              PsiElement(COMMA)(',')
+              RegExpNumberImpl: <5>
+                PsiElement(NUMBER)('5')
+              PsiElement(RBRACE)('}')
+    PsiElement(RBRACE)('}')

@@ -1,0 +1,25 @@
+FILE
+  SmkSLLanguageElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    PyReferenceExpression: null
+      <empty list>
+    PsiErrorElement:Unexpected character
+      PsiElement(UNEXPECTED_TOKEN)('.')
+    PyReferenceExpression: null
+      <empty list>
+    PsiErrorElement:Unexpected character
+      PsiElement(UNEXPECTED_TOKEN)('[')
+    PyReferenceExpression: null
+      PyReferenceExpression: null
+        PyReferenceExpression: foo
+          PsiElement(Py:IDENTIFIER)('foo')
+        PsiElement(DOT)('.')
+    PsiErrorElement:Unexpected character
+      PsiElement(UNEXPECTED_TOKEN)('.')
+    PyReferenceExpression: null
+      PyReferenceExpression: boo
+        PsiElement(Py:IDENTIFIER)('boo')
+      PsiElement(DOT)('.')
+    PsiErrorElement:Expected identifier name
+      <empty list>
+    PsiElement(RBRACE)('}')

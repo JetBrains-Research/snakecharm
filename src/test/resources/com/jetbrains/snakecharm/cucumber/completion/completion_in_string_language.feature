@@ -156,13 +156,15 @@ Feature: Completion for sections in string language
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-       input: "{i}"
+       input: ""
+       message: "{i}"
     """
     When I put the caret after {i
     Then I invoke autocompletion popup, select "input" lookup item and see a text:
     """
     <rule_like> NAME:
-       input: "{input}"
+       input: ""
+       message: "{input}"
     """
     Examples:
       | rule_like  |

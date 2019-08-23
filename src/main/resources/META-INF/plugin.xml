@@ -30,20 +30,22 @@
             language="Snakemake"
             implementationClass="com.jetbrains.snakecharm.lang.parser.SnakemakeParserDefinition"
     />
-    <fileTypeFactory implementation="com.jetbrains.snakecharm.string_language.SmkSLFileTypeFactory"/>
+    <fileTypeFactory implementation="com.jetbrains.snakecharm.stringLanguage.SmkSLFileTypeFactory"/>
     <lang.parserDefinition
             language="SnakemakeSL"
-            implementationClass="com.jetbrains.snakecharm.string_language.lang.parser.SmkSLParserDefinition"
+            implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLParserDefinition"
     />
     <!--<colorSettingsPage implementation="com.jetbrains.snakemake.lang.highlighter.SnakemakeColorsPage"/>-->
     <lang.syntaxHighlighterFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterFactory"/>
     <lang.syntaxHighlighterFactory language="SnakemakeSL"
-     implementationClass="com.jetbrains.snakecharm.string_language.lang.highlighter.SmkSLSyntaxHighlighterFactory"/>
+     implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLSyntaxHighlighterFactory"/>
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkDumbAwareAnnotatorManager"/>
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkStandardAnnotatorManager"/>
-    <annotator language="RegExp" implementationClass="com.jetbrains.snakecharm.string_language.lang.highlighter.SmkSLRegExpHighlightingAnnotator"/>
+    <annotator language="RegExp" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLRegExpHighlightingAnnotator"/>
+    <annotator language="Python" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLHighlightingAnnotator"/>
     <lang.foldingBuilder language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.SmkMakeFoldingBuilder"/>
-    <lang.braceMatcher language="SnakemakeSL" implementationClass="com.jetbrains.snakecharm.string_language.SmkSLBraceMatcher"/>
+    <lang.braceMatcher language="SnakemakeSL" implementationClass="com.jetbrains.snakecharm.stringLanguage.SmkSLBraceMatcher"/>
+    <renamePsiElementProcessor implementation="com.jetbrains.snakecharm.stringLanguage.RenameWildcardsProcessor"/>
     <!--<enterBetweenBracesDelegate language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.editorActions.EnterInRuleParamsListDelegate"/>-->
     <codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>
     <lang.documentationProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.documentation.SmkShadowSettingsDocumentation"/>
@@ -53,7 +55,7 @@
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex"/>
     <gotoSymbolContributor implementation="com.jetbrains.snakecharm.actions.SmkGotoSymbolContributor"/>
 
-    <multiHostInjector implementation="com.jetbrains.snakecharm.string_language.SmkSLInjector"/>
+    <multiHostInjector implementation="com.jetbrains.snakecharm.stringLanguage.SmkSLInjector"/>
 
     <completion.contributor
         language="Python"
