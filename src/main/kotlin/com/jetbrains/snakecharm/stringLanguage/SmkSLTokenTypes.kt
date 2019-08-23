@@ -4,8 +4,6 @@ import com.intellij.lang.*
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.ILazyParseableElementType
-import com.intellij.spellchecker.PsiIdentifierTokenizer
-import com.intellij.spellchecker.tokenizer.PsiIdentifierOwnerTokenizer
 import com.jetbrains.python.PyTokenTypes
 import org.intellij.lang.regexp.RegExpCapability
 import org.intellij.lang.regexp.RegExpLanguage
