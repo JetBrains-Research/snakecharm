@@ -1,0 +1,15 @@
+FILE
+  SmkSLLanguageElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    PyReferenceExpression: too
+      PyReferenceExpression: doo
+        PyReferenceExpression: boo
+          PyReferenceExpression: foo
+            PsiElement(Py:IDENTIFIER)('foo')
+          PsiElement(DOT)('.')
+          PsiElement(Py:IDENTIFIER)('boo')
+        PsiElement(DOT)('.')
+        PsiElement(Py:IDENTIFIER)('doo')
+      PsiElement(DOT)('.')
+      PsiElement(Py:IDENTIFIER)('too')
+    PsiElement(RBRACE)('}')

@@ -9,13 +9,15 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_CHECKPOINTS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_RULES
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkRule
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckPointsType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
-import com.jetbrains.snakecharm.string_language.SmkSL
+import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
+import com.jetbrains.snakecharm.stringLanguage.SmkSL
 
 class SmkSectionTypeProvider : PyTypeProviderBase() {
 
@@ -42,17 +44,21 @@ class SmkSectionTypeProvider : PyTypeProviderBase() {
             return null
         }
 
+        val referencedName = referenceExpression.referencedName
+
         // XXX: at the moment affects all "rules" variables in a *.smk file, better to
         // affect only "rules" which is resolved to appropriate place
-        return when (referenceExpression.referencedName) {
-            SMK_VARS_RULES -> SmkRulesType(
+        return when {
+            referencedName == SMK_VARS_RULES -> SmkRulesType(
                     parentDeclaration as? SmkRule,
                     psiFile
             )
-            SMK_VARS_CHECKPOINTS -> SmkCheckPointsType(
+            referencedName == SMK_VARS_CHECKPOINTS -> SmkCheckPointsType(
                     parentDeclaration as? SmkCheckPoint,
                     psiFile
             )
+            referencedName == SMK_VARS_WILDCARDS && parentDeclaration != null ->
+                SmkWildcardsType(parentDeclaration)
             else -> null
         }
     }

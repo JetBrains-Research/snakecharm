@@ -1,39 +1,30 @@
 package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
-import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
-import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
-import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil.getIdentifierNode
+import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
+import com.jetbrains.snakecharm.lang.psi.SmkFile
+import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
+import com.jetbrains.snakecharm.lang.psi.SmkRule
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 
 
 class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferenceExpression {
-    override fun getName() = getNameNode()?.text
-
-    override fun setName(name: String): PsiElement {
-        val nameElement = PyUtil.createNewName(this, name)
-        val nameNode = getNameNode()
-        if (nameNode != null) {
-            node.replaceChild(nameNode, nameElement)
-        }
-        return this
+    override fun getName(): String? {
+        return super<SmkReferenceExpression>.getName()
     }
 
     override fun getType(context: TypeEvalContext, key: TypeEvalContext.Key): PyType? = null
 
     override fun getReference(): PsiReference? = SmkRuleOrCheckpointNameReference(this, TextRange(0, textLength))
-
-    private fun getNameNode() = getIdentifierNode(node)
 
     class SmkRuleOrCheckpointNameReference(
             element: PsiNamedElement,

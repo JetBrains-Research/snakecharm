@@ -19,7 +19,7 @@ import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
-import com.jetbrains.snakecharm.string_language.SmkSL
+import com.jetbrains.snakecharm.stringLanguage.SmkSL
 
 class SmkRulesAndCheckpointsCompletionContributor : CompletionContributor() {
     init {

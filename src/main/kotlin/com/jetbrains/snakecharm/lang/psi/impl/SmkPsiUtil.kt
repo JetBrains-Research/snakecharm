@@ -9,7 +9,7 @@ import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
-import com.jetbrains.snakecharm.string_language.SmkSL
+import com.jetbrains.snakecharm.stringLanguage.SmkSL
 
 object SmkPsiUtil {
     fun getIdentifierNode(node: ASTNode): ASTNode? {

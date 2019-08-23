@@ -1,6 +1,6 @@
 package com.jetbrains.snakecharm.lang.parser
 
-import com.jetbrains.snakecharm.string_language.lang.parser.SmkSLLexerAdapter
+import com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLLexerAdapter
 
 class SmkStringLanguageLexerTest : PyLexerTestCase() {
     fun testOrdinaryString() {
@@ -17,15 +17,15 @@ class SmkStringLanguageLexerTest : PyLexerTestCase() {
     fun testLanguageWithMultipleAccess() {
         doTest("{params.foo[key].boo[0][1]}",
                 "LBRACE", "Py:IDENTIFIER", "DOT", "Py:IDENTIFIER",
-                "LBRACKET", "ACCESS_KEY", "RBRACKET", "DOT",
-                "Py:IDENTIFIER", "LBRACKET", "ACCESS_KEY", "RBRACKET",
-                "LBRACKET", "ACCESS_KEY", "RBRACKET", "RBRACE")
+                "LBRACKET", "Py:IDENTIFIER", "RBRACKET", "DOT",
+                "Py:IDENTIFIER", "LBRACKET", "Py:IDENTIFIER", "RBRACKET",
+                "LBRACKET", "Py:IDENTIFIER", "RBRACKET", "RBRACE")
     }
 
     fun testLanguageWithUnexpectedTokens() {
         doTest("{.[foo[key]..}",
                 "LBRACE", "UNEXPECTED_TOKEN", "UNEXPECTED_TOKEN",
-                "Py:IDENTIFIER", "LBRACKET", "ACCESS_KEY", "RBRACKET", "DOT",
+                "Py:IDENTIFIER", "LBRACKET", "Py:IDENTIFIER", "RBRACKET", "DOT",
                 "UNEXPECTED_TOKEN", "RBRACE")
     }
 
