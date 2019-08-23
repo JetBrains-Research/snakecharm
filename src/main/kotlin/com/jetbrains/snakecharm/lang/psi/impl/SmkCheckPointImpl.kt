@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
-import com.intellij.psi.PsiElement
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
@@ -28,10 +27,7 @@ class SmkCheckPointImpl
         else -> super.acceptPyVisitor(pyVisitor)
     }
 
-    override fun collectWildcards(): List<Pair<String, PsiElement>> {
-        val wildcardsCollector = SmkWildcardsCollector()
-        wildcardsCollector.visitSmkCheckPoint(this)
-
-        return wildcardsCollector.collectedWildcards.toList()
-    }
+    override fun collectWildcards() = SmkWildcardsCollector().also {
+        it.visitSmkCheckPoint(this)
+    }.getWildcardsFirstMentions()
 }

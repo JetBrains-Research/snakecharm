@@ -1,11 +1,13 @@
 package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
-import com.intellij.psi.PsiElement
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
-import com.jetbrains.snakecharm.lang.psi.*
+import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
+import com.jetbrains.snakecharm.lang.psi.SmkRule
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkWildcardsCollector
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleStub
 import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeType
@@ -25,10 +27,7 @@ class SmkRuleImpl
         else -> super.acceptPyVisitor(pyVisitor)
     }
 
-    override fun collectWildcards(): List<Pair<String, PsiElement>> {
-        val wildcardsCollector = SmkWildcardsCollector()
-        wildcardsCollector.visitSmkRule(this)
-
-        return wildcardsCollector.collectedWildcards.toList()
-    }
+    override fun collectWildcards() = SmkWildcardsCollector().also {
+        it.visitSmkRule(this)
+    }.getWildcardsFirstMentions()
 }

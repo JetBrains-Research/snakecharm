@@ -44,21 +44,21 @@ class SmkSectionTypeProvider : PyTypeProviderBase() {
             return null
         }
 
-        val referencedName = referenceExpression.referencedName
-
         // XXX: at the moment affects all "rules" variables in a *.smk file, better to
         // affect only "rules" which is resolved to appropriate place
-        return when {
-            referencedName == SMK_VARS_RULES -> SmkRulesType(
+        return when (referenceExpression.referencedName) {
+            SMK_VARS_RULES -> SmkRulesType(
                     parentDeclaration as? SmkRule,
                     psiFile
             )
-            referencedName == SMK_VARS_CHECKPOINTS -> SmkCheckPointsType(
+            SMK_VARS_CHECKPOINTS -> SmkCheckPointsType(
                     parentDeclaration as? SmkCheckPoint,
                     psiFile
             )
-            referencedName == SMK_VARS_WILDCARDS && parentDeclaration != null ->
+
+            SMK_VARS_WILDCARDS -> parentDeclaration?.let {
                 SmkWildcardsType(parentDeclaration)
+            }
             else -> null
         }
     }

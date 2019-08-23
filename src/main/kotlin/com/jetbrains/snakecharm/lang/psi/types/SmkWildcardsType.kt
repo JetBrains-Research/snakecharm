@@ -16,7 +16,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
 import com.jetbrains.snakecharm.stringLanguage.SmkSL
 
 class SmkWildcardsType(private val parentDeclaration: SmkRuleOrCheckpoint) : PyType {
-    private val wildcardsNamesAndPsi = parentDeclaration.collectWildcards()
+    private val wildcardsPsiAndName = parentDeclaration.collectWildcards()
 
     override fun getName() = "wildcards"
 
@@ -46,7 +46,7 @@ class SmkWildcardsType(private val parentDeclaration: SmkRuleOrCheckpoint) : PyT
             getRuleWildcardConstraintsSection()?.argumentList?.getKeywordArgument(name)
 
     private fun resolveToFirstDeclaration(name: String) =
-            wildcardsNamesAndPsi.firstOrNull { it.first == name }?.second
+            wildcardsPsiAndName.firstOrNull { it.second == name }?.first
 
     private fun resolveToFileWildcardConstraintsKwarg(name: String): PsiElement? {
         val sections = getFileWildcardConstraintsSections()
@@ -79,8 +79,8 @@ class SmkWildcardsType(private val parentDeclaration: SmkRuleOrCheckpoint) : PyT
             return emptyArray()
         }
 
-        return wildcardsNamesAndPsi
-                .map { SmkCompletionUtil.createPrioritizedLookupElement(it.first) }
+        return wildcardsPsiAndName
+                .map { SmkCompletionUtil.createPrioritizedLookupElement(it.second) }
                 .toTypedArray()
     }
 
