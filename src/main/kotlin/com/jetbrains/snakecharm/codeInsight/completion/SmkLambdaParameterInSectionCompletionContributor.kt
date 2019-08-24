@@ -41,7 +41,8 @@ object SMKLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
     ) {
         val element = parameters.position
         val section = PsiTreeUtil.getParentOfType(element, SmkRuleOrCheckpointArgsSection::class.java) ?: return
-        when (section.name) {
+        val sectionName = section.name
+        when (sectionName) {
             SnakemakeNames.SECTION_INPUT, SnakemakeNames.SECTION_GROUP -> {
                 result.addElement(
                         TailTypeDecorator.withTail(
@@ -51,12 +52,12 @@ object SMKLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
                         )
                 )
             }
-            SnakemakeNames.SECTION_PARAMS ->
-                addCompletionResultsForSection(element, SmkLambdaRuleParamsInspection.ALLOWED_IN_PARAMS, result)
-            SnakemakeNames.SECTION_THREADS ->
-                addCompletionResultsForSection(element, SmkLambdaRuleParamsInspection.ALLOWED_IN_THREADS, result)
-            SnakemakeNames.SECTION_RESOURCES ->
-                addCompletionResultsForSection(element, SmkLambdaRuleParamsInspection.ALLOWED_IN_RESOURCES, result)
+            else -> {
+                val args = SmkLambdaRuleParamsInspection.ALLOWED_LAMBDA_ARGS[sectionName]
+                if (args != null) {
+                    addCompletionResultsForSection(element, args, result)
+                }
+            }
         }
     }
 
