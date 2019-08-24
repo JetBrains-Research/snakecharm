@@ -12,23 +12,27 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
     companion object {
-        val ALLOWED_IN_PARAMS = arrayOf(
-                SnakemakeNames.SMK_VARS_WILDCARDS,
-                SnakemakeNames.SECTION_INPUT,
-                SnakemakeNames.SECTION_OUTPUT,
-                SnakemakeNames.SECTION_RESOURCES,
-                SnakemakeNames.SECTION_THREADS
-        )
-        val ALLOWED_IN_RESOURCES = arrayOf(
-                SnakemakeNames.SMK_VARS_WILDCARDS,
-                SnakemakeNames.SECTION_INPUT,
-                SnakemakeNames.SECTION_THREADS,
-                SnakemakeNames.SMK_VARS_ATTEMPT
-        )
-        val ALLOWED_IN_THREADS = arrayOf(
-                SnakemakeNames.SMK_VARS_WILDCARDS,
-                SnakemakeNames.SECTION_INPUT,
-                SnakemakeNames.SMK_VARS_ATTEMPT
+        val ALLOWED_LAMBDA_ARGS = mapOf(
+                SnakemakeNames.SECTION_INPUT to arrayOf(SnakemakeNames.SMK_VARS_WILDCARDS),
+                SnakemakeNames.SECTION_GROUP to arrayOf(SnakemakeNames.SMK_VARS_WILDCARDS),
+                SnakemakeNames.SECTION_PARAMS to arrayOf(
+                        SnakemakeNames.SMK_VARS_WILDCARDS,
+                        SnakemakeNames.SECTION_INPUT,
+                        SnakemakeNames.SECTION_OUTPUT,
+                        SnakemakeNames.SECTION_RESOURCES,
+                        SnakemakeNames.SECTION_THREADS
+                ),
+                SnakemakeNames.SECTION_RESOURCES to arrayOf(
+                        SnakemakeNames.SMK_VARS_WILDCARDS,
+                        SnakemakeNames.SECTION_INPUT,
+                        SnakemakeNames.SECTION_THREADS,
+                        SnakemakeNames.SMK_VARS_ATTEMPT
+                ),
+                SnakemakeNames.SECTION_THREADS to arrayOf(
+                        SnakemakeNames.SMK_VARS_WILDCARDS,
+                        SnakemakeNames.SECTION_INPUT,
+                        SnakemakeNames.SMK_VARS_ATTEMPT
+                )
         )
     }
 
@@ -47,43 +51,24 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
                             ?: emptyList())
             // see https://github.com/JetBrains-Research/snakecharm/issues/187
             // for more info on which sections are allowed to use callables and why
-            when (st.sectionKeyword) {
-                SnakemakeNames.SECTION_INPUT, SnakemakeNames.SECTION_GROUP ->
-                    registerParamsProblemsForLambdasWithWildcards(
-                            allLambdas,
-                            st.sectionKeyword!!,
-                            SnakemakeNames.SMK_VARS_WILDCARDS
-                    )
-                SnakemakeNames.SECTION_PARAMS ->
-                    registerParamsProblemsForLambdasWithWildcards(
-                            allLambdas,
-                            SnakemakeNames.SECTION_PARAMS,
-                            *ALLOWED_IN_PARAMS
-                    )
-                SnakemakeNames.SECTION_RESOURCES ->
-                    registerParamsProblemsForLambdasWithWildcards(
-                            allLambdas,
-                            SnakemakeNames.SECTION_RESOURCES,
-                            *ALLOWED_IN_RESOURCES
-                    )
-                SnakemakeNames.SECTION_THREADS ->
-                    registerParamsProblemsForLambdasWithWildcards(
-                            allLambdas,
-                            SnakemakeNames.SECTION_THREADS,
-                            *ALLOWED_IN_THREADS
-                    )
-                else -> {
-                    if (st.sectionKeyword != null) {
-                        allLambdas.forEach {
-                            registerProblem(
-                                    it,
-                                    SnakemakeBundle.message(
-                                            "INSP.NAME.functions.not.allowed.in.section",
-                                            st.sectionKeyword!!
-                                    )
+
+            val sectionKeyword = st.sectionKeyword
+            val allowedArgs = ALLOWED_LAMBDA_ARGS[sectionKeyword]
+            if (allowedArgs != null) {
+                registerParamsProblemsForLambdasWithWildcards(
+                        allLambdas,
+                        sectionKeyword!!,
+                        *allowedArgs
+                )
+            } else if (sectionKeyword != null) {
+                allLambdas.forEach {
+                    registerProblem(
+                            it,
+                            SnakemakeBundle.message(
+                                    "INSP.NAME.functions.not.allowed.in.section",
+                                    st.sectionKeyword!!
                             )
-                        }
-                    }
+                    )
                 }
             }
         }
