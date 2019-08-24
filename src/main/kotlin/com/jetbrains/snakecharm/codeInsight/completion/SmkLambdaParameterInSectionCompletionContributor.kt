@@ -41,6 +41,8 @@ object SMKLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
     ) {
         val element = parameters.position
         val section = PsiTreeUtil.getParentOfType(element, SmkRuleOrCheckpointArgsSection::class.java) ?: return
+
+        @Suppress("MoveVariableDeclarationIntoWhen")
         val sectionName = section.name
         when (sectionName) {
             SnakemakeNames.SECTION_INPUT, SnakemakeNames.SECTION_GROUP -> {
