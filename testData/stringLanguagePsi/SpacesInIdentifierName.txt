@@ -1,11 +1,10 @@
 FILE
-  SmkSLElement(LANGUAGE)
+  SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
-    SmkSLElement(EXPRESSION_STATEMENT)
-      PyReferenceExpression:    foo
-        PsiElement(Py:IDENTIFIER)('   foo')
+    PyReferenceExpression:    foo
+      PsiElement(Py:IDENTIFIER)('   foo')
     PsiElement(COMMA)(',')
-    SmkSLElement(REGEXP)
+    SmkSLElementImpl(REGEXP)
       RegExpPatternImpl: <\d+>
         RegExpBranchImpl: <\d+>
           RegExpClosureImpl: <\d+>

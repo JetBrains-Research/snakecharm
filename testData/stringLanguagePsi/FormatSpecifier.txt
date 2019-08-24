@@ -1,9 +1,8 @@
 FILE
-  SmkSLElement(LANGUAGE)
+  SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
-    SmkSLElement(EXPRESSION_STATEMENT)
-      SmkSLElement(FORMAT_SPECIFIER_EXPRESSION)
-        PyReferenceExpression: foo
-          PsiElement(Py:IDENTIFIER)('foo')
-        PsiElement(FORMAT_SPECIFIER)(':%Y-%m-%d %H:%M:%S')
+    SmkSLElementImpl(FORMAT_SPECIFIER_EXPRESSION)
+      PyReferenceExpression: foo
+        PsiElement(Py:IDENTIFIER)('foo')
+      PsiElement(FORMAT_SPECIFIER)(':%Y-%m-%d %H:%M:%S')
     PsiElement(RBRACE)('}')
