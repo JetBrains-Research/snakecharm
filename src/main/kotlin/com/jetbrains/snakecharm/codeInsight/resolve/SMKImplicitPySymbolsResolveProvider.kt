@@ -28,7 +28,7 @@ class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
                         .filter { symbolScope -> contextScope.includes(symbolScope) }
                         .flatMap { symbolScope -> cache.filter(symbolScope, element.name!!).asSequence() }
                         .map {
-                            RatedResolveResult(RatedResolveResult.RATE_NORMAL, it.psiDeclaration)
+                            RatedResolveResult(SmkResolveUtil.IMPLICIT_SYMBOLS_PRIORITY, it.psiDeclaration)
                         }.toMutableList()
 
                 if (contextScope == SmkCodeInsightScope.RULELIKE_RUN_SECTION) {
@@ -41,7 +41,7 @@ class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
                                 .filterIsInstance<SmkRuleOrCheckpointArgsSection>()
                                 .filter { it.name == SnakemakeNames.SECTION_THREADS }.firstOrNull()
 
-                         items.add(RatedResolveResult(RatedResolveResult.RATE_NORMAL, threadsSection ?: ruleOrCheckpoint))
+                         items.add(RatedResolveResult(SmkResolveUtil.IMPLICIT_SYMBOLS_PRIORITY, threadsSection ?: ruleOrCheckpoint))
                     }
                 }
                 return items

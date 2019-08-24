@@ -100,6 +100,20 @@ Feature: Resolve implicitly imported python names
       | res        | resources   | Resources   | io.py       | 1     |
       | lo         | log         | Log         | io.py       | 1     |
 
+  Scenario: Resolve results priority
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      rule NAME:
+        output: "path/to/output"
+        run:
+          input #here
+      """
+      When I put the caret at input #here
+      Then reference should multi resolve to name, file in same order
+        | InputFiles | io.py        |
+        | input      | builtins.pyi |
+
   Scenario Outline: Resolve threads inside run section
     Given a snakemake project
     Given I open a file "foo.smk" with text
