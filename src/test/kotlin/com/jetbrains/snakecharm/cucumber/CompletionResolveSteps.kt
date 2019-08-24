@@ -218,7 +218,7 @@ class CompletionResolveSteps {
         }
     }
 
-    private fun itemText(result: @Nullable PsiElement): String = when (result) {
+    private fun itemText(result: PsiElement): String = when (result) {
         is PsiNamedElement -> {
             "${result.name}"
             // "${result.name} (${result.textRange})"
