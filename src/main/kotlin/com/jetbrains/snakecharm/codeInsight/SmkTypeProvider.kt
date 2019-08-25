@@ -26,7 +26,7 @@ import com.jetbrains.snakecharm.lang.psi.types.SmkSectionType
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.stringLanguage.SmkSL
 
-class SmkSectionTypeProvider : PyTypeProviderBase() {
+class SmkTypeProvider : PyTypeProviderBase() {
     // getParameterType(param, function, context) // only for function declarations, not lambdas
     // registerReturnType(classQualifiedName, methods, callback)
     // getReturnType(callable, context)
