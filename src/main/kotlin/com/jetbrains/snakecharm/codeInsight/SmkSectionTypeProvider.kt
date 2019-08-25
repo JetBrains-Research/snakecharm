@@ -59,7 +59,6 @@ class SmkSectionTypeProvider : PyTypeProviderBase() {
                     parentSection, SmkRuleOrCheckpoint::class.java
             ) ?: return null
 
-            referenceTarget.isKeywordOnly
             val allowedArgs = ALLOWED_LAMBDA_ARGS[parentSection.sectionKeyword] ?: emptyArray()
             val paramName = referenceTarget.text
 
