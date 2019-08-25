@@ -20,7 +20,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_CHECKPOINTS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_RULES
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.psi.types.SmkCheckPointsType
+import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 import com.jetbrains.snakecharm.lang.psi.types.SmkSectionType
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
@@ -120,7 +120,7 @@ class SmkSectionTypeProvider : PyTypeProviderBase() {
                     parentDeclaration as? SmkRule,
                     psiFile
             )
-            SMK_VARS_CHECKPOINTS -> SmkCheckPointsType(
+            SMK_VARS_CHECKPOINTS -> SmkCheckpointType(
                     parentDeclaration as? SmkCheckPoint,
                     psiFile
             )

@@ -5,7 +5,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex.Companion.KEY
 
-class SmkCheckPointsType(
+class SmkCheckpointType(
         containingRule: SmkCheckPoint?,
         smkFile: SmkFile
 ) : AbstractSmkRuleOrCheckpointType<SmkCheckPoint>(
