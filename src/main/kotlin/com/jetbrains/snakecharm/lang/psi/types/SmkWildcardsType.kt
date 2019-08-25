@@ -13,7 +13,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
-import com.jetbrains.snakecharm.stringLanguage.SmkSL
+import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
 class SmkWildcardsType(private val parentDeclaration: SmkRuleOrCheckpoint) : PyType {
     private val wildcardsPsiAndName = parentDeclaration.collectWildcards()
@@ -29,7 +29,7 @@ class SmkWildcardsType(private val parentDeclaration: SmkRuleOrCheckpoint) : PyT
             direction: AccessDirection,
             resolveContext: PyResolveContext
     ): List<RatedResolveResult> {
-        if (!SmkSL.isInsideSmkSLFile(location)) {
+        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location)) {
             return emptyList()
         }
 
@@ -75,7 +75,7 @@ class SmkWildcardsType(private val parentDeclaration: SmkRuleOrCheckpoint) : PyT
             location: PsiElement,
             context: ProcessingContext?
     ): Array<out Any> {
-        if (!SmkSL.isInsideSmkSLFile(location)) {
+        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location)) {
             return emptyArray()
         }
 
