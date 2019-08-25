@@ -42,41 +42,50 @@ class SmkSectionTypeProvider : PyTypeProviderBase() {
     ): Ref<PyType>? {
         // lambdas params types
         if (referenceTarget is PyNamedParameter && anchor is PyReferenceExpression) {
-            // in lambda
-            val lambda = PsiTreeUtil.getParentOfType(
-                    referenceTarget, PyLambdaExpression::class.java
-            ) ?: return null
+            return getLambdaParamType(referenceTarget)
+        }
 
-            // in section, lambda not in call
-            val parentSection = PsiTreeUtil.getParentOfType(
-                    lambda,
-                    SmkRuleOrCheckpointArgsSection::class.java,
-                    true,
-                    PyCallExpression::class.java
-            ) ?: return null
+        // cannot assign SmkRulesType, SmkCheckPointsType here: anchor is null, only resolve
+        // target is available
 
-            val ruleLike = PsiTreeUtil.getParentOfType(
-                    parentSection, SmkRuleOrCheckpoint::class.java
-            ) ?: return null
+        return null
+    }
 
-            val allowedArgs = ALLOWED_LAMBDA_ARGS[parentSection.sectionKeyword] ?: emptyArray()
-            val paramName = referenceTarget.text
+    private fun getLambdaParamType(referenceTarget: PyNamedParameter): Ref<PyType>? {
+        // in lambda
+        val lambda = PsiTreeUtil.getParentOfType(
+                referenceTarget, PyLambdaExpression::class.java
+        ) ?: return null
 
-            val isFstPositionalParam = !referenceTarget.isKeywordOnly
-                    && lambda.parameterList.parameters.indexOf(referenceTarget) == 0
+        // in section, lambda not in call
+        val parentSection = PsiTreeUtil.getParentOfType(
+                lambda,
+                SmkRuleOrCheckpointArgsSection::class.java,
+                true,
+                PyCallExpression::class.java
+        ) ?: return null
 
-            if (isFstPositionalParam || paramName in allowedArgs) {
-                val type = when (paramName) {
-                    SECTION_INPUT, SECTION_OUTPUT, SECTION_RESOURCES -> {
-                        ruleLike.getSectionByName(paramName)?.let { SmkSectionType(it) }
-                    }
-                    else -> {
-                        // 1st pos parameter in lambda is wildcard
-                        if (isFstPositionalParam) SmkWildcardsType(ruleLike) else null
-                    }
+        val ruleLike = PsiTreeUtil.getParentOfType(
+                parentSection, SmkRuleOrCheckpoint::class.java
+        ) ?: return null
+
+        val allowedArgs = ALLOWED_LAMBDA_ARGS[parentSection.sectionKeyword] ?: emptyArray()
+        val paramName = referenceTarget.text
+
+        val isFstPositionalParam = !referenceTarget.isKeywordOnly
+                && lambda.parameterList.parameters.indexOf(referenceTarget) == 0
+
+        if (isFstPositionalParam || paramName in allowedArgs) {
+            val type = when (paramName) {
+                SECTION_INPUT, SECTION_OUTPUT, SECTION_RESOURCES -> {
+                    ruleLike.getSectionByName(paramName)?.let { SmkSectionType(it) }
                 }
-                return type?.let { Ref.create(it) }
+                else -> {
+                    // 1st pos parameter in lambda is wildcard
+                    if (isFstPositionalParam) SmkWildcardsType(ruleLike) else null
+                }
             }
+            return type?.let { Ref.create(it) }
         }
         return null
     }
