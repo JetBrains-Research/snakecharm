@@ -1,11 +1,10 @@
 package com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes
 
 import com.intellij.lang.ASTNode
-import com.intellij.lang.Language
 import com.intellij.lang.injection.InjectedLanguageManager
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.util.PsiTreeUtil
-import com.jetbrains.python.PythonLanguage
 import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.impl.PyReferenceExpressionImpl
 import com.jetbrains.python.psi.impl.references.PyQualifiedReference
@@ -23,6 +22,8 @@ class SmkSLReferenceExpressionImpl(
     override fun getName(): String? {
         return super<SmkSLReferenceExpression>.getName()
     }
+
+    fun getNameRange(): TextRange = getNameNode()?.textRange ?: TextRange.EMPTY_RANGE
 
     override fun getReference(context: PyResolveContext): PsiPolyVariantReference {
         if (qualifier != null) {
