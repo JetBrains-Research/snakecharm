@@ -171,17 +171,20 @@ Feature: Tests on snakemake string language injection
     When I put the caret after foo
     Then I expect language injection on "{foo}"
     Examples:
-    | function  |
-    | ancient   |
-    | directory |
-    | temp      |
-    | pipe      |
-    | temporary |
-    | protected |
-    | dynamic   |
-    | touch     |
-    | repeat    |
-    | report    |
-    | local     |
-    | expand    |
-    | shell     |
+    | function     |
+    | ancient      |
+    | directory    |
+    | temp         |
+    | pipe         |
+    | temporary    |
+    | protected    |
+    | dynamic      |
+    | touch        |
+    | repeat       |
+    | report       |
+    | local        |
+    | expand       |
+    | shell        |
+    | join         |
+    | path.join    |
+    | os.path.join |
