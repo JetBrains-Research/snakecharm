@@ -1,14 +1,14 @@
 Feature: Resolve wildcards in SnakemakeSL
 
-  Scenario Outline: Resolve to first occurrence
+  Scenario Outline: Resolve to definition
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-        input: "{foo} here"
-        output: "{foo}"
+        input: "{foo}"
+        output: "{foo} here"
     """
-    When I put the caret after output: "{fo
+    When I put the caret after input: "{fo
     Then reference in injection should resolve to "foo} here" in "foo.smk"
     Examples:
       | rule_like  |
@@ -25,20 +25,20 @@ Feature: Resolve wildcards in SnakemakeSL
         wildcard_constraints:
           foo=""
     """
-    When I put the caret after output: "{fo
+    When I put the caret after input: "{fo
     Then reference in injection should resolve to "foo=""" in "foo.smk"
     Examples:
       | rule_like  |
       | rule       |
       | checkpoint |
 
-  Scenario Outline: Resolve to first occurrence from wildcards.
+  Scenario Outline: Resolve to definition from wildcards.
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-        input: "{foo} here"
-        output: "{foo}"
+        input: "{foo}"
+        output: "{foo} here"
         shell: "{wildcards.foo}"
     """
     When I put the caret after shell: "{wildcards.fo

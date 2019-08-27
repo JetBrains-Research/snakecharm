@@ -26,6 +26,14 @@ class SmkWildcardsCollector : SmkElementVisitor, PyRecursiveElementVisitor() {
     override val pyElementVisitor: PyElementVisitor
         get() = this
 
+    override fun visitSmkRule(rule: SmkRule) {
+        rule.getWildcardDefiningSection()?.let { visitSmkRuleOrCheckpointArgsSection(it) }
+    }
+
+    override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
+        checkPoint.getWildcardDefiningSection()?.let { visitSmkRuleOrCheckpointArgsSection(it) }
+    }
+
     override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
         if (st.name in SmkRuleOrCheckpointArgsSection.KEYWORDS_CONTAINING_WILDCARDS) {
             super.visitSmkRuleOrCheckpointArgsSection(st)
