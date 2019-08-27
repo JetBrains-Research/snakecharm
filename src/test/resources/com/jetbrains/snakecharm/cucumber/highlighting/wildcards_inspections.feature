@@ -196,3 +196,57 @@ Feature: Check highlighting of inspections on wildcards
       | section    |
       | rule       |
       | checkpoint |
+
+  Scenario Outline: Wildcard not defined: Two rules not interfere
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <section> NAME1:
+      output: "{a}.{b}.{z}"
+      log: "{a}.{d}"
+      
+    <section> NAME2:
+      output: "{x}.{y}"
+      log: "{x}.{z}"
+    """
+    And Wildcard not defined inspection is enabled
+    Then I expect inspection error on <d> with message
+    """
+    Wildcard 'd' isn't defined in 'output' section
+    """
+    Then I expect inspection error on <z> with message
+    """
+    Wildcard 'z' isn't defined in 'output' section
+    """
+    When I check highlighting errors
+    Examples:
+      | section    |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Not same wildcards set: Two rules not interfere
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <section> NAME1:
+      output: "{a}.{b}"
+      log: "{a}.{d}"
+      
+    <section> NAME2:
+      output: "{x}.{y}"
+      log: "{x}.{z}"
+    """
+    And Not same wildcards set inspection is enabled
+    Then I expect inspection error on <"{a}.{d}"> with message
+    """
+    Missing wildcards: 'b'.
+    """
+    Then I expect inspection error on <"{x}.{z}"> with message
+    """
+    Missing wildcards: 'y'.
+    """
+    When I check highlighting errors
+    Examples:
+      | section    |
+      | rule       |
+      | checkpoint |

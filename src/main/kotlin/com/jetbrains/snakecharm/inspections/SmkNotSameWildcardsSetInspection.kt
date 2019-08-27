@@ -2,45 +2,56 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
-import com.jetbrains.snakecharm.lang.psi.SmkWildcardsCollector
+import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
     override fun buildVisitor(
             holder: ProblemsHolder,
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
-    ) = object : AbstractSmkWildcardsInspectionVisitor<SmkRuleOrCheckpointArgsSection>(holder, session) {
-        override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            val sectionKeyword = st.sectionKeyword
+    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        override fun visitSmkRule(rule: SmkRule) {
+            processRuleOrCheckpointLike(rule)
+        }
 
-            // consider non-output wildcards defining sections:
-            if (sectionKeyword == SnakemakeNames.SECTION_OUTPUT ||
-                    sectionKeyword !in SmkRuleOrCheckpointArgsSection.SECTIONS_DEFINING_WILDCARDS) {
-                return
-            }
+        override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
+            processRuleOrCheckpointLike(checkPoint)
+        }
 
-            val allWildcards = collectWildcards {
-                PsiTreeUtil.getParentOfType(st, SmkRuleOrCheckpoint::class.java)
-            }.second
+        fun processRuleOrCheckpointLike(ruleOrCheckpoint: SmkRuleOrCheckpoint) {
+            var wildcards: List<String>? = null
 
-            val sectionArgs = st.argumentList?.arguments ?: return
-            val canContainWildcards = sectionKeyword in SmkRuleOrCheckpointArgsSection.KEYWORDS_CONTAINING_WILDCARDS
-            sectionArgs.forEach { arg ->
-                val argWildcards = when {
-                    !canContainWildcards -> emptyList()
-                    else -> {
-                        SmkWildcardsCollector().also {
-                            arg.accept(it)
-                        }.getWildcards().asSequence().map { it.second }.distinct().toList()
-                    }
+            ruleOrCheckpoint.getSections().forEach { section ->
+                if (section !is SmkRuleOrCheckpointArgsSection) {
+                    return@forEach
                 }
 
-                val missingWildcards = allWildcards.filter { it !in argWildcards }
+                // consider non-output wildcards defining sections:
+                val sectionKeyword = section.sectionKeyword
+                if (sectionKeyword == SnakemakeNames.SECTION_OUTPUT ||
+                        sectionKeyword !in SmkRuleOrCheckpointArgsSection.SECTIONS_DEFINING_WILDCARDS) {
+                    return@forEach
+                }
+
+                if (wildcards == null) {
+                    wildcards = ruleOrCheckpoint.collectWildcards().map { it.second }
+                }
+
+                processSection(section, wildcards!!)
+            }
+        }
+
+        private fun processSection(section: SmkRuleOrCheckpointArgsSection, ruleWildcards: List<String>) {
+
+            val sectionArgs = section.argumentList?.arguments ?: return
+            sectionArgs.forEach { arg ->
+                val argWildcards = SmkWildcardsCollector().also {
+                    arg.accept(it)
+                }.getWildcards().asSequence().map { it.second }.distinct().toList()
+
+                val missingWildcards = ruleWildcards.filter { it !in argWildcards }
                 if (missingWildcards.isNotEmpty()) {
                     registerProblem(
                             arg,
