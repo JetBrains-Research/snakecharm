@@ -95,7 +95,7 @@ class StepDefs {
                 fixture.enableInspections(SmkLocalrulesRuleorderRepeatedRuleInspection::class.java)
             "Lambda Functions in Rule Sections" -> fixture.enableInspections(SmkLambdaRuleParamsInspection::class.java)
             "Wildcard not defined" -> fixture.enableInspections(SmkWildcardNotDefinedInspection::class.java)
-            "Missing wildcards" -> fixture.enableInspections(SmkMissingWildcardsInspection::class.java)
+            "Not same wildcards set" -> fixture.enableInspections(SmkNotSameWildcardsSetInspection::class.java)
             else -> {
                 for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {
                     val o = provider.instance

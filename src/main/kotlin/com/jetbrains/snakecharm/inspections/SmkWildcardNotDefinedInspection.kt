@@ -17,23 +17,19 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
                 return
             }
 
-            updateDeclarationAndWildcards(
-                    expr,
-                    getDeclaration = { expr.getContainingDeclaration() }
-            )
+            val (ruleLike, definedWildcards) = collectWildcards {
+                expr.getContainingDeclaration()
+            }
 
-            if (expr.text !in currentGeneratedWildcards) {
-                val definingSectionName = currentDeclaration?.getWildcardDefiningSection()?.name
-                val message =
-                    if (definingSectionName == null) {
-                        SnakemakeBundle.message("INSP.NAME.wildcard.not.defined", expr.text)
-                    } else {
-                        SnakemakeBundle.message(
-                                "INSP.NAME.wildcard.not.defined.in.section",
-                                expr.text,
-                                definingSectionName
-                        )
-                    }
+            if (expr.text !in definedWildcards) {
+                val definingSection = ruleLike?.getWildcardDefiningSection()?.name
+                val message = when (definingSection) {
+                    null -> SnakemakeBundle.message("INSP.NAME.wildcard.not.defined", expr.text)
+                    else -> SnakemakeBundle.message(
+                            "INSP.NAME.wildcard.not.defined.in.section",
+                            expr.text, definingSection
+                    )
+                }
 
                 registerProblem(expr, message)
             }

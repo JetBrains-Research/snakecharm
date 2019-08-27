@@ -4,21 +4,26 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
+/**
+ * Not thread safe implementation
+ */
 abstract class AbstractSmkWildcardsInspectionVisitor<T>(
         holder: ProblemsHolder,
         session: LocalInspectionToolSession
 ) : SnakemakeInspectionVisitor(holder, session) {
-    protected var currentDeclaration: SmkRuleOrCheckpoint? = null
-        private set
-    protected var currentGeneratedWildcards: List<String> = emptyList()
-        private set
+    private var cachedDeclarationAndWildcards: Pair<SmkRuleOrCheckpoint?, List<String>>? = null
 
-    protected fun updateDeclarationAndWildcards(elem: T, getDeclaration: (T) -> SmkRuleOrCheckpoint?) {
-        val declaration = getDeclaration(elem) ?: return
+    fun collectWildcards(lazyRuleLikeProvider: () -> SmkRuleOrCheckpoint?): Pair<SmkRuleOrCheckpoint?, List<String>> {
+        initWildcards(lazyRuleLikeProvider)
 
-        if (declaration !== currentDeclaration) {
-            currentDeclaration = declaration
-            currentGeneratedWildcards = declaration.collectWildcards().map { it.second }
+        return cachedDeclarationAndWildcards!!
+    }
+
+    private fun initWildcards(lazyRuleLikeProvider: () -> SmkRuleOrCheckpoint?) {
+        if (cachedDeclarationAndWildcards == null) {
+            val ruleLike = lazyRuleLikeProvider()
+            val wildcards = ruleLike?.collectWildcards()?.map { it.second } ?: emptyList()
+            cachedDeclarationAndWildcards = ruleLike to wildcards
         }
     }
 }

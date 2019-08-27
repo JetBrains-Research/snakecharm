@@ -109,16 +109,23 @@ Feature: Check highlighting of inspections on wildcards
     Given I open a file "foo.smk" with text
     """
     <section> NAME:
-      log: "{a}"
+      log:
+        log1 = "{a}.log1",
+        log2 = "{a}/{b}.log2",
+        log3 = "{b}.log3"
       output: "{a}.{b}"
       benchmark: "{b}.{c}"
     """
-    And Missing wildcards inspection is enabled
-    Then I expect inspection error on <log: "{a}"> with message
+    And Not same wildcards set inspection is enabled
+    Then I expect inspection error on <log1 = "{a}.log1"> with message
     """
     Missing wildcards: 'b'. Snakemake requires to use same wildcards in sections: output, log and benchmark.
     """
-    And I expect inspection error on <benchmark: "{b}.{c}"> with message
+    Then I expect inspection error on <log3 = "{b}.log3"> with message
+    """
+    Missing wildcards: 'a'. Snakemake requires to use same wildcards in sections: output, log and benchmark.
+    """
+    And I expect inspection error on <"{b}.{c}"> with message
     """
     Missing wildcards: 'a'. Snakemake requires to use same wildcards in sections: output, log and benchmark.
     """
@@ -128,7 +135,7 @@ Feature: Check highlighting of inspections on wildcards
       | rule       |
       | checkpoint |
 
-  Scenario Outline: Missing wildcards when log section is generator
+  Scenario Outline: Not same wildcards set when log section is generator
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -136,8 +143,8 @@ Feature: Check highlighting of inspections on wildcards
       benchmark: "{b}.{c}"
       log: "{a}.{b}.{c}.{d}"
     """
-    And Missing wildcards inspection is enabled
-    And I expect inspection error on <benchmark: "{b}.{c}"> with message
+    And Not same wildcards set inspection is enabled
+    And I expect inspection error on <"{b}.{c}"> with message
     """
     Missing wildcards: 'a, d'. Snakemake requires to use same wildcards in sections: output, log and benchmark.
     """
@@ -156,7 +163,7 @@ Feature: Check highlighting of inspections on wildcards
       benchmark: "{a}.{b}"
       log: "{a}.{b}"
     """
-    And Missing wildcards inspection is enabled
+    And Not same wildcards set inspection is enabled
     Then I expect no inspection error
     When I check highlighting errors
     Examples:
@@ -170,15 +177,17 @@ Feature: Check highlighting of inspections on wildcards
     """
     <section> NAME:
       output: "{a}"
-      log: ""
-      benchmark: ""
+      log:
+        log2 = "{a}",
+        log1 = ""
+      benchmark: "" #here
     """
-    And Missing wildcards inspection is enabled
-    Then I expect inspection error on <benchmark: ""> with message
+    And Not same wildcards set inspection is enabled
+    Then I expect inspection error on <""> in <"" #here> with message
     """
     Missing wildcards: 'a'. Snakemake requires to use same wildcards in sections: output, log and benchmark.
     """
-    And I expect inspection error on <log: ""> with message
+    And I expect inspection error on <log1 = ""> with message
     """
     Missing wildcards: 'a'. Snakemake requires to use same wildcards in sections: output, log and benchmark.
     """

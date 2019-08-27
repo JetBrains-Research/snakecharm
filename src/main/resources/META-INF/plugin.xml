@@ -125,14 +125,14 @@
     />
 
     <localInspection
-            language="Snakemake" shortName="SmkMissingWildcardsInspection"
+            language="Snakemake" shortName="SmkNotSameWildcardsSetInspection"
             enabledByDefault="true"
             level="ERROR"
-            suppressId="SmkMissingWildcardsInspection"
+            suppressId="SmkNotSameWildcardsSetInspection"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.missing.wildcards"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkMissingWildcardsInspection"
+            key="INSP.NAME.not.same.wildcards.set"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkNotSameWildcardsSetInspection"
     />
 
     <localInspection
