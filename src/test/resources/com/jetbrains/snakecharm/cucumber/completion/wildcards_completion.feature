@@ -21,14 +21,14 @@ Feature: Completion for wildcards
     When I put the caret after input: "{
     And I invoke autocompletion popup
     Then completion list should contain:
+      | wildcard6     |
+    And completion list shouldn't contain:
       | wildcard1     |
       | wildcard2     |
       | wildcard3     |
       | wildcard4     |
       | wildcard5     |
-      | wildcard6     |
       | wildcard7     |
-    And completion list shouldn't contain:
       | non-wildcard1 |
       | non-wildcard2 |
       | non-wildcard3 |
@@ -43,13 +43,13 @@ Feature: Completion for wildcards
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-      input: "{wildcard1}", expand("{wildcard2}"),
+      output: "{wildcard1}", expand("{wildcard2}"),
           "{wildcard3}" + "{wildcard4}" + "{wildcard5}",
           "{wildcard6}" '{wildcard7}' f"{{wildcard8}}"
           kwd="{wildcard6}"
-      output: "{}"
+      input: "{}"
     """
-    When I put the caret after output: "{
+    When I put the caret after input: "{
     And I invoke autocompletion popup
     Then completion list should contain:
       | wildcard1 |
@@ -70,13 +70,13 @@ Feature: Completion for wildcards
     Given I open a file "foo.smk" with text
     """
     <rule_like> ANOTHER_NAME:
-        input: "{wildcard1}"
+        output: "{wildcard1}"
 
     <rule_like> NAME:
-      input: "{wildcard2}"
-      output: "{}"
+      output: "{wildcard2}"
+      input: "{}"
     """
-    When I put the caret after output: "{
+    When I put the caret after input: "{
     And I invoke autocompletion popup
     Then completion list should contain:
       | wildcard2 |
@@ -92,15 +92,15 @@ Feature: Completion for wildcards
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-      input: "{wildcard}"
-      output: "{}"
+      output: "{wildcard}"
+      input: "{}"
     """
-    When I put the caret after output: "{
+    When I put the caret after input: "{
     Then I invoke autocompletion popup, select "wildcard" lookup item and see a text:
     """
     <rule_like> NAME:
-      input: "{wildcard}"
       output: "{wildcard}"
+      input: "{wildcard}"
     """
     Examples:
       | rule_like  |
@@ -113,14 +113,14 @@ Feature: Completion for wildcards
     """
     <rule_like> NAME:
       input: "{wildcard1}"
-      output: "{wildcard2}"
+      output: "{wildcard2}{wildcard3}"
       shell: "{wildcards.}"
     """
     When I put the caret after wildcards.
     And I invoke autocompletion popup
     Then completion list should contain:
-      | wildcard1 |
       | wildcard2 |
+      | wildcard3 |
     Examples:
       | rule_like  |
       | rule       |
@@ -131,14 +131,14 @@ Feature: Completion for wildcards
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-      input: "{wildcard}"
+      output: "{wildcard}"
       shell: "{wildcards.}"
     """
     When I put the caret after wildcards.
     Then I invoke autocompletion popup and see a text:
     """
     <rule_like> NAME:
-      input: "{wildcard}"
+      output: "{wildcard}"
       shell: "{wildcards.wildcard}"
     """
     Examples:
