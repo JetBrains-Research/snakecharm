@@ -47,7 +47,7 @@ interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // P
                 SnakemakeNames.SECTION_LOG, SnakemakeNames.SECTION_PARAMS
         )
 
-        val KEYWORDS_GENERATING_WILDCARDS = setOf(
+        val SECTIONS_DEFINING_WILDCARDS = setOf(
                 SnakemakeNames.SECTION_OUTPUT, SnakemakeNames.SECTION_LOG, SnakemakeNames.SECTION_BENCHMARK
         )
     }

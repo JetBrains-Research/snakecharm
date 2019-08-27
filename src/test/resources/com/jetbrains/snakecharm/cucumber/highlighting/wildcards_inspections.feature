@@ -9,7 +9,7 @@ Feature: Check highlighting of inspections on wildcards
     And Wildcard not defined inspection is enabled
     Then I expect inspection error on <sample> with message
     """
-    Wildcard 'sample' isn't defined in a wildcards-defining section
+    Wildcard 'sample' isn't defined
     """
     When I check highlighting errors
     Examples:
@@ -48,7 +48,7 @@ Feature: Check highlighting of inspections on wildcards
     And Wildcard not defined inspection is enabled
     Then I expect inspection error on <sample> with message
     """
-    Wildcard 'sample' isn't defined in a wildcards-defining section
+    Wildcard 'sample' isn't defined in '<generator>' section
     """
     When I check highlighting errors
     Examples:
@@ -71,7 +71,7 @@ Feature: Check highlighting of inspections on wildcards
     And Wildcard not defined inspection is enabled
     Then I expect inspection error on <sample> with message
     """
-    Wildcard 'sample' isn't defined in a wildcards-defining section
+    Wildcard 'sample' isn't defined in '<generator>' section
     """
     When I check highlighting errors
     Examples:
@@ -94,7 +94,7 @@ Feature: Check highlighting of inspections on wildcards
     And Wildcard not defined inspection is enabled
     Then I expect inspection error on <sample2> with message
     """
-    Wildcard 'sample2' isn't defined in a wildcards-defining section
+    Wildcard 'sample2' isn't defined in 'output' section
     """
     When I check highlighting errors
     Examples:
@@ -174,7 +174,14 @@ Feature: Check highlighting of inspections on wildcards
       benchmark: ""
     """
     And Missing wildcards inspection is enabled
-    Then I expect no inspection error
+    Then I expect inspection error on <benchmark: ""> with message
+    """
+    Missing wildcards: 'a'. Snakemake requires to use same wildcards in sections: output, log and benchmark.
+    """
+    And I expect inspection error on <log: ""> with message
+    """
+    Missing wildcards: 'a'. Snakemake requires to use same wildcards in sections: output, log and benchmark.
+    """
     When I check highlighting errors
     Examples:
       | section    |

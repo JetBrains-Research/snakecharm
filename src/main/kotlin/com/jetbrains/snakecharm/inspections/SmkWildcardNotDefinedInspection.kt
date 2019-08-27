@@ -11,8 +11,7 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
             holder: ProblemsHolder,
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
-    ) =
-            object : SmkWildcardsInspectionVisitor<SmkSLReferenceExpressionImpl>(holder, session) {
+    ) = object : AbstractSmkWildcardsInspectionVisitor<SmkSLReferenceExpressionImpl>(holder, session) {
         override fun visitPyReferenceExpression(expr: PyReferenceExpression) {
             if (expr !is SmkSLReferenceExpressionImpl || !expr.isWildcard()) {
                 return
@@ -24,8 +23,19 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
             )
 
             if (expr.text !in currentGeneratedWildcards) {
-                registerProblem(expr,
-                        SnakemakeBundle.message("INSP.NAME.wildcard.not.defined", expr.text))
+                val definingSectionName = currentDeclaration?.getWildcardDefiningSection()?.name
+                val message =
+                    if (definingSectionName == null) {
+                        SnakemakeBundle.message("INSP.NAME.wildcard.not.defined", expr.text)
+                    } else {
+                        SnakemakeBundle.message(
+                                "INSP.NAME.wildcard.not.defined.in.section",
+                                expr.text,
+                                definingSectionName
+                        )
+                    }
+
+                registerProblem(expr, message)
             }
         }
     }

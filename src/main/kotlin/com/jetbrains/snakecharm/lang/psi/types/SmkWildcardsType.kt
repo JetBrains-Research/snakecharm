@@ -36,7 +36,8 @@ class SmkWildcardsType(private val parentDeclaration: SmkRuleOrCheckpoint) : PyT
         val resolveResult =
                 resolveToFileWildcardConstraintsKwarg(name) ?:
                 resolveToRuleWildcardConstraintsKwarg(name) ?:
-                resolveToFirstDeclaration(name)
+                resolveToFirstDeclaration(name) ?:
+                return emptyList()
 
         return listOf(RatedResolveResult(RatedResolveResult.RATE_NORMAL, resolveResult))
     }

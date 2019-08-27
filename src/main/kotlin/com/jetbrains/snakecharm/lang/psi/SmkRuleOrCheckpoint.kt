@@ -13,9 +13,8 @@ interface SmkRuleOrCheckpoint : SmkRuleLike<SmkRuleOrCheckpointArgsSection>, PyT
      *         if there are no such sections
      */
     fun getWildcardDefiningSection() =
-        statementList.statements.filter {
-            it.name in SmkRuleOrCheckpointArgsSection.KEYWORDS_GENERATING_WILDCARDS
-        }.minBy { pyStatement ->
-            SmkRuleOrCheckpointArgsSection.KEYWORDS_GENERATING_WILDCARDS.indexOf(pyStatement.name)
-        } as SmkRuleOrCheckpointArgsSection?
+        statementList.statements
+                .filterIsInstance<SmkRuleOrCheckpointArgsSection>()
+                .filter { it.sectionKeyword in SmkRuleOrCheckpointArgsSection.SECTIONS_DEFINING_WILDCARDS }
+                .minBy { SmkRuleOrCheckpointArgsSection.SECTIONS_DEFINING_WILDCARDS.indexOf(it.sectionKeyword) }
 }

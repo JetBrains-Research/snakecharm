@@ -4,11 +4,12 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
-abstract class SmkWildcardsInspectionVisitor<T>(
+abstract class AbstractSmkWildcardsInspectionVisitor<T>(
         holder: ProblemsHolder,
         session: LocalInspectionToolSession
 ) : SnakemakeInspectionVisitor(holder, session) {
-    private var currentDeclaration: SmkRuleOrCheckpoint? = null
+    protected var currentDeclaration: SmkRuleOrCheckpoint? = null
+        private set
     protected var currentGeneratedWildcards: List<String> = emptyList()
         private set
 

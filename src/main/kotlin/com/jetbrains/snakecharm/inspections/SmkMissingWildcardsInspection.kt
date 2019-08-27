@@ -14,11 +14,12 @@ class SmkMissingWildcardsInspection : SnakemakeInspection() {
             holder: ProblemsHolder,
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
-    ) =
-            object : SmkWildcardsInspectionVisitor<SmkRuleOrCheckpointArgsSection>(holder, session) {
+    ) = object : AbstractSmkWildcardsInspectionVisitor<SmkRuleOrCheckpointArgsSection>(holder, session) {
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
             if (st.name == SnakemakeNames.SECTION_OUTPUT ||
-                    st.name !in SmkRuleOrCheckpointArgsSection.KEYWORDS_GENERATING_WILDCARDS) {
+                    st.name !in SmkRuleOrCheckpointArgsSection.SECTIONS_DEFINING_WILDCARDS ||
+                    st.argumentList == null ||
+                    st.argumentList!!.arguments.isEmpty()) {
                 return
             }
 
@@ -31,10 +32,6 @@ class SmkMissingWildcardsInspection : SnakemakeInspection() {
                     .also { it.visitSmkRuleOrCheckpointArgsSection(st) }
                     .getWildcardsFirstMentions()
                     .map { it.second }
-
-            if (stWildcards.isEmpty()) {
-                return
-            }
 
             val wildcardsSetDif = currentGeneratedWildcards.filter { it !in stWildcards }
             if (wildcardsSetDif.isNotEmpty()) {
