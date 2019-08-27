@@ -77,6 +77,10 @@
             implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkRulesAndCheckpointsCompletionContributor"
             order="first" id="SmkRulesAndCheckpointsCompletionContributor"
     />
+    <completion.contributor
+            language="Python"
+            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkWrapperCompletionContributor"
+    />
 
     <localInspection
         language="Snakemake"
@@ -193,6 +197,8 @@
             implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"
             id="Python" order="last, before default"
     />
+
+    <postStartupActivity implementation="com.jetbrains.snakecharm.codeInsight.wrapper.WrapperCrawlerBackgroundProcess"/>
   </extensions>
 
   <module-components>
@@ -200,6 +206,12 @@
       <implementation-class>com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider</implementation-class>
     </component>
   </module-components>
+
+  <application-components>
+    <component>
+      <implementation-class>com.jetbrains.snakecharm.codeInsight.wrapper.WrapperStorage</implementation-class>
+    </component>
+  </application-components>
 
 
   <extensions defaultExtensionNs="Pythonid">
