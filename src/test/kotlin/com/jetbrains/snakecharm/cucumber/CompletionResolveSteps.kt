@@ -15,10 +15,7 @@ import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.util.text.StringUtil
-import com.intellij.psi.PsiDirectory
-import com.intellij.psi.PsiNamedElement
-import com.intellij.psi.PsiPolyVariantReference
-import com.intellij.psi.PsiReference
+import com.intellij.psi.*
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.util.containers.ContainerUtil
@@ -29,9 +26,12 @@ import cucumber.api.DataTable
 import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
 import junit.framework.TestCase
-import java.io.File
+import org.jetbrains.annotations.Nullable
 import java.util.*
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * @author Roman.Chernyatchik
@@ -121,26 +121,63 @@ class CompletionResolveSteps {
         assertEquals(marker, text)
     }
 
+    @Then("^reference should multi resolve to name, file in same order$")
+    fun referenceShouldMultiResolveToInOrder(table: DataTable) {
+        ApplicationManager.getApplication().runReadAction {
+            val ref = getReferenceAtOffset()
+            assertNotNull(ref)
+
+            val rawResults = multiResolve(ref)
+            assertEquals(0, rawResults.filter { it == null }.size)
+
+            val results = rawResults.filterNotNull()
+            assertEquals(0, results.filter { it.containingFile == null }.size)
+
+            val resolveResults = results.mapIndexed() { i, result ->
+                (itemText(result) to result.containingFile.name) to i
+            }.toMap()
+
+            val rows = table.asLists(String::class.java)
+
+            val actualRefsInfo = resolveResults.entries.joinToString(separator = "\n") { (textAndFileName, _) ->
+                "|${textAndFileName.first}| ${textAndFileName.second} |"
+            }
+
+            var prev: Pair<Int, Pair<String, String>>? = null
+            rows.forEach { row ->
+                val key = row[0] to row[1]
+                val idx = resolveResults[key]
+                assertNotNull(
+                        idx,
+                        message = "Variant [${key.first}, ${key.second}] is missing in:\n$actualRefsInfo"
+                )
+                if (prev != null) {
+                    val prevKey = prev!!.second
+                    assertTrue(
+                            prev!!.first < idx,
+                            message = "Variant [${prevKey.first}, ${prevKey.second}] should be before" +
+                                    " [${key.first}, ${key.second}] in:\n$actualRefsInfo"
+                    )
+                }
+                prev = idx to key
+            }
+        }
+    }
     @Then("^reference should multi resolve to name, file, times\\[, class name\\]$")
     fun referenceShouldMultiResolveToIn(table: DataTable) {
         ApplicationManager.getApplication().runReadAction {
             val ref = getReferenceAtOffset()
             assertNotNull(ref)
 
-            val results = multiResolve(ref)
+            val rawResults = multiResolve(ref)
+            assertEquals(0, rawResults.filter { it == null }.size)
 
-            assertEquals(0, results.filter { it == null }.size)
-            assertEquals(0, results.filter { it!!.containingFile == null }.size)
+            val results = rawResults.filterNotNull()
+            assertEquals(0, results.filter { it.containingFile == null }.size)
 
             val completionListKey2 = results
                     .map { result ->
-                        when (result){
-                            is PsiNamedElement -> {
-                                "${result.name}"
-                                // "${result.name} (${result.textRange})"
-                            }
-                            else -> result!!.text
-                        } to result.containingFile.name
+                        itemText(result) to result.containingFile.name
                     }
                     .groupBy { it }
                     .map { entry -> entry.key to entry.value.size }
@@ -148,25 +185,19 @@ class CompletionResolveSteps {
 
             val completionListKey3 = results
                     .map { result ->
-                        Triple(when (result) {
-                            is PsiNamedElement -> {
-                                "${result.name}"
-                                // "${result.name} (${result.textRange})"
-                            }
-                            else -> result!!.text
-                        }, result.javaClass.simpleName, result.containingFile.name)
+                        Triple(itemText(result), result.javaClass.simpleName, result.containingFile.name)
                     }
                     .groupBy { it }
                     .map { entry -> entry.key to entry.value.size }
                     .toMap()
 
-            val records = table.asLists(String::class.java)
+            val rows = table.asLists(String::class.java)
 
             val actualRefsInfo = completionListKey3.entries.joinToString(separator = "\n") { (nameAndFile, times) ->
                 "|${nameAndFile.first}| ${nameAndFile.third} | $times | ${nameAndFile.second} |"
             }
 
-            records.forEach { row ->
+            rows.forEach { row ->
                 val expectedTimes = row[2].toInt()
                 val expectedClassName = if (row.size >= 4) row[3] else null
 
@@ -185,6 +216,14 @@ class CompletionResolveSteps {
                 )
             }
         }
+    }
+
+    private fun itemText(result: PsiElement): String = when (result) {
+        is PsiNamedElement -> {
+            "${result.name}"
+            // "${result.name} (${result.textRange})"
+        }
+        else -> result.text
     }
 
     @Then("^reference should not multi resolve to files$")
@@ -372,7 +411,7 @@ class CompletionResolveSteps {
         val completionList = fixture.lookupElements
         return completionList?.map {
             val presentation = LookupElementPresentation()
-            it.renderElement(presentation)
+            it!!.renderElement(presentation)
             presentation
         } ?: emptyList()
     }

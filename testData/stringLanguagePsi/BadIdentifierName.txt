@@ -1,0 +1,34 @@
+FILE
+  SmkSLLanguageElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    PyReferenceExpression: null
+      PyReferenceExpression: f
+        PsiElement(Py:IDENTIFIER)('f')
+    PsiErrorElement:Unexpected character
+      PsiElement(UNEXPECTED_TOKEN)('?')
+    PyReferenceExpression: null
+      PyReferenceExpression: o
+        PsiElement(Py:IDENTIFIER)('o')
+    PsiErrorElement:Unexpected character
+      PsiElement(UNEXPECTED_TOKEN)('&')
+    PyReferenceExpression: null
+      <empty list>
+    PsiErrorElement:Unexpected character
+      PsiElement(UNEXPECTED_TOKEN)('*')
+    SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
+      PyReferenceExpression: to
+        PyReferenceExpression: doo
+          PyReferenceExpression: boo
+            PyReferenceExpression: o
+              PsiElement(Py:IDENTIFIER)('o')
+            PsiElement(DOT)('.')
+            PsiElement(Py:IDENTIFIER)('boo')
+          PsiElement(DOT)('.')
+          PsiElement(Py:IDENTIFIER)('doo')
+        PsiElement(DOT)('.')
+        PsiElement(Py:IDENTIFIER)('to')
+      PsiElement(LBRACKET)('[')
+      SmkSLKeyExpression(KEY_EXPRESSION)
+        PsiElement(Py:IDENTIFIER)('o[100')
+      PsiElement(RBRACKET)(']')
+    PsiElement(RBRACE)('}')

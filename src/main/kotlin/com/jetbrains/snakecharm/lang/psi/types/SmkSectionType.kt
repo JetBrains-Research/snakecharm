@@ -1,6 +1,5 @@
 package com.jetbrains.snakecharm.lang.psi.types
 
-import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiElement
 import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
@@ -10,7 +9,7 @@ import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
-import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
@@ -35,9 +34,7 @@ class SmkSectionType(
         val keywordArgs = getKeywordArgs() ?: return emptyList()
         return keywordArgs
                 .filter { it.name == name }
-                .map {
-                    RatedResolveResult(RatedResolveResult.RATE_NORMAL, it)
-                }
+                .map { RatedResolveResult(RatedResolveResult.RATE_NORMAL, it) }
     }
 
     override fun getCompletionVariants(
@@ -52,9 +49,10 @@ class SmkSectionType(
         val keywordArgs = getKeywordArgs() ?: return emptyArray()
         return keywordArgs
                 .map {
-                    LookupElementBuilder
-                            .create(it.name!!)
-                            .withIcon(PlatformIcons.PARAMETER_ICON)
+                    SmkCompletionUtil.createPrioritizedLookupElement(
+                        it.name!!,
+                        PlatformIcons.PARAMETER_ICON
+                    )
                 }
                 .toTypedArray()
     }

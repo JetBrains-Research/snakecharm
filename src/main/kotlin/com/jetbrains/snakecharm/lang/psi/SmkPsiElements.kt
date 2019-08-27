@@ -1,13 +1,16 @@
 package com.jetbrains.snakecharm.lang.psi
 
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.StubBasedPsiElement
+import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointStub
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleStub
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkSubworkflowStub
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLElement
 
 interface SmkRule: SmkRuleOrCheckpoint, StubBasedPsiElement<SmkRuleStub>
 
@@ -37,6 +40,12 @@ interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // P
                 SnakemakeNames.SECTION_CONDA,
                 SnakemakeNames.SECTION_SCRIPT, SnakemakeNames.SECTION_WRAPPER, SnakemakeNames.SECTION_CWL
         )
+
+        val KEYWORDS_CONTAINING_WILDCARDS = setOf(
+                SnakemakeNames.SECTION_INPUT, SnakemakeNames.SECTION_OUTPUT, SnakemakeNames.SECTION_CONDA,
+                SnakemakeNames.SECTION_RESOURCES, SnakemakeNames.SECTION_GROUP, SnakemakeNames.SECTION_BENCHMARK,
+                SnakemakeNames.SECTION_LOG, SnakemakeNames.SECTION_PARAMS
+        )
     }
 }
 
@@ -63,4 +72,21 @@ interface SmkWorkflowLocalrulesSection: PyStatement, SmkArgsSection
 
 interface SmkWorkflowRuleorderSection: PyStatement, SmkArgsSection
 
-interface SmkReferenceExpression: PyExpression, PsiNamedElement
+interface SmkReferenceExpression : SmkReferenceWithPyIdentifier
+
+interface SmkSLReferenceExpression : SmkReferenceWithPyIdentifier, SmkSLElement
+
+interface SmkReferenceWithPyIdentifier : PsiNamedElement, PyExpression {
+    override fun getName(): String? = getNameNode()?.text
+
+    fun getNameNode() = node.findChildByType(PyTokenTypes.IDENTIFIER)
+
+    override fun setName(name: String): PsiElement {
+        val nameElement = PyUtil.createNewName(this, name)
+        val nameNode = getNameNode()
+        if (nameNode != null) {
+            node.replaceChild(nameNode, nameElement)
+        }
+        return this
+    }
+}

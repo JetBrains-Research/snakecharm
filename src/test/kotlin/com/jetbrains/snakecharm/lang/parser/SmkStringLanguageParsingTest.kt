@@ -2,11 +2,11 @@ package com.jetbrains.snakecharm.lang.parser
 
 import com.intellij.testFramework.ParsingTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
-import com.jetbrains.snakecharm.string_language.lang.parser.SmkSLParserDefinition
+import com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLParserDefinition
 import org.intellij.lang.regexp.RegExpParserDefinition
 
 class SmkStringLanguageParsingTest : ParsingTestCase(
-        "string_language_psi",
+        "stringLanguagePsi",
         "smkStringLanguage",
         SmkSLParserDefinition(),
         RegExpParserDefinition()) {

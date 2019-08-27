@@ -1,0 +1,6 @@
+FILE
+  SmkSLLanguageElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    PsiErrorElement:Expected identifier name
+      <empty list>
+    PsiElement(RBRACE)('}')

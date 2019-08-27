@@ -1,14 +1,13 @@
 package com.jetbrains.snakecharm.lang.psi.types
 
-import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiElement
-import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
+import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
@@ -56,11 +55,7 @@ class SmkRuleLikeType(private val declaration: SmkRuleOrCheckpoint) : PyType {
         }
 
         return getAccessibleStatements()
-                .map {
-                    LookupElementBuilder
-                            .create(it.name!!)
-                            .withIcon(PlatformIcons.PROPERTY_ICON)
-                }
+                .map { SmkCompletionUtil.createPrioritizedLookupElement(it.name!!) }
                 .toTypedArray()
     }
 

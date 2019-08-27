@@ -7,6 +7,7 @@ import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
 import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkWildcardsCollector
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointStub
 import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeType
@@ -25,4 +26,8 @@ class SmkCheckPointImpl
         is SmkElementVisitor -> pyVisitor.visitSmkCheckPoint(this)
         else -> super.acceptPyVisitor(pyVisitor)
     }
+
+    override fun collectWildcards() = SmkWildcardsCollector().also {
+        it.visitSmkCheckPoint(this)
+    }.getWildcardsFirstMentions()
 }

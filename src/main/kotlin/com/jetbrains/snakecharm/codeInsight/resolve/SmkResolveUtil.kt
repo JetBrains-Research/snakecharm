@@ -1,9 +1,12 @@
 package com.jetbrains.snakecharm.codeInsight.resolve
 
+import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 
 class SmkResolveUtil {
     companion object {
+        const val IMPLICIT_SYMBOLS_PRIORITY = RatedResolveResult.RATE_HIGH
+
         fun getIncludedFiles(file: SmkFile): List<SmkFile> {
             val includedFiles = mutableListOf<SmkFile>()
             getIncludedFilesForFile(file, includedFiles, mutableSetOf())

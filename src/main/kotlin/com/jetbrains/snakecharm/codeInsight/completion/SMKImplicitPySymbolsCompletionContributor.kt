@@ -20,8 +20,10 @@ class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
         val IN_PY_REF = psiElement().inside(PyReferenceExpression::class.java)
 
         val FUNCTIONS_VALID_FOR_INJECTION = setOf(
-                "ancient", "directory", "temp", "pipe", "temporary", "protected",
-                "dynamic", "touch", "repeat", "report", "local", "expand", "shell")
+            "ancient", "directory", "temp", "pipe", "temporary", "protected",
+            "dynamic", "touch", "repeat", "report", "local", "expand", "shell",
+            "join"
+        )
 
         private val REF_CAPTURE = psiElement()
                 .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
