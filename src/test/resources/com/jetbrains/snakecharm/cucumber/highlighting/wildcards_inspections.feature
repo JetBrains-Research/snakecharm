@@ -119,15 +119,15 @@ Feature: Check highlighting of inspections on wildcards
     And Not same wildcards set inspection is enabled
     Then I expect inspection error on <log1 = "{a}.log1"> with message
     """
-    Missing wildcards: 'b'. Snakemake requires to use same wildcards in sections: output, log and benchmark.
+    Missing wildcards: 'b'.
     """
     Then I expect inspection error on <log3 = "{b}.log3"> with message
     """
-    Missing wildcards: 'a'. Snakemake requires to use same wildcards in sections: output, log and benchmark.
+    Missing wildcards: 'a'.
     """
     And I expect inspection error on <"{b}.{c}"> with message
     """
-    Missing wildcards: 'a'. Snakemake requires to use same wildcards in sections: output, log and benchmark.
+    Missing wildcards: 'a'.
     """
     When I check highlighting errors
     Examples:
@@ -146,7 +146,7 @@ Feature: Check highlighting of inspections on wildcards
     And Not same wildcards set inspection is enabled
     And I expect inspection error on <"{b}.{c}"> with message
     """
-    Missing wildcards: 'a, d'. Snakemake requires to use same wildcards in sections: output, log and benchmark.
+    Missing wildcards: 'a, d'.
     """
     When I check highlighting errors
     Examples:
@@ -185,11 +185,11 @@ Feature: Check highlighting of inspections on wildcards
     And Not same wildcards set inspection is enabled
     Then I expect inspection error on <""> in <"" #here> with message
     """
-    Missing wildcards: 'a'. Snakemake requires to use same wildcards in sections: output, log and benchmark.
+    Missing wildcards: 'a'.
     """
     And I expect inspection error on <log1 = ""> with message
     """
-    Missing wildcards: 'a'. Snakemake requires to use same wildcards in sections: output, log and benchmark.
+    Missing wildcards: 'a'.
     """
     When I check highlighting errors
     Examples:
