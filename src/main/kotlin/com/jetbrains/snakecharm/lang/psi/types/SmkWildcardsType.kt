@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi.types
 
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.AccessDirection
@@ -10,17 +11,33 @@ import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
-import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
+import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
-class SmkWildcardsType(private val parentDeclaration: SmkRuleOrCheckpoint) : PyType {
-    private val wildcardsPsiAndName = parentDeclaration.collectWildcards()
+class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyType {
+    private val typeName = "Rule ${ruleOrCheckpoint.name?.let { "'$it' " } ?: ""}wildcards"
+    private val wildcardsDeclarations: List<WildcardDescriptor>?
 
-    override fun getName() = "wildcards"
+    init {
+        val collector = SmkWildcardsCollector(
+                visitDefiningSections = true,
+                visitSectionsAllowingUsage = false
+        )
+        ruleOrCheckpoint.accept(collector)
+        wildcardsDeclarations = collector.getWildcards()
+                ?.asSequence()
+                ?.filterNot { it.definingSectionIdx == WildcardDescriptor.UNDEFINED_SECTION }
+                ?.sortedBy { it.definingSectionIdx }
+                ?.distinctBy { it.text }
+                ?.toList()
+    }
+    
+    override fun getName() = typeName
 
     override fun assertValid(message: String?) {
+        if (!ruleOrCheckpoint.isValid) {
+            throw PsiInvalidElementAccessException(ruleOrCheckpoint, message)
+        }
     }
 
     override fun resolveMember(
@@ -46,42 +63,39 @@ class SmkWildcardsType(private val parentDeclaration: SmkRuleOrCheckpoint) : PyT
             getRuleWildcardConstraintsSection()?.argumentList?.getKeywordArgument(name)
 
     private fun resolveToFirstDeclaration(name: String) =
-            wildcardsPsiAndName.firstOrNull { it.second == name }?.first
+            wildcardsDeclarations?.firstOrNull { it.text == name }?.psi
 
-    private fun resolveToFileWildcardConstraintsKwarg(name: String): PsiElement? {
-        val sections = getFileWildcardConstraintsSections()
-        sections.forEach {
-            return it.argumentList?.getKeywordArgument(name) ?: return@forEach
-        }
-
-        return null
-    }
+    private fun resolveToFileWildcardConstraintsKwarg(name: String) = getFileWildcardConstraintsSections()
+                .asSequence()
+                .mapNotNull { section -> section.argumentList?.getKeywordArgument(name) }
+                .firstOrNull()
 
     private fun getFileWildcardConstraintsSections() =
             PsiTreeUtil.findChildrenOfType(
-                    parentDeclaration.containingFile,
+                    ruleOrCheckpoint.containingFile,
                     SmkWorkflowArgsSection::class.java
-            ).filter { it.sectionKeyword == SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS }
+            ).filter { 
+                it.sectionKeyword == SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS 
+            }
 
     private fun getRuleWildcardConstraintsSection() =
-            parentDeclaration
-                    .statementList
-                    .statements
-                    .find { it.name == SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS }
-                    as SmkRuleOrCheckpointArgsSection?
+            ruleOrCheckpoint.getSections()
+                    .asSequence()
+                    .filterIsInstance<SmkRuleOrCheckpointArgsSection>()
+                    .find { it.sectionKeyword == SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS }
 
     override fun getCompletionVariants(
             completionPrefix: String?,
             location: PsiElement,
             context: ProcessingContext?
     ): Array<out Any> {
-        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location)) {
+        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location) || wildcardsDeclarations == null) {
             return emptyArray()
         }
 
-        return wildcardsPsiAndName
-                .map { SmkCompletionUtil.createPrioritizedLookupElement(it.second) }
-                .toTypedArray()
+        return wildcardsDeclarations.map {
+            SmkCompletionUtil.createPrioritizedLookupElement(it.text)
+        }.toTypedArray()
     }
 
     override fun isBuiltin() = false

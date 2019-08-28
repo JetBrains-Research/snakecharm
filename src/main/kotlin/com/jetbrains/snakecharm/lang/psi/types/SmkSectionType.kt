@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi.types
 
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.AccessDirection
@@ -16,9 +17,15 @@ import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 class SmkSectionType(
         val section: SmkRuleOrCheckpointArgsSection
 ) : PyType, SmkAvailableForSubscriptionType {
-    override fun getName() = "section"
+
+    private val typeName: String = "Section${section.sectionKeyword?.let { " '$it'" } ?: ""}"
+
+    override fun getName() = typeName
 
     override fun assertValid(message: String?) {
+        if (!section.isValid) {
+            throw PsiInvalidElementAccessException(section, message)
+        }
     }
 
     override fun resolveMember(

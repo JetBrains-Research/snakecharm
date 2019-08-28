@@ -1,8 +1,11 @@
 package com.jetbrains.snakecharm.lang.psi
 
+import com.intellij.lang.injection.InjectedLanguageManager
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.StubBasedPsiElement
+import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
 import com.jetbrains.python.psi.*
@@ -51,6 +54,11 @@ interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // P
                 SnakemakeNames.SECTION_OUTPUT, SnakemakeNames.SECTION_LOG, SnakemakeNames.SECTION_BENCHMARK
         )
     }
+
+    fun isWildcardsAllowedSection() = sectionKeyword in KEYWORDS_CONTAINING_WILDCARDS
+    fun isWildcardsDefiningSection() = sectionKeyword in SECTIONS_DEFINING_WILDCARDS
+
+    fun getParentRuleOrCheckPoint() = PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpoint::class.java)!!
 }
 
 
@@ -78,12 +86,19 @@ interface SmkWorkflowRuleorderSection: PyStatement, SmkArgsSection
 
 interface SmkReferenceExpression : SmkReferenceWithPyIdentifier
 
-interface SmkSLReferenceExpression : SmkReferenceWithPyIdentifier, SmkSLElement
+interface SmkSLReferenceExpression : SmkReferenceWithPyIdentifier, SmkSLElement {
+    fun containingRuleOrCheckpointSection(): SmkRuleOrCheckpointArgsSection? {
+        val languageManager = InjectedLanguageManager.getInstance(project)
+        val host = languageManager.getInjectionHost(this)
+        return PsiTreeUtil.getParentOfType(host, SmkRuleOrCheckpointArgsSection::class.java)
+    }
+}
 
 interface SmkReferenceWithPyIdentifier : PsiNamedElement, PyExpression {
     override fun getName(): String? = getNameNode()?.text
 
     fun getNameNode() = node.findChildByType(PyTokenTypes.IDENTIFIER)
+    fun getNameRange(): TextRange = getNameNode()?.textRange ?: TextRange.EMPTY_RANGE
 
     override fun setName(name: String): PsiElement {
         val nameElement = PyUtil.createNewName(this, name)

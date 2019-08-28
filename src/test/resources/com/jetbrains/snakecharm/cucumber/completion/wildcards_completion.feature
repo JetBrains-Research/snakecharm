@@ -22,12 +22,12 @@ Feature: Completion for wildcards
     And I invoke autocompletion popup
     Then completion list should contain:
       | wildcard6     |
+      | wildcard5     |
+      | wildcard4     |
     And completion list shouldn't contain:
       | wildcard1     |
       | wildcard2     |
       | wildcard3     |
-      | wildcard4     |
-      | wildcard5     |
       | wildcard7     |
       | non-wildcard1 |
       | non-wildcard2 |
