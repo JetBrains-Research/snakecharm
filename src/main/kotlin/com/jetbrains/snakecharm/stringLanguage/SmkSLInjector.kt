@@ -5,11 +5,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.codeInsight.PyInjectionUtil.InjectionResult
 import com.jetbrains.python.codeInsight.PyInjectorBase
-import com.jetbrains.python.psi.PyCallExpression
-import com.jetbrains.python.psi.PyFormattedStringElement
-import com.jetbrains.python.psi.PyLambdaExpression
-import com.jetbrains.python.psi.PyStringLiteralExpression
-import com.jetbrains.python.psi.impl.PyReferenceExpressionImpl
+import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor.Companion.FUNCTIONS_VALID_FOR_INJECTION
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
@@ -50,8 +46,8 @@ class SmkSLInjector : PyInjectorBase() {
     private fun PsiElement.isInValidCallExpression(): Boolean {
         val parentCallExpr = PsiTreeUtil.getParentOfType(this, PyCallExpression::class.java)
         return parentCallExpr == null ||
-                (parentCallExpr.firstChild as?
-                        PyReferenceExpressionImpl)?.referencedName in FUNCTIONS_VALID_FOR_INJECTION
+                (parentCallExpr.callee as?
+                        PyReferenceExpression)?.referencedName in FUNCTIONS_VALID_FOR_INJECTION
     }
 
     private fun PsiElement.isInValidArgsSection(): Boolean {
