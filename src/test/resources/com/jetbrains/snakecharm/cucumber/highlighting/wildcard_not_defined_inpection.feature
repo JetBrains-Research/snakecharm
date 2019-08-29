@@ -219,3 +219,21 @@ Feature: Check highlighting of inspections on wildcards
       | rule_like  |
       | rule       |
       | checkpoint |
+
+  Scenario Outline: Wildcard references which looks like qualified cannot be resolved as wildcards
+     Given a snakemake project
+     Given I open a file "foo.smk" with text
+       """
+       <rule_like> NAME:
+           output: "{sample}"
+           input: "{wildcards.sample}"
+       """
+     And Wildcard not defined inspection is enabled
+     Then I expect inspection error on <wildcards.sample> with message
+      """
+      Wildcard 'wildcards.sample' isn't defined in 'output' section.
+      """
+     Examples:
+       | rule_like  |
+       | rule       |
+       | checkpoint |

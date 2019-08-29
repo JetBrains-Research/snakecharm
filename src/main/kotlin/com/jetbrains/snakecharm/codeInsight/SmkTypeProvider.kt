@@ -24,6 +24,7 @@ import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 import com.jetbrains.snakecharm.lang.psi.types.SmkSectionType
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.stringLanguage.SmkSL
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
 class SmkTypeProvider : PyTypeProviderBase() {
     // getParameterType(param, function, context) // only for function declarations, not lambdas
@@ -155,6 +156,13 @@ class SmkTypeProvider : PyTypeProviderBase() {
                 psiFile == null ||
                 psiFile !is SmkFile) {
             return null
+        }
+
+        if (referenceExpression is SmkSLReferenceExpression) {
+            if (referenceExpression.getReference() is SmkSLWildcardReference) {
+                // is just a wildcard here
+                return null
+            }
         }
 
         // XXX: at the moment affects all "rules" variables in a *.smk file, better to

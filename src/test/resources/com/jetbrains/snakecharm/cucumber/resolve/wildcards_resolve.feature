@@ -178,3 +178,20 @@ Feature: Resolve wildcards in SnakemakeSL
       | rule       |  input  |
       | rule       |  param  |
       | checkpoint |  input  |
+
+
+  Scenario Outline: Do not resolve in wildcard references which looks like qualified
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+       """
+       <rule_like> NAME:
+           output: "{sample}"
+           input: "{wildcards.sample}"
+       """
+    And I put the caret after wildcards.sa
+    Then reference in injection should not resolve
+    Examples:
+      | rule_like  |
+      | rule       |
+      | rule       |
+      | checkpoint |
