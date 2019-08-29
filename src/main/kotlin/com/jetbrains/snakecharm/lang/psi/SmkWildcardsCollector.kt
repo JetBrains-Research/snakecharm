@@ -6,7 +6,7 @@ import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyRecursiveElementVisitor
 import com.jetbrains.python.psi.PyStringLiteralExpression
-import com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_BANNED_FOR_WILDCARDS
 import com.jetbrains.snakecharm.stringLanguage.SmkSLFile
 import com.jetbrains.snakecharm.stringLanguage.callSimpleName
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLLanguageElement
@@ -62,7 +62,7 @@ class SmkWildcardsCollector(
     }
 
     override fun visitPyCallExpression(node: PyCallExpression) {   //format
-        if (node.callSimpleName() !in SMKImplicitPySymbolsCompletionContributor.FUNCTIONS_INVALID_FOR_WILDCARDS) {
+        if (node.callSimpleName() !in FUNCTIONS_BANNED_FOR_WILDCARDS) {
             super.visitPyCallExpression(node)
         }
     }
@@ -80,6 +80,7 @@ class SmkWildcardsCollector(
     }
 
     private fun collectWildcardsNames(file: SmkSLFile) {
+
         val injections = PsiTreeUtil.getChildrenOfType(file, SmkSLLanguageElement::class.java)
         injections?.forEach { injection ->
             val st = PsiTreeUtil.getChildOfType(injection, SmkSLReferenceExpressionImpl::class.java)

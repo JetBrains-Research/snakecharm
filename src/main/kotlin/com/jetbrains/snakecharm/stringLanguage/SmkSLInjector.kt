@@ -6,7 +6,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.codeInsight.PyInjectionUtil.InjectionResult
 import com.jetbrains.python.codeInsight.PyInjectorBase
 import com.jetbrains.python.psi.*
-import com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor.Companion.FUNCTIONS_VALID_FOR_INJECTION
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_ALLOWING_SMKSL_INJECTION
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
@@ -45,7 +45,7 @@ class SmkSLInjector : PyInjectorBase() {
 
     private fun PsiElement.isInValidCallExpression(): Boolean {
         val parentCallExpr = PsiTreeUtil.getParentOfType(this, PyCallExpression::class.java)
-        return parentCallExpr == null || parentCallExpr.callSimpleName() in FUNCTIONS_VALID_FOR_INJECTION
+        return parentCallExpr == null || parentCallExpr.callSimpleName() in FUNCTIONS_ALLOWING_SMKSL_INJECTION
     }
 
     private fun PsiElement.isInValidArgsSection(): Boolean {

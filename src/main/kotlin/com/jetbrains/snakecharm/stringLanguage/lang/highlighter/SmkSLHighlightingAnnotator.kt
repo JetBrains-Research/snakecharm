@@ -6,7 +6,7 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.highlighting.PyHighlighter
-import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLReferenceExpressionImpl
 
@@ -41,6 +41,6 @@ class SmkSLHighlightingAnnotator : Annotator {
     private fun PsiElement.comesAfterWildcardsPrefix(): Boolean {
         val child =
                 PsiTreeUtil.getChildOfType(this, SmkSLReferenceExpressionImpl::class.java)
-        return child?.name == SnakemakeNames.SMK_VARS_WILDCARDS && child.children.isEmpty()
+        return child?.name == SnakemakeAPI.SMK_VARS_WILDCARDS && child.children.isEmpty()
     }
 }

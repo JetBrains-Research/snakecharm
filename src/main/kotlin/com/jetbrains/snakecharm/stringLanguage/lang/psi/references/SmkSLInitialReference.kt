@@ -9,6 +9,7 @@ import com.jetbrains.python.psi.impl.references.PyQualifiedReference
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.TypeEvalContext
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
@@ -21,9 +22,9 @@ class SmkSLInitialReference(
 ) : PyQualifiedReference(expr, context) {
     companion object {
         val ADDITIONAL_COMPLETION_VARIANTS = listOf(
-                SnakemakeNames.SMK_VARS_RULES,
-                SnakemakeNames.SMK_VARS_CHECKPOINTS,
-                SnakemakeNames.SMK_VARS_WILDCARDS)
+                SnakemakeAPI.SMK_VARS_RULES,
+                SnakemakeAPI.SMK_VARS_CHECKPOINTS,
+                SnakemakeAPI.SMK_VARS_WILDCARDS)
                 .map {
                     SmkCompletionUtil.createPrioritizedLookupElement(
                             it,

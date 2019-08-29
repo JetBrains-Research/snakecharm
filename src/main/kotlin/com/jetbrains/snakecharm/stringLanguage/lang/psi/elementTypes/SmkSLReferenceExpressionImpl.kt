@@ -10,7 +10,7 @@ import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.impl.PyReferenceExpressionImpl
 import com.jetbrains.python.psi.impl.references.PyQualifiedReference
 import com.jetbrains.python.psi.resolve.PyResolveContext
-import com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_BANNED_FOR_WILDCARDS
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSLReferenceExpression
@@ -57,7 +57,7 @@ class SmkSLReferenceExpressionImpl(
         private fun SmkSLReferenceExpression.isInValidCallExpression(): Boolean {
             val host = InjectedLanguageManager.getInstance(project).getInjectionHost(this)
             val callExpression = PsiTreeUtil.getParentOfType(host, PyCallExpression::class.java)
-            return callExpression == null || callExpression.callSimpleName() !in SMKImplicitPySymbolsCompletionContributor.FUNCTIONS_INVALID_FOR_WILDCARDS
+            return callExpression == null || callExpression.callSimpleName() !in FUNCTIONS_BANNED_FOR_WILDCARDS
         }
         
         fun isWildcard(expr: SmkSLReferenceExpression) =
