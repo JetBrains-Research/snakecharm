@@ -18,6 +18,10 @@ import java.util.regex.Pattern
 class WrapperCrawlerBackgroundProcess : StartupActivity {
 
     override fun runActivity(project: Project) {
+        if (ApplicationManager.getApplication().isUnitTestMode) {
+            return
+        }
+
         ApplicationManager.getApplication().invokeLater {
             ProgressManager.getInstance().run(object : Task.Backgroundable(
                     project,

@@ -26,7 +26,6 @@ import cucumber.api.DataTable
 import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
 import junit.framework.TestCase
-import org.jetbrains.annotations.Nullable
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -107,6 +106,30 @@ class CompletionResolveSteps {
         ApplicationManager.getApplication().runReadAction {
             tryToResolveRef(marker, file, getReferenceAtOffset())
         }
+    }
+
+    @Then("^reference should resolve to file \"([^\"]+)\"$")
+    fun referenceShouldResolveToFile(filename: String) {
+        ApplicationManager.getApplication().runReadAction {
+            tryToResolveRefToFile(getReferenceAtOffset(), filename)
+        }
+    }
+
+    @Then("^reference should resolve to file \"([^\"]+)\" with parent \"(.+)\"$")
+    fun referenceShouldResolveToFileWithParent(filename: String, parentFilename: String) {
+        ApplicationManager.getApplication().runReadAction {
+            val file = tryToResolveRefToFile(getReferenceAtOffset(), filename)
+            assert(file.parent?.name == parentFilename)
+        }
+    }
+
+    private fun tryToResolveRefToFile(ref: PsiReference?, filename: String): PsiFile {
+        assertNotNull(ref)
+        val result = resolve(ref)
+        assertNotNull(result)
+        assert(result is PsiFile)
+        assert((result as PsiFile).name == filename)
+        return result
     }
 
     private fun tryToResolveRef(marker: String, file: String, ref: PsiReference?) {

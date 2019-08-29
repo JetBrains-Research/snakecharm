@@ -1,0 +1,15 @@
+0.36.0
+bio/art/profiler_illumina
+channels:\n  - bioconda\n  - conda-forge\ndependencies\n  - art ==2016.06.05\n
+name: art_profiler_illumina\ndescription: Use the art profiler to create a base quality score profile for\n  Illumina read data from a fastq file.\nauthors:\n  - David Laehnemann\n  - Victoria Sack\n
+rule art_profiler_illumina:\n    input:\n        &quot;data/{sample}.fq&quot;,\n    output:\n        &quot;profiles/{sample}.txt&quot;\n    log:\n        &quot;logs/art_profiler_illumina/{sample}.log&quot;\n    params: &quot;&quot;\n    threads: 2\n    wrapper:\n        &quot;master/bio/art/profiler_illumina&quot;\n
+0.36.0
+bio/samtools/sort
+channels:\n  - bioconda\n  - conda-forge\ndependencies:\n  - samtools ==1.9\n
+name: samtools sort\ndescription: Sort bam file with samtools.\nauthors:\n  - Johannes Köster\nnotes: |\n  * Samtools -@/--threads takes one integer as input. This is the number of additional threads and not raw threads.\n
+rule samtools_sort:\n    input:\n        &quot;mapped/{sample}.bam&quot;\n    output:\n        &quot;mapped/{sample}.sorted.bam&quot;\n    params:\n        &quot;-m 4G&quot;\n    threads:  # Samtools takes additional threads through its option -@\n        8     # This value - 1 will be sent to -@.\n    wrapper:\n        &quot;master/bio/samtools/sort&quot;\n
+0.36.0
+bio/samtools/stats
+channels:\n  - bioconda\n  - conda-forge\ndependencies:\n  - samtools ==1.9\n
+name: samtools stats\ndescription: Generate stats using samtools.\nauthors:\n  - Julian de Ruiter\n
+rule samtools_stats:\n    input:\n        &quot;mapped/{sample}.bam&quot;\n    output:\n        &quot;samtools_stats/{sample}.txt&quot;\n    params:\n        extra=&quot;&quot;,                       # Optional: extra arguments.\n        region=&quot;1:1000000-2000000&quot;      # Optional: region string.\n    log:\n        &quot;logs/samtools_stats/{sample}.log&quot;\n    wrapper:\n        &quot;master/bio/samtools/stats&quot;\n
