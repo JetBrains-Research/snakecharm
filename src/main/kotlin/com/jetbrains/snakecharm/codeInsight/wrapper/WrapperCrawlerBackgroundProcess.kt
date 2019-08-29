@@ -98,19 +98,19 @@ class WrapperCrawlerBackgroundProcess : StartupActivity {
             val directories = (directoryContentJSONObject["values"] as JSONArray)
                     .filter { (it as JSONObject)["type"] == "commit_directory" }
                     .map { it as JSONObject }
-            if (files.any { (it["path"] as String).endsWith("wrapper.py") }) {
-                val environment = findFileAndGetPath("environment.yaml", files)
+            if (files.any { (it["path"] as String).endsWith(SmkWrapperUtil.SMK_WRAPPER_FILE_NAME) }) {
+                val environment = findFileAndGetPath(SmkWrapperUtil.SMK_ENVIRONMENT_FILE_NAME, files)
                 val envinronmentContent = environment?.let { path -> getFileContentFromPath("$urlStart/$path") }
                         ?: FILE_UNAVAILABLE
-                val meta = findFileAndGetPath("meta.yaml", files)
+                val meta = findFileAndGetPath(SmkWrapperUtil.SMK_META_FILE_NAME, files)
                 val metaContent = meta?.let { path -> getFileContentFromPath("$urlStart/$path") }
                         ?: FILE_UNAVAILABLE
-                val test = findFileAndGetPath("test", directories)
+                val test = findFileAndGetPath(SmkWrapperUtil.SMK_TEST_DIRECTORY_NAME, directories)
                 val exampleSnakefile = test?.let {testDir ->
                     try {
                         val directoryContent = khttp.get("$urlStart/$testDir").jsonObject
                         val path = findFileAndGetPath(
-                                "Snakefile",
+                                SmkWrapperUtil.SMK_TEST_SNAKEFILE_NAME,
                                 (directoryContent["values"] as JSONArray).map { it as JSONObject }
                         )
                         path?.let { it -> getFileContentFromPath("$urlStart/$it") }

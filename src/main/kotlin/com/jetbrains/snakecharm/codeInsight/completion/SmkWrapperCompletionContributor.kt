@@ -25,10 +25,10 @@ class SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>() 
                 .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
                 .inside(SmkRuleOrCheckpointArgsSection::class.java)
                 .inside(PyStringLiteralExpression::class.java)!!
-    }
 
-    // TODO same as in background process, can it be moved somewhere? Wrapper class perhaps?
-    private val tagNumberRegex = Regex("^v?(\\d*)\\.(\\d*)\\.(\\d*)/")
+        // TODO same as in background process, can it be moved somewhere? Wrapper class perhaps?
+        val tagNumberRegex = Regex("^v?(\\d*)\\.(\\d*)\\.(\\d*)/")
+    }
 
     override fun addCompletions(
             parameters: CompletionParameters,

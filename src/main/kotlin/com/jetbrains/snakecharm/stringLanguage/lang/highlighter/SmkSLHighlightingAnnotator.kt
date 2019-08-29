@@ -44,21 +44,4 @@ class SmkSLHighlightingAnnotator : Annotator {
                 PsiTreeUtil.getChildOfType(this, SmkSLReferenceExpressionImpl::class.java)
         return child?.name == SnakemakeNames.SMK_VARS_WILDCARDS && child.children.isEmpty()
     }
-
-
-    private fun PsiElement.isWildcard() =
-            PsiTreeUtil.getParentOfType(
-                            this,
-                            SmkSLReferenceExpression::class.java
-                    ) == null &&
-                    isInValidSection() &&
-                    text.isNotEmpty()
-
-    private fun PsiElement.isInValidSection(): Boolean {
-        val languageManager = InjectedLanguageManager.getInstance(project)
-        val host = languageManager.getInjectionHost(this)
-        val name = PsiTreeUtil.getParentOfType(host, SmkRuleOrCheckpointArgsSection::class.java)?.name
-
-        return name in SmkRuleOrCheckpointArgsSection.KEYWORDS_CONTAINING_WILDCARDS
-    }
 }
