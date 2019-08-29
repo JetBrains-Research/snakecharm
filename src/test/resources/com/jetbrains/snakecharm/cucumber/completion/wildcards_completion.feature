@@ -166,3 +166,25 @@ Feature: Completion for wildcards
       | rule       |
       | checkpoint |
 
+
+  Scenario Outline: Completion in rule run section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+          output:  "{o1}/{o2}"
+          input:  "{i1}"
+          run:
+             wildcards.smth
+      """
+    And I put the caret after wildcards.
+    When I invoke autocompletion popup
+    Then completion list should contain:
+      | o1 |
+      | o2 |
+    And completion list shouldn't contain:
+      | i1 |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |

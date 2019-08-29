@@ -1,12 +1,11 @@
 package com.jetbrains.snakecharm.codeInsight
 
 /**
- * Also see [ImplicitPySymbolsProvider] classe
+ * Also see [ImplicitPySymbolsProvider] class
  */
 object SnakemakeAPI {
     const val SMK_VARS_RULES = "rules"
     const val SMK_VARS_CHECKPOINTS = "checkpoints"
-    const val SMK_VARS_WILDCARDS = "wildcards"
     const val SMK_VARS_ATTEMPT = "attempt"
 
     val FUNCTIONS_ALLOWING_SMKSL_INJECTION = setOf(
@@ -19,5 +18,17 @@ object SnakemakeAPI {
             "expand"
     )
 
+    const val SMK_VARS_WILDCARDS = "wildcards"
+    const val WILDCARDS_ACCESSOR_CLASS = "snakemake.io.Wildcards"
 
+    /**
+     * Also see [ImplicitPySymbolsProvider], it also processes 'InputFiles', etc. symbols
+     */
+    val SECTION_ACCESSOR_CLASSES = mapOf(
+            "snakemake.io.InputFiles" to "input",
+            "snakemake.io.OutputFiles" to "output",
+            "snakemake.io.Params" to "params",
+            "snakemake.io.Log" to "log",
+            "snakemake.io.Resources" to "resources"
+    )
 }

@@ -1,5 +1,4 @@
-Feature: Completion for params in shell section
-  Complete params section arguments in shell section
+Feature: Completion for section args after section name
 
   Scenario Outline: Complete in shell section
     Given a snakemake project
@@ -110,3 +109,81 @@ Feature: Completion for params in shell section
       | rule_like   |
       | rule        |
       | checkpoint  |
+
+  Scenario Outline: Completion for various sections in shell section
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      <rule_like> rule1:
+        <section>: kwd1="arg1", kwd2="arg2"
+        shell: "{<section>.}"
+      """
+      When I put the caret after {<section>.
+      And I invoke autocompletion popup
+      Then completion list should contain:
+        | kwd1 |
+        | kwd2 |
+      Examples:
+        | section   | rule_like  |
+        | input     | rule       |
+        | output    | rule       |
+        | resources | rule       |
+        | log       | rule       |
+        | input     | checkpoint |
+        | output    | checkpoint |
+        | resources | checkpoint |
+        | log       | checkpoint |
+
+  Scenario Outline: Completion for section keywords in subscription expression
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      <rule_like> rule1:
+        <section>: kwd1="arg1", kwd2="arg2"
+        shell: "{<section>[]}"
+      """
+      When I put the caret after {<section>[
+      And I invoke autocompletion popup
+      Then completion list should contain:
+        | kwd1 |
+        | kwd2 |
+      Examples:
+        | section   | rule_like  |
+        | input     | rule       |
+        | output    | rule       |
+        | resources | rule       |
+        | log       | rule       |
+        | input     | checkpoint |
+        | output    | checkpoint |
+        | resources | checkpoint |
+        | log       | checkpoint |
+
+  Scenario Outline: Completion for section keyword arguments in run section python code
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        <section>: kwd1="arg1", kwd2="arg2"
+        <other_section>: kwd3="arg3"
+        run:
+            <section>.smth
+      """
+      When I put the caret after <section>.
+      And I invoke autocompletion popup
+      Then completion list should contain:
+        | kwd1 |
+        | kwd2 |
+      And completion list shouldn't contain:
+        | kwd3 |
+    Examples:
+      | rule_like  | section   | other_section |
+      | rule       | input     | log           |
+      | rule       | output    | log           |
+      | rule       | params    | log           |
+      | rule       | log       | input         |
+      | rule       | resources | log           |
+      | checkpoint | input     | log           |
+      | checkpoint | output    | log           |
+      | checkpoint | params    | log           |
+      | checkpoint | log       | input         |
+      | checkpoint | resources | log           |

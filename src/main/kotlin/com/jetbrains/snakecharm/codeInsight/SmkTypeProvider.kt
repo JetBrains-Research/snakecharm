@@ -4,21 +4,20 @@ import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import com.jetbrains.python.psi.PyCallExpression
-import com.jetbrains.python.psi.PyLambdaExpression
-import com.jetbrains.python.psi.PyNamedParameter
-import com.jetbrains.python.psi.PyReferenceExpression
+import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.PyTypeProviderBase
 import com.jetbrains.python.psi.types.TypeEvalContext
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTION_ACCESSOR_CLASSES
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_CHECKPOINTS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_RULES
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_ACCESSOR_CLASS
 import com.jetbrains.snakecharm.inspections.SmkLambdaRuleParamsInspection.Companion.ALLOWED_LAMBDA_ARGS
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RESOURCES
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_CHECKPOINTS
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_RULES
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
@@ -40,15 +39,51 @@ class SmkTypeProvider : PyTypeProviderBase() {
             context: TypeEvalContext,
             anchor: PsiElement?
     ): Ref<PyType>? {
-        // lambdas params types
-        if (referenceTarget is PyNamedParameter && anchor is PyReferenceExpression) {
-            return getLambdaParamType(referenceTarget)
+        if (anchor is PyReferenceExpression) {
+            // lambdas params types
+            if (referenceTarget is PyNamedParameter) {
+                return getLambdaParamType(referenceTarget)
+            }
+
+            // XXX: Cannot assign SmkRulesType, SmkCheckPointsType here: anchor is null, only resolve
+            // target is available, we need anchor for [SmkRulesType] at the moment
+
+            // 'run:' section: input, output, wildcards, ..
+            if (referenceTarget is PyClass) {
+                return getSectionAccessorInRunSection(referenceTarget, anchor)
+            }
         }
-
-        // cannot assign SmkRulesType, SmkCheckPointsType here: anchor is null, only resolve
-        // target is available
-
         return null
+    }
+
+    private fun getSectionAccessorInRunSection(
+            referenceTarget: PyClass,
+            anchor: PyReferenceExpression
+    ): Ref<PyType>? {
+
+        val fqn = referenceTarget.qualifiedName
+
+        val refTargetSection = SECTION_ACCESSOR_CLASSES[fqn]
+        val type = when {
+            refTargetSection != null -> {
+                // check if in run section & rule
+                val (_, ruleLike) = getParentSectionAndRuleLike(
+                        anchor, SmkRunSection::class.java
+                ) ?: return null
+
+                ruleLike.getSectionByName(refTargetSection)?.let { SmkSectionType(it) }
+
+            }
+            fqn == WILDCARDS_ACCESSOR_CLASS -> {
+                val ruleLike = PsiTreeUtil.getParentOfType(
+                        anchor, SmkRuleOrCheckpoint::class.java
+                ) ?: return null
+
+                SmkWildcardsType(ruleLike)
+            }
+            else -> null
+        }
+        return type?.let { Ref.create(it) }
     }
 
     private fun getLambdaParamType(referenceTarget: PyNamedParameter): Ref<PyType>? {
@@ -58,15 +93,8 @@ class SmkTypeProvider : PyTypeProviderBase() {
         ) ?: return null
 
         // in section, lambda not in call
-        val parentSection = PsiTreeUtil.getParentOfType(
-                lambda,
-                SmkRuleOrCheckpointArgsSection::class.java,
-                true,
-                PyCallExpression::class.java
-        ) ?: return null
-
-        val ruleLike = PsiTreeUtil.getParentOfType(
-                parentSection, SmkRuleOrCheckpoint::class.java
+        val (parentSection, ruleLike) = getParentSectionAndRuleLike(
+                lambda, SmkRuleOrCheckpointArgsSection::class.java, PyCallExpression::class.java
         ) ?: return null
 
         val allowedArgs = ALLOWED_LAMBDA_ARGS[parentSection.sectionKeyword] ?: emptyArray()
@@ -89,7 +117,23 @@ class SmkTypeProvider : PyTypeProviderBase() {
         }
         return null
     }
-    
+
+    private fun <T: SmkSection> getParentSectionAndRuleLike(
+            element: PsiElement,
+            sectionClass: Class<T>,
+            vararg sectionStopAt: Class<out PsiElement>
+    ): Pair<T, SmkRuleOrCheckpoint>? {
+        val section = PsiTreeUtil.getParentOfType(
+                element, sectionClass, true, *sectionStopAt
+        ) ?: return null
+
+        val ruleLike = PsiTreeUtil.getParentOfType(
+                section, SmkRuleOrCheckpoint::class.java
+        ) ?: return null
+
+        return section to ruleLike
+    }
+
     override fun getReferenceExpressionType(
             referenceExpression: PyReferenceExpression,
             context: TypeEvalContext

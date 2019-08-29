@@ -1,5 +1,4 @@
-Feature: Resolve for params in shell section
-  Resolve params arguments in shell section
+Feature: Resolve to section args after section name
 
   Scenario Outline: Resolve in shell section in rules/checkpoints
     Given a snakemake project
@@ -103,3 +102,114 @@ Feature: Resolve for params in shell section
       | checkpoint | .path    |
       | checkpoint | [path]   |
       | checkpoint | {'path'} |
+
+  Scenario Outline: Resolve to section keyword arguments in smksl injection
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        <section>: kwd1="arg1"
+        shell: "{<rule_like>s.NAME.<section>.kwd1}"
+      """
+      When I put the caret after NAME.<section>.kw
+      Then reference in injection should resolve to "kwd1" in "foo.smk"
+      Examples:
+        | section   | rule_like  |
+        | input     | rule       |
+        | output    | rule       |
+        | resources | rule       |
+        | log       | rule       |
+        | input     | checkpoint |
+        | output    | checkpoint |
+        | resources | checkpoint |
+        | log       | checkpoint |
+
+  Scenario Outline: Resolve to section keyword arguments in smksl subscription expression
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        <section>: kwd1="arg1"
+        shell: "{<rule_like>s.NAME.<section>[kwd1]}"
+      """
+      When I put the caret after <section>[kw
+      Then reference in injection should resolve to "kwd1" in "foo.smk"
+      Examples:
+        | section   | rule_like  |
+        | input     | rule       |
+        | output    | rule       |
+        | resources | rule       |
+        | log       | rule       |
+        | input     | checkpoint |
+        | output    | checkpoint |
+        | resources | checkpoint |
+        | log       | checkpoint |
+
+  Scenario Outline: Resolve to section keyword arguments in section python args
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        <section>: kwd1="arg1"
+
+      <rule_like> ANOTHER_NAME:
+        input: <rule_like>s.NAME.<section>.kwd1
+      """
+      When I put the caret after NAME.<section>.kw
+      Then reference should resolve to "kwd1" in "foo.smk"
+      Examples:
+        | section   | rule_like  |
+        | input     | rule       |
+        | output    | rule       |
+        | resources | rule       |
+        | log       | rule       |
+        | input     | checkpoint |
+        | output    | checkpoint |
+        | resources | checkpoint |
+        | log       | checkpoint |
+
+  Scenario Outline: Resolve to section keyword arguments in run section python code
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        <section>: kwd1="arg1"
+        run:
+            <section>.kwd1
+      """
+      When I put the caret after <section>.kw
+      Then reference should resolve to "kwd1" in "foo.smk"
+      Examples:
+        | rule_like  | section   |
+        | rule       | input     |
+        | rule       | output    |
+        | rule       | params    |
+        | rule       | log       |
+        | rule       | resources |
+        | checkpoint | input     |
+        | checkpoint | output    |
+        | checkpoint | params    |
+        | checkpoint | log       |
+        | checkpoint | resources |
+
+  Scenario Outline: Resolve to section keyword arguments for rules in top level
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        <section>: kwd1="arg1"
+
+      <rule_like>s.NAME.<section>.kwd1
+      """
+      When I put the caret after NAME.<section>.kw
+      Then reference should resolve to "kwd1" in "foo.smk"
+      Examples:
+        | section   | rule_like  |
+        | input     | rule       |
+        | output    | rule       |
+        | resources | rule       |
+        | log       | rule       |
+        | input     | checkpoint |
+        | output    | checkpoint |
+        | resources | checkpoint |
+        | log       | checkpoint |
