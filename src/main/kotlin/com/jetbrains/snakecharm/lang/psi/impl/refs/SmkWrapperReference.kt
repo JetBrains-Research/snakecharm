@@ -14,7 +14,7 @@ class SmkWrapperReference(element: PyStringLiteralExpression) : PsiReferenceBase
         val wrappers = WrapperStorage.getInstance().getWrapperList()
         // return empty array in case there is no tag because urls without tags are not valid
         val referencedWrapperPath = element.text.replace("\"", "")
-        val tag = SmkWrapperCompletionProvider.tagNumberRegex.find(referencedWrapperPath)?.value ?: return null
+        val tag = SmkWrapperUtil.TAG_NUMBER_REGEX.find(referencedWrapperPath)?.value ?: return null
         val directoryPath = let {
             val path = referencedWrapperPath.substringAfter(tag)
             if (path.endsWith("/")) {
@@ -27,14 +27,7 @@ class SmkWrapperReference(element: PyStringLiteralExpression) : PsiReferenceBase
             wrappers.find { it.pathToWrapperDirectory == directoryPath } ?: return null
         }
 
-        val wrapperUrl = "${WRAPPER_PREFIX}$tag$directoryPath/${SmkWrapperUtil.SMK_WRAPPER_FILE_NAME}"
+        val wrapperUrl = "${SmkWrapperUtil.WRAPPER_PREFIX}$tag$directoryPath/${SmkWrapperUtil.SMK_WRAPPER_FILE_NAME}"
         return VirtualFileManager.getInstance().findFileByUrl(wrapperUrl)?.toPsi(element.project)
-    }
-
-
-
-    companion object {
-        // TODO make it possible for user to change this when it's placed elsewhere in the settings
-        private const val WRAPPER_PREFIX = "https://bitbucket.org/snakemake/snakemake-wrappers/raw/"
     }
 }

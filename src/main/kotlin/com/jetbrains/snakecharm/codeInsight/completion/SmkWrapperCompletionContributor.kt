@@ -8,6 +8,7 @@ import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyStringLiteralExpression
+import com.jetbrains.snakecharm.codeInsight.wrapper.SmkWrapperUtil
 import com.jetbrains.snakecharm.codeInsight.wrapper.WrapperStorage
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
@@ -25,9 +26,6 @@ class SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>() 
                 .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
                 .inside(SmkRuleOrCheckpointArgsSection::class.java)
                 .inside(PyStringLiteralExpression::class.java)!!
-
-        // TODO same as in background process, can it be moved somewhere? Wrapper class perhaps?
-        val tagNumberRegex = Regex("^v?(\\d*)\\.(\\d*)\\.(\\d*)/")
     }
 
     override fun addCompletions(
@@ -46,8 +44,8 @@ class SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>() 
         val wrappers = WrapperStorage.getInstance().getWrapperList()
         val prefix = parameters.position.text.substringBefore(result.prefixMatcher.prefix).removePrefix("\"") +
                 result.prefixMatcher.prefix
-        if (tagNumberRegex.containsMatchIn(prefix)) {
-            result.withPrefixMatcher(WrapperPrefixMatcher(prefix.replace(tagNumberRegex, "")))
+        if (SmkWrapperUtil.TAG_NUMBER_REGEX.containsMatchIn(prefix)) {
+            result.withPrefixMatcher(WrapperPrefixMatcher(prefix.replace(SmkWrapperUtil.TAG_NUMBER_REGEX, "")))
                     .addAllElements(wrappers
                             .map { it.pathToWrapperDirectory }
                             .map { LookupElementBuilder.create(it) })
