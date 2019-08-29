@@ -17,6 +17,7 @@ import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.inspections.*
+import com.jetbrains.snakecharm.inspections.smksl.SmkWildcardNotDefinedInspection
 import cucumber.api.java.en.Given
 import kotlin.test.fail
 

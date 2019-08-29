@@ -126,7 +126,7 @@
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.wildcard.not.defined"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkWildcardNotDefinedInspection"
+            implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkWildcardNotDefinedInspection"
     />
 
     <localInspection
@@ -198,8 +198,8 @@
     <localInspection
             language="Snakemake" shortName="SmkLocalrulesRuleorderRepeatedRuleInspection"
             enabledByDefault="true"
-            level="ERROR"
-            suppressId="SmkLocalrulesRuleoderRepeatedRuleInspectoin"
+            level="WARNING"
+            suppressId="SmkLocalrulesRuleorderRepeatedRuleInspection"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.localrules.ruleorder.repeated.rule"

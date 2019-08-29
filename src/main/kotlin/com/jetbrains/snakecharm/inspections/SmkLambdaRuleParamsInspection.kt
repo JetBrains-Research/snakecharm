@@ -7,31 +7,32 @@ import com.jetbrains.python.inspections.quickfix.RenameParameterQuickFix
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
     companion object {
         val ALLOWED_LAMBDA_ARGS = mapOf(
-                SnakemakeNames.SECTION_INPUT to arrayOf(SnakemakeNames.SMK_VARS_WILDCARDS),
-                SnakemakeNames.SECTION_GROUP to arrayOf(SnakemakeNames.SMK_VARS_WILDCARDS),
+                SnakemakeNames.SECTION_INPUT to arrayOf(SnakemakeAPI.SMK_VARS_WILDCARDS),
+                SnakemakeNames.SECTION_GROUP to arrayOf(SnakemakeAPI.SMK_VARS_WILDCARDS),
                 SnakemakeNames.SECTION_PARAMS to arrayOf(
-                        SnakemakeNames.SMK_VARS_WILDCARDS,
+                        SnakemakeAPI.SMK_VARS_WILDCARDS,
                         SnakemakeNames.SECTION_INPUT,
                         SnakemakeNames.SECTION_OUTPUT,
                         SnakemakeNames.SECTION_RESOURCES,
                         SnakemakeNames.SECTION_THREADS
                 ),
                 SnakemakeNames.SECTION_RESOURCES to arrayOf(
-                        SnakemakeNames.SMK_VARS_WILDCARDS,
+                        SnakemakeAPI.SMK_VARS_WILDCARDS,
                         SnakemakeNames.SECTION_INPUT,
                         SnakemakeNames.SECTION_THREADS,
-                        SnakemakeNames.SMK_VARS_ATTEMPT
+                        SnakemakeAPI.SMK_VARS_ATTEMPT
                 ),
                 SnakemakeNames.SECTION_THREADS to arrayOf(
-                        SnakemakeNames.SMK_VARS_WILDCARDS,
+                        SnakemakeAPI.SMK_VARS_WILDCARDS,
                         SnakemakeNames.SECTION_INPUT,
-                        SnakemakeNames.SMK_VARS_ATTEMPT
+                        SnakemakeAPI.SMK_VARS_ATTEMPT
                 )
         )
     }
@@ -80,7 +81,7 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
         ) {
             lambdas.forEach { lambda ->
                 lambda.parameterList.parameters.forEachIndexed { index, pyParameter ->
-                    if (index == 0 && pyParameter.name != SnakemakeNames.SMK_VARS_WILDCARDS) {
+                    if (index == 0 && pyParameter.name != SnakemakeAPI.SMK_VARS_WILDCARDS) {
                         if (pyParameter.name in optionalParameters) {
                             registerProblem(
                                     pyParameter,
@@ -96,11 +97,11 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
                                     SnakemakeBundle.message("INSP.NAME.wildcards.first.parameter.preferable"),
                                     ProblemHighlightType.WEAK_WARNING,
                                     null,
-                                    RenameParameterQuickFix(SnakemakeNames.SMK_VARS_WILDCARDS)
+                                    RenameParameterQuickFix(SnakemakeAPI.SMK_VARS_WILDCARDS)
                             )
                         }
                     }
-                    if (index != 0 && pyParameter.name == SnakemakeNames.SMK_VARS_WILDCARDS) {
+                    if (index != 0 && pyParameter.name == SnakemakeAPI.SMK_VARS_WILDCARDS) {
                         registerProblem(
                                 pyParameter,
                                 SnakemakeBundle.message("INSP.NAME.wildcards.first.parameter")

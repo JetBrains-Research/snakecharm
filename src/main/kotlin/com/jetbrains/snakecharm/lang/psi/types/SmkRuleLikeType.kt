@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi.types
 
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PyExpression
@@ -25,9 +26,12 @@ class SmkRuleLikeType(private val declaration: SmkRuleOrCheckpoint) : PyType {
         )
     }
 
-    override fun getName() = "rule like"
+    override fun getName() = "Rule${declaration.name?.let { " '$it'" } ?: ""}"
 
     override fun assertValid(message: String?) {
+        if (!declaration.isValid) {
+            throw PsiInvalidElementAccessException(declaration, message)
+        }
     }
 
     override fun resolveMember(

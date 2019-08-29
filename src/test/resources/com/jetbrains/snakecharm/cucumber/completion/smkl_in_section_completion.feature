@@ -1,4 +1,4 @@
-Feature: Completion for sections in string language
+Feature: Completion for sections/variables in SmkSL injections
 
   Scenario Outline: Completion list contains only available sections
     Given a snakemake project
@@ -93,30 +93,6 @@ Feature: Completion for sections in string language
       | rule       |
       | checkpoint |
 
-  Scenario Outline: Completion for various sections in shell section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> rule1:
-      <section>: kwd1="arg1", kwd2="arg2"
-      shell: "{<section>.}"
-    """
-    When I put the caret after {<section>.
-    And I invoke autocompletion popup
-    Then completion list should contain:
-      | kwd1 |
-      | kwd2 |
-    Examples:
-      | section   | rule_like  |
-      | input     | rule       |
-      | output    | rule       |
-      | resources | rule       |
-      | log       | rule       |
-      | input     | checkpoint |
-      | output    | checkpoint |
-      | resources | checkpoint |
-      | log       | checkpoint |
-
   Scenario Outline: completion for incomplete section names in run section
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -170,27 +146,3 @@ Feature: Completion for sections in string language
       | rule_like  |
       | rule       |
       | checkpoint |
-
-  Scenario Outline: Completion for section keywords in subscription expression
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> rule1:
-      <section>: kwd1="arg1", kwd2="arg2"
-      shell: "{<section>[]}"
-    """
-    When I put the caret after {<section>[
-    And I invoke autocompletion popup
-    Then completion list should contain:
-      | kwd1 |
-      | kwd2 |
-    Examples:
-      | section   | rule_like  |
-      | input     | rule       |
-      | output    | rule       |
-      | resources | rule       |
-      | log       | rule       |
-      | input     | checkpoint |
-      | output    | checkpoint |
-      | resources | checkpoint |
-      | log       | checkpoint |

@@ -145,12 +145,21 @@ class ActionsSteps {
 
     @When("^I check highlighting (errors|warnings|infos|weak warnings)$")
     fun iCheckHighlighting(type: String) {
+        checkHighlighting(type, false)
+    }
+
+    @When("^I check highlighting (errors|warnings|infos|weak warnings) ignoring extra highlighting$")
+    fun iCheckHighlightingIgnoreExtra(type: String) {
+        checkHighlighting(type, true)
+    }
+
+    fun checkHighlighting(type: String, ignoreExtra: Boolean) {
         val fixture = fixture()
         when (type) {
-            "errors" -> fixture.checkHighlighting(false, false, false, true)
-            "warnings" -> fixture.checkHighlighting(true, false, false, true)
-            "infos" -> fixture.checkHighlighting(false, true, false, true)
-            "weak warnings" -> fixture.checkHighlighting(false, false, true, true)
+            "errors" -> fixture.checkHighlighting(false, false, false, ignoreExtra)
+            "warnings" -> fixture.checkHighlighting(true, false, false, ignoreExtra)
+            "infos" -> fixture.checkHighlighting(false, true, false, ignoreExtra)
+            "weak warnings" -> fixture.checkHighlighting(false, false, true, ignoreExtra)
             else -> fail("Unknown highlighting type: $type")
         }
     }

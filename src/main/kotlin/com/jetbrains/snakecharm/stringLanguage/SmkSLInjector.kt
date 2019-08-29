@@ -5,12 +5,8 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.codeInsight.PyInjectionUtil.InjectionResult
 import com.jetbrains.python.codeInsight.PyInjectorBase
-import com.jetbrains.python.psi.PyCallExpression
-import com.jetbrains.python.psi.PyFormattedStringElement
-import com.jetbrains.python.psi.PyLambdaExpression
-import com.jetbrains.python.psi.PyStringLiteralExpression
-import com.jetbrains.python.psi.impl.PyReferenceExpressionImpl
-import com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor.Companion.FUNCTIONS_VALID_FOR_INJECTION
+import com.jetbrains.python.psi.*
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_ALLOWING_SMKSL_INJECTION
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
@@ -49,9 +45,7 @@ class SmkSLInjector : PyInjectorBase() {
 
     private fun PsiElement.isInValidCallExpression(): Boolean {
         val parentCallExpr = PsiTreeUtil.getParentOfType(this, PyCallExpression::class.java)
-        return parentCallExpr == null ||
-                (parentCallExpr.firstChild as?
-                        PyReferenceExpressionImpl)?.referencedName in FUNCTIONS_VALID_FOR_INJECTION
+        return parentCallExpr == null || parentCallExpr.callSimpleName() in FUNCTIONS_ALLOWING_SMKSL_INJECTION
     }
 
     private fun PsiElement.isInValidArgsSection(): Boolean {
@@ -63,8 +57,15 @@ class SmkSLInjector : PyInjectorBase() {
 
     private fun PsiElement.isValidForInjection() =
             SnakemakeLanguageDialect.isInsideSmkFile(this) &&
-            isInValidArgsSection() &&
-            isInValidCallExpression() &&
-            PsiTreeUtil.getParentOfType(this, PyLambdaExpression::class.java) == null &&
-            (this as PyStringLiteralExpression).containsLBrace()
+                    isInValidArgsSection() &&
+                    isInValidCallExpression() &&
+                    PsiTreeUtil.getParentOfType(this, PyLambdaExpression::class.java) == null &&
+                    (this as PyStringLiteralExpression).containsLBrace()
+}
+
+fun PyCallExpression.callSimpleName() = this.callee.let { expression ->
+    when (expression) {
+        is PyReferenceExpression -> expression.referencedName
+        else -> null
+    }
 }

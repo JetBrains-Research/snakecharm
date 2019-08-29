@@ -22,12 +22,12 @@ Feature: Completion for wildcards
     And I invoke autocompletion popup
     Then completion list should contain:
       | wildcard6     |
+      | wildcard5     |
+      | wildcard4     |
     And completion list shouldn't contain:
       | wildcard1     |
       | wildcard2     |
       | wildcard3     |
-      | wildcard4     |
-      | wildcard5     |
       | wildcard7     |
       | non-wildcard1 |
       | non-wildcard2 |
@@ -53,13 +53,15 @@ Feature: Completion for wildcards
     And I invoke autocompletion popup
     Then completion list should contain:
       | wildcard1 |
-      | wildcard2 |
       | wildcard3 |
       | wildcard4 |
       | wildcard5 |
       | wildcard6 |
       | wildcard7 |
       | wildcard8 |
+    And completion list shouldn't contain:
+      | wildcard2 |
+
     Examples:
       | rule_like  |
       | rule       |
@@ -141,6 +143,47 @@ Feature: Completion for wildcards
       output: "{wildcard}"
       shell: "{wildcards.wildcard}"
     """
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Expand injections not in wildcards
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+        output:
+            expand("{prefix}", prefix="p")
+        shell: "{wildcards.fo}"
+    """
+    And I put the caret after wildcards.
+    When I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | prefix |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+
+  Scenario Outline: Completion in rule run section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+          output:  "{o1}/{o2}"
+          input:  "{i1}"
+          run:
+             wildcards.smth
+      """
+    And I put the caret after wildcards.
+    When I invoke autocompletion popup
+    Then completion list should contain:
+      | o1 |
+      | o2 |
+    And completion list shouldn't contain:
+      | i1 |
     Examples:
       | rule_like  |
       | rule       |

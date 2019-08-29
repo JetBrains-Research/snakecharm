@@ -2,46 +2,32 @@ package com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes
 
 import com.intellij.lang.ASTNode
 import com.intellij.lang.injection.InjectedLanguageManager
-import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.util.PsiTreeUtil
+import com.jetbrains.python.psi.PyCallExpression
+import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.impl.PyReferenceExpressionImpl
 import com.jetbrains.python.psi.impl.references.PyQualifiedReference
 import com.jetbrains.python.psi.resolve.PyResolveContext
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_BANNED_FOR_WILDCARDS
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
+import com.jetbrains.snakecharm.stringLanguage.SmkSLElementVisitor
+import com.jetbrains.snakecharm.stringLanguage.callSimpleName
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLInitialReference
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
 class SmkSLReferenceExpressionImpl(
         node: ASTNode
 ) : PyReferenceExpressionImpl(node), SmkSLReferenceExpression {
-    override fun getName(): String? {
-        return super<SmkSLReferenceExpression>.getName()
-    }
+    override fun getName() = super<SmkSLReferenceExpression>.getName()
 
-    fun getNameRange(): TextRange = getNameNode()?.textRange ?: TextRange.EMPTY_RANGE
-
-    fun getContainingDeclaration(): SmkRuleOrCheckpoint? {
-        val languageManager = InjectedLanguageManager.getInstance(project)
-        val host = languageManager.getInjectionHost(this)
-        return PsiTreeUtil.getParentOfType(host, SmkRuleOrCheckpoint::class.java)
-    }
-
-    fun isWildcard() =
-        PsiTreeUtil.getParentOfType(this, SmkSLReferenceExpression::class.java) == null &&
-        isInWildcardsSection() &&
-        text.isNotEmpty()
-
-    private fun isInWildcardsSection(): Boolean {
-        val languageManager = InjectedLanguageManager.getInstance(project)
-        val host = languageManager.getInjectionHost(this)
-        val name = PsiTreeUtil.getParentOfType(host, SmkRuleOrCheckpointArgsSection::class.java)?.name
-
-        return name in SmkRuleOrCheckpointArgsSection.KEYWORDS_CONTAINING_WILDCARDS
+    override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
+        is SmkSLElementVisitor -> pyVisitor.visitSmkSLReferenceExpression(this)
+        else -> super.acceptPyVisitor(pyVisitor)
     }
 
     override fun getReference(context: PyResolveContext): PsiPolyVariantReference {
@@ -66,4 +52,18 @@ class SmkSLReferenceExpressionImpl(
 
     override fun getQualifier(): PyExpression? =
             children.firstOrNull { it is SmkSLReferenceExpression } as PyExpression?
+
+    companion object {
+        private fun SmkSLReferenceExpression.isInValidCallExpression(): Boolean {
+            val host = InjectedLanguageManager.getInstance(project).getInjectionHost(this)
+            val callExpression = PsiTreeUtil.getParentOfType(host, PyCallExpression::class.java)
+            return callExpression == null || callExpression.callSimpleName() !in FUNCTIONS_BANNED_FOR_WILDCARDS
+        }
+        
+        fun isWildcard(expr: SmkSLReferenceExpression) =
+                PsiTreeUtil.getParentOfType(expr, SmkSLReferenceExpression::class.java) == null &&
+                        (expr.containingRuleOrCheckpointSection()?.isWildcardsAllowedSection() ?: false) &&
+                        expr.text.isNotEmpty() &&
+                        expr.isInValidCallExpression()
+    }
 }

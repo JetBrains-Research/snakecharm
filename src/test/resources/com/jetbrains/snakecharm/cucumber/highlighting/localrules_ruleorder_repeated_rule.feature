@@ -67,19 +67,19 @@ Feature: localrules/ruleorder repeated rule inspection
         <separator> rule3 # repeated
     """
     And Repeated Rule in Localrules or Ruleorder inspection is enabled
-    Then I expect inspection weak warning on <rule2> in <rule2 # repeated> with message
+    Then I expect inspection warning on <rule2> in <rule2 # repeated> with message
     """
     This rule has already been added to this section.
     """
-    And I expect inspection weak warning on <rule1> in <rule1 # repeated> with message
+    And I expect inspection warning on <rule1> in <rule1 # repeated> with message
     """
     This rule has already been added to this section.
     """
-    And I expect inspection weak warning on <rule3> in <rule3 # repeated> with message
+    And I expect inspection warning on <rule3> in <rule3 # repeated> with message
     """
     This rule has already been added to this section.
     """
-    When I check highlighting errors
+    When I check highlighting warnings
     Examples:
     | section_name | separator |
     | localrules   | ,         |
