@@ -46,14 +46,17 @@ Feature: Check highlighting of inspections on wildcards
   Scenario Outline: Cannot parse wildcard defining section but other exists
     Given a snakemake project
     Given I open a file "foo.smk" with text
-       """
-       <section> NAME:
-         <def_section1>: foo()
-         <def_section2>: "{sample}"
-         <usage>: "{sample} {typo}.txt"
-       """
+     """
+     <section> NAME:
+       <def_section1>: foo()
+       <def_section2>: "{sample}"
+       <usage>: "{sample} {typo}.txt"
+     """
     And Wildcard not defined inspection is enabled
-    Then I expect no inspection error
+    Then I expect inspection error on <typo> with message
+    """
+    Wildcard 'typo' isn't defined in '<def_section1>' section.
+    """
     When I check highlighting errors
     Examples:
       | section    | def_section1 | def_section2 | usage |
@@ -166,6 +169,10 @@ Feature: Check highlighting of inspections on wildcards
         group: "{a}.{z}"
       """
     And Wildcard not defined inspection is enabled
+    Then I expect inspection error on <z> in <"{z}"> with message
+      """
+      Wildcard 'z' isn't defined in 'output' section.
+      """
     Then I expect inspection error on <z> in <"{a}.{z}"> with message
       """
       Wildcard 'z' isn't defined in 'output' section.
@@ -195,3 +202,20 @@ Feature: Check highlighting of inspections on wildcards
       | rule       | input | log          | benchmark    |
       | rule       | group | output       | log          |
       | checkpoint | input | output       | log          |
+
+  Scenario Outline: Expand injections isn't undefined wildcard
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+     """
+     <rule_like> NAME:
+         output: "{x}"
+         input:
+             expand("{prefix}", prefix="p")
+     """
+    And Wildcard not defined inspection is enabled
+    Then I expect no inspection error
+    When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |

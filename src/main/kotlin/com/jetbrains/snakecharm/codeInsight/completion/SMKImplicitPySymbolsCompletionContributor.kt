@@ -25,6 +25,10 @@ class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
             "join"
         )
 
+        val FUNCTIONS_INVALID_FOR_WILDCARDS = listOf(
+                "expand"
+        )
+
         private val REF_CAPTURE = psiElement()
                 .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
                 .and(IN_PY_REF)

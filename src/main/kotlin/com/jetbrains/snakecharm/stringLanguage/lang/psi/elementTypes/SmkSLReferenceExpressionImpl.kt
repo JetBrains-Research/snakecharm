@@ -4,16 +4,19 @@ import com.intellij.lang.ASTNode
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.util.PsiTreeUtil
+import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.impl.PyReferenceExpressionImpl
 import com.jetbrains.python.psi.impl.references.PyQualifiedReference
 import com.jetbrains.python.psi.resolve.PyResolveContext
+import com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.stringLanguage.SmkSLElementVisitor
+import com.jetbrains.snakecharm.stringLanguage.callSimpleName
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLInitialReference
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
@@ -51,9 +54,16 @@ class SmkSLReferenceExpressionImpl(
             children.firstOrNull { it is SmkSLReferenceExpression } as PyExpression?
 
     companion object {
+        private fun SmkSLReferenceExpression.isInValidCallExpression(): Boolean {
+            val host = InjectedLanguageManager.getInstance(project).getInjectionHost(this)
+            val callExpression = PsiTreeUtil.getParentOfType(host, PyCallExpression::class.java)
+            return callExpression == null || callExpression.callSimpleName() !in SMKImplicitPySymbolsCompletionContributor.FUNCTIONS_INVALID_FOR_WILDCARDS
+        }
+        
         fun isWildcard(expr: SmkSLReferenceExpression) =
                 PsiTreeUtil.getParentOfType(expr, SmkSLReferenceExpression::class.java) == null &&
                         (expr.containingRuleOrCheckpointSection()?.isWildcardsAllowedSection() ?: false) &&
-                        expr.text.isNotEmpty()
+                        expr.text.isNotEmpty() &&
+                        expr.isInValidCallExpression()
     }
 }

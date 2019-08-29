@@ -45,9 +45,7 @@ class SmkSLInjector : PyInjectorBase() {
 
     private fun PsiElement.isInValidCallExpression(): Boolean {
         val parentCallExpr = PsiTreeUtil.getParentOfType(this, PyCallExpression::class.java)
-        return parentCallExpr == null ||
-                (parentCallExpr.callee as?
-                        PyReferenceExpression)?.referencedName in FUNCTIONS_VALID_FOR_INJECTION
+        return parentCallExpr == null || parentCallExpr.callSimpleName() in FUNCTIONS_VALID_FOR_INJECTION
     }
 
     private fun PsiElement.isInValidArgsSection(): Boolean {
@@ -59,8 +57,15 @@ class SmkSLInjector : PyInjectorBase() {
 
     private fun PsiElement.isValidForInjection() =
             SnakemakeLanguageDialect.isInsideSmkFile(this) &&
-            isInValidArgsSection() &&
-            isInValidCallExpression() &&
-            PsiTreeUtil.getParentOfType(this, PyLambdaExpression::class.java) == null &&
-            (this as PyStringLiteralExpression).containsLBrace()
+                    isInValidArgsSection() &&
+                    isInValidCallExpression() &&
+                    PsiTreeUtil.getParentOfType(this, PyLambdaExpression::class.java) == null &&
+                    (this as PyStringLiteralExpression).containsLBrace()
+}
+
+fun PyCallExpression.callSimpleName() = this.callee.let { expression ->
+    when (expression) {
+        is PyReferenceExpression -> expression.referencedName
+        else -> null
+    }
 }

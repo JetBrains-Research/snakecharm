@@ -2,16 +2,20 @@ package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.util.PsiTreeUtil
+import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyRecursiveElementVisitor
 import com.jetbrains.python.psi.PyStringLiteralExpression
+import com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor
 import com.jetbrains.snakecharm.stringLanguage.SmkSLFile
+import com.jetbrains.snakecharm.stringLanguage.callSimpleName
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLLanguageElement
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLReferenceExpressionImpl
 
 /**
  * For containers which includes:
  *  * rule, checkpoint, sections - collects wildcards in sections according to settings in constructor
+ *  * call expression - ignore some methods, which don't introduce wildcards, e.g. 'expand'
  *  * string literals - collect all injections
  *
  *  @param visitDefiningSections Visit or not downstream sections which introduces new wildcards
@@ -54,6 +58,12 @@ class SmkWildcardsCollector(
             }
         } finally {
             currentSectionIdx = WildcardDescriptor.UNDEFINED_SECTION
+        }
+    }
+
+    override fun visitPyCallExpression(node: PyCallExpression) {   //format
+        if (node.callSimpleName() !in SMKImplicitPySymbolsCompletionContributor.FUNCTIONS_INVALID_FOR_WILDCARDS) {
+            super.visitPyCallExpression(node)
         }
     }
 

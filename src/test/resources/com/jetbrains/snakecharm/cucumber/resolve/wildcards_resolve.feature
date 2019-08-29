@@ -123,3 +123,19 @@ Feature: Resolve wildcards in SnakemakeSL
       | rule_like  |
       | rule       |
       | checkpoint |
+
+  Scenario Outline: Do not resolve expand injections as wildcards
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+     """
+     <rule_like> NAME:
+         output:
+             expand("{prefix}", prefix="p")
+         shell: "{wildcards.prefix}"
+     """
+    When I put the caret after wildcards.pref
+    Then there should be no reference
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |

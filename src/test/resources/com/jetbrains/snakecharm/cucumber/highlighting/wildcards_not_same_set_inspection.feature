@@ -17,9 +17,17 @@ Feature: Inspection - Not same wildcards set
       """
       Missing wildcards: 'b', 'c'.
       """
+    And I expect inspection error on <log2 = "{a}/{b}.log2"> with message
+      """
+      Missing wildcards: 'c'.
+      """
     Then I expect inspection error on <log3 = "{b}.log3"> with message
       """
       Missing wildcards: 'a', 'c'.
+      """
+    And I expect inspection error on <"{a}.{b}"> with message
+      """
+      Missing wildcards: 'c'.
       """
     And I expect inspection error on <"{b}.{c}"> with message
       """
@@ -106,9 +114,17 @@ Feature: Inspection - Not same wildcards set
         log: "{x}.{z}"
       """
     And Not same wildcards set inspection is enabled
+    Then I expect inspection error on <"{a}.{b}"> with message
+      """
+      Missing wildcards: 'd'.
+      """
     Then I expect inspection error on <"{a}.{d}"> with message
       """
       Missing wildcards: 'b'.
+      """
+    Then I expect inspection error on <"{x}.{y}"> with message
+      """
+      Missing wildcards: 'z'.
       """
     Then I expect inspection error on <"{x}.{z}"> with message
       """
@@ -172,6 +188,10 @@ Feature: Inspection - Not same wildcards set
           benchmark: "{sample}.txt"
       """
     And Not same wildcards set inspection is enabled
+    Then I expect inspection error on <"{foo}"> with message
+      """
+      Missing wildcards: 'sample'.
+      """
     Then I expect inspection error on <"{sample}.txt"> with message
       """
       Missing wildcards: 'foo'.
