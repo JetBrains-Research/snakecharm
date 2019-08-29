@@ -193,8 +193,8 @@
     <localInspection
             language="Snakemake" shortName="SmkLocalrulesRuleorderRepeatedRuleInspection"
             enabledByDefault="true"
-            level="ERROR"
-            suppressId="SmkLocalrulesRuleoderRepeatedRuleInspectoin"
+            level="WARNING"
+            suppressId="SmkLocalrulesRuleorderRepeatedRuleInspection"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.localrules.ruleorder.repeated.rule"
