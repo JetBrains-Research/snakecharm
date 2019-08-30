@@ -11,8 +11,7 @@ import com.jetbrains.python.psi.impl.PyReferenceExpressionImpl
 import com.jetbrains.python.psi.impl.references.PyQualifiedReference
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_BANNED_FOR_WILDCARDS
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_EXPANDING_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.stringLanguage.SmkSLElementVisitor
@@ -34,16 +33,11 @@ class SmkSLReferenceExpressionImpl(
         if (qualifier != null) {
             return PyQualifiedReference(this, context)
         }
-
-        val languageManager = InjectedLanguageManager.getInstance(project)
-        val host = languageManager.getInjectionHost(this)
-        val parentSection =
-                PsiTreeUtil.getParentOfType(host, SmkRuleOrCheckpointArgsSection::class.java)
-        val parentDeclaration =
-                PsiTreeUtil.getParentOfType(host, SmkRuleOrCheckpoint::class.java)
+        val parentSection = containingSection()
+        val parentDeclaration = parentSection?.getParentRuleOrCheckPoint()
 
         if (parentDeclaration == null ||
-                parentSection?.name !in SmkRuleOrCheckpointArgsSection.KEYWORDS_CONTAINING_WILDCARDS) {
+                parentSection.sectionKeyword !in WILDCARDS_EXPANDING_SECTIONS_KEYWORDS) {
             return SmkSLInitialReference(this, parentDeclaration, context)
         }
 
@@ -62,7 +56,7 @@ class SmkSLReferenceExpressionImpl(
         
         fun isWildcard(expr: SmkSLReferenceExpression) =
                 PsiTreeUtil.getParentOfType(expr, SmkSLReferenceExpression::class.java) == null &&
-                        (expr.containingRuleOrCheckpointSection()?.isWildcardsAllowedSection() ?: false) &&
+                        (expr.containingRuleOrCheckpointSection()?.isWildcardsExpandingSection() ?: false) &&
                         expr.text.isNotEmpty() &&
                         expr.isInValidCallExpression()
     }

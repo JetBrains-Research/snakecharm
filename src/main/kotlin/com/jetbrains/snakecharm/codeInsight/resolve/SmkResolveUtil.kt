@@ -5,7 +5,8 @@ import com.jetbrains.snakecharm.lang.psi.SmkFile
 
 class SmkResolveUtil {
     companion object {
-        const val IMPLICIT_SYMBOLS_PRIORITY = RatedResolveResult.RATE_HIGH
+        const val RATE_IMPLICIT_SYMBOLS = RatedResolveResult.RATE_HIGH
+        const val RATE_NORMAL = RatedResolveResult.RATE_NORMAL
 
         fun getIncludedFiles(file: SmkFile): List<SmkFile> {
             val includedFiles = mutableListOf<SmkFile>()

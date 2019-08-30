@@ -8,8 +8,6 @@ object SnakemakeNames {
     const val RULE_KEYWORD = "rule"
     const val CHECKPOINT_KEYWORD = "checkpoint"
 
-    const val SUBWORKFLOW_KEYWORD = "subworkflow"
-
     const val WORKFLOW_CONFIGFILE_KEYWORD = "configfile"
     const val WORKFLOW_REPORT_KEYWORD = "report"
     const val WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD = "wildcard_constraints"
@@ -24,6 +22,11 @@ object SnakemakeNames {
     const val WORKFLOW_ONSUCCESS_KEYWORD = "onsuccess"
     const val WORKFLOW_ONERROR_KEYWORD = "onerror"
     const val WORKFLOW_ONSTART_KEYWORD = "onstart"
+
+    const val SUBWORKFLOW_KEYWORD = "subworkflow"
+    const val SUBWORKFLOW_WORKDIR_KEYWORD  = WORKFLOW_WORKDIR_KEYWORD
+    const val SUBWORKFLOW_CONFIGFILE_KEYWORD  = WORKFLOW_CONFIGFILE_KEYWORD
+    const val SUBWORKFLOW_SNAKEFILE_KEYWORD = "snakefile"
 
     const val SECTION_INPUT = "input"
     const val SECTION_OUTPUT = "output"

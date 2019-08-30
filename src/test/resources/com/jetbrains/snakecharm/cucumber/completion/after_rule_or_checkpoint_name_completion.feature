@@ -27,7 +27,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
          run:
 
      <rule_like> ANOTHER_NAME:
-        input: <injection_left><rule_like>s.NAME.<injection_right>
+        message: <injection_left><rule_like>s.NAME.<injection_right>
     """
     When I put the caret after <rule_like>s.NAME.
     And I invoke autocompletion popup
@@ -203,7 +203,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
         input: ""
 
     <rule_like> ANOTHER_NAME:
-        input: <injection_left><rule_like>s.NAME.i<injection_right>
+        message: <injection_left><rule_like>s.NAME.i<injection_right>
     """
     When I put the caret after <rule_like>s.NAME.i
     Then I invoke autocompletion popup and see a text:
@@ -212,7 +212,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
         input: ""
 
     <rule_like> ANOTHER_NAME:
-        input: <injection_left><rule_like>s.NAME.input<injection_right>
+        message: <injection_left><rule_like>s.NAME.input<injection_right>
     """
     Examples:
       | rule_like  | injection_left | injection_right |

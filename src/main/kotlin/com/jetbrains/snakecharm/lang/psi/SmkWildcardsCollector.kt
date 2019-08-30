@@ -7,6 +7,7 @@ import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyRecursiveElementVisitor
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_BANNED_FOR_WILDCARDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.stringLanguage.SmkSLFile
 import com.jetbrains.snakecharm.stringLanguage.callSimpleName
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLLanguageElement
@@ -45,14 +46,13 @@ class SmkWildcardsCollector(
 
     override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
         try {
-            currentSectionIdx = SmkRuleOrCheckpointArgsSection.SECTIONS_DEFINING_WILDCARDS
-                    .indexOf(st.sectionKeyword).toByte()
+            currentSectionIdx = WILDCARDS_DEFINING_SECTIONS_KEYWORDS.indexOf(st.sectionKeyword).toByte()
 
             if (visitDefiningSections && st.isWildcardsDefiningSection()) {
                 super.visitSmkRuleOrCheckpointArgsSection(st)
                 return
             }
-            if (visitSectionsAllowingUsage && st.isWildcardsAllowedSection()) {
+            if (visitSectionsAllowingUsage && st.isWildcardsExpandingSection()) {
                 super.visitSmkRuleOrCheckpointArgsSection(st)
                 return
             }

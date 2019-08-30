@@ -88,17 +88,18 @@ Feature: Resolve implicitly imported python names
       | <symbol_name> | <file> | <times> |
 
     Examples:
-      | ptn        | text        | symbol_name | file        | times |
-      | exp        | expand()    | expand      | io.py       | 1     |
-      | she        | shell()     | __new__     | shell.py    | 1     |
-      | con        | config["a"] | config      | workflow.py | 1     |
-      | rules      | rules.foo   | rules       | workflow.py | 1     |
-      | inp        | input[0]    | InputFiles  | io.py       | 1     |
-      | output.foo | output.foo  | OutputFiles | io.py       | 1     |
-      | par        | params      | Params      | io.py       | 1     |
-      | wil        | wildcards   | Wildcards   | io.py       | 1     |
-      | res        | resources   | Resources   | io.py       | 1     |
-      | lo         | log         | Log         | io.py       | 1     |
+      | ptn         | text        | symbol_name | file        | times |
+      | exp         | expand()    | expand      | io.py       | 1     |
+      | she         | shell()     | __new__     | shell.py    | 1     |
+      | con         | config["a"] | config      | workflow.py | 1     |
+      | rules       | rules.foo   | rules       | workflow.py | 1     |
+      | checkpoints | checkpoints | checkpoints | workflow.py | 1     |
+      | inp         | input[0]    | InputFiles  | io.py       | 1     |
+      | output.foo  | output.foo  | OutputFiles | io.py       | 1     |
+      | par         | params      | Params      | io.py       | 1     |
+      | wil         | wildcards   | Wildcards   | io.py       | 1     |
+      | res         | resources   | Resources   | io.py       | 1     |
+      | lo          | log         | Log         | io.py       | 1     |
 
   Scenario: Resolve results priority
       Given a snakemake project
@@ -217,3 +218,59 @@ Feature: Resolve implicitly imported python names
       | ptn | symbol_name | ext |
       | exp | expand      | py  |
       | exp | expand      | pyi |
+
+  Scenario Outline: Resolve in injections
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+        """
+        <rule_like> NAME:
+           <section>: "{<text>}"
+        """
+    When I put the caret after "{
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | rules       |
+      | checkpoints |
+      | config      |
+
+    Examples:
+      | rule_like  | section |
+      | rule       | shell   |
+      | rule       | message |
+      | checkpoint | shell   |
+
+  Scenario Outline: No resolve in injections for defining expanding sections
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+        """
+        <rule_like> NAME:
+           <section>: "{<text>}"
+        """
+    When I put the caret after "{
+
+    Then reference in injection should multi resolve to name, file, times[, class name]
+      | <symbol_name> | <file> | <times> |
+
+    Examples:
+      | rule_like  | section   | text        | symbol_name | file        | times |
+      | rule       | output    | rules       | rules       | workflow.py | 0     |
+      | rule       | log       | checkpoints | checkpoints | workflow.py | 0     |
+      | rule       | benchmark | config      | config      | workflow.py | 0     |
+      | checkpoint | output    | rules       | rules       | workflow.py | 0     |
+
+  Scenario Outline: No resolve in injections for wildcards expanding sections
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+        """
+        <rule_like> NAME:
+           <section>: "{<text>}"
+        """
+    When I put the caret after "{
+    Then reference in injection should not resolve
+
+    Examples:
+      | rule_like  | section | text        |
+      | rule       | input   | rules       |
+      | rule       | input   | checkpoints |
+      | rule       | input   | config      |
+      | checkpoint | input   | rules       |

@@ -20,6 +20,7 @@ import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
+import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
@@ -62,7 +63,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
         }
 
         return results.map { element ->
-            RatedResolveResult(RatedResolveResult.RATE_NORMAL, element)
+            RatedResolveResult(SmkResolveUtil.RATE_NORMAL, element)
         }
     }
 

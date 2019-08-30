@@ -4,7 +4,7 @@ import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
 import com.jetbrains.python.psi.PyStatementListContainer
 
-interface SmkRuleLike<out S : SmkSection>: SmkSection, PyStatementListContainer,
+interface SmkRuleLike<out S : SmkSection>: SmkSection, SmkToplevelSection, PyStatementListContainer,
         //ScopeOwner,
         PsiNamedElement, PsiNameIdentifierOwner {
 

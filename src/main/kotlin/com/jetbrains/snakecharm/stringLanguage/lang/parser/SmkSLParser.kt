@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.stringLanguage.lang.parser
 import com.intellij.lang.ASTNode
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.PsiParser
-import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.stringLanguage.SmkSLTokenTypes
@@ -75,12 +74,14 @@ class SmkSLParser : PsiParser {
                     exprMarker = exprMarker.precede()
                     identifierExpected = false
                 }
-                tt === SmkSLTokenTypes.UNEXPECTED_TOKEN -> {
-                    exprMarker.done(SmkSLTokenTypes.REFERENCE_EXPRESSION)
+                tt === SmkSLTokenTypes.BAD_CHARACTER -> {
+                    exprMarker.drop()
 
-                    exprMarker = builder.mark()
-                    builder.advanceLexer()
-                    exprMarker.error(SnakemakeBundle.message("SMKSL.PARSE.unexpected.character"))
+                    builder.error(SnakemakeBundle.message("SMKSL.PARSE.unexpected.character"))
+
+                    // exprMarker = builder.mark()
+                     builder.advanceLexer()
+                    // exprMarker.error(SnakemakeBundle.message("SMKSL.PARSE.unexpected.character"))
 
                     exprMarker = builder.mark()
                 }
@@ -117,6 +118,7 @@ class SmkSLParser : PsiParser {
                     exprMarker.drop(identifierExpected)
                     return true
                 }
+                // TODO: better errors handling
                 else -> {
                     exprMarker.drop(identifierExpected)
                     return false

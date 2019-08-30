@@ -44,6 +44,9 @@ ACCESS_KEY=[^\]]+
     \[                            { yybegin(WAITING_ACCESS_KEY); return tokenTypes.getLBRACKET(); }
 
     {FORMAT_SPECIFIER}            { yybegin(WAITING_LANGUAGE_CLOSURE); return tokenTypes.getFORMAT_SPECIFIER();}
+    //TODO report identifier + fix parsing, to report errors more accurate
+    // {IDENTIFIER}                  { return tokenTypes.getIDENTIFIER();}
+    {IDENTIFIER}                  { return tokenTypes.getBAD_CHARACTER();}
 }
 
 <WAITING_ACCESS_KEY> {ACCESS_KEY} { yybegin(WAITING_ACCESS_CLOSURE); return tokenTypes.getIDENTIFIER(); }
@@ -57,4 +60,4 @@ ACCESS_KEY=[^\]]+
 
     \,                            { yybegin(WAITING_REGEXP); return tokenTypes.getCOMMA(); }
 
-    [^]                           { yybegin(WAITING_IDENTIFIER); return tokenTypes.getUNEXPECTED_TOKEN(); }
+    [^]                           { yybegin(WAITING_IDENTIFIER); return tokenTypes.getBAD_CHARACTER(); }
