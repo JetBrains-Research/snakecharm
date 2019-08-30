@@ -115,7 +115,7 @@ Feature: Resolve implicitly imported python names
         | InputFiles | io.py        |
         | input      | builtins.pyi |
 
-  Scenario Outline: Resolve threads inside run section
+  Scenario Outline: Resolve threads inside run section (threads is fake implicit symbol)
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -132,8 +132,7 @@ Feature: Resolve implicitly imported python names
     Examples:
       | rule_like  | text       | symbol_name | file    | times | class                              |
       | rule       | threads: 1 | threads: 1  | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
-      | rule       | log: ""    | NAME        | foo.smk | 1     | SmkRuleImpl                        |
-      | checkpoint | log: ""    | NAME        | foo.smk | 1     | SmkCheckPointImpl                  |
+      | checkpoint | threads: 1 | threads: 1  | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
 
   Scenario Outline: Not-resolved threads if part of reference
     Given a snakemake project
