@@ -22,7 +22,7 @@ import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType.Companion.getVariantsFromIndex
-import com.jetbrains.snakecharm.stringLanguage.SmkSL
+import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
 
 class SmkRulesAndCheckpointsCompletionContributor : CompletionContributor() {
     init {
@@ -184,7 +184,7 @@ private fun addVariantsToCompletionResultSet(
     */
     val position = parameters.position
     val originalFile = when {
-        SmkSL.isInsideSmkSLFile(position) -> {
+        SmkSLanguage.isInsideSmkSLFile(position) -> {
             val originalPosition = parameters.originalPosition ?: return
             val languageManager = InjectedLanguageManager.getInstance(position.project)
             languageManager.getTopLevelFile(originalPosition)

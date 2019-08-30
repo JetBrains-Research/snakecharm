@@ -77,11 +77,9 @@ class SmkSLParser : PsiParser {
                 tt === SmkSLTokenTypes.BAD_CHARACTER -> {
                     exprMarker.drop()
 
-                    builder.error(SnakemakeBundle.message("SMKSL.PARSE.unexpected.character"))
-
-                    // exprMarker = builder.mark()
-                     builder.advanceLexer()
-                    // exprMarker.error(SnakemakeBundle.message("SMKSL.PARSE.unexpected.character"))
+                    val errorMarker = builder.mark()
+                    builder.advanceLexer()
+                    errorMarker.error(SnakemakeBundle.message("SMKSL.PARSE.unexpected.character"))
 
                     exprMarker = builder.mark()
                 }

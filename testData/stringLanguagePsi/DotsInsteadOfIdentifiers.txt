@@ -2,18 +2,15 @@ FILE
   SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
     PsiErrorElement:Unexpected character
-      <empty list>
-    PsiElement(BAD_CHARACTER)('.')
+      PsiElement(BAD_CHARACTER)('.')
     PsiErrorElement:Unexpected character
-      <empty list>
-    PsiElement(BAD_CHARACTER)('[')
+      PsiElement(BAD_CHARACTER)('[')
     PyReferenceExpression: null
       PyReferenceExpression: foo
         PsiElement(Py:IDENTIFIER)('foo')
       PsiElement(DOT)('.')
     PsiErrorElement:Unexpected character
-      <empty list>
-    PsiElement(BAD_CHARACTER)('.')
+      PsiElement(BAD_CHARACTER)('.')
     PyReferenceExpression: null
       PyReferenceExpression: boo
         PsiElement(Py:IDENTIFIER)('boo')

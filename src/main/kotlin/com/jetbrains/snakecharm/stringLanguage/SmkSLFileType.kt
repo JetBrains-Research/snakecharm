@@ -3,7 +3,7 @@ package com.jetbrains.snakecharm.stringLanguage
 import com.intellij.openapi.fileTypes.LanguageFileType
 import com.jetbrains.snakecharm.SmkFileType
 
-object SmkSLFileType : LanguageFileType(SmkSL) {
+object SmkSLFileType : LanguageFileType(SmkSLanguage) {
     override fun getIcon()= SmkFileType.icon
 
     override fun getName() = "SmkSL"

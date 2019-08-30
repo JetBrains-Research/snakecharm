@@ -13,7 +13,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
 
 class SmkSLInjector : PyInjectorBase() {
-    override fun getInjectedLanguage(element: PsiElement) = SmkSL
+    override fun getInjectedLanguage(element: PsiElement) = SmkSLanguage
 
     override fun elementsToInjectIn() = listOf(PyStringLiteralExpression::class.java)
 

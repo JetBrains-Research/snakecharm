@@ -4,16 +4,13 @@ FILE
     PyReferenceExpression: f
       PsiElement(Py:IDENTIFIER)('f')
     PsiErrorElement:Unexpected character
-      <empty list>
-    PsiElement(BAD_CHARACTER)('?')
+      PsiElement(BAD_CHARACTER)('?')
     PyReferenceExpression: o
       PsiElement(Py:IDENTIFIER)('o')
     PsiErrorElement:Unexpected character
-      <empty list>
-    PsiElement(BAD_CHARACTER)('&')
+      PsiElement(BAD_CHARACTER)('&')
     PsiErrorElement:Unexpected character
-      <empty list>
-    PsiElement(BAD_CHARACTER)('*')
+      PsiElement(BAD_CHARACTER)('*')
     SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
       PyReferenceExpression: to
         PyReferenceExpression: doo

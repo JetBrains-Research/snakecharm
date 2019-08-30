@@ -7,6 +7,7 @@ import com.jetbrains.python.psi.PyQualifiedExpression
 import com.jetbrains.python.psi.impl.references.PyReferenceImpl
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
 /**
  * This is fake reference which allow as to remove some results from resolve/completion
@@ -40,6 +41,6 @@ class SmkPyReferenceImpl(
     }
 
     companion object {
-        fun shouldBeRemovedFromDefaultScopeCrawlUpResults(element: PsiElement?) =  element is SmkRuleLike<*>
+        fun shouldBeRemovedFromDefaultScopeCrawlUpResults(element: PsiElement?) =  element is SmkRuleOrCheckpoint
     }
 }

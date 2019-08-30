@@ -16,7 +16,8 @@ import com.intellij.lexer.FlexLexer;
 %type IElementType
 
 ID_LETTER=[:letter:]|\_
-IDENTIFIER=(\s*)({ID_LETTER}({ID_LETTER}|[:digit:])*)*(\s*)
+WHITE_SPACE=\s+
+IDENTIFIER={ID_LETTER}({ID_LETTER}|[:digit:])*
 FORMAT_SPECIFIER=\:[^}]+
 STRING_CONTENT=([^\{]|\{\{)+
 REGEXP=([^{}]+ | \{\d+(,\d+)?\})*
@@ -36,7 +37,10 @@ ACCESS_KEY=[^\]]+
     \{                            { yybegin(WAITING_IDENTIFIER); return tokenTypes.getLBRACE(); }
 }
 
-<WAITING_IDENTIFIER> {IDENTIFIER} { yybegin(WAITING_AFTER_IDENTIFIER); return tokenTypes.getIDENTIFIER(); }
+<WAITING_IDENTIFIER> {
+    {IDENTIFIER}                   { yybegin(WAITING_AFTER_IDENTIFIER); return tokenTypes.getIDENTIFIER(); }
+    {WHITE_SPACE}                  { return tokenTypes.getBAD_CHARACTER(); }
+}
 
 <WAITING_AFTER_IDENTIFIER> {
     \.                            { yybegin(WAITING_IDENTIFIER); return tokenTypes.getDOT(); }
@@ -44,9 +48,12 @@ ACCESS_KEY=[^\]]+
     \[                            { yybegin(WAITING_ACCESS_KEY); return tokenTypes.getLBRACKET(); }
 
     {FORMAT_SPECIFIER}            { yybegin(WAITING_LANGUAGE_CLOSURE); return tokenTypes.getFORMAT_SPECIFIER();}
-    //TODO report identifier + fix parsing, to report errors more accurate
+
+    //TODO report identifier/whitespace + fix parsing, to report errors more accurate
     // {IDENTIFIER}                  { return tokenTypes.getIDENTIFIER();}
-    {IDENTIFIER}                  { return tokenTypes.getBAD_CHARACTER();}
+    {IDENTIFIER}                   { return tokenTypes.getBAD_CHARACTER();}
+
+    {WHITE_SPACE}                  { return tokenTypes.getBAD_CHARACTER(); }
 }
 
 <WAITING_ACCESS_KEY> {ACCESS_KEY} { yybegin(WAITING_ACCESS_CLOSURE); return tokenTypes.getIDENTIFIER(); }

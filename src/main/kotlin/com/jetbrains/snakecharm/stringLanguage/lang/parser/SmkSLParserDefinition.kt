@@ -7,14 +7,14 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PythonParserDefinition
-import com.jetbrains.snakecharm.stringLanguage.SmkSL
+import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
 import com.jetbrains.snakecharm.stringLanguage.SmkSLFile
 import com.jetbrains.snakecharm.stringLanguage.SmkSLTokenTypes
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.*
 
 class SmkSLParserDefinition : PythonParserDefinition() {
     companion object {
-        val FILE = IFileElementType(SmkSL)
+        val FILE = IFileElementType(SmkSLanguage)
     }
 
     override fun createElement(node: ASTNode): PsiElement =

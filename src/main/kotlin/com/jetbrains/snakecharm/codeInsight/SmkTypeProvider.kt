@@ -23,7 +23,7 @@ import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 import com.jetbrains.snakecharm.lang.psi.types.SmkSectionType
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
-import com.jetbrains.snakecharm.stringLanguage.SmkSL
+import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
 class SmkTypeProvider : PyTypeProviderBase() {
@@ -141,7 +141,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
     ): PyType? {
         val smkExpression = when {
             SnakemakeLanguageDialect.isInsideSmkFile(referenceExpression) -> referenceExpression
-            SmkSL.isInsideSmkSLFile(referenceExpression) -> {
+            SmkSLanguage.isInsideSmkSLFile(referenceExpression) -> {
                 val manager = InjectedLanguageManager.getInstance(referenceExpression.project)
                 manager.getInjectionHost(referenceExpression)
             }

@@ -9,8 +9,7 @@ FILE
   SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
     PsiErrorElement:Unexpected character
-      <empty list>
-    PsiElement(BAD_CHARACTER)('.')
+      PsiElement(BAD_CHARACTER)('.')
     PsiErrorElement:Expected identifier name
       <empty list>
     PsiElement(RBRACE)('}')
@@ -34,8 +33,7 @@ FILE
         PsiElement(Py:IDENTIFIER)('foo2')
       PsiElement(DOT)('.')
     PsiErrorElement:Unexpected character
-      <empty list>
-    PsiElement(BAD_CHARACTER)('.')
+      PsiElement(BAD_CHARACTER)('.')
     PsiErrorElement:Expected identifier name
       <empty list>
     PsiElement(RBRACE)('}')
@@ -48,8 +46,7 @@ FILE
         PsiElement(Py:IDENTIFIER)('foo3')
       PsiElement(DOT)('.')
     PsiErrorElement:Unexpected character
-      <empty list>
-    PsiElement(BAD_CHARACTER)('.')
+      PsiElement(BAD_CHARACTER)('.')
     PsiErrorElement:Expected identifier name
       <empty list>
     PsiElement(RBRACE)('}')
@@ -62,16 +59,13 @@ FILE
         PsiElement(Py:IDENTIFIER)('foo3')
       PsiElement(DOT)('.')
     PsiErrorElement:Unexpected character
-      <empty list>
-    PsiElement(BAD_CHARACTER)('.')
+      PsiElement(BAD_CHARACTER)('.')
     PsiErrorElement:Unexpected character
-      <empty list>
-    PsiElement(BAD_CHARACTER)('[')
+      PsiElement(BAD_CHARACTER)('[')
     PyReferenceExpression: dd
       PsiElement(Py:IDENTIFIER)('dd')
     PsiErrorElement:Unexpected character
-      <empty list>
-    PsiElement(BAD_CHARACTER)(']')
+      PsiElement(BAD_CHARACTER)(']')
     PsiElement(RBRACE)('}')
   SmkSLElementImpl(STRING_CONTENT)
     PsiElement(STRING_CONTENT)('\n')
@@ -101,8 +95,7 @@ FILE
         PsiElement(RBRACKET)(']')
       PsiElement(DOT)('.')
     PsiErrorElement:Unexpected character
-      <empty list>
-    PsiElement(BAD_CHARACTER)('.')
+      PsiElement(BAD_CHARACTER)('.')
     PsiErrorElement:Expected identifier name
       <empty list>
     PsiElement(RBRACE)('}')

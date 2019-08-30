@@ -4,8 +4,7 @@ FILE
     PyReferenceExpression: foo
       PsiElement(Py:IDENTIFIER)('foo')
     PsiErrorElement:Unexpected character
-      <empty list>
-    PsiElement(BAD_CHARACTER)(']')
+      PsiElement(BAD_CHARACTER)(']')
     PsiElement(COMMA)(',')
     SmkSLElementImpl(REGEXP)
       RegExpPatternImpl: <\d+>

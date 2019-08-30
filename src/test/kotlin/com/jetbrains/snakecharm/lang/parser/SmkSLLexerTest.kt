@@ -2,7 +2,7 @@ package com.jetbrains.snakecharm.lang.parser
 
 import com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLLexerAdapter
 
-class SmkStringLanguageLexerTest : PyLexerTestCase() {
+class SmkSLLexerTest : PyLexerTestCase() {
     fun testOrdinaryString() {
         doTest("just ordinary string with escaped {{ brackets }}",
                 "STRING_CONTENT")
@@ -90,7 +90,7 @@ class SmkStringLanguageLexerTest : PyLexerTestCase() {
 
     fun testWildcardWithSpaces() {
         doTest("{       sample       }",
-                "LBRACE", "Py:IDENTIFIER", "RBRACE")
+                "LBRACE", "BAD_CHARACTER", "Py:IDENTIFIER", "BAD_CHARACTER", "RBRACE")
     }
 
     fun testFormatSpecifier() {
@@ -105,23 +105,23 @@ class SmkStringLanguageLexerTest : PyLexerTestCase() {
 
     fun testIdentifierNameWithSpacesBefore() {
         doTest("{   foo}",
-                "LBRACE", "Py:IDENTIFIER", "RBRACE")
+                "LBRACE", "BAD_CHARACTER", "Py:IDENTIFIER", "RBRACE")
     }
 
 
     fun testIdentifierNameWithSpacesAfter() {
         doTest("{foo   }",
-                "LBRACE", "Py:IDENTIFIER", "RBRACE")
+                "LBRACE", "Py:IDENTIFIER", "BAD_CHARACTER", "RBRACE")
     }
 
     fun testIdentifierNameWithSpaces() {
         doTest("{   foo   }",
-                "LBRACE", "Py:IDENTIFIER", "RBRACE")
+                "LBRACE", "BAD_CHARACTER", "Py:IDENTIFIER", "BAD_CHARACTER", "RBRACE")
     }
 
     fun testIdentifierNameOnlySpaces() {
         doTest("{      }",
-                "LBRACE", "Py:IDENTIFIER", "RBRACE")
+                "LBRACE", "BAD_CHARACTER", "RBRACE")
     }
 
     fun testDoubleDot() {
@@ -131,7 +131,7 @@ class SmkStringLanguageLexerTest : PyLexerTestCase() {
 
     fun testWhiteSpaceInIdentifier() {
         doTest("{foo boo[doo roo]}",
-                "LBRACE", "Py:IDENTIFIER", "BAD_CHARACTER", "LBRACKET", "Py:IDENTIFIER", "RBRACKET", "RBRACE")
+                "LBRACE", "Py:IDENTIFIER", "BAD_CHARACTER", "BAD_CHARACTER", "LBRACKET", "Py:IDENTIFIER", "RBRACKET", "RBRACE")
     }
 
     private fun doTest(text: String, vararg expectedTokens: String) {

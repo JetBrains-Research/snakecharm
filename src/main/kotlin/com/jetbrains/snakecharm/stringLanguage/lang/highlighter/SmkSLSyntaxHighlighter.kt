@@ -8,7 +8,7 @@ import com.jetbrains.python.highlighting.PyHighlighter
 import com.jetbrains.snakecharm.stringLanguage.SmkSLTokenTypes
 import com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLLexerAdapter
 
-class SmkSLHighlighter : SyntaxHighlighterBase() {
+class SmkSLSyntaxHighlighter : SyntaxHighlighterBase() {
     companion object {
         val BRACES = arrayOf(createTextAttributesKey("BRACES", PyHighlighter.PY_FSTRING_FRAGMENT_BRACES))
         val COMMA = arrayOf(createTextAttributesKey("COMMA", PyHighlighter.PY_FSTRING_FRAGMENT_COLON))

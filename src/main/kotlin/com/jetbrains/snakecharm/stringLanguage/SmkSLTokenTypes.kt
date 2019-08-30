@@ -2,7 +2,6 @@ package com.jetbrains.snakecharm.stringLanguage
 
 import com.intellij.lang.*
 import com.intellij.psi.PsiElement
-import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.ILazyParseableElementType
 import com.jetbrains.python.PyTokenTypes
@@ -11,9 +10,9 @@ import org.intellij.lang.regexp.RegExpLanguage
 import org.intellij.lang.regexp.RegExpParserDefinition
 import java.util.*
 
-class SmkSLTokenType(debugName: String) : IElementType(debugName, SmkSL)
+class SmkSLTokenType(debugName: String) : IElementType(debugName, SmkSLanguage)
 
-class SmkSLRegExpElementType(debugName: String) : ILazyParseableElementType(debugName, SmkSL) {
+class SmkSLRegExpElementType(debugName: String) : ILazyParseableElementType(debugName, SmkSLanguage) {
     companion object {
         // Our choice of capabilities is based on
         // pattern for matching regular expressions in Snakemake:
@@ -62,7 +61,9 @@ object SmkSLTokenTypes {
 
     val COMMA = SmkSLTokenType("COMMA")
 
-    val BAD_CHARACTER = TokenType.BAD_CHARACTER!!
+    val BAD_CHARACTER = PyTokenTypes.BAD_CHARACTER!!
+    // val SPACE = PyTokenTypes.SPACE!!
+    // val TAB = PyTokenTypes.TAB!!
 
     val LANGUAGE = SmkSLTokenType("LANGUAGE")
 

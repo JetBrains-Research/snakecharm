@@ -9,7 +9,7 @@ import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
-import com.jetbrains.snakecharm.stringLanguage.SmkSL
+import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
 
 object SmkPsiUtil {
     fun getIdentifierNode(node: ASTNode): ASTNode? {
@@ -48,5 +48,5 @@ object SmkPsiUtil {
 
     fun isInsideSnakemakeOrSmkSLFile(foothold: PsiElement?) =
             isInsideFileWithLanguage(foothold, SnakemakeLanguageDialect) ||
-                    isInsideFileWithLanguage(foothold, SmkSL)
+                    isInsideFileWithLanguage(foothold, SmkSLanguage)
 }
