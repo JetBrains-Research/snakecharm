@@ -45,7 +45,7 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
         result.add(DocumentationMarkup.SECTIONS_START)
         result.addAll(buildSectionWithFileLink(text, WRAPPER))
         if (wrapper != null) {
-            val descriptionAndFollowingText = wrapper.metaFileContent.substringAfter("description")
+            val descriptionAndFollowingText = wrapper.metaFileContent.substringAfter("description:")
             val textAfterDescriptionStart = nextSectionRegex.find(descriptionAndFollowingText)?.range?.first
             val description = if (textAfterDescriptionStart == null) {
                 descriptionAndFollowingText
@@ -73,7 +73,16 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
         } else {
             result.addAll(buildSectionWithFileLink(text, ENVIRONMENT))
         }
-        result.addAll(buildSectionWithFileLink(text, EXAMPLE_SNAKEFILE, "Example Snakefile"))
+        if (wrapper != null) {
+            result.addAll(buildSectionWithTextAndLink(
+                    "example",
+                    wrapper.testSnakefileContent,
+                    "$URL_START$text/$EXAMPLE_SNAKEFILE",
+                    EXAMPLE_SNAKEFILE
+            ))
+        } else {
+            result.addAll(buildSectionWithFileLink(text, EXAMPLE_SNAKEFILE, "Example Snakefile"))
+        }
         result.add(DocumentationMarkup.SECTIONS_END)
 
         val body = "<body>${result.joinToString("")}</body>"
@@ -110,7 +119,7 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
                 sectionTitle,
                 DocumentationMarkup.SECTION_SEPARATOR,
                 "<p>",
-                sectionContent.replace("\n", "<p>"),
+                sectionContent.toHTML(),
                 if (link != null && linkText != null) { "<p><a href=\"$link\">($linkText)</a>" } else "",
                 DocumentationMarkup.SECTIONS_END
         )
@@ -124,4 +133,6 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
     private fun PsiElement?.isInWrapperSection() =
             PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpointArgsSection::class.java)?.name ==
                     SnakemakeNames.SECTION_WRAPPER
+
+    private fun String.toHTML() = this.replace("\n", "<p>").replace(" ", "&nbsp;")
 }
