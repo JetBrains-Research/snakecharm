@@ -12,7 +12,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.RULE_OR_CHECKPOINT
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_OR_CHECKPOINT
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.RULE_DECLARATION_STATEMENT
@@ -23,25 +23,17 @@ import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.SUBWOR
  * @author Roman.Chernyatchik
  * @date 2018-12-31
  */
-class SnakemakeStatementParsing(
-        context: SnakemakeParserContext,
+class SmkStatementParsing(
+        context: SmkParserContext,
         futureFlag: FUTURE?
 ) : StatementParsing(context, futureFlag) {
-
-    private data class SectionParsingData(
-            val declaration: IElementType,
-            val name: String,
-            val parameterListStatement: PyElementType,
-            val parameters: Set<String>,
-            val sectionKeyword: PyElementType)
-
 
     private val ruleSectionParsingData = SectionParsingData(
             declaration = RULE_DECLARATION_STATEMENT,
             name = "rule",
             parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
             parameters = RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS,
-            sectionKeyword= SnakemakeTokenTypes.RULE_KEYWORD
+            sectionKeyword= SmkTokenTypes.RULE_KEYWORD
     )
 
     private val checkpointSectionParsingData = SectionParsingData(
@@ -49,7 +41,7 @@ class SnakemakeStatementParsing(
             name = "checkpoint",
             parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
             parameters = RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS,
-            sectionKeyword= SnakemakeTokenTypes.CHECKPOINT_KEYWORD
+            sectionKeyword= SmkTokenTypes.CHECKPOINT_KEYWORD
     )
 
     private val subworkflowSectionParsingData = SectionParsingData(
@@ -57,17 +49,19 @@ class SnakemakeStatementParsing(
             name = "subworkflow",
             parameterListStatement = SmkElementTypes.SUBWORKFLOW_ARGS_SECTION_STATEMENT,
             parameters = SUBWORKFLOW_SECTIONS_KEYWORDS,
-            sectionKeyword= SnakemakeTokenTypes.SUBWORKFLOW_KEYWORD
+            sectionKeyword= SmkTokenTypes.SUBWORKFLOW_KEYWORD
     )
+
+    override fun getReferenceType() = SmkElementTypes.SMK_PY_REFERENCE_EXPRESSION
 
     private fun getSectionParsingData(tokenType: IElementType) =
             when {
-                tokenType === SnakemakeTokenTypes.SUBWORKFLOW_KEYWORD -> subworkflowSectionParsingData
-                tokenType === SnakemakeTokenTypes.CHECKPOINT_KEYWORD -> checkpointSectionParsingData
+                tokenType === SmkTokenTypes.SUBWORKFLOW_KEYWORD -> subworkflowSectionParsingData
+                tokenType === SmkTokenTypes.CHECKPOINT_KEYWORD -> checkpointSectionParsingData
                 else -> ruleSectionParsingData
             }
 
-    override fun getParsingContext() = myContext as SnakemakeParserContext
+    override fun getParsingContext() = myContext as SmkParserContext
 
     // TODO cleanup
     //    override fun getReferenceType(): IElementType {
@@ -87,19 +81,19 @@ class SnakemakeStatementParsing(
         }
         val tt = myBuilder.tokenType
 
-        if (tt !in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
+        if (tt !in SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
             super.parseStatement()
             return
         }
         when {
-            tt in SnakemakeTokenTypes.RULE_LIKE -> parseRuleLikeDeclaration(getSectionParsingData(tt!!))
-            tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS -> {
+            tt in SmkTokenTypes.RULE_LIKE -> parseRuleLikeDeclaration(getSectionParsingData(tt!!))
+            tt in SmkTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
                 parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
                 workflowParam.done(SmkElementTypes.WORKFLOW_ARGS_SECTION_STATEMENT)
             }
-            tt === SnakemakeTokenTypes.WORKFLOW_LOCALRULES_KEYWORD -> {
+            tt === SmkTokenTypes.WORKFLOW_LOCALRULES_KEYWORD -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
 
@@ -115,7 +109,7 @@ class SnakemakeStatementParsing(
 
                 workflowParam.done(SmkElementTypes.WORKFLOW_LOCALRULES_SECTION_STATEMENT)
             }
-            tt === SnakemakeTokenTypes.WORKFLOW_RULEORDER_KEYWORD  -> {
+            tt === SmkTokenTypes.WORKFLOW_RULEORDER_KEYWORD  -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
 
@@ -131,7 +125,7 @@ class SnakemakeStatementParsing(
 
                 workflowParam.done(SmkElementTypes.WORKFLOW_RULEORDER_SECTION_STATEMENT)
             }
-            tt in SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS -> {
+            tt in SmkTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS -> {
                 myContext.pushScope(scope.withPythonicSection())
                 val decoratorMarker = myBuilder.mark()
                 nextToken()
@@ -194,7 +188,7 @@ class SnakemakeStatementParsing(
         ruleStatements.done(PyElementTypes.STATEMENT_LIST)
         ruleLikeMarker.done(section.declaration)
 
-        if (incompleteRule && atAnyOfTokens(*SnakemakeTokenTypes.RULE_LIKE.types)) {
+        if (incompleteRule && atAnyOfTokens(*SmkTokenTypes.RULE_LIKE.types)) {
             // inside rule scope, we remap some snakemake keywords to identifiers
             // see #com.jetbrains.snakecharm.lang.parser.SnakemakeStatementParsing.filter
             //
@@ -209,7 +203,7 @@ class SnakemakeStatementParsing(
                     return
                 }
             }
-            if (!atAnyOfTokens(*SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.types)) {
+            if (!atAnyOfTokens(*SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.types)) {
                 nextToken() // probably check token type
             }
         }
@@ -256,7 +250,7 @@ class SnakemakeStatementParsing(
                 ruleParam.done(section.parameterListStatement)
             }
             section.sectionKeyword in RULE_OR_CHECKPOINT && keyword == SnakemakeNames.SECTION_RUN -> {
-                val scope = myContext.scope as SnakemakeParsingScope
+                val scope = myContext.scope as SmkParsingScope
                 myContext.pushScope(scope.withPythonicSection())
                 checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
                 statementParser.parseSuite()
@@ -295,3 +289,11 @@ class SnakemakeStatementParsing(
 }
 
 fun IElementType?.isPythonString() = this in PyTokenTypes.STRING_NODES || this == PyTokenTypes.FSTRING_START
+
+private data class SectionParsingData(
+        val declaration: IElementType,
+        val name: String,
+        val parameterListStatement: PyElementType,
+        val parameters: Set<String>,
+        val sectionKeyword: PyElementType
+)

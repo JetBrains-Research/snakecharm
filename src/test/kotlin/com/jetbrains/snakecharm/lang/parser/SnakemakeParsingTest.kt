@@ -19,7 +19,7 @@ import com.jetbrains.snakecharm.lang.SmkTokenSetContributor
  *
  */
 class SnakemakeParsingTest : ParsingTestCase(
-        "psi", "smk", SnakemakeParserDefinition(), PythonParserDefinition()
+        "psi", "smk", SmkParserDefinition(), PythonParserDefinition()
 ) {
     private var myLanguageLevel = LanguageLevel.getDefault()
 

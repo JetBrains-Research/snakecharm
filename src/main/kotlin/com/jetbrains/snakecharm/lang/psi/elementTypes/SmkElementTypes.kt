@@ -47,4 +47,9 @@ object SmkElementTypes {
             "SMK_REFERENCE_EXPRESSION",
             SmkReferenceExpressionImpl::class.java
     )
+
+    val SMK_PY_REFERENCE_EXPRESSION = PyElementType(
+            "SMK_PY_REFERENCE_EXPRESSION",
+            SmkPyReferenceExpressionImpl::class.java
+    )
 }

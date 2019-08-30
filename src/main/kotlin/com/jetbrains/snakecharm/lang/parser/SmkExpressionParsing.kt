@@ -9,19 +9,22 @@ import com.jetbrains.python.parsing.ExpressionParsing
 import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes.SMK_PY_REFERENCE_EXPRESSION
 
 /**
  * @author Roman.Chernyatchik
  * @date 2019-01-04
  */
-class SnakemakeExpressionParsing(context: SnakemakeParserContext) : ExpressionParsing(context) {
-    override fun getParsingContext() = myContext as SnakemakeParserContext
+class SmkExpressionParsing(context: SmkParserContext) : ExpressionParsing(context) {
+    override fun getParsingContext() = myContext as SmkParserContext
 
     fun parseRuleLikeSectionArgumentList() = parseArgumentList(
             ",", PyTokenTypes.COMMA,
             message("PARSE.expected.expression"),
             this::parseRuleParamArgument
     )
+
+    override fun getReferenceType() = SMK_PY_REFERENCE_EXPRESSION
 
     fun parseArgumentList(
             separatorTokenText: String,

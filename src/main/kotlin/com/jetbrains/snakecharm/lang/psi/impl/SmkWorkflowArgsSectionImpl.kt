@@ -7,7 +7,7 @@ import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes
 import com.jetbrains.snakecharm.lang.psi.*
 
 /**
@@ -30,7 +30,7 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
     }
 
     override fun getSectionKeywordNode()= node
-            .findChildByType(SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
+            .findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
 
     override fun getPresentation() = getPresentation(this)
     override fun getIcon(flags: Int) = getIcon(this, flags)
@@ -63,5 +63,5 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
     private val keywordName: String?
         get() = getKeywordNode()?.text
 
-    private fun getKeywordNode() = node.findChildByType(SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
+    private fun getKeywordNode() = node.findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
 }

@@ -6,21 +6,21 @@ import com.jetbrains.python.parsing.ParsingScope
  * @author Roman.Chernyatchik
  * @date 2018-12-31
  */
-class SnakemakeParsingScope : ParsingScope() {
+class SmkParsingScope : ParsingScope() {
     // in onstart/onsuccess/onerror/run sections
     var inPythonicSection: Boolean = false
         private set
 
-    override fun createInstance() = SnakemakeParsingScope()
+    override fun createInstance() = SmkParsingScope()
 
-    fun withPythonicSection(): SnakemakeParsingScope {
+    fun withPythonicSection(): SmkParsingScope {
         val result = copy()
         result.inPythonicSection = true
         return result
     }
 
-    override fun copy(): SnakemakeParsingScope {
-        val copy = super.copy() as SnakemakeParsingScope
+    override fun copy(): SmkParsingScope {
+        val copy = super.copy() as SmkParsingScope
         copy.inPythonicSection = inPythonicSection
         return copy
     }

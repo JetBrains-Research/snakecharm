@@ -19,8 +19,8 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KE
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
-import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.RULE_LIKE
-import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_LIKE
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE
 import com.jetbrains.snakecharm.lang.psi.*
 
 /**

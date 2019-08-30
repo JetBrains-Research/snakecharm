@@ -15,5 +15,5 @@ class SnakemakeParser : PyParser() {
             builder: PsiBuilder,
             languageLevel: LanguageLevel,
             futureFlag: StatementParsing.FUTURE?
-    ): ParsingContext = SnakemakeParserContext(builder, languageLevel, futureFlag)
+    ): ParsingContext = SmkParserContext(builder, languageLevel, futureFlag)
 }

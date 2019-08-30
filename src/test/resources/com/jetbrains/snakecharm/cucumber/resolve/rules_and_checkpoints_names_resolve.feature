@@ -295,3 +295,41 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       | rule_like  | symbol_name  |
       | rule       | boo          |
       | checkpoint | boo          |
+
+  Scenario Outline: No rule like declarations resolve at top-level
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      rule RULE:
+        input: ""
+
+      checkpoint CHECKPOINT:
+        input: ""
+
+      subworkflow SUBWORKFLOW:
+        snakefile: ""
+
+      <element># place toplevel
+      rule foo:
+        input: "{<element>}" # input injection
+        shell: "{<element>}" # shell injection
+        run:
+          <element># run section
+
+      """
+    When I put the caret at <element><place>
+    Then <ref_type> should not resolve
+    Examples:
+      | element     | place                | ref_type               |
+      | RULE        | # place toplevel     | reference              |
+      | CHECKPOINT  | # place toplevel     | reference              |
+      | SUBWORKFLOW | # place toplevel     | reference              |
+      | RULE        | # run section        | reference              |
+      | CHECKPOINT  | # run section        | reference              |
+      | SUBWORKFLOW | # run section        | reference              |
+      | RULE        | }" # input injection | reference in injection |
+      | CHECKPOINT  | }" # input injection | reference in injection |
+      | SUBWORKFLOW | }" # input injection | reference in injection |
+      | RULE        | }" # shell injection | reference in injection |
+      | CHECKPOINT  | }" # shell injection | reference in injection |
+      | SUBWORKFLOW | }" # shell injection | reference in injection |

@@ -2,8 +2,9 @@ package com.jetbrains.snakecharm.lang
 
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PythonDialectsTokenSetContributorBase
-import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes.SMK_PY_REFERENCE_EXPRESSION
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 
 /**
@@ -26,7 +27,7 @@ class SmkTokenSetContributor : PythonDialectsTokenSetContributorBase() {
     )
 
     override fun getExpressionTokens() = TokenSet.create(
-            SmkElementTypes.REFERENCE_EXPRESSION
+            SmkElementTypes.REFERENCE_EXPRESSION, SMK_PY_REFERENCE_EXPRESSION
     )
 
     /**
@@ -38,7 +39,7 @@ class SmkTokenSetContributor : PythonDialectsTokenSetContributorBase() {
 
     override fun getParameterTokens() = TokenSet.EMPTY!!
 
-    override fun getReferenceExpressionTokens() = TokenSet.EMPTY!!
+    override fun getReferenceExpressionTokens() = TokenSet.create(SMK_PY_REFERENCE_EXPRESSION)
 
     override fun getFunctionDeclarationTokens()= TokenSet.EMPTY!!
 

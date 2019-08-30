@@ -354,3 +354,37 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       | section1   | section2   |
       | rule       | checkpoint |
       | checkpoint | rule       |
+
+  Scenario Outline: No rule like declarations completion at top-level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule RULE:
+      input: ""
+
+    checkpoint CHECKPOINT:
+      input: ""
+
+    subworkflow SUBWORKFLOW:
+      snakefile: ""
+
+    # place toplevel
+    rule foo:
+      input: "{input_injection}"
+      shell: "{shell_injection}"
+      run:
+        # run section
+
+    """
+    When I put the caret at <place>
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | RULE        |
+      | CHECKPOINT  |
+      | SUBWORKFLOW |
+    Examples:
+      | place            |
+      | # place toplevel |
+      | # run section    |
+      | input_injection  |
+      | shell_injection  |

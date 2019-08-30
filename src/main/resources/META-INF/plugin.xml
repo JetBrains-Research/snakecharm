@@ -28,7 +28,7 @@
     <fileTypeFactory implementation="com.jetbrains.snakecharm.SmkFileTypeFactory"/>
     <lang.parserDefinition
             language="Snakemake"
-            implementationClass="com.jetbrains.snakecharm.lang.parser.SnakemakeParserDefinition"
+            implementationClass="com.jetbrains.snakecharm.lang.parser.SmkParserDefinition"
     />
     <fileTypeFactory implementation="com.jetbrains.snakecharm.stringLanguage.SmkSLFileTypeFactory"/>
     <lang.parserDefinition

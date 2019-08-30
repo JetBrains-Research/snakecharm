@@ -10,7 +10,7 @@ import com.jetbrains.python.psi.LanguageLevel
  * @author Roman.Chernyatchik
  * @date 2018-12-31
  */
-class SnakemakeParserContext(
+class SmkParserContext(
         builder: PsiBuilder,
         languageLevel: LanguageLevel,
         futureFlag: StatementParsing.FUTURE?
@@ -23,12 +23,13 @@ class SnakemakeParserContext(
 
     }
 
-    private val stmtParser = SnakemakeStatementParsing(this, futureFlag)
-    private val exprParser = SnakemakeExpressionParsing(this)
+    private val stmtParser = SmkStatementParsing(this, futureFlag)
+    private val exprParser = SmkExpressionParsing(this)
+    private val funParser = SmkFunctionParsing(this)
 
-    override fun getScope(): SnakemakeParsingScope {
+    override fun getScope(): SmkParsingScope {
         val scope = super.getScope()
-        require(scope is SnakemakeParsingScope)
+        require(scope is SmkParsingScope)
         return scope
     }
 
@@ -36,10 +37,7 @@ class SnakemakeParserContext(
 
     override fun getExpressionParser() = exprParser
 
-//    override fun getFunctionParser(): FunctionParsing {
-//        // TODO: cleanup
-//        return super.getFunctionParser()
-//    }
+    override fun getFunctionParser() = funParser
 
-    override fun emptyParsingScope() = SnakemakeParsingScope()
+    override fun emptyParsingScope() = SmkParsingScope()
 }

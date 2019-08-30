@@ -26,6 +26,7 @@ import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
 import com.jetbrains.snakecharm.lang.psi.SmkSection
+import com.jetbrains.snakecharm.lang.psi.impl.refs.SmkPyReferenceImpl
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLReferenceExpressionImpl
 import java.util.*
 
@@ -100,8 +101,8 @@ class SmkSLInitialReference(
     private fun getHostElement(e: PsiElement) =
             InjectedLanguageManager.getInstance(e.project).getInjectionHost(e)
 
-    private fun isSupportedElementType(result: PsiElement?) =
-            !(result is PyFunction || result is PyClass)
+    private fun isSupportedElementType(element: PsiElement?) =
+            !(element is PyFunction || element is PyClass) && !SmkPyReferenceImpl.shouldBeRemovedFromDefaultScopeCrawlUpResults(element)
 
 
     private fun resolveByReferenceResolveProviders(): List<RatedResolveResult> {
@@ -169,7 +170,7 @@ class SmkSLInitialReference(
                 return@CompletionVariantsProcessor true
 
             }, null)
-            
+            //TODO: [ScopeImpl.collectDeclarations.visitPyElement; PsiNameIdentifierOwner is namedElement => added to symbols..]
             PyResolveUtil.scopeCrawlUp(processor, host, null, null);
             processor.resultList
                     .asSequence()
