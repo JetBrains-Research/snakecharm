@@ -11,19 +11,19 @@ Feature: Completion in wrapper section arguments.
     And I prepare wrapper storage
     When I put the caret after sam
     And I invoke autocompletion popup
-    Then completion list should contain:
-      | 0.36.0/bio/samtools/sort            |
-      | 0.36.0/bio/samtools/view            |
-      | 0.36.0/bio/samtools/sort            |
-      | 0.36.0/bio/samtools/bam2fq/separate |
-      | 0.36.0/bio/samtools/faidx           |
+    Then completion list should contain these items with type text:
+      | 0.36.0/bio/samtools/sort            | samtools==1.9 |
+      | 0.36.0/bio/samtools/view            | samtools==1.9 |
+      | 0.36.0/bio/samtools/sort            | samtools==1.9 |
+      | 0.36.0/bio/samtools/bam2fq/separate | samtools==1.9 |
+      | 0.36.0/bio/samtools/faidx           | samtools==1.9 |
     Examples:
       | rule_like  |
       | rule       |
       | checkpoint |
 
 
-  Scenario Outline: complete tool with tag
+  Scenario Outline: complete tool with tag older than cached
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -44,6 +44,29 @@ Feature: Completion in wrapper section arguments.
       | rule_like  |
       | rule       |
       | checkpoint |
+
+  Scenario Outline: complete tool with cached tag
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> foo:
+      wrapper: "0.36.0/"
+    """
+    And I prepare wrapper storage
+    When I put the caret after 0.36.0/
+    And I invoke autocompletion popup
+    Then completion list should contain these items with type text:
+      | 0.36.0/bio/samtools/sort            | samtools==1.9 |
+      | 0.36.0/bio/samtools/sort            | samtools==1.9 |
+      | 0.36.0/bio/samtools/view            | samtools==1.9 |
+      | 0.36.0/bio/samtools/sort            | samtools==1.9 |
+      | 0.36.0/bio/samtools/bam2fq/separate | samtools==1.9 |
+      | 0.36.0/bio/samtools/faidx           | samtools==1.9 |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
 
   Scenario Outline: complete by name in nested directory without tag
     Given a snakemake project
