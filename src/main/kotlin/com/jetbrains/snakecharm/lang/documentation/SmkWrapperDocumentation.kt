@@ -19,6 +19,9 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
         private const val META = "meta.yaml"
         private const val ENVIRONMENT = "environment.yaml"
         private const val EXAMPLE_SNAKEFILE = "test/Snakefile"
+
+        private const val HTML_NBSP = ":&nbsp;"
+        private const val HTML_P = "<p>"
     }
 
     private val nextSectionRegex = Regex("[a-z]+:")
@@ -40,7 +43,7 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
         result.add(DocumentationMarkup.CONTENT_START)
         result.add(text)
         result.add(DocumentationMarkup.CONTENT_END)
-        result.add("<p>")
+        result.add(HTML_P)
 
         result.add(DocumentationMarkup.SECTIONS_START)
         result.addAll(buildSectionWithFileLink(text, WRAPPER))
@@ -103,7 +106,7 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
                 DocumentationMarkup.SECTION_HEADER_START,
                 sectionTitle,
                 DocumentationMarkup.SECTION_SEPARATOR,
-                "<p><a href=\"$url\">$url</a>",
+                "$HTML_P<a href=\"$url\">$url</a>",
                 DocumentationMarkup.SECTION_END
         )
     }
@@ -118,9 +121,9 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
                 DocumentationMarkup.SECTION_HEADER_START,
                 sectionTitle,
                 DocumentationMarkup.SECTION_SEPARATOR,
-                "<p>",
+                HTML_P,
                 sectionContent.toHTML(),
-                if (link != null && linkText != null) { "<p><a href=\"$link\">($linkText)</a>" } else "",
+                if (link != null && linkText != null) { "$HTML_P<a href=\"$link\">($linkText)</a>" } else "",
                 DocumentationMarkup.SECTIONS_END
         )
     }
@@ -134,5 +137,5 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
             PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpointArgsSection::class.java)?.name ==
                     SnakemakeNames.SECTION_WRAPPER
 
-    private fun String.toHTML() = this.replace("\n", "<p>").replace(" ", "&nbsp;")
+    private fun String.toHTML() = this.replace("\n", HTML_P).replace(" ", HTML_NBSP)
 }
