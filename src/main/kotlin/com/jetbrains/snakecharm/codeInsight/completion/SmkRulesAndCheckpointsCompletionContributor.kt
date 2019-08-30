@@ -55,14 +55,16 @@ private class SmkCompletionInLocalRulesAndRuleOrderSectionsProvider : Completion
             context: ProcessingContext,
             result: CompletionResultSet
     ) {
-        val rules = collectVariantsForElement(parameters.position, isCheckPoint = false)
-        val checkpoints = collectVariantsForElement(parameters.position, isCheckPoint = true)
+        val position = parameters.position
+        val rules = collectVariantsForElement(position, isCheckPoint = false)
+        val checkpoints = collectVariantsForElement(position, isCheckPoint = true)
         val elements = rules + checkpoints
 
-        val section = (PsiTreeUtil.getParentOfType(parameters.position, SmkWorkflowRuleorderSection::class.java)
-                ?: PsiTreeUtil.getParentOfType(parameters.position, SmkWorkflowLocalrulesSection::class.java))
+        val ruleorderSection = PsiTreeUtil.getParentOfType(position, SmkWorkflowRuleorderSection::class.java)
+        val ruleOrderOrLocalRulesSection: SmkArgsSection?
+                = (ruleorderSection ?: PsiTreeUtil.getParentOfType(position, SmkWorkflowLocalrulesSection::class.java))
 
-        val references = section?.argumentList?.arguments
+        val references = ruleOrderOrLocalRulesSection?.argumentList?.arguments
                 ?.filterIsInstance<SmkReferenceExpression>()
                 ?.map { it.name }
 

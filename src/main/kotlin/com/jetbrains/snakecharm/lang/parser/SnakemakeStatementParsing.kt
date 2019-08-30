@@ -9,10 +9,10 @@ import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.RULE_OR_CHECKPOINT
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
-import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.RULE_DECLARATION_STATEMENT
@@ -40,7 +40,7 @@ class SnakemakeStatementParsing(
             declaration = RULE_DECLARATION_STATEMENT,
             name = "rule",
             parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
-            parameters = SmkRuleOrCheckpointArgsSection.PARAMS_NAMES,
+            parameters = RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS,
             sectionKeyword= SnakemakeTokenTypes.RULE_KEYWORD
     )
 
@@ -48,7 +48,7 @@ class SnakemakeStatementParsing(
             declaration = CHECKPOINT_DECLARATION_STATEMENT,
             name = "checkpoint",
             parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
-            parameters = SmkRuleOrCheckpointArgsSection.PARAMS_NAMES,
+            parameters = RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS,
             sectionKeyword= SnakemakeTokenTypes.CHECKPOINT_KEYWORD
     )
 
@@ -56,7 +56,7 @@ class SnakemakeStatementParsing(
             declaration = SUBWORKFLOW_DECLARATION_STATEMENT,
             name = "subworkflow",
             parameterListStatement = SmkElementTypes.SUBWORKFLOW_ARGS_SECTION_STATEMENT,
-            parameters = SmkSubworkflowArgsSection.PARAMS_NAMES,
+            parameters = SUBWORKFLOW_SECTIONS_KEYWORDS,
             sectionKeyword= SnakemakeTokenTypes.SUBWORKFLOW_KEYWORD
     )
 

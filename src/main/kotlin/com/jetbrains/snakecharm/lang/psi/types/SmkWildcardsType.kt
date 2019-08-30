@@ -10,6 +10,7 @@ import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
+import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
@@ -56,7 +57,7 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyTy
                 resolveToFirstDeclaration(name) ?:
                 return emptyList()
 
-        return listOf(RatedResolveResult(RatedResolveResult.RATE_NORMAL, resolveResult))
+        return listOf(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, resolveResult))
     }
 
     private fun resolveToRuleWildcardConstraintsKwarg(name: String) =

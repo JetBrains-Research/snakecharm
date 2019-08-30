@@ -41,7 +41,7 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       script: "script.py"
 
     <target> cccc:
-      input: "{<rule_like>s.aaaa}"
+      message: "{<rule_like>s.aaaa}"
     """
     When I put the caret after <rule_like>s.aa
     Then reference in injection should resolve to "aaaa" in "foo.smk"
@@ -95,7 +95,7 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       script: "script.py"
 
     <rule_like> cccc:
-      input: "{<rule_like>s.<symbol_name>}"
+      message: "{<rule_like>s.<symbol_name>}"
     """
     When I put the caret after <rule_like>s.<ptn>
     Then reference in injection should resolve to "<symbol_name>" in "foo.smk"

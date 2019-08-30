@@ -123,7 +123,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
                 // Collect hardcoded classes
                 collectClasses(listOf(
                         "snakemake.shell" to "shell"
-                ), SmkCodeInsightScope.TOP_LEVEL, usedFiles, elementsCache)
+                ), SmkCodeInsightScope.TOP_LEVEL, usedFiles, elementsCache, ImplicitPySymbolUsageType.METHOD)
 
                 ///////////////////////////////////////
                 // Collect variables
@@ -184,7 +184,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
                     .forEach { pyFile ->
                         val attrib = pyFile.findTopLevelAttribute(varName)
                         if (attrib != null && attrib.name != null) {
-                            elementsCache.add(ImplicitPySymbol(attrib.name!!, attrib, scope))
+                            elementsCache.add(ImplicitPySymbol(attrib.name!!, attrib, scope, ImplicitPySymbolUsageType.VARIABLE))
                         }
                     }
         }
@@ -194,7 +194,8 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
             moduleAndClass: List<Pair<String, String>>,
             scope: SmkCodeInsightScope,
             usedFiles: MutableList<PsiFile>,
-            elementsCache: MutableList<ImplicitPySymbol>
+            elementsCache: MutableList<ImplicitPySymbol>,
+            usageType: ImplicitPySymbolUsageType
     ) {
         moduleAndClass.forEach { (pyModuleFqn, className) ->
             val pyFiles = collectPyFiles(pyModuleFqn, usedFiles)
@@ -212,7 +213,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
                                         pyClass.originalElement.containingFile
                                 ))
                         if (constructor != null) {
-                            elementsCache.add(ImplicitPySymbol(pyClass.name!!, constructor, scope))
+                            elementsCache.add(ImplicitPySymbol(pyClass.name!!, constructor, scope, usageType))
                         }
 //                      //XXX: todo do we need 'else' here like:  elementsCache.add(pyClass.name!! to pyClass) ?
                     }
@@ -244,7 +245,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
                         elementsCache.add(ImplicitPySymbol(
                                 varName,
                                 (constructor ?: pyClass) as PyElement,
-                                scope
+                                scope, ImplicitPySymbolUsageType.VARIABLE
                         ))
                     }
         }
@@ -280,7 +281,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
                         val varName = className2VarNameFun(pyClass.name!!)
                         elementsCache.add(ImplicitPySymbol(
                                 varName,
-                                (constructor ?: pyClass) as PyElement, scope
+                                (constructor ?: pyClass) as PyElement, scope, ImplicitPySymbolUsageType.VARIABLE
                         ))
                     }
                 }
@@ -301,7 +302,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
                     .mapNotNull { it.findTopLevelFunction(methodName) }
                     .filter { it.name != null }
                     .forEach { pyFun ->
-                        elementsCache.add(ImplicitPySymbol(pyFun.name!!, pyFun, scope))
+                        elementsCache.add(ImplicitPySymbol(pyFun.name!!, pyFun, scope, ImplicitPySymbolUsageType.METHOD))
                     }
         }
     }
@@ -336,7 +337,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
                 .flatMap { it.topLevelFunctions.asSequence() }
                 .filter { it.name != null }
                 .forEach { pyFun ->
-                    elementsCache.add(ImplicitPySymbol(pyFun.name!!, pyFun, scope))
+                    elementsCache.add(ImplicitPySymbol(pyFun.name!!, pyFun, scope, ImplicitPySymbolUsageType.METHOD))
                 }
     }
 
@@ -368,7 +369,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
                     }
                 })
                 globals.forEach { (name, psi) ->
-                    elementsCache.add(ImplicitPySymbol(name, psi, SmkCodeInsightScope.TOP_LEVEL))
+                    elementsCache.add(ImplicitPySymbol(name, psi, SmkCodeInsightScope.TOP_LEVEL, ImplicitPySymbolUsageType.VARIABLE))
                 }
             }
         }

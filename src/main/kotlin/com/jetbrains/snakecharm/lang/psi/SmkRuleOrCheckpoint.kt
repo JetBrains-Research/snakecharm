@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi
 
 import com.jetbrains.python.psi.PyTypedElement
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
 
 interface SmkRuleOrCheckpoint : SmkRuleLike<SmkRuleOrCheckpointArgsSection>, PyTypedElement {
     /**
@@ -24,6 +25,6 @@ interface SmkRuleOrCheckpoint : SmkRuleLike<SmkRuleOrCheckpointArgsSection>, PyT
     fun getWildcardDefiningSection() =
         statementList.statements
                 .filterIsInstance<SmkRuleOrCheckpointArgsSection>()
-                .filter { it.sectionKeyword in SmkRuleOrCheckpointArgsSection.SECTIONS_DEFINING_WILDCARDS }
-                .minBy { SmkRuleOrCheckpointArgsSection.SECTIONS_DEFINING_WILDCARDS.indexOf(it.sectionKeyword) }
+                .filter { it.isWildcardsDefiningSection() }
+                .minBy { WILDCARDS_DEFINING_SECTIONS_KEYWORDS.indexOf(it.sectionKeyword) }
 }

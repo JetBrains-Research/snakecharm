@@ -144,10 +144,19 @@ class CompletionResolveSteps {
         assertEquals(marker, text)
     }
 
+    @Then("^reference in injection should multi resolve to name, file in same order$")
+    fun referenceInInjectionShouldMultiResolveToInOrder(table: DataTable) {
+        checkMultiResolveInSameOrder(table) { getReferenceInInjectedLanguageAtOffset() }
+    }
+
     @Then("^reference should multi resolve to name, file in same order$")
     fun referenceShouldMultiResolveToInOrder(table: DataTable) {
+        checkMultiResolveInSameOrder(table) { getReferenceAtOffset() }
+    }
+
+    private fun checkMultiResolveInSameOrder(table: DataTable, refProvider: () -> PsiReference?) {
         ApplicationManager.getApplication().runReadAction {
-            val ref = getReferenceAtOffset()
+            val ref = refProvider()
             assertNotNull(ref)
 
             val rawResults = multiResolve(ref)
@@ -186,10 +195,20 @@ class CompletionResolveSteps {
             }
         }
     }
+
+    @Then("^reference in injection should multi resolve to name, file, times\\[, class name\\]$")
+    fun referenceInInjectionShouldMultiResolveTo(table: DataTable) {
+        checkMultiresolve(table) { getReferenceInInjectedLanguageAtOffset() }
+    }
+
     @Then("^reference should multi resolve to name, file, times\\[, class name\\]$")
-    fun referenceShouldMultiResolveToIn(table: DataTable) {
+    fun referenceShouldMultiResolveTo(table: DataTable) {
+        checkMultiresolve(table) { getReferenceAtOffset() }
+    }
+
+    private fun checkMultiresolve(table: DataTable, refProvider: () -> PsiReference?) {
         ApplicationManager.getApplication().runReadAction {
-            val ref = getReferenceAtOffset()
+            val ref = refProvider()
             assertNotNull(ref)
 
             val rawResults = multiResolve(ref)
@@ -357,7 +376,11 @@ class CompletionResolveSteps {
                                 lookupElements,
                                 message = "Autocompletion to a single possible variant didn't happen " +
                                         "because either the completion list was not empty, or given " +
-                                        "prefix didn't match any variants")
+                                        "prefix didn't match any variants. Lookup elements: <${
+                                            lookupElements?.joinToString { le ->
+                                                "${le.lookupString} [${le.psiElement?.javaClass?.simpleName}]"
+                                            }
+                                        }>\n")
                     } else {
                         assertNotNull(
                                 lookupElements,
@@ -447,7 +470,12 @@ class CompletionResolveSteps {
             is PsiPolyVariantReference -> {
                 val results = ref.multiResolve(false)
                 assertNotNull(results)
-                assertEquals(0, results.size.toLong())
+                assertEquals(
+                        0, results.size.toLong(),
+                        "Unexpected results: ${results.joinToString(separator= "\n") {
+                            "${it.element?.javaClass?.simpleName}: [${it.element?.text}]" }
+                        }"
+                )
             }
             else -> TestCase.assertNull(ref.resolve())
         }

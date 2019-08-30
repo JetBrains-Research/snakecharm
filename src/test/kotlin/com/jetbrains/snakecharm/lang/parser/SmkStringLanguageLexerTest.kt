@@ -24,9 +24,9 @@ class SmkStringLanguageLexerTest : PyLexerTestCase() {
 
     fun testLanguageWithUnexpectedTokens() {
         doTest("{.[foo[key]..}",
-                "LBRACE", "UNEXPECTED_TOKEN", "UNEXPECTED_TOKEN",
+                "LBRACE", "BAD_CHARACTER", "BAD_CHARACTER",
                 "Py:IDENTIFIER", "LBRACKET", "Py:IDENTIFIER", "RBRACKET", "DOT",
-                "UNEXPECTED_TOKEN", "RBRACE")
+                "BAD_CHARACTER", "RBRACE")
     }
 
     fun testLanguageWithRegexp() {
@@ -71,15 +71,15 @@ class SmkStringLanguageLexerTest : PyLexerTestCase() {
 
     fun testBadIdentifierName() {
         doTest("{f*o&o?}",
-                "LBRACE", "Py:IDENTIFIER", "UNEXPECTED_TOKEN",
-                "Py:IDENTIFIER", "UNEXPECTED_TOKEN", "Py:IDENTIFIER",
-                "UNEXPECTED_TOKEN", "RBRACE")
+                "LBRACE", "Py:IDENTIFIER", "BAD_CHARACTER",
+                "Py:IDENTIFIER", "BAD_CHARACTER", "Py:IDENTIFIER",
+                "BAD_CHARACTER", "RBRACE")
     }
 
     fun testRbracketInName() {
         doTest("{foo]}",
                 "LBRACE", "Py:IDENTIFIER",
-                "UNEXPECTED_TOKEN", "RBRACE")
+                "BAD_CHARACTER", "RBRACE")
     }
 
     fun testEscapedBracket() {
@@ -122,6 +122,16 @@ class SmkStringLanguageLexerTest : PyLexerTestCase() {
     fun testIdentifierNameOnlySpaces() {
         doTest("{      }",
                 "LBRACE", "Py:IDENTIFIER", "RBRACE")
+    }
+
+    fun testDoubleDot() {
+        doTest("{FOO..}",
+                "LBRACE", "Py:IDENTIFIER", "DOT", "BAD_CHARACTER", "RBRACE")
+    }
+
+    fun testWhiteSpaceInIdentifier() {
+        doTest("{foo boo[doo roo]}",
+                "LBRACE", "Py:IDENTIFIER", "BAD_CHARACTER", "LBRACKET", "Py:IDENTIFIER", "RBRACKET", "RBRACE")
     }
 
     private fun doTest(text: String, vararg expectedTokens: String) {

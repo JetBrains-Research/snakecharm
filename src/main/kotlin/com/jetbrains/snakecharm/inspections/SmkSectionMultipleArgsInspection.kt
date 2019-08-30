@@ -4,6 +4,7 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SINGLE_ARGUMENT_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
 
@@ -19,7 +20,7 @@ class SmkSectionMultipleArgsInspection : SnakemakeInspection() {
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            if (st.name in SmkRuleOrCheckpointArgsSection.SINGLE_ARGUMENT_KEYWORDS) {
+            if (st.name in SINGLE_ARGUMENT_SECTIONS_KEYWORDS) {
                 checkArgumentList(st.argumentList, st.name!!)
             }
         }

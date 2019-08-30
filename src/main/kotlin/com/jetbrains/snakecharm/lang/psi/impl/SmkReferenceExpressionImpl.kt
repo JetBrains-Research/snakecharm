@@ -8,6 +8,7 @@ import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
+import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
@@ -41,7 +42,7 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
                     { getCheckpoints().map{ (_, psi) -> psi }}
 
             return (rules + checkpoints)
-                    .map { RatedResolveResult(RatedResolveResult.RATE_NORMAL, it) }
+                    .map { RatedResolveResult(SmkResolveUtil.RATE_NORMAL, it) }
                     .toTypedArray()
         }
 

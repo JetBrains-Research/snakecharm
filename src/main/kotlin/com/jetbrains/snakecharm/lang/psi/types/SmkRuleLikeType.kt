@@ -8,24 +8,13 @@ import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_TYPE_ACCESSIBLE_SECTIONS
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
-import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
 class SmkRuleLikeType(private val declaration: SmkRuleOrCheckpoint) : PyType {
-    companion object {
-        // Some sections in snakemake are inaccessible
-        // in rules.NAME.<section>, so this set is required
-        // to filter these sections for resolve and completion
-        val ACCESSIBLE_SECTIONS = setOf(
-                SnakemakeNames.SECTION_INPUT, SnakemakeNames.SECTION_OUTPUT, SnakemakeNames.SECTION_VERSION,
-                SnakemakeNames.SECTION_WRAPPER, SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS, SnakemakeNames.SECTION_MESSAGE,
-                SnakemakeNames.SECTION_BENCHMARK, SnakemakeNames.SECTION_LOG, SnakemakeNames.SECTION_PARAMS,
-                SnakemakeNames.SECTION_PRIORITY, SnakemakeNames.SECTION_RESOURCES
-        )
-    }
-
     override fun getName() = "Rule${declaration.name?.let { " '$it'" } ?: ""}"
 
     override fun assertValid(message: String?) {
@@ -46,7 +35,7 @@ class SmkRuleLikeType(private val declaration: SmkRuleOrCheckpoint) : PyType {
 
         return getAccessibleStatements()
                 .filter { it.name == name }
-                .map { RatedResolveResult(RatedResolveResult.RATE_NORMAL, it) }
+                .map { RatedResolveResult(SmkResolveUtil.RATE_NORMAL, it) }
     }
 
     override fun getCompletionVariants(
@@ -64,7 +53,7 @@ class SmkRuleLikeType(private val declaration: SmkRuleOrCheckpoint) : PyType {
     }
 
     private fun getAccessibleStatements() =
-            declaration.statementList.statements.filter { it.name in ACCESSIBLE_SECTIONS }
+            declaration.statementList.statements.filter { it.name in RULE_TYPE_ACCESSIBLE_SECTIONS }
 
     override fun isBuiltin() = false
 }

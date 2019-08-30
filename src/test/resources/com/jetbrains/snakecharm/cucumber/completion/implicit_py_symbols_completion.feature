@@ -183,3 +183,44 @@ Feature: Completion in python part of snakemake file
       | ext |
       | py  |
       | pyi |
+
+  Scenario Outline: Completion in injections
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+        """
+        <rule_like> NAME:
+           <section>: "{}"
+        """
+    When I put the caret after "{
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | rules       |
+      | checkpoints |
+      | config      |
+
+    Examples:
+      | rule_like  | section |
+      | rule       | shell   |
+      | rule       | message |
+      | checkpoint | shell   |
+
+  Scenario Outline: No completion in injections for wildcards expanding/defining sections
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+        """
+        <rule_like> NAME:
+           <section>: "{}"
+        """
+    When I put the caret after "{
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | rules       |
+      | checkpoints |
+      | config      |
+
+    Examples:
+      | rule_like  | section |
+      | rule       | input   |
+      | rule       | output  |
+      | rule       | log     |
+      | checkpoint | input   |

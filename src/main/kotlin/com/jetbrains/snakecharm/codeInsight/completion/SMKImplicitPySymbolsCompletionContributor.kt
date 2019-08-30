@@ -48,11 +48,7 @@ class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
 
         val module = ModuleUtilCore.findModuleForPsiElement(parameters.originalFile)
         if (module != null) {
-            val processor = object : CompletionVariantsProcessor(contextElement) {
-                public override fun addElement(name: String, element: PsiElement) {
-                    super.addElement(name, element)
-                }
-            }
+            val processor = SmkCompletionVariantsProcessor(contextElement)
             val contextScope = SmkCodeInsightScope[contextElement]
             val cache = ImplicitPySymbolsProvider.instance(module).cache
 
@@ -74,4 +70,11 @@ class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
             result.addAllElements(processor.resultList)
         }
     }
+}
+
+/**
+ * Just makes `addElement` public. PyCharm API required here
+ */
+class SmkCompletionVariantsProcessor(context: PsiElement) : CompletionVariantsProcessor(context) {
+    public override fun addElement(name: String, element: PsiElement) = super.addElement(name, element)
 }

@@ -83,4 +83,16 @@ class SmkStringLanguageParsingTest : ParsingTestCase(
     fun testFormatSpecifier() {
         doTest(true)
     }
+
+    fun testInjectionWithSpaceInside() {
+        doTest(true)
+    }
+
+    fun testMissingIdentifier() {
+        doTest(true)
+    }
+
+    fun testMissingDot() {
+        doTest(true)
+    }
 }

@@ -1,20 +1,19 @@
 FILE
   SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
-    PyReferenceExpression: null
-      PyReferenceExpression: f
-        PsiElement(Py:IDENTIFIER)('f')
+    PyReferenceExpression: f
+      PsiElement(Py:IDENTIFIER)('f')
     PsiErrorElement:Unexpected character
-      PsiElement(UNEXPECTED_TOKEN)('?')
-    PyReferenceExpression: null
-      PyReferenceExpression: o
-        PsiElement(Py:IDENTIFIER)('o')
-    PsiErrorElement:Unexpected character
-      PsiElement(UNEXPECTED_TOKEN)('&')
-    PyReferenceExpression: null
       <empty list>
+    PsiElement(BAD_CHARACTER)('?')
+    PyReferenceExpression: o
+      PsiElement(Py:IDENTIFIER)('o')
     PsiErrorElement:Unexpected character
-      PsiElement(UNEXPECTED_TOKEN)('*')
+      <empty list>
+    PsiElement(BAD_CHARACTER)('&')
+    PsiErrorElement:Unexpected character
+      <empty list>
+    PsiElement(BAD_CHARACTER)('*')
     SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
       PyReferenceExpression: to
         PyReferenceExpression: doo

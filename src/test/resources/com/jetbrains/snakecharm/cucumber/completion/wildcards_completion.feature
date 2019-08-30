@@ -188,3 +188,21 @@ Feature: Completion for wildcards
       | rule_like  |
       | rule       |
       | checkpoint |
+
+
+  Scenario Outline: No completion in wildcard references which looks like qualified
+     Given a snakemake project
+     Given I open a file "foo.smk" with text
+       """
+       <rule_like> NAME:
+           output: "{sample}"
+           input: "{wildcards.sample}"
+       """
+     And I put the caret after wildcards.
+     When I invoke autocompletion popup
+     And completion list shouldn't contain:
+       | sample |
+     Examples:
+       | rule_like  |
+       | rule       |
+       | checkpoint |

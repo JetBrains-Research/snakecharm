@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.stringLanguage
 
 import com.intellij.lang.*
 import com.intellij.psi.PsiElement
+import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.ILazyParseableElementType
 import com.jetbrains.python.PyTokenTypes
@@ -61,7 +62,7 @@ object SmkSLTokenTypes {
 
     val COMMA = SmkSLTokenType("COMMA")
 
-    val UNEXPECTED_TOKEN = SmkSLTokenType("UNEXPECTED_TOKEN")
+    val BAD_CHARACTER = TokenType.BAD_CHARACTER!!
 
     val LANGUAGE = SmkSLTokenType("LANGUAGE")
 
@@ -70,8 +71,6 @@ object SmkSLTokenTypes {
     val REFERENCE_EXPRESSION = SmkSLTokenType("REFERENCE_EXPRESSION")
 
     val KEY_EXPRESSION = SmkSLTokenType("KEY_EXPRESSION")
-
-    val EXPRESSION_STATEMENT = SmkSLTokenType("EXPRESSION_STATEMENT")
 
     val FORMAT_SPECIFIER = SmkSLTokenType("FORMAT_SPECIFIER")
 
