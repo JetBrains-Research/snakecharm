@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyStringLiteralExpression
+import com.jetbrains.snakecharm.codeInsight.wrapper.WrapperStorage
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
@@ -20,6 +21,8 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
         private const val EXAMPLE_SNAKEFILE = "test/Snakefile"
     }
 
+    private val nextSectionRegex = Regex("[a-z]+:")
+
 
     override fun generateDoc(element: PsiElement?, originalElement: PsiElement?): String? {
         if (!originalElement.isStringLiteralInWrapperSection()) {
@@ -27,6 +30,8 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
         }
 
         val text = originalElement?.text?.replace("\"", "") ?: return null
+
+        val wrapper = WrapperStorage.getInstance().getWrapperList().find { text.contains(it.pathToWrapperDirectory) }
 
         val result = mutableListOf<String>()
         result.add(DocumentationMarkup.DEFINITION_START)
@@ -39,8 +44,35 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
 
         result.add(DocumentationMarkup.SECTIONS_START)
         result.addAll(buildSectionWithFileLink(text, WRAPPER))
-        result.addAll(buildSectionWithFileLink(text, META))
-        result.addAll(buildSectionWithFileLink(text, ENVIRONMENT))
+        if (wrapper != null) {
+            val descriptionAndFollowingText = wrapper.metaFileContent.substringAfter("description")
+            val textAfterDescriptionStart = nextSectionRegex.find(descriptionAndFollowingText)?.range?.first
+            val description = if (textAfterDescriptionStart == null) {
+                descriptionAndFollowingText
+            } else {
+                descriptionAndFollowingText.substring(0, textAfterDescriptionStart)
+            }
+            result.addAll(buildSectionWithTextAndLink(
+                    "description",
+                    description.trim(),
+                    "$URL_START$text/$META",
+                    META
+            ))
+        } else {
+            result.addAll(buildSectionWithFileLink(text, META))
+        }
+        if (wrapper != null) {
+            result.addAll(buildSectionWithTextAndLink(
+                    "dependencies",
+                    wrapper.environmentFileContent
+                            .substringAfter("dependencies:")
+                            .trim { it.isWhitespace() || it == '\n' },
+                    "$URL_START$text/$ENVIRONMENT",
+                    ENVIRONMENT
+            ))
+        } else {
+            result.addAll(buildSectionWithFileLink(text, ENVIRONMENT))
+        }
         result.addAll(buildSectionWithFileLink(text, EXAMPLE_SNAKEFILE, "Example Snakefile"))
         result.add(DocumentationMarkup.SECTIONS_END)
 
@@ -64,6 +96,23 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
                 DocumentationMarkup.SECTION_SEPARATOR,
                 "<p><a href=\"$url\">$url</a>",
                 DocumentationMarkup.SECTION_END
+        )
+    }
+
+    private fun buildSectionWithTextAndLink(
+            sectionTitle: String,
+            sectionContent: String,
+            link: String?,
+            linkText: String?
+    ): List<String> {
+        return listOf(
+                DocumentationMarkup.SECTION_HEADER_START,
+                sectionTitle,
+                DocumentationMarkup.SECTION_SEPARATOR,
+                "<p>",
+                sectionContent.replace("\n", "<p>"),
+                if (link != null && linkText != null) { "<p><a href=\"$link\">($linkText)</a>" } else "",
+                DocumentationMarkup.SECTIONS_END
         )
     }
 
