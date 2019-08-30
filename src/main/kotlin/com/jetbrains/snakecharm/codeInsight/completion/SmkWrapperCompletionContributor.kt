@@ -43,8 +43,7 @@ class SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>() 
                 result.prefixMatcher.prefix
         val wrapperDependencies = wrappers.map { it to extractToolDependencies(it) }.toMap()
         val currentTag = SmkWrapperUtil.TAG_NUMBER_REGEX.find(prefix)?.value
-        if (currentTag != null &&
-                wrappers.find { it.repositoryTag == currentTag.substringBefore("/") } == null) {
+        if (currentTag != null) {
             result.withPrefixMatcher(
                     WrapperPrefixMatcher(prefix.replace(SmkWrapperUtil.TAG_NUMBER_REGEX, ""))
             ).addAllElements(wrappers.map { LookupElementBuilder.create(it.pathToWrapperDirectory) })
