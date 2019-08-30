@@ -323,13 +323,9 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       | element     | place                | ref_type               |
       | RULE        | # place toplevel     | reference              |
       | CHECKPOINT  | # place toplevel     | reference              |
-      | SUBWORKFLOW | # place toplevel     | reference              |
       | RULE        | # run section        | reference              |
       | CHECKPOINT  | # run section        | reference              |
-      | SUBWORKFLOW | # run section        | reference              |
       | RULE        | }" # input injection | reference in injection |
       | CHECKPOINT  | }" # input injection | reference in injection |
-      | SUBWORKFLOW | }" # input injection | reference in injection |
       | RULE        | }" # shell injection | reference in injection |
       | CHECKPOINT  | }" # shell injection | reference in injection |
-      | SUBWORKFLOW | }" # shell injection | reference in injection |

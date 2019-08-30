@@ -381,7 +381,6 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
     Then completion list shouldn't contain:
       | RULE        |
       | CHECKPOINT  |
-      | SUBWORKFLOW |
     Examples:
       | place            |
       | # place toplevel |
