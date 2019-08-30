@@ -115,11 +115,11 @@ class CompletionResolveSteps {
         }
     }
 
-    @Then("^reference should resolve to file \"([^\"]+)\" with parent \"(.+)\"$")
-    fun referenceShouldResolveToFileWithParent(filename: String, parentFilename: String) {
+    @Then("^reference should resolve to file \"([^\"]+)\" at path \"(.+)\"$")
+    fun referenceShouldResolveToFileAtPath(filename: String, path: String) {
         ApplicationManager.getApplication().runReadAction {
             val file = tryToResolveRefToFile(getReferenceAtOffset(), filename)
-            assert(file.parent?.name == parentFilename)
+            assertEquals(file.virtualFile.canonicalPath, path)
         }
     }
 

@@ -1,15 +1,90 @@
 0.36.0
-bio/art/profiler_illumina
-channels:\n  - bioconda\n  - conda-forge\ndependencies\n  - art ==2016.06.05\n
-name: art_profiler_illumina\ndescription: Use the art profiler to create a base quality score profile for\n  Illumina read data from a fastq file.\nauthors:\n  - David Laehnemann\n  - Victoria Sack\n
-rule art_profiler_illumina:\n    input:\n        &quot;data/{sample}.fq&quot;,\n    output:\n        &quot;profiles/{sample}.txt&quot;\n    log:\n        &quot;logs/art_profiler_illumina/{sample}.log&quot;\n    params: &quot;&quot;\n    threads: 2\n    wrapper:\n        &quot;master/bio/art/profiler_illumina&quot;\n
+bio/bcftools/call
+channels:\n  - bioconda\n  - conda-forge\n  - defaults\ndependencies:\n  - samtools ==1.9\n  - bcftools ==1.9\n
+name: bcftools call\ndescription: Call variants with bcftools.\nauthors:\n  - Johannes Köster\n
+rule bcftools_call:\n    input:\n        ref="genome.fasta",\n        samples=expand("mapped/{sample}.sorted.bam", sample=config["samples"]),\n        indexes=expand("mapped/{sample}.sorted.bam.bai", sample=config["samples"])\n    output:\n        # Here, we optionally use a region as wildcard and constrain it to the\n        # format accepted by samtools mpileup.\n        "called/{region,.+(:[0-9]+-[0-9]+)?}.bcf"\n    params:\n        # Optional parameters for samtools mpileup (except -g, -f).\n        # In this example, we forward the region wildcard from the output file to mpileup.\n        mpileup="--region {region}",\n        # Optional parameters for bcftools call (except -v, -o, -m).\n        call=""\n    log:\n        "logs/bcftools_call/{region}.log"\n    wrapper:\n        "master/bio/bcftools/call"\n
+0.36.0
+bio/bcftools/concat
+channels:\n  - bioconda\n  - conda-forge\n  - defaults\ndependencies:\n  - bcftools ==1.9\n
+name: bcftools concat\ndescription: Concatenate vcf/bcf files with bcftools.\nauthors:\n  - Johannes Köster\n
+rule bcftools_concat:\n    input:\n        calls=["a.bcf", "b.bcf"]\n    output:\n        "all.bcf"\n    params:\n        ""  # optional parameters for bcftools concat (except -o)\n    wrapper:\n        "master/bio/bcftools/concat"\n
+0.36.0
+bio/bcftools/merge
+channels:\n  - bioconda\n  - conda-forge\n  - defaults\ndependencies:\n  - bcftools ==1.9\n
+name: bcftools merge\ndescription: Merge vcf/bcf files with bcftools.\nauthors:\n  - Patrik Smeds\n
+rule bcftools_merge:\n    input:\n        calls=["a.bcf", "b.bcf"]\n    output:\n        "all.bcf"\n    params:\n        ""  # optional parameters for bcftools concat (except -o)\n    wrapper:\n        "master/bio/bcftools/merge"\n
+0.36.0
+bio/bcftools/view
+channels:\n  - bioconda\n  - conda-forge\n  - defaults\ndependencies:\n  - bcftools ==1.9\n
+name: bcftools view\ndescription: View vcf/bcf file in a different format.\nauthors:\n  - Johannes Köster\n
+rule bcf_to_vcf:\n    input:\n        "{prefix}.bcf"\n    output:\n        "{prefix}.vcf"\n    params:\n        ""  # optional parameters for bcftools view (except -o)\n    wrapper:\n        "master/bio/bcftools/view"\n
+0.36.0
+bio/salmon/index
+channels:\n  - bioconda\n  - conda-forge\n  - defaults\ndependencies:\n  - salmon ==0.13.1\n
+name: salmon_index\ndescription: |\n  Index a transcriptome assembly with salmon \nauthors:\n  - Tessa Pierce\ninput:\n  - assembly fasta\noutput:\n  - indexed assembly \n
+rule salmon_index:\n    input:\n        "assembly/transcriptome.fasta"\n    output:\n        directory("salmon/transcriptome_index")\n    log:\n        "logs/salmon/transcriptome_index.log"\n    threads: 2\n    params:\n        # optional parameters\n        extra=""\n    wrapper:\n        "master/bio/salmon/index"\n
+0.36.0
+bio/sambamba/sort
+channels:\n  - bioconda\n  - conda-forge\n  - defaults\ndependencies:\n  - sambamba ==0.6.6\n
+name: sambamba sort\ndescription: Sort bam file with sambamba\nauthors:\n  - Johannes Köster\ninput:\n  - bam file\noutput:\n  - sorted bam file\n
+rule sambamba_sort:\n    input:\n        "mapped/{sample}.bam"\n    output:\n        "mapped/{sample}.sorted.bam"\n    params:\n        ""  # optional parameters\n    threads: 8\n    wrapper:\n        "master/bio/sambamba/sort"\n
+0.36.0
+bio/samtools/bam2fq/interleaved
+channels:\n  - conda-forge\n  - bioconda\ndependencies:\n  - samtools ==1.9\n
+name: samtools bam2fq interleaved\ndescription:\n  Convert a bam file back to unaligned reads in a single fastq file with\n  samtools. For paired end reads, this results in an unsorted interleaved file.\nauthors:\n  - David Laehnemann\n  - Victoria Sack\n
+rule samtools_bam2fq_interleaved:\n    input:\n        "mapped/{sample}.bam"\n    output:\n        "reads/{sample}.fq"\n    params:\n        " "\n    threads: 3\n    wrapper:\n        "master/bio/samtools/bam2fq/interleaved"\n
+0.36.0
+bio/samtools/bam2fq/separate
+channels:\n  - conda-forge\n  - bioconda\ndependencies:\n  - samtools ==1.9\n
+name: samtools bam2fq separate\ndescription:\n  Convert a bam file with paired end reads back to unaligned reads in a two\n  separate fastq files with samtools. Reads that are not properly paired are\n  discarded (READ_OTHER and singleton reads in samtools bam2fq documentation),\n  as are secondary (0x100) and supplementary reads (0x800).\nauthors:\n  - David Laehnemann\n  - Victoria Sack\nnotes: |\n  * Samtools -@/--threads takes one integer as input. This is the number of additional threads and not raw threads.\n
+rule samtools_bam2fq_separate:\n    input:\n        "mapped/{sample}.bam"\n    output:\n        "reads/{sample}.1.fq",\n        "reads/{sample}.2.fq"\n    params:\n        sort = "-m 4G",\n        bam2fq = "-n"\n    threads:  # Remember, this is the number of samtools' additional threads\n        3     # At least 2 threads have to be requested on cluster sumbission.\n              # Thus, this value - 2 will be sent to samtools sort -@ argument.\n    wrapper:\n        "master/bio/samtools/bam2fq/separate"\n
+0.36.0
+bio/samtools/faidx
+channels:\n  - bioconda\n  - conda-forge\ndependencies:\n  - samtools ==1.9\n
+name: samtools faidx\ndescription: index reference sequence in FASTA format from reference sequence\nauthors:\n  - Michael Chambers\ninput:\n  - reference sequence file (.fa)\noutput:\n  - indexed reference sequence file (.fai)\n
+rule samtools_index:\n    input:\n        "{sample}.fa"\n    output:\n        "{sample}.fa.fai"\n    params:\n        "" # optional params string\n    wrapper:\n        "master/bio/samtools/faidx"\n
+0.36.0
+bio/samtools/flagstat
+channels:\n  - bioconda\n  - conda-forge\ndependencies:\n  - samtools ==1.9\n
+name: samtools flagstat\ndescription: Use samtools to create a flagstat file from a bam or sam file.\nauthors:\n  - Christopher Preusch\ninput:\n  - bam or sam file (.bam,.sam)\noutput:\n  - flagstat file (.flagstat)\n
+rule samtools_flagstat:\n    input:\n        "mapped/{sample}.bam"\n    output:\n        "mapped/{sample}.bam.flagstat"\n    wrapper:\n        "master/bio/samtools/flagstat"\n
+0.36.0
+bio/samtools/index
+channels:\n  - bioconda\n  - conda-forge\ndependencies:\n  - samtools ==1.9\n
+name: samtools index\ndescription: Index bam file with samtools.\nauthors:\n  - Johannes Köster\ninput:\n  - bam file\noutput:\n  - bam file index (.bai)\n
+rule samtools_index:\n    input:\n        "mapped/{sample}.sorted.bam"\n    output:\n        "mapped/{sample}.sorted.bam.bai"\n    params:\n        "" # optional params string\n    wrapper:\n        "master/bio/samtools/index"\n
+0.36.0
+bio/samtools/merge
+channels:\n  - bioconda\n  - conda-forge\ndependencies:\n  - samtools ==1.9\n
+name: samtools merge\ndescription: Merge two bam files with samtools.\nauthors:\n  - Johannes Köster\ninput:\n  - list of bam files to merge\noutput:\n  - merged bam file\nnotes: |\n  * Samtools -@/--threads takes one integer as input. This is the number of additional threads and not raw threads.\n
+rule samtools_merge:\n    input:\n        ["mapped/A.bam", "mapped/B.bam"]\n    output:\n        "merged.bam"\n    params:\n        "" # optional additional parameters as string\n    threads:  # Samtools takes additional threads through its option -@\n        8     # This value - 1 will be sent to -@\n    wrapper:\n        "master/bio/samtools/merge"\n
+0.36.0
+bio/samtools/mpileup
+channels:\n  - bioconda\n  - conda-forge\ndependencies:\n  - samtools ==1.9\n  - pigz ==2.3.4\n
+name: samtools mpileup\ndescription: Generate pileup using samtools.\nauthors:\n  - Patrik Smeds\n
+rule mpilup:\n    input:\n        # single or list of bam files\n        bam="mapped/{sample}.bam",\n        reference_genome="genome.fasta"\n    output:\n        "mpileup/{sample}.mpileup.gz"\n    log:\n        "logs/samtools/mpileup/{sample}.log"\n    params:\n        extra="-d 10000",  # optional\n    wrapper:\n        "master/bio/samtools/mpileup"\n
 0.36.0
 bio/samtools/sort
 channels:\n  - bioconda\n  - conda-forge\ndependencies:\n  - samtools ==1.9\n
 name: samtools sort\ndescription: Sort bam file with samtools.\nauthors:\n  - Johannes Köster\nnotes: |\n  * Samtools -@/--threads takes one integer as input. This is the number of additional threads and not raw threads.\n
-rule samtools_sort:\n    input:\n        &quot;mapped/{sample}.bam&quot;\n    output:\n        &quot;mapped/{sample}.sorted.bam&quot;\n    params:\n        &quot;-m 4G&quot;\n    threads:  # Samtools takes additional threads through its option -@\n        8     # This value - 1 will be sent to -@.\n    wrapper:\n        &quot;master/bio/samtools/sort&quot;\n
+rule samtools_sort:\n    input:\n        "mapped/{sample}.bam"\n    output:\n        "mapped/{sample}.sorted.bam"\n    params:\n        "-m 4G"\n    threads:  # Samtools takes additional threads through its option -@\n        8     # This value - 1 will be sent to -@.\n    wrapper:\n        "master/bio/samtools/sort"\n
 0.36.0
 bio/samtools/stats
 channels:\n  - bioconda\n  - conda-forge\ndependencies:\n  - samtools ==1.9\n
 name: samtools stats\ndescription: Generate stats using samtools.\nauthors:\n  - Julian de Ruiter\n
-rule samtools_stats:\n    input:\n        &quot;mapped/{sample}.bam&quot;\n    output:\n        &quot;samtools_stats/{sample}.txt&quot;\n    params:\n        extra=&quot;&quot;,                       # Optional: extra arguments.\n        region=&quot;1:1000000-2000000&quot;      # Optional: region string.\n    log:\n        &quot;logs/samtools_stats/{sample}.log&quot;\n    wrapper:\n        &quot;master/bio/samtools/stats&quot;\n
+rule samtools_stats:\n    input:\n        "mapped/{sample}.bam"\n    output:\n        "samtools_stats/{sample}.txt"\n    params:\n        extra="",                       # Optional: extra arguments.\n        region="1:1000000-2000000"      # Optional: region string.\n    log:\n        "logs/samtools_stats/{sample}.log"\n    wrapper:\n        "master/bio/samtools/stats"\n
+0.36.0
+bio/samtools/view
+channels:\n  - bioconda\n  - conda-forge\ndependencies:\n  - samtools ==1.9\n
+name: samtools view\ndescription: Convert or filter SAM/BAM.\nauthors:\n  - Johannes Köster\n
+rule samtools_view:\n    input:\n        "{sample}.sam"\n    output:\n        "{sample}.bam"\n    params:\n        "-b" # optional params string\n    wrapper:\n        "master/bio/samtools/view"\n
+0.36.0
+bio/sickle/pe
+channels:\n  - bioconda\n  - conda-forge\n  - defaults\ndependencies:\n  - sickle-trim ==1.33\n
+name: sickle pe\ndescription: Trim paired-end reads with sickle.\nhomepage: https://github.com/najoshi/sickle\nauthors:\n  - Wibowo Arindrarto\n
+rule sickle_pe:\n  input:\n    r1="input_R1.fq",\n    r2="input_R2.fq"\n  output:\n    r1="output_R1.fq",\n    r2="output_R2.fq",\n    rs="output_single.fq",\n  params:\n    qual_type="sanger",\n    # optional extra parameters\n    extra=""\n  log:\n    # optional log file\n    "logs/sickle/job.log"\n  wrapper:\n    "master/bio/sickle/pe"\n
+0.36.0
+bio/sickle/se
+channels:\n  - bioconda\n  - conda-forge\n  - defaults\ndependencies:\n  - sickle-trim ==1.33\n
+name: sickle se\ndescription: Trim single-end reads with sickle.\nhomepage: https://github.com/najoshi/sickle\nauthors:\n  - Wibowo Arindrarto\n
+rule sickle_pe:\n  input:\n    "input_R1.fq"\n  output:\n    "output_R1.fq"\n  params:\n    qual_type="sanger",\n    # optional extra parameters\n    extra=""\n  log:\n    "logs/sickle/job.log"\n  wrapper:\n    "master/bio/sickle/pe"\n
