@@ -43,24 +43,21 @@ class SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>() 
                 result.prefixMatcher.prefix
         val wrapperDependencies = wrappers.map { it to extractToolDependencies(it) }.toMap()
         val currentTag = SmkWrapperUtil.TAG_NUMBER_REGEX.find(prefix)?.value
-        if (currentTag != null && wrappers.find { it.repositoryTag == currentTag.substringBefore("/") } == null) {
-            result.withPrefixMatcher(WrapperPrefixMatcher(prefix.replace(SmkWrapperUtil.TAG_NUMBER_REGEX, "")))
-                    .addAllElements(wrappers.map { LookupElementBuilder.create(it.pathToWrapperDirectory) })
+        if (currentTag != null &&
+                wrappers.find { it.repositoryTag == currentTag.substringBefore("/") } == null) {
+            result.withPrefixMatcher(
+                    WrapperPrefixMatcher(prefix.replace(SmkWrapperUtil.TAG_NUMBER_REGEX, ""))
+            ).addAllElements(wrappers.map { LookupElementBuilder.create(it.pathToWrapperDirectory) })
             // don't add type text to completion list items because tool versions might be incorrect for earlier tags
         } else {
             result.withPrefixMatcher(WrapperPrefixMatcher(prefix))
-                    .addAllElements(wrappers
-                            .map {
-                                LookupElementBuilder.create("${it.repositoryTag}/${it.pathToWrapperDirectory}")
-                                        .withTypeText(wrapperDependencies[it]?.joinToString(", "))
+                    .addAllElements(wrappers.map {
+                                PrioritizedLookupElement.withPriority(
+                                        LookupElementBuilder.create("${it.repositoryTag}/${it.pathToWrapperDirectory}")
+                                                .withTypeText(wrapperDependencies[it]?.joinToString(", ")),
+                                        getPriorityByTag(it.repositoryTag, wrappers))
                             })
         }
-    }
-
-    private class WrapperPrefixMatcher(prefix: String) : PrefixMatcher(prefix) {
-        override fun prefixMatches(name: String) = name.contains(prefix)
-
-        override fun cloneWithPrefix(prefix: String) = WrapperPrefixMatcher(prefix)
     }
 
     // extract not all dependencies but only those mentioned in wrapper name
@@ -72,5 +69,15 @@ class SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>() 
                 .filter { wrapperToolNames.any { tool -> it.contains(tool) } && it.contains("==")}
                 // using this instead of it.trim() because the file format seems to be 'tool ==ver', and 'tool==ver' looks better
                 .map { it.substringBefore("==").trim() + "==" + it.substringAfter("==").trim() }
+    }
+
+    private fun getPriorityByTag(tag: String, wrappers: List<WrapperStorage.Wrapper>) =
+            SmkWrapperUtil.sortTags(wrappers.map { it.repositoryTag }.distinct()).indexOf(tag).toDouble()
+
+
+    private class WrapperPrefixMatcher(prefix: String) : PrefixMatcher(prefix) {
+        override fun prefixMatches(name: String) = name.contains(prefix)
+
+        override fun cloneWithPrefix(prefix: String) = WrapperPrefixMatcher(prefix)
     }
 }

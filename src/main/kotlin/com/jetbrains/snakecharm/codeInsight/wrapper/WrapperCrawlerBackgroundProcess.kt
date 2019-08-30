@@ -13,7 +13,6 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
 import java.nio.charset.Charset
-import java.util.regex.Pattern
 
 class WrapperCrawlerBackgroundProcess : StartupActivity {
 
@@ -30,23 +29,14 @@ class WrapperCrawlerBackgroundProcess : StartupActivity {
             ) {
                 override fun run(indicator: ProgressIndicator) {
                     // only fetching the latest tag to try to avoid exceeding rate limit
-                    val tagNumberPattern = Pattern.compile(SmkWrapperUtil.TAG_NUMBER_REGEX_STRING)
+
                     val (res, tags) = collectTags()
                     if (!res) {
                         notifyAboutWrapperFetchingError(project)
                         return
                     }
 
-                    val latestTag = tags.sortedWith(compareBy({ tag ->
-                        val matcher = tagNumberPattern.matcher(tag)
-                        matcher.find()
-                        matcher.group(2).toInt()
-                    }, { tag ->
-                        val matcher = tagNumberPattern.matcher(tag)
-                        matcher.find()
-                        matcher.group(3).toInt()
-                    })).lastOrNull()
-                            ?: return
+                    val latestTag = SmkWrapperUtil.sortTags(tags).lastOrNull() ?: return
 
                     // fetch data if a new tag is available or if there's no saved data
                     val cachedWrappers = WrapperStorage.getInstance().getWrapperList()

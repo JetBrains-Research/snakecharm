@@ -35,7 +35,7 @@ class WrapperStorage : PersistentStateComponent<WrapperStorage> {
 
     fun getWrapperList(): List<Wrapper> {
         val wrappers = mutableListOf<Wrapper>()
-        // TODO can this be modified? storing everything as a list of strings is not preferable
+        // storing everything as list of strings because that was the only way to get it to serialize
         val wrapperSize = 5
         for (i in 0 until wrapperStringStorage.size step wrapperSize) {
             wrappers.add(Wrapper(
