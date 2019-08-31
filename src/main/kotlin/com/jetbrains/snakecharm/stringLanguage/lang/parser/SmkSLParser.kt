@@ -5,7 +5,7 @@ import com.intellij.lang.PsiBuilder
 import com.intellij.lang.PsiParser
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.stringLanguage.SmkSLTokenTypes
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLElementTypes
 
 class SmkSLParser : PsiParser {
     override fun parse(root: IElementType, builder: PsiBuilder): ASTNode {
@@ -50,7 +50,7 @@ class SmkSLParser : PsiParser {
             builder.error(SnakemakeBundle.message("SMKSL.PARSE.expected.rbrace"))
         }
 
-        languageMarker.done(SmkSLTokenTypes.LANGUAGE)
+        languageMarker.done(SmkSLElementTypes.LANGUAGE)
     }
 
     // Returns true if parsing ended on token 'COMMA', and
@@ -70,7 +70,7 @@ class SmkSLParser : PsiParser {
             when {
                 tt === SmkSLTokenTypes.IDENTIFIER -> {
                     builder.advanceLexer()
-                    exprMarker.done(SmkSLTokenTypes.REFERENCE_EXPRESSION)
+                    exprMarker.done(SmkSLElementTypes.REFERENCE_EXPRESSION)
                     exprMarker = exprMarker.precede()
                     identifierExpected = false
                 }
@@ -90,7 +90,7 @@ class SmkSLParser : PsiParser {
                     } else {
                         identifierExpected = true
                     }
-                    exprMarker.done(SmkSLTokenTypes.REFERENCE_EXPRESSION)
+                    exprMarker.done(SmkSLElementTypes.REFERENCE_EXPRESSION)
                     exprMarker = exprMarker.precede()
                 }
                 tt === SmkSLTokenTypes.FORMAT_SPECIFIER -> {
@@ -102,13 +102,13 @@ class SmkSLParser : PsiParser {
                     builder.advanceLexer()
 
                     val keyMarker = builder.mark()
-                    builder.checkMatches(SmkSLTokenTypes.IDENTIFIER,
+                    builder.checkMatches(SmkSLTokenTypes.ACCESS_KEY,
                             SnakemakeBundle.message("SMKSL.PARSE.expected.key"))
-                    keyMarker.done(SmkSLTokenTypes.KEY_EXPRESSION)
+                    keyMarker.done(SmkSLElementTypes.KEY_EXPRESSION)
 
                     builder.checkMatches(SmkSLTokenTypes.RBRACKET,
                             SnakemakeBundle.message("SMKSL.PARSE.expected.rbracket"))
-                    exprMarker.done(SmkSLTokenTypes.SUBSCRIPTION_EXPRESSION)
+                    exprMarker.done(SmkSLElementTypes.SUBSCRIPTION_EXPRESSION)
 
                     exprMarker = exprMarker.precede()
                 }

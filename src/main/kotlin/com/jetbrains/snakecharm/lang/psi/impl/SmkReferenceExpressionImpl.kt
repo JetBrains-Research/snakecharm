@@ -2,7 +2,9 @@ package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.*
+import com.intellij.psi.PsiReference
+import com.intellij.psi.PsiReferenceBase
+import com.intellij.psi.ResolveResult
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.python.psi.resolve.RatedResolveResult
@@ -19,18 +21,16 @@ import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 
 
 class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferenceExpression {
-    override fun getName(): String? {
-        return super<SmkReferenceExpression>.getName()
-    }
+    override fun getName() = getReferenceName()
 
     override fun getType(context: TypeEvalContext, key: TypeEvalContext.Key): PyType? = null
 
     override fun getReference(): PsiReference? = SmkRuleOrCheckpointNameReference(this, TextRange(0, textLength))
 
     class SmkRuleOrCheckpointNameReference(
-            element: PsiNamedElement,
+            element: SmkReferenceExpression,
             textRange: TextRange
-    ) : PsiReferenceBase.Poly<PsiNamedElement>(element, textRange, true) {
+    ) : PsiReferenceBase.Poly<SmkReferenceExpression>(element, textRange, true) {
         private val key: String = element.text
 
         override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
@@ -46,8 +46,8 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
                     .toTypedArray()
         }
 
-        override fun handleElementRename(newElementName: String): PsiElement =
-                element.setName(newElementName)
+        override fun handleElementRename(newElementName: String) =
+                        SmkResolveUtil.renameNameNode(newElementName, element.getNameElement(), element)
 
         private fun getRules() = PsiTreeUtil.getParentOfType(element, SmkFile::class.java)
                 ?.collectRules() ?: emptyList()

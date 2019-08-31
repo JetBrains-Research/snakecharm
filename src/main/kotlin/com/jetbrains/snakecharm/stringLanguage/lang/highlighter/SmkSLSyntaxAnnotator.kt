@@ -6,11 +6,13 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.highlighting.PyHighlighter
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.lang.psi.SmkSLReferenceExpression
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLReferenceExpressionImpl
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
 object SmkSLSyntaxAnnotator : AbstractSmkSLAnnotator() {
     override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpression) {
         val wildcard = SmkSLReferenceExpressionImpl.isWildcard(expr)
+
+        val namePsiElement = expr.nameElement?.psi
         when {
             // XXX: Is not fast check
             wildcard -> {
@@ -21,10 +23,10 @@ object SmkSLSyntaxAnnotator : AbstractSmkSLAnnotator() {
 
             // TODO: replace 'wildcards.' check with: if left part of reference
             //  is 'wildcards' with "WildcardsType" (Smk + SmkSL)
-            expr.comesAfterWildcardsPrefix() -> {
+            namePsiElement != null && expr.comesAfterWildcardsPrefix() -> {
                 // expr.getNameRange()
                 addHighlightingAnnotation(
-                        expr.getNameNode()?.psi!!, PyHighlighter.PY_NUMBER, HighlightSeverity.INFORMATION
+                        namePsiElement, PyHighlighter.PY_NUMBER, HighlightSeverity.INFORMATION
                 )
             }
         }

@@ -17,15 +17,15 @@ class SmkSLLexerTest : PyLexerTestCase() {
     fun testLanguageWithMultipleAccess() {
         doTest("{params.foo[key].boo[0][1]}",
                 "LBRACE", "Py:IDENTIFIER", "DOT", "Py:IDENTIFIER",
-                "LBRACKET", "Py:IDENTIFIER", "RBRACKET", "DOT",
-                "Py:IDENTIFIER", "LBRACKET", "Py:IDENTIFIER", "RBRACKET",
-                "LBRACKET", "Py:IDENTIFIER", "RBRACKET", "RBRACE")
+                "LBRACKET", "ACCESS_KEY", "RBRACKET", "DOT",
+                "Py:IDENTIFIER", "LBRACKET", "ACCESS_KEY", "RBRACKET",
+                "LBRACKET", "ACCESS_KEY", "RBRACKET", "RBRACE")
     }
 
     fun testLanguageWithUnexpectedTokens() {
         doTest("{.[foo[key]..}",
                 "LBRACE", "BAD_CHARACTER", "BAD_CHARACTER",
-                "Py:IDENTIFIER", "LBRACKET", "Py:IDENTIFIER", "RBRACKET", "DOT",
+                "Py:IDENTIFIER", "LBRACKET", "ACCESS_KEY", "RBRACKET", "DOT",
                 "BAD_CHARACTER", "RBRACE")
     }
 
@@ -131,7 +131,7 @@ class SmkSLLexerTest : PyLexerTestCase() {
 
     fun testWhiteSpaceInIdentifier() {
         doTest("{foo boo[doo roo]}",
-                "LBRACE", "Py:IDENTIFIER", "BAD_CHARACTER", "BAD_CHARACTER", "LBRACKET", "Py:IDENTIFIER", "RBRACKET", "RBRACE")
+                "LBRACE", "Py:IDENTIFIER", "BAD_CHARACTER", "BAD_CHARACTER", "LBRACKET", "ACCESS_KEY", "RBRACKET", "RBRACE")
     }
 
     private fun doTest(text: String, vararg expectedTokens: String) {

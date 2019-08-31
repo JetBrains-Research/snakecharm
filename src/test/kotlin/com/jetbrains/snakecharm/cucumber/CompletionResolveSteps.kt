@@ -288,6 +288,15 @@ class CompletionResolveSteps {
         completionListShouldContainMethods(table.asList(String::class.java))
     }
 
+    @Then("^completion list should be empty")
+    fun completionListShouldBeEmpty() {
+        assertEquals(
+                0, SnakemakeWorld.completionList().size,
+                "Unexpected items: ${SnakemakeWorld.completionList().take(20)
+                        .joinToString(separator="\n")}\n"
+                )
+    }
+
     @Then("^completion list should only contain:$")
     fun completionListShouldOnlyContain(table: DataTable) {
         completionListShouldOnlyContainMethods(table.asList(String::class.java))

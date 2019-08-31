@@ -1,9 +1,10 @@
-package com.jetbrains.snakecharm.stringLanguage
+package com.jetbrains.snakecharm.stringLanguage.lang
 
 import com.intellij.lang.BracePair
 import com.intellij.lang.PairedBraceMatcher
 import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IElementType
+import com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLTokenTypes
 
 class SmkSLBraceMatcher : PairedBraceMatcher {
     companion object {

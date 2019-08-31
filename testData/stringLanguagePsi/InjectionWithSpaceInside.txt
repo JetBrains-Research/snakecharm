@@ -3,7 +3,7 @@ FILE
     PsiElement(STRING_CONTENT)('"')
   SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
-    PyReferenceExpression: Prefix1
+    SmkSLReferenceExpressionImpl: Prefix1
       PsiElement(Py:IDENTIFIER)('Prefix1')
     PsiErrorElement:Unexpected character
       PsiElement(BAD_CHARACTER)(' ')
@@ -14,8 +14,8 @@ FILE
     PsiElement(STRING_CONTENT)('" "')
   SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
-    PyReferenceExpression: fooo
-      PyReferenceExpression: Prefix2
+    SmkSLReferenceExpressionImpl: fooo
+      SmkSLReferenceExpressionImpl: Prefix2
         PsiElement(Py:IDENTIFIER)('Prefix2')
       PsiElement(DOT)('.')
       PsiElement(Py:IDENTIFIER)('fooo')
@@ -23,7 +23,7 @@ FILE
       PsiElement(BAD_CHARACTER)(' ')
     PsiErrorElement:Unexpected character
       PsiElement(BAD_CHARACTER)('Suffix2')
-    PyReferenceExpression: boo
+    SmkSLReferenceExpressionImpl: boo
       PsiElement(DOT)('.')
       PsiElement(Py:IDENTIFIER)('boo')
     PsiElement(RBRACE)('}')

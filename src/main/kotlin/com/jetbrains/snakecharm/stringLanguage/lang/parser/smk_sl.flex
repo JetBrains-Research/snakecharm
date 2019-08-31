@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.stringLanguage.lang.parser;
 
 import com.intellij.psi.tree.IElementType;
-import com.jetbrains.snakecharm.stringLanguage.SmkSLTokenTypes;
 import com.intellij.lexer.FlexLexer;
 
 %%
@@ -56,7 +55,7 @@ ACCESS_KEY=[^\]]+
     {WHITE_SPACE}                  { return tokenTypes.getBAD_CHARACTER(); }
 }
 
-<WAITING_ACCESS_KEY> {ACCESS_KEY} { yybegin(WAITING_ACCESS_CLOSURE); return tokenTypes.getIDENTIFIER(); }
+<WAITING_ACCESS_KEY> {ACCESS_KEY} { yybegin(WAITING_ACCESS_CLOSURE); return tokenTypes.getACCESS_KEY(); }
 
 <WAITING_REGEXP> {REGEXP}         { yybegin(WAITING_LANGUAGE_CLOSURE); return tokenTypes.getREGEXP(); }
 

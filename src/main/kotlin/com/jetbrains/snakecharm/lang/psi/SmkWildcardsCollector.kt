@@ -8,10 +8,10 @@ import com.jetbrains.python.psi.PyRecursiveElementVisitor
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_BANNED_FOR_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.stringLanguage.SmkSLFile
-import com.jetbrains.snakecharm.stringLanguage.callSimpleName
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLLanguageElement
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLReferenceExpressionImpl
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLFile
+import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLLanguageElement
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
 /**
  * For containers which includes:

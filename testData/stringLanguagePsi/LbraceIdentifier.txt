@@ -1,7 +1,7 @@
 FILE
   SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
-    PyReferenceExpression: foo
+    SmkSLReferenceExpressionImpl: foo
       PsiElement(Py:IDENTIFIER)('foo')
     PsiErrorElement:Expected '}'
       <empty list>

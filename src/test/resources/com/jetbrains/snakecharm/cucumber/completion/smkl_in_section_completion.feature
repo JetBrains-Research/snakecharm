@@ -188,3 +188,19 @@ Feature: Completion for sections/variables in SmkSL injections
       | rule       | shell   |
       | checkpoint |  message   |
       | checkpoint |  shell   |
+
+  Scenario Outline: No completion after subscription (not supported yet)
+        Given a snakemake project
+        Given I open a file "foo.smk" with text
+        """
+        <rule_like> NAME:
+            input: k = ""
+            shell: "{input[k].k}"
+        """
+        When I put the caret after input[k].
+        And I invoke autocompletion popup
+        Then completion list should be empty
+        Examples:
+          | rule_like  |
+          | rule       |
+          | checkpoint |

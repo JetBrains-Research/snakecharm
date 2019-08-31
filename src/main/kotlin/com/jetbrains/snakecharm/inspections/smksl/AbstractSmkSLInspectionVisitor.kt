@@ -4,7 +4,7 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.inspections.PyInspectionVisitor
 import com.jetbrains.python.psi.PyElementVisitor
-import com.jetbrains.snakecharm.stringLanguage.SmkSLElementVisitor
+import com.jetbrains.snakecharm.stringLanguage.lang.SmkSLElementVisitor
 
 abstract class AbstractSmkSLInspectionVisitor(
         holder: ProblemsHolder,

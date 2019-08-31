@@ -5,14 +5,14 @@ FILE
       PsiElement(BAD_CHARACTER)('.')
     PsiErrorElement:Unexpected character
       PsiElement(BAD_CHARACTER)('[')
-    PyReferenceExpression: null
-      PyReferenceExpression: foo
+    SmkSLReferenceExpressionImpl: null
+      SmkSLReferenceExpressionImpl: foo
         PsiElement(Py:IDENTIFIER)('foo')
       PsiElement(DOT)('.')
     PsiErrorElement:Unexpected character
       PsiElement(BAD_CHARACTER)('.')
-    PyReferenceExpression: null
-      PyReferenceExpression: boo
+    SmkSLReferenceExpressionImpl: null
+      SmkSLReferenceExpressionImpl: boo
         PsiElement(Py:IDENTIFIER)('boo')
       PsiElement(DOT)('.')
     PsiErrorElement:Expected identifier name

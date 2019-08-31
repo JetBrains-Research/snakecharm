@@ -8,9 +8,9 @@ import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PythonParserDefinition
 import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
-import com.jetbrains.snakecharm.stringLanguage.SmkSLFile
-import com.jetbrains.snakecharm.stringLanguage.SmkSLTokenTypes
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.*
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.*
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLElementImpl
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLElementTypes
 
 class SmkSLParserDefinition : PythonParserDefinition() {
     companion object {
@@ -18,11 +18,11 @@ class SmkSLParserDefinition : PythonParserDefinition() {
     }
 
     override fun createElement(node: ASTNode): PsiElement =
-            when(node.elementType) {
-                SmkSLTokenTypes.REFERENCE_EXPRESSION -> SmkSLReferenceExpressionImpl(node)
-                SmkSLTokenTypes.SUBSCRIPTION_EXPRESSION -> SmkSLSubscriptionExpression(node)
-                SmkSLTokenTypes.LANGUAGE -> SmkSLLanguageElement(node)
-                SmkSLTokenTypes.KEY_EXPRESSION -> SmkSLKeyExpression(node)
+            when (node.elementType) {
+                SmkSLElementTypes.LANGUAGE -> SmkSLLanguageElement(node)
+                SmkSLElementTypes.REFERENCE_EXPRESSION -> SmkSLReferenceExpressionImpl(node)
+                SmkSLElementTypes.SUBSCRIPTION_EXPRESSION -> SmkSLSubscriptionExpression(node)
+                SmkSLElementTypes.KEY_EXPRESSION -> SmkSLKeyExpression(node)
                 else -> SmkSLElementImpl(node)
             }
 

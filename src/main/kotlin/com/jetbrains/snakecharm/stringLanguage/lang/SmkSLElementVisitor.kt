@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.stringLanguage
+package com.jetbrains.snakecharm.stringLanguage.lang
 
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkSLReferenceExpression

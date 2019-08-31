@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes
+package com.jetbrains.snakecharm.stringLanguage.lang.psi
 
 import com.intellij.lang.ASTNode
 import com.intellij.lang.injection.InjectedLanguageManager
@@ -14,15 +14,18 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_BANNED_FOR_WI
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_EXPANDING_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
-import com.jetbrains.snakecharm.stringLanguage.SmkSLElementVisitor
-import com.jetbrains.snakecharm.stringLanguage.callSimpleName
+import com.jetbrains.snakecharm.stringLanguage.lang.SmkSLElementVisitor
+import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLInitialReference
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
 class SmkSLReferenceExpressionImpl(
         node: ASTNode
 ) : PyReferenceExpressionImpl(node), SmkSLReferenceExpression {
-    override fun getName() = super<SmkSLReferenceExpression>.getName()
+
+    override fun getNameIdentifier() = nameElement?.psi
+
+    override fun getName() = referencedName
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SmkSLElementVisitor -> pyVisitor.visitSmkSLReferenceExpression(this)
@@ -45,7 +48,13 @@ class SmkSLReferenceExpressionImpl(
     }
 
     override fun getQualifier(): PyExpression? =
-            children.firstOrNull { it is SmkSLReferenceExpression } as PyExpression?
+            children.firstOrNull { it is PyExpression } as PyExpression?
+//            children.firstOrNull { it is SmkSLReferenceExpression } as PyExpression?
+//            children.firstOrNull { it is SmkSLSubscriptionExpression } as PyExpression?
+
+    override fun toString(): String {
+        return "SmkSLReferenceExpressionImpl: " + this.referencedName
+    }
 
     companion object {
         private fun SmkSLReferenceExpression.isInValidCallExpression(): Boolean {

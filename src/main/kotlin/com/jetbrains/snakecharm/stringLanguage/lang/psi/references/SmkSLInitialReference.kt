@@ -25,9 +25,10 @@ import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionVariantsProc
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
+import com.jetbrains.snakecharm.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.SmkSection
 import com.jetbrains.snakecharm.lang.psi.impl.refs.SmkPyReferenceImpl
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLReferenceExpressionImpl
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 import java.util.*
 
 
@@ -35,9 +36,9 @@ class SmkSLInitialReference(
         expr: SmkSLReferenceExpressionImpl,
         private val parentDeclaration: SmkRuleOrCheckpoint?,
         context: PyResolveContext
-) : PyQualifiedReference(expr, context) {
+) : PyQualifiedReference(expr, context), SmkSLBaseReference {
 
-    override fun getElement() = super.getElement() as SmkSLReferenceExpressionImpl
+    override fun getElement() = myElement as SmkSLReferenceExpression
 
     override fun resolveInner(): List<RatedResolveResult> {
         require(!element.isQualified) // this reference is supposed to be not qualified
@@ -205,4 +206,7 @@ class SmkSLInitialReference(
     }
 
     override fun getUnresolvedHighlightSeverity(context: TypeEvalContext?): HighlightSeverity? = HighlightSeverity.WEAK_WARNING
+
+    override fun handleElementRename(newElementName: String) =
+            element.setName(newElementName)
 }

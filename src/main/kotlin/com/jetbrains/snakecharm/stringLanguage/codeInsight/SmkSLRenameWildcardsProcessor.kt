@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.stringLanguage
+package com.jetbrains.snakecharm.stringLanguage.codeInsight
 
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.PsiElement
@@ -8,9 +8,9 @@ import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.rename.RenamePsiElementProcessor
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLReferenceExpressionImpl
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
-class RenameWildcardsProcessor : RenamePsiElementProcessor() { //RenamePyElementProcessor()
+class SmkSLRenameWildcardsProcessor : RenamePsiElementProcessor() { //RenamePyElementProcessor()
     override fun canProcessElement(element: PsiElement) =
             element is SmkSLReferenceExpressionImpl
 

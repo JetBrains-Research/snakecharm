@@ -3,9 +3,9 @@ FILE
     PsiElement(STRING_CONTENT)('some text ')
   SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
-    PyReferenceExpression: doo
-      PyReferenceExpression: boo
-        PyReferenceExpression: foo
+    SmkSLReferenceExpressionImpl: doo
+      SmkSLReferenceExpressionImpl: boo
+        SmkSLReferenceExpressionImpl: foo
           PsiElement(Py:IDENTIFIER)('foo')
         PsiElement(DOT)('.')
         PsiElement(Py:IDENTIFIER)('boo')
@@ -27,22 +27,22 @@ FILE
     PsiElement(STRING_CONTENT)(' some text ')
   SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
-    PyReferenceExpression: too
-      PyReferenceExpression: doo
+    SmkSLReferenceExpressionImpl: too
+      SmkSLReferenceExpressionImpl: doo
         SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
-          PyReferenceExpression: boo
+          SmkSLReferenceExpressionImpl: boo
             SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
-              PyReferenceExpression: foo
+              SmkSLReferenceExpressionImpl: foo
                 PsiElement(Py:IDENTIFIER)('foo')
               PsiElement(LBRACKET)('[')
-              SmkSLKeyExpression(KEY_EXPRESSION)
-                PsiElement(Py:IDENTIFIER)('0')
+              SmkSLKeyExpression: [0]
+                PsiElement(ACCESS_KEY)('0')
               PsiElement(RBRACKET)(']')
             PsiElement(DOT)('.')
             PsiElement(Py:IDENTIFIER)('boo')
           PsiElement(LBRACKET)('[')
-          SmkSLKeyExpression(KEY_EXPRESSION)
-            PsiElement(Py:IDENTIFIER)('0')
+          SmkSLKeyExpression: [0]
+            PsiElement(ACCESS_KEY)('0')
           PsiElement(RBRACKET)(']')
         PsiElement(DOT)('.')
         PsiElement(Py:IDENTIFIER)('doo')

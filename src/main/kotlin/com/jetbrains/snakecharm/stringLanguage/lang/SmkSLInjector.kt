@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.stringLanguage
+package com.jetbrains.snakecharm.stringLanguage.lang
 
 import com.intellij.lang.injection.MultiHostRegistrar
 import com.intellij.psi.PsiElement
@@ -11,6 +11,7 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTIONS_INVALID_FOR_IN
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
+import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
 
 class SmkSLInjector : PyInjectorBase() {
     override fun getInjectedLanguage(element: PsiElement) = SmkSLanguage

@@ -17,8 +17,8 @@ FILE
     PsiElement(STRING_CONTENT)('\n')
   SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
-    PyReferenceExpression: null
-      PyReferenceExpression: foo1
+    SmkSLReferenceExpressionImpl: null
+      SmkSLReferenceExpressionImpl: foo1
         PsiElement(Py:IDENTIFIER)('foo1')
       PsiElement(DOT)('.')
     PsiErrorElement:Expected identifier name
@@ -28,8 +28,8 @@ FILE
     PsiElement(STRING_CONTENT)('\n')
   SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
-    PyReferenceExpression: null
-      PyReferenceExpression: foo2
+    SmkSLReferenceExpressionImpl: null
+      SmkSLReferenceExpressionImpl: foo2
         PsiElement(Py:IDENTIFIER)('foo2')
       PsiElement(DOT)('.')
     PsiErrorElement:Unexpected character
@@ -41,8 +41,8 @@ FILE
     PsiElement(STRING_CONTENT)('\n')
   SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
-    PyReferenceExpression: null
-      PyReferenceExpression: foo3
+    SmkSLReferenceExpressionImpl: null
+      SmkSLReferenceExpressionImpl: foo3
         PsiElement(Py:IDENTIFIER)('foo3')
       PsiElement(DOT)('.')
     PsiErrorElement:Unexpected character
@@ -54,15 +54,15 @@ FILE
     PsiElement(STRING_CONTENT)('\n')
   SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
-    PyReferenceExpression: null
-      PyReferenceExpression: foo3
+    SmkSLReferenceExpressionImpl: null
+      SmkSLReferenceExpressionImpl: foo3
         PsiElement(Py:IDENTIFIER)('foo3')
       PsiElement(DOT)('.')
     PsiErrorElement:Unexpected character
       PsiElement(BAD_CHARACTER)('.')
     PsiErrorElement:Unexpected character
       PsiElement(BAD_CHARACTER)('[')
-    PyReferenceExpression: dd
+    SmkSLReferenceExpressionImpl: dd
       PsiElement(Py:IDENTIFIER)('dd')
     PsiErrorElement:Unexpected character
       PsiElement(BAD_CHARACTER)(']')
@@ -72,10 +72,10 @@ FILE
   SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
     SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
-      PyReferenceExpression: foo3
+      SmkSLReferenceExpressionImpl: foo3
         PsiElement(Py:IDENTIFIER)('foo3')
       PsiElement(LBRACKET)('[')
-      SmkSLKeyExpression(KEY_EXPRESSION)
+      SmkSLKeyExpression: [null]
         PsiErrorElement:Expected key
           <empty list>
       PsiElement(RBRACKET)(']')
@@ -84,12 +84,12 @@ FILE
     PsiElement(STRING_CONTENT)('\n')
   SmkSLLanguageElement(LANGUAGE)
     PsiElement(LBRACE)('{')
-    PyReferenceExpression: null
+    SmkSLReferenceExpressionImpl: null
       SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
-        PyReferenceExpression: foo3
+        SmkSLReferenceExpressionImpl: foo3
           PsiElement(Py:IDENTIFIER)('foo3')
         PsiElement(LBRACKET)('[')
-        SmkSLKeyExpression(KEY_EXPRESSION)
+        SmkSLKeyExpression: [null]
           PsiErrorElement:Expected key
             <empty list>
         PsiElement(RBRACKET)(']')

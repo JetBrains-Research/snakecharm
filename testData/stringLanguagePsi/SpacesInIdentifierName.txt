@@ -3,7 +3,7 @@ FILE
     PsiElement(LBRACE)('{')
     PsiErrorElement:Unexpected character
       PsiElement(BAD_CHARACTER)('   ')
-    PyReferenceExpression: foo
+    SmkSLReferenceExpressionImpl: foo
       PsiElement(Py:IDENTIFIER)('foo')
     PsiElement(COMMA)(',')
     SmkSLElementImpl(REGEXP)

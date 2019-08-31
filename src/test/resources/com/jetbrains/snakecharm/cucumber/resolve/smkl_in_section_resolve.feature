@@ -190,3 +190,18 @@ Feature: Resolve for sections/variables in SmkSL injections
       | checkpoint | shell   | variable1 | *           | foo.smk     | 1     |
       | checkpoint | message | CONST2    | CONST2      | my_util2.py | 1     |
       | checkpoint | message | CONST2    | CONST2      | foo.smk     | 1     |
+
+  Scenario Outline: No resolve after subscription (not supported yet)
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+          input: k = ""
+          shell: "{input[k].k}"
+      """
+      When I put the caret after input[k].
+      Then reference in injection should not resolve
+      Examples:
+        | rule_like  |
+        | rule       |
+        | checkpoint |
