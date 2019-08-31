@@ -124,6 +124,7 @@ hs_err_pid*
 
 # Settings for IDE launched from sources
 .sandbox
+.sandbox_pycharm
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
