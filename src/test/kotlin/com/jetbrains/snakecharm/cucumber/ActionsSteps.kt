@@ -92,7 +92,7 @@ class ActionsSteps {
             searchInTags: Boolean = false
     ) {
         require(!Pattern.compile("(^|[^\\\\])\"").matcher(message).find()) {
-            "Quotes should be escaped in message: $message"
+            "Quotes (\") should be escaped (with \\) in message: $message"
         }
 
         val tag = highlightingLevel.replace(' ', '_')

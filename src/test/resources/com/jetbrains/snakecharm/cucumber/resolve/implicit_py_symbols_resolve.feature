@@ -21,12 +21,26 @@ Feature: Resolve implicitly imported python names
       | dyn | dynamic()   | dynamic     | io.py        |
       | un  | unpack()    | unpack      | io.py        |
       | anc | ancient()   | ancient     | io.py        |
-      | she | shell()     | __new       | shell.py     |
       | con | config      | config      | workflow.py  |
       | con | config["a"] | config      | workflow.py  |
       | ru  | rules       | rules       | workflow.py  |
       | ru  | rules.foo   | rules       | workflow.py  |
       | inp | input       | input       | builtins.pyi |
+
+  Scenario: Resolve at top-level: shell()
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+      shell()
+    """
+    When I put the caret at she
+    Then reference should multi resolve to name, file, times[, class name]
+      | shell    | shell.py     | 1 |
+      | __init__ | builtins.pyi | 1 |
+
+    Then reference should multi resolve to name, file in same order
+      | shell    | shell.py     |
+      | __init__ | builtins.pyi |
 
   Scenario Outline: Also available on top-level at runtime, but not API
     Given a snakemake project
@@ -72,7 +86,22 @@ Feature: Resolve implicitly imported python names
       | exp   | expand()    | expand      | io.py       |
       | con   | config["a"] | config      | workflow.py |
       | rules | rules.foo   | rules       | workflow.py |
-      | she   | shell()     | __new       | shell.py    |
+
+  Scenario: Resolve inside rule parameters: shell()
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule all:
+      input: shell()
+    """
+    When I put the caret at she
+    Then reference should multi resolve to name, file, times[, class name]
+      | shell       | shell.py     | 1     |
+      | __init__    | builtins.pyi | 1     |
+
+    Then reference should multi resolve to name, file in same order
+    | shell | shell.py |
+    | __init__    | builtins.pyi |
 
   Scenario Outline: Resolve inside run section
     Given a snakemake project
@@ -90,7 +119,7 @@ Feature: Resolve implicitly imported python names
     Examples:
       | ptn         | text        | symbol_name | file        | times |
       | exp         | expand()    | expand      | io.py       | 1     |
-      | she         | shell()     | __new__     | shell.py    | 1     |
+      | she         | shell()     | shell       | shell.py    | 1     |
       | con         | config["a"] | config      | workflow.py | 1     |
       | rules       | rules.foo   | rules       | workflow.py | 1     |
       | checkpoints | checkpoints | checkpoints | workflow.py | 1     |

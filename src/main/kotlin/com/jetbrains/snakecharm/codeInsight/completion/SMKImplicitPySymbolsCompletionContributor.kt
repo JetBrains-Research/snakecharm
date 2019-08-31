@@ -1,12 +1,15 @@
 package com.jetbrains.snakecharm.codeInsight.completion
 
 import com.intellij.codeInsight.completion.*
+import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.patterns.PatternCondition
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
+import com.jetbrains.python.codeInsight.completion.PyFunctionInsertHandler
+import com.jetbrains.python.psi.PyClass
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.resolve.CompletionVariantsProcessor
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
@@ -67,7 +70,15 @@ class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
                         .filter { it.name == SnakemakeNames.SECTION_THREADS }.firstOrNull()
                 processor.addElement("threads", threadsSection ?: ruleOrCheckpoint)
             }
-            result.addAllElements(processor.resultList)
+            val resultList = processor.resultList
+            val idx = resultList.indexOfFirst { item ->
+                item is LookupElementBuilder && item.psiElement is PyClass && item.lookupString == SnakemakeNames.SECTION_SHELL
+            }
+            if (idx != -1) {
+                val lookupItem = resultList[idx] as LookupElementBuilder
+                resultList[idx] = lookupItem.withInsertHandler(PyFunctionInsertHandler.INSTANCE)
+            }
+            result.addAllElements(resultList)
         }
     }
 }
@@ -76,5 +87,6 @@ class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
  * Just makes `addElement` public. PyCharm API required here
  */
 class SmkCompletionVariantsProcessor(context: PsiElement) : CompletionVariantsProcessor(context) {
+    // todo: actually need setupItem()
     public override fun addElement(name: String, element: PsiElement) = super.addElement(name, element)
 }

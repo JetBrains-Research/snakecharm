@@ -140,7 +140,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
                 // snakemake.io.Log
                 // snakemake.io.Wildcards
                 // snakemake.io.Resources
-                collectTopLevelClassesInstancesFrom(
+                collectTopLevelClassesInheretedFrom(
                         "snakemake.io",
                         "snakemake.io.Namedlist",
                         SmkCodeInsightScope.RULELIKE_RUN_SECTION, usedFiles, elementsCache
@@ -190,7 +190,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
         }
     }
 
-    private fun collectClasses(
+    private fun collectClassConstuctors(
             moduleAndClass: List<Pair<String, String>>,
             scope: SmkCodeInsightScope,
             usedFiles: MutableList<PsiFile>,
@@ -220,38 +220,28 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
         }
     }
 
-    private fun collectClassInstances(
-            moduleClassAndVariableName: List<Pair<Pair<String, String>, String>>,
+    private fun collectClasses(
+            moduleAndClass: List<Pair<String, String>>,
             scope: SmkCodeInsightScope,
             usedFiles: MutableList<PsiFile>,
-            elementsCache: MutableList<ImplicitPySymbol>
+            elementsCache: MutableList<ImplicitPySymbol>,
+            usageType: ImplicitPySymbolUsageType
     ) {
-        moduleClassAndVariableName.forEach { (moduleFqnAndClass, varName) ->
-            val (pyModuleFqn, className) = moduleFqnAndClass
+        moduleAndClass.forEach { (pyModuleFqn, className) ->
             val pyFiles = collectPyFiles(pyModuleFqn, usedFiles)
 
             pyFiles
                     .asSequence()
                     .filter { it.isValid }
                     .mapNotNull { it.findTopLevelClass(className) }
+                    .filter { it.name != null }
                     .forEach { pyClass ->
-                        val constructor = pyClass.findInitOrNew(
-                                false, //TODO false
-                                TypeEvalContext.userInitiated(
-                                        pyClass.project,
-                                        pyClass.originalElement.containingFile
-                                ))
-
-                        elementsCache.add(ImplicitPySymbol(
-                                varName,
-                                (constructor ?: pyClass) as PyElement,
-                                scope, ImplicitPySymbolUsageType.VARIABLE
-                        ))
+                        elementsCache.add(ImplicitPySymbol(pyClass.name!!, pyClass, scope, usageType))
                     }
         }
     }
 
-    private fun collectTopLevelClassesInstancesFrom(
+    private fun collectTopLevelClassesInheretedFrom(
             pyModuleFqn: String,
             parentClassRequirement: String?,
             scope: SmkCodeInsightScope,
@@ -272,16 +262,12 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
                             pyClass.project,
                             pyClass.originalElement.containingFile
                     )
-                    val constructor = pyClass.findInitOrNew(
-                            false, //TODO true
-                             typeEvalContext
-                    )
 
                     if (parentClassRequirement == null || pyClass.inherits(typeEvalContext, parentClassRequirement)) {
                         val varName = className2VarNameFun(pyClass.name!!)
                         elementsCache.add(ImplicitPySymbol(
                                 varName,
-                                (constructor ?: pyClass) as PyElement, scope, ImplicitPySymbolUsageType.VARIABLE
+                                pyClass, scope, ImplicitPySymbolUsageType.VARIABLE
                         ))
                     }
                 }

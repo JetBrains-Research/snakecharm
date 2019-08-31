@@ -147,10 +147,10 @@ Feature: Completion in python part of snakemake file
       foo = 1;<inserted_text>
       """
     Examples:
-      | item    | inserted_text |
-      | expand  | expand()      |
-      | config  | config        |
-      | shell   | shell()       |
+      | item   | inserted_text |
+      | expand | expand()      |
+      | config | config        |
+      | shell  | shell()       |
 
   #noinspection SpellCheckingInspection
   Scenario: Complete in not-empty context
