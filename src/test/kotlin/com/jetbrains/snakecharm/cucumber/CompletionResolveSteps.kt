@@ -108,6 +108,30 @@ class CompletionResolveSteps {
         }
     }
 
+    @Then("^reference should resolve to file \"([^\"]+)\"$")
+    fun referenceShouldResolveToFile(filename: String) {
+        ApplicationManager.getApplication().runReadAction {
+            tryToResolveRefToFile(getReferenceAtOffset(), filename)
+        }
+    }
+
+    @Then("^reference should resolve to file \"([^\"]+)\" at path \"(.+)\"$")
+    fun referenceShouldResolveToFileAtPath(filename: String, path: String) {
+        ApplicationManager.getApplication().runReadAction {
+            val file = tryToResolveRefToFile(getReferenceAtOffset(), filename)
+            assertEquals(file.virtualFile.canonicalPath, path)
+        }
+    }
+
+    private fun tryToResolveRefToFile(ref: PsiReference?, filename: String): PsiFile {
+        assertNotNull(ref)
+        val result = resolve(ref)
+        assertNotNull(result)
+        assert(result is PsiFile)
+        assert((result as PsiFile).name == filename)
+        return result
+    }
+
     private fun tryToResolveRef(marker: String, file: String, ref: PsiReference?) {
         assertNotNull(ref)
         val result = resolve(ref)

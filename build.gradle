@@ -63,6 +63,7 @@ compileTestKotlin { kotlinOptions.jvmTarget = sourceCompatibility }
 
 repositories {
     mavenCentral()
+    jcenter()
 }
                        
 dependencies {
@@ -70,6 +71,8 @@ dependencies {
 //    testImplementation 'io.cucumber:cucumber-junit:4.2.6'
     testImplementation 'info.cukes:cucumber-java:1.2.4'
     testImplementation 'info.cukes:cucumber-junit:1.2.4'
+    // https://mvnrepository.com/artifact/khttp/khttp
+    compile 'khttp:khttp:1.0.0'
 }
 
 task cucumber() {
