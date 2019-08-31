@@ -12,10 +12,18 @@ class SmkCompletionUtil {
     companion object {
         val RULES_AND_CHECKPOINTS_PRIORITY = Double.MAX_VALUE
         const val WILDCARDS_LAMBDA_PARAMETER_PRIORITY = 1.0
+        const val SECTIONS_KEYS_PRIORITY = 30.0
+        const val SUBSCRIPTION_INDEXES_PRIORITY = 20.0
+
+        fun createPrioritizedLookupElement(
+                item: LookupElement,
+                priority: Double = PythonCompletionWeigher.WEIGHT_DELTA.toDouble()
+        ): LookupElement = PrioritizedLookupElement.withPriority(item, priority)
 
         fun createPrioritizedLookupElement(
                 name: String,
                 icon: Icon = PlatformIcons.PROPERTY_ICON,
+                priority: Double = PythonCompletionWeigher.WEIGHT_DELTA.toDouble(),
                 typeText: String? = null,
                 insertHandler: InsertHandler<LookupElement>? = null
         ): LookupElement {
@@ -29,10 +37,7 @@ class SmkCompletionUtil {
                 elementBuilder = elementBuilder.withInsertHandler(insertHandler)
             }
 
-            return PrioritizedLookupElement.withPriority(
-                    elementBuilder,
-                    PythonCompletionWeigher.WEIGHT_DELTA.toDouble()
-            )
+            return createPrioritizedLookupElement(elementBuilder, priority)
         }
     }
 }

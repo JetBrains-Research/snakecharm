@@ -15,7 +15,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
 class SmkRuleLikeType(private val declaration: SmkRuleOrCheckpoint) : PyType {
-    override fun getName() = "Rule${declaration.name?.let { " '$it'" } ?: ""}"
+    override fun getName() = "${declaration.sectionTokenType}${declaration.name?.let { " $it" } ?: ""}"
 
     override fun assertValid(message: String?) {
         if (!declaration.isValid) {

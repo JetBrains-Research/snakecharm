@@ -2,8 +2,11 @@ package com.jetbrains.snakecharm.codeInsight.completion
 
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.codeInsight.lookup.LookupElementDecorator
+import com.intellij.codeInsight.lookup.LookupElementPresentation
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PySubscriptionExpression
@@ -11,6 +14,8 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLSubscriptionKeyReference.Companion.indexArgTypeText
+import java.util.*
 
 class SmkDictionaryTypesCompletionContributor : CompletionContributor() {
     init {
@@ -69,14 +74,62 @@ object SmkDictionaryTypesCompletionProvider: CompletionProvider<CompletionParame
         val type = TypeEvalContext.codeCompletion(original.project, original.containingFile).getType(operand)
         if (type is SmkAvailableForSubscriptionType) {
             val prefix = original.containingFile.text.substring(original.textOffset, parameters.offset)
+
             // here need position with dummy identifier to differ [<carret>'ff'] from ['<carret>ff']
-            val variants = type.getCompletionVariants(prefix, parameters.position, context)
-            variants.asSequence().filterIsInstance<LookupElement>().forEach {
-                result.addElement(it)
+            val location = parameters.position
+            val inStringLiteralKey = location.node.elementType in PyTokenTypes.STRING_NODES
+
+            val (variants, priority) = type.getCompletionVariantsAndPriority(prefix, location, context)
+            variants.asSequence().forEach { originalItem ->
+                val item = when {
+                    inStringLiteralKey -> originalItem
+                    else -> ReplaceLookupStringDecorator(originalItem, "'${originalItem.lookupString}'")
+                }
+                result.addElement(SmkCompletionUtil.createPrioritizedLookupElement(item, priority))
             }
+
+            if (!inStringLiteralKey) {
+                val typeText = indexArgTypeText(type)
+                (0 until type.getPositionArgsNumber(location)).forEach { idx ->
+                    val item = SmkCompletionUtil.createPrioritizedLookupElement(
+                            idx.toString(),
+                            PlatformIcons.PARAMETER_ICON,
+                            priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY,
+                            typeText = typeText
+                    )
+                    result.addElement(item)
+                }
+            }
+
         }
 //        val resolvedElement = PyResolveUtil.fullResolveLocally(operand as PyReferenceExpression)
     }
+
+    private fun createLookupItem(
+            text: String,
+            typeText: String,
+            inStringLiteralKey: Boolean
+    ): LookupElement = SmkCompletionUtil.createPrioritizedLookupElement(
+            if (!inStringLiteralKey) "'$text'" else text,
+            PlatformIcons.PARAMETER_ICON,
+            priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY,
+            typeText = typeText
+    )
 }
 
+class ReplaceLookupStringDecorator<T: LookupElement>(
+        item: T,
+        private val newLookupString: String
+) : LookupElementDecorator<T>(item) {
+    private val allLookups: Set<String> by lazy { Collections.unmodifiableSet(setOf(newLookupString)) }
 
+    override fun getLookupString() = newLookupString
+
+    override fun getAllLookupStrings() = allLookups
+
+    override fun renderElement(presentation: LookupElementPresentation) {
+        delegate.renderElement(presentation)
+        presentation.itemText = lookupString
+    }
+
+}

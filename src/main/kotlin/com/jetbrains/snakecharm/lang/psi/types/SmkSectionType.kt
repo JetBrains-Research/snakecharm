@@ -4,10 +4,8 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiInvalidElementAccessException
-import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
-import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.impl.ResolveResultList
 import com.jetbrains.python.psi.resolve.PyResolveContext
@@ -19,14 +17,12 @@ import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLElement
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionKeyExpression
 
 class SmkSectionType(
         val section: SmkRuleOrCheckpointArgsSection
 ) : PyType, SmkAvailableForSubscriptionType {
 
-    private val typeName: String = "Section${section.sectionKeyword?.let { " '$it'" } ?: ""}"
+    private val typeName: String = section.sectionKeyword?.let { "$it:" } ?: "section"
 
     override fun getName() = typeName
 
@@ -76,64 +72,63 @@ class SmkSectionType(
             location: PsiElement,
             context: ProcessingContext?
     ): Array<LookupElement> {
-        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location)) {
-            return LookupElementBuilder.EMPTY_ARRAY
+        val (list, priority) = getCompletionVariantsAndPriority(completionPrefix, location, context)
+
+        return if (list.isEmpty()) {
+            LookupElementBuilder.EMPTY_ARRAY
+        } else {
+            list.map { SmkCompletionUtil.createPrioritizedLookupElement(it, priority) }.toTypedArray()
         }
 
-        val inSmkSlInjection = location is SmkSLElement
-        val inStringLiteralKey = location.node.elementType in PyTokenTypes.STRING_NODES
-        val inPySubscription = PsiTreeUtil.getParentOfType(location, PySubscriptionExpression::class.java) != null
-        val inSmkSubscription = location is SmkSLSubscriptionKeyExpression
+    }
 
-        val results = arrayListOf<LookupElement>()
+    override fun getCompletionVariantsAndPriority(
+            completionPrefix: String?,
+            location: PsiElement,
+            context: ProcessingContext?
+    ): Pair<List<LookupElementBuilder>, Double> {
+        val priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
+
+        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location)) {
+            return emptyList<LookupElementBuilder>() to priority
+        }
+
+        val results = arrayListOf<LookupElementBuilder>()
         val args = getSectionArgs()
 
         @Suppress("FoldInitializerAndIfToElvis")
         if (args == null) {
-            return LookupElementBuilder.EMPTY_ARRAY
+            return emptyList<LookupElementBuilder>() to priority
         }
 
         val sectionKeyword = section.sectionKeyword
         val typeText = "$sectionKeyword section key"
         args.filterIsInstance<PyKeywordArgument>().forEach {
-            results.add(createLookupItem(
-                    it.name!!, typeText,
-                    false, inSmkSlInjection, inPySubscription, inStringLiteralKey
-            ))
-        }
-        if ((inSmkSubscription || inPySubscription) && (inSmkSlInjection || !inStringLiteralKey) && isSimpleArgsList(args)) {
-            args.indices.forEach { i ->
-                results.add(createLookupItem(
-                        i.toString(), typeText,
-                        true, inSmkSlInjection, inPySubscription, inStringLiteralKey
-                ))
-            }
+            val item = LookupElementBuilder
+                    .create(it.name!!)
+                    .withTypeText(typeText)
+                    .withIcon(PlatformIcons.PARAMETER_ICON)
+            results.add(item)
         }
 
         if (results.isEmpty()) {
-            LookupElementBuilder.EMPTY_ARRAY
+            return emptyList<LookupElementBuilder>() to priority
         }
-        return results.toTypedArray()
+        return results to priority
     }
 
-    private fun createLookupItem(
-            text: String,
-            typeText: String,
-            isIdx: Boolean,
-            inSmkSlInjection: Boolean,
-            inPySubscription: Boolean,
-            inStringLiteralKey: Boolean
-    ): LookupElement {
-        val lookupString = when {
-            !inStringLiteralKey && !isIdx && !inSmkSlInjection && inPySubscription -> "'$text'"
-            else -> text
+    override fun getPositionArgsNumber(location: PsiElement): Int {
+        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location)) {
+            return 0
         }
 
-        return SmkCompletionUtil.createPrioritizedLookupElement(
-                lookupString,
-                PlatformIcons.PARAMETER_ICON,
-                typeText
-        )
+        val args = getSectionArgs()
+
+        if (args == null || !isSimpleArgsList(args)) {
+            return 0
+        }
+
+        return args.size
     }
 
     private fun isSimpleArgsList(args: Array<out PyExpression>): Boolean {

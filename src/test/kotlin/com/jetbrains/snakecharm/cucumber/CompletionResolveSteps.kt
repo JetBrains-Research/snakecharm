@@ -588,20 +588,48 @@ class LookupFilter private constructor(
     }
 
     override fun toString(): String {
-        return "Text: \"" + myLookupString + "\"; Type: \"" + (myTypeString ?: "any") + "\""
+        return "Text: <" + myLookupString + ">; Type text: <" + (myTypeString ?: "any") + ">"
     }
 
     fun findElement(lookupElements: Array<LookupElement>): LookupElement {
         val filteredElements = ContainerUtil.filter(lookupElements, this)
-        if (filteredElements.isEmpty()) {
-            org.junit.Assert.fail(toString() + " - isn't in autocompletion popup")
-        } else if (filteredElements.size > 1) {
-            val error = StringBuilder()
-            error.append("Several elements with the same conditions: ").append(toString())
-            filteredElements.forEach { element -> error.append("\n - ").append(dumpElement(element)) }
-            org.junit.Assert.fail(error.toString())
+        when {
+            filteredElements.isEmpty() -> {
+                val msg = generatedDetailedMsg(
+                        "Lookup item not found: ",
+                        filteredElements
+                )
+
+                val itemsDump = dumpLookupItem(lookupElements)
+                org.junit.Assert.fail(toString() + " - isn't in autocompletion popup, all elements:$itemsDump\n")
+            }
+            filteredElements.size > 1 -> {
+                val msg = generatedDetailedMsg(
+                        "Several elements with the same conditions: ",
+                        filteredElements
+                )
+                org.junit.Assert.fail(msg)
+            }
         }
         return filteredElements[0]
+    }
+
+    private fun generatedDetailedMsg(prefix: String, filteredElements: List<LookupElement>): String {
+        val error = StringBuilder("$prefix\n Filter:${toString()}\n")
+        filteredElements.forEach { element ->
+            error.append("\n - ").append(dumpElement(element))
+        }
+        return error.toString()
+    }
+
+    private fun dumpLookupItem(lookupElements: Array<LookupElement>): String {
+        val itemsDump = lookupElements.joinToString { lookupElement ->
+            val itemPresentableText = LookupElementPresentation()
+                    .also { lookupElement.renderElement(it) }
+                    .itemText
+            "${lookupElement.lookupString} [$itemPresentableText]"
+        }
+        return itemsDump
     }
 
     companion object {
