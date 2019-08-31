@@ -8,8 +8,8 @@ import com.jetbrains.python.psi.PyRecursiveElementVisitor
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_BANNED_FOR_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLFile
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLFile
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLLanguageElement
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
@@ -20,11 +20,13 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
  *  * string literals - collect all injections
  *
  *  @param visitDefiningSections Visit or not downstream sections which introduces new wildcards
- *  @param visitSectionsAllowingUsage Visit or not downstream sections which allows wildcards usage w/o 'wildcards.' prefix
+ *  @param visitExpandingSections Visit or not downstream sections which allows wildcards usage w/o 'wildcards.' prefix
+ *  @param visitAllSections If true visit all sections (including run) ignoring [visitDefiningSections] and [visitExpandingSections] flags
  */
 class SmkWildcardsCollector(
         private val visitDefiningSections: Boolean,
-        private val visitSectionsAllowingUsage: Boolean
+        private val visitExpandingSections: Boolean,
+        private val visitAllSections: Boolean = false
 ) : SmkElementVisitor, PyRecursiveElementVisitor() {
     private val wildcardsElements = mutableListOf<WildcardDescriptor>()
     private var atLeastOneInjectionVisited = false
@@ -44,15 +46,21 @@ class SmkWildcardsCollector(
     override val pyElementVisitor: PyElementVisitor
         get() = this
 
+    override fun visitSmkRunSection(st: SmkRunSection) {
+        if (visitAllSections) {
+            super.visitSmkRunSection(st)
+        }
+    }
+
     override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
         try {
             currentSectionIdx = WILDCARDS_DEFINING_SECTIONS_KEYWORDS.indexOf(st.sectionKeyword).toByte()
 
-            if (visitDefiningSections && st.isWildcardsDefiningSection()) {
-                super.visitSmkRuleOrCheckpointArgsSection(st)
-                return
-            }
-            if (visitSectionsAllowingUsage && st.isWildcardsExpandingSection()) {
+            if (
+                    visitAllSections ||
+                    (visitDefiningSections && st.isWildcardsDefiningSection()) ||
+                    (visitExpandingSections && st.isWildcardsExpandingSection())
+            ) {
                 super.visitSmkRuleOrCheckpointArgsSection(st)
                 return
             }

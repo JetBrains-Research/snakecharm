@@ -10,7 +10,7 @@ interface SmkRuleOrCheckpoint : SmkRuleLike<SmkRuleOrCheckpointArgsSection>, PyT
     fun collectWildcards(): List<String>? {
         val collector = SmkWildcardsCollector(
                 visitDefiningSections = true,
-                visitSectionsAllowingUsage = false
+                visitExpandingSections = false
         )
         this.accept(collector)
         return collector.getWildcardsNames()

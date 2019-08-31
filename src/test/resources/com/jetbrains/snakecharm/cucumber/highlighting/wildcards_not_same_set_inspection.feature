@@ -229,3 +229,21 @@ Feature: Inspection - Not same wildcards set
       | section    |
       | rule       |
       | checkpoint |
+
+
+  Scenario Outline: Do not look for wildcards in `run:` section:
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <section> NAME:
+         output: "{sample}"
+         run:
+            shell("curl {config} {output} | gunzip > {output[0]}")
+      """
+    And Not same wildcards set inspection is enabled
+    Then I expect no inspection error
+    When I check highlighting errors
+      Examples:
+        | section    |
+        | rule       |
+#        | checkpoint |

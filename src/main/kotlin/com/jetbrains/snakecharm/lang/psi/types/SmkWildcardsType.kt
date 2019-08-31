@@ -22,7 +22,7 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyTy
     init {
         val collector = SmkWildcardsCollector(
                 visitDefiningSections = true,
-                visitSectionsAllowingUsage = false
+                visitExpandingSections = false
         )
         ruleOrCheckpoint.accept(collector)
         wildcardsDeclarations = collector.getWildcards()
