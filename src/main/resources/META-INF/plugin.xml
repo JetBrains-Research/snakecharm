@@ -235,5 +235,7 @@
             language="Snakemake"
             implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeVisitorFilter"
     />
+    <inspectionExtension
+            implementation="com.jetbrains.snakecharm.inspections.SmkPyInspectionExtension"/>
   </extensions>
 </idea-plugin>

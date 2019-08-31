@@ -24,3 +24,36 @@ Feature: This feature is tests for errors/warnings related to implicit symbols
       | rulelike   |
       | rule       |
       | checkpoint |
+
+  Scenario Outline: Cannot find __getitem__ in section types
+    Given a snakemake project
+    And I open a file "foo.smk" with text
+    """
+    o = object()
+    <rulelike> foo:
+        input: "in.txt"
+        output: "{sample}"
+        run:
+            arg_test = o[0] # here1
+            arg0 = wildcards['sample'] # here1
+            arg1 = <section>[0]
+    """
+    And PyUnresolvedReferencesInspection inspection is enabled
+      # Ensure Inspection works
+    Then I expect inspection warning on <[> in <[0] # here1> with message
+      """
+      Class 'object' does not define '__getitem__', so the '[]' operator cannot be used on its instances
+      """
+    Then I expect inspection warning on <[> in <['sample'] # here1> with message
+      """
+      Cannot find reference '[' in 'Rule 'foo' wildcards'
+      """
+      # And no inspection warnings for input!
+    When I check highlighting warnings
+    Examples:
+      | rulelike   | section |
+      | rule       | input   |
+      | rule       | log     |
+      | rule       | output  |
+      | rule       | params  |
+      | checkpoint | input   |

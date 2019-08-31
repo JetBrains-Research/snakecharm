@@ -188,4 +188,5 @@ Feature: Completion for section args after section name
       | checkpoint | log       | input         |
       | checkpoint | resources | log           |
 
+# and __get_item__
 # output[0] for all ars + [IndexError: list index out of range] + inspection on IE? ]
