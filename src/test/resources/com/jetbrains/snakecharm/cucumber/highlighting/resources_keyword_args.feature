@@ -38,3 +38,26 @@ Feature: Inspection checking whether all resources section arguments are keyword
       | rule_like  |
       | rule       |
       | checkpoint |
+
+  Scenario Outline: Name an unnamed (positional) resources section argument
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+        """
+        <rule_like> NAME:
+          resources: 4
+        """
+      And Resources Keyword Arguments inspection is enabled
+      Then I expect inspection error on <4> with message
+        """
+        Resources have to be named (e.g. 'threads=4').
+        """
+      When I check highlighting errors
+      And I invoke quick fix Name argument and see text:
+      """
+      <rule_like> NAME:
+        resources: arg=4
+      """
+      Examples:
+        | rule_like  |
+        | rule       |
+        | checkpoint |

@@ -83,3 +83,48 @@ Feature: Rule section redeclaration inspection
     Declaration of section 'snakefile' above overrides this declaration.
     """
     When I check highlighting errors
+
+  Scenario Outline: Section redeclaration element removal fix test
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> name1:
+      input: "input1"
+      input: "input2"
+      output: "output.txt"
+    """
+    And Section Redeclaration inspection is enabled
+    Then I check highlighting errors
+    And I invoke quick fix Remove section and see text:
+    """
+    <rule_like> name1:
+      input: "input1"
+      output: "output.txt"
+    """
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Section redeclaration rename fix test
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> name1:
+      input: "input1"
+      input: "input2"
+      output: "output.txt"
+    """
+    And Section Redeclaration inspection is enabled
+    Then I check highlighting errors
+    And I invoke quick fix Rename element and see text:
+    """
+    <rule_like> name1:
+      input: "input1"
+      SNAKEMAKE_IDENTIFIER: "input2"
+      output: "output.txt"
+    """
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |

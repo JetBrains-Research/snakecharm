@@ -37,6 +37,28 @@ Feature: Annotate syntax errors
       | rule       |
       | checkpoint |
 
+  Scenario Outline: Name an unnamed (positional) argument after keyword argument
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        params: a="a", "b", c="c"
+      """
+    Then I expect inspection error on <"b"> with message
+      """
+      Positional argument after keyword argument.
+      """
+    When I check highlighting errors
+    And I invoke quick fix Name argument and see text:
+    """
+    <rule_like> NAME:
+      params: a="a", arg="b", c="c"
+    """
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
   Scenario Outline: Annotate multiple run/shell/script/wrapper/cwl sections.
     Given a snakemake project
     Given I open a file "foo.smk" with text

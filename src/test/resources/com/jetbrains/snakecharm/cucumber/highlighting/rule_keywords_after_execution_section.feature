@@ -86,4 +86,48 @@ Feature: Rule sections after execution sections inspection.
       | rule       |
       | checkpoint |
 
+  Scenario Outline: Move execution section to the end of the rule fix test
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> name1:
+      input: "input1"
+      # comment
+      shell: "command"
+             "multiline"
+             "string"
+      resources: a=4
+      version: 2.0
+
+    <rule_like> name2:
+      input: "input2"
+    """
+    And Rule Section After Execution Section inspection is enabled
+    Then I expect inspection error on <resources: a=4> with message
+    """
+    Rule section 'resources' isn't allowed after 'shell' section.
+    """
+    And I expect inspection error on <version: 2.0> with message
+    """
+    Rule section 'version' isn't allowed after 'shell' section.
+    """
+    When I check highlighting errors
+    And I invoke quick fix Move execution section to the end of the rule and see text:
+    """
+    <rule_like> name1:
+      input: "input1"
+      # comment
+      resources: a=4
+      version: 2.0
+      shell: "command"
+             "multiline"
+             "string"
+
+    <rule_like> name2:
+      input: "input2"
+    """
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
