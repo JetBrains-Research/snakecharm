@@ -12,7 +12,7 @@ import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
 import com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLTokenTypes
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLSubscriptionKeyReference
 
-class SmkSLKeyExpression(node: ASTNode) : PyReferenceExpressionImpl(node), SmkSLReferenceExpression {
+class SmkSLSubscriptionKeyExpression(node: ASTNode) : PyReferenceExpressionImpl(node), SmkSLReferenceExpression {
     override fun getName() = referencedName
 
     override fun getNameElement() = node.findChildByType(SmkSLTokenTypes.ACCESS_KEY)
@@ -38,7 +38,7 @@ class SmkSLKeyExpression(node: ASTNode) : PyReferenceExpressionImpl(node), SmkSL
                     as? SmkSLReferenceExpression
 
     override fun toString(): String {
-        return "SmkSLKeyExpression: [${this.referencedName}]"
+        return "SmkSLSubscriptionKeyExpression: [${this.referencedName}]"
     }
 
 }

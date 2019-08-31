@@ -124,7 +124,7 @@ class SmkSLInitialReference(
         // Accessible sections
         val accessibleSections = collectAccessibleSectionsFromDeclaration().toList()
         accessibleSections.forEach {
-            variants.add(SmkCompletionUtil.createPrioritizedLookupElement(it.name!!))
+            variants.add(SmkCompletionUtil.createPrioritizedLookupElement(it.name!!, typeText = "rule section"))
         }
 
 

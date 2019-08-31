@@ -25,6 +25,8 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_WRAPPER
  * Also see [ImplicitPySymbolsProvider] class
  */
 object SnakemakeAPI {
+    const val UNPACK_FUNCTION = "unpack"
+
     const val SMK_VARS_RULES = "rules"
     const val SMK_VARS_CHECKPOINTS = "checkpoints"
     const val SMK_VARS_ATTEMPT = "attempt"

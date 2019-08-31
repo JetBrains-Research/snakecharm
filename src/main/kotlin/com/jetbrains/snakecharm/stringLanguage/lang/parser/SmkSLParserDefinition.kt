@@ -9,7 +9,6 @@ import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PythonParserDefinition
 import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.*
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLElementImpl
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLElementTypes
 
 class SmkSLParserDefinition : PythonParserDefinition() {
@@ -22,7 +21,7 @@ class SmkSLParserDefinition : PythonParserDefinition() {
                 SmkSLElementTypes.LANGUAGE -> SmkSLLanguageElement(node)
                 SmkSLElementTypes.REFERENCE_EXPRESSION -> SmkSLReferenceExpressionImpl(node)
                 SmkSLElementTypes.SUBSCRIPTION_EXPRESSION -> SmkSLSubscriptionExpression(node)
-                SmkSLElementTypes.KEY_EXPRESSION -> SmkSLKeyExpression(node)
+                SmkSLElementTypes.KEY_EXPRESSION -> SmkSLSubscriptionKeyExpression(node)
                 else -> SmkSLElementImpl(node)
             }
 

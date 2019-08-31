@@ -95,7 +95,7 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyTy
         }
 
         return wildcardsDeclarations.map {
-            SmkCompletionUtil.createPrioritizedLookupElement(it.text)
+            SmkCompletionUtil.createPrioritizedLookupElement(it.text, typeText = "wildcard")
         }.toTypedArray()
     }
 

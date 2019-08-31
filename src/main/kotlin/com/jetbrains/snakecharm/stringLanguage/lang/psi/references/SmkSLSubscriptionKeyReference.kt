@@ -12,19 +12,19 @@ import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLKeyExpression
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionKeyExpression
 
 class SmkSLSubscriptionKeyReference(
-        private val element: SmkSLKeyExpression,
+        private val element: SmkSLSubscriptionKeyExpression,
         private val type: PyType?
-) : PsiPolyVariantReferenceBase<SmkSLKeyExpression>(element), PsiReferenceEx, SmkSLBaseReference {
+) : PsiPolyVariantReferenceBase<SmkSLSubscriptionKeyExpression>(element), PsiReferenceEx, SmkSLBaseReference {
     override fun getUnresolvedDescription(): String =
             SnakemakeBundle.message("INSP.NAME.unresolved.subscription.ref", element.text)
 
     override fun getUnresolvedHighlightSeverity(context: TypeEvalContext?): HighlightSeverity? =
             when (type) {
                 null -> null
-                else -> HighlightSeverity.WEAK_WARNING
+                else -> HighlightSeverity.WARNING
             }
 
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {

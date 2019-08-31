@@ -76,7 +76,13 @@
     <completion.contributor
             language="Python"
             implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkRulesAndCheckpointsCompletionContributor"
-            order="first" id="SmkRulesAndCheckpointsCompletionContributor"
+            order="first"
+            id="SmkRulesAndCheckpointsCompletionContributor"
+    />
+    <completion.contributor
+            language="Python"
+            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkDictionaryTypesCompletionContributor"
+            id="SmkDictionaryTypesCompletionContributor"
     />
 
     <localInspection
