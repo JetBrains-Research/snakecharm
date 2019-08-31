@@ -35,13 +35,13 @@ FILE
               SmkSLReferenceExpressionImpl: foo
                 PsiElement(Py:IDENTIFIER)('foo')
               PsiElement(LBRACKET)('[')
-              SmkSLKeyExpression: [0]
+              SmkSLSubscriptionKeyExpression: [0]
                 PsiElement(ACCESS_KEY)('0')
               PsiElement(RBRACKET)(']')
             PsiElement(DOT)('.')
             PsiElement(Py:IDENTIFIER)('boo')
           PsiElement(LBRACKET)('[')
-          SmkSLKeyExpression: [0]
+          SmkSLSubscriptionKeyExpression: [0]
             PsiElement(ACCESS_KEY)('0')
           PsiElement(RBRACKET)(']')
         PsiElement(DOT)('.')

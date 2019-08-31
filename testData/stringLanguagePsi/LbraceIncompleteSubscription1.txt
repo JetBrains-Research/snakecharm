@@ -5,6 +5,6 @@ FILE
       SmkSLReferenceExpressionImpl: foo
         PsiElement(Py:IDENTIFIER)('foo')
       PsiElement(LBRACKET)('[')
-      SmkSLKeyExpression: [null]
+      SmkSLSubscriptionKeyExpression: [null]
         PsiErrorElement:Expected key
           <empty list>

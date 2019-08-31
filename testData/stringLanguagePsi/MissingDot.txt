@@ -16,7 +16,7 @@ FILE
       SmkSLReferenceExpressionImpl: foo1
         PsiElement(Py:IDENTIFIER)('foo1')
       PsiElement(LBRACKET)('[')
-      SmkSLKeyExpression: [key]
+      SmkSLSubscriptionKeyExpression: [key]
         PsiElement(ACCESS_KEY)('key')
       PsiElement(RBRACKET)(']')
     PsiErrorElement:Unexpected character

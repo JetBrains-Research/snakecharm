@@ -24,7 +24,7 @@ FILE
         PsiElement(DOT)('.')
         PsiElement(Py:IDENTIFIER)('to')
       PsiElement(LBRACKET)('[')
-      SmkSLKeyExpression: [o[100]
+      SmkSLSubscriptionKeyExpression: [o[100]
         PsiElement(ACCESS_KEY)('o[100')
       PsiElement(RBRACKET)(']')
     PsiElement(RBRACE)('}')

@@ -75,7 +75,7 @@ FILE
       SmkSLReferenceExpressionImpl: foo3
         PsiElement(Py:IDENTIFIER)('foo3')
       PsiElement(LBRACKET)('[')
-      SmkSLKeyExpression: [null]
+      SmkSLSubscriptionKeyExpression: [null]
         PsiErrorElement:Expected key
           <empty list>
       PsiElement(RBRACKET)(']')
@@ -89,7 +89,7 @@ FILE
         SmkSLReferenceExpressionImpl: foo3
           PsiElement(Py:IDENTIFIER)('foo3')
         PsiElement(LBRACKET)('[')
-        SmkSLKeyExpression: [null]
+        SmkSLSubscriptionKeyExpression: [null]
           PsiErrorElement:Expected key
             <empty list>
         PsiElement(RBRACKET)(']')
