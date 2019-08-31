@@ -236,6 +236,6 @@
             implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeVisitorFilter"
     />
     <inspectionExtension
-            implementation="com.jetbrains.snakecharm.inspections.SmkPyInspectionExtension"/>
+            implementation="com.jetbrains.snakecharm.inspections.SmkIgnorePyInspectionExtension"/>
   </extensions>
 </idea-plugin>
