@@ -10,6 +10,7 @@ import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PsiReferenceEx
 import com.jetbrains.python.psi.resolve.PyResolveContext
+import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
@@ -32,12 +33,23 @@ class SmkSLSubscriptionKeyReference(
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         type ?: return ResolveResult.EMPTY_ARRAY
 
-        val resolveResults = type.resolveMember(
-                canonicalText,
-                element,
-                AccessDirection.READ,
-                PyResolveContext.defaultContext()
-        ) ?: return ResolveResult.EMPTY_ARRAY
+        val resolveContext = PyResolveContext.defaultContext()
+        val accessDirection = AccessDirection.READ
+
+        val resolveResults = arrayListOf<RatedResolveResult>()
+        type.resolveMember(
+                canonicalText, element, accessDirection, resolveContext
+        )?.let {
+            resolveResults.addAll(it)
+        }
+
+        if (type.getPositionArgsNumber(element) > 0) {
+            canonicalText.toIntOrNull()?.let { idx ->
+                resolveResults.addAll(type.resolveMemberByIndex(
+                        idx, element, accessDirection, resolveContext
+                ))
+            }
+        }
 
         if (resolveResults.isEmpty()) {
             return ResolveResult.EMPTY_ARRAY

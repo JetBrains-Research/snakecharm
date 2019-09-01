@@ -85,6 +85,7 @@
             id="SmkDictionaryTypesCompletionContributor"
     />
 
+    <psi.referenceContributor implementation="com.jetbrains.snakecharm.lang.psi.references.SmkPySubscriptionReferenceContributor"/>
     <localInspection
         language="Snakemake"
         shortName="SmkResourcesKeywordArgsInspection"

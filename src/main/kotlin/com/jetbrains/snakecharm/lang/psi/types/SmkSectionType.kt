@@ -56,13 +56,25 @@ class SmkSectionType(
                     resolveResult.poke(it, SmkResolveUtil.RATE_NORMAL)
                 }
 
-        if (isSimpleArgsList(args)) {
-            val asIdx = name.toIntOrNull()
-            if (asIdx != null && asIdx < args.size)
-                resolveResult.poke(args[asIdx], SmkResolveUtil.RATE_NORMAL)
-        }
-
         return resolveResult
+    }
+
+    override fun resolveMemberByIndex(
+            idx: Int,
+            location: PyExpression?,
+            direction: AccessDirection,
+            resolveContext: PyResolveContext
+    ): List<RatedResolveResult> {
+        val args = getSectionArgs()
+
+        if (args != null && isSimpleArgsList(args)) {
+            val resolveResult = ResolveResultList()
+            if (idx in args.indices) {
+                resolveResult.poke(args[idx], SmkResolveUtil.RATE_NORMAL)
+            }
+            return resolveResult
+        }
+        return emptyList()
     }
 
     private fun getSectionArgs(): Array<out PyExpression>? = section.argumentList?.arguments

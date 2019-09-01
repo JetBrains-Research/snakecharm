@@ -3,6 +3,10 @@ package com.jetbrains.snakecharm.lang.psi.types
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
+import com.jetbrains.python.psi.AccessDirection
+import com.jetbrains.python.psi.PyExpression
+import com.jetbrains.python.psi.resolve.PyResolveContext
+import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 
 
@@ -17,4 +21,11 @@ interface SmkAvailableForSubscriptionType : PyType {
             location: PsiElement,
             context: ProcessingContext?
     ): Pair<List<LookupElementBuilder>, Double>
+
+    fun resolveMemberByIndex(
+            idx: Int,
+            location: PyExpression?,
+            direction: AccessDirection,
+            resolveContext: PyResolveContext
+    ): List<RatedResolveResult>
 }

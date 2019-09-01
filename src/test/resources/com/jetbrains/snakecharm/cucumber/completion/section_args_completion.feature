@@ -223,7 +223,7 @@ Feature: Completion for section args after section name
     | checkpoint | shell   | ]}" #here1 |   |
     | checkpoint | shell   | ] # here2  | ' |
 
-  Scenario Outline: Completion of section args inside python string
+  Scenario Outline: Completion of section args inside python string in subscription
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -253,6 +253,36 @@ Feature: Completion for section args after section name
       | rule       | ar  | " |
       | checkpoint |     | ' |
       | checkpoint | ar  | ' |
+
+  Scenario Outline: Completion of section args inside python string in get()
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        output:
+          "in1.txt",
+           arg1 = "in1.txt",
+           arg2 = "in2.txt"
+        run:
+            output<text> # here1
+      """
+      When I put the caret at <signature>
+      And I invoke autocompletion popup
+      Then completion list should contain:
+        | arg1 |
+        | arg2 |
+      And completion list shouldn't contain:
+        | 0 |
+        | 1 |
+        | 2 |
+
+      Examples:
+        | rule_like  | text | signature |
+        | rule       | .get('')        | ')        |
+        | rule       | .get("")        | ")        |
+        | rule       | .get('a')       | ')        |
+        | rule       | .get('a', None) | ', None)  |
+        | checkpoint | .get('')        | ')        |
 
   Scenario Outline: Completion of section args and indexes names after dot
     Given a snakemake project
@@ -320,7 +350,9 @@ Feature: Completion for section args after section name
       | rule_like  | section | complicated_item | signature  | q |
       | rule       | shell   | unpack(foo)      | ]}" #here1 |   |
       | rule       | message | **foo            | ]}" #here1 |   |
+      | rule       | message | **foo()          | ]}" #here1 |   |
       | checkpoint | shell   | *foo             | ]}" #here1 |   |
+      | checkpoint | shell   | *foo()           | ]}" #here1 |   |
       | rule       | shell   | unpack(foo)      | ] # here2  | ' |
       | rule       | shell   | **foo            | ] # here2  | ' |
       | checkpoint | shell   | *foo             | ] # here2  | ' |
@@ -349,31 +381,33 @@ Feature: Completion for section args after section name
             output<result> # here
       """
     Examples:
-      | key       | signature     | item   | mode    | result        |
-      | ['']      | '] # here     | arg1   | normal  | ['arg1']      |
-      | ['']      | '] # here     | arg1   | replace | ['arg1']      |
-      | [""]      | "] # here     | arg1   | normal  | ["arg1"]      |
-      | [""]      | "] # here     | arg1   | replace | ["arg1"]      |
-      | ['ar']    | '] # here     | arg1   | normal  | ['arg1']      |
-      | ['ar']    | '] # here     | arg1   | replace | ['arg1']      |
-      | ["ar"]    | "] # here     | arg1   | normal  | ["arg1"]      |
-      | ["ar"]    | "] # here     | arg1   | replace | ["arg1"]      |
-      | ['ar']    | ar'] # here   | arg1   | normal  | ['arg1ar']    |
-      | ['ar']    | ar'] # here   | arg1   | replace | ['arg1']      |
-      | ['arfoo'] | foo'] # here  | arg1   | normal  | ['arg1foo']   |
-      | ['arfoo'] | foo'] # here  | arg1   | replace | ['arg1']      |
-      | ["arfoo"] | foo"] # here  | arg1   | normal  | ["arg1foo"]   |
-      | ["arfoo"] | foo"] # here  | arg1   | replace | ["arg1"]      |
-      | ['ar']    | 'ar'] # here  | 'arg1' | normal  | ['arg1''ar']  |
-      | ['ar']    | 'ar'] # here  | 'arg1' | replace | ['arg1']      |
-      | ['foo']   | 'foo'] # here | 'arg1' | normal  | ['arg1''foo'] |
-      | ['foo']   | 'foo'] # here | 'arg1' | replace | ['arg1']      |
-      | ['foo']   | 'foo'] # here | 0      | normal  | [0'foo']      |
-      | ['foo']   | 'foo'] # here | 0      | replace | [0]           |
-      | [123]     | 123] # here   | 0      | normal  | [0123]        |
-      | [123]     | 123] # here   | 0      | replace | [0]           |
-      | .foo      | foo           | arg1   | normal  | .arg1foo      |
-      | .foo      | foo           | arg1   | replace | .arg1         |
+      | key         | signature     | item   | mode    | result        |
+      | ['']        | '] # here     | arg1   | normal  | ['arg1']      |
+      | ['']        | '] # here     | arg1   | replace | ['arg1']      |
+      | [""]        | "] # here     | arg1   | normal  | ["arg1"]      |
+      | [""]        | "] # here     | arg1   | replace | ["arg1"]      |
+      | ['ar']      | '] # here     | arg1   | normal  | ['arg1']      |
+      | ['ar']      | '] # here     | arg1   | replace | ['arg1']      |
+      | ["ar"]      | "] # here     | arg1   | normal  | ["arg1"]      |
+      | ["ar"]      | "] # here     | arg1   | replace | ["arg1"]      |
+      | ['ar']      | ar'] # here   | arg1   | normal  | ['arg1ar']    |
+      | ['ar']      | ar'] # here   | arg1   | replace | ['arg1']      |
+      | ['arfoo']   | foo'] # here  | arg1   | normal  | ['arg1foo']   |
+      | ['arfoo']   | foo'] # here  | arg1   | replace | ['arg1']      |
+      | ["arfoo"]   | foo"] # here  | arg1   | normal  | ["arg1foo"]   |
+      | ["arfoo"]   | foo"] # here  | arg1   | replace | ["arg1"]      |
+      | ['ar']      | 'ar'] # here  | 'arg1' | normal  | ['arg1''ar']  |
+      | ['ar']      | 'ar'] # here  | 'arg1' | replace | ['arg1']      |
+      | ['foo']     | 'foo'] # here | 'arg1' | normal  | ['arg1''foo'] |
+      | ['foo']     | 'foo'] # here | 'arg1' | replace | ['arg1']      |
+      | ['foo']     | 'foo'] # here | 0      | normal  | [0'foo']      |
+      | ['foo']     | 'foo'] # here | 0      | replace | [0]           |
+      | [123]       | 123] # here   | 0      | normal  | [0123]        |
+      | [123]       | 123] # here   | 0      | replace | [0]           |
+      | .get('')    | ') # here     | arg1   | normal  | .get('arg1')  |
+      | .get('foo') | foo') # here  | arg1   | replace | .get('arg1')  |
+      | .foo        | foo           | arg1   | normal  | .arg1foo      |
+      | .foo        | foo           | arg1   | replace | .arg1         |
 
   Scenario Outline: Insert handler for smksl subscription elements
         Given a snakemake project
@@ -417,3 +451,5 @@ Feature: Completion for section args after section name
         | [123]   | 123]}     | 0    | replace | [0]       |
         | .foo    | foo       | arg1 | normal  | .arg1foo  |
         | .foo    | foo       | arg1 | replace | .arg1     |
+
+    #TODO: contributor in foo<here>.bood.doo[aa] ?
