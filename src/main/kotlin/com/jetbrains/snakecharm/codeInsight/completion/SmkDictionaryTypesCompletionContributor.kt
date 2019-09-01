@@ -97,7 +97,7 @@ object SmkDictionaryTypesCompletionProvider: CompletionProvider<CompletionParame
                 val item = SmkCompletionUtil.createPrioritizedLookupElement(
                         idx.toString(),
                         PlatformIcons.PARAMETER_ICON,
-                        priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY,
+                        priority = SmkCompletionUtil.SUBSCRIPTION_INDEXES_PRIORITY,
                         typeText = typeText
                 )
                 result.addElement(item)

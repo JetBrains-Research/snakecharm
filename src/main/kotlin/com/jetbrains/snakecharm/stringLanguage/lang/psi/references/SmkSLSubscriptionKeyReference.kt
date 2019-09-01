@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.stringLanguage.lang.psi.references
 
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.util.ArrayUtil
@@ -21,13 +22,21 @@ class SmkSLSubscriptionKeyReference(
         private val element: SmkSLSubscriptionKeyExpression,
         private val type: SmkAvailableForSubscriptionType?
 ) : PsiPolyVariantReferenceBase<SmkSLSubscriptionKeyExpression>(element), PsiReferenceEx, SmkSLBaseReference {
-    override fun getUnresolvedDescription(): String =
-            SnakemakeBundle.message("INSP.NAME.unresolved.subscription.ref", element.text)
+    companion object {
+        fun indexArgTypeText(type: SmkAvailableForSubscriptionType) =
+                "Arg index in ${type.name}"
+
+        fun unresolvedErrorMsg(element: PsiElement) =
+                SnakemakeBundle.message("INSP.NAME.unresolved.subscription.ref", element.text)
+
+        val INSPECTION_SEVERITY = HighlightSeverity.WARNING!!
+    }
+    override fun getUnresolvedDescription(): String = unresolvedErrorMsg(element)
 
     override fun getUnresolvedHighlightSeverity(context: TypeEvalContext?): HighlightSeverity? =
             when (type) {
                 null -> null
-                else -> HighlightSeverity.WARNING
+                else -> INSPECTION_SEVERITY
             }
 
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
@@ -80,10 +89,4 @@ class SmkSLSubscriptionKeyReference(
 
     override fun handleElementRename(newElementName: String) =
             element.setName(newElementName)
-
-    companion object {
-        fun indexArgTypeText(type: SmkAvailableForSubscriptionType) =
-                "Arg index in ${type.name}"
-
-    }
 }
