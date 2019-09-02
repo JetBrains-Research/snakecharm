@@ -12,16 +12,15 @@ import com.jetbrains.python.psi.impl.references.PyQualifiedReference
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_BANNED_FOR_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_EXPANDING_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.lang.psi.SmkSLReferenceExpression
+import com.jetbrains.snakecharm.lang.psi.BaseSmkSLReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.stringLanguage.lang.SmkSLElementVisitor
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLInitialReference
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
-class SmkSLReferenceExpressionImpl(
-        node: ASTNode
-) : PyReferenceExpressionImpl(node), SmkSLReferenceExpression {
+class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(node),
+        BaseSmkSLReferenceExpression {
 
     override fun getNameIdentifier() = nameElement?.psi
 
@@ -57,14 +56,14 @@ class SmkSLReferenceExpressionImpl(
     }
 
     companion object {
-        private fun SmkSLReferenceExpression.isInValidCallExpression(): Boolean {
+        private fun BaseSmkSLReferenceExpression.isInValidCallExpression(): Boolean {
             val host = InjectedLanguageManager.getInstance(project).getInjectionHost(this)
             val callExpression = PsiTreeUtil.getParentOfType(host, PyCallExpression::class.java)
             return callExpression == null || callExpression.callSimpleName() !in FUNCTIONS_BANNED_FOR_WILDCARDS
         }
         
-        fun isWildcard(expr: SmkSLReferenceExpression) =
-                PsiTreeUtil.getParentOfType(expr, SmkSLReferenceExpression::class.java) == null &&
+        fun isWildcard(expr: BaseSmkSLReferenceExpression) =
+                PsiTreeUtil.getParentOfType(expr, BaseSmkSLReferenceExpression::class.java) == null &&
                         (expr.containingRuleOrCheckpointSection()?.isWildcardsExpandingSection() ?: false) &&
                         expr.text.isNotEmpty() &&
                         expr.isInValidCallExpression()

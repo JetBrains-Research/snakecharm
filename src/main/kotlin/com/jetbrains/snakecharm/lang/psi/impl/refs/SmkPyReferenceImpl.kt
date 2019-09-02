@@ -7,7 +7,9 @@ import com.jetbrains.python.psi.PyQualifiedExpression
 import com.jetbrains.python.psi.impl.references.PyReferenceImpl
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkSection
+import com.jetbrains.snakecharm.lang.psi.SmkSubworkflow
 
 /**
  * This is fake reference which allow as to remove some results from resolve/completion
@@ -19,11 +21,12 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
  */
 class SmkPyReferenceImpl(
         element: PyQualifiedExpression,
-        context: PyResolveContext
+        context: PyResolveContext,
+        private val inRunSection: Boolean
     ): PyReferenceImpl(element, context) {
 
     override fun resolveInner() = super.resolveInner().filter {
-        !shouldBeRemovedFromDefaultScopeCrawlUpResults(it?.element)
+        !shouldBeRemovedFromDefaultScopeCrawlUpResults(it?.element, inRunSection)
     }
 
     override fun getVariants(): Array<Any> {
@@ -33,14 +36,23 @@ class SmkPyReferenceImpl(
         // python collects all named elements although we don't need this
         return defaultVariants.filter { v ->
             when (v) {
-                is LookupElement -> !shouldBeRemovedFromDefaultScopeCrawlUpResults(v.psiElement)
-                is PsiElement -> !shouldBeRemovedFromDefaultScopeCrawlUpResults(v)
+                is LookupElement -> !shouldBeRemovedFromDefaultScopeCrawlUpResults(v.psiElement, inRunSection)
+                is PsiElement -> !shouldBeRemovedFromDefaultScopeCrawlUpResults(v, inRunSection)
                 else -> true
             }
         }.toTypedArray()
     }
 
     companion object {
-        fun shouldBeRemovedFromDefaultScopeCrawlUpResults(element: PsiElement?) =  element is SmkRuleOrCheckpoint
+        fun shouldBeRemovedFromDefaultScopeCrawlUpResults(
+                element: PsiElement?, inRunSection: Boolean
+        ): Boolean {
+            // TODO: re-implement using smk visitor
+            var shouldBeRemoved = (element is SmkSection) && (element !is SmkSubworkflow)
+            if (shouldBeRemoved && inRunSection) {
+                shouldBeRemoved = element !is SmkRuleOrCheckpointArgsSection
+            }
+            return shouldBeRemoved
+        }
     }
 }

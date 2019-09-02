@@ -13,6 +13,7 @@ class Hooks {
     @After(order = 1)
     @Throws(Throwable::class)
     fun cleanup() {
+        //SeveritiesProvider.EP_NAME.getPoint(null).unregisterExtension(FindUsagesSteps.SEVERITIES_PROVIDER)
         InspectionProfileImpl.INIT_INSPECTIONS = false
         SnakemakeWorld.myFixture?.tearDown()
 

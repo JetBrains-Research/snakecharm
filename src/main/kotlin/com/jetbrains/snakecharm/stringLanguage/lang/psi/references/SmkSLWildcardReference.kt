@@ -8,14 +8,13 @@ import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PsiReferenceEx
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.types.TypeEvalContext
-import com.jetbrains.snakecharm.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
 class SmkSLWildcardReference(
         element: SmkSLReferenceExpressionImpl,
         private val type: SmkWildcardsType
-) : PsiPolyVariantReferenceBase<SmkSLReferenceExpression>(element), SmkSLBaseReference, PsiReferenceEx {
+) : PsiPolyVariantReferenceBase<SmkSLReferenceExpressionImpl>(element), SmkSLBaseReference, PsiReferenceEx {
 
     override fun handleElementRename(newElementName: String) =
             element.setName(newElementName)

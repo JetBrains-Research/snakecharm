@@ -9,6 +9,7 @@ import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
+import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.SnakemakeNames
@@ -95,7 +96,10 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyTy
         }
 
         return wildcardsDeclarations.map {
-            SmkCompletionUtil.createPrioritizedLookupElement(it.text, typeText = "wildcard")
+            SmkCompletionUtil.createPrioritizedLookupElement(
+                    it.text, it.psi,
+                    typeText = SnakemakeBundle.message("TYPES.rule.wildcard.type.text")
+            )
         }.toTypedArray()
     }
 

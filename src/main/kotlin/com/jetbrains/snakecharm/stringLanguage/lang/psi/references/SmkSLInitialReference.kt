@@ -15,30 +15,31 @@ import com.jetbrains.python.psi.impl.ResolveResultList
 import com.jetbrains.python.psi.impl.references.PyQualifiedReference
 import com.jetbrains.python.psi.resolve.*
 import com.jetbrains.python.psi.types.TypeEvalContext
+import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolUsageType
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionVariantsProcessor
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
+import com.jetbrains.snakecharm.lang.psi.BaseSmkSLReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
-import com.jetbrains.snakecharm.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.SmkSection
 import com.jetbrains.snakecharm.lang.psi.impl.refs.SmkPyReferenceImpl
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 import java.util.*
 
 
 class SmkSLInitialReference(
-        expr: SmkSLReferenceExpressionImpl,
+        expr: BaseSmkSLReferenceExpression,
         private val parentDeclaration: SmkRuleOrCheckpoint?,
-        context: PyResolveContext
+        context: PyResolveContext?
 ) : PyQualifiedReference(expr, context), SmkSLBaseReference {
 
-    override fun getElement() = myElement as SmkSLReferenceExpression
+    override fun getElement() = myElement as BaseSmkSLReferenceExpression
 
     override fun resolveInner(): List<RatedResolveResult> {
         require(!element.isQualified) // this reference is supposed to be not qualified
@@ -52,12 +53,19 @@ class SmkSLInitialReference(
         // XXX: (except threads, version, which doesn't have declaration so far)
         val section = collectAccessibleSectionsFromDeclaration().firstOrNull { it.name == referencedName }
         if (section != null) {
-            ret.poke(section, RatedResolveResult.RATE_HIGH)
+            ret.poke(section, SmkResolveUtil.RATE_IMPLICIT_SYMBOLS)
             return ret
         }
 
         val host = getHostElement(element)
         if (host != null) {
+            if (referencedName == SMK_VARS_WILDCARDS) {
+                val parentRule = PsiTreeUtil.getParentOfType(host, SmkRuleOrCheckpoint::class.java)
+                if (parentRule != null) {
+                    return listOf(RatedResolveResult(SmkResolveUtil.RATE_IMPLICIT_SYMBOLS, parentRule.wildcardsElement))
+                }
+            }
+
             // Implicit Symbols
             val module = ModuleUtilCore.findModuleForPsiElement(element)
             if (module != null) {
@@ -103,7 +111,8 @@ class SmkSLInitialReference(
             InjectedLanguageManager.getInstance(e.project).getInjectionHost(e)
 
     private fun isSupportedElementType(element: PsiElement?) =
-            !(element is PyFunction || element is PyClass) && !SmkPyReferenceImpl.shouldBeRemovedFromDefaultScopeCrawlUpResults(element)
+            !(element is PyFunction || element is PyClass) &&
+                    !SmkPyReferenceImpl.shouldBeRemovedFromDefaultScopeCrawlUpResults(element, false)
 
 
     private fun resolveByReferenceResolveProviders(): List<RatedResolveResult> {
@@ -116,6 +125,9 @@ class SmkSLInitialReference(
                 .toList()
     }
 
+    override fun copyWithResolveContext(context: PyResolveContext?) =
+            SmkSLInitialReference(element, parentDeclaration, context)
+
     override fun getVariants(): Array<LookupElement> {
         // val originalElement = CompletionUtil.getOriginalElement(myElement)
 
@@ -124,15 +136,30 @@ class SmkSLInitialReference(
         // Accessible sections
         val accessibleSections = collectAccessibleSectionsFromDeclaration().toList()
         accessibleSections.forEach {
-            variants.add(SmkCompletionUtil.createPrioritizedLookupElement(it.name!!, typeText = "rule section"))
+            variants.add(SmkCompletionUtil.createPrioritizedLookupElement(
+                    it.name!!, it,
+                    typeText = SnakemakeBundle.message("TYPES.rule.section.type.text"),
+                    priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
+            ))
         }
-
 
         val host = getHostElement(element)
         if (host != null) {
+            // Wildcards
+            parentDeclaration?.let {
+                val element = SmkCompletionUtil.createPrioritizedLookupElement(
+                        SMK_VARS_WILDCARDS,
+                        parentDeclaration.wildcardsElement,
+                        typeText = SnakemakeBundle.message("TYPES.rule.wildcard.type.text"),
+                        priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
+                )
+                variants.add(element)
+            }
 
             // Implicit Symbols
-            val accessibleSectionsNames = accessibleSections.asSequence().map { it.sectionKeyword }.toSet()
+            val seenImplicitSymbols = accessibleSections.asSequence().map { it.sectionKeyword }.toMutableSet()
+            seenImplicitSymbols.add(SMK_VARS_WILDCARDS)
+
             val module = ModuleUtilCore.findModuleForPsiElement(element)
             if (module != null) {
                 val contextScope = getSmkScopeForInjection(host)
@@ -144,7 +171,7 @@ class SmkSLInitialReference(
                         .filter { symbolScope -> contextScope.includes(symbolScope) }
                         .flatMap { symbolScope -> cache[symbolScope].asSequence() }
                         .filter { symbol -> symbol.usageType == ImplicitPySymbolUsageType.VARIABLE }
-                        .filter { symbol -> symbol.identifier !in accessibleSectionsNames }
+                        .filter { symbol -> symbol.identifier !in seenImplicitSymbols }
                         .forEach { symbol ->
                             // processor.execute(it, ResolveState.initial())
                             processor.addElement(symbol.identifier, symbol.psiDeclaration)

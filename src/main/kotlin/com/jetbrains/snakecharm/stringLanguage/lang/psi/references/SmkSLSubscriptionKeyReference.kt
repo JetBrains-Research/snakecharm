@@ -76,7 +76,7 @@ class SmkSLSubscriptionKeyReference(
 
         (0 until type.getPositionArgsNumber(element)).forEach { idx ->
             val item = SmkCompletionUtil.createPrioritizedLookupElement(
-                    idx.toString(),
+                    idx.toString(), null,
                     PlatformIcons.PARAMETER_ICON,
                     priority = SmkCompletionUtil.SUBSCRIPTION_INDEXES_PRIORITY,
                     typeText = typeText

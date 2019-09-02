@@ -4,6 +4,7 @@ import com.intellij.codeInsight.completion.InsertHandler
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.psi.PsiElement
 import com.intellij.util.PlatformIcons
 import com.jetbrains.python.codeInsight.completion.PythonCompletionWeigher
 import javax.swing.Icon
@@ -22,12 +23,13 @@ class SmkCompletionUtil {
 
         fun createPrioritizedLookupElement(
                 name: String,
+                psiElement: PsiElement?,
                 icon: Icon = PlatformIcons.PROPERTY_ICON,
                 priority: Double = PythonCompletionWeigher.WEIGHT_DELTA.toDouble(),
                 typeText: String? = null,
                 insertHandler: InsertHandler<LookupElement>? = null
         ): LookupElement {
-            var elementBuilder = LookupElementBuilder.create(name).withIcon(icon)
+            var elementBuilder = LookupElementBuilder.create(name).withPsiElement(psiElement).withIcon(icon)
 
             if (typeText != null) {
                 elementBuilder = elementBuilder.withTypeText(typeText)

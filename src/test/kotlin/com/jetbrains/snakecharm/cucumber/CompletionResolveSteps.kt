@@ -490,17 +490,6 @@ class CompletionResolveSteps {
                 """.trimIndent())
     }
 
-    private fun getReferenceAtOffset() = SnakemakeWorld.fixture()
-            .file.findReferenceAt(getOffsetUnderCaret())
-
-    private fun getReferenceInInjectedLanguageAtOffset(): PsiReference?  {
-        val fixture = SnakemakeWorld.injectionFixture()
-        val element = fixture.injectedElement ?: return null
-        val host = fixture.injectedLanguageManager.getInjectionHost(element) as PyStringLiteralExpression? ?: return null
-        val offset = getOffsetUnderCaret() - (host.stringValueTextRange.startOffset + host.textOffset)
-        return element.containingFile?.findReferenceAt(offset)
-    }
-
     private fun getPositionBySignature(editor: Editor, marker: String, after: Boolean): Int {
         val text = editor.document.text
         val pos = text.indexOf(marker)
@@ -561,6 +550,19 @@ class CompletionResolveSteps {
         UIUtil.invokeLaterIfNeeded {
             CommandProcessor.getInstance().executeCommand(
                     project, { lookup.finishLookup(ch) }, "", null)
+        }
+    }
+
+    companion object {
+        fun getReferenceAtOffset() = SnakemakeWorld.fixture()
+                .file.findReferenceAt(getOffsetUnderCaret())
+
+        fun getReferenceInInjectedLanguageAtOffset(): PsiReference?  {
+            val fixture = SnakemakeWorld.injectionFixture()
+            val element = fixture.injectedElement ?: return null
+            val host = fixture.injectedLanguageManager.getInjectionHost(element) as PyStringLiteralExpression? ?: return null
+            val offset = getOffsetUnderCaret() - (host.stringValueTextRange.startOffset + host.textOffset)
+            return element.containingFile?.findReferenceAt(offset)
         }
     }
 }

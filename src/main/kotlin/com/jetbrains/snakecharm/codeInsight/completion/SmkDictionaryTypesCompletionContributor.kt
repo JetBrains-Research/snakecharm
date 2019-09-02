@@ -95,7 +95,7 @@ object SmkDictionaryTypesCompletionProvider: CompletionProvider<CompletionParame
             val typeText = indexArgTypeText(type)
             (0 until type.getPositionArgsNumber(location)).forEach { idx ->
                 val item = SmkCompletionUtil.createPrioritizedLookupElement(
-                        idx.toString(),
+                        idx.toString(), null,
                         PlatformIcons.PARAMETER_ICON,
                         priority = SmkCompletionUtil.SUBSCRIPTION_INDEXES_PRIORITY,
                         typeText = typeText

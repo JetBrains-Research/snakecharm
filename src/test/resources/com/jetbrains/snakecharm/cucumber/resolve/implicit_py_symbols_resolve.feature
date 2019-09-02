@@ -108,7 +108,6 @@ Feature: Resolve implicitly imported python names
     Given I open a file "foo.smk" with text
     """
     rule NAME:
-      output: "path/to/output"
       run:
         <text> #here
     """
@@ -160,8 +159,8 @@ Feature: Resolve implicitly imported python names
 
     Examples:
       | rule_like  | text       | symbol_name | file    | times | class                              |
-      | rule       | threads: 1 | threads: 1  | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
-      | checkpoint | threads: 1 | threads: 1  | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | rule       | threads: 1 | threads  | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | checkpoint | threads: 1 | threads  | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
 
   Scenario Outline: Not-resolved threads if part of reference
     Given a snakemake project

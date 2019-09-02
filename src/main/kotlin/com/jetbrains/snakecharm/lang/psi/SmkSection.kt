@@ -1,7 +1,10 @@
 package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.IncorrectOperationException
 import com.intellij.util.PlatformIcons
 import com.jetbrains.python.PyNames
 import com.jetbrains.python.psi.PyStatement
@@ -10,11 +13,17 @@ import com.jetbrains.python.psi.impl.PyElementPresentation
 // rule section is an 'input' or 'run' section in a Snakemake rule
 // which corresponds to SmkRuleOrCheckpointArgsSection and SMKRuleRunParameter respectively
 // thus the need for an interface: to group the two together
-interface SmkSection: PyStatement {
+interface SmkSection: PyStatement, PsiNameIdentifierOwner {
     // , PyDocStringOwner
 
     val sectionKeyword: String?
         get() = getSectionKeywordNode()?.text
+
+    override fun getNameIdentifier() = getSectionKeywordNode()?.psi
+
+    override fun setName(name: String): PsiElement {
+        throw IncorrectOperationException()
+    }
 
     fun getSectionKeywordNode(): ASTNode?
 

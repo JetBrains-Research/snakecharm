@@ -1,7 +1,7 @@
 Feature: Spellchecker for snakemake exclusive psi elements
 
   #noinspection SpellCheckingInspection
-  Scenario Outline: Check rule/checkpoint/subworkflow names
+  Scenario Outline: Check rule/checkpoint names
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -18,4 +18,21 @@ Feature: Spellchecker for snakemake exclusive psi elements
       | rule_like   | section   |
       | rule        | input     |
       | checkpoint  | input     |
-      | subworkflow | snakefile |
+
+  Scenario: Check subworkflow names
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    subworkflow soooome:
+        snakefile: "in.txt"
+    """
+    And SpellCheckingInspection inspection is enabled
+    And I expect inspection TYPO on <soooome> in <soooome:> with message
+    """
+    Typo: In word 'soooome'
+    """
+    And I expect inspection TYPO on <snakefile> in <snakefile:> with message
+    """
+    Typo: In word 'snakefile'
+    """
+    When I check highlighting warnings

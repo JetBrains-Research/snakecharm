@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.cucumber
 import com.intellij.psi.PsiReference
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.InjectionTestFixture
+import com.intellij.usageView.UsageInfo
 
 /**
  * @author Roman.Chernyatchik
@@ -14,6 +15,7 @@ object SnakemakeWorld {
     var myCompletionList: List<String>? = null
     var myGeneratedDocPopupText: String? = null
     var myFoundRefs: List<PsiReference> = emptyList()
+    var myFoundUsages: List<UsageInfo> = emptyList()
 
     fun injectionFixture() = myInjectionFixture!!
     fun fixture()= myFixture!!

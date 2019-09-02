@@ -120,7 +120,8 @@ Feature: Resolve for sections/variables in SmkSL injections
       | rule       | shell   | log       | Log         | io.py       |
       | rule       | shell   | params    | Params      | io.py       |
       | rule       | shell   | resources | Resources   | io.py       |
-      | rule       | shell   | wildcards | Wildcards   | io.py       |
+      | rule       | shell   | wildcards | NAME:   | foo.smk       |
+      #| rule       | shell   | wildcards | Wildcards   | io.py       |
       | checkpoint | shell   | local_var | local_var   | foo.smk     |
       | rule       | message | config    | config      | workflow.py |
       | checkpoint | message | local_var | local_var   | foo.smk     |

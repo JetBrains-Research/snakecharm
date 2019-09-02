@@ -5,17 +5,18 @@ import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.PsiReference
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStringLiteralExpression
-import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkConfigfileReference
 import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
-import com.jetbrains.snakecharm.lang.psi.types.SmkSectionType
+import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeSectionArgsType
 
-open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode): SmkArgsSectionImpl(node), SmkRuleOrCheckpointArgsSection {
+open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode): SmkArgsSectionImpl(node),
+        SmkRuleOrCheckpointArgsSection
+{
     override fun getType(context: TypeEvalContext, key: TypeEvalContext.Key)
-            = SmkSectionType(this)
+            = SmkRuleLikeSectionArgsType(this)
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SmkElementVisitor -> pyVisitor.visitSmkRuleOrCheckpointArgsSection(this)

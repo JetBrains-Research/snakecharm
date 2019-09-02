@@ -20,8 +20,8 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RESOURCES
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
+import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeSectionArgsType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
-import com.jetbrains.snakecharm.lang.psi.types.SmkSectionType
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
@@ -72,7 +72,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
                         anchor, SmkRunSection::class.java
                 ) ?: return null
 
-                ruleLike.getSectionByName(refTargetSection)?.let { SmkSectionType(it) }
+                ruleLike.getSectionByName(refTargetSection)?.let { SmkRuleLikeSectionArgsType(it) }
 
             }
             fqn == WILDCARDS_ACCESSOR_CLASS -> {
@@ -107,7 +107,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
         if (isFstPositionalParam || paramName in allowedArgs) {
             val type = when (paramName) {
                 SECTION_INPUT, SECTION_OUTPUT, SECTION_RESOURCES -> {
-                    ruleLike.getSectionByName(paramName)?.let { SmkSectionType(it) }
+                    ruleLike.getSectionByName(paramName)?.let { SmkRuleLikeSectionArgsType(it) }
                 }
                 else -> {
                     // 1st pos parameter in lambda is wildcard
@@ -158,7 +158,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
             return null
         }
 
-        if (referenceExpression is SmkSLReferenceExpression) {
+        if (referenceExpression is BaseSmkSLReferenceExpression) {
             if (referenceExpression.getReference() is SmkSLWildcardReference) {
                 // is just a wildcard here
                 return null

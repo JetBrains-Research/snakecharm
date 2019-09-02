@@ -14,7 +14,7 @@ import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
-class SmkRuleLikeType(private val declaration: SmkRuleOrCheckpoint) : PyType {
+class SmkRuleLikeSectionType(private val declaration: SmkRuleOrCheckpoint) : PyType {
     override fun getName() = "${declaration.sectionTokenType}${declaration.name?.let { " $it" } ?: ""}"
 
     override fun assertValid(message: String?) {
@@ -48,7 +48,7 @@ class SmkRuleLikeType(private val declaration: SmkRuleOrCheckpoint) : PyType {
         }
 
         return getAccessibleStatements()
-                .map { SmkCompletionUtil.createPrioritizedLookupElement(it.name!!) }
+                .map { SmkCompletionUtil.createPrioritizedLookupElement(it.name!!, it) }
                 .toTypedArray()
     }
 

@@ -1,9 +1,11 @@
 package com.jetbrains.snakecharm.lang.psi
 
+import com.intellij.psi.PsiElement
 import com.jetbrains.python.psi.PyTypedElement
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
 
 interface SmkRuleOrCheckpoint : SmkRuleLike<SmkRuleOrCheckpointArgsSection>, PyTypedElement {
+    val wildcardsElement: PsiElement
     /**
      * Collect wildcards which are defined at any of defining sections
      */

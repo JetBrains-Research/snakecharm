@@ -66,7 +66,7 @@ interface SmkReferenceExpression: PyExpression {
     fun getReferenceName() = getNameElement()?.text
 }
 
-interface SmkSLReferenceExpression : PyReferenceExpression, SmkSLElement, PsiNameIdentifierOwner {
+interface BaseSmkSLReferenceExpression : PyReferenceExpression, SmkSLElement, PsiNameIdentifierOwner {
     fun containingRuleOrCheckpointSection(): SmkRuleOrCheckpointArgsSection? {
         val languageManager = InjectedLanguageManager.getInstance(project)
         val host = languageManager.getInjectionHost(this)

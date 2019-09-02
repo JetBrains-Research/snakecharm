@@ -99,7 +99,7 @@ class SmkWildcardsCollector(
     }
 }
 data class WildcardDescriptor(
-        val psi: SmkSLReferenceExpression,
+        val psi: SmkSLReferenceExpressionImpl,
         val text: String,
         val definingSectionIdx: Byte
 ) {

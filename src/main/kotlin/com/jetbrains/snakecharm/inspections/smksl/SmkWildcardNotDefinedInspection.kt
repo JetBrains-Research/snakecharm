@@ -9,7 +9,6 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
-import com.jetbrains.snakecharm.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
 class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
@@ -23,7 +22,7 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
             session: LocalInspectionToolSession
     ) = object : AbstractSmkSLInspectionVisitor(holder, session) {
 
-        override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpression) {
+        override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpressionImpl) {
             if (!SmkSLReferenceExpressionImpl.isWildcard(expr)) {
                 return
             }

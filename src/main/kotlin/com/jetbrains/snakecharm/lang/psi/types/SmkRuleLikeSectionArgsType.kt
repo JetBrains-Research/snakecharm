@@ -18,7 +18,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
 
-class SmkSectionType(
+class SmkRuleLikeSectionArgsType(
         val section: SmkRuleOrCheckpointArgsSection
 ) : PyType, SmkAvailableForSubscriptionType {
 

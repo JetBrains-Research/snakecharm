@@ -12,8 +12,10 @@ import com.jetbrains.python.codeInsight.completion.PyFunctionInsertHandler
 import com.jetbrains.python.psi.PyClass
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.resolve.CompletionVariantsProcessor
+import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
@@ -48,11 +50,38 @@ class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
                                 result: CompletionResultSet) {
 
         val contextElement = parameters.position
+        val contextScope = SmkCodeInsightScope[contextElement]
+
+        if (contextScope == SmkCodeInsightScope.RULELIKE_RUN_SECTION) {
+            val ruleOrCheckpoint = PsiTreeUtil.getParentOfType(contextElement, SmkRuleOrCheckpoint::class.java)!!
+
+            // wildcards
+            result.addElement(
+                    SmkCompletionUtil.createPrioritizedLookupElement(
+                            SnakemakeAPI.SMK_VARS_WILDCARDS,
+                            ruleOrCheckpoint.wildcardsElement,
+                            typeText = SnakemakeBundle.message("TYPES.rule.wildcard.type.text"),
+                            priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
+                    )
+            )
+
+            // threads
+            val threadsSection = ruleOrCheckpoint.statementList.statements.asSequence()
+                    .filterIsInstance<SmkRuleOrCheckpointArgsSection>()
+                    .filter { it.name == SnakemakeNames.SECTION_THREADS }.firstOrNull()
+            result.addElement(
+                    SmkCompletionUtil.createPrioritizedLookupElement(
+                            SnakemakeNames.SECTION_THREADS,
+                            threadsSection,
+                            typeText = SnakemakeBundle.message("TYPES.rule.section.type.text"),
+                            priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
+                    )
+            )
+        }
 
         val module = ModuleUtilCore.findModuleForPsiElement(parameters.originalFile)
         if (module != null) {
             val processor = SmkCompletionVariantsProcessor(contextElement)
-            val contextScope = SmkCodeInsightScope[contextElement]
             val cache = ImplicitPySymbolsProvider.instance(module).cache
 
             SmkCodeInsightScope.values().asSequence()
@@ -63,22 +92,18 @@ class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
                         processor.addElement(symbol.identifier, symbol.psiDeclaration)
                     }
 
-            if (contextScope == SmkCodeInsightScope.RULELIKE_RUN_SECTION) {
-                val ruleOrCheckpoint = PsiTreeUtil.getParentOfType(contextElement, SmkRuleOrCheckpoint::class.java)!!
-                val threadsSection = ruleOrCheckpoint.statementList.statements.asSequence()
-                        .filterIsInstance<SmkRuleOrCheckpointArgsSection>()
-                        .filter { it.name == SnakemakeNames.SECTION_THREADS }.firstOrNull()
-                processor.addElement("threads", threadsSection ?: ruleOrCheckpoint)
-            }
-            val resultList = processor.resultList
-            val idx = resultList.indexOfFirst { item ->
+            val processorResults = processor.resultList
+
+            // let's make 'shell' class to have insert handler like for function
+            val idx = processorResults.indexOfFirst { item ->
                 item is LookupElementBuilder && item.psiElement is PyClass && item.lookupString == SnakemakeNames.SECTION_SHELL
             }
             if (idx != -1) {
-                val lookupItem = resultList[idx] as LookupElementBuilder
-                resultList[idx] = lookupItem.withInsertHandler(PyFunctionInsertHandler.INSTANCE)
+                val lookupItem = processorResults[idx] as LookupElementBuilder
+                processorResults[idx] = lookupItem.withInsertHandler(PyFunctionInsertHandler.INSTANCE)
             }
-            result.addAllElements(resultList)
+
+            result.addAllElements(processorResults)
         }
     }
 }
