@@ -6,7 +6,7 @@ import com.jetbrains.python.inspections.PyInspectionVisitor
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.snakecharm.stringLanguage.lang.SmkSLElementVisitor
 
-abstract class AbstractSmkSLInspectionVisitor(
+abstract class SmkSLInspectionVisitor(
         holder: ProblemsHolder,
         session: LocalInspectionToolSession
 ) : SmkSLElementVisitor, PyInspectionVisitor(holder, session) {

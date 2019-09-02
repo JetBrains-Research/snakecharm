@@ -54,6 +54,7 @@ object SnakemakeAPI {
             "snakemake.io.Log" to "log",
             "snakemake.io.Resources" to "resources"
     )
+    const val SNAKEMAKE_MODULE_NAME_IO_PY = "io.py"
     
     val EXECUTION_SECTIONS_KEYWORDS = setOf(
             SECTION_SHELL, SECTION_SCRIPT,
@@ -110,7 +111,7 @@ object SnakemakeAPI {
 
     /**
      * For type inference:
-     * In SnakemakeSL some sections are inaccessible in `shell: "{<section>}"` and other sections which doesn't
+     * In SnakemakeSL some sections are inaccessible in `shell: "{<section>}"` and other sections, which doesn't
      * expand wildcards.
      */
     val SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS = setOf(

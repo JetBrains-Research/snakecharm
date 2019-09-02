@@ -20,7 +20,7 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
             holder: ProblemsHolder,
             isOnTheFly: Boolean,
             session: LocalInspectionToolSession
-    ) = object : AbstractSmkSLInspectionVisitor(holder, session) {
+    ) = object : SmkSLInspectionVisitor(holder, session) {
 
         override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpressionImpl) {
             if (!SmkSLReferenceExpressionImpl.isWildcard(expr)) {

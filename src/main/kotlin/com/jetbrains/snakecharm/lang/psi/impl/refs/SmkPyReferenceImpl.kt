@@ -22,7 +22,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkSubworkflow
 class SmkPyReferenceImpl(
         element: PyQualifiedExpression,
         context: PyResolveContext,
-        private val inRunSection: Boolean
+        val inRunSection: Boolean
     ): PyReferenceImpl(element, context) {
 
     override fun resolveInner() = super.resolveInner().filter {

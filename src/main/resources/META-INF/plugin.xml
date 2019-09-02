@@ -221,10 +221,33 @@
             implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkWildcardNotDefinedInspection"
     />
 
+    <localInspection
+            language="SnakemakeSL" shortName="SmkSLUnresolvedSectionInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkSLUnresolvedSection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.unresolved.section.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkSLUnresolvedSectionInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkUnresolvedSectionInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkUnresolvedSection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.unresolved.section.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkUnresolvedSectionInspection"
+    />
+
     <findUsagesHandlerFactory
             implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"
             id="Python" order="last, before default"
     />
+
   </extensions>
 
   <module-components>
