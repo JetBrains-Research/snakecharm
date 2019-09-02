@@ -20,7 +20,7 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionKeyRefe
 
 class SmkSLSubscriptionKeyReference(
         private val element: SmkSLSubscriptionKeyReferenceExpression,
-        private val type: SmkAvailableForSubscriptionType?
+        val type: SmkAvailableForSubscriptionType?
 ) : PsiPolyVariantReferenceBase<SmkSLSubscriptionKeyReferenceExpression>(element), PsiReferenceEx, SmkSLBaseReference {
     companion object {
         fun indexArgTypeText(type: SmkAvailableForSubscriptionType) =

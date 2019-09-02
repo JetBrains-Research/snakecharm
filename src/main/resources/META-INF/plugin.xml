@@ -233,6 +233,28 @@
     />
 
     <localInspection
+            language="SnakemakeSL" shortName="SmkSLSubscriptionIndexOutOfBoundsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkSLSubscriptionIndexOutOfBounds"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.arg.idx.aiobe.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkSLSubscriptionIndexOutOfBoundsInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkSubscriptionIndexOutOfBoundsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkSubscriptionIndexOutOfBounds"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.arg.idx.aiobe.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSubscriptionIndexOutOfBoundsInspection"
+    />
+
+    <localInspection
             language="SnakemakeSL" shortName="SmkSLUnresolvedSectionInspection"
             enabledByDefault="true"
             level="WARNING"
