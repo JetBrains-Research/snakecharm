@@ -47,6 +47,12 @@ class SmkSLInitialReference(
         PyPsiUtils.assertValid(myElement)
         val ret = ResolveResultList()
 
+        //TODO: change resolve order if in 'run:' section at least to support local variables like 'output=1' preference
+        // 1. python local resolve
+        // 2. if no result => sections, implicts
+        // 3. else rest python + providers
+
+
         val referencedName = element.referencedName ?: return Collections.emptyList()
 
         // XXX: resolve names of supported sections available in rule into sections or snakemake python declaration?

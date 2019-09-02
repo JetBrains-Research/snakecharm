@@ -186,13 +186,17 @@ Feature: Resolve wildcards in SnakemakeSL
     Given I open a file "foo.smk" with text
        """
        <rule_like> NAME:
-           output: "{sample}"
-           input: "{wildcards.sample}"
+           output: arg = "{input}"
+           params: <text>
        """
-    And I put the caret after wildcards.sa
+    And I put the caret after <signature>
     Then reference in injection should not resolve
     Examples:
-      | rule_like  |
-      | rule       |
-      | rule       |
-      | checkpoint |
+      | rule_like  | text                | signature     |
+      | rule       | "{wildcards.input}" | {wildcards.in |
+      | rule       | "{wildcards.input}" | {wildcar      |
+      | rule       | "{output.arg}"      | {output.ar    |
+      | rule       | "{output.arg}"      | {outp         |
+      | rule       | "{input.arg}"       | params: "{inp          |
+      | checkpoint | "{wildcards.input}" | {wildcards.in |
+      | checkpoint | "{output.arg}"      | {outp         |

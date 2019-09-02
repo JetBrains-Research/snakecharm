@@ -21,7 +21,7 @@ class SmkSLParserDefinition : PythonParserDefinition() {
                 SmkSLElementTypes.LANGUAGE -> SmkSLLanguageElement(node)
                 SmkSLElementTypes.REFERENCE_EXPRESSION -> SmkSLReferenceExpressionImpl(node)
                 SmkSLElementTypes.SUBSCRIPTION_EXPRESSION -> SmkSLSubscriptionExpression(node)
-                SmkSLElementTypes.KEY_EXPRESSION -> SmkSLSubscriptionKeyExpression(node)
+                SmkSLElementTypes.KEY_EXPRESSION -> SmkSLSubscriptionKeyReferenceExpression(node)
                 else -> SmkSLElementImpl(node)
             }
 

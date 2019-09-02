@@ -14,7 +14,7 @@ import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointStub
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleStub
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkSubworkflowStub
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLElement
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLExpression
 
 interface SmkToplevelSection: SmkSection {
     override fun getParentRuleOrCheckPoint(): SmkRuleOrCheckpoint? = null
@@ -66,7 +66,7 @@ interface SmkReferenceExpression: PyExpression {
     fun getReferenceName() = getNameElement()?.text
 }
 
-interface BaseSmkSLReferenceExpression : PyReferenceExpression, SmkSLElement, PsiNameIdentifierOwner {
+interface BaseSmkSLReferenceExpression : PyReferenceExpression, SmkSLExpression, PsiNameIdentifierOwner {
     fun containingRuleOrCheckpointSection(): SmkRuleOrCheckpointArgsSection? {
         val languageManager = InjectedLanguageManager.getInstance(project)
         val host = languageManager.getInjectionHost(this)

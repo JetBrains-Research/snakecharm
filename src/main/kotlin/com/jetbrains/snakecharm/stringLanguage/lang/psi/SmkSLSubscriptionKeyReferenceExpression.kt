@@ -14,7 +14,7 @@ import com.jetbrains.snakecharm.stringLanguage.lang.SmkSLElementVisitor
 import com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLTokenTypes
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLSubscriptionKeyReference
 
-class SmkSLSubscriptionKeyExpression(node: ASTNode) : PyReferenceExpressionImpl(node), BaseSmkSLReferenceExpression {
+class SmkSLSubscriptionKeyReferenceExpression(node: ASTNode) : PyReferenceExpressionImpl(node), BaseSmkSLReferenceExpression {
     override fun getName() = referencedName
 
     override fun getNameElement() = node.findChildByType(SmkSLTokenTypes.ACCESS_KEY)
@@ -39,10 +39,8 @@ class SmkSLSubscriptionKeyExpression(node: ASTNode) : PyReferenceExpressionImpl(
     override fun getReference(context: PyResolveContext) = getReference()
 
     override fun getQualifier() =
-            PsiTreeUtil.getParentOfType(this, SmkSLSubscriptionExpression::class.java)
-                    ?.children
-                    ?.firstOrNull { it is BaseSmkSLReferenceExpression }
-                    as? BaseSmkSLReferenceExpression
+            PsiTreeUtil.getParentOfType(this, SmkSLSubscriptionExpression::class.java)?.getOperand()
+
 
     override fun toString(): String {
         return "SmkSLSubscriptionKeyExpression: [${this.referencedName}]"

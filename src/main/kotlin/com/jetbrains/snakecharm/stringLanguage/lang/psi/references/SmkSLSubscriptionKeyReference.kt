@@ -16,12 +16,12 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionKeyExpression
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionKeyReferenceExpression
 
 class SmkSLSubscriptionKeyReference(
-        private val element: SmkSLSubscriptionKeyExpression,
+        private val element: SmkSLSubscriptionKeyReferenceExpression,
         private val type: SmkAvailableForSubscriptionType?
-) : PsiPolyVariantReferenceBase<SmkSLSubscriptionKeyExpression>(element), PsiReferenceEx, SmkSLBaseReference {
+) : PsiPolyVariantReferenceBase<SmkSLSubscriptionKeyReferenceExpression>(element), PsiReferenceEx, SmkSLBaseReference {
     companion object {
         fun indexArgTypeText(type: SmkAvailableForSubscriptionType) =
                 "Arg index in ${type.name}"

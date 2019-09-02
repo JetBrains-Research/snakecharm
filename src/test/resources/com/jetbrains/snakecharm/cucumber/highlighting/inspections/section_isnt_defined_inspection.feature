@@ -81,23 +81,24 @@ Feature: Inspection if section isn't defined in rule
     And <inspection> inspection is enabled
     Then I expect no inspection warning
     When I check highlighting warnings
+    # not fully implemented
     Examples:
       | rule_like  | section   | text                 | inspection                       |
-      | rule       | input     | shell("{input}")     | SmkSLUnresolvedSectionInspection |
+#      | rule       | input     | shell("{input}")     | SmkSLUnresolvedSectionInspection |
       | rule       | input     | print(input[0])      | SmkUnresolvedSectionInspection   |
-      | rule       | output    | shell("{output}")    | SmkSLUnresolvedSectionInspection |
+#      | rule       | output    | shell("{output}")    | SmkSLUnresolvedSectionInspection |
       | rule       | output    | print(output[0])     | SmkUnresolvedSectionInspection   |
-      | rule       | params    | shell("{params}")    | SmkSLUnresolvedSectionInspection |
+#      | rule       | params    | shell("{params}")    | SmkSLUnresolvedSectionInspection |
       | rule       | params    | print(params[0])     | SmkUnresolvedSectionInspection   |
-      | rule       | resources | shell("{resources}") | SmkSLUnresolvedSectionInspection |
+#      | rule       | resources | shell("{resources}") | SmkSLUnresolvedSectionInspection |
       | rule       | resources | print(resources[0])  | SmkUnresolvedSectionInspection   |
       | rule       | threads   | shell("{threads}")   | SmkSLUnresolvedSectionInspection |
       | rule       | threads   | print(threads[0])    | SmkUnresolvedSectionInspection   |
-      | rule       | log       | shell("{log}")       | SmkSLUnresolvedSectionInspection |
+#      | rule       | log       | shell("{log}")       | SmkSLUnresolvedSectionInspection |
       | rule       | log       | print(log[0])        | SmkUnresolvedSectionInspection   |
-      | rule       | input     | shell("{input}")     | SmkSLUnresolvedSectionInspection |
+#      | rule       | input     | shell("{input}")     | SmkSLUnresolvedSectionInspection |
       | rule       | input     | print(input[0])      | SmkUnresolvedSectionInspection   |
-      | checkpoint | params    | shell("{params}")    | SmkSLUnresolvedSectionInspection |
+#      | checkpoint | params    | shell("{params}")    | SmkSLUnresolvedSectionInspection |
       | checkpoint | params    | print(params[0])     | SmkUnresolvedSectionInspection   |
       | checkpoint | version   | shell("{version}")   | SmkSLUnresolvedSectionInspection |
       | checkpoint | version   | print(version[0])    | SmkUnresolvedSectionInspection   |
