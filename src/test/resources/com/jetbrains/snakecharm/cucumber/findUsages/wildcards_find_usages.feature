@@ -7,21 +7,23 @@ Feature: Find Usages for wildcards
         <rule_like> foo:
           output: "{sample}"
           message: "{wildcards.sample}"
-          shell: "{wildcards.sample}" # here
+          shell: "{wildcards[sample]}" # here
           run:
             p1 = wildcards.sample
+            p2 = wildcards['sample']
         """
-    When I put the caret at wildcards.sample}" # here
+    When I put the caret at wildcards[sample]}" # here
     And I invoke find usages
     Then find usages shows me following references:
       | file    | offset    | length   |
       | foo.smk | <offset1> | <length> |
       | foo.smk | <offset2> | <length> |
       | foo.smk | <offset3> | <length> |
+      | foo.smk | <offset4> | <length> |
     Examples:
-      | rule_like  | offset1 | offset2 | offset3 | length |
-      | rule       | 44      | 74      |    116     | 9      |
-      | checkpoint | 50      | 80      |    122     | 9      |
+      | rule_like  | offset1 | offset2 | offset3 |offset4 | length |
+      | rule       | 44      | 74      |    117     | 143 | 9      |
+      | checkpoint | 50      | 80      |    123     | 149 | 9      |
 
   Scenario Outline: Usages for wildcard names
     Given a snakemake project

@@ -123,24 +123,13 @@
     />
 
     <localInspection
-            language="SnakemakeSL" shortName="SmkWildcardNotDefinedInspection"
-            enabledByDefault="true"
-            level="ERROR"
-            suppressId="SmkWildcardNotDefinedInspection"
-            bundle="SnakemakeBundle"
-            groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.wildcard.not.defined"
-            implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkWildcardNotDefinedInspection"
-    />
-
-    <localInspection
             language="Snakemake" shortName="SmkNotSameWildcardsSetInspection"
             enabledByDefault="true"
             level="ERROR"
             suppressId="SmkNotSameWildcardsSetInspection"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.not.same.wildcards.set"
+            key="INSP.NAME.not.same.wildcards.set.title"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkNotSameWildcardsSetInspection"
     />
 
@@ -219,6 +208,17 @@
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.only.specific.lambda.params"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkLambdaRuleParamsInspection"
+    />
+
+    <localInspection
+            language="SnakemakeSL" shortName="SmkWildcardNotDefinedInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkWildcardNotDefinedInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.wildcard.not.defined.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkWildcardNotDefinedInspection"
     />
 
     <findUsagesHandlerFactory

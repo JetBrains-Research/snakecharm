@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.lang.psi.types
 
+import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.psi.util.PsiTreeUtil
@@ -16,7 +17,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
-class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyType {
+class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyType, SmkAvailableForSubscriptionType {
     private val typeName = "Rule ${ruleOrCheckpoint.name?.let { "'$it' " } ?: ""}wildcards"
     private val wildcardsDeclarations: List<WildcardDescriptor>?
 
@@ -61,6 +62,15 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyTy
         return listOf(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, resolveResult))
     }
 
+    override fun resolveMemberByIndex(
+            idx: Int, location: PyExpression?, direction: AccessDirection, resolveContext: PyResolveContext
+    ): List<RatedResolveResult> = emptyList() // not supported
+
+    /**
+     * Access by an index not supported
+     */
+    override fun getPositionArgsNumber(location: PsiElement) = 0
+
     private fun resolveToRuleWildcardConstraintsKwarg(name: String) =
             getRuleWildcardConstraintsSection()?.argumentList?.getKeywordArgument(name)
 
@@ -102,6 +112,10 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyTy
             )
         }.toTypedArray()
     }
+
+    override fun getCompletionVariantsAndPriority(
+            completionPrefix: String?, location: PsiElement, context: ProcessingContext?
+    ) = emptyList<LookupElementBuilder>() to 0.0
 
     override fun isBuiltin() = false
 }

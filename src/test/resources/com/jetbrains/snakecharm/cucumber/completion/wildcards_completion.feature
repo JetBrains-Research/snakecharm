@@ -109,26 +109,27 @@ Feature: Completion for wildcards
       | rule       |
       | checkpoint |
 
-  Scenario Outline: Completion list after wildcards.
+  Scenario Outline: Completion list after wildcards keyword
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
       input: "{wildcard1}"
       output: "{wildcard2}{wildcard3}"
-      shell: "{wildcards.}"
+      shell: "{wildcards<accessor>}"
     """
-    When I put the caret after wildcards.
+    When I put the caret after <signature>
     And I invoke autocompletion popup
     Then completion list should contain:
       | wildcard2 |
       | wildcard3 |
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | accessor | signature  |
+      | rule       | .        | wildcards. |
+      | rule       | []       | wildcards[ |
+      | checkpoint | .        | wildcards. |
 
-  Scenario Outline: Complete after wildcards.
+  Scenario Outline: Insertion handler after wildcards.
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """

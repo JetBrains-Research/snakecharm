@@ -39,14 +39,15 @@ Feature: Resolve wildcards in SnakemakeSL
     <rule_like> NAME:
         input: "{foo}"
         output: "{foo} here"
-        shell: "{wildcards.foo}"
+        shell: "{wildcards<accessor>}"
     """
-    When I put the caret after shell: "{wildcards.fo
+    When I put the caret after <signature>
     Then reference in injection should resolve to "foo} here" in "foo.smk"
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | accessor | signature             |
+      | rule       | .foo     | shell: "{wildcards.fo |
+      | rule       | [foo]    | shell: "{wildcards[fo |
+      | checkpoint | .foo     | shell: "{wildcards.fo |
 
   Scenario Outline: Resolve to second definition from wildcards.
     Given a snakemake project

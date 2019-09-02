@@ -44,10 +44,6 @@ Feature: This feature is tests for errors/warnings related to implicit symbols
       """
       Class 'object' does not define '__getitem__', so the '[]' operator cannot be used on its instances
       """
-    Then I expect inspection warning on <[> in <['sample'] # here1> with message
-      """
-      Cannot find reference '[' in 'Rule 'foo' wildcards'
-      """
       # And no inspection warnings for input!
     When I check highlighting warnings
     Examples:
@@ -84,20 +80,12 @@ Feature: This feature is tests for errors/warnings related to implicit symbols
       """
       Unresolved attribute reference 'get' for class 'object'
       """
-    Then I expect inspection warning on <get> in <get('sample')> with message
-      """
-      Cannot find reference 'get' in 'Rule 'foo' wildcards'
-      """
-    Then I expect inspection warning on <get> in <get('sample', None)> with message
-      """
-      Cannot find reference 'get' in 'Rule 'foo' wildcards'
-      """
       # And no inspection warnings for input!
     When I check highlighting warnings
     Examples:
       | rulelike   | section |
       | rule       | input   |
-#      | rule       | log     |
-#      | rule       | output  |
-#      | rule       | params  |
-#      | checkpoint | input   |
+      | rule       | log     |
+      | rule       | output  |
+      | rule       | params  |
+      | checkpoint | input   |
