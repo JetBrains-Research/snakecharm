@@ -25,7 +25,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
 
-abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
+abstract class AbstractSmkRuleOrCheckpointsListType<T: SmkRuleOrCheckpoint>(
         private val containingRule: T?,
         private val typeName: String,
         private val indexKey: StubIndexKey<String, T>,

@@ -13,7 +13,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleStub
-import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeSectionType
+import com.jetbrains.snakecharm.lang.psi.types.SmkRuleOrCheckpointSectionType
 
 class SmkRuleImpl
     : SmkRuleLikeImpl<SmkRuleStub, SmkRule, SmkRuleOrCheckpointArgsSection>, SmkRule {
@@ -21,7 +21,7 @@ class SmkRuleImpl
     override val wildcardsElement = createFakeWildcardsPsiElement(this)
 
     override fun getType(context: TypeEvalContext, key: TypeEvalContext.Key)
-            = SmkRuleLikeSectionType(this)
+            = SmkRuleOrCheckpointSectionType(this)
 
     constructor(node: ASTNode): super(node)
     constructor(stub: SmkRuleStub): super(stub, SmkStubElementTypes.RULE_DECLARATION_STATEMENT)

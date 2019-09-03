@@ -43,6 +43,9 @@ object SnakemakeAPI {
 
     const val SMK_VARS_WILDCARDS = "wildcards"
     const val WILDCARDS_ACCESSOR_CLASS = "snakemake.io.Wildcards"
+    const val CHECKPOINT_CLASS_FQN = "snakemake.checkpoints.Checkpoint"
+    const val PY_GET_METHOD = "get"
+    const val PY_GETITEM_METHOD = "__getitem__"
 
     /**
      * Also see [ImplicitPySymbolsProvider], it also processes 'InputFiles', etc. symbols

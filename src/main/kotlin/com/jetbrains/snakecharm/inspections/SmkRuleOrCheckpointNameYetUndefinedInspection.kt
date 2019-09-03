@@ -8,8 +8,8 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
-import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
-import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
+import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointsListType
+import com.jetbrains.snakecharm.lang.psi.types.SmkRulesListType
 
 class SmkRuleOrCheckpointNameYetUndefinedInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -20,7 +20,7 @@ class SmkRuleOrCheckpointNameYetUndefinedInspection : SnakemakeInspection() {
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {
             val nodeFile = node.containingFile
             val type = TypeEvalContext.codeAnalysis(node.project, nodeFile).getType(node)
-            if (type !is SmkRulesType && type !is SmkCheckpointType) {
+            if (type !is SmkRulesListType && type !is SmkCheckpointsListType) {
                 return
             }
 

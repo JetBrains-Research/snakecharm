@@ -20,8 +20,8 @@ import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
-import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
-import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType.Companion.getVariantsFromIndex
+import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointsListType
+import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointsListType.Companion.getVariantsFromIndex
 import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
 
 class SmkRulesAndCheckpointsCompletionContributor : CompletionContributor() {
@@ -205,7 +205,7 @@ private fun addVariantsToCompletionResultSet(
 
     result.addAllElements(
             variants.map { (name, elem) ->
-                AbstractSmkRuleOrCheckpointType.createRuleLikeLookupItem(name, elem)
+                AbstractSmkRuleOrCheckpointsListType.createRuleLikeLookupItem(name, elem)
             }
     )
 

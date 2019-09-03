@@ -14,12 +14,14 @@ import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
-class SmkRuleLikeSectionType(private val declaration: SmkRuleOrCheckpoint) : PyType {
-    override fun getName() = "${declaration.sectionTokenType}${declaration.name?.let { " $it" } ?: ""}"
+class SmkRuleOrCheckpointSectionType(
+        val ruleOrCheckpoint: SmkRuleOrCheckpoint
+) : PyType {
+    override fun getName() = "${ruleOrCheckpoint.sectionTokenType}${ruleOrCheckpoint.name?.let { " $it" } ?: ""}"
 
     override fun assertValid(message: String?) {
-        if (!declaration.isValid) {
-            throw PsiInvalidElementAccessException(declaration, message)
+        if (!ruleOrCheckpoint.isValid) {
+            throw PsiInvalidElementAccessException(ruleOrCheckpoint, message)
         }
     }
 
@@ -53,7 +55,7 @@ class SmkRuleLikeSectionType(private val declaration: SmkRuleOrCheckpoint) : PyT
     }
 
     private fun getAccessibleStatements() =
-            declaration.statementList.statements.filter { it.name in RULE_TYPE_ACCESSIBLE_SECTIONS }
+            ruleOrCheckpoint.statementList.statements.filter { it.name in RULE_TYPE_ACCESSIBLE_SECTIONS }
 
     override fun isBuiltin() = false
 }

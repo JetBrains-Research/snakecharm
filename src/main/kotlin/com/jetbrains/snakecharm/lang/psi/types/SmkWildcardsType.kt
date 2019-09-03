@@ -17,7 +17,9 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
-class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyType, SmkAvailableForSubscriptionType {
+class SmkWildcardsType(
+        val ruleOrCheckpoint: SmkRuleOrCheckpoint
+) : PyType, SmkAvailableForSubscriptionType {
     private val typeName = "Rule ${ruleOrCheckpoint.name?.let { "'$it' " } ?: ""}wildcards"
     private val wildcardsDeclarations: List<WildcardDescriptor>?
 
@@ -34,7 +36,7 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyTy
                 ?.distinctBy { it.text }
                 ?.toList()
     }
-    
+
     override fun getName() = typeName
 
     override fun assertValid(message: String?) {

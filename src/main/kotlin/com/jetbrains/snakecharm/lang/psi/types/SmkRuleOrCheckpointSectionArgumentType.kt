@@ -18,13 +18,15 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
 
-class SmkRuleLikeSectionArgsType(
+class SmkRuleOrCheckpointSectionArgumentType(
         val section: SmkRuleOrCheckpointArgsSection
 ) : PyType, SmkAvailableForSubscriptionType {
 
     private val typeName: String = section.sectionKeyword?.let { "$it:" } ?: "section"
 
     override fun getName() = typeName
+
+    override fun getDeclarationElement(): SmkRuleOrCheckpointArgsSection = section
 
     override fun assertValid(message: String?) {
         if (!section.isValid) {

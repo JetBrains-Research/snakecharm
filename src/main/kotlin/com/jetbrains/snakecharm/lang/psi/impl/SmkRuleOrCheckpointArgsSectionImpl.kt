@@ -10,13 +10,14 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkConfigfileReference
 import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
-import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeSectionArgsType
+import com.jetbrains.snakecharm.lang.psi.types.SmkRuleOrCheckpointSectionArgumentType
 
 open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode): SmkArgsSectionImpl(node),
         SmkRuleOrCheckpointArgsSection
 {
+    //TODO: checkpoint
     override fun getType(context: TypeEvalContext, key: TypeEvalContext.Key)
-            = SmkRuleLikeSectionArgsType(this)
+            = SmkRuleOrCheckpointSectionArgumentType(this)
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SmkElementVisitor -> pyVisitor.visitSmkRuleOrCheckpointArgsSection(this)

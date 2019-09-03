@@ -26,5 +26,5 @@ class SmkFakePsiElement(
 
     override fun getTextOffset() = parent.textOffset
     override fun getTextLength() = parent.textLength
-
+    override fun isValid() = myParent.isValid
 }

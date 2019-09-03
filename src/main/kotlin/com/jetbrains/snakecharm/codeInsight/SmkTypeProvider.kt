@@ -8,6 +8,7 @@ import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.PyTypeProviderBase
 import com.jetbrains.python.psi.types.TypeEvalContext
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.PY_GET_METHOD
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTION_ACCESSOR_CLASSES
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_CHECKPOINTS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_RULES
@@ -19,18 +20,23 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RESOURCES
 import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
-import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeSectionArgsType
-import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
-import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
+import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
+import com.jetbrains.snakecharm.lang.psi.types.*
 import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
+import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
 class SmkTypeProvider : PyTypeProviderBase() {
-    // getParameterType(param, function, context) // only for function declarations, not lambdas
-    // registerReturnType(classQualifiedName, methods, callback)
-    // getReturnType(callable, context)
-    // getCallType(function, callSite, context)
+    override fun getCallType(function: PyFunction, callSite: PyCallSiteExpression, context: TypeEvalContext): Ref<PyType>? {
+        return super.getCallType(function, callSite, context)
+    }
+
+    override fun getCallableType(callable: PyCallable, context: TypeEvalContext): PyType? {
+//        if (callable.qualifiedName == "get") {
+//            println("!!")
+//        }
+        return super.getCallableType(callable, context)
+    }
     // getGenericType(cls, context)
     // getGenericSubstitutions(cls, context)
     // getCallableType(callable, context)  // e.g. method calls
@@ -40,6 +46,10 @@ class SmkTypeProvider : PyTypeProviderBase() {
             context: TypeEvalContext,
             anchor: PsiElement?
     ): Ref<PyType>? {
+        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(anchor)) {
+            return null
+        }
+
         if (anchor is PyReferenceExpression) {
             // lambdas params types
             if (referenceTarget is PyNamedParameter) {
@@ -54,6 +64,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
                 return getSectionAccessorInRunSection(referenceTarget, anchor)
             }
         }
+
         return null
     }
 
@@ -72,7 +83,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
                         anchor, SmkRunSection::class.java
                 ) ?: return null
 
-                ruleLike.getSectionByName(refTargetSection)?.let { SmkRuleLikeSectionArgsType(it) }
+                ruleLike.getSectionByName(refTargetSection)?.let { SmkRuleOrCheckpointSectionArgumentType(it) }
 
             }
             fqn == WILDCARDS_ACCESSOR_CLASS -> {
@@ -107,7 +118,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
         if (isFstPositionalParam || paramName in allowedArgs) {
             val type = when (paramName) {
                 SECTION_INPUT, SECTION_OUTPUT, SECTION_RESOURCES -> {
-                    ruleLike.getSectionByName(paramName)?.let { SmkRuleLikeSectionArgsType(it) }
+                    ruleLike.getSectionByName(paramName)?.let { SmkRuleOrCheckpointSectionArgumentType(it) }
                 }
                 else -> {
                     // 1st pos parameter in lambda is wildcard
@@ -139,6 +150,30 @@ class SmkTypeProvider : PyTypeProviderBase() {
             referenceExpression: PyReferenceExpression,
             context: TypeEvalContext
     ): PyType? {
+        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(referenceExpression)) {
+             return null
+        }
+
+        val qualifier = referenceExpression.qualifier
+
+        // Checkpoint type:
+        //      after checkpoints.NAME.get().section_name
+        if (qualifier is PyCallExpression) {
+            val callSimpleName = qualifier.callSimpleName()
+            if (callSimpleName == PY_GET_METHOD) {
+                val callCallee = qualifier.callee
+                if (callCallee is PyReferenceExpression) {
+                    val callQualifier = callCallee.qualifier
+                    if (callQualifier != null) {
+                        val type = context.getType(callQualifier)
+                        if (type is CheckpointType) {
+                            return SmkRuleOrCheckpointSectionType(type.checkpoint)
+                        }
+                    }
+                }
+            }
+        }
+
         val smkExpression = when {
             SnakemakeLanguageDialect.isInsideSmkFile(referenceExpression) -> referenceExpression
             SmkSLanguage.isInsideSmkSLFile(referenceExpression) -> {
@@ -147,7 +182,6 @@ class SmkTypeProvider : PyTypeProviderBase() {
             }
             else -> return null
         }
-
         val psiFile = smkExpression?.containingFile
         val parentDeclaration =
                 PsiTreeUtil.getParentOfType(smkExpression, SmkRuleOrCheckpoint::class.java)
@@ -168,11 +202,11 @@ class SmkTypeProvider : PyTypeProviderBase() {
         // XXX: at the moment affects all "rules" variables in a *.smk file, better to
         // affect only "rules" which is resolved to appropriate place
         return when (referenceExpression.referencedName) {
-            SMK_VARS_RULES -> SmkRulesType(
+            SMK_VARS_RULES -> SmkRulesListType(
                     parentDeclaration as? SmkRule,
                     psiFile
             )
-            SMK_VARS_CHECKPOINTS -> SmkCheckpointType(
+            SMK_VARS_CHECKPOINTS -> SmkCheckpointsListType(
                     parentDeclaration as? SmkCheckPoint,
                     psiFile
             )

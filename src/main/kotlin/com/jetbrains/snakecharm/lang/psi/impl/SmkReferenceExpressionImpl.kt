@@ -17,7 +17,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.SmkRule
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
-import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
+import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointsListType
 
 
 class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferenceExpression {
@@ -34,10 +34,10 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyElementImpl(node), SmkReferen
         private val key: String = element.text
 
         override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
-            val rules = AbstractSmkRuleOrCheckpointType
+            val rules = AbstractSmkRuleOrCheckpointsListType
                     .findAvailableRuleLikeElementByName(element, key, SmkRuleNameIndex.KEY, SmkRule::class.java)
                     { getRules().map{ (_, psi) -> psi }}
-            val checkpoints = AbstractSmkRuleOrCheckpointType
+            val checkpoints = AbstractSmkRuleOrCheckpointsListType
                     .findAvailableRuleLikeElementByName(element, key, SmkCheckpointNameIndex.KEY, SmkCheckPoint::class.java)
                     { getCheckpoints().map{ (_, psi) -> psi }}
 

@@ -5,10 +5,10 @@ import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex.Companion.KEY
 
-class SmkCheckpointType(
+class SmkCheckpointsListType(
         containingRule: SmkCheckPoint?,
         smkFile: SmkFile
-) : AbstractSmkRuleOrCheckpointType<SmkCheckPoint>(
+) : AbstractSmkRuleOrCheckpointsListType<SmkCheckPoint>(
         containingRule, SMK_VARS_CHECKPOINTS, KEY, SmkCheckPoint::class.java
 ) {
     override val currentFileDeclarations: List<SmkCheckPoint> by lazy {
