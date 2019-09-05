@@ -7,14 +7,35 @@
     </vendor>
 
     <description><![CDATA[
-    Adds Snakemake language support.<br>
-    <a href="https://snakemake.readthedocs.io/en/stable/">Snakemake</a> is a language for workflow management.
+    <br>
+    <a href="https://snakemake.readthedocs.io/en/stable/">Snakemake</a> workflow management system is a tool to create
+     reproducible and scalable data analyses widely used by bioinformaticians.
     <br>
     <br>
-    <a href="https://github.com/JetBrains-Research/snakecharm">SnakeCharm at GitHub</a><br>
-    <a href="https://github.com/JetBrains-Research/snakecharm/issues">Issue tracker</a><br>
-    <a href="https://github.com/JetBrains-Research/snakecharm/releases">Releases</a><br>
-    <a href="https://github.com/JetBrains-Research/snakecharm/blob/master/CHANGES">Changelog</a><br>
+    This plugin adds syntax highlighting and code insight support for python-based language used in Snakemake.<br>
+    Main features are:
+    <ul>
+        <li>Snakemake syntax highlighting: both python and pipelines related extension language.</li>
+        <li>Syntax highlighting for snakemake string format language.</li>
+        <li>Special highlighting for rule wildcards.</li>
+        <li>Code completion and goto to declaration for:
+            <ul>
+                <li>Snakemake specific methods and variables (e.g. config, rules, expand(), etc);</li>
+                <li>Rules names, rules sections and section arguments;</li>
+                <li>Wildcard names;</li>
+                <li>Python methods and variables.</li>
+            </ul>
+        </li>
+        <li>Inspections for undeclared wildcards usage.</li>
+        <li>Multiple inspections for different possibles bugs in the pipeline.</li>
+    </ul>
+    <br>
+    Useful links: <ul>
+        <li><a href="https://github.com/JetBrains-Research/snakecharm">SnakeCharm at GitHub</a><br></li>
+        <li><a href="https://github.com/JetBrains-Research/snakecharm/issues">Issue tracker</a><br></li>
+        <li><a href="https://github.com/JetBrains-Research/snakecharm/blob/master/CHANGES">Changelog</a><br></li>
+        <li><a href="https://plugins.jetbrains.com/plugin/11947-snakecharm">SnakeCharm in JetBrains Plugin Repository</a><br></li>
+    </ul>
     ]]></description>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
@@ -230,6 +251,17 @@
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.wildcards.confusing.section.title"
             implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkSLWildcardNameIsConfusingInspection"
+    />
+
+    <localInspection
+            language="SnakemakeSL" shortName="SmkSLMissingWildcardsAccessorPrefixInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkSLMissingWildcardsAccessorPrefix"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.wildcards.prefix.missing.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkSLMissingWildcardsAccessorPrefixInspection"
     />
 
     <localInspection
