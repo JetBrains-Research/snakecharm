@@ -24,8 +24,11 @@
                 <li>Rules names, rules sections and section arguments;</li>
                 <li>Wildcard names;</li>
                 <li>Python methods and variables.</li>
+                <li>Paths in sections: configfile, workdir, conda, include</li>
             </ul>
         </li>
+        <li>Open rule declaration by name using 'Navigate|Symbol...'</li>
+        <li>Structure view for Snakemake files</li>
         <li>Inspections for undeclared wildcards usage.</li>
         <li>Multiple inspections for different possibles bugs in the pipeline.</li>
     </ul>
