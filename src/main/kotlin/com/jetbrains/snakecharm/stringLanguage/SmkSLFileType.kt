@@ -10,5 +10,5 @@ object SmkSLFileType : LanguageFileType(SmkSLanguage) {
 
     override fun getDefaultExtension() = "smkStringLanguage"
 
-    override fun getDescription() = "Snakemake formatted string"
+    override fun getDescription() = "Snakemake Formatted String"
 }
