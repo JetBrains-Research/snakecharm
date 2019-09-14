@@ -70,7 +70,7 @@
     <lang.foldingBuilder language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.SmkMakeFoldingBuilder"/>
     <lang.braceMatcher language="SnakemakeSL" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.SmkSLBraceMatcher"/>
     <lang.findUsagesProvider
-            language="Python" implementationClass="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesProvider"
+            language="Python" implementationClass="com.jetbrains.snakecharm.codeInsight.refactoring.SmkAndSmkSLFindUsagesProvider"
             order="first"
             id="smkElements"
     />

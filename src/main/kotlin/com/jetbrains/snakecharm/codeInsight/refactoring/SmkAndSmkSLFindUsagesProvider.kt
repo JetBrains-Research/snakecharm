@@ -15,7 +15,7 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 /**
  * Provides correct usages types for Snakemake specific elements, should be executed before Python impl.
  */
-class SmkFindUsagesProvider: PythonFindUsagesProvider() {
+class SmkAndSmkSLFindUsagesProvider: PythonFindUsagesProvider() {
     override fun getWordsScanner() = SmkWordsScanner()
 
     override fun getNodeText(element: PsiElement, useFullName: Boolean) = getDescriptiveName(element)
