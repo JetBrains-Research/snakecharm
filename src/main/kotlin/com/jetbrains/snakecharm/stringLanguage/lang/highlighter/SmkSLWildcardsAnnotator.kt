@@ -5,7 +5,6 @@ import com.jetbrains.python.highlighting.PyHighlighter
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
 object SmkSLWildcardsAnnotator : AbstractSmkSLAnnotator() {
     val HIGHLIGHTING_WILDCARDS_KEY = PyHighlighter.PY_NUMBER!!
@@ -14,7 +13,7 @@ object SmkSLWildcardsAnnotator : AbstractSmkSLAnnotator() {
         val exprIdentifier = expr.nameIdentifier
 
         when {
-            expr.reference is SmkSLWildcardReference -> {
+            expr.isWildcard() -> {
                 addHighlightingAnnotation(
                         expr, HIGHLIGHTING_WILDCARDS_KEY, HighlightSeverity.INFORMATION
                 )

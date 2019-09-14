@@ -42,7 +42,7 @@ class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(no
 
         if (parentSection is SmkRuleOrCheckpointArgsSection && parentSection.isWildcardsExpandingSection()) {
             val parentRuleOrCheckPoint = parentSection.getParentRuleOrCheckPoint()
-            if (!isQualified) {
+            if (!isQualified && isInValidCallExpression()) {
                 val type = context.typeEvalContext.getType(parentRuleOrCheckPoint.wildcardsElement)
                 if (type is SmkWildcardsType) {
                     return SmkSLWildcardReference(this, type)
@@ -65,18 +65,14 @@ class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(no
         return "SmkSLReferenceExpressionImpl: " + this.referencedName
     }
 
+    fun isWildcard() = reference is SmkSLWildcardReference
+
     companion object {
         private fun BaseSmkSLReferenceExpression.isInValidCallExpression(): Boolean {
             val host = InjectedLanguageManager.getInstance(project).getInjectionHost(this)
             val callExpression = PsiTreeUtil.getParentOfType(host, PyCallExpression::class.java)
             return callExpression == null || callExpression.callSimpleName() !in FUNCTIONS_BANNED_FOR_WILDCARDS
         }
-
-        fun isWildcard(expr: BaseSmkSLReferenceExpression) =
-                PsiTreeUtil.getParentOfType(expr, BaseSmkSLReferenceExpression::class.java) == null &&
-                        (expr.containingRuleOrCheckpointSection()?.isWildcardsExpandingSection() ?: false) &&
-                        expr.text.isNotEmpty() &&
-                        expr.isInValidCallExpression()
     }
 }
 

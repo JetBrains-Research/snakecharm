@@ -25,7 +25,7 @@ import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeSectionArgsType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
 class SmkTypeProvider : PyTypeProviderBase() {
     // getParameterType(param, function, context) // only for function declarations, not lambdas
@@ -164,11 +164,9 @@ class SmkTypeProvider : PyTypeProviderBase() {
             return null
         }
 
-        if (referenceExpression is BaseSmkSLReferenceExpression) {
-            if (referenceExpression.getReference() is SmkSLWildcardReference) {
-                // is just a wildcard here
-                return null
-            }
+        if (referenceExpression is SmkSLReferenceExpressionImpl && referenceExpression.isWildcard()) {
+            // is just a wildcard here
+            return null
         }
 
         // XXX: at the moment affects all "rules" variables in a *.smk file, better to

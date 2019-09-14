@@ -24,7 +24,7 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
     ) = object : SmkSLInspectionVisitor(holder, session) {
 
         override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpressionImpl) {
-            if (!SmkSLReferenceExpressionImpl.isWildcard(expr)) {
+            if (!expr.isWildcard()) {
                 return
             }
 

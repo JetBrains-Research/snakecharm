@@ -95,7 +95,7 @@ class SmkWildcardsCollector(
             if (st != null) {
                 wildcardsElements.add(WildcardDescriptor(
                         st, st.text,
-                        if (currentSectionIdx == (-1).toByte()) WildcardDescriptor.UNDEFINED_SECTION else currentSectionIdx
+                        if (currentSectionIdx == (-1).toByte()) WildcardDescriptor.UNDEFINED_SECTION_RATE else currentSectionIdx
                 ))
             }
         }
@@ -107,6 +107,6 @@ data class WildcardDescriptor(
         val definingSectionRate: Byte
 ) {
     companion object {
-        const val UNDEFINED_SECTION: Byte = Byte.MAX_VALUE
+        const val UNDEFINED_SECTION_RATE: Byte = Byte.MAX_VALUE
     }
 }

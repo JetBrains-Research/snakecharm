@@ -36,7 +36,6 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyTy
 
         collector.getWildcards()
                 ?.asSequence()
-                //                ?.filterNot { it.definingSectionIdx == WildcardDescriptor.UNDEFINED_SECTION }
                 ?.sortedBy { it.definingSectionRate }
                 ?.distinctBy { it.text }
                 ?.toList()
@@ -70,7 +69,6 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyTy
             return listOf(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, resolveResult))
         }
 
-        // TODO: resolve or not into themselfs?
         return emptyList()
     }
 

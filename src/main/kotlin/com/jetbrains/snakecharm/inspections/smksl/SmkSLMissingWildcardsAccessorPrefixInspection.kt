@@ -12,7 +12,6 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
 class SmkSLMissingWildcardsAccessorPrefixInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -25,8 +24,7 @@ class SmkSLMissingWildcardsAccessorPrefixInspection : SnakemakeInspection() {
             if (expr.isQualified) {
                 return
             }
-            val ref = expr.reference
-            if (ref is SmkSLWildcardReference) {
+            if (expr.isWildcard()) {
                 return
             }
             val referencedName = expr.referencedName
@@ -42,7 +40,7 @@ class SmkSLMissingWildcardsAccessorPrefixInspection : SnakemakeInspection() {
                         // check if our expr has a name as one of wildcards:
                         if (referencedName in wildcards) {
                             // ensure that reference isn't resolved to some other element
-                            if (ref.resolve() == null) {
+                            if (expr.reference.resolve() == null) {
                                 registerProblem(
                                         expr,
                                         SnakemakeBundle.message("INSP.NAME.wildcards.prefix.missing.message"),

@@ -91,3 +91,24 @@ Feature: Annotate wildcards
       | rule_like  |
       | rule       |
       | checkpoint |
+
+  Scenario Outline: Simple wildcard name in allows calls
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> foo:
+      input: <call>("{sample}")
+    """
+    Then I expect inspection info on <sample> with message
+    """
+    PY.NUMBER
+    """
+    When I check highlighting infos ignoring extra highlighting
+    Examples:
+      | rule_like  | call    |
+      | rule       | ancient |
+      | rule       | temp    |
+      | checkpoint | temp    |
+
+  # TODO: Scenario Outline: Simple wildcard name in banned calls
+  # (e.g. expand), at the moment not clear how to write test for such highlighting
