@@ -30,7 +30,7 @@ class SmkWildcardsCollector(
 ) : SmkElementVisitor, PyRecursiveElementVisitor() {
     private val wildcardsElements = mutableListOf<WildcardDescriptor>()
     private var atLeastOneInjectionVisited = false
-    private var currentSectionIdx: Byte = WildcardDescriptor.UNDEFINED_SECTION
+    private var currentSectionIdx: Byte = -1
 
     /**
      * @return List of all wildcard element usages and its names or null if no string literals were found
@@ -65,7 +65,7 @@ class SmkWildcardsCollector(
                 return
             }
         } finally {
-            currentSectionIdx = WildcardDescriptor.UNDEFINED_SECTION
+            currentSectionIdx = -1
         }
     }
 
@@ -93,7 +93,10 @@ class SmkWildcardsCollector(
         injections?.forEach { injection ->
             val st = PsiTreeUtil.getChildOfType(injection, SmkSLReferenceExpressionImpl::class.java)
             if (st != null) {
-                wildcardsElements.add(WildcardDescriptor(st, st.text, currentSectionIdx))
+                wildcardsElements.add(WildcardDescriptor(
+                        st, st.text,
+                        if (currentSectionIdx == (-1).toByte()) WildcardDescriptor.UNDEFINED_SECTION else currentSectionIdx
+                ))
             }
         }
     }
@@ -101,9 +104,9 @@ class SmkWildcardsCollector(
 data class WildcardDescriptor(
         val psi: SmkSLReferenceExpressionImpl,
         val text: String,
-        val definingSectionIdx: Byte
+        val definingSectionRate: Byte
 ) {
     companion object {
-        const val UNDEFINED_SECTION: Byte = -1
+        const val UNDEFINED_SECTION: Byte = Byte.MAX_VALUE
     }
 }

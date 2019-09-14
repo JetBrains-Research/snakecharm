@@ -19,6 +19,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RESOURCES
 import com.jetbrains.snakecharm.lang.psi.*
+import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeSectionArgsType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
@@ -40,6 +41,10 @@ class SmkTypeProvider : PyTypeProviderBase() {
             context: TypeEvalContext,
             anchor: PsiElement?
     ): Ref<PyType>? {
+        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(anchor)) {
+            return null
+        }
+
         if (anchor is PyReferenceExpression) {
             // lambdas params types
             if (referenceTarget is PyNamedParameter) {
@@ -51,7 +56,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
 
             // 'run:' section: input, output, wildcards, ..
             if (referenceTarget is PyClass) {
-                return getSectionAccessorInRunSection(referenceTarget, anchor)
+                return getSectionAccessorInRunSection(referenceTarget, anchor, context)
             }
         }
         return null
@@ -59,7 +64,8 @@ class SmkTypeProvider : PyTypeProviderBase() {
 
     private fun getSectionAccessorInRunSection(
             referenceTarget: PyClass,
-            anchor: PyReferenceExpression
+            anchor: PyReferenceExpression,
+            context: TypeEvalContext
     ): Ref<PyType>? {
 
         val fqn = referenceTarget.qualifiedName
@@ -80,7 +86,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
                         anchor, SmkRuleOrCheckpoint::class.java
                 ) ?: return null
 
-                SmkWildcardsType(ruleLike)
+                context.getType(ruleLike.wildcardsElement)
             }
             else -> null
         }
@@ -88,12 +94,12 @@ class SmkTypeProvider : PyTypeProviderBase() {
     }
 
     private fun getLambdaParamType(referenceTarget: PyNamedParameter): Ref<PyType>? {
-        // in lambda
+        // in a lambda
         val lambda = PsiTreeUtil.getParentOfType(
                 referenceTarget, PyLambdaExpression::class.java
         ) ?: return null
 
-        // in section, lambda not in call
+        // in a section, lambda not in call
         val (parentSection, ruleLike) = getParentSectionAndRuleLike(
                 lambda, SmkRuleOrCheckpointArgsSection::class.java, PyCallExpression::class.java
         ) ?: return null
@@ -110,7 +116,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
                     ruleLike.getSectionByName(paramName)?.let { SmkRuleLikeSectionArgsType(it) }
                 }
                 else -> {
-                    // 1st pos parameter in lambda is wildcard
+                    // 1st positional parameter in a lambda is wildcard
                     if (isFstPositionalParam) SmkWildcardsType(ruleLike) else null
                 }
             }

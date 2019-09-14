@@ -29,14 +29,21 @@ class SmkSLWildcardReference(
                     PyResolveContext.defaultContext()
             ).toTypedArray()
 
-    fun wildcardName(): String {
-        // not canonical text!!!! (because range will be wrong for "foo.boo.doo" wildcard name
-        return (PsiTreeUtil.getTopmostParentOfType(element, SmkSLExpression::class.java) ?: element).text
-    }
+    /**
+     * not canonical text!!!! (because range will be wrong for "foo.boo.doo" wildcard name
+     */
+    fun wildcardName() = getWildcardTrueExpression().text
+
+    /**
+     * In case of wildcards with dots inside, which is allows but very confusing, we need to take the
+     * leftmost qualifier, e.g. "foo.boo.doo.coo", for 'doo' it will be 'foo'. And use it's text as wildcard
+     * name
+     */
+    fun getWildcardTrueExpression() =
+            PsiTreeUtil.getTopmostParentOfType(element, SmkSLExpression::class.java) ?: element
 
     override fun getVariants(): Array<out Any> =
             type.getCompletionVariants(canonicalText, element, ProcessingContext())
-//            type.getCompletionVariants(wildcardName(), element, ProcessingContext())
 
     override fun getUnresolvedHighlightSeverity(context: TypeEvalContext?): HighlightSeverity? = null
 

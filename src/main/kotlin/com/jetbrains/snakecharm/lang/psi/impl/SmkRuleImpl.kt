@@ -3,6 +3,8 @@ package com.jetbrains.snakecharm.lang.psi.impl
 import com.intellij.lang.ASTNode
 import com.intellij.util.PlatformIcons
 import com.jetbrains.python.psi.PyElementVisitor
+import com.jetbrains.python.psi.PyTypedElement
+import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkFakePsiElement
@@ -14,6 +16,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleStub
 import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeSectionType
+import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 
 class SmkRuleImpl
     : SmkRuleLikeImpl<SmkRuleStub, SmkRule, SmkRuleOrCheckpointArgsSection>, SmkRule {
@@ -34,6 +37,15 @@ class SmkRuleImpl
     }
 
     companion object {
-        fun createFakeWildcardsPsiElement(element: SmkRuleOrCheckpoint) = SmkFakePsiElement(element, SnakemakeAPI.SMK_VARS_WILDCARDS, PlatformIcons.PARAMETER_ICON)
+        fun createFakeWildcardsPsiElement(element: SmkRuleOrCheckpoint)
+                = SmkWildcardFakePsiElement(element)
+    }
+}
+
+class SmkWildcardFakePsiElement(val element: SmkRuleOrCheckpoint): SmkFakePsiElement(
+        element, SnakemakeAPI.SMK_VARS_WILDCARDS, PlatformIcons.PARAMETER_ICON
+), PyTypedElement {
+    override fun getType(typeEvalContext: TypeEvalContext, key: TypeEvalContext.Key): PyType? {
+        return SmkWildcardsType(element)
     }
 }

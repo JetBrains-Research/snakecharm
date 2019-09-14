@@ -9,7 +9,7 @@ Feature: Resolve wildcards in SnakemakeSL
         output: "{foo} here"
     """
     When I put the caret after input: "{fo
-    Then reference in injection should resolve to "foo} here" in "foo.smk"
+    Then reference in injection should resolve to "foo" in context "foo} here" in file "foo.smk"
     Examples:
       | rule_like  |
       | rule       |
@@ -42,7 +42,7 @@ Feature: Resolve wildcards in SnakemakeSL
         shell: "{wildcards<accessor>}"
     """
     When I put the caret after <signature>
-    Then reference in injection should resolve to "foo} here" in "foo.smk"
+    Then reference in injection should resolve to "foo" in context "foo} here" in file "foo.smk"
     Examples:
       | rule_like  | accessor | signature             |
       | rule       | .foo     | shell: "{wildcards.fo |
@@ -61,7 +61,7 @@ Feature: Resolve wildcards in SnakemakeSL
         shell: "{wildcards.foo}"
     """
     When I put the caret after shell: "{wildcards.fo
-    Then reference in injection should resolve to "foo} here" in "foo.smk"
+    Then reference in injection should resolve to "foo" in context "foo} here" in file "foo.smk"
     Examples:
       | rule_like  |
       | rule       |
@@ -162,7 +162,43 @@ Feature: Resolve wildcards in SnakemakeSL
       | rule       |  4  |
       | checkpoint |  1  |
 
-  Scenario Outline: Do not resolve in rule run section if wildcard from non-declaring section
+  Scenario Outline: Resolve non-declared wildcards to expanding section (run section)
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+       """
+       <rule_like> NAME:
+           <section>:  "{sample}" #def
+           run:
+              wildcards.sample
+       """
+    And I put the caret after wildcards.sa
+    Then reference should resolve to "sample" in context "sample}" #def" in file "foo.smk"
+    Examples:
+      | rule_like  | section |
+      | rule       |  input  |
+      | rule       |  params  |
+      | checkpoint |  input  |
+
+  Scenario Outline: Resolve non-declared wildcards to expanding section (in injection)
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+          """
+          <rule_like> NAME:
+              <section>:  "{sample}" #def
+              <text>sample}" # here
+
+          """
+    And I put the caret at ample}" # here
+    Then reference in injection should resolve to "sample" in context "sample}" #def" in file "foo.smk"
+    Examples:
+      | rule_like  | section | text                |
+      | rule       | input   | shell: "{wildcards. |
+      | rule       | params  | shell: "{wildcards. |
+      | rule       | input   | params: "{          |
+      | rule       | params  | input: "{           |
+      | checkpoint | input   | shell: "{wildcards. |
+
+  Scenario Outline: Do not resolve in rule run section if wildcard from non-declaring and non-expanding section
     Given a snakemake project
     Given I open a file "foo.smk" with text
        """
@@ -175,13 +211,11 @@ Feature: Resolve wildcards in SnakemakeSL
     And I put the caret after wildcards.sa
     Then reference should not resolve
     Examples:
-      | rule_like  | section |
-      | rule       |  input  |
-      | rule       |  param  |
-      | checkpoint |  input  |
+      | rule_like | section |
+      | rule      | message |
+      | rule      | shell   |
 
-
-  Scenario Outline: Do not resolve in wildcard references which looks like qualified
+  Scenario Outline: Do not resolve after dot in wildcard references which looks like qualified
     Given a snakemake project
     Given I open a file "foo.smk" with text
        """
@@ -194,9 +228,22 @@ Feature: Resolve wildcards in SnakemakeSL
     Examples:
       | rule_like  | text                | signature     |
       | rule       | "{wildcards.input}" | {wildcards.in |
-      | rule       | "{wildcards.input}" | {wildcar      |
       | rule       | "{output.arg}"      | {output.ar    |
-      | rule       | "{output.arg}"      | {outp         |
-      | rule       | "{input.arg}"       | params: "{inp          |
       | checkpoint | "{wildcards.input}" | {wildcards.in |
-      | checkpoint | "{output.arg}"      | {outp         |
+
+  Scenario Outline: Resolve first part of qualified like wildcard references into itself
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+       """
+       <rule_like> NAME:
+           output: arg = "{input}"
+           params: "{<text>
+       """
+    And I put the caret after <signature>
+    Then reference in injection should resolve to "<resolve_target>" in context "<text>" in file "foo.smk"
+    Examples:
+      | rule_like  | text                | signature     | resolve_target |
+      | rule       | wildcards.input}" | {wildcar      | wildcards      |
+      | rule       | output.arg}"      | {outp         | output         |
+      | rule       | input.arg}"       | params: "{inp | input          |
+      | checkpoint | output.arg}"      | {outp         | output         |

@@ -9,7 +9,7 @@ import javax.swing.Icon
 /**
  * Optionally consider RenameableFakePsiElement superclass
  */
-class SmkFakePsiElement(
+open class SmkFakePsiElement(
         private val myParent: PsiElement,
         private val myName: String,
         private val myIcon: Icon?

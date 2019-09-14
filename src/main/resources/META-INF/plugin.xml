@@ -252,7 +252,7 @@
             suppressId="SmkSLWildcardNameIsConfusing"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.wildcards.confusing.section.title"
+            key="INSP.NAME.wildcards.confusing.name.title"
             implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkSLWildcardNameIsConfusingInspection"
     />
 

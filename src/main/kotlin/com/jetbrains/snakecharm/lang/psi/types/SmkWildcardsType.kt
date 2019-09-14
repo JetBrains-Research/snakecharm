@@ -19,18 +19,25 @@ import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
 class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyType, SmkAvailableForSubscriptionType {
     private val typeName = "Rule ${ruleOrCheckpoint.name?.let { "'$it' " } ?: ""}wildcards"
-    private val wildcardsDeclarations: List<WildcardDescriptor>?
 
-    init {
+    /**
+     * Null if failed to parse wildcards declarations
+     */
+    private val wildcardsDeclarations: List<WildcardDescriptor>? by lazy {
+        if (!ruleOrCheckpoint.isValid) {
+            return@lazy null
+        }
         val collector = SmkWildcardsCollector(
                 visitDefiningSections = true,
-                visitExpandingSections = false
+                // do not affect completion / resolve if output section cannot be parsed
+                visitExpandingSections = true
         )
         ruleOrCheckpoint.accept(collector)
-        wildcardsDeclarations = collector.getWildcards()
+
+        collector.getWildcards()
                 ?.asSequence()
-                ?.filterNot { it.definingSectionIdx == WildcardDescriptor.UNDEFINED_SECTION }
-                ?.sortedBy { it.definingSectionIdx }
+                //                ?.filterNot { it.definingSectionIdx == WildcardDescriptor.UNDEFINED_SECTION }
+                ?.sortedBy { it.definingSectionRate }
                 ?.distinctBy { it.text }
                 ?.toList()
     }
@@ -56,10 +63,15 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyTy
         val resolveResult =
                 resolveToFileWildcardConstraintsKwarg(name) ?:
                 resolveToRuleWildcardConstraintsKwarg(name) ?:
-                resolveToFirstDeclaration(name) ?:
-                return emptyList()
+                resolveToFirstDeclaration(name)
 
-        return listOf(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, resolveResult))
+        // if not empty result
+        if (resolveResult != null) {
+            return listOf(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, resolveResult))
+        }
+
+        // TODO: resolve or not into themselfs?
+        return emptyList()
     }
 
     override fun resolveMemberByIndex(
@@ -105,13 +117,15 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyTy
             return emptyArray()
         }
 
-        return wildcardsDeclarations.map {
+        return wildcardsDeclarations!!.map {
             SmkCompletionUtil.createPrioritizedLookupElement(
                     it.text, it.psi,
                     typeText = SnakemakeBundle.message("TYPES.rule.wildcard.type.text")
             )
         }.toTypedArray()
     }
+
+    fun getWildcards() = wildcardsDeclarations?.map { it.text }
 
     override fun getCompletionVariantsAndPriority(
             completionPrefix: String?, location: PsiElement, context: ProcessingContext?

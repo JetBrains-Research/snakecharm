@@ -296,7 +296,7 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       | rule       | boo          |
       | checkpoint | boo          |
 
-  Scenario Outline: No rule like declarations resolve at top-level
+  Scenario Outline: No rule like declarations resolve for non-qualified names
       Given a snakemake project
       Given I open a file "foo.smk" with text
       """
@@ -311,7 +311,6 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
 
       <element># place toplevel
       rule foo:
-        input: "{<element>}" # input injection
         shell: "{<element>}" # shell injection
         run:
           <element># run section
@@ -325,7 +324,5 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       | CHECKPOINT  | # place toplevel     | reference              |
       | RULE        | # run section        | reference              |
       | CHECKPOINT  | # run section        | reference              |
-      | RULE        | }" # input injection | reference in injection |
-      | CHECKPOINT  | }" # input injection | reference in injection |
       | RULE        | }" # shell injection | reference in injection |
       | CHECKPOINT  | }" # shell injection | reference in injection |

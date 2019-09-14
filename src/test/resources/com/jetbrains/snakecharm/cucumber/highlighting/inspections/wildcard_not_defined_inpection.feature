@@ -10,7 +10,7 @@ Feature: Check highlighting of inspections on wildcards
     And Wildcard not defined inspection is enabled
     Then I expect inspection error on <sample> with message
     """
-    Wildcard 'sample' isn't defined.
+    Wildcard 'sample' isn't properly defined.
     """
     When I check highlighting errors
     Examples:

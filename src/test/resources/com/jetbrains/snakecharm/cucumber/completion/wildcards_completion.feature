@@ -21,14 +21,16 @@ Feature: Completion for wildcards
     When I put the caret after input: "{
     And I invoke autocompletion popup
     Then completion list should contain:
+      # wildcards defining:
       | wildcard6     |
       | wildcard5     |
       | wildcard4     |
-    And completion list shouldn't contain:
+      # wildcards expanding:
       | wildcard1     |
       | wildcard2     |
       | wildcard3     |
       | wildcard7     |
+    And completion list shouldn't contain:
       | non-wildcard1 |
       | non-wildcard2 |
       | non-wildcard3 |
@@ -175,6 +177,7 @@ Feature: Completion for wildcards
       <rule_like> NAME:
           output:  "{o1}/{o2}"
           input:  "{i1}"
+          message:  "{non_wc}"
           run:
              wildcards.smth
       """
@@ -183,8 +186,9 @@ Feature: Completion for wildcards
     Then completion list should contain:
       | o1 |
       | o2 |
-    And completion list shouldn't contain:
       | i1 |
+    And completion list shouldn't contain:
+      | non_wc |
     Examples:
       | rule_like  |
       | rule       |

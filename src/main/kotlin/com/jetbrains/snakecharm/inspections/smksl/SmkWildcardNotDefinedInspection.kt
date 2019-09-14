@@ -9,6 +9,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkWildcardsCollector
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
 class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
@@ -32,7 +33,6 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
 
             val wildcardsByRule = session.putUserDataIfAbsent(KEY, hashMapOf())
             if (ruleOrCheckpoint !in wildcardsByRule) {
-                // TODO: somehow connect with Python types Cache?
                 val wildcardsDefiningSectionsAvailable = ruleOrCheckpoint.getSections()
                         .asSequence()
                         .filterIsInstance(SmkRuleOrCheckpointArgsSection::class.java)
@@ -41,7 +41,27 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
                 val wildcards = when {
                     // if no suitable sections let's think that no wildcards
                     !wildcardsDefiningSectionsAvailable -> emptyList()
-                    else -> ruleOrCheckpoint.collectWildcards()
+                    else -> {
+                        // Cannot do via types, we'd like to have wildcards only from
+                        // defining sections and ensure that defining sections could be parsed
+                        val collector = SmkWildcardsCollector(
+                                visitDefiningSections = true,
+                                visitExpandingSections = false
+                        )
+                        ruleOrCheckpoint.accept(collector)
+                        collector.getWildcardsNames()
+//
+//                        val type = TypeEvalContext.codeAnalysis(expr.project, expr.containingFile)
+//                                .getType(ruleOrCheckpoint.wildcardsElement)
+//
+//                        var definedWildcards: List<WildcardDescriptor>? = null
+//                        if (type is SmkWildcardsType) {
+//                            definedWildcards = type.wildcardsDeclarations
+//                                    ?.filter { it.definingSectionRate != UNDEFINED_SECTION }
+//                                    ?.ifEmpty { null }
+//                        }
+//                        definedWildcards
+                    }
                 }
                 wildcardsByRule[ruleOrCheckpoint] =  Ref.create(wildcards)
             }

@@ -66,19 +66,25 @@ class CompletionResolveSteps {
 
     @When("^I put the caret at (.+)$")
     fun iPutCaretAt(marker: String) {
-        ApplicationManager.getApplication().invokeAndWait({
-            val editor = SnakemakeWorld.fixture().editor
-            val position = getPositionBySignature(editor, marker, false)
-            editor.caretModel.moveToOffset(position)
+        val application = ApplicationManager.getApplication()
+        application.invokeAndWait({
+            application.runWriteAction {
+                val editor = SnakemakeWorld.fixture().editor
+                val position = getPositionBySignature(editor, marker, false)
+                editor.caretModel.moveToOffset(position)
+            }                          
         }, ModalityState.NON_MODAL)
     }
 
     @When("^I put the caret after (.+)$")
     fun iPutCaretAfter(marker: String) {
-        ApplicationManager.getApplication().invokeAndWait({
-            val editor = SnakemakeWorld.fixture().editor
-            val position = getPositionBySignature(editor, marker, true)
-            editor.caretModel.moveToOffset(position)
+        val application = ApplicationManager.getApplication()
+        application.invokeAndWait({
+            application.runWriteAction {
+                val editor = SnakemakeWorld.fixture().editor
+                val position = getPositionBySignature(editor, marker, true)
+                editor.caretModel.moveToOffset(position)
+            }
         }, ModalityState.NON_MODAL)
     }
 
@@ -95,29 +101,76 @@ class CompletionResolveSteps {
     }
 
     @Then("^reference in injection should resolve to \"(.+)\" in \"(.+)\"$")
-    fun referenceInInjectionShouldResolveToIn(marker: String, file: String) {
+    fun referenceInInjectionShouldResolveToIn(targetPrefix: String, file: String) {
         ApplicationManager.getApplication().runReadAction {
-            tryToResolveRef(marker, file, getReferenceInInjectedLanguageAtOffset())
+            tryToResolveRef(targetPrefix, targetPrefix, file, getReferenceInInjectedLanguageAtOffset())
+        }
+    }
+
+    @Then("^reference in injection should resolve to \"(.+)\" in context \"(.+)\" in file \"(.+)\"$")
+    fun referenceInInjectionShouldResolveToAtInFile(targetPrefix: String, context: String, file: String) {
+        ApplicationManager.getApplication().runReadAction {
+            tryToResolveRef(targetPrefix, context, file, getReferenceInInjectedLanguageAtOffset())
+        }
+    }
+
+    @Then("^reference should resolve to \"(.+)\" in context \"(.+)\" in file \"(.+)\"$")
+    fun referenceShouldResolveToAtInFile(resultSubstr: String, context: String, file: String) {
+        ApplicationManager.getApplication().runReadAction {
+            tryToResolveRef(resultSubstr, context, file, getReferenceAtOffset())
         }
     }
 
     @Then("^reference should resolve to \"(.+)\" in \"(.+)\"$")
-    fun referenceShouldResolveToIn(marker: String, file: String) {
+    fun referenceShouldResolveToIn(targetPrefix: String, file: String) {
         ApplicationManager.getApplication().runReadAction {
-            tryToResolveRef(marker, file, getReferenceAtOffset())
+            tryToResolveRef(targetPrefix, targetPrefix, file, getReferenceAtOffset())
         }
     }
 
-    private fun tryToResolveRef(marker: String, file: String, ref: PsiReference?) {
+    private fun tryToResolveRef(targetPrefix: String, context: String, file: String, ref: PsiReference?) {
         assertNotNull(ref)
+
         val result = resolve(ref)
         assertNotNull(result)
-        val containingFile = result.containingFile
-        assertNotNull(containingFile)
-        assertEquals(file, containingFile.name)
 
-        val text = TextRange.from(result.textOffset, marker.length).substring(containingFile.text)
-        assertEquals(marker, text)
+        val injectionHost = SnakemakeWorld.injectionFixture().injectedLanguageManager.getInjectionHost(result)
+        val containingFile = (injectionHost ?: result).containingFile
+        val msg = "Resolve result type: ${result::class.java.simpleName}}, file: ${containingFile.name}\n" +
+                "Psi element text: ${result.text}"
+        require(context.isNotEmpty() && targetPrefix.isNotEmpty()) {
+            msg
+        }
+
+        require(targetPrefix.isNotEmpty()) {
+            "Target prefix is empty. $msg"
+        }
+
+        require(injectionHost == null || injectionHost is PyStringLiteralExpression) {
+            "Injection only in strings are currently by this method, but was injection in ${injectionHost!!::class.java.simpleName}\n$msg"
+        }
+        val injectionStartOffset = if (injectionHost == null) {
+            0
+        } else {
+            injectionHost.textOffset + (injectionHost as PyStringLiteralExpression).stringValueTextRange.startOffset
+        }
+
+
+        assertNotNull(containingFile)
+        assertEquals(file, containingFile.name, msg)
+
+        assertTrue(
+                targetPrefix.length <= result.textLength,
+                "Expected result prefix <$targetPrefix> is longer than element <${result.text}>\n$msg"
+        )
+
+        val elementText = TextRange.from(result.textOffset, targetPrefix.length).substring(result.containingFile.text)
+//        val elementText = TextRange.from(0, targetPrefix.length).substring(result.text)
+        assertEquals(targetPrefix, elementText, msg)
+
+        val text = TextRange.from(injectionStartOffset + result.textOffset,  context.length).substring(containingFile.text)
+        assertEquals(context, text, msg)
+
     }
 
     @Then("^reference in injection should multi resolve to name, file in same order$")

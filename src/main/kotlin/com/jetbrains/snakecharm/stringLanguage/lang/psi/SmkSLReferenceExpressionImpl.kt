@@ -1,21 +1,24 @@
 package com.jetbrains.snakecharm.stringLanguage.lang.psi
 
 import com.intellij.lang.ASTNode
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiPolyVariantReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.util.PsiTreeUtil
+import com.jetbrains.python.psi.PsiReferenceEx
 import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.impl.PyReferenceExpressionImpl
 import com.jetbrains.python.psi.impl.references.PyQualifiedReference
 import com.jetbrains.python.psi.resolve.PyResolveContext
+import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_BANNED_FOR_WILDCARDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_EXPANDING_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.BaseSmkSLReferenceExpression
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.stringLanguage.lang.SmkSLElementVisitor
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
@@ -36,21 +39,23 @@ class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(no
 
     override fun getReference(context: PyResolveContext): PsiPolyVariantReference {
         val parentSection = containingSection()
-        val parentDeclaration = parentSection?.getParentRuleOrCheckPoint()
 
-        if (parentDeclaration != null && parentSection.sectionKeyword in WILDCARDS_EXPANDING_SECTIONS_KEYWORDS) {
-            return if (!isQualified) {
-                SmkSLWildcardReference(this, SmkWildcardsType(parentDeclaration))
-            } else {
-                SmkEmptyReference(this)
+        if (parentSection is SmkRuleOrCheckpointArgsSection && parentSection.isWildcardsExpandingSection()) {
+            val parentRuleOrCheckPoint = parentSection.getParentRuleOrCheckPoint()
+            if (!isQualified) {
+                val type = context.typeEvalContext.getType(parentRuleOrCheckPoint.wildcardsElement)
+                if (type is SmkWildcardsType) {
+                    return SmkSLWildcardReference(this, type)
+                }
             }
+            return SmkEmptyReference(this)
         }
 
         if (qualifier != null) {
             return PyQualifiedReference(this, context)
         }
 
-        return SmkSLInitialReference(this, parentDeclaration, context)
+        return SmkSLInitialReference(this, parentSection?.getParentRuleOrCheckPoint(), context)
     }
 
     override fun getQualifier(): PyExpression? =
@@ -75,6 +80,9 @@ class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(no
     }
 }
 
-class SmkEmptyReference<T: PsiElement>(element: T): PsiPolyVariantReferenceBase<T>(element) {
-    override fun multiResolve(incompleteCode: Boolean) = ResolveResult.EMPTY_ARRAY
+class SmkEmptyReference<T: PsiElement>(element: T): PsiPolyVariantReferenceBase<T>(element),
+    PsiReferenceEx {
+    override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> = ResolveResult.EMPTY_ARRAY!!
+    override fun getUnresolvedHighlightSeverity(p0: TypeEvalContext?): HighlightSeverity? = null
+    override fun getUnresolvedDescription(): String? = null
 }

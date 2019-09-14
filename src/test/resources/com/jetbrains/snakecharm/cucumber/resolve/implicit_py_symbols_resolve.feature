@@ -254,17 +254,14 @@ Feature: Resolve implicitly imported python names
            <section>: "{<text>}"
         """
     When I put the caret after "{
-    And I invoke autocompletion popup
-    Then completion list should contain:
-      | rules       |
-      | checkpoints |
-      | config      |
-
+    Then reference in injection should resolve to "<text>" in "<file>"
     Examples:
-      | rule_like  | section |
-      | rule       | shell   |
-      | rule       | message |
-      | checkpoint | shell   |
+      | rule_like  | section | text        | file        |
+      | rule       | shell   | rules       | workflow.py |
+      | rule       | shell   | config      | workflow.py |
+      | rule       | shell   | checkpoints | workflow.py |
+      | rule       | message | rules       | workflow.py |
+      | checkpoint | shell   | rules       | workflow.py |
 
   Scenario Outline: No resolve in injections for defining expanding sections
     Given a snakemake project
@@ -285,7 +282,7 @@ Feature: Resolve implicitly imported python names
       | rule       | benchmark | config      | config      | workflow.py | 0     |
       | checkpoint | output    | rules       | rules       | workflow.py | 0     |
 
-  Scenario Outline: No resolve in injections for wildcards expanding sections
+  Scenario Outline: Resolve undefined wildcards with names like explicit symbols not into these symbols
     Given a snakemake project
     Given I open a file "foo.smk" with text
         """
@@ -293,11 +290,11 @@ Feature: Resolve implicitly imported python names
            <section>: "{<text>}"
         """
     When I put the caret after "{
-    Then reference in injection should not resolve
-
+    Then reference in injection should resolve to "<text>" in context "<text>}"" in file "foo.smk"
     Examples:
       | rule_like  | section | text        |
       | rule       | input   | rules       |
+      | rule       | params  | rules       |
       | rule       | input   | checkpoints |
       | rule       | input   | config      |
       | checkpoint | input   | rules       |

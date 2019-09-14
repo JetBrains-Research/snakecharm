@@ -29,7 +29,14 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
                 }
 
                 if (wildcardsRef == null) {
-                    wildcardsRef = Ref.create(ruleOrCheckpoint.collectWildcards())
+                    // Cannot do via types, we'd like to have wildcards only from
+                    // defining sections and ensure that defining sections could be parsed
+                    val collector = SmkWildcardsCollector(
+                            visitDefiningSections = true,
+                            visitExpandingSections = false
+                    )
+                    ruleOrCheckpoint.accept(collector)
+                    wildcardsRef = Ref.create(collector.getWildcardsNames())
                 }
 
                 val wildcards = wildcardsRef!!.get()
