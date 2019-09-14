@@ -104,8 +104,21 @@ Feature: Tests on snakemake string language injection
     Examples:
     | content |
     | text    |
-    |         |
     | text }  |
+
+  Scenario Outline: Injection in empty strings
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule NAME:
+      input: <quote><quote>#here
+    """
+    When I put the caret at <quote>#here
+    Then I expect language injection on ""
+    Examples:
+      | quote |
+      | '    |
+      | "    |
 
   Scenario Outline: No injection in top-level workflow sections
     Given a snakemake project

@@ -26,15 +26,19 @@ class SmkSLInjector : PyInjectorBase() {
         else -> InjectionResult.EMPTY
     }
 
-    private fun PyStringLiteralExpression.containsLBrace(): Boolean {
+    private fun PyStringLiteralExpression.containsLBraceOrIsEmpty(): Boolean {
+        var allIsEmpty = true
         stringElements.forEach {
-            if ((it is PyFormattedStringElement && it.content.contains("{{") ) ||
-                (it !is PyFormattedStringElement && it.content.contains("{"))) {
+            val content = it.content
+            allIsEmpty = allIsEmpty && content.isEmpty()
+            if ((it is PyFormattedStringElement && content.contains("{{")) ||
+                    (it !is PyFormattedStringElement && it.content.contains("{"))) {
                 return true
             }
         }
 
-        return false
+        // to enable braces handler, otherwise doesn't work for first brace
+        return allIsEmpty
     }
 
     private fun PsiElement.isInValidCallExpression(): Boolean {
@@ -54,7 +58,7 @@ class SmkSLInjector : PyInjectorBase() {
                     isInValidArgsSection() &&
                     isInValidCallExpression() &&
                     PsiTreeUtil.getParentOfType(this, PyLambdaExpression::class.java) == null &&
-                    (this as PyStringLiteralExpression).containsLBrace()
+                    (this as PyStringLiteralExpression).containsLBraceOrIsEmpty()
 }
 
 fun PyCallExpression.callSimpleName() = this.callee.let { expression ->
