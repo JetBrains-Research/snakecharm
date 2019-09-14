@@ -63,11 +63,6 @@ class SmkStatementParsing(
 
     override fun getParsingContext() = myContext as SmkParserContext
 
-    // TODO cleanup
-    //    override fun getReferenceType(): IElementType {
-    //            return CythonElementTypes.REFERENCE_EXPRESSION
-    //        }
-
     override fun parseStatement() {
         val context = parsingContext
         val scope = context.scope
