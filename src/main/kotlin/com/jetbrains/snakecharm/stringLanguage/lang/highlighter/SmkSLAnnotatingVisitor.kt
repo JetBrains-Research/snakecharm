@@ -6,6 +6,6 @@ import com.intellij.psi.PsiElement
 
 class SmkSLAnnotatingVisitor : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-        SmkSLSyntaxAnnotator.annotateElement(element, holder)
+        SmkSLWildcardsAnnotator.annotateElement(element, holder)
     }
 }
