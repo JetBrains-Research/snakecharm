@@ -1,12 +1,12 @@
 package com.jetbrains.snakecharm.inspections.smksl
 
 import com.intellij.codeInspection.LocalInspectionToolSession
+import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.inspections.quickfix.PyRenameElementQuickFix
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLLanguageElement
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
@@ -17,16 +17,9 @@ class SmkSLWildcardNameIsConfusingInspection : SnakemakeInspection() {
                 session: LocalInspectionToolSession
         ) = object : SmkSLInspectionVisitor(holder, session) {
 
-        override fun visitSmkSLLanguageElement(element: SmkSLLanguageElement) {
-            element.getExpressions().forEach {expr ->
-                if (expr is SmkSLReferenceExpressionImpl) {
-                    process(expr)
-                }
-            }
-            super.visitSmkSLLanguageElement(element)
-        }
+        override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpressionImpl) {
+            // expr.isQualified: 'wildcards' in 'wildcards.input'
 
-        private fun process(expr: SmkSLReferenceExpressionImpl) {
             val ref = expr.reference
             if (ref is SmkSLWildcardReference) {
                 val wildcardName = ref.wildcardName()
@@ -36,8 +29,15 @@ class SmkSLWildcardNameIsConfusingInspection : SnakemakeInspection() {
 
                     registerProblem(
                             expr,
-                            SnakemakeBundle.message("INSP.NAME.wildcards.confusing.section.message", wildcardName),
+                            SnakemakeBundle.message("INSP.NAME.wildcards.confusing.name.like.section.message", wildcardName),
                             PyRenameElementQuickFix(expr)
+                    )
+                } else if ('.' in wildcardName) {
+                    // E.g. 'wildcards.name' or 'foo.boo.doo'
+                    registerProblem(
+                            ref.getWildcardTrueExpression(),
+                            SnakemakeBundle.message("INSP.NAME.wildcards.confusing.name.with.dot.message", wildcardName),
+                            ProblemHighlightType.GENERIC_ERROR
                     )
                 }
             }

@@ -63,24 +63,29 @@ Feature: Inspection warns about confusing wildcard names.
       | checkpoint | shell      |
 
 
-  Scenario: No confusion if wildcard looks like qualified name
-      Given a snakemake project
-      Given I open a file "foo.smk" with text
+  Scenario: Confusion if wildcard looks like qualified name
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
           """
           rule:
               output: "{input}" #1
               params:
                   "{input.smth}", "{foo.input.smth}"
           """
-      And SmkSLWildcardNameIsConfusingInspection inspection is enabled
-      # Only one warning
-      Then I expect inspection warning on <input> in <"{input}" #1> with message
-        """
-        Confusing wildcard name: 'input'. It looks like section name.
-        """
-
-      Then I expect no inspection warning
-      When I check highlighting warnings
+    And SmkSLWildcardNameIsConfusingInspection inspection is enabled
+    Then I expect inspection warning on <input> in <"{input}" #1> with message
+      """
+      Confusing wildcard name: 'input'. It looks like section name.
+      """
+    Then I expect inspection error on <input.smth> in <{input.smth}> with message
+      """
+      Confusing wildcard name: 'input.smth', looks like call chain. Please don't use dots here.
+      """
+    Then I expect inspection error on <foo.input.smth> in <{foo.input.smth}> with message
+      """
+      Confusing wildcard name: 'foo.input.smth', looks like call chain. Please don't use dots here.
+      """
+    When I check highlighting warnings
 
   Scenario Outline: No confusion in non-wildcards sections
     Given a snakemake project
@@ -121,3 +126,24 @@ Feature: Inspection warns about confusing wildcard names.
       message: "{input} {wildcards.INPUT}.foo"
       params: "{INPUT}.foo"
     """
+
+  Scenario Outline: Dot in wildcard name is also confusing
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like>:
+        <section>:  "{wildcards.input}"
+    """
+    And SmkSLWildcardNameIsConfusingInspection inspection is enabled
+    Then I expect inspection error on <wildcards.input> with message
+    """
+    Confusing wildcard name: 'wildcards.input', looks like call chain. Please don't use dots here.
+    """
+
+    When I check highlighting errors
+    Examples:
+      | rule_like   | section |
+      | rule        | output  |
+      | rule        | params  |
+      | rule        | input   |
+      | checkpoint  | output  |
