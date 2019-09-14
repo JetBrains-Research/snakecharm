@@ -13,6 +13,7 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.findPsiElementUnderCaret
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.fixture
@@ -211,10 +212,28 @@ class ActionsSteps {
         )
     }
 
-    @When("^I invoke rename with name \"(.+)\"$")
+    @When("^I invoke rename with name \"([^\"]+)\"$")
     fun iInvokeRenameWithName(newName: String) {
         ApplicationManager.getApplication().invokeAndWait {
                 fixture().renameElementAtCaret(newName)
+        }
+    }
+
+    @When("^I invoke rename with name \"(.+)\" and get error \"(.+)\"$")
+    fun iInvokeRenameWithNameAndGetError(newName: String, expectedError: String) {
+        ApplicationManager.getApplication().invokeAndWait {
+            var actualError: String? = null
+            try {
+                fixture().renameElementAtCaret(newName)
+            } catch (e: RuntimeException) {
+                if (e.cause is IncorrectOperationException) {
+                    actualError = e.cause!!.message
+                } else {
+                    throw e
+                }
+            }
+            assertNotNull(actualError, "Error not occurred")
+            assertEquals(expectedError, actualError)
         }
     }
 

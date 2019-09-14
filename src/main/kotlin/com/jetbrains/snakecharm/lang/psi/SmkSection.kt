@@ -22,7 +22,11 @@ interface SmkSection: PyStatement, PsiNameIdentifierOwner {
     override fun getNameIdentifier() = getSectionKeywordNode()?.psi
 
     override fun setName(name: String): PsiElement {
-        throw IncorrectOperationException()
+        //TODO: maybe allow?
+        // Not clear what is expected use case for such renaming, looks like user
+        // really don't want to do this
+        // also see SmkFindUsagesProvider impl
+        throw IncorrectOperationException("Section keyword rename not allowed.")
     }
 
     fun getSectionKeywordNode(): ASTNode?

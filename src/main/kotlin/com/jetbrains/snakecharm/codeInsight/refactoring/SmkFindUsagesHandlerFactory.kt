@@ -7,6 +7,9 @@ import com.jetbrains.python.findUsages.PyFunctionFindUsagesHandler
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkFakePsiElement
 import com.jetbrains.snakecharm.lang.psi.SmkSection
 
+ /**
+  * Enables find usages for an element, e.g highlight usages
+  */
 class SmkFindUsagesHandlerFactory: FindUsagesHandlerFactory() {
     override fun createFindUsagesHandler(element: PsiElement, forHighlightUsages: Boolean): FindUsagesHandler? {
         if (canFindUsages(element)) {

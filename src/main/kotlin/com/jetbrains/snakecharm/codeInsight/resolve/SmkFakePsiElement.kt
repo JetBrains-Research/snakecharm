@@ -4,6 +4,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.impl.FakePsiElement
 import com.intellij.util.IncorrectOperationException
+import com.jetbrains.python.PythonLanguage
 import javax.swing.Icon
 
 /**
@@ -26,5 +27,5 @@ open class SmkFakePsiElement(
 
     override fun getTextOffset() = parent.textOffset
     override fun getTextLength() = parent.textLength
-
+    override fun getLanguage() = PythonLanguage.getInstance()
 }

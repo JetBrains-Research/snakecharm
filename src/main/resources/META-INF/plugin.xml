@@ -72,7 +72,9 @@
     <lang.findUsagesProvider
             language="Python" implementationClass="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesProvider"
             order="first"
+            id="smkElements"
     />
+    <renamePsiElementProcessor implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkRenamePsiElementProcessor" id="smkSection"/>
     <renamePsiElementProcessor implementation="com.jetbrains.snakecharm.stringLanguage.codeInsight.SmkSLRenameWildcardsProcessor"/>
     <!--<enterBetweenBracesDelegate language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.editorActions.EnterInRuleParamsListDelegate"/>-->
     <codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>

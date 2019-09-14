@@ -1,41 +1,43 @@
 package com.jetbrains.snakecharm.codeInsight.refactoring
 
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner
-import com.intellij.lang.findUsages.FindUsagesProvider
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PyTokenTypes
+import com.jetbrains.python.findUsages.PythonFindUsagesProvider
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkFakePsiElement
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSection
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
 /**
  * Provides correct usages types for Snakemake specific elements, should be executed before Python impl.
  */
-class SmkFindUsagesProvider: FindUsagesProvider {
+class SmkFindUsagesProvider: PythonFindUsagesProvider() {
     override fun getWordsScanner() = SmkWordsScanner()
 
     override fun getNodeText(element: PsiElement, useFullName: Boolean) = getDescriptiveName(element)
 
-    override fun getDescriptiveName(element: PsiElement) = if (element is PsiNamedElement) {
-        element.name ?: "<unnamed>"
-    } else {
-        ""
-    }
-
     override fun getType(element: PsiElement) = when (element) {
         is SmkRuleOrCheckpointArgsSection -> "rule section"
         is SmkSection -> "section"
-        else -> ""
+        is SmkFakePsiElement -> "element"
+        is SmkSLReferenceExpressionImpl -> {
+            if (element.isWildcard()) {
+                "wildcard"
+            } else {
+                super.getType(element)
+            }
+        }
+        else -> super.getType(element)
     }
 
     override fun getHelpId(psiElement: PsiElement) = null
 
     override fun canFindUsagesFor(element: PsiElement): Boolean {
-       return element is SmkSection || element is SmkFakePsiElement
+       return element is SmkSection || element is SmkFakePsiElement || element is SmkSLReferenceExpressionImpl
     }
 }
 
