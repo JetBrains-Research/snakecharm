@@ -22,7 +22,11 @@ class SmkSLSubscriptionKeyReferenceExpression(node: ASTNode) : PyReferenceExpres
     override fun getType(context: TypeEvalContext, key: TypeEvalContext.Key): PyType? = null
 
     override fun getReference(): PsiPolyVariantReference {
-        val type = qualifier?.let { PyResolveContext.defaultContext().typeEvalContext.getType(it) }
+        val type = qualifier?.let {
+            // Use same eval context as in PyReferenceExpressionImpl.getReference(), maybe it is more correct
+            val context = TypeEvalContext.codeAnalysis(this.project, this.containingFile)
+            context.getType(it)
+        }
         val subscriptionType = when (type) {
             is SmkAvailableForSubscriptionType -> type
             else -> null
