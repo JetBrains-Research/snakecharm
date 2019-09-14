@@ -30,6 +30,7 @@ object SnakemakeAPI {
     const val SMK_VARS_RULES = "rules"
     const val SMK_VARS_CHECKPOINTS = "checkpoints"
     const val SMK_VARS_ATTEMPT = "attempt"
+    const val SMK_FUN_EXPAND = "expand"
 
     val FUNCTIONS_ALLOWING_SMKSL_INJECTION = setOf(
         "ancient", "directory", "temp", "pipe", "temporary", "protected",
@@ -38,7 +39,7 @@ object SnakemakeAPI {
     )
 
     val FUNCTIONS_BANNED_FOR_WILDCARDS = listOf(
-            "expand"
+            SMK_FUN_EXPAND
     )
 
     const val SMK_VARS_WILDCARDS = "wildcards"

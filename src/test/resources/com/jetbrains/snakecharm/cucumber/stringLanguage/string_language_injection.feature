@@ -60,6 +60,17 @@ Feature: Tests on snakemake string language injection
     When I put the caret after {output
     Then I expect no language injection
 
+   Scenario: Allow injection in lambdas in expand call
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule:
+      output: "foo"
+      log: lambda wd: expand("{output}.log", output="out.txt")
+    """
+    When I put the caret after {output
+     Then I expect language injection on "{output}.log"
+
   Scenario: Injection in split string literal
     Given a snakemake project
     Given I open a file "foo.smk" with text
