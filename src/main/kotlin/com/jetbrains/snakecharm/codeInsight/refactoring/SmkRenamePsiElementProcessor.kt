@@ -5,10 +5,11 @@ import com.intellij.refactoring.listeners.RefactoringElementListener
 import com.intellij.refactoring.rename.RenamePsiElementProcessor
 import com.intellij.usageView.UsageInfo
 import com.intellij.util.IncorrectOperationException
+import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
 import com.jetbrains.snakecharm.lang.psi.SmkSection
 
 class SmkRenamePsiElementProcessor: RenamePsiElementProcessor() {
-    override fun canProcessElement(element: PsiElement) = element is SmkSection
+    override fun canProcessElement(element: PsiElement) = element is SmkSection && element !is SmkRuleLike<*>
     override fun renameElement(
             element: PsiElement,
             newName: String,
