@@ -40,37 +40,72 @@ Feature: Inspection: Unresolved element
       | checkpoint | rule               |
       | checkpoint | subworkflow        |
 
-#  Scenario: Unresolved simple wildcard in injection
-#    Given TODO
-#
-#  Scenario Outline: Unresolved wildcard after wildcards in injection
-#    Given a snakemake project
-#    Given I open a file "foo.smk" with text
-#    """
-#    <rule_like> foo:
-#      <section>: "{wildcards.sample}"
-#    """
-#    And PyUnresolvedReferencesInspection inspection is enabled
-#    Then I expect inspection error on <sample> with message
-#    """
-#    Cannot find reference 'sample' in 'wildcards'
-#    """
-#    When I check highlighting warnings ignoring extra highlighting
-#    Examples:
-#      | rule_like  | section |
-#      | rule       | shell   |
-#      | rule       | message |
-#      | checkpoint | shell   |
-#
-#
-#  Scenario: Unresolved wildcard in run section
-#    Given TODO
-#
-#  Scenario: Unresolved section name in injection
-#    Given TODO
-#
-#  Scenario: Unresolved section name in run section
-#    Given TODO
-#
-#  Scenario: Unresolved variable in injection
-#    Given TODO
+  Scenario Outline: Unresolved wildcard after wildcards in injection
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> foo:
+      <section>: "{wildcards.sample}"
+    """
+    And PyUnresolvedReferencesInspection inspection is enabled
+    Then I expect inspection warning on <sample> with message
+    """
+    Cannot find reference 'sample' in 'Rule 'foo' wildcards'
+    """
+    When I check highlighting warnings ignoring extra highlighting
+    Examples:
+      | rule_like  | section |
+      | rule       | shell   |
+      | rule       | message |
+      | checkpoint | shell   |
+
+
+  Scenario Outline: Unresolved wildcard in run section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> foo:
+      run:
+        print(wildcards.sample)
+    """
+    And PyUnresolvedReferencesInspection inspection is enabled
+    Then I expect inspection warning on <sample> with message
+    """
+    Cannot find reference 'sample' in 'Rule 'foo' wildcards'
+    """
+    When I check highlighting warnings ignoring extra highlighting
+    Examples:
+      | rule_like  |
+      | rule       |
+      | rule       |
+      | checkpoint |
+
+  Scenario: Unresolved variable in injection
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule foo:
+      shell: "{dooooo}"
+    """
+    And PyUnresolvedReferencesInspection inspection is enabled
+    Then I expect inspection warning on <dooooo> with message
+    """
+    Unresolved reference 'dooooo'
+    """
+    When I check highlighting warnings ignoring extra highlighting
+
+  Scenario: Unresolved variable in run section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule foo:
+      run:
+        print(dooooo)
+    """
+    And PyUnresolvedReferencesInspection inspection is enabled
+    Then I expect inspection error on <dooooo> with message
+    """
+    Unresolved reference 'dooooo'
+    """
+    When I check highlighting errors ignoring extra highlighting
+
