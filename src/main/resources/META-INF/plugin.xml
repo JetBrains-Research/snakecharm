@@ -296,25 +296,25 @@
     />
 
     <localInspection
-            language="SnakemakeSL" shortName="SmkSLUnresolvedSectionInspection"
+            language="SnakemakeSL" shortName="SmkSLUndeclaredSectionInspection"
             enabledByDefault="true"
-            level="WARNING"
-            suppressId="SmkSLUnresolvedSection"
+            level="ERROR"
+            suppressId="SmkSLUndeclaredSectionInspection"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.unresolved.section.title"
-            implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkSLUnresolvedSectionInspection"
+            key="INSP.NAME.undeclared.section.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkSLUndeclaredSectionInspection"
     />
 
     <localInspection
-            language="Snakemake" shortName="SmkUnresolvedSectionInspection"
+            language="Snakemake" shortName="SmkUndeclaredSectionInspection"
             enabledByDefault="true"
-            level="WARNING"
-            suppressId="SmkUnresolvedSection"
+            level="ERROR"
+            suppressId="SmkUndeclaredSectionInspection"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.unresolved.section.title"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkUnresolvedSectionInspection"
+            key="INSP.NAME.undeclared.section.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkUndeclaredSectionInspection"
     />
 
     <localInspection

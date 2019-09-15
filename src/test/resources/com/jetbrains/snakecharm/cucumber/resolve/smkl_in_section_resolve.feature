@@ -60,45 +60,6 @@ Feature: Resolve for sections/variables in SmkSL injections
       | run                  |
       | script               |
 
-  Scenario Outline: Resolve for available sections
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    rule NAME:
-         input: ""
-         version: 1
-         wrapper: ""
-         wildcard_constraints: a=""
-         conda: ""
-         message: ""
-         threads: 1
-         benchmark: ""
-         shadow: "full"
-         output: ""
-         group: ""
-         singularity: ""
-         cwl: ""
-         log: ""
-         params: a=""
-         priority: 1
-         resources: a=""
-         script: ""
-         shell: "{<section>}"
-         run:
-    """
-    When I put the caret after "{
-    Then reference in injection should resolve to "<section>" in "foo.smk"
-    Examples:
-      | section              |
-      | input                |
-      | version              |
-      | threads              |
-      | output               |
-      | log                  |
-      | params               |
-      | resources            |
-
-
   Scenario Outline: Resolve for python specific variables for sections w/o arguments
       Given a snakemake project
       Given I open a file "foo.smk" with text

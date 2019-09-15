@@ -118,7 +118,7 @@ class SmkSLInitialReference(
 
     private fun isSupportedElementType(element: PsiElement?) =
             !(element is PyFunction || element is PyClass) &&
-                    !SmkPyReferenceImpl.shouldBeRemovedFromDefaultScopeCrawlUpResults(element, false)
+                    !SmkPyReferenceImpl.shouldBeRemovedFromDefaultScopeCrawlUpResults(element, false, parentDeclaration)
 
 
     private fun resolveByReferenceResolveProviders(): List<RatedResolveResult> {
@@ -127,7 +127,7 @@ class SmkSLInitialReference(
 
         return PyReferenceResolveProvider.EP_NAME.extensionList.asSequence()
                 .filterNot { it is PyOverridingReferenceResolveProvider }
-                .flatMap {  it.resolveName(expression, context).asSequence() }
+                .flatMap { it.resolveName(expression, context).asSequence() }
                 .toList()
     }
 

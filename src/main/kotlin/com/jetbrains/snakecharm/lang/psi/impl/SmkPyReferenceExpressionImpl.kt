@@ -30,6 +30,7 @@ class SmkPyReferenceExpressionImpl(astNode: ASTNode): PyReferenceExpressionImpl(
         val runSection = PsiTreeUtil.getParentOfType(
                 this, SmkRunSection::class.java, true, SmkSection::class.java
         )
-        return SmkPyReferenceImpl(this, context, runSection != null)
+        val containingRuleOrCheckpoint = runSection?.getParentRuleOrCheckPoint()
+        return SmkPyReferenceImpl(this, context, runSection != null, containingRuleOrCheckpoint)
     }
 }

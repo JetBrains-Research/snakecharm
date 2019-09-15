@@ -5,11 +5,11 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
 import com.jetbrains.python.psi.PyQualifiedExpression
 import com.jetbrains.python.psi.impl.references.PyReferenceImpl
+import com.jetbrains.python.psi.resolve.PyReferenceResolveProvider
 import com.jetbrains.python.psi.resolve.PyResolveContext
-import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
-import com.jetbrains.snakecharm.lang.psi.SmkSection
-import com.jetbrains.snakecharm.lang.psi.SmkSubworkflow
+import com.jetbrains.python.psi.resolve.RatedResolveResult
+import com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider
+import com.jetbrains.snakecharm.lang.psi.*
 
 /**
  * This is fake reference which allow as to remove some results from resolve/completion
@@ -22,11 +22,32 @@ import com.jetbrains.snakecharm.lang.psi.SmkSubworkflow
 class SmkPyReferenceImpl(
         element: PyQualifiedExpression,
         context: PyResolveContext,
-        val inRunSection: Boolean
-    ): PyReferenceImpl(element, context) {
+        val inRunSection: Boolean,
+        val containingRuleOrCheckpoint: SmkRuleOrCheckpoint?
+): PyReferenceImpl(element, context) {
 
-    override fun resolveInner() = super.resolveInner().filter {
-        !shouldBeRemovedFromDefaultScopeCrawlUpResults(it?.element, inRunSection)
+    override fun resolveInner(): List<RatedResolveResult> {
+        val results = super.resolveInner()
+        val sizeBeforeFiltration = results.size
+        val fitleredResults = results.filter {
+            !shouldBeRemovedFromDefaultScopeCrawlUpResults(it?.element, inRunSection, containingRuleOrCheckpoint)
+        }
+        if (sizeBeforeFiltration != 0 && fitleredResults.isEmpty()) {
+            // We've removed all elements from completion (likely named)
+            // Our named elements processing inside PyReferenceImpl stops resolve
+            // and doesn't collect required implicit symbols
+            return resolveAsImplicitSymbol()
+        }
+        return fitleredResults
+    }
+
+    private fun resolveAsImplicitSymbol(): List<RatedResolveResult> {
+        val context = myContext.typeEvalContext
+
+        return PyReferenceResolveProvider.EP_NAME.extensionList.asSequence()
+                .filter { it is SMKImplicitPySymbolsResolveProvider }
+                .flatMap {  it.resolveName(myElement, context).asSequence() }
+                .toList()
     }
 
     override fun getVariants(): Array<Any> {
@@ -36,8 +57,12 @@ class SmkPyReferenceImpl(
         // python collects all named elements although we don't need this
         return defaultVariants.filter { v ->
             when (v) {
-                is LookupElement -> !shouldBeRemovedFromDefaultScopeCrawlUpResults(v.psiElement, inRunSection)
-                is PsiElement -> !shouldBeRemovedFromDefaultScopeCrawlUpResults(v, inRunSection)
+                is LookupElement -> !shouldBeRemovedFromDefaultScopeCrawlUpResults(
+                        v.psiElement, inRunSection, containingRuleOrCheckpoint
+                )
+                is PsiElement -> !shouldBeRemovedFromDefaultScopeCrawlUpResults(
+                        v, inRunSection, containingRuleOrCheckpoint
+                )
                 else -> true
             }
         }.toTypedArray()
@@ -45,12 +70,20 @@ class SmkPyReferenceImpl(
 
     companion object {
         fun shouldBeRemovedFromDefaultScopeCrawlUpResults(
-                element: PsiElement?, inRunSection: Boolean
+                element: PsiElement?,
+                inRunSection: Boolean,
+                containingRuleOrCheckpoint: SmkRuleOrCheckpoint?
         ): Boolean {
             // TODO: re-implement using smk visitor
             var shouldBeRemoved = (element is SmkSection) && (element !is SmkSubworkflow)
             if (shouldBeRemoved && inRunSection) {
-                shouldBeRemoved = element !is SmkRuleOrCheckpointArgsSection
+                if (element is SmkRuleOrCheckpointArgsSection) {
+                    if (containingRuleOrCheckpoint != null &&
+                            containingRuleOrCheckpoint.containingFile == element.containingFile &&
+                            containingRuleOrCheckpoint == element.getParentRuleOrCheckPoint()) {
+                        shouldBeRemoved = false
+                    }
+                }
             }
             return shouldBeRemoved
         }

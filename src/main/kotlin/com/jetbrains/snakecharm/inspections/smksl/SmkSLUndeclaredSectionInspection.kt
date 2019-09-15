@@ -9,10 +9,11 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTION_ACCESSOR_CLASSES
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SNAKEMAKE_MODULE_NAME_IO_PY
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLInitialReference
 
-class SmkSLUnresolvedSectionInspection: SnakemakeInspection() {
+class SmkSLUndeclaredSectionInspection: SnakemakeInspection() {
     override fun buildVisitor(
                 holder: ProblemsHolder,
                 isOnTheFly: Boolean,
@@ -30,7 +31,7 @@ class SmkSLUnresolvedSectionInspection: SnakemakeInspection() {
                     if (checkIsSectionNameUnresolved(ref)) {
                         registerProblem(
                                 expr,
-                                SnakemakeBundle.message("INSP.NAME.unresolved.section.message", referencedName!!)
+                                SnakemakeBundle.message("INSP.NAME.undeclared.section.message", referencedName!!)
                         )
                     }
                 }
@@ -49,6 +50,7 @@ class SmkSLUnresolvedSectionInspection: SnakemakeInspection() {
                     declaration.containingFile.name == SNAKEMAKE_MODULE_NAME_IO_PY
                             || declaration.qualifiedName in SECTION_ACCESSOR_CLASSES
                 }
+                is SmkRuleOrCheckpoint -> true
                 else -> false
             }
         }
