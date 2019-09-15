@@ -1,4 +1,4 @@
-Feature: Yet-undefined name after rules/checkpoints
+Feature: Inspection: Yet-undefined name after rules/checkpoints
 
   Scenario Outline: Name not defined yet
     Given a snakemake project
@@ -66,8 +66,8 @@ Feature: Yet-undefined name after rules/checkpoints
       input: <section>s.NAME
     """
     And Rule or Checkpoint Name yet undefined inspection is enabled
-    And Unresolved reference inspection is enabled
-    Then I expect inspection warning on <NAME> with message
+    And PyUnresolvedReferencesInspection inspection is enabled
+    Then I expect inspection error on <NAME> with message
     """
     Cannot find reference 'NAME' in '<section>s'
     """

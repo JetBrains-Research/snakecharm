@@ -1,4 +1,4 @@
-Feature: Check highlighting of inspections on wildcards
+Feature: Inspection: Wildcard not defined
 
   Scenario Outline: No wildcards defining section
     Given a snakemake project

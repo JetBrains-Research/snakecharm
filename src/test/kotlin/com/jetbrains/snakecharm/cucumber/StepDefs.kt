@@ -12,7 +12,6 @@ import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.codeInsight.controlflow.ControlFlowCache
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.inspections.PyUnreachableCodeInspection
-import com.jetbrains.python.inspections.unresolvedReference.PyUnresolvedReferencesInspection
 import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
@@ -91,7 +90,6 @@ class StepDefs {
             "Unreachable Code" -> fixture.enableInspections(PyUnreachableCodeInspection::class.java)
             "Rule or Checkpoint Name yet undefined" ->
                 fixture.enableInspections(SmkRuleOrCheckpointNameYetUndefinedInspection::class.java)
-            "Unresolved reference" -> fixture.enableInspections(PyUnresolvedReferencesInspection::class.java)
             "Repeated Rule in Localrules or Ruleorder" ->
                 fixture.enableInspections(SmkLocalrulesRuleorderRepeatedRuleInspection::class.java)
             "Lambda Functions in Rule Sections" -> fixture.enableInspections(SmkLambdaRuleParamsInspection::class.java)
@@ -108,5 +106,10 @@ class StepDefs {
                 fail("Unknown inspection:$inspectionName")
             }
         }
+    }
+
+    @Given("^TODO")
+    fun todo() {
+        TODO()
     }
 }

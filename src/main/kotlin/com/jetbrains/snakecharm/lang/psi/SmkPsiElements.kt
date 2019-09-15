@@ -61,9 +61,8 @@ interface SmkWorkflowLocalrulesSection: PyStatement, SmkArgsSection, SmkToplevel
 
 interface SmkWorkflowRuleorderSection: PyStatement, SmkArgsSection, SmkToplevelSection
 
-interface SmkReferenceExpression: PyExpression {
-    fun getNameElement(): ASTNode? = node.findChildByType(PyTokenTypes.IDENTIFIER)
-    fun getReferenceName() = getNameElement()?.text
+interface SmkReferenceExpression: PyReferenceExpression {
+    override fun getNameElement(): ASTNode? = node.findChildByType(PyTokenTypes.IDENTIFIER)
 }
 
 interface BaseSmkSLReferenceExpression : PyReferenceExpression, SmkSLExpression, PsiNameIdentifierOwner {

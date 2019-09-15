@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.highlighter
 
 import com.intellij.psi.PsiFile
+import com.jetbrains.python.inspections.PyUnboundLocalVariableInspection
 import com.jetbrains.python.inspections.PyUnreachableCodeInspection
 import com.jetbrains.python.inspections.PythonVisitorFilter
 import com.jetbrains.python.psi.PyElementVisitor
@@ -11,7 +12,9 @@ class SnakemakeVisitorFilter: PythonVisitorFilter {
             /** Instead use [com.jetbrains.snakecharm.lang.validation.SmkReturnAnnotator] **/
             ReturnAnnotator::class.java,
             // [HACK] See https://github.com/JetBrains-Research/snakecharm/issues/14
-            PyUnreachableCodeInspection::class.java
+            PyUnreachableCodeInspection::class.java,
+            // TODO: Need API for: PyResolveUtil.allowForwardReferences(node)
+            PyUnboundLocalVariableInspection::class.java
 
 // other possible candidates to disable             
 //            //inspections

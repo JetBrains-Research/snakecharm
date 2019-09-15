@@ -317,6 +317,18 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkUnresolvedSectionInspection"
     />
 
+    <localInspection
+            language="Python"
+            shortName="SmkPyUnboundLocalVariableInspection"
+            suppressId="PyUnboundLocalVariable"
+            bundle="SnakemakeBundle"
+            key="INSP.NAME.unbound"
+            groupKey="INSP.GROUP.snakemake"
+            enabledByDefault="true"
+            level="WARNING"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkPyUnboundLocalVariableInspection"
+    />
+
     <findUsagesHandlerFactory
             implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"
             id="Python" order="last, before default"
