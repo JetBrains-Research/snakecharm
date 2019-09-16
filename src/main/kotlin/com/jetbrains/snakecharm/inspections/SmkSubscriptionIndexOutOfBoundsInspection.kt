@@ -18,7 +18,7 @@ class SmkSubscriptionIndexOutOfBoundsInspection : SnakemakeInspection() {
             session: LocalInspectionToolSession
     ) = object : SmkSLInspectionVisitor(holder, session) {
         override fun visitPySubscriptionExpression(expr: PySubscriptionExpression) {
-            val psiOperand = expr.operand ?: return
+            val psiOperand = expr.operand
             val indexExp = expr.indexExpression ?: return
 
             // negative numbers not supported

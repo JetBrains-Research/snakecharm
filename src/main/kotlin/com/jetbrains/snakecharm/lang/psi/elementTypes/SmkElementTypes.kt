@@ -9,47 +9,56 @@ import com.jetbrains.snakecharm.lang.psi.impl.*
  */
 object SmkElementTypes {
     val RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT = PyElementType(
-            "SMK_RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT",
-            SmkRuleOrCheckpointArgsSectionImpl::class.java
-    )
+            "SMK_RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT"
+    ) {
+        SmkRuleOrCheckpointArgsSectionImpl(it)
+    }
 
     val SUBWORKFLOW_ARGS_SECTION_STATEMENT =  PyElementType(
-            "SMK_SUBWORKFLOW_ARGS_SECTION_STATEMENT",
-            SmkSubworkflowArgsSectionImpl::class.java
-    )
+            "SMK_SUBWORKFLOW_ARGS_SECTION_STATEMENT"
+    ) {
+        SmkSubworkflowArgsSectionImpl(it)
+    }
 
     val WORKFLOW_ARGS_SECTION_STATEMENT = PyElementType(
-            "SMK_WORKFLOW_ARGS_SECTION_STATEMENT",
-            SmkWorkflowArgsSectionImpl::class.java
-    )
+            "SMK_WORKFLOW_ARGS_SECTION_STATEMENT"
+    ) {
+        SmkWorkflowArgsSectionImpl(it)
+    }
 
     val RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT = PyElementType(
-            "SMK_RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT",
-            SmkRunSectionImpl::class.java
-    )
+            "SMK_RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT"
+    ) {
+        SmkRunSectionImpl(it)
+    }
 
     val WORKFLOW_PY_BLOCK_SECTION_STATEMENT = PyElementType(
-            "SMK_WORKFLOW_PY_BLOCK_SECTION_STATEMENT",
-            SmkWorkflowPythonBlockSectionImpl::class.java
-    )
+            "SMK_WORKFLOW_PY_BLOCK_SECTION_STATEMENT" 
+    ) {
+        SmkWorkflowPythonBlockSectionImpl(it)
+    }
 
     val WORKFLOW_LOCALRULES_SECTION_STATEMENT = PyElementType(
-            "SMK_WORKFLOW_LOCALRULES_SECTION_STATEMENT",
-            SmkWorkflowLocalrulesSectionImpl::class.java
-    )
+            "SMK_WORKFLOW_LOCALRULES_SECTION_STATEMENT"
+    ) {
+        SmkWorkflowLocalrulesSectionImpl(it)
+    }
 
     val WORKFLOW_RULEORDER_SECTION_STATEMENT = PyElementType(
-            "SMK_WORKFLOW_RULEORDER_SECTION_STATEMENT",
-            SmkWorkflowRuleorderSectionImpl::class.java
-    )
+            "SMK_WORKFLOW_RULEORDER_SECTION_STATEMENT"
+    ) {
+        SmkWorkflowRuleorderSectionImpl(it)
+    }
 
     val REFERENCE_EXPRESSION = PyElementType(
-            "SMK_REFERENCE_EXPRESSION",
-            SmkReferenceExpressionImpl::class.java
-    )
+            "SMK_REFERENCE_EXPRESSION"
+    ) {
+        SmkReferenceExpressionImpl(it)
+    }
 
     val SMK_PY_REFERENCE_EXPRESSION = PyElementType(
-            "SMK_PY_REFERENCE_EXPRESSION",
-            SmkPyReferenceExpressionImpl::class.java
-    )
+            "SMK_PY_REFERENCE_EXPRESSION"
+    ) {
+        SmkPyReferenceExpressionImpl(it)
+    }
 }

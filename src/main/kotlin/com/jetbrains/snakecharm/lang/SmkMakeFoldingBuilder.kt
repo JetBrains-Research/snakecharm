@@ -2,7 +2,6 @@ package com.jetbrains.snakecharm.lang
 
 import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.FoldingDescriptor
-import com.intellij.lang.folding.NamedFoldingDescriptor
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.FoldingGroup
 import com.intellij.openapi.util.TextRange
@@ -12,8 +11,8 @@ import com.intellij.testFramework.LightVirtualFile
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonFoldingBuilder
 import com.jetbrains.snakecharm.lang.psi.SmkFile
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import java.util.*
 
 /**
@@ -57,8 +56,13 @@ class SmkMakeFoldingBuilder : PythonFoldingBuilder() {
                 val startElement = colon.psi
                 val range = TextRange(getVisibleTextOffset(startElement), endOffset)
                 if (!range.isEmpty) {
-                    descriptors.add(NamedFoldingDescriptor(node, range, FoldingGroup.newGroup("group"),
-                            "...", isRegionCollapsedByDefault(node), Collections.emptySet()))
+                    descriptors.add(FoldingDescriptor(
+                            node, range,
+                            FoldingGroup.newGroup("group"),
+                            "...",
+                            isRegionCollapsedByDefault(node),
+                            Collections.emptySet()
+                    ))
                 }
             }
         }

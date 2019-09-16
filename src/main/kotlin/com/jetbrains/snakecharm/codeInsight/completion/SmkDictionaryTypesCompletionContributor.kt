@@ -65,7 +65,6 @@ object SmkDictionaryTypesCompletionProvider: CompletionProvider<CompletionParame
             result: CompletionResultSet) {
 
         val original = parameters.originalPosition ?: return
-        val offset = parameters.offset
 
         // subscription is like: "input[key]"
         val subscription = PsiTreeUtil.getParentOfType(original, PySubscriptionExpression::class.java) ?: return
