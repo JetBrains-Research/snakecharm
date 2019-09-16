@@ -49,12 +49,25 @@
   <depends optional="true">com.intellij.modules.python</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <fileTypeFactory implementation="com.jetbrains.snakecharm.SmkFileTypeFactory"/>
+    <fileType
+                name="Snakemake"
+                extensions="smk;rule;rules"
+                fileNames="Snakefile"
+                language="Snakemake"
+                implementationClass="com.jetbrains.snakecharm.SmkFileType"
+                fieldName="INSTANCE"
+        />
     <lang.parserDefinition
             language="Snakemake"
             implementationClass="com.jetbrains.snakecharm.lang.parser.SmkParserDefinition"
     />
-    <fileTypeFactory implementation="com.jetbrains.snakecharm.stringLanguage.SmkSLFileTypeFactory"/>
+    <fileType
+            name="SmkSL"
+            extensions="smkStringLanguage"
+            language="SnakemakeSL"
+            implementationClass="com.jetbrains.snakecharm.stringLanguage.SmkSLFileType"
+            fieldName="INSTANCE"
+    />
     <lang.parserDefinition
             language="SnakemakeSL"
             implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLParserDefinition"
