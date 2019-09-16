@@ -97,9 +97,10 @@ Feature: Complete file names in workflow sections
     Given a directory "Folder"
     Given I open a file "foo.smk" with text
     """
-    workdir: "D "
+    workdir: "X "
     """
-    When I put the caret after D
+    When I put the caret after X
+    And I invoke autocompletion popup
     Then completion list shouldn't contain:
       | Folder |
 

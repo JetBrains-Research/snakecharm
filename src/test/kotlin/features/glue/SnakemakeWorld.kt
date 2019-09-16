@@ -22,7 +22,12 @@ object SnakemakeWorld {
 
     fun injectionFixture() = myInjectionFixture!!
     fun fixture()= myFixture!!
-    fun completionList()= myCompletionList!!
+    fun completionList(): List<String> {
+        requireNotNull(myCompletionList) {
+            "Completion list not initialized, likely you've forgotten 'I invoke autocompletion popup' step."
+        }
+        return myCompletionList!!
+    }
 
     fun getOffsetUnderCaret() = fixture().editor.caretModel.offset
     fun findPsiElementUnderCaret() = fixture().file.findElementAt(getOffsetUnderCaret())

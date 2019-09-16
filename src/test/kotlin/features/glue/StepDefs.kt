@@ -30,7 +30,9 @@ class StepDefs {
     @Given("^a (snakemake|python)? project$")
     @Throws(Exception::class)
     fun configureSnakemakeProject(projectType: String) {
-        require(SnakemakeWorld.myFixture == null) { "fixture must be null here" }
+        require(SnakemakeWorld.myFixture == null) {
+            "fixture must be null here, looks like cleanup after prev test failed."
+        }
 
         // From UsefullTestCase
         Disposer.setDebugMode(true)
