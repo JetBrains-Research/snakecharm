@@ -35,12 +35,7 @@ Feature: Resolve implicitly imported python names
     """
     When I put the caret at she
     Then reference should multi resolve to name, file, times[, class name]
-      | shell    | shell.py     | 1 |
-      | __init__ | builtins.pyi | 1 |
-
-    Then reference should multi resolve to name, file in same order
-      | shell    | shell.py     |
-      | __init__ | builtins.pyi |
+      | __new__  | shell.py     | 1 |
 
   Scenario Outline: Also available on top-level at runtime, but not API
     Given a snakemake project
@@ -96,12 +91,7 @@ Feature: Resolve implicitly imported python names
     """
     When I put the caret at she
     Then reference should multi resolve to name, file, times[, class name]
-      | shell       | shell.py     | 1     |
-      | __init__    | builtins.pyi | 1     |
-
-    Then reference should multi resolve to name, file in same order
-    | shell | shell.py |
-    | __init__    | builtins.pyi |
+      | __new__  | shell.py     | 1 |
 
   Scenario Outline: Resolve inside run section
     Given a snakemake project
@@ -118,7 +108,7 @@ Feature: Resolve implicitly imported python names
     Examples:
       | ptn         | text        | symbol_name | file        | times |
       | exp         | expand()    | expand      | io.py       | 1     |
-      | she         | shell()     | shell       | shell.py    | 1     |
+      | she         | shell()     | __new__     | shell.py    | 1     |
       | con         | config["a"] | config      | workflow.py | 1     |
       | rules       | rules.foo   | rules       | workflow.py | 1     |
       | checkpoints | checkpoints | checkpoints | workflow.py | 1     |
@@ -130,18 +120,18 @@ Feature: Resolve implicitly imported python names
       | lo          | log         | Log         | io.py       | 1     |
 
   Scenario: Resolve results priority
-      Given a snakemake project
-      Given I open a file "foo.smk" with text
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
       """
       rule NAME:
         output: "path/to/output"
         run:
           input #here
       """
-      When I put the caret at input #here
-      Then reference should multi resolve to name, file in same order
-        | InputFiles | io.py        |
-        | input      | builtins.pyi |
+    When I put the caret at input #here
+    Then reference should multi resolve to name, file in same order
+      | InputFiles | io.py        |
+      | input      | builtins.pyi |
 
   Scenario Outline: Resolve threads inside run section (threads is fake implicit symbol)
     Given a snakemake project
@@ -159,8 +149,8 @@ Feature: Resolve implicitly imported python names
 
     Examples:
       | rule_like  | text       | symbol_name | file    | times | class                              |
-      | rule       | threads: 1 | threads  | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
-      | checkpoint | threads: 1 | threads  | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | rule       | threads: 1 | threads     | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | checkpoint | threads: 1 | threads     | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
 
   Scenario Outline: Not-resolved threads if part of reference
     Given a snakemake project

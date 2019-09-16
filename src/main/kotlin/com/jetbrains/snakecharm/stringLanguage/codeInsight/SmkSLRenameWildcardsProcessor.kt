@@ -1,9 +1,9 @@
 package com.jetbrains.snakecharm.stringLanguage.codeInsight
 
-import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.search.LocalSearchScope
+import com.intellij.psi.search.SearchScope
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.rename.RenamePsiElementProcessor
@@ -14,16 +14,19 @@ class SmkSLRenameWildcardsProcessor : RenamePsiElementProcessor() { //RenamePyEl
     override fun canProcessElement(element: PsiElement) =
             element is SmkSLReferenceExpressionImpl
 
-    // We want to search for wildcard references only in containing rule/checkpoint
-    override fun findReferences(element: PsiElement): Collection<PsiReference> {
+    override fun findReferences(
+            element: PsiElement,
+            searchScope: SearchScope,
+            searchInCommentsAndStrings: Boolean
+    ): Collection<PsiReference> {
         if (element !is SmkSLReferenceExpressionImpl) {
-            return super.findReferences(element)
+            return emptyList()
         }
 
-        val languageManager = InjectedLanguageManager.getInstance(element.project)
-        val host = languageManager.getInjectionHost(element)
-        val parentDeclaration = PsiTreeUtil.getParentOfType(host, SmkRuleOrCheckpoint::class.java)
-                ?: return emptyList()
+         // We want to search for wildcard references only in containing rule/checkpoint
+        val parentDeclaration = PsiTreeUtil.getParentOfType(
+                element.injectionHost(), SmkRuleOrCheckpoint::class.java
+        ) ?: return emptyList()
 
         return ReferencesSearch.search(element, LocalSearchScope(parentDeclaration)).toList()
     }
