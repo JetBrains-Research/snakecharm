@@ -67,13 +67,6 @@ class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(no
     }
 
     fun isWildcard() = reference is SmkSLWildcardReference
-
-    companion object {
-        private fun BaseSmkSLReferenceExpression.isInValidCallExpression(): Boolean {
-            val callExpression = PsiTreeUtil.getParentOfType(this.injectionHost(), PyCallExpression::class.java)
-            return callExpression == null || callExpression.callSimpleName() !in FUNCTIONS_BANNED_FOR_WILDCARDS
-        }
-    }
 }
 
 class SmkEmptyReference<T: PsiElement>(element: T): PsiPolyVariantReferenceBase<T>(element),
