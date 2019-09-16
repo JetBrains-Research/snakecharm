@@ -283,7 +283,7 @@ class ActionsSteps {
         }
     }
 
-    @Then("^I expect language injection on \"(.+)\"")
+    @Then("^I expect language injection on \"(.*)\"")
     fun iExpectLanguageInjectionOn(str: String) {
         ApplicationManager.getApplication().invokeAndWait {
             val fixture = SnakemakeWorld.injectionFixture()
