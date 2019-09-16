@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.cucumber
+package features
 
 import cucumber.api.CucumberOptions
 import cucumber.api.junit.Cucumber
