@@ -4,6 +4,7 @@ import com.intellij.codeInspection.LocalInspectionEP
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Computable
+import com.intellij.openapi.util.Disposer
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.InjectionTestFixture
@@ -29,6 +30,9 @@ class StepDefs {
     @Given("^a (snakemake|python)? project$")
     @Throws(Exception::class)
     fun configureSnakemakeProject(projectType: String) {
+        // From UsefullTestCase
+        Disposer.setDebugMode(true)
+
         // XXX: Seems don't need to enable them, enabled via fixture.enableInspection()
         //if (enabledInspections != null) {
         //    InspectionProfileImpl.INIT_INSPECTIONS = true
@@ -58,8 +62,8 @@ class StepDefs {
                 tmpDirFixture
         )
 
-        SnakemakeWorld.fixture().setUp()
         SnakemakeWorld.fixture().testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
+        SnakemakeWorld.fixture().setUp()
 
         SnakemakeWorld.myInjectionFixture = InjectionTestFixture(SnakemakeWorld.fixture())
 

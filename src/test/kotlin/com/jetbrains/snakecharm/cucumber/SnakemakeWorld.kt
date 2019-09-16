@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.cucumber
 
+import com.intellij.openapi.Disposable
 import com.intellij.psi.PsiReference
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.InjectionTestFixture
@@ -16,6 +17,7 @@ object SnakemakeWorld {
     var myGeneratedDocPopupText: String? = null
     var myFoundRefs: List<PsiReference> = emptyList()
     var myFoundUsages: List<UsageInfo> = emptyList()
+    var myTestRootDisposable = TestDisposable()
 
     fun injectionFixture() = myInjectionFixture!!
     fun fixture()= myFixture!!
@@ -23,4 +25,14 @@ object SnakemakeWorld {
 
     fun getOffsetUnderCaret() = fixture().editor.caretModel.offset
     fun findPsiElementUnderCaret() = fixture().file.findElementAt(getOffsetUnderCaret())
+}
+
+
+class TestDisposable : Disposable {
+    @Volatile
+    var isDisposed: Boolean = false
+
+    override fun dispose() {
+        isDisposed = true
+    }
 }
