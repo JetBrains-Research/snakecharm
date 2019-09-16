@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.cucumber
 import com.intellij.codeInsight.documentation.DocumentationManager
 import com.intellij.codeInsight.highlighting.BraceMatchingUtil
 import com.intellij.ide.util.gotoByName.GotoSymbolModel2
+import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Document
@@ -15,6 +16,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
+import com.jetbrains.snakecharm.FakeSnakemakeInjector
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.findPsiElementUnderCaret
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.fixture
 import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.myGeneratedDocPopupText
@@ -291,6 +293,22 @@ class ActionsSteps {
         }
     }
 
+    @Then("^I inject SmkSL at a caret")
+       fun iInjectSmkSLAtCaret() {
+           ApplicationManager.getApplication().invokeAndWait {
+               val injectedFixture = SnakemakeWorld.injectionFixture()
+               val fixture = SnakemakeWorld.fixture()
+               val offsetUnderCaret = SnakemakeWorld.getOffsetUnderCaret()
+               val elementAtOffset = fixture.file.findElementAt(offsetUnderCaret)
+               requireNotNull(elementAtOffset) { "No element at a caret offset: $offsetUnderCaret" }
+
+               // auto unregister when fixture is disposed
+               InjectedLanguageManager.getInstance(fixture.project).registerMultiHostInjector(
+                       FakeSnakemakeInjector(offsetUnderCaret), fixture.projectDisposable
+               )
+           }
+       }
+    
     @Then("^I expect no language injection")
     fun iExpectNoLanguageInjection() {
         ApplicationManager.getApplication().invokeAndWait {

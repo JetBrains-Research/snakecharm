@@ -22,14 +22,14 @@ Feature: Completion for wildcards
     And I invoke autocompletion popup
     Then completion list should contain:
       # wildcards defining:
-      | wildcard6     |
-      | wildcard5     |
-      | wildcard4     |
+      | wildcard6 |
+      | wildcard5 |
+      | wildcard4 |
       # wildcards expanding:
-      | wildcard1     |
-      | wildcard2     |
-      | wildcard3     |
-      | wildcard7     |
+      | wildcard1 |
+      | wildcard2 |
+      | wildcard3 |
+      | wildcard7 |
     And completion list shouldn't contain:
       | non-wildcard1 |
       | non-wildcard2 |
@@ -156,8 +156,8 @@ Feature: Completion for wildcards
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-        output:
-            expand("{prefix}", prefix="p")
+        <section>:
+            <text>
         shell: "{wildcards.fo}"
     """
     And I put the caret after wildcards.
@@ -165,9 +165,37 @@ Feature: Completion for wildcards
     Then completion list shouldn't contain:
       | prefix |
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | section | text                                      |
+      | rule       | output  | expand("{prefix}", prefix="p")            |
+      | rule       | input   | expand("{prefix}", prefix="p")            |
+      | rule       | input   | lambda wd: expand("{prefix}", prefix="p") |
+      | checkpoint | output  | expand("{prefix}", prefix="p")            |
+      | checkpoint | input   | lambda wd: expand("{prefix}", prefix="p") |
+
+
+  Scenario Outline: Do not collect wildcard from lambdas (manual injection case)
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+        <section>: lambda wildcards: <text>
+        shell: "{wildcards.fo}"
+    """
+    And I put the caret at prefix}"
+    And I inject SmkSL at a caret
+    Then I expect language injection on "{prefix}"
+    And I put the caret after wildcards.
+    When I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | prefix |
+    Examples:
+      | rule_like  | section | text                |
+      | rule       | input   | "{prefix}"          |
+      | rule       | input   | ancient("{prefix}") |
+      | rule       | input   | temp("{prefix}")    |
+      | rule       | input   | foo("{prefix}")     |
+      | checkpoint | input   | "{prefix}"          |
+      | checkpoint | input   | ancient("{prefix}") |
 
 
   Scenario Outline: Completion in rule run section
@@ -196,18 +224,18 @@ Feature: Completion for wildcards
 
 
   Scenario Outline: No completion in wildcard references which looks like qualified
-     Given a snakemake project
-     Given I open a file "foo.smk" with text
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
        """
        <rule_like> NAME:
            output: "{sample}"
            input: "{wildcards.sample}"
        """
-     And I put the caret after wildcards.
-     When I invoke autocompletion popup
-     And completion list shouldn't contain:
-       | sample |
-     Examples:
-       | rule_like  |
-       | rule       |
-       | checkpoint |
+    And I put the caret after wildcards.
+    When I invoke autocompletion popup
+    And completion list shouldn't contain:
+      | sample |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |

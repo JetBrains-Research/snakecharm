@@ -66,16 +66,14 @@ interface SmkReferenceExpression: PyReferenceExpression {
 }
 
 interface BaseSmkSLReferenceExpression : PyReferenceExpression, SmkSLExpression, PsiNameIdentifierOwner {
+    fun injectionHost() = InjectedLanguageManager.getInstance(project).getInjectionHost(this)
+
     fun containingRuleOrCheckpointSection(): SmkRuleOrCheckpointArgsSection? {
-        val languageManager = InjectedLanguageManager.getInstance(project)
-        val host = languageManager.getInjectionHost(this)
-        return PsiTreeUtil.getParentOfType(host, SmkRuleOrCheckpointArgsSection::class.java)
+        return PsiTreeUtil.getParentOfType(injectionHost(), SmkRuleOrCheckpointArgsSection::class.java)
     }
 
     fun containingSection(): SmkSection? {
-        val languageManager = InjectedLanguageManager.getInstance(project)
-        val host = languageManager.getInjectionHost(this)
-        return PsiTreeUtil.getParentOfType(host, SmkSection::class.java)
+        return PsiTreeUtil.getParentOfType(injectionHost(), SmkSection::class.java)
     }
 
     override fun getNameIdentifier() = nameElement?.psi

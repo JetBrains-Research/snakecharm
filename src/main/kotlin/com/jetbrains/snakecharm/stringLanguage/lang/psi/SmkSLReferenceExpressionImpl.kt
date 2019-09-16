@@ -2,16 +2,12 @@ package com.jetbrains.snakecharm.stringLanguage.lang.psi
 
 import com.intellij.lang.ASTNode
 import com.intellij.lang.annotation.HighlightSeverity
-import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiPolyVariantReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.util.PsiTreeUtil
-import com.jetbrains.python.psi.PsiReferenceEx
-import com.jetbrains.python.psi.PyCallExpression
-import com.jetbrains.python.psi.PyElementVisitor
-import com.jetbrains.python.psi.PyExpression
+import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.impl.PyReferenceExpressionImpl
 import com.jetbrains.python.psi.impl.references.PyQualifiedReference
 import com.jetbrains.python.psi.resolve.PyResolveContext
@@ -42,7 +38,12 @@ class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(no
 
         if (parentSection is SmkRuleOrCheckpointArgsSection && parentSection.isWildcardsExpandingSection()) {
             val parentRuleOrCheckPoint = parentSection.getParentRuleOrCheckPoint()
-            if (!isQualified && isInValidCallExpression()) {
+            val injectionHost = injectionHost()
+            val callExpression = PsiTreeUtil.getParentOfType(injectionHost, PyCallExpression::class.java)
+            if (!isQualified &&
+                    (callExpression == null || callExpression.callSimpleName() !in FUNCTIONS_BANNED_FOR_WILDCARDS) &&
+                    PsiTreeUtil.getParentOfType(injectionHost, PyLambdaExpression::class.java) == null
+            ) {
                 val type = context.typeEvalContext.getType(parentRuleOrCheckPoint.wildcardsElement)
                 if (type is SmkWildcardsType) {
                     return SmkSLWildcardReference(this, type)
@@ -69,8 +70,7 @@ class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(no
 
     companion object {
         private fun BaseSmkSLReferenceExpression.isInValidCallExpression(): Boolean {
-            val host = InjectedLanguageManager.getInstance(project).getInjectionHost(this)
-            val callExpression = PsiTreeUtil.getParentOfType(host, PyCallExpression::class.java)
+            val callExpression = PsiTreeUtil.getParentOfType(this.injectionHost(), PyCallExpression::class.java)
             return callExpression == null || callExpression.callSimpleName() !in FUNCTIONS_BANNED_FOR_WILDCARDS
         }
     }

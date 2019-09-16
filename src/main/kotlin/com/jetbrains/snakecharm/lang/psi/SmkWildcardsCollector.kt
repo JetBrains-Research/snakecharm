@@ -2,10 +2,7 @@ package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.util.PsiTreeUtil
-import com.jetbrains.python.psi.PyCallExpression
-import com.jetbrains.python.psi.PyElementVisitor
-import com.jetbrains.python.psi.PyRecursiveElementVisitor
-import com.jetbrains.python.psi.PyStringLiteralExpression
+import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_BANNED_FOR_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
@@ -50,6 +47,11 @@ class SmkWildcardsCollector(
         if (visitAllSections) {
             super.visitSmkRunSection(st)
         }
+    }
+
+    override fun visitPyLambdaExpression(node: PyLambdaExpression?) {
+        // #249 do not collect wildcards in lambdas
+        // Do nothing here
     }
 
     override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {

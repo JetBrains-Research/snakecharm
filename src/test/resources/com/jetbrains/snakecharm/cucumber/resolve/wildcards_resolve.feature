@@ -247,3 +247,25 @@ Feature: Resolve wildcards in SnakemakeSL
       | rule       | output.arg}"      | {outp         | output         |
       | rule       | input.arg}"       | params: "{inp | input          |
       | checkpoint | output.arg}"      | {outp         | output         |
+
+  Scenario Outline: Do not resolve non-declared wildcards to lambdas (manual injection)
+     Given a snakemake project
+     Given I open a file "foo.smk" with text
+     """
+     <rule_like> NAME:
+         <section>: lambda wildcards: <text>
+         shell: "{wildcards.prefix}"
+     """
+     And I put the caret after "{pref
+     And I inject SmkSL at a caret
+     Then I expect language injection on "{prefix}"
+     And I put the caret after wildcards.pref
+     Then reference in injection should not resolve
+     Examples:
+       | rule_like  | section | text                |
+       | rule       | input   | "{prefix}"          |
+       | rule       | input   | ancient("{prefix}") |
+       | rule       | input   | temp("{prefix}")    |
+       | rule       | input   | foo("{prefix}")     |
+       | checkpoint | input   | "{prefix}"          |
+       | checkpoint | input   | ancient("{prefix}") |

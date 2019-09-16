@@ -14,7 +14,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
 import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
 
-class SmkSLInjector : PyInjectorBase() {
+open class SmkSLInjector : PyInjectorBase() {
     override fun getInjectedLanguage(element: PsiElement) = SmkSLanguage
 
     override fun elementsToInjectIn() = listOf(PyStringLiteralExpression::class.java)
@@ -47,11 +47,6 @@ class SmkSLInjector : PyInjectorBase() {
         return parentCallExpr == null || parentCallExpr.callSimpleName() in FUNCTIONS_ALLOWING_SMKSL_INJECTION
     }
 
-    private fun PsiElement.isInExpandCallExpression(): Boolean {
-        val parentCallExpr = PsiTreeUtil.getParentOfType(this, PyCallExpression::class.java)
-        return parentCallExpr?.callSimpleName() == SMK_FUN_EXPAND
-    }
-
     private fun PsiElement.isInValidArgsSection(): Boolean {
         val parentSection = PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpointArgsSection::class.java)
 
@@ -63,11 +58,17 @@ class SmkSLInjector : PyInjectorBase() {
             SnakemakeLanguageDialect.isInsideSmkFile(this) &&
                     isInValidArgsSection() &&
                     isInValidCallExpression() &&
-                    (isInExpandCallExpression() ||
+                    (isInExpandCallExpression(this) ||
                             PsiTreeUtil.getParentOfType(
                             this, PyLambdaExpression::class.java) == null
                             ) &&
                     (this as PyStringLiteralExpression).containsLBraceOrIsEmpty()
+    companion object {
+        fun isInExpandCallExpression(element: PsiElement): Boolean {
+                val parentCallExpr = PsiTreeUtil.getParentOfType(element, PyCallExpression::class.java)
+                return parentCallExpr?.callSimpleName() == SMK_FUN_EXPAND
+            }
+    }
 }
 
 fun PyCallExpression.callSimpleName() = this.callee.let { expression ->
