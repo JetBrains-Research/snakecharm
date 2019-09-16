@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.cucumber
+package features.glue
 
 import com.intellij.codeInsight.TargetElementUtil
 import com.intellij.openapi.application.ApplicationManager
@@ -8,11 +8,12 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.jetbrains.python.psi.PyStringLiteralExpression
-import com.jetbrains.snakecharm.cucumber.CompletionResolveSteps.Companion.getReferenceInInjectedLanguageAtOffset
 import cucumber.api.DataTable
 import cucumber.api.java.en.Given
 import cucumber.api.java.en.Then
+import features.glue.CompletionResolveSteps.Companion.getReferenceInInjectedLanguageAtOffset
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 
 class FindUsagesSteps {
@@ -51,11 +52,15 @@ class FindUsagesSteps {
 
     @Then("^find usages shows me following references:$")
     fun find_usages_shows_me_following_references(dataTable: DataTable) {
-        //TODO: re-implement with SnakemakeWorld.myFoundUsages
-
         ApplicationManager.getApplication().runReadAction() {
             val expectedUsages = dataTable.asList(Ref::class.java)
-            val actualRefs = SnakemakeWorld.myFoundRefs.sortedBy { it.element.containingFile.name }
+
+            val foundRefs = SnakemakeWorld.myFoundRefs
+            assertNotNull(foundRefs) { "Likely you've missed 'I invoke find usages' step" }
+            val foundUsages = SnakemakeWorld.myFoundUsages
+            assertNotNull(foundUsages) { "Likely you've missed 'I invoke find usages' step" }
+
+            val actualRefs = foundRefs.sortedBy { it.element.containingFile.name }
 
             val actualRefsHint = "Actual refs:\n" + actualRefs.joinToString(separator = "\n") { ref ->
                 val (elem, textOffset, textLength) = getOriginalElementOffsetAndLengthForPossibleInjection(ref)
@@ -102,7 +107,7 @@ class FindUsagesSteps {
                 )
             }
 
-            assertEquals(expectedUsages.size, SnakemakeWorld.myFoundUsages.size)
+            assertEquals(expectedUsages.size, foundUsages.size)
         }
     }
 

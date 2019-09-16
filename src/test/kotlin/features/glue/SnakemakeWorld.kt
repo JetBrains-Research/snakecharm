@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.cucumber
+package features.glue
 
 import com.intellij.openapi.Disposable
 import com.intellij.psi.PsiReference
@@ -11,13 +11,14 @@ import com.intellij.usageView.UsageInfo
  * @date 2019-04-28
  */
 object SnakemakeWorld {
-    var myInjectionFixture: InjectionTestFixture? = null
-    var myFixture: CodeInsightTestFixture? = null
-    var myCompletionList: List<String>? = null
-    var myGeneratedDocPopupText: String? = null
-    var myFoundRefs: List<PsiReference> = emptyList()
-    var myFoundUsages: List<UsageInfo> = emptyList()
-    var myTestRootDisposable = TestDisposable()
+    // NB: all fields should be null by default and with @JvmField notation (for cleanup Hook)
+    @JvmField var myInjectionFixture: InjectionTestFixture? = null
+    @JvmField var myFixture: CodeInsightTestFixture? = null
+    @JvmField var myCompletionList: List<String>? = null
+    @JvmField var myGeneratedDocPopupText: String? = null
+    @JvmField var myFoundRefs: List<PsiReference>? = null
+    @JvmField var myFoundUsages: List<UsageInfo> = emptyList()
+    @JvmField var myTestRootDisposable: TestDisposable? = null
 
     fun injectionFixture() = myInjectionFixture!!
     fun fixture()= myFixture!!

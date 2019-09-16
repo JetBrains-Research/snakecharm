@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.cucumber
+package features.glue
 
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.lookup.Lookup
@@ -21,7 +21,7 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.ui.UIUtil
 import com.jetbrains.python.psi.PyStringLiteralExpression
-import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.getOffsetUnderCaret
+import features.glue.SnakemakeWorld.getOffsetUnderCaret
 import cucumber.api.DataTable
 import cucumber.api.java.en.Then
 import cucumber.api.java.en.When

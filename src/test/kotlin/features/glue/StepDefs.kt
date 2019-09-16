@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.cucumber
+package features.glue
 
 import com.intellij.codeInspection.LocalInspectionEP
 import com.intellij.codeInspection.LocalInspectionTool
@@ -30,8 +30,13 @@ class StepDefs {
     @Given("^a (snakemake|python)? project$")
     @Throws(Exception::class)
     fun configureSnakemakeProject(projectType: String) {
+        require(SnakemakeWorld.myFixture == null) { "fixture must be null here" }
+
         // From UsefullTestCase
         Disposer.setDebugMode(true)
+
+        SnakemakeWorld.myTestRootDisposable = TestDisposable()
+        SnakemakeWorld.myFoundRefs
 
         // XXX: Seems don't need to enable them, enabled via fixture.enableInspection()
         //if (enabledInspections != null) {

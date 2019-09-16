@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.cucumber
+package features.glue
 
 import com.intellij.codeInsight.documentation.DocumentationManager
 import com.intellij.codeInsight.highlighting.BraceMatchingUtil
@@ -17,9 +17,9 @@ import com.intellij.psi.PsiFile
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.FakeSnakemakeInjector
-import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.findPsiElementUnderCaret
-import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.fixture
-import com.jetbrains.snakecharm.cucumber.SnakemakeWorld.myGeneratedDocPopupText
+import features.glue.SnakemakeWorld.findPsiElementUnderCaret
+import features.glue.SnakemakeWorld.fixture
+import features.glue.SnakemakeWorld.myGeneratedDocPopupText
 import cucumber.api.DataTable
 import cucumber.api.java.en.Given
 import cucumber.api.java.en.Then
