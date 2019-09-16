@@ -17,13 +17,13 @@ import com.intellij.psi.PsiFile
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.FakeSnakemakeInjector
-import features.glue.SnakemakeWorld.findPsiElementUnderCaret
-import features.glue.SnakemakeWorld.fixture
-import features.glue.SnakemakeWorld.myGeneratedDocPopupText
 import cucumber.api.DataTable
 import cucumber.api.java.en.Given
 import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
+import features.glue.SnakemakeWorld.findPsiElementUnderCaret
+import features.glue.SnakemakeWorld.fixture
+import features.glue.SnakemakeWorld.myGeneratedDocPopupText
 import java.io.File.separator
 import java.util.regex.Pattern
 import kotlin.test.*
@@ -36,7 +36,7 @@ class ActionsSteps {
     }
 
     @Given("^I expect no inspection (error|warning|info|TYPO|weak warning)$")
-    fun iExpectNoInspection(level: String) {
+    fun iExpectNoInspection(_level: String) {
         //Fake step, do nothing "check highlighting" step will show errors in such case
         //This step just for more readable tests
     }
@@ -296,8 +296,7 @@ class ActionsSteps {
     @Then("^I inject SmkSL at a caret")
        fun iInjectSmkSLAtCaret() {
            ApplicationManager.getApplication().invokeAndWait {
-               val injectedFixture = SnakemakeWorld.injectionFixture()
-               val fixture = SnakemakeWorld.fixture()
+               val fixture = fixture()
                val offsetUnderCaret = SnakemakeWorld.getOffsetUnderCaret()
                val elementAtOffset = fixture.file.findElementAt(offsetUnderCaret)
                requireNotNull(elementAtOffset) { "No element at a caret offset: $offsetUnderCaret" }

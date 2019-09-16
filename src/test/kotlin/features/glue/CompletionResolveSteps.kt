@@ -21,10 +21,10 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.ui.UIUtil
 import com.jetbrains.python.psi.PyStringLiteralExpression
-import features.glue.SnakemakeWorld.getOffsetUnderCaret
 import cucumber.api.DataTable
 import cucumber.api.java.en.Then
 import cucumber.api.java.en.When
+import features.glue.SnakemakeWorld.getOffsetUnderCaret
 import junit.framework.TestCase
 import java.util.*
 import kotlin.test.assertEquals
@@ -650,11 +650,6 @@ class LookupFilter private constructor(
         val filteredElements = ContainerUtil.filter(lookupElements, this)
         when {
             filteredElements.isEmpty() -> {
-                val msg = generatedDetailedMsg(
-                        "Lookup item not found: ",
-                        filteredElements
-                )
-
                 val itemsDump = dumpLookupItem(lookupElements)
                 org.junit.Assert.fail(toString() + " - isn't in autocompletion popup, all elements:$itemsDump\n")
             }
