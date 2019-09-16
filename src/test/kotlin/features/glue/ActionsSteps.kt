@@ -17,13 +17,13 @@ import com.intellij.psi.PsiFile
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.FakeSnakemakeInjector
-import cucumber.api.DataTable
-import cucumber.api.java.en.Given
-import cucumber.api.java.en.Then
-import cucumber.api.java.en.When
 import features.glue.SnakemakeWorld.findPsiElementUnderCaret
 import features.glue.SnakemakeWorld.fixture
 import features.glue.SnakemakeWorld.myGeneratedDocPopupText
+import io.cucumber.datatable.DataTable
+import io.cucumber.java.en.Given
+import io.cucumber.java.en.Then
+import io.cucumber.java.en.When
 import java.io.File.separator
 import java.util.regex.Pattern
 import kotlin.test.*
@@ -254,7 +254,7 @@ class ActionsSteps {
             val model = GotoSymbolModel2(fixture().project)
             model.getNames(false).toList()
         })
-        val expected = table.asList(String::class.java)
+        val expected = table.asList()
         assertHasElements(names, expected)
     }
 
@@ -307,7 +307,7 @@ class ActionsSteps {
                )
            }
        }
-    
+
     @Then("^I expect no language injection")
     fun iExpectNoLanguageInjection() {
         ApplicationManager.getApplication().invokeAndWait {

@@ -21,10 +21,10 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.ui.UIUtil
 import com.jetbrains.python.psi.PyStringLiteralExpression
-import cucumber.api.DataTable
-import cucumber.api.java.en.Then
-import cucumber.api.java.en.When
 import features.glue.SnakemakeWorld.getOffsetUnderCaret
+import io.cucumber.datatable.DataTable
+import io.cucumber.java.en.Then
+import io.cucumber.java.en.When
 import junit.framework.TestCase
 import java.util.*
 import kotlin.test.assertEquals
@@ -198,7 +198,7 @@ class CompletionResolveSteps {
                 (itemText(result) to result.containingFile.name) to i
             }.toMap()
 
-            val rows = table.asLists(String::class.java)
+            val rows = table.asLists()
 
             val actualRefsInfo = resolveResults.entries.joinToString(separator = "\n") { (textAndFileName, _) ->
                 "|${textAndFileName.first}| ${textAndFileName.second} |"
@@ -262,7 +262,7 @@ class CompletionResolveSteps {
                     .map { entry -> entry.key to entry.value.size }
                     .toMap()
 
-            val rows = table.asLists(String::class.java)
+            val rows = table.asLists()
 
             val actualRefsInfo = completionListKey3.entries.joinToString(separator = "\n") { (nameAndFile, times) ->
                 "|${nameAndFile.first}| ${nameAndFile.third} | $times | ${nameAndFile.second} |"
@@ -313,7 +313,7 @@ class CompletionResolveSteps {
                 "|${el!!.containingFile.name} | # ${ if (el is PsiNamedElement) el.name else el.text}"
             }
 
-            table.asList(String::class.java).forEach { fileName ->
+            table.asList().forEach { fileName ->
                 assertTrue(
                         fileName !in completionList,
                         "Expected no items from $fileName in completion list." +
@@ -331,14 +331,14 @@ class CompletionResolveSteps {
     }
 
     @When("^I invoke autocompletion popup (\\d+) times$")
-    fun iInvokeAutocompletionPopupNTimes(invocationCount: String) {
+    fun iInvokeAutocompletionPopupNTimes(invocationCount: Int) {
         Registry.get("ide.completion.variant.limit").setValue(10000)
-        doComplete(invocationCount.toInt())
+        doComplete(invocationCount)
     }
 
     @Then("^completion list should contain:$")
     fun completionListShouldContain(table: DataTable) {
-        completionListShouldContainMethods(table.asList(String::class.java))
+        assertHasElements(SnakemakeWorld.completionList(), table.asList())
     }
 
     @Then("^completion list should be empty")
@@ -352,7 +352,7 @@ class CompletionResolveSteps {
 
     @Then("^completion list should only contain:$")
     fun completionListShouldOnlyContain(table: DataTable) {
-        completionListShouldOnlyContainMethods(table.asList(String::class.java))
+        completionListShouldOnlyContainMethods(table.asList())
     }
 
     @Then("^completion list should only contain items (.+)$")
@@ -363,18 +363,19 @@ class CompletionResolveSteps {
     @Then("^completion list should contain these items with type text:$")
     fun completionListShouldContainWithTypeText(table: DataTable) {
         val actualLookupItems = getCompletionListWithTypeText()
-        val expectedLookupItems = table.asLists(String::class.java).filter { it.size >= 2 }.map { it[0] to it[1] }
+        val expectedLookupItems = table.asLists().filter { it.size >= 2 }.map { it[0] to it[1] }
         assertHasElements(actualLookupItems, expectedLookupItems)
     }
 
     @Then("^completion list should contain items (.+)$")
-    fun completionListShouldContainMethods(lookupItems: List<String>) {
+    fun completionListShouldContainMethods(str: String) {
+        val lookupItems: List<String> = str.split(",").map { it.trim() }
         assertHasElements(SnakemakeWorld.completionList(), lookupItems)
     }
 
     @Then("^completion list shouldn't contain:$")
     fun completionListShouldNotContain(table: DataTable) {
-        val lookupStrings = table.asList(String::class.java)
+        val lookupStrings = table.asList()
         assertNotInCompletionList(SnakemakeWorld.completionList(), lookupStrings)
     }
 

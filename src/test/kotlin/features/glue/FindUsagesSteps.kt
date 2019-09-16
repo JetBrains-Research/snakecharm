@@ -8,10 +8,10 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.jetbrains.python.psi.PyStringLiteralExpression
-import cucumber.api.DataTable
-import cucumber.api.java.en.Given
-import cucumber.api.java.en.Then
+import io.cucumber.java.en.Then
+import io.cucumber.java.en.Given
 import features.glue.CompletionResolveSteps.Companion.getReferenceInInjectedLanguageAtOffset
+import io.cucumber.datatable.DataTable
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -39,7 +39,7 @@ class FindUsagesSteps {
                     if (element == null) {
                         element = getReferenceInInjectedLanguageAtOffset()?.resolve()
                     }
-                    
+
                     requireNotNull(element) {
                         "Target element not found"
                     }
@@ -53,10 +53,13 @@ class FindUsagesSteps {
     @Then("^find usages shows me following references:$")
     fun find_usages_shows_me_following_references(dataTable: DataTable) {
         ApplicationManager.getApplication().runReadAction() {
-            val expectedUsages = dataTable.asList(Ref::class.java)
+            val expectedUsages = dataTable.asLists().let { it.subList(1, it.size) }.map { row ->
+                FindUsagesReference(row[0], row[1], row[2])
+            }
 
             val foundRefs = SnakemakeWorld.myFoundRefs
             assertNotNull(foundRefs) { "Likely you've missed 'I invoke find usages' step" }
+
             val foundUsages = SnakemakeWorld.myFoundUsages
             assertNotNull(foundUsages) { "Likely you've missed 'I invoke find usages' step" }
 
@@ -126,11 +129,12 @@ class FindUsagesSteps {
         }
     }
 
-    private class Ref {
-        internal var file: String? = null
-        internal var offset: String? = null
-        internal var length: String? = null
-    }
+
+    data class FindUsagesReference(
+            val file: String?,
+            val offset: String?,
+            val length: String?
+    )
 
 //    companion object {
 //        val SEVERITIES_PROVIDER = object : SeveritiesProvider() {

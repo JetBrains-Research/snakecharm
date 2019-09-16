@@ -4,9 +4,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.text.StringUtil
-import cucumber.api.java.en.Given
-import cucumber.api.java.en.Then
-import features.glue.SnakemakeWorld
+import io.cucumber.java.en.Then
+import io.cucumber.java.en.Given
 import junit.framework.TestCase.assertEquals
 
 

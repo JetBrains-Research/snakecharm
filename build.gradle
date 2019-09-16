@@ -66,25 +66,19 @@ repositories {
 }
                        
 dependencies {
-//    testImplementation 'io.cucumber:cucumber-java:4.2.6'
-//    testImplementation 'io.cucumber:cucumber-junit:4.2.6'
-    testImplementation 'info.cukes:cucumber-java:1.2.4'
-    testImplementation 'info.cukes:cucumber-junit:1.2.4'
+    testImplementation 'io.cucumber:cucumber-java:4.7.1'
+    testImplementation 'io.cucumber:cucumber-junit:4.7.1'
 }
 
 task cucumber() {
     dependsOn assemble, compileTestKotlin
     doLast {
         javaexec {
-            main = "cucumber.api.cli.Main"
+            main = "io.cucumber.core.cli.Mai"
 
             classpath =  project.sourceSets.test.runtimeClasspath
 
-            // for cucumber 4.2.6: remove old version from classpath, it is there from idea platform dependency
-//            classpath =  project.sourceSets.test.runtimeClasspath.filter {
-//                 it.parentFile.name != "lib" || !it.name.startsWith("cucumber-")
-//            }
-            args = ['--plugin', 'pretty', '--glue', 'com.jetbrains.snakecharm.cucumber', 'src/test/resources']
+            args = ['--plugin', 'pretty', '--glue', 'features.glue', 'src/test/resources']
         }
     }
 }

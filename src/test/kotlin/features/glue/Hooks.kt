@@ -3,12 +3,15 @@ package features.glue
 import com.intellij.codeInspection.ex.InspectionProfileImpl
 import com.intellij.idea.IdeaTestApplication
 import com.intellij.openapi.util.Disposer
+import com.intellij.testFramework.UsefulTestCase
 import com.intellij.util.ReflectionUtil
 import com.intellij.util.ui.UIUtil
-import cucumber.api.java.After
-import cucumber.api.java.Before
+import io.cucumber.java.After
+import io.cucumber.java.Before
 import java.lang.reflect.Modifier
 import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 
 /**
  * @author Roman.Chernyatchik
@@ -32,7 +35,7 @@ class Hooks {
         cleanupSwingDataStructures()
         Disposer.setDebugMode(true)
         UIUtil.removeLeakingAppleListeners()
-        //TODO UsefulTestCase.waitForAppLeakingThreads(10, TimeUnit.SECONDS)
+        UsefulTestCase.waitForAppLeakingThreads(10, TimeUnit.SECONDS)
     }
 
     @After(order = 0)
@@ -41,7 +44,7 @@ class Hooks {
         for (field in SnakemakeWorld::class.java.declaredFields) {
             if (!Modifier.isPublic(field.modifiers)) {
                 System.err.println("Cannot cleanup SnakemakeWorld, field isn't public: ${field.name}")
-                System.exit(1)
+                exitProcess(1)
             }
             if (field.name == "INSTANCE") {
                 // skip kotlin object instance field
