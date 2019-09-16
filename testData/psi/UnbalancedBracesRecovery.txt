@@ -288,12 +288,12 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: d
         PsiElement(Py:IDENTIFIER)('d')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: d
         PsiElement(Py:IDENTIFIER)('d')
   PsiWhiteSpace('\n\n')
   SmkRule
@@ -323,10 +323,10 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: d
         PsiElement(Py:IDENTIFIER)('d')
       PsiElement(Py:COMMA)(',')
-      SmkReferenceExpression
+      SmkReferenceExpression: d
         PsiElement(Py:IDENTIFIER)('d')
   PsiWhiteSpace('\n\n')
   SmkWorkflowPythonBlockSection

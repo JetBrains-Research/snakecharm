@@ -18,5 +18,7 @@ class SmkReferenceExpressionImpl(node: ASTNode): PyReferenceExpressionImpl(node)
 
     override fun getReference(context: PyResolveContext) =
             SmkRuleOrCheckpointNameReference(this, context)
+
+    override fun toString() = "SmkReferenceExpression: ${this.referencedName}"
 }
 

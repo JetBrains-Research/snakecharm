@@ -4,7 +4,7 @@ SnakemakeFile: WorkflowLocalrulesHangingComma.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: foo0
         PsiElement(Py:IDENTIFIER)('foo0')
       PsiElement(Py:COMMA)(',')
   PsiWhiteSpace('\n\n')
@@ -13,11 +13,11 @@ SnakemakeFile: WorkflowLocalrulesHangingComma.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: foo1
         PsiElement(Py:IDENTIFIER)('foo1')
       PsiElement(Py:COMMA)(',')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: foo2
         PsiElement(Py:IDENTIFIER)('foo2')
       PsiElement(Py:COMMA)(',')
   PsiWhiteSpace('\n\n')
@@ -26,10 +26,10 @@ SnakemakeFile: WorkflowLocalrulesHangingComma.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: foo1
         PsiElement(Py:IDENTIFIER)('foo1')
       PsiElement(Py:COMMA)(',')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: foo2
         PsiElement(Py:IDENTIFIER)('foo2')
       PsiElement(Py:COMMA)(',')

@@ -9,12 +9,12 @@ SnakemakeFile: WorkflowRuleorderInvalid.smk
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: rule2
         PsiElement(Py:IDENTIFIER)('rule2')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: rule3
         PsiElement(Py:IDENTIFIER)('rule3')
   PsiWhiteSpace('\n\n')
   SmkWorkflowRuleorderSection
@@ -22,7 +22,7 @@ SnakemakeFile: WorkflowRuleorderInvalid.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: rule4
         PsiElement(Py:IDENTIFIER)('rule4')
       PsiErrorElement:'>' expected
         PsiElement(Py:COMMA)(',')
@@ -34,7 +34,7 @@ SnakemakeFile: WorkflowRuleorderInvalid.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: rule6
         PsiElement(Py:IDENTIFIER)('rule6')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
@@ -47,7 +47,7 @@ SnakemakeFile: WorkflowRuleorderInvalid.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: rule8
         PsiElement(Py:IDENTIFIER)('rule8')
       PsiWhiteSpace(' ')
       PsiErrorElement:'>' expected
@@ -58,7 +58,7 @@ SnakemakeFile: WorkflowRuleorderInvalid.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace('\n  ')
-      SmkReferenceExpression
+      SmkReferenceExpression: rule10
         PsiElement(Py:IDENTIFIER)('rule10')
       PsiWhiteSpace('\n  ')
       PsiErrorElement:'>' expected
@@ -69,5 +69,5 @@ SnakemakeFile: WorkflowRuleorderInvalid.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: rule12
         PsiElement(Py:IDENTIFIER)('rule12')
