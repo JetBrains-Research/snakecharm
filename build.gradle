@@ -28,12 +28,12 @@ intellij {
     def usePyCharm = "PC" == ideType || "PY" == ideType
 
     plugins = []
-    if (usePyCharm && hasPythonPlugin)  {
-        throw new StopActionException("Cannot install python plugin in PyCharm. Use PyCharm or IDEA with defined pythonPlugin.")
-    } else if (hasPythonPlugin) {
-        plugins += [pythonPlugin]
-    } else if (!usePyCharm) {
-        throw new StopActionException("Define either PyCharm build or other ide with pythonPlugin in your gradle.properties")
+    if (!usePyCharm) {
+        if (hasPythonPlugin) {
+            plugins += [pythonPlugin]
+        } else {
+            throw new StopActionException("Define either PyCharm build or other ide with pythonPlugin in your gradle.properties")
+        }
     }
 
     sandboxDirectory "${project.rootDir}/.sandbox${usePyCharm ? "_pycharm" : "" }"
