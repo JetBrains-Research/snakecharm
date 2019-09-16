@@ -245,7 +245,7 @@ class ActionsSteps {
         ApplicationManager.getApplication().invokeAndWait {
             fixture().launchAction(quickFix)
         }
-        fixture().checkResult(text)
+        fixture().checkResult(text.replace("\r", ""))
     }
 
     @Then("^go to symbol should contain:$")
