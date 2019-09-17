@@ -41,9 +41,6 @@ class SmkMakeFoldingBuilder : PythonFoldingBuilder() {
         if (root !is SmkFile || root.virtualFile !is LightVirtualFile) {
             collectDescriptors(root.node, descriptors)
         }
-
-        // No dialect support for folding, so let's delegate to python folding
-        super.buildLanguageFoldRegions(descriptors, root, document, quick)
     }
 
     private fun collectDescriptors(node: ASTNode, descriptors: MutableList<FoldingDescriptor>) {
