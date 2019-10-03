@@ -315,7 +315,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             val isAtComment = atBaseToken(commentTokenType)
             restore(indentPos)
             if (isAtComment) {
-                processComments()
+                processComments(startPos)
                 return
             }
             myLineHasSignificantTokens = hasSignificantTokens
@@ -378,14 +378,15 @@ class SnakemakeLexer : PythonIndentingLexer() {
     }
 
     // consumes comments and line breaks and processes the next line depending on the current section
-    private fun processComments() {
+    private fun processComments(startPos: Int) {
+        var currentLineBreakStart = startPos
         while (atBaseToken(PyTokenTypes.LINE_BREAK)) {
             val linebreakPosition = currentPosition
             val hasSignificantTokens = myLineHasSignificantTokens
             val indent = nextLineIndent
             myLineHasSignificantTokens = hasSignificantTokens
             restore(linebreakPosition)
-            processInsignificantLineBreak(baseTokenStart, false)
+            processInsignificantLineBreak(currentLineBreakStart, false)
             if (atBaseToken(commentTokenType)) {
                 if (linebreakBeforeFirstComment == -1) {
                     linebreakBeforeFirstComment = myTokenQueue.size - 1
@@ -396,6 +397,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 restore(linebreakPosition)
                 break
             }
+            currentLineBreakStart = baseTokenStart
         }
 
         val position = currentPosition

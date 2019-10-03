@@ -45,7 +45,12 @@ abstract class PyLexerTestCase  : PlatformLiteFixture() {
                 }
                 TestCase.fail("Too many tokens. Following tokens: " + remainingTokens.toString())
             }
-            TestCase.assertEquals("Token offset mismatch at position $idx", tokenPos, lexer.tokenStart)
+            TestCase.assertEquals(
+                "Token offset mismatch at lexeme $idx ${expectedTokens[idx]}, " +
+                        "tokenText: <${lexer.tokenText}>; tokenType: ${lexer.tokenType};" +
+                        " prev token end: ${tokenPos}; current token start: ${lexer.tokenStart}",
+                tokenPos,  lexer.tokenStart
+            )
             val tokenName = if (checkTokenText) lexer.tokenText else lexer.tokenType!!.toString()
             TestCase.assertEquals("Token mismatch at position $idx", expectedTokens[idx], tokenName)
             idx++

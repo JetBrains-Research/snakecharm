@@ -1,0 +1,38 @@
+SnakemakeFile: Issue190.smk
+  PyIfStatement
+    PyIfPartIf
+      PsiElement(Py:IF_KEYWORD)('if')
+      PsiWhiteSpace(' ')
+      PyBoolLiteralExpression
+        PsiElement(Py:TRUE_KEYWORD)('True')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('       \n    ')
+      PyStatementList
+        PyAssignmentStatement
+          PyTargetExpression: a
+            PsiElement(Py:IDENTIFIER)('a')
+          PsiWhiteSpace(' ')
+          PsiElement(Py:EQ)('=')
+          PsiWhiteSpace(' ')
+          PyNumericLiteralExpression
+            PsiElement(Py:INTEGER_LITERAL)('2')
+  PsiWhiteSpace('\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('       \n   ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('params')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n       ')
+          PyKeywordArgumentImpl: extra
+            PsiElement(Py:IDENTIFIER)('extra')
+            PsiElement(Py:EQ)('=')
+            PyStringLiteralExpression: --buffer_size 20G
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"--buffer_size 20G"')
+          PsiWhiteSpace('          \n       ')
+          PsiComment(Py:END_OF_LINE_COMMENT)('# fooo')

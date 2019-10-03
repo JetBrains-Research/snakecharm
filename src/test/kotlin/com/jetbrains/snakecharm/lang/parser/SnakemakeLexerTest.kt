@@ -198,6 +198,21 @@ class SnakemakeLexerTest : PyLexerTestCase() {
                 "Py:STATEMENT_BREAK")
     }
 
+    fun testIssue190() {
+        // https//github.com/JetBrains-Research/snakecharm/issues/190
+        doTest("""
+            |rule all:    
+            |   params:
+            |       extra="--buffer_size 20G"     
+            |       # fooo
+            |""".trimMargin().trimStart()
+            ,
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:EQ", "Py:SINGLE_QUOTED_STRING", "Py:LINE_BREAK", "Py:END_OF_LINE_COMMENT", "Py:LINE_BREAK", "Py:STATEMENT_BREAK"
+        )
+    }
+
     private fun doTest(text: String, vararg expectedTokens: String) {
         doLexerTest(text, SnakemakeLexer(), *expectedTokens)
     }
