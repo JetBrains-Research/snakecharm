@@ -16,8 +16,8 @@ Feature: Complete file name in conda section
     When I put the caret after b
     And I invoke autocompletion popup
     Then completion list should contain:
-    | boo.yaml |
-    | bob.yml |
+      | boo.yaml |
+      | bob.yml  |
     Examples:
       | section    |
       | rule       |
@@ -65,19 +65,19 @@ Feature: Complete file name in conda section
 
   Scenario Outline: Completion for file in subdirectory
     Given a snakemake project
-    Given a file "Dir/boo.yaml" with text
+    Given a file "dir/boo.yaml" with text
     """
     """
     Given I open a file "foo.smk" with text
     """
     <section> NAME:
-      conda: "D"
+      conda: "di"
     """
-    When I put the caret after D
+    When I put the caret after di
     Then I invoke autocompletion popup and see a text:
     """
     <section> NAME:
-      conda: "Dir/boo.yaml"
+      conda: "dir/boo.yaml"
     """
     Examples:
       | section    |
@@ -127,3 +127,27 @@ Feature: Complete file name in conda section
       | "     |
       | """   |
       | '     |
+
+  Scenario Outline: Completion if rule file in subdirectory
+    Given a snakemake project
+    Given a file "prevent_single_entry_completion.yaml" with text
+    """
+    """
+    Given a file "<yaml_path>" with text
+    """
+    """
+    Given I open a file "rules/foo.smk" with text
+    """
+    <section> NAME:
+      conda: ""
+    """
+    When I put the caret after conda: "
+    Then I invoke autocompletion popup
+    Then completion list should contain:
+      | <relative_path> |
+    Examples:
+      | section    | yaml_path      | relative_path    |
+      | rule       | boo.yaml       | ../boo.yaml      |
+      | rule       | envs/boo.yaml  | ../envs/boo.yaml |
+      | rule       | rules/boo.yaml | boo.yaml         |
+      | checkpoint | envs/boo.yaml  | ../envs/boo.yaml |

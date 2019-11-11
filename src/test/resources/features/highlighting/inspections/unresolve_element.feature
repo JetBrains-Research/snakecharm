@@ -109,3 +109,33 @@ Feature: Inspection: Unresolved element
     """
     When I check highlighting errors ignoring extra highlighting
 
+  Scenario: Unresolved conda path
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+     """
+     rule:
+       conda: "boo.yaml"
+     """
+    And PyUnresolvedReferencesInspection inspection is enabled
+    Then I expect inspection error on <boo.yaml> with message
+     """
+     Unresolved reference 'boo.yaml'
+     """
+    Then I expect no inspection error
+    When I check highlighting errors
+
+  # Ignore unresolved conda env path if it cannot be statically analyzed #256
+  Scenario: Unresolved conda path (complex string)
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+     """
+     rule:
+       conda: f"{2}/boo.yaml"
+     """
+    And PyUnresolvedReferencesInspection inspection is enabled
+    # PyUnresolvedReferencesInspection replaces it with: LIKE_UNKNOWN_SYMBOL severity
+    Then I expect inspection warning on <{2}/boo.yaml> with message
+     """
+     Unresolved reference '{2}/boo.yaml'
+     """
+    When I check highlighting warnings

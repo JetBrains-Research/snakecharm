@@ -38,7 +38,7 @@ class SmkPyReferenceImpl(
             // and doesn't collect required implicit symbols
             return resolveAsImplicitSymbol()
         }
-        return fitleredResults
+        return fitleredResults.toMutableList()
     }
 
     private fun resolveAsImplicitSymbol(): List<RatedResolveResult> {

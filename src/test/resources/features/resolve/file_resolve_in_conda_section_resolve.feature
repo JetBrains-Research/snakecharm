@@ -71,7 +71,7 @@ Feature: Resolve file in conda section
       | """   |
       | '     |
 
-  Scenario Outline: Resolve for fstrings in different quotes
+  Scenario Outline: Resolve is off for fstrings
     Given a snakemake project
     Given a file "boo.yaml" with text
     """
@@ -83,7 +83,7 @@ Feature: Resolve file in conda section
       conda: f<quote>boo.yaml<quote>
     """
     When I put the caret after boo
-    Then reference should resolve to "TEXT" in "boo.yaml"
+    Then reference should not resolve
     Examples:
       | quote |
       | "     |
@@ -117,9 +117,10 @@ Feature: Resolve file in conda section
     Given I open a file "foo.smk" with text
     """
     <section> NAME:
-      conda: "" 'b' "o" "o" f'.' f"yaml" ''
+      conda: "" 'b' "o" "o" '.' "yaml" ''
+      #co#nda: "" 'b' "o" "o" f'.' f"yaml" ''
     """
-    When I put the caret at b
+    When I put the caret after  conda: "" 'b
     Then reference should resolve to "TEXT" in "boo.yaml"
     Examples:
       | section    |
@@ -142,3 +143,41 @@ Feature: Resolve file in conda section
       | section    |
       | rule       |
       | checkpoint |
+
+  Scenario Outline: Unresolved if complicated
+      Given a snakemake project
+      Given a file "boo.yaml" with text
+      """
+      TEXT
+      """
+      Given I open a file "foo.smk" with text
+      """
+      <section>:
+        conda: f"{root}/boo.yaml"
+      """
+      When I put the caret at boo
+      Then reference should not resolve
+      Examples:
+        | section    |
+        | rule       |
+        | checkpoint |
+
+  Scenario Outline: Resolve if rule file in subdirectory
+    Given a snakemake project
+    Given a file "<yaml_path>" with text
+     """
+     TEXT
+     """
+    Given I open a file "rules/foo.smk" with text
+     """
+     <section> NAME:
+       conda: "<relative_path>"
+     """
+    When I put the caret after conda: "
+    Then reference should resolve to "TEXT" in "<yaml_path>"
+    Examples:
+      | section    | yaml_path      | relative_path    |
+      | rule       | boo.yaml       | ../boo.yaml      |
+      | rule       | envs/boo.yaml  | ../envs/boo.yaml |
+      | rule       | rules/boo.yaml | boo.yaml         |
+      | checkpoint | envs/boo.yaml  | ../envs/boo.yaml |

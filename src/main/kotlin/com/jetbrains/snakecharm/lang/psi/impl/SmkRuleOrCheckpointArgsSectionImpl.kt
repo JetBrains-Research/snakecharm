@@ -7,7 +7,7 @@ import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SmkConfigfileReference
+import com.jetbrains.snakecharm.lang.psi.SmkCondaEnvReference
 import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeSectionArgsType
@@ -42,10 +42,10 @@ open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode): SmkArgsSectionImpl
         }
 
         val offsetInParent = SnakemakeNames.SECTION_CONDA.length + stringLiteral.startOffsetInParent
-        return SmkConfigfileReference(
+        return SmkCondaEnvReference(
                 this,
                 SmkPsiUtil.getReferenceRange(stringLiteral).shiftRight(offsetInParent),
-                stringLiteral.stringValue
+                stringLiteral, stringLiteral.stringValue
         )
     }
 }

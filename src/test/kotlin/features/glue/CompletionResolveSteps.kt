@@ -26,6 +26,7 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import junit.framework.TestCase
+import java.lang.Integer.max
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -134,9 +135,11 @@ class CompletionResolveSteps {
         val result = resolve(ref)
         assertNotNull(result)
 
-        val injectionHost = SnakemakeWorld.injectionFixture().injectedLanguageManager.getInjectionHost(result)
+        val injectionHost = SnakemakeWorld.injectionFixture().injectedLanguageManager
+                .getInjectionHost(result)
         val containingFile = (injectionHost ?: result).containingFile
-        val msg = "Resolve result type: ${result::class.java.simpleName}}, file: ${containingFile.name}\n" +
+        val msg = "Resolve result type: ${result::class.java.simpleName}," +
+                " file: ${containingFile.virtualFile.path}\n" +
                 "Psi element text: ${result.text}"
         require(context.isNotEmpty() && targetPrefix.isNotEmpty()) {
             msg
@@ -157,7 +160,12 @@ class CompletionResolveSteps {
 
 
         assertNotNull(containingFile)
-        assertEquals(file, containingFile.name, msg)
+        val actualPath = containingFile.virtualFile.path
+        val actualSubString = actualPath.subSequence(
+                max(0,  actualPath.length - file.length),
+                actualPath.length
+        )
+        assertEquals(file, actualSubString, msg)
 
         assertTrue(
                 targetPrefix.length <= result.textLength,
@@ -409,7 +417,7 @@ class CompletionResolveSteps {
         val lookupElements = fixture.lookupElements?.filterNotNull()?.toTypedArray()
 
         ApplicationManager.getApplication().invokeAndWait(
-                {
+                Runnable {
                     if (lookupText == null) {
                         assertNull(
                                 lookupElements,
