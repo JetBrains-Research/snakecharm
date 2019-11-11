@@ -212,3 +212,36 @@ Feature: Rule redeclaration inspection
     This rule name is probably used by another rule declaration. Not sure because this rule isn't at file top level.
     """
     When I check highlighting weak warnings
+
+
+  Scenario Outline: Warn if rule definition redeclared in other file
+    Given a snakemake project
+    Given a file "a.smk" with text
+    """
+    <rule_like1> foo:
+      input "aa"
+    """
+    Given I open a file "b.smk" with text
+    """
+    <rule_like2> foo: # duplicate1
+      output: "bb"
+
+    <rule_like2> foo: # duplicate2
+      output: "bb"
+    """
+    And Rule Redeclaration inspection is enabled
+    Then I expect inspection weak warning on <foo> in <foo: # duplicate1> with message
+    """
+    This rule name is probably used by another rule declaration. Not sure because the usage is in the other file.
+    """
+    Then I expect inspection error on <foo> in <foo: # duplicate2> with message
+    """
+    This rule name is already used by another rule declaration.
+    """
+    When I check highlighting weak warnings
+    
+    Examples:
+      | rule_like1 | rule_like2 |
+      | rule       | rule       |
+      | rule       | checkpoint |
+      | checkpoint | rule       |
