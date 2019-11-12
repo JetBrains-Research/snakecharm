@@ -105,7 +105,7 @@ Feature: Resolve workflow file names to their corresponding files
       | '     |
       | """   |
 
-  Scenario Outline: Resolve for fstrings in different quotes
+  Scenario Outline: Do not resolve fstrings
     Given a snakemake project
     Given a file "boo.smk" with text
     """
@@ -116,7 +116,7 @@ Feature: Resolve workflow file names to their corresponding files
     include: f<quote>boo.smk<quote>
     """
     When I put the caret after boo
-    Then reference should resolve to "rule" in "boo.smk"
+    Then reference should not resolve
     Examples:
       | quote |
       | "     |
@@ -189,7 +189,7 @@ Feature: Resolve workflow file names to their corresponding files
     """
     Given I open a file "foo.smk" with text
     """
-    <workflow>: "" "b" 'oo' f"." f'<file_type>' ''
+    <workflow>: "" "b" 'oo' "." '<file_type>' ''
     """
     When I put the caret at b
     Then reference should resolve to "TEXT" in "boo.<file_type>"
