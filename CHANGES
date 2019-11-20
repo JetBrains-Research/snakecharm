@@ -1,7 +1,90 @@
 SnakeCharm Changelog
 ====================
-                             
+
 Here you can see the full list of changes between each big release.
+
+Version 0.5 build #0.5.112.2018.3
+-------------
+Released on November 20th 2019
+- sinceBuild "183.4284" (2018.3)
+- untilBuild "193.*" (2019.3)
+
+This is a major update which includes two major features:
+* Wildcards support with syntax highlighting, code completion, resolve, find usages,
+    rename and various useful inspections
+* Internal code parser and lexer updated to support multiline strings and removes wrong
+    errors highlighting in many places
+
+To get all features enabled please configure in your project Python interpreter with snakemake
+module installed. Otherwise some smart code insight features will not work.
+
+Special thanks to our contributors Sharkova Darya and Nazarov Nikita. Without them this major plugin
+update won't be possible.
+
+Code completion / Resolve Features:
+- SnakemakeSL language: implement basic type inference & resolve/completion engine, see #183
+- Completion/Resolve for wildcards, output, input in lambdas, see #230
+- Includes links resolve and completion, see #20
+- File reference support for `conda` section, see #144
+- In rules/checkpoint completion: show all names only on 2nd auto-completion invocaton, see #173
+- ruleorder, localrules should resolve/complete not only rules from same file,
+    but all rules from project, see #155
+- Completion in 'run:' section for input/output/log/resources/wildcards/params keys, #237
+- Python variables completion in SmkSL injections, #213
+- Resolve / completion for indexes in subscription expressions, e.g. output[1], #243
+- Show all project rules/checkpoints in autocompletion, #120
+- 'shell' section & call: resolve & completion for input args, #152
+- Resolve completion for `input.foo` in lambda functions, #154
+- Resolve/Completion for: input, output, params rule options in shell argument, #3
+
+
+Inspections:
+- Support highlighting for arguments of format strings, see #53
+- Duplicated keyword arguments, see #72
+- Multiple arguments inspection doesn't work for several keywords, see #159
+- Inspection quick fixes, see #194
+- False position arg after keyword arg inspection warning, see #210
+- Highlight wildcard name after `wildcards.foo` same as in injection '{foo}', see #227
+- Inspection: warn if wildcards set is different in input, output, log, message and
+ other required sections (check snakemake sources & runtime behaviour), see #207
+- Inspections for identifier names in SnakemakeSL, #215
+- Inspection for unavailable rule sections in SnakemakeSL, #199
+- Inspection: warn if wildcard name is same as section name, #244
+- Warn about section argument index out of bounds exception , #245
+- Warn if lambda argument isn't supported for the section, #141
+- Inspection: SyntaxRuntime Error: Only input files can be specified as functions, #156
+- Warn if user uses dot in wildcards names, it is confusing, #265
+- Highlight wildcards in python code, #264
+- Inspection: wildcards in shell script can be used only with `wildcards.` prefix., #56
+
+
+Find Usages / Rename:
+- For rule sections and wildcards, #233
+- For rules, checkpoints
+
+Other:
+- Determine wildcard names for rule, see #184
+- Multiline string syntax error not reported, see #146
+- Implemented brace matcher for SmkString injection language, see #181
+- Inject Snakemake format language in strings concatenated by `+`, see #189
+- Do not inject SmkSl in rule parameter lambda functions, see #204
+- Do not inject SmkSL in f-strings without { or } in string part, see #201
+- Lambda expression cannot be used in some rule section, see #187
+- Parsing of python format specifiers, see #214
+- Inject SmkSL in os.path.join() args, #228
+- Don't detect wildcards in snakemake expand() method, #229
+- Don't resolve/complete rule like names when not part of 'rules.' or 'checkpoints.' reference, #223
+- Do not collect rule wildcards from lambdas, #249
+
+Fixed:
+- Parsing error for rules after certain Python statements, see #130
+- Top level workflow sections issue, see #179
+- F-strings parsing errors in onstart section, see #200
+- Wrong completion list after rules./checkpoints., see #211
+- Ignore rule redeclaration in conditional statements, #241
+- Do not warn: Parameter 'cmd' unfilled in 'shell', #242
+- Cannot find reference 'get' in section, #234
+- No warning if rule name already used in other file, #253
 
 Version 0.4 build #46
 -------------
