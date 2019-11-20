@@ -14,10 +14,16 @@ Features available in `*.smk`, `*.rule` and `Snakefile` files:
 * Snakemake specific syntax highlighting
 * Limited resolve and code completion for python code
 * Rules folding
-* Code completion for rules names after `rules.`
-* Code completion for params keywords in `shell` section, e.g. in  `shell: "echo {params.<caret>}"`
+* Code completion and resolve for:
+   * Rules names after `rules.`, checkpoints after `checkpoints.`
+   * Rules sections names after `rules.my_rule_name.`
+   * Rule sections keywords arguments, e.g. after ``rules.my_rule_name.input.`
+   * Snakemake api methods like `expand`, `temp`, etc.
+   * Wildcards and sections names in `shell` and other sections
+   * Included rules files and conda environment files
 * File structure view with rules
-* Different inspections for possible errors in snakemake file.
+* Wildcards support (code completion, resolve, usages highligting, inspections)
+* Multiple inspections inspections for possible errors in snakemake file.
 
 # Installation
 
@@ -26,8 +32,8 @@ If you've already configured custom file type for `Snakefile` or `*.smk` files p
 In PyCharm (or other `IntelliJ Platfrom` based IDE with `Python Community Edition` plugin installed) open `Preferences|Plugins|Marketplace|SnakeCharm` and press `Install` button.
 
 At the moment the plugin is tested with:
-* IDEA CI 2018.3-2019.2, Python Community Edition Plugin: 2018.3.183.4284.36-2019.1.191.7479.19
-* PyCharm 2018.3.1-2019.2 (Professional & Community Editions)
+* IDEA CI 2018.3-2019.2.x, Python Community Edition Plugin: 2018.3.183.4284.36-2019.1.191.7479.19
+* PyCharm 2018.3.1-2019.2.x (Professional & Community Editions)
 
 # Setup Snakemake support
 
