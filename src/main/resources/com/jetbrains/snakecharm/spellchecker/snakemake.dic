@@ -12,3 +12,5 @@ subworkflow
 snakefile
 conda
 cwl
+snakemake
+snakefile
