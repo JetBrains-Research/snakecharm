@@ -14,6 +14,9 @@ class SmkPyUnboundLocalVariableInspection: PyUnboundLocalVariableInspection() {
 
         return object : PyUnboundLocalVariableInspection.Visitor(holder, session) {
             override fun visitPyReferenceExpression(node: PyReferenceExpression) {
+                if (!node.isValid) {
+                    return
+                }
                 if (node is SmkReferenceExpression) {
                     // no error here, disable inspection FP, api required
                     // e.g. PyResolveUtil.allowForwardReferences(node)
