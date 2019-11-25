@@ -62,6 +62,7 @@ Contact me at roman.chernyatchik@jetbrains.com or post issues in [Issue Tracker]
 Pull requests are welcome. It is my side project, so I appreciate your help implementing plugin desired features.
 
 ### Build plugin from sources:
+* Create `./.idea_distrib_cache` folder
 * Run `./gradlew assemble`
 * Plugin bundle is located in ` build/distributions/snakecharm-*.zip`
 
