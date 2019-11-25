@@ -3,7 +3,7 @@ package com.jetbrains.snakecharm.lang.highlighter
 import com.intellij.psi.PsiFile
 import com.jetbrains.python.inspections.PyUnboundLocalVariableInspection
 import com.jetbrains.python.inspections.PyUnreachableCodeInspection
-import com.jetbrains.python.inspections.PythonVisitorFilter
+import com.jetbrains.python.psi.PythonVisitorFilter
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.validation.ReturnAnnotator
 
