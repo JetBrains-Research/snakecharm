@@ -19,7 +19,7 @@ apply plugin: 'kotlin'
 
 def hasPythonPlugin = project.hasProperty('pythonPlugin')
 
-version "${project.version}.${project.buildCounter}.${project.sincePlatform}"
+version "${project.version}.${project.buildCounter}.${project.versionSincePlatform}"
 
 intellij {
     pluginName 'snakecharm'
