@@ -41,7 +41,7 @@ intellij {
     updateSinceUntilBuild false
     instrumentCode Boolean.valueOf(instrumentPluginCode)
     downloadSources Boolean.valueOf(downloadIdeaSources)
-    // intellijRepo "https://www.jetbrains.com/intellij-repository"
+    intellijRepo "https://www.jetbrains.com/intellij-repository"
 }
 
 publishPlugin {
