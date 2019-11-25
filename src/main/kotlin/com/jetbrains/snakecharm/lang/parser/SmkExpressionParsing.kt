@@ -2,7 +2,7 @@ package com.jetbrains.snakecharm.lang.parser
 
 import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.IElementType
-import com.jetbrains.python.PyBundle.message
+import com.jetbrains.python.PyPsiBundle.message
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.ExpressionParsing

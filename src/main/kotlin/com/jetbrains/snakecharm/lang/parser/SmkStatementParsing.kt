@@ -2,8 +2,8 @@ package com.jetbrains.snakecharm.lang.parser
 
 import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.IElementType
-import com.jetbrains.python.PyBundle
 import com.jetbrains.python.PyElementTypes
+import com.jetbrains.python.PyPsiBundle
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.parsing.StatementParsing
@@ -124,7 +124,7 @@ class SmkStatementParsing(
                 myContext.pushScope(scope.withPythonicSection())
                 val decoratorMarker = myBuilder.mark()
                 nextToken()
-                checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
+                checkMatches(PyTokenTypes.COLON, PyPsiBundle.message("PARSE.expected.colon"))
                 parseSuite()
                 decoratorMarker.done(SmkElementTypes.WORKFLOW_PY_BLOCK_SECTION_STATEMENT)
                 myContext.popScope()
@@ -247,7 +247,7 @@ class SmkStatementParsing(
             section.sectionKeyword in RULE_OR_CHECKPOINT && keyword == SnakemakeNames.SECTION_RUN -> {
                 val scope = myContext.scope as SmkParsingScope
                 myContext.pushScope(scope.withPythonicSection())
-                checkMatches(PyTokenTypes.COLON, PyBundle.message("PARSE.expected.colon"))
+                checkMatches(PyTokenTypes.COLON, PyPsiBundle.message("PARSE.expected.colon"))
                 statementParser.parseSuite()
                 ruleParam.done(SmkElementTypes.RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT)
                 myContext.popScope()
