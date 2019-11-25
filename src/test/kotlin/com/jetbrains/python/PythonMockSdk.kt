@@ -20,15 +20,20 @@ import com.intellij.openapi.projectRoots.impl.MockSdk
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.containers.MultiMap
 import com.jetbrains.python.codeInsight.typing.PyTypeShed
 import com.jetbrains.python.codeInsight.userSkeletons.PyUserSkeletonsUtil
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.sdk.PythonSdkType
+import com.jetbrains.python.sdk.PythonSdkUtil
 import org.jetbrains.annotations.NonNls
 import java.io.File
+import java.util.*
 
 /**
+ * We cannot re-use PythonMockSdk because api not available in Platform artifacts
+ * 
  * @author yole
  */
 object PythonMockSdk {
@@ -63,7 +68,14 @@ object PythonMockSdk {
             }
         }
 
-        val mock_stubs_path = mock_path + PythonSdkType.SKELETON_DIR_NAME
+        val mock_stubs_path = mock_path + PythonSdkUtil.SKELETON_DIR_NAME
+        val classes = OrderRootType.CLASSES
+        ContainerUtil.putIfNotNull(
+                    classes,
+                    LocalFileSystem.getInstance().refreshAndFindFileByPath(mock_stubs_path),
+                    roots
+                )
+        roots.putValues(classes, Arrays.asList(*additionalRoots))
         roots.putValue(PythonSdkType.BUILTIN_ROOT_TYPE, LocalFileSystem.getInstance().refreshAndFindFileByPath(mock_stubs_path))
 
         for (root in additionalRoots) {
