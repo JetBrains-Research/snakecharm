@@ -123,6 +123,25 @@ Feature: Resolve for section names in rules and checkpoints
       | rule       | threads: 1 | threads |
       | checkpoint | threads: 1 | threads |
 
+  Scenario Outline: Do not resolve to section where lambda access is required (#153)
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+     """
+     <rule_like> foo:
+        input: in = "in"
+        input: out = "out"
+        params:
+          a = len(input.in)
+          b = output.out
+     """
+    When I put the caret at <signature>
+    Then <rule>
+    Examples:
+      | rule_like  | signature | rule                         |
+      | rule       | nput.in)  | reference should not resolve |
+      | rule       | utput.out | there should be no reference |
+      | checkpoint | utput.out | there should be no reference |
+
   Scenario Outline: Resolve section to snakemake library if section undeclared
     Given a snakemake project
     Given I open a file "foo.smk" with text
