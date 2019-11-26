@@ -3,6 +3,18 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
+Version 0.5.2 build #0.5.2.124
+-------------
+Released on November 20th 2019
+
+Minor update compatible with 2019.3 builds
+
+Fixed:
+- 2019.2 Deprecated API cleanup (see #219)
+- PluginException: While loading class SnakemakeVisitorFilter (see #270)
+- PsiInvalidElementAccessException: PyUnboundLocalVariableInspection (see #268)
+
+
 Version 0.5.1 build #0.5.1.126
 -------------
 Released on November 20th 2019
