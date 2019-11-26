@@ -8,6 +8,8 @@ import com.intellij.testFramework.ParsingTestCase
 import com.jetbrains.python.*
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFunction
+import com.jetbrains.python.psi.PyPsiFacade
+import com.jetbrains.python.psi.impl.PyPsiFacadeImpl
 import com.jetbrains.python.psi.impl.PythonASTFactory
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.lang.SmkTokenSetContributor
@@ -30,6 +32,10 @@ class SnakemakeParsingTest : ParsingTestCase(
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SmkTokenSetContributor())
         addExplicitExtension<ASTFactory>(LanguageASTFactory.INSTANCE, PythonLanguage.getInstance(), PythonASTFactory())
         PythonDialectsTokenSetProvider.reset()
+        project.registerService(
+            PyPsiFacade::class.java,
+            PyPsiFacadeImpl::class.java
+        )
     }
 
     override fun getTestDataPath() = SnakemakeTestUtil.getTestDataPath().toString()
