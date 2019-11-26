@@ -8,12 +8,13 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.jetbrains.python.psi.PyStringLiteralExpression
-import io.cucumber.java.en.Then
-import io.cucumber.java.en.Given
 import features.glue.CompletionResolveSteps.Companion.getReferenceInInjectedLanguageAtOffset
 import io.cucumber.datatable.DataTable
+import io.cucumber.java.en.Given
+import io.cucumber.java.en.Then
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.fail
 
 
 class FindUsagesSteps {
@@ -79,35 +80,40 @@ class FindUsagesSteps {
                     "The number of found usages doesn't match. $actualRefsHint"
             )
 
-            expectedUsages.zip(actualRefs).forEach { (expected, actual) ->
+            val notSeenExpectedUsages = expectedUsages.toMutableList()
+            actualRefs.forEach() { actual ->
                 val (actualPsi, actualOffset, actualLength) = getOriginalElementOffsetAndLengthForPossibleInjection(actual)
-
-                assertEquals(
-                        expected.file, actualPsi.containingFile.name,
-                        "File containing the usage is incorrect. $actualRefsHint"
-                )
-
+                val actualFile = actualPsi.containingFile.name
                 val text = actualPsi.containingFile.text
-
-                val expectedOffset = expected.offset!!.toInt()
-                val expectedLength = expected.length!!.toInt()
-                val expectedEndOffset = expectedOffset + expectedLength
-                val expectedContent = if (expectedEndOffset <= text.length) {
-                    TextRange.from(expectedOffset, expectedLength).substring(text)
-                } else {
-                    "Expected range out of bounds: $expectedEndOffset > ${text.length}"
-                }
-
                 val actualContent = TextRange.from(actualOffset, actualLength).substring(text)
 
-                val errorMsg = "Element offset doesn't match. Expected content <$expectedContent>, " +
-                        "actual content <$actualContent>. $actualRefsHint\n"
-
-                assertEquals(
-                        expectedOffset to expectedLength,
-                        actualOffset to actualLength,
-                        errorMsg
-                )
+                val expectedForFile = notSeenExpectedUsages.filter { it.file == actualFile }
+                val matchedExpectedResult = expectedForFile.firstOrNull() {
+                    it.length == actualLength.toString() && it.offset == actualOffset.toString()
+                }
+                if (matchedExpectedResult != null) {
+                    // ok
+                    notSeenExpectedUsages.remove(matchedExpectedResult)
+                } else {
+                    val errorBuff = StringBuilder()
+                    errorBuff.append("Cannot find matching expected result for $actualFile.")
+                    errorBuff.append("  Actual: Offset <$actualOffset>, Length <$actualLength>, Content <$actualContent>\n")
+                    if (expectedForFile.isNotEmpty()) {
+                        errorBuff.append("Expected candidates number = ${expectedForFile.size}:\n")
+                        expectedForFile.forEachIndexed { i, expected ->
+                            val expectedOffset = expected.offset!!.toInt()
+                            val expectedLength = expected.length!!.toInt()
+                            val expectedEndOffset = expectedOffset + expectedLength
+                            val expectedContent = if (expectedEndOffset <= text.length) {
+                                TextRange.from(expectedOffset, expectedLength).substring(text)
+                            } else {
+                                "Expected range out of bounds: $expectedEndOffset > ${text.length}"
+                            }
+                            errorBuff.append("  ${i + 1}. Expected: Offset <$expectedOffset>, Length <$expectedLength>, Content <$expectedContent>\n")
+                        }
+                    }
+                    fail(errorBuff.toString())
+                }
             }
 
             assertEquals(expectedUsages.size, foundUsages.size)
