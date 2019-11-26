@@ -5,7 +5,7 @@ Here you can see the full list of changes between each big release.
 
 Version 0.5.2 build #0.5.2.124
 -------------
-Released on November 20th 2019
+Released on November 26th 2019
 
 Minor update compatible with 2019.3 builds
 
@@ -17,7 +17,7 @@ Fixed:
 
 Version 0.5.1 build #0.5.1.126
 -------------
-Released on November 20th 2019
+Released on November 26th 2019
 
 Minor update which corrects untilBuild, this plugin version isn't compatible with 2019.3 EAP / RC.
 
