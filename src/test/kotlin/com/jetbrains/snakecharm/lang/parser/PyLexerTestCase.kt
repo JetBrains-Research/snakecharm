@@ -16,7 +16,7 @@ import junit.framework.TestCase
 abstract class PyLexerTestCase  : PlatformLiteFixture() {
     override fun setUp() {
         super.setUp()
-
+        initApplication()
         registerExtensionPoint(PythonDialectsTokenSetContributor.EP_NAME, PythonDialectsTokenSetContributor::class.java)
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
         PythonDialectsTokenSetProvider.reset()
