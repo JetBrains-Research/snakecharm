@@ -78,13 +78,13 @@ Feature: Resolve for section names in rules and checkpoints
     Then reference should not multi resolve to files
       | foo.smk |
     Examples:
-      | rule_like  | text          | section   | target      | file  |
-      | rule       | output: ""    | output    | OutputFiles | io.py |
-      | rule       | input: ""     | input     | InputFiles  | io.py |
-      | rule       | params: ""    | params    | Params      | io.py |
-      | rule       | log: ""       | log       | Log         | io.py |
-      | rule       | resources: "" | resources | Resources   | io.py |
-      | checkpoint | output: ""    | output    | OutputFiles | io.py |
+      | rule_like  | text          | section   |
+      | rule       | output: ""    | output    |
+      | rule       | input: ""     | input     |
+      | rule       | params: ""    | params    |
+      | rule       | log: ""       | log       |
+      | rule       | resources: "" | resources |
+      | checkpoint | output: ""    | output    |
 
   Scenario Outline: Do not resolve to section in another rule, part2 (correct filters in SmkPyReferenceImpl)
     Given a snakemake project
