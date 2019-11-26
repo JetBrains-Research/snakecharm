@@ -151,4 +151,26 @@ object SnakemakeAPI {
             SECTION_OUTPUT, SECTION_LOG, SECTION_BENCHMARK
     )
 
+    val ALLOWED_LAMBDA_ARGS = mapOf(
+        SECTION_INPUT to arrayOf(SMK_VARS_WILDCARDS),
+        SECTION_GROUP to arrayOf(SMK_VARS_WILDCARDS),
+        SECTION_PARAMS to arrayOf(
+            SMK_VARS_WILDCARDS,
+            SECTION_INPUT,
+            SECTION_OUTPUT,
+            SECTION_RESOURCES,
+            SECTION_THREADS
+        ),
+        SECTION_RESOURCES to arrayOf(
+            SMK_VARS_WILDCARDS,
+            SECTION_INPUT,
+            SECTION_THREADS,
+            SMK_VARS_ATTEMPT
+        ),
+        SECTION_THREADS to arrayOf(
+            SMK_VARS_WILDCARDS,
+            SECTION_INPUT,
+            SMK_VARS_ATTEMPT
+        )
+    )
 }

@@ -8,35 +8,10 @@ import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
-import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_ARGS
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
-    companion object {
-        val ALLOWED_LAMBDA_ARGS = mapOf(
-                SnakemakeNames.SECTION_INPUT to arrayOf(SnakemakeAPI.SMK_VARS_WILDCARDS),
-                SnakemakeNames.SECTION_GROUP to arrayOf(SnakemakeAPI.SMK_VARS_WILDCARDS),
-                SnakemakeNames.SECTION_PARAMS to arrayOf(
-                        SnakemakeAPI.SMK_VARS_WILDCARDS,
-                        SnakemakeNames.SECTION_INPUT,
-                        SnakemakeNames.SECTION_OUTPUT,
-                        SnakemakeNames.SECTION_RESOURCES,
-                        SnakemakeNames.SECTION_THREADS
-                ),
-                SnakemakeNames.SECTION_RESOURCES to arrayOf(
-                        SnakemakeAPI.SMK_VARS_WILDCARDS,
-                        SnakemakeNames.SECTION_INPUT,
-                        SnakemakeNames.SECTION_THREADS,
-                        SnakemakeAPI.SMK_VARS_ATTEMPT
-                ),
-                SnakemakeNames.SECTION_THREADS to arrayOf(
-                        SnakemakeAPI.SMK_VARS_WILDCARDS,
-                        SnakemakeNames.SECTION_INPUT,
-                        SnakemakeAPI.SMK_VARS_ATTEMPT
-                )
-        )
-    }
-
     override fun buildVisitor(
             holder: ProblemsHolder,
             isOnTheFly: Boolean,
