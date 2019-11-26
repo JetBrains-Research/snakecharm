@@ -8,12 +8,12 @@ import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.PyTypeProviderBase
 import com.jetbrains.python.psi.types.TypeEvalContext
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_ARGS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTION_ACCESSOR_CLASSES
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_CHECKPOINTS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_RULES
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_ACCESSOR_CLASS
-import com.jetbrains.snakecharm.inspections.SmkLambdaRuleParamsInspection.Companion.ALLOWED_LAMBDA_ARGS
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT

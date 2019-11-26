@@ -13,7 +13,7 @@ import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.python.psi.PyParameterList
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
-import com.jetbrains.snakecharm.inspections.SmkLambdaRuleParamsInspection
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_ARGS
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
@@ -56,7 +56,7 @@ object SMKLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
                 )
             }
             else -> {
-                val args = SmkLambdaRuleParamsInspection.ALLOWED_LAMBDA_ARGS[sectionName]
+                val args = ALLOWED_LAMBDA_ARGS[sectionName]
                 if (args != null) {
                     addCompletionResultsForSection(element, args, result)
                 }
