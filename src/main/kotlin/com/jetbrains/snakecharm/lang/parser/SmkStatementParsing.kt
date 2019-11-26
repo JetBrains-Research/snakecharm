@@ -69,7 +69,7 @@ class SmkStatementParsing(
 
         myBuilder.setDebugMode(false)
         if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER && !scope.inPythonicSection) {
-            val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText]
+            val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText!!]
             if (actualToken != null) {
                 myBuilder.remapCurrentToken(actualToken)
             }
@@ -183,23 +183,26 @@ class SmkStatementParsing(
         ruleStatements.done(PyElementTypes.STATEMENT_LIST)
         ruleLikeMarker.done(section.declaration)
 
-        if (incompleteRule && atAnyOfTokens(*SmkTokenTypes.RULE_LIKE.types)) {
-            // inside rule scope, we remap some snakemake keywords to identifiers
-            // see #com.jetbrains.snakecharm.lang.parser.SnakemakeStatementParsing.filter
-            //
-            // Do nothing, next rule will be parsed automatically
-            // XXX probably recover until some useful token, see recoverUntilMatches() method
-            // XXX at the moment it seems any complex behaviour isn't needed
-        } else if (multiline && !myBuilder.eof()) {
-            if (atToken(PyTokenTypes.IDENTIFIER)) {
-                val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText]
-                if (actualToken != null) {
-                    myBuilder.remapCurrentToken(actualToken)
-                    return
-                }
+        when {
+            incompleteRule && atAnyOfTokens(*SmkTokenTypes.RULE_LIKE.types) -> {
+                // inside rule scope, we remap some snakemake keywords to identifiers
+                // see #com.jetbrains.snakecharm.lang.parser.SnakemakeStatementParsing.filter
+                //
+                // Do nothing, next rule will be parsed automatically
+                // XXX probably recover until some useful token, see recoverUntilMatches() method
+                // XXX at the moment it seems any complex behaviour isn't needed
             }
-            if (!atAnyOfTokens(*SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.types)) {
-                nextToken() // probably check token type
+            multiline && !myBuilder.eof() -> {
+                if (atToken(PyTokenTypes.IDENTIFIER)) {
+                    val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText!!]
+                    if (actualToken != null) {
+                        myBuilder.remapCurrentToken(actualToken)
+                        return
+                    }
+                }
+                if (!atAnyOfTokens(*SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.types)) {
+                    nextToken() // probably check token type
+                }
             }
         }
     }
