@@ -14,7 +14,6 @@ import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.util.ProcessingContext
 import com.intellij.util.Processors
-import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.resolve.PyResolveContext
@@ -24,6 +23,7 @@ import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
+import gnu.trove.THashSet
 
 
 abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
@@ -136,7 +136,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
             val results = mutableListOf<Psi>()
             val project = module.project
             val stubIndex = StubIndex.getInstance()
-            val allKeys = ContainerUtil.newTroveSet<String>()
+            val allKeys = THashSet<String>()
             stubIndex.processAllKeys(
                     indexKey, Processors.cancelableCollectProcessor<String>(allKeys), scope, null
             )
