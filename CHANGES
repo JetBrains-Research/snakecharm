@@ -3,7 +3,17 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
-Version 0.5 build #0.5.112.2018.3
+Version 0.5.1 build #0.5.1.126
+-------------
+Released on November 20th 2019
+
+Minor update which corrects untilBuild, this plugin version isn't compatible with 2019.3 EAP / RC.
+
+Fixed:
+- SnakeCharm is not compatible with AppCode (see #269)
+
+
+Version 0.5 build #0.5.112.2018.3  (removed from plugins repo)
 -------------
 Released on November 20th 2019
 - sinceBuild "183.4284" (2018.3)
