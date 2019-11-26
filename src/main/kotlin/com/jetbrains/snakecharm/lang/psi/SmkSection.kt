@@ -37,6 +37,7 @@ interface SmkSection: PyStatement, PsiNameIdentifierOwner {
     fun getParentRuleOrCheckPoint(): SmkRuleOrCheckpoint? = PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpoint::class.java)!!
 }
 
+@Suppress("UNUSED_PARAMETER")
 fun getIcon(section: SmkSection, flags: Int) = PlatformIcons.PROPERTY_ICON!!
 
 fun getPresentation(section: SmkSection) = object : PyElementPresentation(section) {
