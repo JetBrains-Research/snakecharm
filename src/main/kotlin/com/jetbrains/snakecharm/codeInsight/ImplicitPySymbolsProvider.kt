@@ -21,7 +21,7 @@ import com.jetbrains.python.psi.PyRecursiveElementVisitor
 import com.jetbrains.python.psi.resolve.fromModule
 import com.jetbrains.python.psi.resolve.resolveQualifiedName
 import com.jetbrains.python.psi.types.TypeEvalContext
-import com.jetbrains.python.sdk.PythonSdkType
+import com.jetbrains.python.sdk.PythonSdkUtil
 import javax.swing.SwingUtilities
 
 /**
@@ -54,7 +54,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
             override fun rootsChanged(event: ModuleRootEvent) {
                 LOG.debug("[PROJECT_ROOTS]: ${event.source}, mod=${module.name}, " +
                         "p=${module.project.name}," +
-                        " sdk=${PythonSdkType.findPythonSdk(module)}")
+                        " sdk=${PythonSdkUtil.findPythonSdk(module)}")
 
                 onChange(true)
             }
@@ -62,7 +62,7 @@ class ImplicitPySymbolsProvider(private val module: Module) : ModuleComponent {
 
         // Listen packages installed / removed
         connection.subscribe(PyPackageManager.PACKAGE_MANAGER_TOPIC, PyPackageManager.Listener { sdk ->
-            val moduleSdk = PythonSdkType.findPythonSdk(module)
+            val moduleSdk = PythonSdkUtil.findPythonSdk(module)
             if (sdk === moduleSdk) {
                 LOG.debug("[PACKAGE_MANAGER_TOPIC]: sdk == [$sdk], module == [$module]")
 
