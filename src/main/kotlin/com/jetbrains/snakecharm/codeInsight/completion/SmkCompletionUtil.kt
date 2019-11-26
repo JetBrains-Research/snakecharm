@@ -6,6 +6,7 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiElement
 import com.intellij.util.PlatformIcons
+import com.jetbrains.python.codeInsight.completion.PythonCompletionWeigher
 import javax.swing.Icon
 
 class SmkCompletionUtil {
@@ -15,12 +16,8 @@ class SmkCompletionUtil {
         const val SECTIONS_KEYS_PRIORITY = 30.0
         const val SUBSCRIPTION_INDEXES_PRIORITY = 20.0
 
-        const val PYTHON_PRIORITY_WEIGHT = 5.0
-        // < 2019.2
-        // const val PYTHON_PRIORITY_WEIGHT = PythonCompletionWeigher.WEIGHT_DELTA.toDouble()
-        // >= 2019.3
-        // const val PYTHON_PRIORITY_WEIGHT = PythonCompletionWeigher.PRIORITY_WEIGHT.toDouble()
-        
+        const val PYTHON_PRIORITY_WEIGHT = PythonCompletionWeigher.PRIORITY_WEIGHT.toDouble()
+
         fun createPrioritizedLookupElement(
                 item: LookupElement,
                 priority: Double = PYTHON_PRIORITY_WEIGHT
