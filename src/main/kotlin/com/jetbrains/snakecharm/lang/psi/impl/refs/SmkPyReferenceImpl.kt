@@ -26,7 +26,7 @@ class SmkPyReferenceImpl(
         val containingRuleOrCheckpoint: SmkRuleOrCheckpoint?
 ): PyReferenceImpl(element, context) {
 
-    override fun resolveInner(): List<RatedResolveResult> {
+    override fun resolveInner(): MutableList<RatedResolveResult> {
         val results = super.resolveInner()
         val sizeBeforeFiltration = results.size
         val fitleredResults = results.filter {
@@ -41,13 +41,13 @@ class SmkPyReferenceImpl(
         return fitleredResults.toMutableList()
     }
 
-    private fun resolveAsImplicitSymbol(): List<RatedResolveResult> {
+    private fun resolveAsImplicitSymbol(): MutableList<RatedResolveResult> {
         val context = myContext.typeEvalContext
 
         return PyReferenceResolveProvider.EP_NAME.extensionList.asSequence()
                 .filter { it is SMKImplicitPySymbolsResolveProvider }
                 .flatMap {  it.resolveName(myElement, context).asSequence() }
-                .toList()
+                .toMutableList()
     }
 
     override fun getVariants(): Array<Any> {

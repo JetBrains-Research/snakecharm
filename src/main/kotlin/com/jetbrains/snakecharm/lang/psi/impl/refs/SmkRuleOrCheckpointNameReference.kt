@@ -30,10 +30,10 @@ class SmkRuleOrCheckpointNameReference(
     override fun getUnresolvedHighlightSeverity(typeEvalContext: TypeEvalContext?) = HighlightSeverity.ERROR!!
 
 
-    override fun resolveInner(): List<RatedResolveResult> {
+    override fun resolveInner(): MutableList<RatedResolveResult> {
         val smkFile = element.containingFile
         if (smkFile !is SmkFile) {
-            return emptyList()
+            return mutableListOf()
         }
 
         val name = element.text

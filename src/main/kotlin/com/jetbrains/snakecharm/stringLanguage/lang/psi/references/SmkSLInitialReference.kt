@@ -41,7 +41,7 @@ class SmkSLInitialReference(
 
     override fun getElement() = myElement as BaseSmkSLReferenceExpression
 
-    override fun resolveInner(): List<RatedResolveResult> {
+    override fun resolveInner(): MutableList<RatedResolveResult> {
         require(!element.isQualified) // this reference is supposed to be not qualified
 
         PyPsiUtils.assertValid(myElement)
@@ -68,7 +68,8 @@ class SmkSLInitialReference(
             if (referencedName == SMK_VARS_WILDCARDS) {
                 val parentRule = PsiTreeUtil.getParentOfType(host, SmkRuleOrCheckpoint::class.java)
                 if (parentRule != null) {
-                    return listOf(RatedResolveResult(SmkResolveUtil.RATE_IMPLICIT_SYMBOLS, parentRule.wildcardsElement))
+                    ret.poke(parentRule.wildcardsElement, SmkResolveUtil.RATE_IMPLICIT_SYMBOLS)
+                    return ret
                 }
             }
 
