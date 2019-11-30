@@ -3,6 +3,13 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
+Version 0.5.2 build #0.5.2.126
+-------------
+Released on November 26th 2019
+
+Fixed:
+- UnsupportedOperationException (see #271)
+
 Version 0.5.2 build #0.5.2.124
 -------------
 Released on November 26th 2019
