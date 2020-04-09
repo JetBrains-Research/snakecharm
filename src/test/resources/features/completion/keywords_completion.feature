@@ -217,6 +217,8 @@ Feature: Completion for snakemake keyword-like things
       | checkpoint | be  | benchmark            |
       | rule       | ve  | version              |
       | checkpoint | ve  | version              |
+      | rule       | cac  | cache                |
+      | checkpoint | cac  | cache                |
       | rule       | me  | message              |
       | checkpoint | me  | message              |
       | rule       | pr  | priority             |

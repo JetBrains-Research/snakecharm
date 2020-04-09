@@ -64,6 +64,7 @@ Feature: Completion for sections/variables in SmkSL injections
          wrapper: ""
          wildcard_constraints: a=""
          conda: ""
+         cache: True
          message: ""
          benchmark: ""
          shadow: "full"
@@ -91,6 +92,7 @@ Feature: Completion for sections/variables in SmkSL injections
       | priority             |
       | run                  |
       | script               |
+      | cache                |
     Examples:
       | rule_like  | signature     |
       | rule       | shell: "{     |

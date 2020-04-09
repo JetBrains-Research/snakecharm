@@ -49,6 +49,7 @@ Feature: Inspection for multiple arguments in various sections
       | singularity |
       | priority    |
       | version     |
+      | cache       |
       | group       |
       | message     |
       | benchmark   |

@@ -157,6 +157,7 @@ Feature: Resolve for section after rule/checkpoint name e.g. rules.NAME.input
          resources: a=""
          script: ""
          shell: ""
+         cache: True
          run:
 
      rule ANOTHER_NAME:
@@ -175,6 +176,7 @@ Feature: Resolve for section after rule/checkpoint name e.g. rules.NAME.input
       | cwl                  |
       | run                  |
       | script               |
+      | cache                |
 
   Scenario Outline: Resolve for available sections
     Given a snakemake project

@@ -76,6 +76,7 @@ Feature: Annotate additional syntax
       | rule       | log                  | "file.txt" | PY.DECORATOR             |
       | rule       | resources            | foo        | PY.DECORATOR             |
       | rule       | version              | ""         | PY.DECORATOR             |
+      | rule       | cache                | ""         | PY.DECORATOR             |
       | rule       | message              | ""         | PY.DECORATOR             |
       | rule       | threads              | ""         | PY.DECORATOR             |
       | rule       | singularity          | ""         | PY.DECORATOR             |

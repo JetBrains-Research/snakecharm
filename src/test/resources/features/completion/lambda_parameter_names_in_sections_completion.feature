@@ -222,6 +222,7 @@ Feature: Completion for lambda parameter names in specific sections
       | script               | rule       |
       | cwl                  | rule       |
       | version              | rule       |
+      | cache                | rule       |
       | benchmark            | checkpoint |
       | conda                | checkpoint |
       | output               | checkpoint |
@@ -234,3 +235,4 @@ Feature: Completion for lambda parameter names in specific sections
       | script               | checkpoint |
       | cwl                  | checkpoint |
       | version              | checkpoint |
+      | cache                | checkpoint |

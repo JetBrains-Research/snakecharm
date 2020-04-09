@@ -26,6 +26,7 @@ Feature: Resolve for sections/variables in SmkSL injections
          wrapper: ""
          wildcard_constraints: a=""
          conda: ""
+         cache: True
          message: ""
          threads: 1
          benchmark: ""
@@ -59,6 +60,7 @@ Feature: Resolve for sections/variables in SmkSL injections
       | priority             |
       | run                  |
       | script               |
+      | cache                |
 
   Scenario Outline: Resolve for python specific variables for sections w/o arguments
       Given a snakemake project

@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.codeInsight
 
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_BENCHMARK
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CACHE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CONDA
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CWL
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_GROUP
@@ -67,7 +68,7 @@ object SnakemakeAPI {
             SECTION_CWL, SECTION_BENCHMARK, SECTION_VERSION,
             SECTION_MESSAGE, SECTION_THREADS, SECTION_SINGULARITY,
             SECTION_PRIORITY, SECTION_CONDA, SECTION_GROUP,
-            SECTION_SHADOW
+            SECTION_SHADOW, SECTION_CACHE
     )
 
     /**
@@ -78,7 +79,8 @@ object SnakemakeAPI {
             SECTION_BENCHMARK, SECTION_VERSION, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS, SECTION_SINGULARITY,
             SECTION_PRIORITY, SECTION_WILDCARD_CONSTRAINTS, SECTION_GROUP, SECTION_SHADOW,
             SECTION_CONDA,
-            SECTION_SCRIPT, SECTION_WRAPPER, SECTION_CWL
+            SECTION_SCRIPT, SECTION_WRAPPER, SECTION_CWL,
+            SECTION_CACHE
     )
 
     /**
@@ -128,7 +130,7 @@ object SnakemakeAPI {
             SECTION_SHADOW,
             SECTION_WRAPPER,
             SECTION_VERSION, SECTION_THREADS,
-            SECTION_PRIORITY, SECTION_SINGULARITY
+            SECTION_PRIORITY, SECTION_SINGULARITY, SECTION_CACHE
     )
 
     /**

@@ -436,6 +436,7 @@ Feature: Inspection checking lambda parameter names in various sections
       | script               | checkpoint |
       | cwl                  | checkpoint |
       | version              | checkpoint |
+      | cache                | checkpoint |
 
   Scenario Outline: lambda invocations in sections where lambdas are not allowed
     Given a snakemake project

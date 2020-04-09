@@ -7,6 +7,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
     <rule_like> NAME:
          input: ""
          version: 1
+         cache: True
          wrapper: ""
          wildcard_constraints: a=""
          conda: ""

@@ -181,6 +181,7 @@ Feature: Tests on snakemake string language injection
     | wildcard_constraints |
     | wrapper              |
     | version              |
+    | cache                |
     | threads              |
     | priority             |
     | singularity          |

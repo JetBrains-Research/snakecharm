@@ -21,6 +21,7 @@ Feature: Resolve for section names in rules and checkpoints
          log: ""
          params: a=""
          priority: 1
+         cache: True
          resources: a=""
          script: ""
          shell: "{<section>}"
