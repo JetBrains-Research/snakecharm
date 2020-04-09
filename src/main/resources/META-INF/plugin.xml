@@ -6,6 +6,10 @@
         JetBrains Research
     </vendor>
 
+    <change-notes><![CDATA[
+         See changes at <a href="https://github.com/JetBrains-Research/snakecharm/releases">GitHub Releases Page</a>
+    ]]></change-notes>
+
     <description><![CDATA[
     <br>
     <a href="https://snakemake.readthedocs.io/en/stable/">Snakemake</a> workflow management system is a tool to create
