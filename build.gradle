@@ -11,14 +11,19 @@ plugins {
     id 'org.jetbrains.intellij' version '0.4.16'
 
     // Kotlin
-    id "org.jetbrains.kotlin.jvm" version "1.3.21"
+    id "org.jetbrains.kotlin.jvm" version "1.3.70"
 }
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
 
+javaVersion = 1.8
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
 version "${project.version}.${project.buildCounter}"
 
+// ----------------------------------------------------------------------
 intellij {
     pluginName 'snakecharm'
     version ideVersion
@@ -51,8 +56,17 @@ patchPluginXml {
     untilBuild "${project.untilBuild}"
 }
 
-compileKotlin { kotlinOptions.jvmTarget = sourceCompatibility }
-compileTestKotlin { kotlinOptions.jvmTarget = sourceCompatibility }
+compileKotlin {
+  kotlinOptions {
+    jvmTarget = javaVersion
+  }
+}
+
+compileTestKotlin {
+  kotlinOptions {
+    jvmTarget = javaVersion
+  }
+}
 
 repositories {
     mavenCentral()
