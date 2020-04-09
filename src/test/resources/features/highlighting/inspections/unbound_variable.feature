@@ -11,7 +11,7 @@ Feature: Inspection: Unbound variable Inspection replacement
     And SmkPyUnboundLocalVariableInspection inspection is enabled
     Then I expect inspection warning on <tt> in <print(tt)> with message
     """
-    Name 'tt' can be not defined
+    Name 'tt' can be undefined
     """
     When I check highlighting warnings
 
