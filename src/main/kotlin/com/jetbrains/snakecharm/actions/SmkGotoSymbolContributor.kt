@@ -14,29 +14,6 @@ import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
 
 class SmkGotoSymbolContributor : ChooseByNameContributorEx {
-    override fun getItemsByName(
-        name: String,
-        pattern: String?,
-        project: Project,
-        includeNonProjectItems: Boolean
-    ): Array<NavigationItem> {
-        val result = ArrayList<NavigationItem>()
-        processElementsWithName(
-            name, result::add,
-            FindSymbolParameters(
-                "", "", FindSymbolParameters.searchScopeFor(project, includeNonProjectItems),
-                IdFilter.getProjectIdFilter(project, includeNonProjectItems)
-            )
-        )
-        return if (result.isEmpty()) NavigationItem.EMPTY_NAVIGATION_ITEM_ARRAY else result.toTypedArray()
-    }
-
-
-    override fun getNames(project: Project?, includeNonProjectItems: Boolean): Array<String> {
-        val result = ArrayList<String>()
-        processNames(result::add, FindSymbolParameters.searchScopeFor(project, includeNonProjectItems), null)
-        return result.toTypedArray()
-    }
 
     override fun processNames(
         processor: Processor<in String>,
