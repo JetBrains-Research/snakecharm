@@ -212,3 +212,4 @@ Feature: Tests on snakemake string language injection
     | join         |
     | path.join    |
     | os.path.join |
+    | multiext     |

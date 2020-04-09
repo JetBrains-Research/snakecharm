@@ -35,7 +35,7 @@ object SnakemakeAPI {
     val FUNCTIONS_ALLOWING_SMKSL_INJECTION = setOf(
         "ancient", "directory", "temp", "pipe", "temporary", "protected",
         "dynamic", "touch", "repeat", "report", "local", "expand", "shell",
-        "join"
+        "join", "multiext"
     )
 
     val FUNCTIONS_BANNED_FOR_WILDCARDS = listOf(
