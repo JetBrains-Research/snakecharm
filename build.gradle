@@ -67,7 +67,7 @@ task cucumber() {
     dependsOn assemble, compileTestKotlin
     doLast {
         javaexec {
-            main = "io.cucumber.core.cli.Mai"
+            main = "io.cucumber.core.cli.Main"
 
             classpath =  project.sourceSets.test.runtimeClasspath
 
