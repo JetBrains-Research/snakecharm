@@ -24,10 +24,12 @@ intellij {
     pluginName 'snakecharm'
     version ideVersion
 
+    def isPyCharm = ideVersion.contains('PY') || ideVersion.contains('PC')
+
     plugins=[] // add "terminal" plugin?
-    if (ideaVersion.contains('PC')) {
+    if (ideVersion.contains('PC')) {
         plugins += ['python-ce']
-    } else if (ideaVersion.contains('PY')) {
+    } else if (ideVersion.contains('PY')) {
         plugins += ['python']
     } else {
         plugins += [pythonPlugin]
