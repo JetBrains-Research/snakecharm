@@ -2,8 +2,6 @@ package com.jetbrains.snakecharm
 
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.testFramework.HeavyPlatformTestCase
-import com.intellij.testFramework.LightPlatformTestCase
-import com.intellij.testFramework.PlatformTestCase
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import junit.framework.TestCase
 
