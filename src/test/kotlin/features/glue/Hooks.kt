@@ -22,6 +22,7 @@ class Hooks {
     fun initParamdefs() {
         // todo: most likely we should remove this call
         TestApplicationManager.getInstance()
+        Disposer.setDebugMode(true)
     }
 
     @After(order = 1)
@@ -32,9 +33,6 @@ class Hooks {
 
         SnakemakeWorld.myFixture?.tearDown()
         SnakemakeWorld.myTestRootDisposable?.let { Disposer.dispose(it) }
-        cleanupSwingDataStructures()
-        Disposer.setDebugMode(true)
-        UsefulTestCase.waitForAppLeakingThreads(10, TimeUnit.SECONDS)
     }
 
     @After(order = 0)
@@ -55,17 +53,5 @@ class Hooks {
                 field.set(null, null)
             }
         }
-    }
-
-    @Throws(Exception::class)
-    private fun cleanupSwingDataStructures() {
-        val manager =
-            ReflectionUtil.getDeclaredMethod(Class.forName("javax.swing.KeyboardManager"), "getCurrentManager")!!
-                .invoke(null)
-        val componentKeyStrokeMap =
-            ReflectionUtil.getField(manager.javaClass, manager, Hashtable::class.java, "componentKeyStrokeMap")
-        componentKeyStrokeMap.clear()
-        val containerMap = ReflectionUtil.getField(manager.javaClass, manager, Hashtable::class.java, "containerMap")
-        containerMap.clear()
     }
 }
