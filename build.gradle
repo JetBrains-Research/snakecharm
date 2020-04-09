@@ -17,10 +17,6 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'kotlin'
 
-javaVersion = 1.8
-sourceCompatibility = javaVersion
-targetCompatibility = javaVersion
-
 version "${project.version}.${project.buildCounter}"
 
 // ----------------------------------------------------------------------
