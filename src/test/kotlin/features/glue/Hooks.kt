@@ -1,8 +1,8 @@
 package features.glue
 
 import com.intellij.codeInspection.ex.InspectionProfileImpl
-import com.intellij.idea.IdeaTestApplication
 import com.intellij.openapi.util.Disposer
+import com.intellij.testFramework.TestApplicationManager
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.util.ReflectionUtil
 import com.intellij.util.ui.UIUtil
@@ -21,7 +21,7 @@ class Hooks {
     @Before
     fun initParamdefs() {
         // todo: most likely we should remove this call
-        IdeaTestApplication.getInstance()
+        TestApplicationManager.getInstance()
     }
 
     @After(order = 1)
@@ -34,13 +34,12 @@ class Hooks {
         SnakemakeWorld.myTestRootDisposable?.let { Disposer.dispose(it) }
         cleanupSwingDataStructures()
         Disposer.setDebugMode(true)
-        UIUtil.removeLeakingAppleListeners()
         UsefulTestCase.waitForAppLeakingThreads(10, TimeUnit.SECONDS)
     }
 
     @After(order = 0)
-       @Throws(Throwable::class)
-       fun cleanupMyWorld() {
+    @Throws(Throwable::class)
+    fun cleanupMyWorld() {
         for (field in SnakemakeWorld::class.java.declaredFields) {
             if (!Modifier.isPublic(field.modifiers)) {
                 System.err.println("Cannot cleanup SnakemakeWorld, field isn't public: ${field.name}")
@@ -60,8 +59,11 @@ class Hooks {
 
     @Throws(Exception::class)
     private fun cleanupSwingDataStructures() {
-        val manager = ReflectionUtil.getDeclaredMethod(Class.forName("javax.swing.KeyboardManager"), "getCurrentManager")!!.invoke(null)
-        val componentKeyStrokeMap = ReflectionUtil.getField(manager.javaClass, manager, Hashtable::class.java, "componentKeyStrokeMap")
+        val manager =
+            ReflectionUtil.getDeclaredMethod(Class.forName("javax.swing.KeyboardManager"), "getCurrentManager")!!
+                .invoke(null)
+        val componentKeyStrokeMap =
+            ReflectionUtil.getField(manager.javaClass, manager, Hashtable::class.java, "componentKeyStrokeMap")
         componentKeyStrokeMap.clear()
         val containerMap = ReflectionUtil.getField(manager.javaClass, manager, Hashtable::class.java, "containerMap")
         containerMap.clear()
