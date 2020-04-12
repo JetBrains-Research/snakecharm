@@ -62,7 +62,10 @@
                 implementationClass="com.jetbrains.snakecharm.SmkFileType"
                 fieldName="INSTANCE"
         />
-    <stubElementTypeHolder class="com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes"/>
+    <stubElementTypeHolder
+            class="com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes"
+            externalIdPrefix="smk.SNAKEMAKE_"
+    />
     <lang.parserDefinition
             language="Snakemake"
             implementationClass="com.jetbrains.snakecharm.lang.parser.SmkParserDefinition"
