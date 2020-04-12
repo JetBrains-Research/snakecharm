@@ -3,6 +3,14 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
+Version 0.6.0 build #0.6.0.165
+-------------
+Released on April 12th 2019
+
+Fixed:
+- 2020.1 Compatibility (see #279)
+- “cache:” rule section support (see #280)
+
 Version 0.5.2 build #0.5.2.126
 -------------
 Released on November 26th 2019
