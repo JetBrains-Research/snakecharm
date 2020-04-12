@@ -26,7 +26,7 @@ intellij {
 
     def isPyCharm = ideVersion.contains('PY') || ideVersion.contains('PC')
 
-    plugins=[] // add "terminal" plugin?
+    plugins=[] // add "terminal", xdebug plugin?
     if (ideVersion.contains('PC')) {
         plugins += ['python-ce']
     } else if (ideVersion.contains('PY')) {
