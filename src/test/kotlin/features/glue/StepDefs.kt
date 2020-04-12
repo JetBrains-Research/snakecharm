@@ -5,6 +5,7 @@ import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Disposer
+import com.intellij.testFramework.TestApplicationManager
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.InjectionTestFixture
@@ -19,6 +20,7 @@ import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.inspections.*
 import com.jetbrains.snakecharm.inspections.smksl.SmkWildcardNotDefinedInspection
 import io.cucumber.java.en.Given
+import javax.swing.SwingUtilities
 import kotlin.test.fail
 
 
@@ -34,6 +36,8 @@ class StepDefs {
             "fixture must be null here, looks like cleanup after prev test failed."
         }
 
+        TestApplicationManager.getInstance()
+        
         // From UsefullTestCase
         Disposer.setDebugMode(true)
 
@@ -64,13 +68,13 @@ class StepDefs {
 
         val tmpDirFixture = LightTempDirTestFixtureImpl(true) // "tmp://" dir by default
 
-        SnakemakeWorld.myFixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(
-                fixtureBuilder.fixture,
-                tmpDirFixture
+        val fixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(
+            fixtureBuilder.fixture,
+            tmpDirFixture
         )
-
-        SnakemakeWorld.fixture().testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
-        SnakemakeWorld.fixture().setUp()
+        SnakemakeWorld.myFixture = fixture
+        fixture.testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
+        fixture.setUp()
 
         SnakemakeWorld.myInjectionFixture = InjectionTestFixture(SnakemakeWorld.fixture())
 

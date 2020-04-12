@@ -22,7 +22,6 @@ class Hooks {
     fun initParamdefs() {
         // todo: most likely we should remove this call
         TestApplicationManager.getInstance()
-        Disposer.setDebugMode(true)
     }
 
     @After(order = 1)
