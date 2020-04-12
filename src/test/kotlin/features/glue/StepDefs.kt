@@ -37,7 +37,7 @@ class StepDefs {
         }
 
         TestApplicationManager.getInstance()
-        
+
         // From UsefullTestCase
         Disposer.setDebugMode(true)
 
@@ -54,28 +54,23 @@ class StepDefs {
             emptyArray()
         }
 
-        // SnakemakeWorld.myFixture = ...
         // Write code here that turns the phrase above into concrete actions
         val projectDescriptor = PyLightProjectDescriptor(
-                SnakemakeTestCase.PYTHON_3_MOCK_SDK,
-                SnakemakeTestUtil.getTestDataPath().toString(),
-                *additionalRoots
+            SnakemakeTestCase.PYTHON_3_MOCK_SDK,
+            SnakemakeTestUtil.getTestDataPath().toString(),
+            *additionalRoots
         )
 
-        val fixtureBuilder = IdeaTestFixtureFactory
-                .getFixtureFactory()
-                .createLightFixtureBuilder(projectDescriptor)
-
+        val factory = IdeaTestFixtureFactory.getFixtureFactory()
+        val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor)
         val tmpDirFixture = LightTempDirTestFixtureImpl(true) // "tmp://" dir by default
 
-        val fixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(
-            fixtureBuilder.fixture,
-            tmpDirFixture
-        )
-        SnakemakeWorld.myFixture = fixture
-        fixture.testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
-        fixture.setUp()
-
+        SnakemakeWorld.myFixture = factory.createCodeInsightFixture(
+            fixtureBuilder.fixture, tmpDirFixture
+        ).apply {
+            testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
+            setUp()
+        }
         SnakemakeWorld.myInjectionFixture = InjectionTestFixture(SnakemakeWorld.fixture())
 
         PythonDialectsTokenSetProvider.reset()
