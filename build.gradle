@@ -97,9 +97,6 @@ test {
     }
     include '**/*Test.class'
     //exclude '**/AllCucumberFeaturesTest.class'
-    classpath = project.sourceSets.test.runtimeClasspath.filter {
-        it.parentFile.name != "lib" || !it.name.startsWith("cucumber-")
-    }
 
 }
 
