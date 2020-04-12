@@ -1,6 +1,9 @@
 package com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes
 
-import com.intellij.lang.*
+import com.intellij.lang.ASTNode
+import com.intellij.lang.LanguageParserDefinitions
+import com.intellij.lang.LightPsiParser
+import com.intellij.lang.PsiBuilderFactory
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.ILazyParseableElementType
 import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
@@ -20,19 +23,17 @@ class SmkSLRegExpElementType(debugName: String) : ILazyParseableElementType(debu
                 RegExpCapability.MIN_OCTAL_3_DIGITS
         )
     }
-    override fun parseLight(chameleon: ASTNode): PsiBuilder {
+
+    override fun doParseContents(chameleon: ASTNode, psi: PsiElement): ASTNode? {
         val project = chameleon.psi.project
         val regExpLanguage = RegExpLanguage.INSTANCE
         val definition =
-                LanguageParserDefinitions.INSTANCE.forLanguage(regExpLanguage) as RegExpParserDefinition
+            LanguageParserDefinitions.INSTANCE.forLanguage(regExpLanguage) as RegExpParserDefinition
         val lexer = definition.createLexer(project, CAPABILITIES)
         val parser = definition.createParser(project, CAPABILITIES)
-        val builder = PsiBuilderFactory.getInstance().createBuilder(project, chameleon, lexer, regExpLanguage, chameleon.chars)
+        val builder =
+            PsiBuilderFactory.getInstance().createBuilder(project, chameleon, lexer, regExpLanguage, chameleon.chars)
         (parser as LightPsiParser).parseLight(this, builder)
-
-        return builder
+        return builder.treeBuilt.firstChildNode
     }
-
-    override fun doParseContents(chameleon: ASTNode, psi: PsiElement): ASTNode? =
-        parseLight(chameleon).treeBuilt.firstChildNode
 }
