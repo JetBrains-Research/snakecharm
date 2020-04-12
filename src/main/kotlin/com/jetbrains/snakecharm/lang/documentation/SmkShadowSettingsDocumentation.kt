@@ -30,10 +30,13 @@ class SmkShadowSettingsDocumentation : AbstractDocumentationProvider() {
     }
 
     override fun getCustomDocumentationElement(
-            editor: Editor,
-            file: PsiFile,
-            contextElement: PsiElement?): PsiElement? {
-        return if (contextElement.isStringLiteralInShadowSection()) contextElement else null
+        editor: Editor,
+        file: PsiFile,
+        contextElement: PsiElement?,
+        targetOffset: Int
+    ) = when {
+        contextElement.isStringLiteralInShadowSection() -> contextElement
+        else -> null
     }
 
     private fun PsiElement?.isStringLiteralInShadowSection() =

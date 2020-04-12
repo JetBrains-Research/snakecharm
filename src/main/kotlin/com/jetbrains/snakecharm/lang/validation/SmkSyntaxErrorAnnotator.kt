@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.lang.validation
 
+import com.intellij.lang.annotation.HighlightSeverity.ERROR
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.python.psi.PyStarArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -26,19 +27,18 @@ object SmkSyntaxErrorAnnotator : SmkAnnotator() {
                             // arg value is nullable, let's take arg text which isn't null
                             seenKeywords2Value[keyword] = arg.text
                         } else {
-                            holder.createErrorAnnotation(
-                                    arg.keywordNode?.textRange!!,
-                                    SnakemakeBundle.message("ANN.keyword.argument.already.provided", keywordValue)
-                            )
+                            holder.newAnnotation(
+                                ERROR,
+                                SnakemakeBundle.message("ANN.keyword.argument.already.provided", keywordValue)
+                            ).range(arg.keywordNode!!).create()
                         }
                     }
                     encounteredKeywordArgument = true
                 }
                 !is PyStarArgument -> if (encounteredKeywordArgument) {
-                    holder.createErrorAnnotation(
-                            arg,
-                            SnakemakeBundle.message("ANN.positional.argument.after.keyword.argument")
-                    ).registerFix(IntroduceKeywordArgument(arg))
+                    holder.newAnnotation(
+                        ERROR, SnakemakeBundle.message("ANN.positional.argument.after.keyword.argument")
+                    ).range(arg).withFix(IntroduceKeywordArgument(arg)).create()
                 }
             }
         }
@@ -63,7 +63,9 @@ object SmkSyntaxErrorAnnotator : SmkAnnotator() {
                     val isExecutionSection = sectionName in EXECUTION_SECTIONS_KEYWORDS
 
                     if (executionSectionOccurred && isExecutionSection) {
-                        holder.createErrorAnnotation(st, SnakemakeBundle.message("ANN.multiple.execution.sections"))
+                        holder.newAnnotation(
+                            ERROR, SnakemakeBundle.message("ANN.multiple.execution.sections")
+                        ).range(st).create()
                     }
 
                     if (isExecutionSection) {
@@ -72,7 +74,9 @@ object SmkSyntaxErrorAnnotator : SmkAnnotator() {
                 }
                 is SmkRunSection -> {
                     if (executionSectionOccurred) {
-                        holder.createErrorAnnotation(st, SnakemakeBundle.message("ANN.multiple.execution.sections"))
+                        holder.newAnnotation(
+                            ERROR, SnakemakeBundle.message("ANN.multiple.execution.sections")
+                        ).range(st).create()
                     }
                     executionSectionOccurred = true
                 }
