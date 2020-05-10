@@ -77,7 +77,6 @@ Feature: Inspection: Unresolved element
     Examples:
       | rule_like  |
       | rule       |
-      | rule       |
       | checkpoint |
 
   Scenario: Unresolved variable in injection
