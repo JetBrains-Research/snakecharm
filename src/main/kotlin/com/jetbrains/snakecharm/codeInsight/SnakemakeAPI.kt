@@ -4,11 +4,13 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_BENCHMARK
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CACHE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CONDA
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CONTAINER
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CWL
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_GROUP
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_LOG
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_MESSAGE
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_NOTEBOOK
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_PARAMS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_PRIORITY
@@ -60,7 +62,7 @@ object SnakemakeAPI {
     
     val EXECUTION_SECTIONS_KEYWORDS = setOf(
             SECTION_SHELL, SECTION_SCRIPT,
-            SECTION_WRAPPER, SECTION_CWL
+            SECTION_WRAPPER, SECTION_CWL, SECTION_NOTEBOOK
     )
 
     val SINGLE_ARGUMENT_SECTIONS_KEYWORDS = setOf(
@@ -68,7 +70,7 @@ object SnakemakeAPI {
             SECTION_CWL, SECTION_BENCHMARK, SECTION_VERSION,
             SECTION_MESSAGE, SECTION_THREADS, SECTION_SINGULARITY,
             SECTION_PRIORITY, SECTION_CONDA, SECTION_GROUP,
-            SECTION_SHADOW, SECTION_CACHE
+            SECTION_SHADOW, SECTION_CACHE, SECTION_NOTEBOOK, SECTION_CONTAINER
     )
 
     /**
@@ -79,8 +81,9 @@ object SnakemakeAPI {
             SECTION_BENCHMARK, SECTION_VERSION, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS, SECTION_SINGULARITY,
             SECTION_PRIORITY, SECTION_WILDCARD_CONSTRAINTS, SECTION_GROUP, SECTION_SHADOW,
             SECTION_CONDA,
-            SECTION_SCRIPT, SECTION_WRAPPER, SECTION_CWL,
-            SECTION_CACHE
+            SECTION_SCRIPT, SECTION_WRAPPER, SECTION_CWL, SECTION_NOTEBOOK,
+            SECTION_CACHE,
+            SECTION_CONTAINER
     )
 
     /**
@@ -130,7 +133,8 @@ object SnakemakeAPI {
             SECTION_SHADOW,
             SECTION_WRAPPER,
             SECTION_VERSION, SECTION_THREADS,
-            SECTION_PRIORITY, SECTION_SINGULARITY, SECTION_CACHE
+            SECTION_PRIORITY, SECTION_SINGULARITY, SECTION_CACHE,
+            SECTION_CONTAINER, SECTION_NOTEBOOK
     )
 
     /**

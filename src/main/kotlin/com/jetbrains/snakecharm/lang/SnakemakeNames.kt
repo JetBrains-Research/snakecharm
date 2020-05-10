@@ -52,6 +52,8 @@ object SnakemakeNames {
     const val SECTION_SHADOW = "shadow"
     const val SECTION_RUN = "run"
     const val SECTION_CACHE = "cache" // >= 5.12.0
+    const val SECTION_CONTAINER = "container"
+    const val SECTION_NOTEBOOK = "notebook"
 
     const val RUN_SECTION_VARIABLE_RULE = "rule"
     const val RUN_SECTION_VARIABLE_JOBID = "jobid"

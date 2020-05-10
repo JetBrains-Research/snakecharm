@@ -185,6 +185,8 @@ Feature: Tests on snakemake string language injection
     | threads              |
     | priority             |
     | singularity          |
+    | container            |
+    | notebook             |
 
   Scenario Outline: Inject in snakemake function calls
     Given a snakemake project

@@ -59,30 +59,28 @@ Feature: Annotate syntax errors
       | rule       |
       | checkpoint |
 
-  Scenario Outline: Annotate multiple run/shell/script/wrapper/cwl sections.
+  Scenario Outline: Annotate multiple run/shell/script/wrapper/cwl/notebook sections.
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
         input: "file1.txt"
         output: touch("output.txt")
-        script: "script.py"
-        shell: "command"
-        wrapper: "dir/wrapper"
+        <sect1>: <sect1_text>
+        <sect2>: <sect2_text>
     """
-    Then I expect inspection error on <shell: "command"> with message
+    Then I expect inspection error on <<sect2>: <sect2_text>> with message
     """
-    Multiple run/shell sections.
-    """
-    And I expect inspection error on <wrapper: "dir/wrapper"> with message
-    """
-    Multiple run/shell sections.
+    Multiple execution sections, the first is '<sect1>'.
     """
     When I check highlighting errors
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | sect1  | sect1_text  | sect2    | sect2_text   |
+      | rule       | script | "script.py" | shell    | "cmd"        |
+      | checkpoint | script | "script.py" | shell    | "cmd"        |
+      | rule       | script | "script.py" | wrapper  | "dir"        |
+      | rule       | script | "script.py" | notebook | "fo.r.ipynb" |
+      | rule       | script | "script.py" | run      | pass         |
 
 
   Scenario Outline: no error highlighting for star arguments

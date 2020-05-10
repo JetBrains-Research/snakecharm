@@ -55,3 +55,5 @@ Feature: Inspection for multiple arguments in various sections
       | benchmark   |
       | threads     |
       | shadow      |
+      | notebook    |
+      | container   |

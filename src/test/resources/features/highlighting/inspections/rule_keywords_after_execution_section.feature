@@ -1,90 +1,30 @@
 Feature: Rule sections after execution sections inspection.
-  Execution sections being: run, script, wrapper, shell, cwl.
+  Execution sections being: run, script, wrapper, shell, cwl, notebook
 
-  Scenario Outline: Params section after shell section
+  Scenario Outline: One execution section not allowed after another execution section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
         input: "input.txt"
         output: "output.txt"
-        shell: "command"
-        params: a="value"
+        <sect1>: <sect1_text>
+        <sect2>: <sect2_text>
     """
     And Rule Section After Execution Section inspection is enabled
-    Then I expect inspection error on <params: a="value"> with message
+    Then I expect inspection error on <<sect2>: <sect2_text>> with message
     """
-    Rule section 'params' isn't allowed after 'shell' section.
+    Rule section '<sect2>' isn't allowed after '<sect1>' section.
     """
     When I check highlighting errors
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-  Scenario Outline: Threads section after wrapper section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-        input: "input.txt"
-        output: "output.txt"
-        wrapper: "dir/wrapper"
-        threads: 8
-    """
-    And Rule Section After Execution Section inspection is enabled
-    Then I expect inspection error on <threads: 8> with message
-    """
-    Rule section 'threads' isn't allowed after 'wrapper' section.
-    """
-    When I check highlighting errors
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-
-  Scenario Outline: Log section after script section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-        input: "input.txt"
-        output: "output.txt"
-        script: "script_file.py"
-        log: "log_path"
-    """
-    And Rule Section After Execution Section inspection is enabled
-    Then I expect inspection error on <log: "log_path"> with message
-    """
-    Rule section 'log' isn't allowed after 'script' section.
-    """
-    When I check highlighting errors
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-  Scenario Outline: Resources section after cwl section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-        input: "input.txt"
-        output: "output.txt"
-        cwl: "https://github.com/repository/with/file.cwl"
-        resources: mem_mb=100
-    """
-    And Rule Section After Execution Section inspection is enabled
-    Then I expect inspection error on <resources: mem_mb=100> with message
-    """
-    Rule section 'resources' isn't allowed after 'cwl' section.
-    """
-    When I check highlighting errors
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | sect1    | sect1_text           | sect2     | sect2_text |
+      | rule       | script   | "s.py"               | log       | "l.log"    |
+      | checkpoint | script   | "s.py"               | log       | "l.log"    |
+      | rule       | cwl      | "https://f.cwl" | resources | mem_mb=100 |
+      | rule       | wrapper  | "dir/wrapper"        | threads   | 8          |
+      | rule       | shell    | "cmd"                | params    | a="value"  |
+      | rule       | notebook | "n.r"                | params    | a="value"  |
 
   Scenario Outline: Move execution section to the end of the rule fix test
     Given a snakemake project

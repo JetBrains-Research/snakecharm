@@ -53,7 +53,7 @@ object SmkSyntaxErrorAnnotator : SmkAnnotator() {
     }
 
     private fun checkMultipleExecutionSections(ruleOrCheckpoint: SmkRuleOrCheckpoint) {
-        var executionSectionOccurred = false
+        var seenExecutionSection: String? = null
 
         val sections = ruleOrCheckpoint.getSections()
         for (st in sections) {
@@ -62,23 +62,24 @@ object SmkSyntaxErrorAnnotator : SmkAnnotator() {
                     val sectionName = st.sectionKeyword
                     val isExecutionSection = sectionName in EXECUTION_SECTIONS_KEYWORDS
 
-                    if (executionSectionOccurred && isExecutionSection) {
-                        holder.newAnnotation(
-                            ERROR, SnakemakeBundle.message("ANN.multiple.execution.sections")
-                        ).range(st).create()
-                    }
-
                     if (isExecutionSection) {
-                        executionSectionOccurred = true
+                        if (seenExecutionSection != null) {
+                            holder.newAnnotation(
+                                ERROR, SnakemakeBundle.message("ANN.multiple.execution.sections", seenExecutionSection)
+                            ).range(st).create()
+                        } else {
+                            seenExecutionSection = sectionName
+                        }
                     }
                 }
                 is SmkRunSection -> {
-                    if (executionSectionOccurred) {
+                    if (seenExecutionSection != null) {
                         holder.newAnnotation(
-                            ERROR, SnakemakeBundle.message("ANN.multiple.execution.sections")
+                            ERROR, SnakemakeBundle.message("ANN.multiple.execution.sections", seenExecutionSection)
                         ).range(st).create()
+                    } else {
+                        seenExecutionSection = st.sectionKeyword!!
                     }
-                    executionSectionOccurred = true
                 }
             }
         }
