@@ -182,6 +182,18 @@ class SmkCondaEnvReference(
 }
 private fun isYamlFile(it: PsiFileSystemItem) = it.name.endsWith(".yaml") || it.name.endsWith(".yml")
 
+class SmkNotebookReference(
+        element: SmkArgsSection,
+        textRange: TextRange,
+        stringLiteralExpression: PyStringLiteralExpression,
+        path: String
+) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
+    override fun getVariants() =  collectFileSystemItemLike(onlyFromParentFolder = false) {
+        val name = it.name.toLowerCase()
+        name.endsWith(".py.ipynb") or name.endsWith(".r.ipynb")
+    }
+}
+
 class SmkReportReference(
         element: SmkArgsSection,
         textRange: TextRange,

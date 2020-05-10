@@ -8,7 +8,7 @@ import com.jetbrains.snakecharm.lang.psi.getPresentation
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil.getIdentifierNode
 
 abstract class SmkArgsSectionImpl(node: ASTNode): PyElementImpl(node), SmkArgsSection {
-    override fun getName() = getSectionKeywordNode()?.text
+    override fun getName() = sectionKeyword
 
     override fun getSectionKeywordNode() = getIdentifierNode(node)
 

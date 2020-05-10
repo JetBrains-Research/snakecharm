@@ -13,6 +13,7 @@ Features:
 - 'notebook' section parsing error (see #288)
 - `envvars` isn't parsed properly (see #281)
 - `container` top level and rule sections parsing
+- Resolve/completion for paths in notebook section (see #289)
 
 Fixed:
 - Rule not yet defined false positive for lambdas (see #286)

@@ -7,9 +7,7 @@ import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.psi.SmkCondaEnvReference
-import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeSectionArgsType
 
 open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode): SmkArgsSectionImpl(node),
@@ -24,12 +22,27 @@ open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode): SmkArgsSectionImpl
     }
 
     override fun getReference(): PsiReference? =
-        when (this.name) {
-            SnakemakeNames.SECTION_CONDA -> getCondaSectionReference()
+        when (this.sectionKeyword) {
+            SnakemakeNames.SECTION_CONDA -> getSimplePathRelatedSectionReference { stringLiteral, offsetInParent ->
+                SmkCondaEnvReference(
+                    this,
+                    SmkPsiUtil.getReferenceRange(stringLiteral).shiftRight(offsetInParent),
+                    stringLiteral, stringLiteral.stringValue
+                )
+            }
+            SnakemakeNames.SECTION_NOTEBOOK -> getSimplePathRelatedSectionReference { stringLiteral, offsetInParent ->
+                SmkNotebookReference(
+                    this,
+                    SmkPsiUtil.getReferenceRange(stringLiteral).shiftRight(offsetInParent),
+                    stringLiteral, stringLiteral.stringValue
+                )
+            }
             else -> null
         }
 
-    private fun getCondaSectionReference() : PsiReference? {
+    private fun getSimplePathRelatedSectionReference(
+        refFun: (PyStringLiteralExpression, Int) -> SmkFileReference
+    ) : PsiReference? {
         val stringLiteral =
                 argumentList?.arguments
                         ?.firstOrNull { it is PyStringLiteralExpression }
@@ -41,11 +54,7 @@ open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode): SmkArgsSectionImpl
             return null
         }
 
-        val offsetInParent = SnakemakeNames.SECTION_CONDA.length + stringLiteral.startOffsetInParent
-        return SmkCondaEnvReference(
-                this,
-                SmkPsiUtil.getReferenceRange(stringLiteral).shiftRight(offsetInParent),
-                stringLiteral, stringLiteral.stringValue
-        )
+        val offsetInParent = sectionKeyword!!.length + stringLiteral.startOffsetInParent
+        return refFun(stringLiteral, offsetInParent)
     }
 }
