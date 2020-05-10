@@ -133,7 +133,7 @@ Feature: Resolve implicitly imported python names
       | InputFiles | io.py        |
       | input      | builtins.pyi |
 
-  Scenario Outline: Resolve threads inside run section (threads is fake implicit symbol)
+  Scenario Outline: Resolve section name inside run section (threads is fake implicit symbol)
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -141,9 +141,9 @@ Feature: Resolve implicitly imported python names
       output: "path/to/output"
       <text>
       run:
-        threads #here
+        <symbol_name> #here
     """
-    When I put the caret at threads #here
+    When I put the caret at <symbol_name> #here
     Then reference should multi resolve to name, file, times[, class name]
       | <symbol_name> | <file> | <times> | <class> |
 
@@ -151,23 +151,44 @@ Feature: Resolve implicitly imported python names
       | rule_like  | text       | symbol_name | file    | times | class                              |
       | rule       | threads: 1 | threads     | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
       | checkpoint | threads: 1 | threads     | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | rule       | version: 1 | version     | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | checkpoint | version: 1 | version     | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
 
-  Scenario Outline: Not-resolved threads if part of reference
+  Scenario Outline: Resolve rule variable inside run section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      run:
+        rule #here
+    """
+    When I put the caret at rule #here
+    Then reference should multi resolve to name, file, times[, class name]
+      | <symbol_name> | <file> | <times> | <class> |
+
+    Examples:
+      | rule_like  | symbol_name | file    | times | class             |
+      | rule       | NAME        | foo.smk | 1     | SmkRuleImpl       |
+      | checkpoint | NAME        | foo.smk | 1     | SmkCheckPointImpl |
+
+  Scenario Outline: Not-resolved fake variables if part of reference
     Given a snakemake project
     Given I open a file "foo.smk" with text
         """
         <rule_like> NAME:
             threads: 1
             run:
-              a.threads #here
+              a.<text> #here
         """
-    When I put the caret after a.thr
+    When I put the caret after a.<ptn>
     Then reference should not multi resolve to files
       | foo.smk |
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | text    | ptn |
+      | rule       | threads | thr |
+      | rule       | rule    | ru  |
+      | rule       | jobid   | jo  |
+      | checkpoint | threads | thr |
 
   Scenario Outline: Not-resolved in rule outside run section
     Given a snakemake project
@@ -188,6 +209,9 @@ Feature: Resolve implicitly imported python names
       | rule       | res       | resources  |
       | rule       | log #here | log        |
       | rule       | thr       | threads    |
+      | rule       | vers      | version    |
+      | rule       | rule #    | rule       |
+      | rule       | jobid     | jobid      |
       | checkpoint | out       | output.foo |
       | checkpoint | wild      | wildcards  |
 
@@ -196,21 +220,23 @@ Feature: Resolve implicitly imported python names
     Given I open a file "foo.smk" with text
        """
        <block>:
-           <text>
+           <text> #here
        """
     When I put the caret at <ptn>
     Then reference should not resolve
 
     Examples:
-      | block     | ptn | text       |
-      | onstart   | out | output.foo |
-      | onstart   | par | params     |
-      | onstart   | wil | wildcards  |
-      | onstart   | res | resources  |
-      | onstart   | lo  | log        |
-      | onstart   | thr | threads    |
-      | onerror   | wil | wildcards  |
-      | onsuccess | wil | wildcards  |
+      | block     | ptn         | text       |
+      | onstart   | out         | output.foo |
+      | onstart   | par         | params     |
+      | onstart   | wil         | wildcards  |
+      | onstart   | res         | resources  |
+      | onstart   | lo          | log        |
+      | onstart   | thr         | threads    |
+      | onstart   | rule #here  | rule       |
+      | onstart   | jobid #here | jobid      |
+      | onerror   | wil         | wildcards  |
+      | onsuccess | wil         | wildcards  |
 
   Scenario: Resolve also works inside call args
     Given a snakemake project

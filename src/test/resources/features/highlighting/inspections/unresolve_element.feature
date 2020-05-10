@@ -79,6 +79,22 @@ Feature: Inspection: Unresolved element
       | rule       |
       | checkpoint |
 
+  Scenario Outline: Synthetic jobid variable not marked as unresolved in run section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> foo:
+      run:
+        jobid
+    """
+    And PyUnresolvedReferencesInspection inspection is enabled
+    Then I expect no inspection error
+    When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
   Scenario: Unresolved variable in injection
     Given a snakemake project
     Given I open a file "foo.smk" with text

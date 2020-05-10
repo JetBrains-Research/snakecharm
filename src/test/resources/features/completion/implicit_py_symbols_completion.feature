@@ -90,6 +90,9 @@ Feature: Completion in python part of snakemake file
     | resources |
     | log       |
     | threads   |
+    | version   |
+    | rule      |
+    | jobid     |
 
 
   Scenario: Not-completed in rule outside run section
@@ -110,6 +113,9 @@ Feature: Completion in python part of snakemake file
      | resources |
      | log       |
      | threads   |
+     | version   |
+     | rule      |
+     | jobid     |
 
   Scenario Outline: Not-completed in top level python block
     Given a snakemake project
@@ -128,6 +134,9 @@ Feature: Completion in python part of snakemake file
       | resources |
       | log       |
       | threads   |
+      | version   |
+      | rule      |
+      | jobid     |
     Examples:
       | block     |
       | onstart   |

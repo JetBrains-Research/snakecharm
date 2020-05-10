@@ -9,7 +9,10 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
+import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil.RATE_IMPLICIT_SYMBOLS
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_JOBID
+import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_RULE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_THREADS
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
@@ -29,16 +32,24 @@ class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
 
                 when (referencedName) {
                     SMK_VARS_WILDCARDS -> {
-                        items.add(RatedResolveResult(SmkResolveUtil.RATE_IMPLICIT_SYMBOLS, ruleOrCheckpoint.wildcardsElement))
+                        items.add(RatedResolveResult(RATE_IMPLICIT_SYMBOLS, ruleOrCheckpoint.wildcardsElement))
                     }
 
                     SECTION_THREADS -> {
                         val threadsSection = ruleOrCheckpoint.getSectionByName(SECTION_THREADS)
 
                         items.add(
-                                RatedResolveResult(SmkResolveUtil.RATE_IMPLICIT_SYMBOLS, threadsSection
-                                        ?: ruleOrCheckpoint)
+                                RatedResolveResult(
+                                    RATE_IMPLICIT_SYMBOLS, threadsSection ?: ruleOrCheckpoint)
                         )
+                    }
+
+                    RUN_SECTION_VARIABLE_RULE -> {
+                        items.add(RatedResolveResult(RATE_IMPLICIT_SYMBOLS, ruleOrCheckpoint))
+                    }
+
+                    RUN_SECTION_VARIABLE_JOBID -> {
+                        items.add(RatedResolveResult(RATE_IMPLICIT_SYMBOLS, null))
                     }
                 }
             }
@@ -51,7 +62,7 @@ class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
                         .filter { symbolScope -> contextScope.includes(symbolScope) }
                         .flatMap { symbolScope -> cache.filter(symbolScope, element.name!!).asSequence() }
                         .map {
-                            RatedResolveResult(SmkResolveUtil.RATE_IMPLICIT_SYMBOLS, it.psiDeclaration)
+                            RatedResolveResult(RATE_IMPLICIT_SYMBOLS, it.psiDeclaration)
                         }.forEach {
                             items.add(it)
 

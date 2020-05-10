@@ -28,6 +28,9 @@ import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
 class SmkTypeProvider : PyTypeProviderBase() {
+    // TODO: provide types for 'run:' : threads, version, wildcards, rule, jobid,...
+    //  collectPyFiles("builtins", usedFiles).get(0).findTopLevelClass("str")
+
     // getParameterType(param, function, context) // only for function declarations, not lambdas
     // registerReturnType(classQualifiedName, methods, callback)
     // getReturnType(callable, context)
