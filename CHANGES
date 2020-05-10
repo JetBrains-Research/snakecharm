@@ -3,6 +3,14 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
+Version <next>
+-------------
+Released on ...
+
+Features:
+- Inspection: warn about confusing reference in localrules section (see #287)
+
+
 Version 0.6.0 build #0.6.0.165
 -------------
 Released on April 12th 2019
