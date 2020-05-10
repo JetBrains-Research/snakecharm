@@ -240,6 +240,17 @@
     />
 
     <localInspection
+            language="Snakemake" shortName="SmkAvoidTabWhitespace"
+            enabledByDefault="true"
+            level="WEAK WARNING"
+            suppressId="SmkAvoidTabWhitespace"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.codestyle.avoid.whitespace.tab"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkAvoidTabWhitespace"
+    />
+
+    <localInspection
             language="Snakemake" shortName="SmkLocalrulesRuleorderRepeatedRuleInspection"
             enabledByDefault="true"
             level="WARNING"

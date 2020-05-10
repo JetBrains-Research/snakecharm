@@ -9,6 +9,7 @@ Released on ...
 
 Features:
 - Inspection: warn about confusing reference in localrules section (see #287)
+- Inspection: Warn if mixed tabs and spaces (see #285)
 
 Fixed:
 - Rule not yet defined false positive for lambdas (see #286)

@@ -35,6 +35,15 @@ class ActionsSteps {
         iExpectInspectionOnIn(level, signature, signature, message)
     }
 
+    @When("^I expect inspection (error|warning|info|TYPO|weak warning) on pattern <([^>]+)> with message$")
+    fun iExpectInspectionOnPattern(level: String, pattern: String, message: String) {
+        val signature = pattern
+            .replace("\\n", "\n")
+            .replace("\\r", "\r")
+            .replace("\\t", "\t")
+        iExpectInspectionOnIn(level, signature, signature, message)
+    }
+
     @Given("^I expect no inspection (error|warning|info|TYPO|weak warning)$")
     fun iExpectNoInspection(_level: String) {
         //Fake step, do nothing "check highlighting" step will show errors in such case
