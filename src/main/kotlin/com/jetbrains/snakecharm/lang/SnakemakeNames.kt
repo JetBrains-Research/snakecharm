@@ -28,6 +28,9 @@ object SnakemakeNames {
     const val SUBWORKFLOW_CONFIGFILE_KEYWORD  = WORKFLOW_CONFIGFILE_KEYWORD
     const val SUBWORKFLOW_SNAKEFILE_KEYWORD = "snakefile"
 
+    const val WORKFLOW_ENVVARS_KEYWORD = "envvars"
+    const val WORKFLOW_CONTAINER_KEYWORD = "container"
+
     const val SECTION_INPUT = "input"
     const val SECTION_OUTPUT = "output"
     const val SECTION_LOG = "log"

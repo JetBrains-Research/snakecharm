@@ -315,6 +315,15 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testWorkflowContainer() {
+        doTest()
+    }
+
+    fun testWorkflowEnvvars() {
+        doTest()
+    }
+
+
     fun testFormattedStringInToplevelStatements() {
         doTest()
     }

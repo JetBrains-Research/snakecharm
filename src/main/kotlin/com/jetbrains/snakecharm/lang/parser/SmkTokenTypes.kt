@@ -1,6 +1,5 @@
 package com.jetbrains.snakecharm.lang.parser
 
-import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyElementType
@@ -20,6 +19,8 @@ object SmkTokenTypes {
     val WORKFLOW_SINGULARITY_KEYWORD = PyElementType("WORKFLOW_SINGULARITY_KEYWORD")
     val WORKFLOW_INCLUDE_KEYWORD = PyElementType("WORKFLOW_INCLUDE_KEYWORD")
     val WORKFLOW_WORKDIR_KEYWORD = PyElementType("WORKFLOW_WORKDIR_KEYWORD")
+    val WORKFLOW_ENVVARS_KEYWORD = PyElementType("WORKFLOW_ENVVARS_KEYWORD")
+    val WORKFLOW_CONTAINER_KEYWORD = PyElementType("WORKFLOW_CONTAINER_KEYWORD")
 
     val WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS = TokenSet.create(
             WORKFLOW_CONFIGFILE_KEYWORD,
@@ -27,7 +28,9 @@ object SmkTokenTypes {
             WORKFLOW_SINGULARITY_KEYWORD,
             WORKFLOW_INCLUDE_KEYWORD,
             WORKFLOW_WORKDIR_KEYWORD,
-            WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD
+            WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD,
+            WORKFLOW_ENVVARS_KEYWORD,
+            WORKFLOW_CONTAINER_KEYWORD
     )
 
     val WORKFLOW_LOCALRULES_KEYWORD = PyElementType("WORKFLOW_LOCALRULES_KEYWORD")

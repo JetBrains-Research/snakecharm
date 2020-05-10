@@ -85,6 +85,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 .put(SnakemakeNames.WORKFLOW_SINGULARITY_KEYWORD, SmkTokenTypes.WORKFLOW_SINGULARITY_KEYWORD)
                 .put(SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD, SmkTokenTypes.WORKFLOW_INCLUDE_KEYWORD)
                 .put(SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD, SmkTokenTypes.WORKFLOW_WORKDIR_KEYWORD)
+                .put(SnakemakeNames.WORKFLOW_ENVVARS_KEYWORD, SmkTokenTypes.WORKFLOW_ENVVARS_KEYWORD)
+                .put(SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD, SmkTokenTypes.WORKFLOW_CONTAINER_KEYWORD)
                 .put(SnakemakeNames.WORKFLOW_LOCALRULES_KEYWORD, SmkTokenTypes.WORKFLOW_LOCALRULES_KEYWORD)
                 .put(SnakemakeNames.WORKFLOW_RULEORDER_KEYWORD, SmkTokenTypes.WORKFLOW_RULEORDER_KEYWORD)
                 .put(SnakemakeNames.WORKFLOW_ONSUCCESS_KEYWORD, SmkTokenTypes.WORKFLOW_ONSUCCESS_KEYWORD)

@@ -14,6 +14,8 @@ Features:
 Fixed:
 - Rule not yet defined false positive for lambdas (see #286)
 - Unresolved reference for 'rule' in 'run' section (see #283)
+- `envvars` isn't parsed properly (see #281)
+- `container` top level section parsing fixed
 
 Version 0.6.0 build #0.6.0.165
 -------------

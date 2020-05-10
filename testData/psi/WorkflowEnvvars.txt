@@ -1,0 +1,28 @@
+SnakemakeFile: WorkflowEnvvars.smk
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_ENVVARS_KEYWORD)('envvars')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: SOME_VARIABLE
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"SOME_VARIABLE"')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('aaa')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('params')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PyKeywordArgumentImpl: envvars
+            PsiElement(Py:IDENTIFIER)('envvars')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:EQ)('=')
+            PsiWhiteSpace(' ')
+            PyStringLiteralExpression: foo10
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"foo10"')
