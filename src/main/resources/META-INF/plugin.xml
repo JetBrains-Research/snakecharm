@@ -264,11 +264,11 @@
     <localInspection
             language="Snakemake" shortName="SmkLocalRuleConfusingReference"
             enabledByDefault="true"
-            level="ERROR"
+            level="WEAK WARNING"
             suppressId="SmkLocalRuleConfusingReference"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.localrule.confusing.ref"
+            key="INSP.NAME.localrules.confusing.ref"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkLocalRuleConfusingReference"
     />
     <localInspection

@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
-import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkFile
@@ -32,11 +31,9 @@ class SmkLocalRuleConfusingReference : SnakemakeInspection() {
                     if (name != null && name !in ruleLike) {
                         registerProblem(
                             expr,
-                            SnakemakeBundle.message("INSP.NAME.localrule.confusing.ref.msg", name),
-                            ProblemHighlightType.WEAK_WARNING
+                            SnakemakeBundle.message("INSP.NAME.localrules.confusing.ref.msg", name)
                         )
                     }
-
                 }
             }
         }
