@@ -10,6 +10,8 @@ Released on ...
 Features:
 - Inspection: warn about confusing reference in localrules section (see #287)
 
+Fixed:
+- Rule not yet defined false positive for lambdas (see #286)
 
 Version 0.6.0 build #0.6.0.165
 -------------

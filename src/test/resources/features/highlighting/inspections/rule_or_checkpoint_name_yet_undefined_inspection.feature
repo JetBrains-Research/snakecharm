@@ -96,3 +96,22 @@ Feature: Inspection: Yet-undefined name after rules/checkpoints
       | checkpoint | ANOTHER |
       | rule       | NAME    |
       | checkpoint | NAME    |
+
+  Scenario Outline: No inspection in 'lambda' section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> foo:
+        <section>: lambda wildcards: rules.boo.input
+
+    rule boo:
+        input: "in"
+    """
+    And SmkRuleOrCheckpointNameYetUndefinedInspection inspection is enabled
+    Then I expect no inspection error
+    When I check highlighting errors
+    Examples:
+      | rule_like  | section |
+      | rule       | input   |
+      | rule       | params  |
+      | checkpoint | input   |

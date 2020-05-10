@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.util.PsiTreeUtil
+import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -26,6 +27,12 @@ class SmkRuleOrCheckpointNameYetUndefinedInspection : SnakemakeInspection() {
 
             val containingRunSection = PsiTreeUtil.getParentOfType(node, SmkRunSection::class.java)
             if (containingRunSection != null) {
+                return
+            }
+
+            val containingLambdaSection = PsiTreeUtil.getParentOfType(node, PyLambdaExpression::class.java)
+            if (containingLambdaSection != null) {
+                // you could use lambdas for rules which are defined later
                 return
             }
 
