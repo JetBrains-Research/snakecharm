@@ -20,7 +20,6 @@ import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.inspections.*
 import com.jetbrains.snakecharm.inspections.smksl.SmkWildcardNotDefinedInspection
 import io.cucumber.java.en.Given
-import javax.swing.SwingUtilities
 import kotlin.test.fail
 
 
@@ -98,8 +97,6 @@ class StepDefs {
             "Section Multiple Args" -> fixture.enableInspections(SmkSectionMultipleArgsInspection::class.java)
             "Subworkflow Redeclaration" -> fixture.enableInspections(SmkSubworkflowRedeclarationInspection::class.java)
             "Unreachable Code" -> fixture.enableInspections(PyUnreachableCodeInspection::class.java)
-            "Rule or Checkpoint Name yet undefined" ->
-                fixture.enableInspections(SmkRuleOrCheckpointNameYetUndefinedInspection::class.java)
             "Repeated Rule in Localrules or Ruleorder" ->
                 fixture.enableInspections(SmkLocalrulesRuleorderRepeatedRuleInspection::class.java)
             "Lambda Functions in Rule Sections" -> fixture.enableInspections(SmkLambdaRuleParamsInspection::class.java)

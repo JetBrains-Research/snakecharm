@@ -10,7 +10,7 @@ Feature: Inspection: Yet-undefined name after rules/checkpoints
     <section> ANOTHER_NAME:
       input: "in.txt"
     """
-    And Rule or Checkpoint Name yet undefined inspection is enabled
+    And SmkRuleOrCheckpointNameYetUndefinedInspection inspection is enabled
     Then I expect inspection error on <ANOTHER_NAME> in <s.ANOTHER_NAME> with message
     """
     Rule or Checkpoint name 'ANOTHER_NAME' has not been defined yet
@@ -29,7 +29,7 @@ Feature: Inspection: Yet-undefined name after rules/checkpoints
      <section> NAME:
        input: <section>s.NAME
      """
-    And Rule or Checkpoint Name yet undefined inspection is enabled
+    And SmkRuleOrCheckpointNameYetUndefinedInspection inspection is enabled
     Then I expect inspection error on <NAME> in <s.NAME> with message
      """
      Rule or Checkpoint name 'NAME' has not been defined yet
@@ -50,7 +50,7 @@ Feature: Inspection: Yet-undefined name after rules/checkpoints
     <section> ANOTHER_NAME:
       input: <section>s.NAME
     """
-    And Rule or Checkpoint Name yet undefined inspection is enabled
+    And SmkRuleOrCheckpointNameYetUndefinedInspection inspection is enabled
     Then I expect no inspection error
     When I check highlighting errors
     Examples:
@@ -65,7 +65,7 @@ Feature: Inspection: Yet-undefined name after rules/checkpoints
     <section> ANOTHER:
       input: <section>s.NAME
     """
-    And Rule or Checkpoint Name yet undefined inspection is enabled
+    And SmkRuleOrCheckpointNameYetUndefinedInspection inspection is enabled
     And PyUnresolvedReferencesInspection inspection is enabled
     Then I expect inspection error on <NAME> with message
     """
@@ -87,7 +87,7 @@ Feature: Inspection: Yet-undefined name after rules/checkpoints
     <section> ANOTHER:
       run: <section>s.<name>
     """
-    And Rule or Checkpoint Name yet undefined inspection is enabled
+    And SmkRuleOrCheckpointNameYetUndefinedInspection inspection is enabled
     Then I expect no inspection error
     When I check highlighting errors
     Examples:
