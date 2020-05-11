@@ -246,4 +246,47 @@ Feature: Inspection - Not same wildcards set
       Examples:
         | section    |
         | rule       |
+        | checkpoint |
+
+  Scenario Outline: Issue 266 No error
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <section> a:
+          output:
+              **foo(""),
+              o1 = foo("{wd} "),
+              o2 = "{wd}"
+      """
+    And Not same wildcards set inspection is enabled
+    Then I expect inspection weak warning on <**foo("")> with message
+         """
+         Cannot check missing wildcards here.
+         """
+    Then I expect inspection weak warning on <o1 = foo("{wd} ")> with message
+         """
+         Cannot check missing wildcards here.
+         """
+    When I check highlighting weak warnings
+      Examples:
+        | section    |
+        | rule       |
+        | checkpoint |
+
+#  Scenario Outline: Issue 266 Weak warning
+#    Given a snakemake project
+#    Given I open a file "foo.smk" with text
+#      """
+#      <section> a:
+#          output:
+#              **foo(""),
+#              o1 = foo("{wd} "),
+#              o2 = "{wd}"
+#      """
+#    And Not same wildcards set inspection is enabled
+#    Then I expect no inspection error
+#    When I check highlighting errors
+#      Examples:
+#        | section    |
+#        | rule       |
 #        | checkpoint |

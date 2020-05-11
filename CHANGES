@@ -22,6 +22,7 @@ Fixed:
 - Unresolved reference for 'rule' in 'run' section (see #283)
 - Doesn't automatically create folding code element for "checkpoint" (see #273)
 - Multiline shell commands in anonymous rules defined in loops (see #275)
+- Do not warn about missing wildcards if no SmkSL injection in string (see #266)
 
 Version 0.6.0 build #0.6.0.165
 -------------
