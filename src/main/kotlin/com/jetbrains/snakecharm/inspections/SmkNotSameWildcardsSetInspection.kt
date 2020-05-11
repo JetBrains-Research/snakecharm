@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
+import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.util.Ref
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -73,6 +74,15 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
                                 )
                         )
                     }
+                } else {
+                    // no injections, cannot check
+                    registerProblem(
+                        arg,
+                        SnakemakeBundle.message(
+                            "INSP.NAME.not.same.wildcards.set.cannot.check"
+                        ),
+                        ProblemHighlightType.WEAK_WARNING
+                    )
                 }
             }
         }

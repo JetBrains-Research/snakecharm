@@ -78,7 +78,6 @@ class SmkWildcardsCollector(
     }
 
     override fun visitPyStringLiteralExpression(stringLiteral: PyStringLiteralExpression) {
-        atLeastOneInjectionVisited = true
         val languageManager = InjectedLanguageManager.getInstance(stringLiteral.project)
         val injectedFiles =
                 languageManager.getInjectedPsiFiles(stringLiteral)
@@ -86,6 +85,7 @@ class SmkWildcardsCollector(
                         ?.filterIsInstance<SmkSLFile>()
                         ?: return
 
+        atLeastOneInjectionVisited = atLeastOneInjectionVisited || injectedFiles.isNotEmpty()
         injectedFiles.forEach { collectWildcardsNames(it) }
     }
 
