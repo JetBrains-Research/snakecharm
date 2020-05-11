@@ -23,6 +23,7 @@ class SmkMakeFoldingBuilder : PythonFoldingBuilder() {
     companion object {
         val FOLDED_ELEMENTS = TokenSet.create(
                 SmkStubElementTypes.RULE_DECLARATION_STATEMENT,
+                SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT,
                 SmkElementTypes.RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT,
                 SmkElementTypes.WORKFLOW_PY_BLOCK_SECTION_STATEMENT
         )
