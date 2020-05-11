@@ -177,6 +177,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 if (text[i] == ' ') {
                     spaces++
                 } else if (text[i] == '\t') {
+                    // Size 8 is used in com.jetbrains.python.lexer.PythonIndentingProcessor.advance()
+                    // AFAIU is default continuation indent
                     spaces += 8
                 }
             }
@@ -209,6 +211,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 isInPythonSection = false
             }
         } else if (atToken(PyTokenTypes.TAB)) {
+            // Size 8 is used in com.jetbrains.python.lexer.PythonIndentingProcessor.advance()
+            // AFAIU is default continuation indent
             myCurrentNewlineIndent += 8
         }
 
@@ -303,6 +307,11 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
         return isToplevelSection
     }
+
+    // TODO: it seems restore not always work ok, may be also resore some part of our complicated state?
+    //override fun restore(position: LexerPosition) {
+    //    super.restore(position)
+    //}
 
     override fun processLineBreak(startPos: Int) {
         if ((ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections)
