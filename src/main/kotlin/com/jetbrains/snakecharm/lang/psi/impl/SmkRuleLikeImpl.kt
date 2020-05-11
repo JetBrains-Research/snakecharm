@@ -12,6 +12,7 @@ import com.jetbrains.python.psi.impl.PyBaseElementImpl
 import com.jetbrains.python.psi.impl.PyElementPresentation
 import com.jetbrains.python.psi.impl.PyPsiUtils
 import com.jetbrains.snakecharm.SnakemakeIcons
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
 import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
 import com.jetbrains.snakecharm.lang.psi.SmkSection
@@ -56,9 +57,15 @@ abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT: SmkRuleLike<S>, ou
 
     private fun getNameNode() = getIdentifierNode(node)
 
-    override fun getSectionByName(sectionName: String) = getSections().find {
-        it.sectionKeyword == sectionName
-    } as? S
+    override fun getSectionByName(sectionName: String): S? {
+        require(sectionName != SnakemakeNames.SECTION_RUN) {
+            "Run section not supported here"
+        }
+
+        return getSections().find {
+            it.sectionKeyword == sectionName
+        } as? S
+    }
 
     override fun getStatementList() = childToPsiNotNull<PyStatementList>(PyElementTypes.STATEMENT_LIST)
 

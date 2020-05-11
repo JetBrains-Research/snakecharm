@@ -14,6 +14,8 @@ Features:
 - `envvars` isn't parsed properly (see #281)
 - `container` top level and rule sections parsing
 - Resolve/completion for paths in notebook section (see #289)
+- Inspection: Conda environments are only allowed with shell, script, notebook,
+    or wrapper directives (not with run). #290
 
 Fixed:
 - Rule not yet defined false positive for lambdas (see #286)

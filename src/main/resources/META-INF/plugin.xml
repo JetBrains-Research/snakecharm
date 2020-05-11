@@ -205,6 +205,16 @@
             key="INSP.NAME.section.redeclaration"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionRedeclarationInspection"
     />
+    <localInspection
+            language="Snakemake" shortName="SmkCondaSectionNotAllowedWithRun"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkCondaSectionNotAllowedWithRun"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.conda.section.not.allowed.with.run"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkCondaSectionNotAllowedWithRun"
+    />
 
     <localInspection
             language="Snakemake" shortName="SmkSectionMultipleArgsInspection"
