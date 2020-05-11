@@ -1,0 +1,123 @@
+SnakemakeFile: Issue275.smk
+  PyAssignmentStatement
+    PyTargetExpression: files
+      PsiElement(Py:IDENTIFIER)('files')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:EQ)('=')
+    PsiWhiteSpace(' ')
+    PyDictLiteralExpression
+      PsiElement(Py:LBRACE)('{')
+      PyKeyValueExpression
+        PyStringLiteralExpression: file1.txt
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"file1.txt"')
+        PsiElement(Py:COLON)(':')
+        PsiWhiteSpace(' ')
+        PyListLiteralExpression
+          PsiElement(Py:LBRACKET)('[')
+          PyStringLiteralExpression: file1_a.pdf
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file1_a.pdf"')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: file1_b.pdf
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file1_b.pdf"')
+          PsiElement(Py:RBRACKET)(']')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace('\n         ')
+      PyKeyValueExpression
+        PyStringLiteralExpression: file2.txt
+          PsiElement(Py:SINGLE_QUOTED_STRING)('"file2.txt"')
+        PsiElement(Py:COLON)(':')
+        PsiWhiteSpace(' ')
+        PyListLiteralExpression
+          PsiElement(Py:LBRACKET)('[')
+          PyStringLiteralExpression: file2_a.pdf
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file2_a.pdf"')
+          PsiElement(Py:RBRACKET)(']')
+      PsiElement(Py:RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyCallExpression: files.values
+            PyReferenceExpression: values
+              PyReferenceExpression: files
+                PsiElement(Py:IDENTIFIER)('files')
+              PsiElement(Py:DOT)('.')
+              PsiElement(Py:IDENTIFIER)('values')
+            PyArgumentList
+              PsiElement(Py:LPAR)('(')
+              PsiElement(Py:RPAR)(')')
+  PsiWhiteSpace('\n\n')
+  PyForStatement
+    PyForPart
+      PsiElement(Py:FOR_KEYWORD)('for')
+      PsiWhiteSpace(' ')
+      PyTupleExpression
+        PyTargetExpression: input_files
+          PsiElement(Py:IDENTIFIER)('input_files')
+        PsiElement(Py:COMMA)(',')
+        PsiWhiteSpace(' ')
+        PyTargetExpression: output_files
+          PsiElement(Py:IDENTIFIER)('output_files')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:IN_KEYWORD)('in')
+      PsiWhiteSpace(' ')
+      PyCallExpression: files.items
+        PyReferenceExpression: items
+          PyReferenceExpression: files
+            PsiElement(Py:IDENTIFIER)('files')
+          PsiElement(Py:DOT)('.')
+          PsiElement(Py:IDENTIFIER)('items')
+        PyArgumentList
+          PsiElement(Py:LPAR)('(')
+          PsiElement(Py:RPAR)(')')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      PyStatementList
+        SmkRule
+          PsiElement(Py:RULE_KEYWORD)('rule')
+          PsiElement(Py:COLON)(':')
+          PyStatementList
+            PsiWhiteSpace('\n        ')
+            SmkRuleOrCheckpointArgsSection
+              PsiElement(Py:IDENTIFIER)('input')
+              PyArgumentList
+                PsiElement(Py:COLON)(':')
+                PsiWhiteSpace(' ')
+                PyReferenceExpression: input_files
+                  PsiElement(Py:IDENTIFIER)('input_files')
+            PsiWhiteSpace('\n        ')
+            SmkRuleOrCheckpointArgsSection
+              PsiElement(Py:IDENTIFIER)('output')
+              PyArgumentList
+                PsiElement(Py:COLON)(':')
+                PsiWhiteSpace(' ')
+                PyReferenceExpression: output_files
+                  PsiElement(Py:IDENTIFIER)('output_files')
+            PsiWhiteSpace('\n        ')
+            SmkRuleOrCheckpointArgsSection
+              PsiElement(Py:IDENTIFIER)('shell')
+              PyArgumentList
+                PsiElement(Py:COLON)(':')
+                PsiWhiteSpace(' ')
+                PyStringLiteralExpression: python scripy.py --input {input} --output {output} --many --other --flags 
+                  PsiElement(Py:SINGLE_QUOTED_STRING)('"python scripy.py "')
+                  PsiWhiteSpace('\n               ')
+                  PsiElement(Py:SINGLE_QUOTED_STRING)('"--input {input} "')
+                  PsiWhiteSpace('\n               ')
+                  PsiElement(Py:SINGLE_QUOTED_STRING)('"--output {output} "')
+                  PsiWhiteSpace('\n               ')
+                  PsiElement(Py:SINGLE_QUOTED_STRING)('"--many "')
+                  PsiWhiteSpace('\n               ')
+                  PsiElement(Py:SINGLE_QUOTED_STRING)('"--other "')
+                  PsiWhiteSpace('\n               ')
+                  PsiElement(Py:SINGLE_QUOTED_STRING)('"--flags "')

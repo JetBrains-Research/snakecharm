@@ -220,6 +220,38 @@ class SnakemakeLexerTest : PyLexerTestCase() {
         )
     }
 
+    fun testIssue275_1() {
+        doTest(
+            """
+            |if True:
+            |   rule:
+            |       shell: "2"
+            |              "3"
+            |""".trimMargin().trimStart(),
+            "Py:IF_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING", "Py:LINE_BREAK",
+            "Py:SINGLE_QUOTED_STRING", "Py:STATEMENT_BREAK",
+            "Py:DEDENT", "Py:DEDENT", "Py:LINE_BREAK", "Py:STATEMENT_BREAK"
+        )
+    }
+    fun testIssue275_2() {
+        doTest("""
+            |if True:
+            |   pass
+            |   rule:
+            |       shell: "2"
+            |              "3"
+            |""".trimMargin().trimStart(),
+            "Py:IF_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:PASS_KEYWORD", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING", "Py:LINE_BREAK",
+            "Py:SINGLE_QUOTED_STRING", "Py:STATEMENT_BREAK",
+            "Py:DEDENT", "Py:DEDENT", "Py:LINE_BREAK", "Py:STATEMENT_BREAK"
+        )
+    }
+
     private fun doTest(text: String, vararg expectedTokens: String) {
         doLexerTest(text, SnakemakeLexer(), *expectedTokens)
     }

@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.lang.parser
 
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
+import com.intellij.lexer.LexerPosition
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonDialectsTokenSetProvider
@@ -273,7 +274,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         advanceBase()
         // is currently the last word in the file or is followed by a colon or a whitespace, an identifier and a colon
         var isToplevelSection = (tokenType == PyTokenTypes.COLON || tokenType == null) &&
-                (previousToken == null || previousToken == PyTokenTypes.LINE_BREAK)
+                (previousToken == null || previousToken == PyTokenTypes.LINE_BREAK || previousToken == PyTokenTypes.INDENT)
 
         if (isToplevelSection && possibleToplevelSectionKeyword !in RULE_LIKE_KEYWORDS) {
             restore(possibleKeywordPosition)
