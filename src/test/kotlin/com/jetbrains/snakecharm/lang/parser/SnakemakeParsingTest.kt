@@ -6,12 +6,16 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.ParsingTestCase
 import com.intellij.testFramework.TestApplicationManager
-import com.jetbrains.python.*
+import com.jetbrains.python.PythonDialectsTokenSetContributor
+import com.jetbrains.python.PythonLanguage
+import com.jetbrains.python.PythonParserDefinition
+import com.jetbrains.python.PythonTokenSetContributor
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyPsiFacade
 import com.jetbrains.python.psi.impl.PyPsiFacadeImpl
 import com.jetbrains.python.psi.impl.PythonASTFactory
+import com.jetbrains.python.psi.impl.PythonLanguageLevelPusher
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.lang.SmkTokenSetContributor
 
@@ -38,8 +42,7 @@ class SnakemakeParsingTest : ParsingTestCase(
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SmkTokenSetContributor())
         addExplicitExtension<ASTFactory>(LanguageASTFactory.INSTANCE, PythonLanguage.getInstance(), PythonASTFactory())
-        PythonDialectsTokenSetProvider.reset()
-        
+
         // w/o this fails due to NPEs on PyPsiFacade access
         project.registerService(
             PyPsiFacade::class.java,
@@ -51,7 +54,7 @@ class SnakemakeParsingTest : ParsingTestCase(
 
     override fun createFile(name: String, text: String): PsiFile {
         val file = super.createFile(name, text)
-        file.virtualFile.putUserData(LanguageLevel.KEY, myLanguageLevel)
+        PythonLanguageLevelPusher.specifyFileLanguageLevel(file.virtualFile, myLanguageLevel)
         return file
     }
 
@@ -354,7 +357,7 @@ class SnakemakeParsingTest : ParsingTestCase(
         // Actually snakemake requires python 3.x and no need to have it working with python 2.x
         //doTest(LanguageLevel.fromPythonVersion("2"))
 
-        doTest(LanguageLevel.fromPythonVersion("3"))
+        doTest(LanguageLevel.fromPythonVersion("3")!!)
     }
 
     private fun doTest(languageLevel: LanguageLevel) {

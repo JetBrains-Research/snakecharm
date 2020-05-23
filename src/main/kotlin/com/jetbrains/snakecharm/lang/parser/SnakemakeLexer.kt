@@ -2,7 +2,6 @@ package com.jetbrains.snakecharm.lang.parser
 
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
-import com.intellij.lexer.LexerPosition
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonDialectsTokenSetProvider
@@ -15,8 +14,6 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
  * @date 2018-12-31
  */
 class SnakemakeLexer : PythonIndentingLexer() {
-    private val recoveryTokens = PythonDialectsTokenSetProvider.INSTANCE.unbalancedBracesRecoveryTokens
-
     // number of spaces between line start and the first non-whitespace token on the line
     private var myCurrentNewlineIndent = 0
     // end offset of the last line break before the first non-whitespace token on the line,
@@ -239,6 +236,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
             tokenType in PyTokenTypes.OPEN_BRACES -> myBraceLevel++
             tokenType in PyTokenTypes.CLOSE_BRACES -> myBraceLevel--
             myBraceLevel != 0 -> {
+                 val recoveryTokens = PythonDialectsTokenSetProvider.getInstance().unbalancedBracesRecoveryTokens
+
                 val leftPreviousSection = myCurrentNewlineIndent <= ruleLikeSectionIndent ||
                         ruleLikeSectionIndent == -1 && myCurrentNewlineIndent <= topLevelSectionIndent
                 val isInPythonCode = isInPythonSection || topLevelSectionIndent == -1

@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.lang.parser
 import com.intellij.lexer.Lexer
 import com.intellij.testFramework.PlatformLiteFixture
 import com.jetbrains.python.PythonDialectsTokenSetContributor
-import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.PythonTokenSetContributor
 import junit.framework.TestCase
 
@@ -19,7 +18,6 @@ abstract class PyLexerTestCase  : PlatformLiteFixture() {
         initApplication()
         registerExtensionPoint(PythonDialectsTokenSetContributor.EP_NAME, PythonDialectsTokenSetContributor::class.java)
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
-        PythonDialectsTokenSetProvider.reset()
     }
 
     fun doLexerTest(text: String, lexer: Lexer, vararg expectedTokens: String) {
@@ -37,7 +35,7 @@ abstract class PyLexerTestCase  : PlatformLiteFixture() {
             if (idx >= expectedTokens.size) {
                 val remainingTokens = StringBuilder()
                 while (lexer.tokenType != null) {
-                    if (remainingTokens.length != 0) {
+                    if (remainingTokens.isNotEmpty()) {
                         remainingTokens.append(", ")
                     }
                     remainingTokens.append("\"").append(if (checkTokenText) lexer.tokenText else lexer.tokenType!!.toString()).append("\"")

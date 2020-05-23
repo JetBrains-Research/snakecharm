@@ -24,10 +24,6 @@ class SnakemakeMethodLineMarkerProvider : LineMarkerProvider {
                 null
             }
 
-    override fun collectSlowLineMarkers(elements: MutableList<PsiElement>, result: MutableCollection<LineMarkerInfo<PsiElement>>) {
-        // Do nothing
-    }
-
     private fun isSeparatorAllowed(element: PsiElement?): Boolean {
         if (element is SmkRuleLike<*>)  {
             return true

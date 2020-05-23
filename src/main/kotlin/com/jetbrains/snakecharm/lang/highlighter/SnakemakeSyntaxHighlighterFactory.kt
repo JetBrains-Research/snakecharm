@@ -7,7 +7,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.containers.FactoryMap
 import com.jetbrains.python.highlighting.PyHighlighter
 import com.jetbrains.python.psi.LanguageLevel
-import com.jetbrains.python.psi.PyUtil
+import com.jetbrains.python.psi.impl.PythonLanguageLevelPusher
 
 /**
  * @author Roman.Chernyatchik
@@ -22,7 +22,7 @@ class SnakemakeSyntaxHighlighterFactory : SyntaxHighlighterFactory() {
 
     override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?): SyntaxHighlighter {
         val level = when {
-            project != null && virtualFile != null -> PyUtil.getLanguageLevelForVirtualFile(project, virtualFile)
+            project != null && virtualFile != null -> PythonLanguageLevelPusher.getLanguageLevelForVirtualFile(project, virtualFile)
             else -> LanguageLevel.getDefault()
         }
 
