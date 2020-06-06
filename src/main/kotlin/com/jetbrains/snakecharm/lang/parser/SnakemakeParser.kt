@@ -1,6 +1,6 @@
 package com.jetbrains.snakecharm.lang.parser
 
-import com.intellij.lang.PsiBuilder
+import com.intellij.lang.SyntaxTreeBuilder
 import com.jetbrains.python.parsing.ParsingContext
 import com.jetbrains.python.parsing.PyParser
 import com.jetbrains.python.parsing.StatementParsing
@@ -12,8 +12,8 @@ import com.jetbrains.python.psi.LanguageLevel
  */
 class SnakemakeParser : PyParser() {
     override fun createParsingContext(
-            builder: PsiBuilder,
-            languageLevel: LanguageLevel,
-            futureFlag: StatementParsing.FUTURE?
-    ): ParsingContext = SmkParserContext(builder, languageLevel, futureFlag)
+        builder: SyntaxTreeBuilder?,
+        languageLevel: LanguageLevel?,
+        futureFlag: StatementParsing.FUTURE?
+    ): ParsingContext = SmkParserContext(builder!!, languageLevel!!, futureFlag)
 }

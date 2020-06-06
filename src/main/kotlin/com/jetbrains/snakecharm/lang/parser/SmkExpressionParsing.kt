@@ -1,9 +1,9 @@
 package com.jetbrains.snakecharm.lang.parser
 
-import com.intellij.lang.PsiBuilder
+import com.intellij.lang.SyntaxTreeBuilder
 import com.intellij.psi.tree.IElementType
-import com.jetbrains.python.PyPsiBundle.message
 import com.jetbrains.python.PyElementTypes
+import com.jetbrains.python.PyPsiBundle.message
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.ExpressionParsing
 import com.jetbrains.python.parsing.Parsing
@@ -63,7 +63,7 @@ class SmkExpressionParsing(context: SmkParserContext) : ExpressionParsing(contex
         }
         var indents = if (argsOnNextLine) 1 else 0
         var argNumber = 0
-        var incorrectUnindentMarker: PsiBuilder.Marker? = null
+        var incorrectUnindentMarker: SyntaxTreeBuilder.Marker? = null
         while (!myBuilder.eof() && !atToken(PyTokenTypes.STATEMENT_BREAK)) {
             argNumber++
 

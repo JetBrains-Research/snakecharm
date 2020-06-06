@@ -1,6 +1,5 @@
 package com.jetbrains.snakecharm.lang.parser
 
-import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyPsiBundle
@@ -14,9 +13,7 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KE
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_OR_CHECKPOINT
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.RULE_DECLARATION_STATEMENT
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.SUBWORKFLOW_DECLARATION_STATEMENT
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.*
 
 
 /**
@@ -141,7 +138,7 @@ class SmkStatementParsing(
     }
 
     private fun parseRuleLikeDeclaration(section: SectionParsingData) {
-        val ruleLikeMarker: PsiBuilder.Marker = myBuilder.mark()
+        val ruleLikeMarker = myBuilder.mark()
         nextToken()
 
         // rule name
