@@ -96,8 +96,8 @@ test {
         html.enabled = false
     }
 
-    include '**/SnakemakeLexerTest.class' //
-//    include '**/SnakemakeParsingTest.class' // if SnakemakeParsingTest+SnakeFileTypeTest: parsing tests OK, file type test fails
+//    include '**/SnakemakeLexerTest.class' // if SnakemakeLexerTest+SnakeFileTypeTest: all OK
+    include '**/SnakemakeParsingTest.class' // if SnakemakeParsingTest+SnakeFileTypeTest: parsing tests OK, file type: FAIL
     include '**/SnakeFileTypeTest.class' // passes on win when single
 //    include '**/*Test.class'
 //    exclude '**/AllCucumberFeaturesTest.class'
