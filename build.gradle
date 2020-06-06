@@ -95,6 +95,7 @@ test {
         junitXml.enabled = true
         html.enabled = false
     }
+    include '**/SnakemakeParsingTest.class'
     include '**/SnakeFileTypeTest.class'
 //    include '**/*Test.class'
 //    exclude '**/AllCucumberFeaturesTest.class'
