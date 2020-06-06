@@ -42,8 +42,8 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
 
     @Throws(Exception::class)
     override fun setUp() {
-        TestApplicationManager.getInstance()
         super.setUp()
+        TestApplicationManager.getInstance()
         val factory = IdeaTestFixtureFactory.getFixtureFactory()
         val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor)
         fixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(
