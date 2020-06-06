@@ -96,7 +96,7 @@ test {
         html.enabled = false
     }
     include '**/*Test.class'
-    //exclude '**/AllCucumberFeaturesTest.class'
+    exclude '**/AllCucumberFeaturesTest.class'
 
 }
 
