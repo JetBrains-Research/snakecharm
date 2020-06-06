@@ -95,8 +95,9 @@ test {
         junitXml.enabled = true
         html.enabled = false
     }
-    include '**/*Test.class'
-    exclude '**/AllCucumberFeaturesTest.class'
+    include '**/SnakeFileTypeTest.class'
+//    include '**/*Test.class'
+//    exclude '**/AllCucumberFeaturesTest.class'
 
 }
 
