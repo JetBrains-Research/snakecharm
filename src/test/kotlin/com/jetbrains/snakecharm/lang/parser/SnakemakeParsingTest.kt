@@ -1,7 +1,11 @@
 package com.jetbrains.snakecharm.lang.parser
 
+import com.intellij.ide.plugins.PluginUtil
+import com.intellij.ide.plugins.PluginUtilImpl
 import com.intellij.lang.ASTFactory
 import com.intellij.lang.LanguageASTFactory
+import com.intellij.mock.MockApplication
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.ParsingTestCase
