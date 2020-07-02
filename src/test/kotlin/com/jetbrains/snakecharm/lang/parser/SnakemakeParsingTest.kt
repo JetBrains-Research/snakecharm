@@ -31,6 +31,10 @@ class SnakemakeParsingTest : ParsingTestCase(
     override fun setUp() {
         super.setUp()
 
+        // XXX: remove in 2020.2
+        (ApplicationManager.getApplication() as MockApplication).registerService(PluginUtil::class.java, PluginUtilImpl())
+
+
         // Parsing tests doesn't use real intellij app => we cannot use
         // TestApplicationManager.getInstance() here
 
