@@ -96,11 +96,8 @@ test {
         html.enabled = false
     }
 
-//    include '**/SnakemakeLexerTest.class' // if SnakemakeLexerTest+SnakeFileTypeTest: all OK
-    include '**/SnakemakeParsingTest.class' // if SnakemakeParsingTest+SnakeFileTypeTest: parsing tests OK, file type: FAIL
-    include '**/SnakeFileTypeTest.class' // passes on win when single
-//    include '**/*Test.class'
-//    exclude '**/AllCucumberFeaturesTest.class'
+    include '**/*Test.class'
+    // exclude '**/AllCucumberFeaturesTest.class'  // Uncomment to disable gradle tests
 
 }
 
