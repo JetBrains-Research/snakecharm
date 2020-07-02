@@ -28,6 +28,6 @@ class SnakeFileTypeTest: SnakemakeTestCase() {
         TestCase.assertTrue(psiFile is SmkFile)
 
         val virtualFile = psiFile.virtualFile
-        assertEquals(SmkFileType, virtualFile.fileType)
+        assertEquals(SmkFileType.INSTANCE, virtualFile.fileType)
     }
 }

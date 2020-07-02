@@ -5,8 +5,10 @@ import com.intellij.lang.LanguageASTFactory
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.ParsingTestCase
-import com.intellij.testFramework.TestApplicationManager
-import com.jetbrains.python.*
+import com.jetbrains.python.PythonDialectsTokenSetContributor
+import com.jetbrains.python.PythonLanguage
+import com.jetbrains.python.PythonParserDefinition
+import com.jetbrains.python.PythonTokenSetContributor
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyPsiFacade
@@ -29,17 +31,15 @@ class SnakemakeParsingTest : ParsingTestCase(
     override fun setUp() {
         super.setUp()
 
-        // W/O this call we get `java.lang.NoClassDefFoundError: Could not initialize class com.jetbrains.python.PythonDialectsTokenSetProvider`
-        // locally (macos)
-        TestApplicationManager.getInstance()
+        // Parsing tests doesn't use real intellij app => we cannot use
+        // TestApplicationManager.getInstance() here
 
         // w/o this cannot instantiate SnakemakeLexer
         registerExtensionPoint(PythonDialectsTokenSetContributor.EP_NAME, PythonDialectsTokenSetContributor::class.java)
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SmkTokenSetContributor())
         addExplicitExtension<ASTFactory>(LanguageASTFactory.INSTANCE, PythonLanguage.getInstance(), PythonASTFactory())
-        PythonDialectsTokenSetProvider.reset()
-        
+
         // w/o this fails due to NPEs on PyPsiFacade access
         project.registerService(
             PyPsiFacade::class.java,
@@ -344,7 +344,7 @@ class SnakemakeParsingTest : ParsingTestCase(
         // minimal test case
         doTest()
     }
-    
+
     fun testIssue275_2() {
         // minimal test case + workaround
         doTest()
@@ -354,7 +354,7 @@ class SnakemakeParsingTest : ParsingTestCase(
         // Actually snakemake requires python 3.x and no need to have it working with python 2.x
         //doTest(LanguageLevel.fromPythonVersion("2"))
 
-        doTest(LanguageLevel.fromPythonVersion("3"))
+        doTest(LanguageLevel.fromPythonVersion("3")!!)
     }
 
     private fun doTest(languageLevel: LanguageLevel) {
@@ -371,8 +371,8 @@ class SnakemakeParsingTest : ParsingTestCase(
     }
 
     private fun <T : PyFunction> ensureEachFunctionHasStatementList(
-            parentFile: PsiFile,
-            functionType: Class<T>
+      parentFile: PsiFile,
+      functionType: Class<T>
     ) {
         val functions = PsiTreeUtil.findChildrenOfType(parentFile, functionType)
         for (functionToCheck in functions) {
