@@ -9,10 +9,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.ParsingTestCase
-import com.jetbrains.python.PythonDialectsTokenSetContributor
-import com.jetbrains.python.PythonLanguage
-import com.jetbrains.python.PythonParserDefinition
-import com.jetbrains.python.PythonTokenSetContributor
+import com.jetbrains.python.*
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyPsiFacade
@@ -47,6 +44,7 @@ class SnakemakeParsingTest : ParsingTestCase(
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SmkTokenSetContributor())
         addExplicitExtension<ASTFactory>(LanguageASTFactory.INSTANCE, PythonLanguage.getInstance(), PythonASTFactory())
+        PythonDialectsTokenSetProvider.reset()
 
         // w/o this fails due to NPEs on PyPsiFacade access
         project.registerService(
