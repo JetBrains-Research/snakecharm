@@ -8,10 +8,10 @@ plugins {
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
     // See https://github.com/JetBrains/gradle-intellij-plugin
-    id 'org.jetbrains.intellij' version '0.4.18'
+    id 'org.jetbrains.intellij' version '0.4.21'
 
     // Kotlin
-    id "org.jetbrains.kotlin.jvm" version "1.3.70"
+    id "org.jetbrains.kotlin.jvm" version "1.3.72"
 }
 
 apply plugin: 'java'
@@ -57,13 +57,13 @@ patchPluginXml {
 
 compileKotlin {
   kotlinOptions {
-    jvmTarget = javaVersion
+    jvmTarget = "1.8"
   }
 }
 
 compileTestKotlin {
   kotlinOptions {
-    jvmTarget = javaVersion
+    jvmTarget = "1.8"
   }
 }
 
@@ -95,8 +95,9 @@ test {
         junitXml.enabled = true
         html.enabled = false
     }
+
     include '**/*Test.class'
-    //exclude '**/AllCucumberFeaturesTest.class'
+    // exclude '**/AllCucumberFeaturesTest.class'  // Uncomment to disable gradle tests
 
 }
 

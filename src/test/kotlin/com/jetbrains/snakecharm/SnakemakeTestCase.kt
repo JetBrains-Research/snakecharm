@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.roots.impl.FilePropertyPusher
 import com.intellij.testFramework.TestApplicationManager
 import com.intellij.testFramework.UsefulTestCase
@@ -7,13 +8,10 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.TempDirTestFixture
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
-import com.jetbrains.python.PythonDialectsTokenSetContributor
-import com.jetbrains.python.PythonDialectsTokenSetProvider
-import com.jetbrains.python.PythonTokenSetContributor
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.impl.PythonLanguageLevelPusher
-import com.jetbrains.snakecharm.lang.SmkTokenSetContributor
+import javax.swing.SwingUtilities
 
 /**
  * @author Roman.Chernyatchik
@@ -45,6 +43,7 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
     @Throws(Exception::class)
     override fun setUp() {
         super.setUp()
+        TestApplicationManager.getInstance()
         val factory = IdeaTestFixtureFactory.getFixtureFactory()
         val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor)
         fixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(
@@ -52,13 +51,18 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
                 createTempDirFixture()
         )
         fixture!!.testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
-        fixture!!.setUp()
 
-        val ep = PythonDialectsTokenSetContributor.EP_NAME.getPoint(null)
-        ep.registerExtension(PythonTokenSetContributor(), fixture!!.testRootDisposable)
-        ep.registerExtension(SmkTokenSetContributor(), fixture!!.testRootDisposable)
-
-        PythonDialectsTokenSetProvider.reset()
+        if (SwingUtilities.isEventDispatchThread()) {
+            fixture!!.setUp()
+        } else {
+            ApplicationManager.getApplication().invokeAndWait {
+                try {
+                    fixture!!.setUp()
+                } catch (e: java.lang.Exception) {
+                    throw RuntimeException("Error running setup", e)
+                }
+            }
+        }
     }
 
     @Throws(Exception::class)

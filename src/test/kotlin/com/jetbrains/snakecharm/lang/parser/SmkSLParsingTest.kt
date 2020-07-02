@@ -3,7 +3,10 @@ package com.jetbrains.snakecharm.lang.parser
 import com.intellij.lang.ASTFactory
 import com.intellij.lang.LanguageASTFactory
 import com.intellij.testFramework.ParsingTestCase
-import com.jetbrains.python.*
+import com.jetbrains.python.PythonDialectsTokenSetContributor
+import com.jetbrains.python.PythonLanguage
+import com.jetbrains.python.PythonParserDefinition
+import com.jetbrains.python.PythonTokenSetContributor
 import com.jetbrains.python.psi.PyPsiFacade
 import com.jetbrains.python.psi.impl.PyPsiFacadeImpl
 import com.jetbrains.python.psi.impl.PythonASTFactory
@@ -24,7 +27,6 @@ class SmkSLParsingTest : ParsingTestCase(
         registerExtensionPoint(PythonDialectsTokenSetContributor.EP_NAME, PythonDialectsTokenSetContributor::class.java)
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
         addExplicitExtension<ASTFactory>(LanguageASTFactory.INSTANCE, PythonLanguage.getInstance(), PythonASTFactory())
-        PythonDialectsTokenSetProvider.reset()
         project.registerService(
             PyPsiFacade::class.java,
             PyPsiFacadeImpl::class.java

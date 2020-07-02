@@ -10,7 +10,6 @@ import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.InjectionTestFixture
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
-import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.codeInsight.controlflow.ControlFlowCache
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.inspections.PyUnreachableCodeInspection
@@ -20,6 +19,7 @@ import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.inspections.*
 import com.jetbrains.snakecharm.inspections.smksl.SmkWildcardNotDefinedInspection
 import io.cucumber.java.en.Given
+import javax.swing.SwingUtilities
 import kotlin.test.fail
 
 
@@ -37,7 +37,7 @@ class StepDefs {
 
         TestApplicationManager.getInstance()
 
-        // From UsefullTestCase
+        // From UsefulTestCase
         Disposer.setDebugMode(true)
 
         SnakemakeWorld.myTestRootDisposable = TestDisposable()
@@ -68,11 +68,20 @@ class StepDefs {
             fixtureBuilder.fixture, tmpDirFixture
         ).apply {
             testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
-            setUp()
+
+            if (SwingUtilities.isEventDispatchThread()) {
+                setUp()
+            } else {
+                ApplicationManager.getApplication().invokeAndWait {
+                    try {
+                        setUp()
+                    } catch (e: java.lang.Exception) {
+                        throw RuntimeException("Error running setup", e)
+                    }
+                }
+            }
         }
         SnakemakeWorld.myInjectionFixture = InjectionTestFixture(SnakemakeWorld.fixture())
-
-        PythonDialectsTokenSetProvider.reset()
     }
 
     @Given("^I expect controlflow")

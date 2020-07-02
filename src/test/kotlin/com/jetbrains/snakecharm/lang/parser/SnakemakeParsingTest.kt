@@ -1,20 +1,20 @@
 package com.jetbrains.snakecharm.lang.parser
 
-import com.intellij.ide.plugins.PluginUtil
-import com.intellij.ide.plugins.PluginUtilImpl
 import com.intellij.lang.ASTFactory
 import com.intellij.lang.LanguageASTFactory
-import com.intellij.mock.MockApplication
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.ParsingTestCase
-import com.jetbrains.python.*
+import com.jetbrains.python.PythonDialectsTokenSetContributor
+import com.jetbrains.python.PythonLanguage
+import com.jetbrains.python.PythonParserDefinition
+import com.jetbrains.python.PythonTokenSetContributor
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyPsiFacade
 import com.jetbrains.python.psi.impl.PyPsiFacadeImpl
 import com.jetbrains.python.psi.impl.PythonASTFactory
+import com.jetbrains.python.psi.impl.PythonLanguageLevelPusher
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.lang.SmkTokenSetContributor
 
@@ -31,10 +31,6 @@ class SnakemakeParsingTest : ParsingTestCase(
 
     override fun setUp() {
         super.setUp()
-
-        // XXX: remove in 2020.2
-        (ApplicationManager.getApplication() as MockApplication).registerService(PluginUtil::class.java, PluginUtilImpl())
-
 
         // Parsing tests doesn't use real intellij app => we cannot use
         // TestApplicationManager.getInstance() here
@@ -57,7 +53,7 @@ class SnakemakeParsingTest : ParsingTestCase(
 
     override fun createFile(name: String, text: String): PsiFile {
         val file = super.createFile(name, text)
-        file.virtualFile.putUserData(LanguageLevel.KEY, myLanguageLevel)
+        PythonLanguageLevelPusher.specifyFileLanguageLevel(file.virtualFile, myLanguageLevel)
         return file
     }
 

@@ -18,7 +18,7 @@ object SmkPsiUtil {
             val error = node.findChildByType(TokenType.ERROR_ELEMENT)
             if (error != null) {
                 // TODO: do we need this? it is like in PyFunction
-                id = error.findChildByType(PythonDialectsTokenSetProvider.INSTANCE.keywordTokens)
+                 id = error.findChildByType(PythonDialectsTokenSetProvider.getInstance().keywordTokens)
             }
         }
         return id
