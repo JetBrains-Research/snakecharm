@@ -12,7 +12,7 @@ Features:
 - Inspection: Warn if mixed tabs and spaces (see #285)
 - 'notebook' section parsing error (see #288)
 - `envvars` isn't parsed properly (see #281)
-- `container` top level and rule sections parsing
+- `container` top level and rule sections parsing (#291)
 - Resolve/completion for paths in notebook section (see #289)
 - Inspection: Conda environments are only allowed with shell, script, notebook,
     or wrapper directives (not with run). #290
