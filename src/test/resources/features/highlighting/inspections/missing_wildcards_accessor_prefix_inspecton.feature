@@ -14,6 +14,7 @@ Feature: Inspection for missing 'wildcards.' prefix
     Wildcard access requires 'wildcards.' prefix in this section.
     """
     When I check highlighting warnings
+    And I put the caret after <section2>: "{
     And I invoke quick fix Add 'wildcards.' prefix. and see text:
     """
     <rule_like> NAME:
