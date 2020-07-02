@@ -64,7 +64,7 @@
         />
     <stubElementTypeHolder
             class="com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes"
-            externalIdPrefix="smk.SNAKEMAKE_"
+            externalIdPrefix="py.SMK_"
     />
     <lang.parserDefinition
             language="Snakemake"
