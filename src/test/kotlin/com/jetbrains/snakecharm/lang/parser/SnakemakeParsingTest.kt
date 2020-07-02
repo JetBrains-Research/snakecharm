@@ -40,7 +40,6 @@ class SnakemakeParsingTest : ParsingTestCase(
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SmkTokenSetContributor())
         addExplicitExtension<ASTFactory>(LanguageASTFactory.INSTANCE, PythonLanguage.getInstance(), PythonASTFactory())
-        PythonDialectsTokenSetProvider.reset()
 
         // w/o this fails due to NPEs on PyPsiFacade access
         project.registerService(
