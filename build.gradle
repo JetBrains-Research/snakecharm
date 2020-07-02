@@ -8,7 +8,7 @@ plugins {
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
     // See https://github.com/JetBrains/gradle-intellij-plugin
-    id 'org.jetbrains.intellij' version '0.4.18'
+    id 'org.jetbrains.intellij' version '0.4.21'
 
     // Kotlin
     id "org.jetbrains.kotlin.jvm" version "1.3.72"
@@ -57,13 +57,13 @@ patchPluginXml {
 
 compileKotlin {
   kotlinOptions {
-    jvmTarget = javaVersion
+    jvmTarget = "1.8"
   }
 }
 
 compileTestKotlin {
   kotlinOptions {
-    jvmTarget = javaVersion
+    jvmTarget = "1.8"
   }
 }
 
@@ -74,6 +74,7 @@ repositories {
 dependencies {
     testImplementation 'io.cucumber:cucumber-java:5.6.0'
     testImplementation 'io.cucumber:cucumber-junit:5.6.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 
 task cucumber() {
