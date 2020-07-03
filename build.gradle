@@ -36,7 +36,7 @@ intellij {
     }
 
     sandboxDirectory "${project.rootDir}/.sandbox${isPyCharm ? "_pycharm" : "" }"
-    ideaDependencyCachePath  "${project.rootDir}/.idea_distrib_cache"
+    // ideaDependencyCachePath  "${project.rootDir}/.idea_distrib_cache"  // Useful for Windows due to short cmdline path
     updateSinceUntilBuild false
     instrumentCode Boolean.valueOf(instrumentPluginCode)
     downloadSources Boolean.valueOf(downloadIdeSources)
