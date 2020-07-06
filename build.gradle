@@ -19,6 +19,9 @@ apply plugin: 'kotlin'
 
 version "${project.version}.${project.buildCounter}"
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 // ----------------------------------------------------------------------
 intellij {
     pluginName 'snakecharm'
