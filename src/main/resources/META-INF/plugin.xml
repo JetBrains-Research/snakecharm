@@ -393,6 +393,17 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkPyUnboundLocalVariableInspection"
     />
 
+    <localInspection
+            language="Snakemake" shortName="SmkRedundantComaInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkRedundantComaInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.redundant.coma.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkRedundantComaInspection"
+    />
+
     <findUsagesHandlerFactory
             implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"
             id="Python" order="last, before default"
