@@ -10,9 +10,8 @@ Feature: Rule section redeclaration inspection
         shell: "command {params.a}"
     """
     And Section Redeclaration inspection is enabled
-    Then I expect no inspection error
-    And I expect no inspection warning
-    When I check highlighting errors
+    And I expect no inspection weak warning
+    When I check highlighting weak warnings
   Examples:
     | rule_like  |
     | checkpoint |
@@ -30,11 +29,11 @@ Feature: Rule section redeclaration inspection
         shell: "command {params.a}"
     """
     And Section Redeclaration inspection is enabled
-    Then I expect inspection warning on <params: c="c_value", a="value"> with message
+    Then I expect inspection weak warning on <params: c="c_value", a="value"> with message
     """
     Declaration of section 'params' above overrides this declaration.
     """
-    When I check highlighting errors
+    When I check highlighting weak warnings
     Examples:
       | rule_like  |
       | rule       |
@@ -55,15 +54,15 @@ Feature: Rule section redeclaration inspection
         shell: "command {params.a}"
     """
     And Section Redeclaration inspection is enabled
-    Then I expect inspection warning on <params: c="c_value", a="value"> with message
+    Then I expect inspection weak warning on <params: c="c_value", a="value"> with message
     """
     Declaration of section 'params' above overrides this declaration.
     """
-    And I expect inspection warning on <params: b="value"> with message
+    And I expect inspection weak warning on <params: b="value"> with message
     """
     Declaration of section 'params' above overrides this declaration.
     """
-    When I check highlighting errors
+    When I check highlighting weak warnings
     Examples:
       | rule_like  |
       | rule       |
@@ -78,11 +77,11 @@ Feature: Rule section redeclaration inspection
       snakefile: "boo.smk"
     """
     And Section Redeclaration inspection is enabled
-    Then I expect inspection warning on <snakefile: "boo.smk"> with message
+    Then I expect inspection weak warning on <snakefile: "boo.smk"> with message
     """
     Declaration of section 'snakefile' above overrides this declaration.
     """
-    When I check highlighting errors
+    When I check highlighting weak warnings
 
   Scenario Outline: Section redeclaration element removal fix test
     Given a snakemake project
@@ -94,7 +93,11 @@ Feature: Rule section redeclaration inspection
       output: "output.txt"
     """
     And Section Redeclaration inspection is enabled
-    Then I check highlighting errors
+    Then I expect inspection weak warning on <input: "input2"> with message
+    """
+    Declaration of section 'input' above overrides this declaration.
+    """
+    Then I check highlighting weak warnings
     And I invoke quick fix Remove section and see text:
     """
     <rule_like> name1:
@@ -116,7 +119,11 @@ Feature: Rule section redeclaration inspection
       output: "output.txt"
     """
     And Section Redeclaration inspection is enabled
-    Then I check highlighting errors
+    Then I expect inspection weak warning on <input: "input2"> with message
+    """
+    Declaration of section 'input' above overrides this declaration.
+    """
+    When I check highlighting weak warnings
     And I invoke quick fix Rename element and see text:
     """
     <rule_like> name1:

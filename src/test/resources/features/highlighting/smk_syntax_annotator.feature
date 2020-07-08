@@ -165,6 +165,7 @@ Feature: Annotate additional syntax
     import <identifier>
     """
     # AND NO HIGHLIGHTING ON IDENTIFIERS WITH KEYWORD LIKE NAMES!
+    Then I expect no inspection info
     When I check highlighting infos
     Examples:
       | identifier           |

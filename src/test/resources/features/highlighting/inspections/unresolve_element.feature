@@ -136,7 +136,6 @@ Feature: Inspection: Unresolved element
      """
      Unresolved reference 'boo.yaml'
      """
-    Then I expect no inspection error
     When I check highlighting errors
 
   # Ignore unresolved conda env path if it cannot be statically analyzed #256

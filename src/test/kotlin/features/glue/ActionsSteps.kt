@@ -1,5 +1,6 @@
 package features.glue
 
+import com.google.common.collect.ImmutableMap
 import com.intellij.codeInsight.documentation.DocumentationManager
 import com.intellij.codeInsight.highlighting.BraceMatchingUtil
 import com.intellij.ide.util.gotoByName.GotoSymbolModel2
@@ -45,9 +46,17 @@ class ActionsSteps {
     }
 
     @Given("^I expect no inspection (error|warning|info|TYPO|weak warning)$")
-    fun iExpectNoInspection(_level: String) {
+    fun iExpectNoInspection(level: String) {
         //Fake step, do nothing "check highlighting" step will show errors in such case
         //This step just for more readable tests
+        require(SnakemakeWorld.myInspectionProblemsCounts == null) {
+            "Do not mix expected inspection steps with expect no inspections step. " +
+                    "Other inspections: ${SnakemakeWorld.myInspectionProblemsCounts!!.entries}"
+        }
+
+        SnakemakeWorld.myInspectionProblemsCounts = ImmutableMap.of(
+            level, -1
+        )
     }
 
     @Given("^I expect inspection (error|warning|info|TYPO|weak warning) with message \"(.*)\" on")
@@ -96,6 +105,16 @@ class ActionsSteps {
         }
     }
 
+    private fun updatedInspectionProblemsCounter(level: String) {
+        if (SnakemakeWorld.myInspectionProblemsCounts == null) {
+            SnakemakeWorld.myInspectionProblemsCounts = mutableMapOf(level to 1)
+        } else {
+            val counts = SnakemakeWorld.myInspectionProblemsCounts!!
+            counts[level] = counts.getOrDefault(level, 0) + 1
+        }
+
+    }
+
     private fun wrapTextInHighlightingTags(
             highlightingLevel: String,
             text: String,
@@ -121,6 +140,7 @@ class ActionsSteps {
             posInsideTags
         }
 
+        updatedInspectionProblemsCounter(highlightingLevel)
         ApplicationManager.getApplication().invokeAndWait {
             performAction(project, Runnable {
                 fixture.editor.document.replaceString(startPos, startPos + text.length, newText)
@@ -155,24 +175,35 @@ class ActionsSteps {
         return pos + posInSignature
     }
 
-    @When("^I check highlighting (errors|warnings|infos|weak warnings)$")
-    fun iCheckHighlighting(type: String) {
-        checkHighlighting(type, false)
+    @When("^I check highlighting (error|warning|info|weak warning)s$")
+    fun iCheckHighlighting(level: String) {
+        checkHighlighting(level, false)
     }
 
-    @When("^I check highlighting (errors|warnings|infos|weak warnings) ignoring extra highlighting$")
+    @When("^I check highlighting (error|warning|info|weak warning)s ignoring extra highlighting$")
     fun iCheckHighlightingIgnoreExtra(type: String) {
         checkHighlighting(type, true)
     }
 
-    fun checkHighlighting(type: String, ignoreExtra: Boolean) {
+    fun checkHighlighting(level: String, ignoreExtra: Boolean) {
+        val problemsCounts = SnakemakeWorld.myInspectionProblemsCounts
+        requireNotNull(problemsCounts) {
+            "No expected inspections steps in test. Add 'I expect no inspection ..' step if no inspection" +
+                    " should be triggered."
+        }
+        val acceptedLevels = setOf(level, "error").sorted()
+        require(acceptedLevels.mapNotNull { problemsCounts[it] }.isNotEmpty()) {
+            "Noting to check for severity level '$level'. Expected at least 1 inspection with severity: $acceptedLevels." +
+                    " Test expects inspections problems: ${problemsCounts.entries}. "
+        }
+
         val fixture = fixture()
-        when (type) {
-            "errors" -> fixture.checkHighlighting(false, false, false, ignoreExtra)
-            "warnings" -> fixture.checkHighlighting(true, false, false, ignoreExtra)
-            "infos" -> fixture.checkHighlighting(false, true, false, ignoreExtra)
-            "weak warnings" -> fixture.checkHighlighting(false, false, true, ignoreExtra)
-            else -> fail("Unknown highlighting type: $type")
+        when (level) {
+            "error" -> fixture.checkHighlighting(false, false, false, ignoreExtra)
+            "warning" -> fixture.checkHighlighting(true, false, false, ignoreExtra)
+            "info" -> fixture.checkHighlighting(false, true, false, ignoreExtra)
+            "weak warning" -> fixture.checkHighlighting(false, false, true, ignoreExtra)
+            else -> fail("Unknown highlighting type: $level")
         }
     }
 

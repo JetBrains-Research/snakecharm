@@ -38,7 +38,7 @@ Feature: localrules/ruleorder repeated rule inspection
     """
     And Repeated Rule in Localrules or Ruleorder inspection is enabled
     Then I expect no inspection warning
-    When I check highlighting errors
+    When I check highlighting warnings
     Examples:
     | section    | separator |
     | localrules | ,         |

@@ -19,6 +19,7 @@ object SnakemakeWorld {
     @JvmField var myFoundRefs: List<PsiReference>? = null
     @JvmField var myFoundUsages: List<UsageInfo> = emptyList()
     @JvmField var myTestRootDisposable: TestDisposable? = null
+    @JvmField var myInspectionProblemsCounts: MutableMap<String, Int>? = null
 
     fun injectionFixture() = myInjectionFixture!!
     fun fixture()= myFixture!!
