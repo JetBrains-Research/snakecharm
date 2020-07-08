@@ -1,4 +1,4 @@
-Feature: Inspection: Wildcard not defined
+Feature: Inspection: SmkWildcardNotDefinedInspection
 
   Scenario Outline: No wildcards defining section
     Given a snakemake project
@@ -7,7 +7,7 @@ Feature: Inspection: Wildcard not defined
     <section> NAME:
       <usage>: "{sample}.txt"
     """
-    And Wildcard not defined inspection is enabled
+    And SmkWildcardNotDefinedInspection inspection is enabled
     Then I expect inspection error on <sample> with message
     """
     Wildcard 'sample' isn't properly defined.
@@ -27,7 +27,7 @@ Feature: Inspection: Wildcard not defined
        <def_section>: <def_section_body>
        <usage>: "{sample}.txt"
     """
-    And Wildcard not defined inspection is enabled
+    And SmkWildcardNotDefinedInspection inspection is enabled
     Then I expect inspection weak warning on <sample> with message
     """
     Cannot check whether wildcard 'sample' is defined or not.
@@ -52,7 +52,7 @@ Feature: Inspection: Wildcard not defined
        <def_section2>: "{sample}"
        <usage>: "{sample} {typo}.txt"
      """
-    And Wildcard not defined inspection is enabled
+    And SmkWildcardNotDefinedInspection inspection is enabled
     Then I expect inspection error on <typo> with message
     """
     Wildcard 'typo' isn't defined in '<def_section1>' section.
@@ -73,8 +73,8 @@ Feature: Inspection: Wildcard not defined
       <usage>: "{sample}.txt"
       <def>: "{sample}"
     """
-    And Wildcard not defined inspection is enabled
-    Then I expect no inspection error
+    And SmkWildcardNotDefinedInspection inspection is enabled
+    Then I expect no inspection errors
     When I check highlighting errors
     Examples:
       | section    | def       | usage |
@@ -94,7 +94,7 @@ Feature: Inspection: Wildcard not defined
       <usage>: "{sample}.txt"
       <def>: "{sample1}{sample2}"
     """
-    And Wildcard not defined inspection is enabled
+    And SmkWildcardNotDefinedInspection inspection is enabled
     Then I expect inspection error on <sample> with message
     """
     Wildcard 'sample' isn't defined in '<def>' section.
@@ -122,8 +122,8 @@ Feature: Inspection: Wildcard not defined
       <def>: "{sample1}.txt"
       <other_def>: "{sample2}"
     """
-    And Wildcard not defined inspection is enabled
-    Then I expect no inspection error
+    And SmkWildcardNotDefinedInspection inspection is enabled
+    Then I expect no inspection errors
     When I check highlighting errors
     Examples:
       | section    | def    | other_def |
@@ -144,7 +144,7 @@ Feature: Inspection: Wildcard not defined
         output: "{x}.{y}"
         input: "{x}.{a}"
       """
-    And Wildcard not defined inspection is enabled
+    And SmkWildcardNotDefinedInspection inspection is enabled
     Then I expect inspection error on <a> in <input: "{x}.{a}"> with message
       """
       Wildcard 'a' isn't defined in 'output' section.
@@ -168,7 +168,7 @@ Feature: Inspection: Wildcard not defined
         output: "{a}.{b}"
         group: "{a}.{z}"
       """
-    And Wildcard not defined inspection is enabled
+    And SmkWildcardNotDefinedInspection inspection is enabled
     Then I expect inspection error on <z> in <"{z}"> with message
       """
       Wildcard 'z' isn't defined in 'output' section.
@@ -192,8 +192,8 @@ Feature: Inspection: Wildcard not defined
            <def_section2>: "{a}{b}"
            <usage>: "{b}.txt"
        """
-    And Wildcard not defined inspection is enabled
-    Then I expect no inspection error
+    And SmkWildcardNotDefinedInspection inspection is enabled
+    Then I expect no inspection errors
     When I check highlighting errors
     Examples:
       | section    | usage | def_section1 | def_section2 |
@@ -212,8 +212,8 @@ Feature: Inspection: Wildcard not defined
          input:
              expand("{prefix}", prefix="p")
      """
-    And Wildcard not defined inspection is enabled
-    Then I expect no inspection error
+    And SmkWildcardNotDefinedInspection inspection is enabled
+    Then I expect no inspection errors
     When I check highlighting errors
     Examples:
       | rule_like  |
@@ -228,7 +228,7 @@ Feature: Inspection: Wildcard not defined
            output: "{sample}"
            input: "{wildcards.sample}"
        """
-     And Wildcard not defined inspection is enabled
+     And SmkWildcardNotDefinedInspection inspection is enabled
      Then I expect inspection error on <wildcards.sample> with message
       """
       Wildcard 'wildcards.sample' isn't defined in 'output' section.

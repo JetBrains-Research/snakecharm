@@ -1,5 +1,5 @@
-Feature: Rule section redeclaration inspection
-  Scenario Outline: No section redeclarations
+Feature: Rule SmkSectionRedeclarationInspection inspection
+  Scenario Outline: No SmkSectionRedeclarationInspections
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -9,15 +9,15 @@ Feature: Rule section redeclaration inspection
         params: a="value"
         shell: "command {params.a}"
     """
-    And Section Redeclaration inspection is enabled
-    And I expect no inspection weak warning
+    And SmkSectionRedeclarationInspection inspection is enabled
+    And I expect no inspection weak warnings
     When I check highlighting weak warnings
   Examples:
     | rule_like  |
     | checkpoint |
     | rule       |
 
-  Scenario Outline: Single section redeclaration
+  Scenario Outline: Single SmkSectionRedeclarationInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -28,7 +28,7 @@ Feature: Rule section redeclaration inspection
         params: c="c_value", a="value"
         shell: "command {params.a}"
     """
-    And Section Redeclaration inspection is enabled
+    And SmkSectionRedeclarationInspection inspection is enabled
     Then I expect inspection weak warning on <params: c="c_value", a="value"> with message
     """
     Declaration of section 'params' above overrides this declaration.
@@ -39,7 +39,7 @@ Feature: Rule section redeclaration inspection
       | rule       |
       | checkpoint |
 
-  Scenario Outline: Multiple section redeclarations
+  Scenario Outline: Multiple SmkSectionRedeclarationInspections
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -53,7 +53,7 @@ Feature: Rule section redeclaration inspection
         params: b="value"
         shell: "command {params.a}"
     """
-    And Section Redeclaration inspection is enabled
+    And SmkSectionRedeclarationInspection inspection is enabled
     Then I expect inspection weak warning on <params: c="c_value", a="value"> with message
     """
     Declaration of section 'params' above overrides this declaration.
@@ -68,7 +68,7 @@ Feature: Rule section redeclaration inspection
       | rule       |
       | checkpoint |
 
-  Scenario: Subworkflow section redeclaration
+  Scenario: Subworkflow SmkSectionRedeclarationInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -76,14 +76,14 @@ Feature: Rule section redeclaration inspection
       snakefile: "foo.smk"
       snakefile: "boo.smk"
     """
-    And Section Redeclaration inspection is enabled
+    And SmkSectionRedeclarationInspection inspection is enabled
     Then I expect inspection weak warning on <snakefile: "boo.smk"> with message
     """
     Declaration of section 'snakefile' above overrides this declaration.
     """
     When I check highlighting weak warnings
 
-  Scenario Outline: Section redeclaration element removal fix test
+  Scenario Outline: SmkSectionRedeclarationInspection element removal fix test
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -92,7 +92,7 @@ Feature: Rule section redeclaration inspection
       input: "input2"
       output: "output.txt"
     """
-    And Section Redeclaration inspection is enabled
+    And SmkSectionRedeclarationInspection inspection is enabled
     Then I expect inspection weak warning on <input: "input2"> with message
     """
     Declaration of section 'input' above overrides this declaration.
@@ -109,7 +109,7 @@ Feature: Rule section redeclaration inspection
       | rule       |
       | checkpoint |
 
-  Scenario Outline: Section redeclaration rename fix test
+  Scenario Outline: SmkSectionRedeclarationInspection rename fix test
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -118,7 +118,7 @@ Feature: Rule section redeclaration inspection
       input: "input2"
       output: "output.txt"
     """
-    And Section Redeclaration inspection is enabled
+    And SmkSectionRedeclarationInspection inspection is enabled
     Then I expect inspection weak warning on <input: "input2"> with message
     """
     Declaration of section 'input' above overrides this declaration.

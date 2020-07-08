@@ -1,5 +1,5 @@
-Feature: Rule redeclaration inspection
-  Scenario: A single rule redeclaration
+Feature: SmkRuleRedeclarationInspection inspection
+  Scenario: A single SmkRuleRedeclarationInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -15,7 +15,7 @@ Feature: Rule redeclaration inspection
     rule NAME: #overrides
         output: touch("output.txt")
     """
-    And Rule Redeclaration inspection is enabled
+    And SmkRuleRedeclarationInspection inspection is enabled
     Then I expect inspection error on <NAME> in <rule NAME: #overrides> with message
     """
     This rule name is already used by another rule declaration.
@@ -23,7 +23,7 @@ Feature: Rule redeclaration inspection
     When I check highlighting errors
 
 
-  Scenario: Multiple rule redeclarations
+  Scenario: Multiple SmkRuleRedeclarationInspections
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -45,7 +45,7 @@ Feature: Rule redeclaration inspection
     rule NAME: #overrides2
         output: touch("output.txt")
     """
-    And Rule Redeclaration inspection is enabled
+    And SmkRuleRedeclarationInspection inspection is enabled
     Then I expect inspection error on <NAME> in <rule NAME: #overrides1> with message
     """
     This rule name is already used by another rule declaration.
@@ -76,14 +76,14 @@ Feature: Rule redeclaration inspection
     rule NAME: #overrides
         output: touch("output.txt")
     """
-    And Rule Redeclaration inspection is enabled
+    And SmkRuleRedeclarationInspection inspection is enabled
     Then I expect inspection error on <NAME> in <rule NAME: #overrides> with message
     """
     This rule name is already used by another rule declaration.
     """
     When I check highlighting errors
 
-  Scenario Outline: Rule redeclaration rename fix
+  Scenario Outline: SmkRuleRedeclarationInspection rename fix
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -93,7 +93,7 @@ Feature: Rule redeclaration inspection
     <rule_like> name1: # duplicate
       input: "input2"
     """
-    And Rule Redeclaration inspection is enabled
+    And SmkRuleRedeclarationInspection inspection is enabled
     Then I expect inspection error on <name1> in <<rule_like> name1: # duplicate> with message
     """
     This rule name is already used by another rule declaration.
@@ -112,7 +112,7 @@ Feature: Rule redeclaration inspection
       | rule       |
       | checkpoint |
 
-  Scenario Outline: rule redeclaration rename does not rename rule usages
+  Scenario Outline: SmkRuleRedeclarationInspection rename does not rename rule usages
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -131,7 +131,7 @@ Feature: Rule redeclaration inspection
     rule foo2:
       input: rules.boo
     """
-    And Rule Redeclaration inspection is enabled
+    And SmkRuleRedeclarationInspection inspection is enabled
     Then I expect inspection error on <boo> in <boo: # duplicate> with message
     """
     This rule name is already used by another rule declaration.
@@ -159,7 +159,7 @@ Feature: Rule redeclaration inspection
       | rule       |
       | checkpoint |
 
-  Scenario: Rule redeclaration for rule in if..else..
+  Scenario: SmkRuleRedeclarationInspection for rule in if..else..
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -170,14 +170,14 @@ Feature: Rule redeclaration inspection
         rule NAME: #overrides
             output: touch("output.txt")
     """
-    And Rule Redeclaration inspection is enabled
+    And SmkRuleRedeclarationInspection inspection is enabled
     Then I expect inspection weak warning on <NAME> in <rule NAME: #overrides> with message
     """
     This rule name is probably used by another rule declaration. Not sure because this rule isn't at file top level.
     """
     When I check highlighting weak warnings
 
-  Scenario: Rule redeclaration for rule in while
+  Scenario: SmkRuleRedeclarationInspection for rule in while
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -188,14 +188,14 @@ Feature: Rule redeclaration inspection
         rule NAME: #overrides
             output: touch("output.txt")
     """
-    And Rule Redeclaration inspection is enabled
+    And SmkRuleRedeclarationInspection inspection is enabled
     Then I expect inspection weak warning on <NAME> in <rule NAME: #overrides> with message
     """
     This rule name is probably used by another rule declaration. Not sure because this rule isn't at file top level.
     """
     When I check highlighting weak warnings
 
-  Scenario: Rule redeclaration for rule in function def
+  Scenario: SmkRuleRedeclarationInspection for rule in function def
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -206,7 +206,7 @@ Feature: Rule redeclaration inspection
         rule NAME: #overrides
             output: touch("output.txt")
     """
-    And Rule Redeclaration inspection is enabled
+    And SmkRuleRedeclarationInspection inspection is enabled
     Then I expect inspection weak warning on <NAME> in <rule NAME: #overrides> with message
     """
     This rule name is probably used by another rule declaration. Not sure because this rule isn't at file top level.
@@ -229,7 +229,7 @@ Feature: Rule redeclaration inspection
     <rule_like2> foo: # duplicate2
       output: "bb"
     """
-    And Rule Redeclaration inspection is enabled
+    And SmkRuleRedeclarationInspection inspection is enabled
     Then I expect inspection weak warning on <foo> in <foo: # duplicate1> with message
     """
     This rule name is probably used by another rule declaration. Not sure because the usage is in the other file.

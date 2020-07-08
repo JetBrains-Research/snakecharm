@@ -102,7 +102,7 @@ Feature: Inspection section argument index is out of bounds
         """
       And SmkSLSubscriptionIndexOutOfBoundsInspection inspection is enabled
       And SmkSubscriptionIndexOutOfBoundsInspection inspection is enabled
-      Then I expect no inspection error
+      Then I expect no inspection errors
       When I check highlighting errors
       Examples:
         | rule_like  |

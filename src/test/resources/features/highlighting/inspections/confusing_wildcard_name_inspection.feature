@@ -53,7 +53,7 @@ Feature: Inspection warns about confusing wildcard names.
             shell: "{<section>}"
         """
     And SmkSLWildcardNameIsConfusingInspection inspection is enabled
-    Then I expect no inspection warning
+    Then I expect no inspection warnings
     When I check highlighting warnings
     Examples:
       | rule_like  | section    |
@@ -96,7 +96,7 @@ Feature: Inspection warns about confusing wildcard names.
             shell: "{<section>}"
         """
     And SmkSLWildcardNameIsConfusingInspection inspection is enabled
-    Then I expect no inspection warning
+    Then I expect no inspection warnings
     When I check highlighting warnings
     Examples:
       | rule_like  | section   |

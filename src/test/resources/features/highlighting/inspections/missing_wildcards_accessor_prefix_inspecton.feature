@@ -39,7 +39,7 @@ Feature: Inspection for missing 'wildcards.' prefix
       <section2>: "{sample}.log"
     """
     And SmkSLMissingWildcardsAccessorPrefixInspection inspection is enabled
-    Then I expect no inspection warning
+    Then I expect no inspection warnings
     When I check highlighting warnings
     Examples:
       | rule_like  | section1 | section2 |
@@ -58,7 +58,7 @@ Feature: Inspection for missing 'wildcards.' prefix
       <section2>: "{sample}.log"
     """
     And SmkSLMissingWildcardsAccessorPrefixInspection inspection is enabled
-    Then I expect no inspection warning
+    Then I expect no inspection warnings
     When I check highlighting warnings
     Examples:
       | rule_like  | section1 | section2 |
@@ -76,7 +76,7 @@ Feature: Inspection for missing 'wildcards.' prefix
       <section>: expand("{sample}.txt", sample="")
     """
     And SmkSLMissingWildcardsAccessorPrefixInspection inspection is enabled
-    Then I expect no inspection warning
+    Then I expect no inspection warnings
     When I check highlighting warnings
     Examples:
       | rule_like  | section |
@@ -96,7 +96,7 @@ Feature: Inspection for missing 'wildcards.' prefix
     And I inject SmkSL at a caret
     Then I expect language injection on "{prefix}.txt"
     And SmkSLMissingWildcardsAccessorPrefixInspection inspection is enabled
-    Then I expect no inspection warning
+    Then I expect no inspection warnings
     When I check highlighting warnings
     Examples:
       | rule_like  | section | text                              |

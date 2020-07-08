@@ -51,7 +51,7 @@ Feature: Inspection: Yet-undefined name after rules/checkpoints
       input: <section>s.NAME
     """
     And SmkRuleOrCheckpointNameYetUndefinedInspection inspection is enabled
-    Then I expect no inspection error
+    Then I expect no inspection errors
     When I check highlighting errors
     Examples:
       | section    |
@@ -88,7 +88,7 @@ Feature: Inspection: Yet-undefined name after rules/checkpoints
       run: <section>s.<name>
     """
     And SmkRuleOrCheckpointNameYetUndefinedInspection inspection is enabled
-    Then I expect no inspection error
+    Then I expect no inspection errors
     When I check highlighting errors
     Examples:
       | section    | name    |
@@ -108,7 +108,7 @@ Feature: Inspection: Yet-undefined name after rules/checkpoints
         input: "in"
     """
     And SmkRuleOrCheckpointNameYetUndefinedInspection inspection is enabled
-    Then I expect no inspection error
+    Then I expect no inspection errors
     When I check highlighting errors
     Examples:
       | rule_like  | section |

@@ -1,4 +1,4 @@
-Feature: Inspection - Not same wildcards set
+Feature: Inspection - SmkNotSameWildcardsSetInspection
 
   Scenario Outline: Missing wildcards when output section is generator
     Given a snakemake project
@@ -12,7 +12,7 @@ Feature: Inspection - Not same wildcards set
         output: "{a}.{b}"
         benchmark: "{b}.{c}"
       """
-    And Not same wildcards set inspection is enabled
+    And SmkNotSameWildcardsSetInspection inspection is enabled
     Then I expect inspection error on <log1 = "{a}.log1"> with message
       """
       Missing wildcards: 'b', 'c'.
@@ -47,7 +47,7 @@ Feature: Inspection - Not same wildcards set
         benchmark: "{b}.{c}"
         log: "{a}.{b}.{c}.{d}"
       """
-    And Not same wildcards set inspection is enabled
+    And SmkNotSameWildcardsSetInspection inspection is enabled
     And I expect inspection error on <"{b}.{c}"> with message
       """
       Missing wildcards: 'a', 'd'.
@@ -67,8 +67,8 @@ Feature: Inspection - Not same wildcards set
       benchmark: "{a}.{b}"
       log: "{a}.{b}"
     """
-    And Not same wildcards set inspection is enabled
-    Then I expect no inspection error
+    And SmkNotSameWildcardsSetInspection inspection is enabled
+    Then I expect no inspection errors
     When I check highlighting errors
     Examples:
       | section    |
@@ -86,7 +86,7 @@ Feature: Inspection - Not same wildcards set
           log1 = ""
         benchmark: "" #here
       """
-    And Not same wildcards set inspection is enabled
+    And SmkNotSameWildcardsSetInspection inspection is enabled
     Then I expect inspection error on <""> in <"" #here> with message
       """
       Missing wildcards: 'a'.
@@ -113,7 +113,7 @@ Feature: Inspection - Not same wildcards set
         output: "{x}.{y}"
         log: "{x}.{z}"
       """
-    And Not same wildcards set inspection is enabled
+    And SmkNotSameWildcardsSetInspection inspection is enabled
     Then I expect inspection error on <"{a}.{b}"> with message
       """
       Missing wildcards: 'd'.
@@ -145,7 +145,7 @@ Feature: Inspection - Not same wildcards set
       output: "{a}.{b}"
       log: "{a}.{z}"
     """
-    And Not same wildcards set inspection is enabled
+    And SmkNotSameWildcardsSetInspection inspection is enabled
     Then I expect inspection error on <"{a}.{b}"> with message
     """
     Missing wildcards: 'z'.
@@ -168,8 +168,8 @@ Feature: Inspection - Not same wildcards set
           <def1>: "{foo}"
           <def2>: <def2_body>
       """
-    And Not same wildcards set inspection is enabled
-    Then I expect no inspection error
+    And SmkNotSameWildcardsSetInspection inspection is enabled
+    Then I expect no inspection errors
     When I check highlighting errors
     Examples:
       | section    | def1   | def2      | def2_body   |
@@ -187,7 +187,7 @@ Feature: Inspection - Not same wildcards set
           log: "{foo}"
           benchmark: "{sample}.txt"
       """
-    And Not same wildcards set inspection is enabled
+    And SmkNotSameWildcardsSetInspection inspection is enabled
     Then I expect inspection error on <"{foo}"> with message
       """
       Missing wildcards: 'sample'.
@@ -211,7 +211,7 @@ Feature: Inspection - Not same wildcards set
          log: "{foo}"
          benchmark: "{sample}.txt"
       """
-    And Not same wildcards set inspection is enabled
+    And SmkNotSameWildcardsSetInspection inspection is enabled
     Then I expect inspection error on <""> with message
       """
       Missing wildcards: 'foo', 'sample'.
@@ -240,8 +240,8 @@ Feature: Inspection - Not same wildcards set
          run:
             shell("curl {config} {output} | gunzip > {output[0]}")
       """
-    And Not same wildcards set inspection is enabled
-    Then I expect no inspection error
+    And SmkNotSameWildcardsSetInspection inspection is enabled
+    Then I expect no inspection errors
     When I check highlighting errors
       Examples:
         | section    |
@@ -258,7 +258,7 @@ Feature: Inspection - Not same wildcards set
               o1 = foo("{wd} "),
               o2 = "{wd}"
       """
-    And Not same wildcards set inspection is enabled
+    And SmkNotSameWildcardsSetInspection inspection is enabled
     Then I expect inspection weak warning on <**foo("")> with message
          """
          Cannot check missing wildcards here.
@@ -283,8 +283,8 @@ Feature: Inspection - Not same wildcards set
 #              o1 = foo("{wd} "),
 #              o2 = "{wd}"
 #      """
-#    And Not same wildcards set inspection is enabled
-#    Then I expect no inspection error
+#    And SmkNotSameWildcardsSetInspection inspection is enabled
+#    Then I expect no inspection errors
 #    When I check highlighting errors
 #      Examples:
 #        | section    |

@@ -16,8 +16,8 @@ Feature: localrules/ruleorder repeated rule inspection
     localrules: rule1, rule2, rule3
     ruleorder: rule1 > rule2 > rule3
     """
-    And Repeated Rule in Localrules or Ruleorder inspection is enabled
-    Then I expect no inspection warning
+    And SmkLocalrulesRuleorderRepeatedRuleInspection inspection is enabled
+    Then I expect no inspection warnings
     When I check highlighting warnings
 
   Scenario Outline: No repeated rules in localrules/ruleorder
@@ -36,8 +36,8 @@ Feature: localrules/ruleorder repeated rule inspection
         
     <section>: rule1<separator> rule2<separator> rule3
     """
-    And Repeated Rule in Localrules or Ruleorder inspection is enabled
-    Then I expect no inspection warning
+    And SmkLocalrulesRuleorderRepeatedRuleInspection inspection is enabled
+    Then I expect no inspection warnings
     When I check highlighting warnings
     Examples:
     | section    | separator |
@@ -66,7 +66,7 @@ Feature: localrules/ruleorder repeated rule inspection
         <separator> rule1 # repeated
         <separator> rule3 # repeated
     """
-    And Repeated Rule in Localrules or Ruleorder inspection is enabled
+    And SmkLocalrulesRuleorderRepeatedRuleInspection inspection is enabled
     Then I expect inspection warning on <rule2> in <rule2 # repeated> with message
     """
     This rule has already been added to this section.

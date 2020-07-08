@@ -12,12 +12,9 @@ import com.intellij.testFramework.fixtures.InjectionTestFixture
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.jetbrains.python.codeInsight.controlflow.ControlFlowCache
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
-import com.jetbrains.python.inspections.PyUnreachableCodeInspection
 import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
-import com.jetbrains.snakecharm.inspections.*
-import com.jetbrains.snakecharm.inspections.smksl.SmkWildcardNotDefinedInspection
 import io.cucumber.java.en.Given
 import javax.swing.SwingUtilities
 import kotlin.test.fail
@@ -96,32 +93,15 @@ class StepDefs {
     @Given("^([^\\]]+) inspection is enabled$")
     fun inspectionIsEnabled(inspectionName: String) {
         val fixture = SnakemakeWorld.fixture()
-        when (inspectionName) {
-            "Shadow Settings" -> fixture.enableInspections(SmkShadowSettingsInspection::class.java)
-            "Resources Keyword Arguments" -> fixture.enableInspections(SmkResourcesKeywordArgsInspection::class.java)
-            "Rule Redeclaration" -> fixture.enableInspections(SmkRuleRedeclarationInspection::class.java)
-            "Rule Section After Execution Section" ->
-                fixture.enableInspections(SmkRuleSectionAfterExecutionInspection::class.java)
-            "Section Redeclaration" -> fixture.enableInspections(SmkSectionRedeclarationInspection::class.java)
-            "Section Multiple Args" -> fixture.enableInspections(SmkSectionMultipleArgsInspection::class.java)
-            "Subworkflow Redeclaration" -> fixture.enableInspections(SmkSubworkflowRedeclarationInspection::class.java)
-            "Unreachable Code" -> fixture.enableInspections(PyUnreachableCodeInspection::class.java)
-            "Repeated Rule in Localrules or Ruleorder" ->
-                fixture.enableInspections(SmkLocalrulesRuleorderRepeatedRuleInspection::class.java)
-            "Lambda Functions in Rule Sections" -> fixture.enableInspections(SmkLambdaRuleParamsInspection::class.java)
-            "Wildcard not defined" -> fixture.enableInspections(SmkWildcardNotDefinedInspection::class.java)
-            "Not same wildcards set" -> fixture.enableInspections(SmkNotSameWildcardsSetInspection::class.java)
-            else -> {
-                for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {
-                    val o = provider.instance
-                    if (o is LocalInspectionTool && inspectionName == o.shortName) {
-                        fixture.enableInspections(o)
-                        return
-                    }
-                }
-                fail("Unknown inspection:$inspectionName")
+
+        for (provider in LocalInspectionEP.LOCAL_INSPECTION.extensionList) {
+            val o = provider.instance
+            if (o is LocalInspectionTool && inspectionName == o.shortName) {
+                fixture.enableInspections(o)
+                return
             }
         }
+        fail("Unknown inspection:$inspectionName")
     }
 
     @Given("^TODO")

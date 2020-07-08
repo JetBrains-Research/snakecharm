@@ -11,7 +11,7 @@ Feature: Rule sections after execution sections inspection.
         <sect1>: <sect1_text>
         <sect2>: <sect2_text>
     """
-    And Rule Section After Execution Section inspection is enabled
+    And SmkRuleSectionAfterExecutionInspection inspection is enabled
     Then I expect inspection error on <<sect2>: <sect2_text>> with message
     """
     Rule section '<sect2>' isn't allowed after '<sect1>' section.
@@ -42,7 +42,7 @@ Feature: Rule sections after execution sections inspection.
     <rule_like> name2:
       input: "input2"
     """
-    And Rule Section After Execution Section inspection is enabled
+    And SmkRuleSectionAfterExecutionInspection inspection is enabled
     Then I expect inspection error on <resources: a=4> with message
     """
     Rule section 'resources' isn't allowed after 'shell' section.

@@ -45,7 +45,7 @@ class ActionsSteps {
         iExpectInspectionOnIn(level, signature, signature, message)
     }
 
-    @Given("^I expect no inspection (error|warning|info|TYPO|weak warning)$")
+    @Given("^I expect no inspection (error|warning|info|TYPO|weak warning)s$")
     fun iExpectNoInspection(level: String) {
         //Fake step, do nothing "check highlighting" step will show errors in such case
         //This step just for more readable tests

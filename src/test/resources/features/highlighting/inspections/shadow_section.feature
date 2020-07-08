@@ -7,7 +7,7 @@ Feature: 'shadow:' section related inspections
         output: "output.txt"
         shadow: "parameter"
     """
-    And Shadow Settings inspection is enabled
+    And SmkShadowSettingsInspection inspection is enabled
     Then I expect inspection warning on <"parameter"> with message
     """
     Shadow must either be 'shallow', 'full', 'minimal', or True (equivalent to 'full').
@@ -22,7 +22,7 @@ Feature: 'shadow:' section related inspections
         output: "output.txt"
         shadow: "full"
     """
-    And Shadow Settings inspection is enabled
-    And Section Multiple Args inspection is enabled
-    Then I expect no inspection warning
+    And SmkShadowSettingsInspection inspection is enabled
+    And SmkSectionMultipleArgsInspection inspection is enabled
+    Then I expect no inspection warnings
     When I check highlighting warnings

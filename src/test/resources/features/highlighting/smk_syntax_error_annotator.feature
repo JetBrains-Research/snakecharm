@@ -95,7 +95,7 @@ Feature: Annotate syntax errors
               a = "file.out", **dictfunct()
         shell: "echo hhh > {output.foo} | echo uuu > {output.a}"
     """
-    Then I expect no inspection error
+    Then I expect no inspection errors
     When I check highlighting errors
     Examples:
       | rule_like  |

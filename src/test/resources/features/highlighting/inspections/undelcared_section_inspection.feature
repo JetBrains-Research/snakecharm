@@ -44,7 +44,7 @@ Feature: Inspection if section isn't declared in rule
           <text>
       """
     And <inspection> inspection is enabled
-    Then I expect no inspection error
+    Then I expect no inspection errors
     When I check highlighting errors
     Examples:
       | rule_like  | text                     | section   | signature | inspection                       |
@@ -79,7 +79,7 @@ Feature: Inspection if section isn't declared in rule
             <text>
       """
     And <inspection> inspection is enabled
-    Then I expect no inspection error
+    Then I expect no inspection errors
     When I check highlighting errors
     # not fully implemented
     Examples:

@@ -1,6 +1,6 @@
 Feature: Completion in 'shadow' section
 
-  Scenario Outline: Complete shadow settings in string literal after 'shadow' section
+  Scenario Outline: Complete SmkShadowSettingsInspection in string literal after 'shadow' section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """

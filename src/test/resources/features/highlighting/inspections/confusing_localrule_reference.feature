@@ -41,7 +41,7 @@ Feature: Inspection warns about confusing localrules names.
       input: "in"
     """
     When SmkLocalRuleConfusingReference inspection is enabled
-    Then I expect no inspection weak warning
+    Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
       | rule_like1 | rule_like2 |

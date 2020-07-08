@@ -11,8 +11,8 @@ Feature: Inspection checking lambda parameter names in various sections
       output:
         "output.txt"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
-    Then I expect no inspection weak warning
+    And SmkLambdaRuleParamsInspection inspection is enabled
+    Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
       | rule_like  |
@@ -30,7 +30,7 @@ Feature: Inspection checking lambda parameter names in various sections
       output:
         "output.txt"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
+    And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection weak warning on <a> in <a:> with message
     """
     Snakemake documentation suggests it's preferable to name the first parameter 'wildcards'.
@@ -52,7 +52,7 @@ Feature: Inspection checking lambda parameter names in various sections
       output:
         "output.txt"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
+    And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection error on <a> in <, a:> with messages
       | Only use 'wildcards' as lambda parameter in 'input' section. |
       | Don't use more than 1 lambda parameter(s) in 'input' section.  |
@@ -73,8 +73,8 @@ Feature: Inspection checking lambda parameter names in various sections
       output:
         "output.txt"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
-    Then I expect no inspection weak warning
+    And SmkLambdaRuleParamsInspection inspection is enabled
+    Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
       | rule_like  |
@@ -91,7 +91,7 @@ Feature: Inspection checking lambda parameter names in various sections
       output:
         "output.txt"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
+    And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection weak warning on <a> in <a:> with message
     """
     Snakemake documentation suggests it's preferable to name the first parameter 'wildcards'.
@@ -112,7 +112,7 @@ Feature: Inspection checking lambda parameter names in various sections
       output:
         "output.txt"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
+    And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection error on <a> in <, a:> with messages
       | Only use 'wildcards' as lambda parameter in 'group' section. |
       | Don't use more than 1 lambda parameter(s) in 'group' section.  |
@@ -135,8 +135,8 @@ Feature: Inspection checking lambda parameter names in various sections
       shell:
         "somecommand -o {params.prefix}"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
-    Then I expect no inspection weak warning
+    And SmkLambdaRuleParamsInspection inspection is enabled
+    Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
       | rule_like  |
@@ -156,7 +156,7 @@ Feature: Inspection checking lambda parameter names in various sections
       shell:
         "somecommand -o {params.prefix}"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
+    And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection error on <log> with message
     """
     Only use 'wildcards/input/output/resources/threads' as lambda parameter in 'params' section.
@@ -179,7 +179,7 @@ Feature: Inspection checking lambda parameter names in various sections
       shell:
         "somecommand -o {params.prefix}"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
+    And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection error on <wildcards> with message
     """
     'wildcards' has to be the first lambda parameter.
@@ -206,7 +206,7 @@ Feature: Inspection checking lambda parameter names in various sections
       shell:
         "somecommand -o {params.prefix}"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
+    And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection error on <log> with messages
       | Only use 'wildcards/input/output/resources/threads' as lambda parameter in 'params' section. |
       | Don't use more than 5 lambda parameter(s) in 'params' section.                                 |
@@ -230,8 +230,8 @@ Feature: Inspection checking lambda parameter names in various sections
       shell:
         "somecommand -o {resources.prefix}"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
-    Then I expect no inspection weak warning
+    And SmkLambdaRuleParamsInspection inspection is enabled
+    Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
       | rule_like  |
@@ -251,7 +251,7 @@ Feature: Inspection checking lambda parameter names in various sections
       shell:
         "somecommand -o {resources.prefix}"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
+    And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection error on <params> with message
     """
     Only use 'wildcards/input/threads/attempt' as lambda parameter in 'resources' section.
@@ -274,7 +274,7 @@ Feature: Inspection checking lambda parameter names in various sections
       shell:
         "somecommand -o {resources.prefix}"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
+    And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection error on <wildcards> with message
     """
     'wildcards' has to be the first lambda parameter.
@@ -301,7 +301,7 @@ Feature: Inspection checking lambda parameter names in various sections
       shell:
         "somecommand -o {resources.prefix}"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
+    And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection error on <random_name> with messages
       | Don't use more than 4 lambda parameter(s) in 'resources' section.                      |
       | Only use 'wildcards/input/threads/attempt' as lambda parameter in 'resources' section. |
@@ -323,8 +323,8 @@ Feature: Inspection checking lambda parameter names in various sections
       output:
         "somedir/{sample}.csv"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
-    Then I expect no inspection weak warning
+    And SmkLambdaRuleParamsInspection inspection is enabled
+    Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
       | rule_like  |
@@ -342,7 +342,7 @@ Feature: Inspection checking lambda parameter names in various sections
       output:
         "somedir/{sample}.csv"
     """
-    And Lambda Functions in Rule Sections inspection is enabled
+    And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection error on <output> with message
     """
     Only use 'wildcards/input/attempt' as lambda parameter in 'threads' section.
@@ -363,7 +363,7 @@ Feature: Inspection checking lambda parameter names in various sections
       threads:
         lambda input, wildcards: 10
     """
-    And Lambda Functions in Rule Sections inspection is enabled
+    And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection error on <wildcards> with message
     """
     'wildcards' has to be the first lambda parameter.
@@ -387,7 +387,7 @@ Feature: Inspection checking lambda parameter names in various sections
       threads:
         lambda wildcards, input, attempt, params: attempt % 8
     """
-    And Lambda Functions in Rule Sections inspection is enabled
+    And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection error on <params> with messages
       | Don't use more than 3 lambda parameter(s) in 'threads' section.      |
       | Only use 'wildcards/input/attempt' as lambda parameter in 'threads' section. |
@@ -404,7 +404,7 @@ Feature: Inspection checking lambda parameter names in various sections
     <rule_like> NAME:
       <section>: lambda wildcards: wildcards
     """
-    And Lambda Functions in Rule Sections inspection is enabled
+    And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection error on <lambda wildcards: wildcards> with message
     """
     Function object cannot be used as a value in '<section>' section.
@@ -445,8 +445,8 @@ Feature: Inspection checking lambda parameter names in various sections
     <rule_like> NAME:
       <section>: (lambda wildcards: wildcards)("")
     """
-    And Lambda Functions in Rule Sections inspection is enabled
-    Then I expect no inspection error
+    And SmkLambdaRuleParamsInspection inspection is enabled
+    Then I expect no inspection errors
     When I check highlighting weak warnings
     Examples:
       | section              | rule_like  |
@@ -482,7 +482,7 @@ Feature: Inspection checking lambda parameter names in various sections
     <rule_like> foo:
       input: lambda a: a + a.foo
     """
-    And Lambda Functions in Rule Sections inspection is enabled
+    And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection weak warning on <a> in <a:> with message
     """
     Snakemake documentation suggests it's preferable to name the first parameter 'wildcards'.

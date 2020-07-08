@@ -9,8 +9,8 @@ Feature: Inspection checking whether all resources section arguments are keyword
         resources: threads=4, mem_mb=100
         shell: "command"
     """
-    And Resources Keyword Arguments inspection is enabled
-    Then I expect no inspection error
+    And SmkResourcesKeywordArgsInspection inspection is enabled
+    Then I expect no inspection errors
     When I check highlighting errors
     Examples:
       | rule_like  |
@@ -28,7 +28,7 @@ Feature: Inspection checking whether all resources section arguments are keyword
         resources: 4, mem_mb=100
         shell: "command"
     """
-    And Resources Keyword Arguments inspection is enabled
+    And SmkResourcesKeywordArgsInspection inspection is enabled
     Then I expect inspection error on <4> with message
     """
     Resources have to be named (e.g. 'threads=4').
@@ -46,7 +46,7 @@ Feature: Inspection checking whether all resources section arguments are keyword
         <rule_like> NAME:
           resources: 4
         """
-      And Resources Keyword Arguments inspection is enabled
+      And SmkResourcesKeywordArgsInspection inspection is enabled
       Then I expect inspection error on <4> with message
         """
         Resources have to be named (e.g. 'threads=4').

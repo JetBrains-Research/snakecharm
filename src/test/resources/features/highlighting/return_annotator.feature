@@ -27,7 +27,7 @@ Feature: Annotate if return out of function or run/onstart/onerror/onsuccess blo
             run:
                 return 1
         """
-        Then I expect no inspection error
+        Then I expect no inspection errors
         When I check highlighting errors
 
   Scenario Outline: Return out of snakemake blocks
@@ -37,7 +37,7 @@ Feature: Annotate if return out of function or run/onstart/onerror/onsuccess blo
         <block>:
             return 1
         """
-        Then I expect no inspection error
+        Then I expect no inspection errors
         When I check highlighting errors
     Examples:
       | block     |

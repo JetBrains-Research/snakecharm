@@ -6,7 +6,7 @@ Feature: Inspection for multiple arguments in various sections
     subworkflow NAME:
         <section>: "a", "b", "c"
     """
-    And Section Multiple Args inspection is enabled
+    And SmkSectionMultipleArgsInspection inspection is enabled
     Then I expect inspection error on <"b"> with message
     """
     Only one argument is allowed for 'subworkflow' section.
@@ -29,7 +29,7 @@ Feature: Inspection for multiple arguments in various sections
     rule NAME:
         <section>: "a", "b", "c"
     """
-    And Section Multiple Args inspection is enabled
+    And SmkSectionMultipleArgsInspection inspection is enabled
     Then I expect inspection error on <"b"> with message
     """
     Only one argument is allowed for '<section>' section.

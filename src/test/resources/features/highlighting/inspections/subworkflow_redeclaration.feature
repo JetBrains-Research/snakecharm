@@ -1,5 +1,5 @@
-Feature: Subworkflow redeclaration inspection
-  Scenario: A single subworkflow redeclaration
+Feature: SmkSubworkflowRedeclarationInspection inspection
+  Scenario: A single SmkSubworkflowRedeclarationInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -12,7 +12,7 @@ Feature: Subworkflow redeclaration inspection
     subworkflow NAME: #overrides
         snakefile: "boo.smk"
     """
-    And Subworkflow Redeclaration inspection is enabled
+    And SmkSubworkflowRedeclarationInspection inspection is enabled
     Then I expect inspection weak warning with message "Only last subworkflow with the same name will be executed" on
     """
     subworkflow NAME:

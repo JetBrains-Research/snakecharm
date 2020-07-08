@@ -26,7 +26,7 @@ Feature: Inspection: Unbound variable Inspection replacement
     And PyUnresolvedReferencesInspection inspection is enabled
     And PyUnboundLocalVariableInspection inspection is enabled
     And SmkPyUnboundLocalVariableInspection inspection is enabled
-    Then I expect no inspection warning
+    Then I expect no inspection warnings
     When I check highlighting warnings
     Examples:
       | rule_like  | section    |
