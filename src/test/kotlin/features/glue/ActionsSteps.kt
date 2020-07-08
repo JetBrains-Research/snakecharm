@@ -191,7 +191,7 @@ class ActionsSteps {
             "No expected inspections steps in test. Add 'I expect no inspection ..' step if no inspection" +
                     " should be triggered."
         }
-        val acceptedLevels = setOf(level, "error").sorted()
+        val acceptedLevels = setOf(level, "error", "TYPO").sorted()
         require(acceptedLevels.mapNotNull { problemsCounts[it] }.isNotEmpty()) {
             "Noting to check for severity level '$level'. Expected at least 1 inspection with severity: $acceptedLevels." +
                     " Test expects inspections problems: ${problemsCounts.entries}. "
