@@ -68,7 +68,7 @@ Pull requests are welcome. It is my side project, so I appreciate your help impl
 * Run `./gradlew buildPlugin`
 * Plugin bundle is located in ` build/distributions/snakecharm-*.zip`
 
-**Install plugin from *.zip bundle:**
+**Install plugin from ZIP bundle:**
 * Open IDEA/PyCharm Preferences
 * Choose `Plugins` section
 * Press gear icon and choose `Install Plugin from Disk...`
@@ -81,7 +81,7 @@ If you get "Unimplemented substep definition" in all `*.feature` files, ensure:
   * Not installed or disabled: `Substeps IntelliJ Plugin` 
   * Plugins installed: `Cucumber Java`, `Gherkin`
   
-### Release plugin:
+**Release plugin:**
 * Fix version in `build.gradle`
 * Fix since/until build versions in `build.gradle`
 * Fix change notes in `CHANGES` file
