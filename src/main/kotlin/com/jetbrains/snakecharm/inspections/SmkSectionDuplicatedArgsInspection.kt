@@ -5,10 +5,9 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.project.Project
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SINGLE_ARGUMENT_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
-import com.jetbrains.snakecharm.inspections.quickfix.RenameElementWithoutUsagesQuickFix
+import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
 
 class SmkSectionDuplicatedArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -17,44 +16,33 @@ class SmkSectionDuplicatedArgsInspection : SnakemakeInspection() {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
+        override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
+            checkArgumentList(st.argumentList, st)
+        }
+
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            if (st.sectionKeyword in (RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
-                            - SINGLE_ARGUMENT_SECTIONS_KEYWORDS)) {
-                checkArgumentList(st.argumentList, st)
-            }
+            checkArgumentList(st.argumentList, st)
         }
 
         private fun checkArgumentList(
                 argumentList: PyArgumentList?,
-                section: SmkRuleOrCheckpointArgsSection
+                section: SmkArgsSection
         ) {
-
             val args = argumentList?.arguments ?: emptyArray()
-            args.forEachIndexed { i, arg ->
-                if (args.indexOfFirst{iterator -> iterator.text == arg.text} != i) {
+            if (args.size > 1) {
+                val setOfDeclaredArguments = mutableSetOf<String>()
 
-                    val sectionElement = arg.originalElement
-                    val fixes =
-                            arrayOf(
-                                    RemoveArgumentQuickFix(),
-                                    if (sectionElement != null) {
-                                        RenameElementWithoutUsagesQuickFix(
-                                                section,
-                                                sectionElement.textRangeInParent.startOffset,
-                                                sectionElement.textRangeInParent.endOffset
-                                        )
-                                    } else {
-                                        null
-                                    }
-                            )
-                    registerProblem(
-                            arg,
-                            SnakemakeBundle.message("INSP.NAME.section.duplicated.args.message",
-                                    section.sectionKeyword!!),
-                            ProblemHighlightType.WARNING,
-                            null,
-                            *fixes
-                    )
+                args.forEach { arg ->
+                    if (arg.text in setOfDeclaredArguments) {
+                        registerProblem(
+                                arg,
+                                SnakemakeBundle.message("INSP.NAME.section.duplicated.args.message",
+                                        section.sectionKeyword!!),
+                                RemoveArgumentQuickFix()
+                        )
+                    } else {
+                        setOfDeclaredArguments.add(arg.text)
+                    }
                 }
             }
         }
