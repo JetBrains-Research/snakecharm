@@ -12,11 +12,13 @@ import com.jetbrains.python.PythonTokenSetContributor
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyPsiFacade
+import com.jetbrains.python.psi.PythonVisitorFilter
 import com.jetbrains.python.psi.impl.PyPsiFacadeImpl
 import com.jetbrains.python.psi.impl.PythonASTFactory
 import com.jetbrains.python.psi.impl.PythonLanguageLevelPusher
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.lang.SmkTokenSetContributor
+import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 
 
 /**
@@ -46,6 +48,17 @@ class SnakemakeParsingTest : ParsingTestCase(
             PyPsiFacade::class.java,
             PyPsiFacadeImpl::class.java
         )
+    }
+
+    override fun tearDown() {
+        // We have to force clean language extensions cache here, because these parser tests don't use real
+        // test application and don't load all required extensions.
+        // E.g. PythonId.visitorFilter EP will not load `SnakemakeVisitorFilter` and as a result other tests in test suite will fail
+        val languageExtension = PythonVisitorFilter.INSTANCE
+        languageExtension.clearCache(SnakemakeLanguageDialect)
+        languageExtension.clearCache(PythonLanguage.INSTANCE)
+
+        super.tearDown()
     }
 
     override fun getTestDataPath() = SnakemakeTestUtil.getTestDataPath().toString()
