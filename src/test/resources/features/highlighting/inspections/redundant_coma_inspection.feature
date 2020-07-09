@@ -8,10 +8,11 @@ Feature: Inspection for redundant coma in the end of the line
       <section>: "input.txt",
     """
     And SmkRedundantComaInspection inspection is enabled
-    Then I expect inspection warning on <,> in <input: "input.txt",> with message
+    Then I expect inspection warning on <,> in <<section>: "input.txt",> with message
     """
     Coma is unnecessary
     """
+    When I check highlighting warnings
     Examples:
       | rule_like  | section |
       | rule       | input   |
@@ -26,10 +27,11 @@ Feature: Inspection for redundant coma in the end of the line
       <section>: "input.txt",
     """
     And SmkRedundantComaInspection inspection is enabled
-    Then I expect inspection warning on <,> in <input: "input.txt",> with message
+    Then I expect inspection warning on <,> in <<section>: "input.txt",> with message
     """
     Coma is unnecessary
     """
+    When I check highlighting warnings
     Then I invoke quick fix Remove redundant coma and see text:
      """
     <rule_like> NAME:
