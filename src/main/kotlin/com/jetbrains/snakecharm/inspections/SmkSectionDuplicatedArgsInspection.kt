@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.*
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
@@ -30,10 +31,10 @@ class SmkSectionDuplicatedArgsInspection : SnakemakeInspection() {
         ) {
             val args = argumentList?.arguments ?: emptyArray()
             if (args.size > 1) {
-                val setOfDeclaredArguments = mutableSetOf<String>()
+                val setOfDeclaredArguments = mutableSetOf<PsiElement>()
 
                 args.forEach { arg ->
-                    if (arg.text in setOfDeclaredArguments) {
+                    if (setOfDeclaredArguments.any{x -> arg.textMatches(x)}) {
                         registerProblem(
                                 arg,
                                 SnakemakeBundle.message("INSP.NAME.section.duplicated.args.message",
@@ -41,7 +42,7 @@ class SmkSectionDuplicatedArgsInspection : SnakemakeInspection() {
                                 RemoveArgumentQuickFix()
                         )
                     } else {
-                        setOfDeclaredArguments.add(arg.text)
+                        setOfDeclaredArguments.add(arg)
                     }
                 }
             }
