@@ -1,13 +1,13 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.*
+import com.intellij.psi.PsiWhiteSpace
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_LOG
+import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
 
 class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -16,20 +16,26 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
+        override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
+            checkArgumentList(st.argumentList, st)
+        }
+
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            if (st.sectionKeyword in setOf(SECTION_INPUT, SECTION_OUTPUT, SECTION_LOG)) {
                 checkArgumentList(st.argumentList, st)
-            }
         }
 
         private fun checkArgumentList(
                 argumentList: PyArgumentList?,
-                section: SmkRuleOrCheckpointArgsSection
+                section: SmkArgsSection
         ) {
 
             val args = argumentList?.arguments ?: emptyArray()
             args.forEach { arg ->
-                if (arg is PyStringLiteralExpression && arg.decodedFragments.size > 1) {
+                if (arg is PyStringLiteralExpression && arg.decodedFragments.size > 1
+                        && arg.stringElements.any { x ->
+                            x.nextSibling is PsiWhiteSpace
+                                    && x.nextSibling.textContains('\n')
+                        }) {
 
                     registerProblem(
                             arg,

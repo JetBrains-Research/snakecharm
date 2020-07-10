@@ -220,7 +220,7 @@
     <localInspection
             language="Snakemake" shortName="SmkSectionMultilineStringArgsInspection"
             enabledByDefault="true"
-            level="WARNING"
+            level="WEAK WARNING"
             suppressId="SmkSectionMultilineStringArgs"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
