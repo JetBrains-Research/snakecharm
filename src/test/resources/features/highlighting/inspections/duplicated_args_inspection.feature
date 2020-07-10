@@ -84,7 +84,7 @@ Feature: Inspection for duplicated arguments in same section
       | rule        | log                  |
       | rule        | wildcard_constraints |
 
-  Scenario Outline: Duplicated keyword arguments in section
+  Scenario Outline: Duplicated keyword arguments in section ()
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -92,13 +92,13 @@ Feature: Inspection for duplicated arguments in same section
         <section>: a="foo", b="bar", b="bar" # duplicate
     """
     And SmkSectionDuplicatedArgsInspection inspection is enabled
-    Then I expect inspection error on <b> in <b="bar" # duplicate> with message
-    """
-    Keyword argument already provided: b=\"bar\".
-    """
-    When I check highlighting warnings
+    Then I expect no inspection warnings
+    When I check highlighting warnings ignoring extra highlighting
     Examples:
       | rule_like   | section              |
+      | subworkflow | workdir              |
+      | subworkflow | snakefile            |
+      | subworkflow | configfile           |
       | checkpoint  | input                |
       | checkpoint  | output               |
       | checkpoint  | params               |
@@ -114,10 +114,10 @@ Feature: Inspection for duplicated arguments in same section
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-        <section>: "target_1", "target_2", "target_2" # duplicate
+        <section>: <arg1>, <arg2>, <arg2> # duplicate
     """
     And SmkSectionDuplicatedArgsInspection inspection is enabled
-    Then I expect inspection warning on <"target_2"> in <"target_2" # duplicate> with message
+    Then I expect inspection warning on <<arg2>> in <<arg2> # duplicate> with message
     """
     This argument has been already added to '<section>' section.
     """
@@ -125,10 +125,10 @@ Feature: Inspection for duplicated arguments in same section
     Then I invoke quick fix Remove duplicated argument and see text:
     """
     <rule_like> NAME:
-        <section>: "target_1", "target_2"  # duplicate
+        <section>: <arg1>, <arg2>  # duplicate
     """
     Examples:
-      | section              | rule_like   |
-      | configfile           | subworkflow |
-      | input                | checkpoint  |
-      | input                | rule        |
+      | rule_like   | section    | arg1                         | arg2                         |
+      | subworkflow | configfile | "target_1"                   | "target_2"                   |
+      | checkpoint  | input      | "{sample}.txt"               | "{sample}.bin"               |
+      | rule        | output     | expand("{t}1", t=["A", "B"]) | expand("{t}2", t=["A", "B"]) |
