@@ -35,7 +35,7 @@ Feature: Inspection for redundant coma in the end of the line
     Then I invoke quick fix Remove redundant coma and see text:
      """
     <rule_like> NAME:
-      <section>: "input.txt"
+       <section>: "input.txt"
     """
     Examples:
       | rule_like  | section |
@@ -51,7 +51,7 @@ Feature: Inspection for redundant coma in the end of the line
       <section>: "input1.txt", "input2.txt",
     """
     And SmkRedundantComaInspection inspection is enabled
-    Then I expect inspection warning on <,> in <<section>: "input1.txt", "input2.txt",> with message
+    Then I expect inspection warning on <,> in <"input2.txt",> with message
     """
     Coma is unnecessary
     """
@@ -59,7 +59,7 @@ Feature: Inspection for redundant coma in the end of the line
     Then I invoke quick fix Remove redundant coma and see text:
      """
     <rule_like> NAME:
-      <section>: "input1.txt", "input2.txt"
+       <section>: "input1.txt", "input2.txt"
     """
     Examples:
       | rule_like  | section |
