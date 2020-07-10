@@ -382,6 +382,17 @@
     />
 
     <localInspection
+            language="Snakemake" shortName="SmkRulesOrderConfusingReference"
+            enabledByDefault="true"
+            level="WEAK WARNING"
+            suppressId="SmkRulesOrderConfusingReference"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.rulesorder.confusing.ref.msg"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkRulesOrderConfusingReference"
+    />
+
+    <localInspection
             language="Python"
             shortName="SmkPyUnboundLocalVariableInspection"
             suppressId="PyUnboundLocalVariable"
