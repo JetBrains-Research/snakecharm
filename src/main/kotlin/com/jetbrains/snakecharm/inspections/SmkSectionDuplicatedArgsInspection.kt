@@ -3,8 +3,8 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.*
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiElement
 import com.jetbrains.python.psi.PyArgumentList
+import com.jetbrains.python.psi.impl.PyKeywordArgumentImpl
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
@@ -31,18 +31,24 @@ class SmkSectionDuplicatedArgsInspection : SnakemakeInspection() {
         ) {
             val args = argumentList?.arguments ?: emptyArray()
             if (args.size > 1) {
-                val setOfDeclaredArguments = mutableSetOf<PsiElement>()
+                val setOfDeclaredArguments = mutableSetOf<String>()
 
                 args.forEach { arg ->
-                    if (setOfDeclaredArguments.any{x -> arg.textMatches(x)}) {
-                        registerProblem(
-                                arg,
-                                SnakemakeBundle.message("INSP.NAME.section.duplicated.args.message",
-                                        section.sectionKeyword!!),
-                                RemoveArgumentQuickFix()
-                        )
-                    } else {
-                        setOfDeclaredArguments.add(arg)
+
+                    /* PyKeywordArgumentImpl is checked by SmkSyntaxErrorAnnotator */
+                    if (arg !is PyKeywordArgumentImpl) {
+                        val text = arg.text
+
+                        if (text in setOfDeclaredArguments) {
+                            registerProblem(
+                                    arg,
+                                    SnakemakeBundle.message("INSP.NAME.section.duplicated.args.message",
+                                            section.sectionKeyword!!),
+                                    RemoveArgumentQuickFix()
+                            )
+                        } else {
+                            setOfDeclaredArguments.add(text)
+                        }
                     }
                 }
             }
