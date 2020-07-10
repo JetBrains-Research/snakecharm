@@ -13,13 +13,17 @@ Feature: Inspection for multiline arguments in same section
     """
     When I check highlighting weak warnings
     Examples:
-      | section | rule_like  | args                                |
-      | output  | rule       | "a" \n        "b"                   |
-      | log     | rule       | "a" \n        'b'                   |
-      | input   | rule       | "a" \n        """b"""               |
-      | input   | checkpoint | f"a" \n        "b"                  |
-      | output  | checkpoint | "{input[0]}" \n        "{input[1]}" |
-      | log     | checkpoint | 'a' \n        "b"                   |
+      | section | rule_like  | args                                  |
+      | output  | rule       | "a" \n        "b"                     |
+      | log     | rule       | "a" \n        'b'                     |
+      | input   | rule       | "a" \n        """b"""                 |
+      | input   | rule       | "foo" + "boo" + "doo" \n        "roo" |
+      | input   | rule       | f"foo{1}oo""boo" \n        "roo"      |
+      | input   | rule       | "boo"f"foo{1}oo" \n        "roo"      |
+      | input   | rule       | "boo""foo{sample}oo" \n        "roo"  |
+      | input   | checkpoint | f"a" \n        "b"                    |
+      | output  | checkpoint | "{input[0]}" \n        "{input[1]}"   |
+      | log     | checkpoint | 'a' \n        "b"                     |
 
   Scenario Outline: Multiple strings (one line) argument in execution section
     Given a snakemake project
