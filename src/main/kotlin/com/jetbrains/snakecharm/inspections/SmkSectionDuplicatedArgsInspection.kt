@@ -4,7 +4,7 @@ import com.intellij.codeInspection.*
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.project.Project
 import com.jetbrains.python.psi.PyArgumentList
-import com.jetbrains.python.psi.impl.PyKeywordArgumentImpl
+import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
@@ -35,8 +35,8 @@ class SmkSectionDuplicatedArgsInspection : SnakemakeInspection() {
 
                 args.forEach { arg ->
 
-                    /* PyKeywordArgumentImpl is checked by SmkSyntaxErrorAnnotator */
-                    if (arg !is PyKeywordArgumentImpl) {
+                    /* PyKeywordArgument is checked by SmkSyntaxErrorAnnotator */
+                    if (arg !is PyKeywordArgument) {
                         val text = arg.text
 
                         if (text in setOfDeclaredArguments) {

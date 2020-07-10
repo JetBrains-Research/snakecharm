@@ -84,7 +84,7 @@ Feature: Inspection for duplicated arguments in same section
       | rule        | log                  |
       | rule        | wildcard_constraints |
 
-  Scenario Outline: Duplicated keyword arguments in section ()
+  Scenario Outline: Duplicated keyword arguments in section (no warning)
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
