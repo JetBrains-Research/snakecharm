@@ -8,7 +8,9 @@ Version 0.8.1 build #0.8.1.xxx
 Released on ...
 
 Features:
--
+- Inspection: Warn users if they have arguments with same value in section (see #263)
+
+
 
 Version 0.8.0 build #0.8.0.214
 -------------
