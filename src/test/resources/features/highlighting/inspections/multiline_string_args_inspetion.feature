@@ -9,7 +9,7 @@ Feature: Inspection for multiline arguments in same section
     And SmkSectionMultilineStringArgsInspection inspection is enabled
     Then I expect inspection weak warning on <<args>> with message
     """
-    Multiline string argument in '<section>' will be considered as concatenation.
+    Multiline string argument in '<section>' will be considered as concatenation. Maybe comma is missing.
     """
     When I check highlighting weak warnings
     Examples:
