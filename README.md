@@ -7,12 +7,12 @@ Tests Windows [![tests](http://teamcity.jetbrains.com/app/rest/builds/buildType:
 
 **SnakeCharm** is a plugin for [PyCharm](https://www.jetbrains.com/pycharm/) / [IntelliJ Platform IDEs](https://www.jetbrains.com/products.html?fromMenu#type=ide) which adds support for [Snakemake](https://snakemake.readthedocs.io/en/stable/) workflows language. The plugin is developed by JetBrains Research Team, for more details see [project home page](https://research.jetbrains.org/groups/biolabs/projects?project_id=57).
 
-At the moment plugin is an early alpha version and will be improved in future.
 
 Please report features suggestions or found bugs to project [issue tracker](https://github.com/JetBrains-Research/snakecharm/issues).
 
----
-Features available in `*.smk`, `*.rule` and `Snakefile` files:
+# Features
+
+Features available in `Snakefile` and `*.smk`, `*.rule`, `*.rules` files:
 * Python code syntax highlighting
 * Snakemake specific syntax highlighting
 * Limited resolve and code completion for python code
