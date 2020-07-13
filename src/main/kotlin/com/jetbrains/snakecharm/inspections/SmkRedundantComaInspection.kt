@@ -30,10 +30,9 @@ class SmkRedundantComaInspection : SnakemakeInspection() {
         )
 
         private fun checkPyArgumentList(
-                element: PsiElement
+                element: PyArgumentList
         ) {
-            element.children.forEach {
-                println(it)
+            element.arguments.reversed().forEach {
                 if (it.elementType !== PyTokenTypes.END_OF_LINE_COMMENT
                         && it.elementType !== PyTokenTypes.COMMA
                         && it.elementType !== PyTokenTypes.WHITESPACE) return
