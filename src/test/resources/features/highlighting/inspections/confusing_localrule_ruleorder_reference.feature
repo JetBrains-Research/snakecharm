@@ -1,4 +1,4 @@
-Feature: Inspection warns about confusing localrules or ruleorders names.
+Feature: Inspection warns about confusing localrules or ruleorder names.
 
   Scenario Outline: Confusing localrule/ruleorder ref
     Given a snakemake project
@@ -16,18 +16,18 @@ Feature: Inspection warns about confusing localrules or ruleorders names.
     checkpoint foo2:
       input: "in"
     """
-    When SmkLocalRuleConfusingReference inspection is enabled
+    When SmkLocalrulesRuleorderConfusingReference inspection is enabled
     Then I expect inspection weak warning on <boo> with message
     """
     Rule 'boo' isn't defined in this file, not an error but it is confusing.
     """
     When I check highlighting weak warnings
     Examples:
-      | rule_like  | section   | separator |
-      | rule       | localrule | ,         |
-      | checkpoint | localrule | ,         |
-      | rule       | ruleorder | >         |
-      | checkpoint | ruleorder | >         |
+      | rule_like  | section    | separator |
+      | rule       | localrules | ,         |
+      | checkpoint | localrules | ,         |
+      | rule       | ruleorder  | >         |
+      | checkpoint | ruleorder  | >         |
 
   Scenario Outline: No confusing localrule/ruleorder ref when overridden
     Given a snakemake project
@@ -42,7 +42,7 @@ Feature: Inspection warns about confusing localrules or ruleorders names.
     <rule_like2> boo:
       input: "in"
     """
-    When SmkLocalRuleConfusingReference inspection is enabled
+    When SmkLocalrulesRuleorderConfusingReference inspection is enabled
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
