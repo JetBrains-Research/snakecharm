@@ -1,6 +1,6 @@
-Feature: Inspection warns about confusing localrules names.
+Feature: Inspection warns about confusing localrules or ruleorders names.
 
-  Scenario Outline: Confusing ref
+  Scenario Outline: Confusing localrule/ruleorder ref
     Given a snakemake project
     And a file "boo.smk" with text
     """
@@ -9,7 +9,7 @@ Feature: Inspection warns about confusing localrules names.
     """
     And I open a file "foo.smk" with text
     """
-    localrules: foo2, boo, foo1
+    <section>: foo2<separator> boo<separator> foo1
     rule foo1:
       input: "in"
 
@@ -23,11 +23,13 @@ Feature: Inspection warns about confusing localrules names.
     """
     When I check highlighting weak warnings
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | section   | separator |
+      | rule       | localrule | ,         |
+      | checkpoint | localrule | ,         |
+      | rule       | ruleorder | >         |
+      | checkpoint | ruleorder | >         |
 
-  Scenario Outline: No confusing ref when overridden
+  Scenario Outline: No confusing localrule/ruleorder ref when overridden
     Given a snakemake project
     And a file "boo.smk" with text
     """
@@ -36,7 +38,7 @@ Feature: Inspection warns about confusing localrules names.
     """
     Given I open a file "foo.smk" with text
     """
-    localrules: boo
+    <section>: boo
     <rule_like2> boo:
       input: "in"
     """
@@ -44,8 +46,12 @@ Feature: Inspection warns about confusing localrules names.
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
-      | rule_like1 | rule_like2 |
-      | rule       | rule       |
-      | rule       | checkpoint |
-      | checkpoint | rule       |
-      | checkpoint | checkpoint |
+      | rule_like1 | rule_like2 |  section  |
+      | rule       | rule       | localrule |
+      | rule       | checkpoint | localrule |
+      | checkpoint | rule       | localrule |
+      | checkpoint | checkpoint | localrule |
+      | rule       | rule       | ruleorder |
+      | rule       | checkpoint | ruleorder |
+      | checkpoint | rule       | ruleorder |
+      | checkpoint | checkpoint | ruleorder |

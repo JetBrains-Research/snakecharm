@@ -295,14 +295,14 @@
     />
 
     <localInspection
-            language="Snakemake" shortName="SmkLocalRuleConfusingReference"
+            language="Snakemake" shortName="SmkLocalrulesRuleorderConfusingReference"
             enabledByDefault="true"
             level="WEAK WARNING"
-            suppressId="SmkLocalRuleConfusingReference"
+            suppressId="SmkLocalrulesRuleorderConfusingReference"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.localrules.confusing.ref"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkLocalRuleConfusingReference"
+            key="INSP.NAME.localrules.ruleorder.confusing.ref"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkLocalrulesRuleorderConfusingReference"
     />
     <localInspection
             language="SnakemakeSL" shortName="SmkWildcardNotDefinedInspection"
@@ -379,17 +379,6 @@
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.undeclared.section.title"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkUndeclaredSectionInspection"
-    />
-
-    <localInspection
-            language="Snakemake" shortName="SmkRulesOrderConfusingReference"
-            enabledByDefault="true"
-            level="WEAK WARNING"
-            suppressId="SmkRulesOrderConfusingReference"
-            bundle="SnakemakeBundle"
-            groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.rulesorder.confusing.ref.msg"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkRulesOrderConfusingReference"
     />
 
     <localInspection
