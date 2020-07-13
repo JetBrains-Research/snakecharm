@@ -394,13 +394,13 @@
     />
 
     <localInspection
-            language="Snakemake" shortName="SmkRedundantComaInspection"
+            language="Snakemake" shortName="SmkRedundantCommaInspection"
             enabledByDefault="true"
             level="WARNING"
-            suppressId="SmkRedundantComa"
+            suppressId="SmkRedundantComma"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.redundant.coma.title"
+            key="INSP.NAME.redundant.comma.title"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkRedundantCommaInspection"
     />
 
