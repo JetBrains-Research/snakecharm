@@ -2,7 +2,7 @@
     <id>SnakeCharm</id>
     <name>SnakeCharm</name>
     <vendor email="roman.chernyatchik@jetbrains.com"
-            url="https://research.jetbrains.org/groups/biolabs">
+            url="https://jetbrains-research.github.io/snakecharm/">
         JetBrains Research
     </vendor>
 
@@ -12,14 +12,14 @@
 
     <description><![CDATA[
     <br>
-    <a href="https://snakemake.readthedocs.io/en/stable/">Snakemake</a> workflow management system is a tool to create
-     reproducible and scalable data analyses widely used by bioinformaticians.
+    This plugin adds syntax highlighting and code insight support for python-based language used in
+    <a href="https://snakemake.readthedocs.io/en/stable/">Snakemake</a> workflow management system. Bioinformaticians widely use
+     Snakemake to create reproducible and scalable data analyses pipelines for their research.
     <br>
     <br>
-    This plugin adds syntax highlighting and code insight support for python-based language used in Snakemake.<br>
     Main features are:
     <ul>
-        <li>Snakemake syntax highlighting: both python and pipelines related extension language.</li>
+        <li>Snakemake syntax highlighting: both python and snakemake specifix syntax.</li>
         <li>Syntax highlighting for snakemake string format language.</li>
         <li>Special highlighting for rule wildcards.</li>
         <li>Code completion and goto to declaration for:
@@ -37,11 +37,12 @@
         <li>Multiple inspections for different possibles bugs in the pipeline.</li>
     </ul>
     <br>
+    Please report features suggestions or found bugs to project <a href="https://github.com/JetBrains-Research/snakecharm/issues">issue tracker</a><br>
+    <br>
     Useful links: <ul>
         <li><a href="https://research.jetbrains.org/groups/biolabs/projects?project_id=57">Project Home Page</a><br></li>
-        <li><a href="https://github.com/JetBrains-Research/snakecharm">SnakeCharm at GitHub</a><br></li>
-        <li><a href="https://github.com/JetBrains-Research/snakecharm/issues">Issue tracker</a><br></li>
         <li><a href="https://github.com/JetBrains-Research/snakecharm/blob/master/CHANGES">Changelog</a><br></li>
+        <li><a href="https://github.com/JetBrains-Research/snakecharm">SnakeCharm at GitHub</a><br></li>
         <li><a href="https://plugins.jetbrains.com/plugin/11947-snakecharm">SnakeCharm in JetBrains Plugin Repository</a><br></li>
     </ul>
     ]]></description>
@@ -237,6 +238,17 @@
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.section.multiple.args"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionMultipleArgsInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkSectionDuplicatedArgsInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkSectionDuplicatedArgs"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.duplicated.args"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionDuplicatedArgsInspection"
     />
 
     <localInspection

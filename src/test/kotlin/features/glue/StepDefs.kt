@@ -78,6 +78,17 @@ class StepDefs {
                 }
             }
         }
+
+        // XXX: optional: Ensure than language extensions are loaded, e.g. if `SnakemakeVisitorFilter` isn't available at
+        //   runtime in test suite. This workaround is used in SnakemakeParsingTests and seems resolves all issues,
+        //   but you could re-enable it here if something goes wrong
+        // We have to force clean language extensions cache here, because these parser tests don't use real
+        // test application and don't load all required extensions.
+        // E.g. PythonId.visitorFilter EP will not load `SnakemakeVisitorFilter` and as a result other tests in test suite will fail
+        // val languageExtension = PythonVisitorFilter.INSTANCE
+        // languageExtension.clearCache(SnakemakeLanguageDialect)
+        // languageExtension.clearCache(PythonLanguage.INSTANCE)
+
         SnakemakeWorld.myInjectionFixture = InjectionTestFixture(SnakemakeWorld.fixture())
     }
 
