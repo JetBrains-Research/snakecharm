@@ -397,7 +397,7 @@
             language="Snakemake" shortName="SmkRedundantComaInspection"
             enabledByDefault="true"
             level="WARNING"
-            suppressId="SmkRedundantComaInspection"
+            suppressId="SmkRedundantComa"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.redundant.coma.title"
