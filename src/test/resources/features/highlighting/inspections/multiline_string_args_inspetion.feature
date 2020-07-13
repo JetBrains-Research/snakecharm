@@ -18,6 +18,7 @@ Feature: Inspection for multiline arguments in same section
       | log     | rule       | "a" \n        'b'                     |
       | input   | rule       | "a" \n        """b"""                 |
       | input   | rule       | "foo" + "boo" + "doo" \n        "roo" |
+      | input   | rule       | "a" + ("b" \n        "c" + "d")       |
       | input   | rule       | f"foo{1}oo""boo" \n        "roo"      |
       | input   | rule       | "boo"f"foo{1}oo" \n        "roo"      |
       | input   | rule       | "boo""foo{sample}oo" \n        "roo"  |

@@ -1,9 +1,9 @@
 package com.jetbrains.snakecharm.inspections
 
-import com.intellij.codeInspection.*
+import com.intellij.codeInspection.LocalInspectionToolSession
+import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiWhiteSpace
-import com.jetbrains.python.psi.PyArgumentList
-import com.jetbrains.python.psi.PyStringLiteralExpression
+import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
@@ -21,7 +21,7 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-                checkArgumentList(st.argumentList, st)
+            checkArgumentList(st.argumentList, st)
         }
 
         private fun checkArgumentList(
@@ -31,18 +31,26 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
 
             val args = argumentList?.arguments ?: emptyArray()
             args.forEach { arg ->
-                if (arg is PyStringLiteralExpression && arg.decodedFragments.size > 1
-                        && arg.stringElements.any { x ->
-                            x.nextSibling is PsiWhiteSpace
-                                    && x.nextSibling.textContains('\n')
-                        }) {
-
+                if (checkRecursive(arg)) {
                     registerProblem(
                             arg,
                             SnakemakeBundle.message("INSP.NAME.section.multiline.string.args.message",
                                     section.sectionKeyword!!)
                     )
                 }
+            }
+        }
+
+        private fun checkRecursive(expr: PyExpression?): Boolean {
+            return when (expr) {
+                is PyBinaryExpression -> checkRecursive(expr.leftExpression)
+                        || checkRecursive(expr.rightExpression)
+                is PyParenthesizedExpression -> checkRecursive(expr.containedExpression)
+                is PyStringLiteralExpression -> expr.decodedFragments.size > 1
+                        && expr.stringElements.any { x ->
+                    x.nextSibling is PsiWhiteSpace && x.nextSibling.textContains('\n')
+                }
+                else -> false
             }
         }
     }
