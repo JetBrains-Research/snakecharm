@@ -31,7 +31,9 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
 
             val args = argumentList?.arguments ?: emptyArray()
             args.forEach { arg ->
-                if (checkRecursive(arg)) {
+                val visitor = SmkMultilineStringArgsInspectionVisitor()
+                arg.accept(visitor)
+                if (visitor.warning) {
                     registerProblem(
                             arg,
                             SnakemakeBundle.message("INSP.NAME.section.multiline.string.args.message",
@@ -40,20 +42,32 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
                 }
             }
         }
-
-        private fun checkRecursive(expr: PyExpression?): Boolean {
-            return when (expr) {
-                is PyBinaryExpression -> checkRecursive(expr.leftExpression)
-                        || checkRecursive(expr.rightExpression)
-                is PyParenthesizedExpression -> checkRecursive(expr.containedExpression)
-                is PyStringLiteralExpression -> expr.decodedFragments.size > 1
-                        && expr.stringElements.any { x ->
-                    x.nextSibling is PsiWhiteSpace && x.nextSibling.textContains('\n')
-                }
-                else -> false
-            }
-        }
     }
 
     override fun getDisplayName(): String = SnakemakeBundle.message("INSP.NAME.section.multiline.string.args")
+}
+
+class SmkMultilineStringArgsInspectionVisitor : PyElementVisitor() {
+
+    var warning: Boolean = false
+        private set
+
+    override fun visitPyBinaryExpression(node: PyBinaryExpression) {
+        node.leftExpression.accept(this)
+        if (!warning) {
+            node.rightExpression?.accept(this)
+        }
+    }
+
+    override fun visitPyParenthesizedExpression(node: PyParenthesizedExpression) {
+        node.containedExpression?.accept(this)
+    }
+
+    override fun visitPyStringLiteralExpression(node: PyStringLiteralExpression) {
+        if (node.decodedFragments.size > 1 && node.stringElements.any { x ->
+                    x.nextSibling is PsiWhiteSpace && x.nextSibling.textContains('\n')
+                }) {
+            warning = true
+        }
+    }
 }
