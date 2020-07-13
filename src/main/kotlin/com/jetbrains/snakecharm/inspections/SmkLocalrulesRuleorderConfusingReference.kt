@@ -14,14 +14,14 @@ class SmkLocalrulesRuleorderConfusingReference : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
         override fun visitSmkWorkflowLocalrulesSection(st: SmkWorkflowLocalrulesSection) {
-            checkCofusingReference(st)
+            checkConfusingReference(st)
         }
 
         override fun visitSmkWorkflowRuleorderSection(st: SmkWorkflowRuleorderSection) {
-            checkCofusingReference(st)
+            checkConfusingReference(st)
         }
 
-        private fun checkCofusingReference(st: SmkArgsSection){
+        private fun checkConfusingReference(st: SmkArgsSection){
             val file = st.containingFile
             if (file !is SmkFile) {
                 return
