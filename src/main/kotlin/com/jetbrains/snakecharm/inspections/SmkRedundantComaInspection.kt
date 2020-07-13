@@ -8,6 +8,7 @@ import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.TokenType
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.parents
+import com.intellij.psi.util.siblings
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -21,34 +22,32 @@ class SmkRedundantComaInspection : SnakemakeInspection() {
         session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
-        fun problemRegiser(psiEl: PsiElement) = holder.registerProblem(
+        private fun problemRegiser(psiEl: PsiElement) = holder.registerProblem(
                 psiEl,
                 SnakemakeBundle.message("INSP.NAME.redundant.coma.title"),
                 ProblemHighlightType.LIKE_UNUSED_SYMBOL,
                 fix
         )
 
-        fun checkElement(
+        private fun checkPyArgumentList(
                 element: PsiElement
-        ){
-            val args = element.children
-            for (arg in args){
-                if (arg.elementType !== PyTokenTypes.END_OF_LINE_COMMENT
-                        && arg.elementType !== PyTokenTypes.COMMA) return
-                this.problemRegiser(arg)
+        ) {
+            element.children.forEach {
+                println(it)
+                if (it.elementType !== PyTokenTypes.END_OF_LINE_COMMENT
+                        && it.elementType !== PyTokenTypes.COMMA
+                        && it.elementType !== PyTokenTypes.WHITESPACE) return
+                else if (it.elementType == PyTokenTypes.COMMA)
+                    problemRegiser(it)
             }
         }
 
-        override fun visitElement(element: PsiElement) {
-            if ((element.lastChild?.elementType !== PyTokenTypes.COMMA
-                            && element.lastChild?.elementType !== PyTokenTypes.END_OF_LINE_COMMENT)
-                    || element.parent !is SmkArgsSection) return
-            else if (element.lastChild?.elementType == PyTokenTypes.COMMA) this.problemRegiser(element.lastChild)
-            else if (element.lastChild?.elementType == PyTokenTypes.END_OF_LINE_COMMENT) this.checkElement(element)
-//            if ((node.lastChild?.elementType !== PyTokenTypes.COMMA
-//                            && node.lastChild?.elementType !== PyTokenTypes.END_OF_LINE_COMMENT)
-//                            || node.parent !is SmkArgsSection) return
-//                this.problemRegiser(node.lastChild)
+        override fun visitPyArgumentList(node: PyArgumentList) {
+            if ((node.lastChild?.elementType !== PyTokenTypes.COMMA
+                            && node.lastChild?.elementType !== PyTokenTypes.END_OF_LINE_COMMENT)
+                    || node.parent !is SmkArgsSection) return
+            else if (node.lastChild?.elementType == PyTokenTypes.COMMA) problemRegiser(node.lastChild)
+            else if (node.lastChild?.elementType == PyTokenTypes.END_OF_LINE_COMMENT) checkPyArgumentList(node)
         }
     }
 
