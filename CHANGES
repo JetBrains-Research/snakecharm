@@ -8,7 +8,7 @@ Version 0.8.1 build #0.8.1.xxx
 Released on ...
 
 Features:
--
+- Inspection: Warn about string arguments splitted on several lines (see #259)
 
 Version 0.8.0 build #0.8.0.214
 -------------
