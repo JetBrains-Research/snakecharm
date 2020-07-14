@@ -21,7 +21,7 @@ class SmkRedundantCommaInspection : SnakemakeInspection() {
         private fun problemRegiser(psiEl: PsiElement?) = psiEl?.let {
             holder.registerProblem(
                     it,
-                    SnakemakeBundle.message("INSP.NAME.redundant.coma.title"),
+                    SnakemakeBundle.message("INSP.NAME.redundant.comma.title"),
                     ProblemHighlightType.LIKE_UNUSED_SYMBOL,
                     fix
         )
@@ -52,11 +52,10 @@ class SmkRedundantCommaInspection : SnakemakeInspection() {
 
             var problemEl: PsiElement? = null
 
-            if (node.lastChild?.elementType == PyTokenTypes.COMMA) {
+            if (node.lastChild?.elementType === PyTokenTypes.COMMA) {
                 problemEl = node.lastChild
-            } else if (node.lastChild?.elementType == PyTokenTypes.END_OF_LINE_COMMENT) {
+            } else if (node.lastChild?.elementType === PyTokenTypes.END_OF_LINE_COMMENT) {
                 problemEl = checkCommaInPyArgumentList(node)
-                println(problemEl)
             }
 
             problemRegiser(problemEl)
@@ -65,7 +64,7 @@ class SmkRedundantCommaInspection : SnakemakeInspection() {
 
 
     private class RemoveSectionQuickFix : LocalQuickFix {
-        override fun getFamilyName() = SnakemakeBundle.message("INSP.NAME.redundant.coma.fix.message")
+        override fun getFamilyName() = SnakemakeBundle.message("INSP.NAME.redundant.comma.fix.message")
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             WriteCommandAction.runWriteCommandAction(project) { descriptor.psiElement.delete() }
