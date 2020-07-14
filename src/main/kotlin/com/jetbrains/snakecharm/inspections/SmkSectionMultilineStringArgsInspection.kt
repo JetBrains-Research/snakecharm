@@ -3,10 +3,8 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiWhiteSpace
-import com.jetbrains.python.psi.PyArgumentList
-import com.jetbrains.python.psi.PyExpression
-import com.jetbrains.python.psi.PyRecursiveElementVisitor
-import com.jetbrains.python.psi.PyStringLiteralExpression
+import com.intellij.psi.util.PsiTreeUtil
+import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
@@ -20,25 +18,27 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
-            checkArgumentList(st.argumentList, st)
+            checkArgumentList(st.argumentList)
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            checkArgumentList(st.argumentList, st)
+            checkArgumentList(st.argumentList)
         }
 
-        private fun checkArgumentList(
-                argumentList: PyArgumentList?,
-                section: SmkArgsSection
-        ) {
-            val args = argumentList?.arguments ?: emptyArray()
-            val visitor = SmkMultilineStringArgsInspectionVisitor { arg ->
+        private val instanceArgumentVisitor: SmkMultilineStringArgsInspectionVisitor? = null
+        val myArgumentVisitor: SmkMultilineStringArgsInspectionVisitor
+            get() = instanceArgumentVisitor ?: SmkMultilineStringArgsInspectionVisitor { arg, name ->
                 registerProblem(arg,
                         SnakemakeBundle.message("INSP.NAME.section.multiline.string.args.message",
-                                section.sectionKeyword!!))
+                                name))
             }
+
+        private fun checkArgumentList(
+                argumentList: PyArgumentList?
+        ) {
+            val args = argumentList?.arguments ?: emptyArray()
             args.forEach { arg ->
-                arg.accept(visitor)
+                arg.accept(myArgumentVisitor)
             }
         }
     }
@@ -46,12 +46,21 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
     override fun getDisplayName(): String = SnakemakeBundle.message("INSP.NAME.section.multiline.string.args")
 }
 
-class SmkMultilineStringArgsInspectionVisitor(val action: (PyExpression) -> Unit) : PyRecursiveElementVisitor() {
+class SmkMultilineStringArgsInspectionVisitor(val warnAction: (PyExpression, String) -> Unit) : PyElementVisitor() {
+    override fun visitPyBinaryExpression(node: PyBinaryExpression?) {
+        node?.children?.forEach { child -> child.accept(this) }
+    }
+
+    override fun visitPyParenthesizedExpression(node: PyParenthesizedExpression?) {
+        node?.children?.forEach { child -> child.accept(this) }
+    }
+
     override fun visitPyStringLiteralExpression(node: PyStringLiteralExpression) {
         if (node.decodedFragments.size > 1 && node.stringElements.any { x ->
                     x.nextSibling is PsiWhiteSpace && x.nextSibling.textContains('\n')
                 }) {
-            action(node)
+            val section = PsiTreeUtil.getParentOfType(node, SmkArgsSection::class.java)
+            warnAction(node, section?.sectionKeyword!!)
         }
     }
 }

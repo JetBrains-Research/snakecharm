@@ -15,16 +15,16 @@ Feature: Inspection for multiline arguments in same section
     """
     When I check highlighting weak warnings
     Examples:
-      | section | rule_like  | args                                 |
-      | output  | rule       | "a" \n        "b"                    |
-      | log     | rule       | "a" \n        'b'                    |
-      | input   | rule       | "a" \n        """b"""                |
-      | input   | rule       | f"foo{1}oo""boo" \n        "roo"     |
-      | input   | rule       | "boo"f"foo{1}oo" \n        "roo"     |
-      | input   | rule       | "boo""foo{sample}oo" \n        "roo" |
-      | input   | checkpoint | f"a" \n        "b"                   |
-      | output  | checkpoint | "{input[0]}" \n        "{input[1]}"  |
-      | log     | checkpoint | 'a' \n        "b"                    |
+      | rule_like  | section | args                                 |
+      | rule       | output  | "a" \n        "b"                    |
+      | rule       | log     | "a" \n        'b'                    |
+      | rule       | input   | "a" \n        """b"""                |
+      | rule       | input   | f"foo{1}oo""boo" \n        "roo"     |
+      | rule       | input   | "boo"f"foo{1}oo" \n        "roo"     |
+      | rule       | input   | "boo""foo{sample}oo" \n        "roo" |
+      | checkpoint | input   | f"a" \n        "b"                   |
+      | checkpoint | output  | "{input[0]}" \n        "{input[1]}"  |
+      | checkpoint | log     | 'a' \n        "b"                    |
 
   #noinspection CucumberTableInspection
   Scenario Outline: Multiline string argument in execution section (warning on subexpression)
@@ -42,9 +42,9 @@ Feature: Inspection for multiline arguments in same section
     """
     When I check highlighting weak warnings
     Examples:
-      | section | rule_like | args                                  | warning               |
-      | input   | rule      | "foo" + "boo" + "doo" \n        "roo" | "doo" \n        "roo" |
-      | input   | rule      | "a" + ("b" \n        "c" + "d")       | "b" \n        "c"     |
+      | rule_like | section | args                                  | warning               |
+      | rule      | input   | "foo" + "boo" + "doo" \n        "roo" | "doo" \n        "roo" |
+      | rule      | input   | "a" + ("b" \n        "c" + "d")       | "b" \n        "c"     |
 
   Scenario Outline: Multiple strings (one line) argument in execution section
     Given a snakemake project
@@ -57,10 +57,11 @@ Feature: Inspection for multiline arguments in same section
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
-      | section | rule_like  | args                           |
-      | output  | rule       | "a" "b"                        |
-      | log     | rule       | "a""b"                         |
-      | input   | rule       | f"a""b"                        |
-      | input   | checkpoint | """a \n        "b" \n """  'c' |
-      | output  | checkpoint | "a"        "b"                 |
-      | log     | checkpoint | "{input}"        "{output}"    |
+      | rule_like  | section | args                           |
+      | rule       | output  | "a" "b"                        |
+      | rule       | log     | "a""b"                         |
+      | rule       | input   | f"a""b"                        |
+      | rule       | input   | foo("bar" \n "abc" \n "123")   |
+      | checkpoint | input   | """a \n        "b" \n """  'c' |
+      | checkpoint | output  | "a"        "b"                 |
+      | checkpoint | log     | "{input}"        "{output}"    |
