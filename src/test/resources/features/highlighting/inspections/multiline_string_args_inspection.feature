@@ -8,7 +8,6 @@ Feature: Inspection for multiline arguments in same section
         <section>: <args>, "c"
     """
     And SmkSectionMultilineStringArgsInspection inspection is enabled
-    #noinspection CucumberUndefinedStep
     Then I expect inspection weak warning on <<args>> with message
     """
     Multiline string argument in '<section>' will be considered as concatenation. Maybe comma is missing.
@@ -26,7 +25,6 @@ Feature: Inspection for multiline arguments in same section
       | checkpoint | output  | "{input[0]}" \n        "{input[1]}"  |
       | checkpoint | log     | 'a' \n        "b"                    |
 
-  #noinspection CucumberTableInspection
   Scenario Outline: Multiline string argument in execution section (warning on subexpression)
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -35,7 +33,6 @@ Feature: Inspection for multiline arguments in same section
         <section>: <args>, "c"
     """
     And SmkSectionMultilineStringArgsInspection inspection is enabled
-    #noinspection CucumberUndefinedStep
     Then I expect inspection weak warning on <<warning>> with message
     """
     Multiline string argument in '<section>' will be considered as concatenation. Maybe comma is missing.
