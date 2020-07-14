@@ -3,7 +3,10 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiWhiteSpace
-import com.jetbrains.python.psi.*
+import com.jetbrains.python.psi.PyArgumentList
+import com.jetbrains.python.psi.PyExpression
+import com.jetbrains.python.psi.PyRecursiveElementVisitor
+import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
@@ -44,15 +47,6 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
 }
 
 class SmkMultilineStringArgsInspectionVisitor(val action: (PyExpression) -> Unit) : PyRecursiveElementVisitor() {
-
-    override fun visitPyBinaryExpression(node: PyBinaryExpression) {
-        node.acceptChildren(this)
-    }
-
-    override fun visitPyParenthesizedExpression(node: PyParenthesizedExpression) {
-        node.acceptChildren(this)
-    }
-
     override fun visitPyStringLiteralExpression(node: PyStringLiteralExpression) {
         if (node.decodedFragments.size > 1 && node.stringElements.any { x ->
                     x.nextSibling is PsiWhiteSpace && x.nextSibling.textContains('\n')
