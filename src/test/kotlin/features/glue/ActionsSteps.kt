@@ -187,6 +187,8 @@ class ActionsSteps {
 
     fun checkHighlighting(level: String, ignoreExtra: Boolean) {
         val problemsCounts = SnakemakeWorld.myInspectionProblemsCounts
+        SnakemakeWorld.myInspectionProblemsCounts = null // reset counter after check in order to validate in teardown that assertion step was called
+
         requireNotNull(problemsCounts) {
             "No expected inspections steps in test. Add 'I expect no inspection ..' step if no inspection" +
                     " should be triggered."
