@@ -18,26 +18,19 @@ class SmkRedundantCommaInspection : SnakemakeInspection() {
         session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
-        private fun problemRegiser(psiEl: PsiElement?) = psiEl?.let {
-            holder.registerProblem(
-                    it,
-                    SnakemakeBundle.message("INSP.NAME.redundant.comma.title"),
-                    ProblemHighlightType.LIKE_UNUSED_SYMBOL,
-                    fix
-        )
-        }
-
         private fun checkCommaInPyArgumentList(
                 element: PyArgumentList
         ): PsiElement? {
 
             element.node.getChildren(null).reversed().forEach {
-                if (it.elementType !== PyTokenTypes.END_OF_LINE_COMMENT
-                        && it.elementType !== PyTokenTypes.COMMA
-                        && it.elementType !== TokenType.WHITE_SPACE) {
+                val elType = it.elementType
+
+                if (elType !== PyTokenTypes.END_OF_LINE_COMMENT
+                        && elType !== PyTokenTypes.COMMA
+                        && elType !== TokenType.WHITE_SPACE) {
                     return null
                 }
-                if (it.elementType == PyTokenTypes.COMMA) {
+                if (elType == PyTokenTypes.COMMA) {
                     return it.psi
                 }
             }
@@ -47,18 +40,23 @@ class SmkRedundantCommaInspection : SnakemakeInspection() {
 
         override fun visitPyArgumentList(node: PyArgumentList) {
             if ((node.lastChild?.elementType !== PyTokenTypes.COMMA
-                            && node.lastChild?.elementType !== PyTokenTypes.END_OF_LINE_COMMENT)
+                            && node.lastChild.elementType !== PyTokenTypes.END_OF_LINE_COMMENT)
                     || node.parent !is SmkArgsSection) return
 
-            var problemEl: PsiElement? = null
-
-            if (node.lastChild?.elementType === PyTokenTypes.COMMA) {
-                problemEl = node.lastChild
-            } else if (node.lastChild?.elementType === PyTokenTypes.END_OF_LINE_COMMENT) {
-                problemEl = checkCommaInPyArgumentList(node)
+            val problemEl = when (node.lastChild?.elementType) {
+                PyTokenTypes.COMMA -> node.lastChild
+                PyTokenTypes.END_OF_LINE_COMMENT -> checkCommaInPyArgumentList(node)
+                else -> null
             }
 
-            problemRegiser(problemEl)
+            problemEl?.let {
+                holder.registerProblem(
+                        it,
+                        SnakemakeBundle.message("INSP.NAME.redundant.comma.title"),
+                        ProblemHighlightType.LIKE_UNUSED_SYMBOL,
+                        fix
+                )
+            }
         }
     }
 
