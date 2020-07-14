@@ -47,12 +47,12 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
 }
 
 class SmkMultilineStringArgsInspectionVisitor(val warnAction: (PyExpression, String) -> Unit) : PyElementVisitor() {
-    override fun visitPyBinaryExpression(node: PyBinaryExpression?) {
-        node?.children?.forEach { child -> child.accept(this) }
+    override fun visitPyBinaryExpression(node: PyBinaryExpression) {
+        node.acceptChildren(this)
     }
 
-    override fun visitPyParenthesizedExpression(node: PyParenthesizedExpression?) {
-        node?.children?.forEach { child -> child.accept(this) }
+    override fun visitPyParenthesizedExpression(node: PyParenthesizedExpression) {
+        node.acceptChildren(this)
     }
 
     override fun visitPyStringLiteralExpression(node: PyStringLiteralExpression) {
