@@ -217,6 +217,18 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkCondaSectionNotAllowedWithRun"
     />
 
+
+    <localInspection
+            language="Snakemake" shortName="SmkSectionMultilineStringArgsInspection"
+            enabledByDefault="true"
+            level="WEAK WARNING"
+            suppressId="SmkSectionMultilineStringArgs"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.multiline.string.args"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionMultilineStringArgsInspection"
+    />
+
     <localInspection
             language="Snakemake" shortName="SmkSectionMultipleArgsInspection"
             enabledByDefault="true"
