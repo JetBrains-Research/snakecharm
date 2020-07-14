@@ -54,7 +54,7 @@ class SmkRedundantCommaInspection : SnakemakeInspection() {
                         it,
                         SnakemakeBundle.message("INSP.NAME.redundant.comma.title"),
                         ProblemHighlightType.LIKE_UNUSED_SYMBOL,
-                        fix
+                        FIX
                 )
             }
         }
@@ -70,6 +70,6 @@ class SmkRedundantCommaInspection : SnakemakeInspection() {
     }
 
     companion object {
-        private val fix = RemoveSectionQuickFix()
+        private val FIX = RemoveSectionQuickFix()
     }
 }
