@@ -1,6 +1,9 @@
 package com.jetbrains.snakecharm.inspections
 
-import com.intellij.codeInspection.*
+import com.intellij.codeInspection.LocalInspectionToolSession
+import com.intellij.codeInspection.LocalQuickFix
+import com.intellij.codeInspection.ProblemDescriptor
+import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.project.Project
 import com.jetbrains.python.psi.PyArgumentList
@@ -44,7 +47,7 @@ class SmkSectionDuplicatedArgsInspection : SnakemakeInspection() {
                                     arg,
                                     SnakemakeBundle.message("INSP.NAME.section.duplicated.args.message",
                                             section.sectionKeyword!!),
-                                    RemoveArgumentQuickFix()
+                                    RemoveArgumentQuickFix
                             )
                         } else {
                             setOfDeclaredArguments.add(text)
@@ -55,7 +58,7 @@ class SmkSectionDuplicatedArgsInspection : SnakemakeInspection() {
         }
     }
 
-    private class RemoveArgumentQuickFix : LocalQuickFix {
+    private object RemoveArgumentQuickFix : LocalQuickFix {
         override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.remove.duplicated.arg")
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {

@@ -33,7 +33,7 @@ class SmkSectionRedeclarationInspection : SnakemakeInspection() {
 
                 if (sectionNamesSet.contains(name)) {
                     val fixes: ArrayList<LocalQuickFix> = arrayListOf(
-                        RemoveSectionQuickFix()
+                        RemoveSectionQuickFix
                     )
                     section.getSectionKeywordNode()?.psi?.let { sectionElement ->
                         fixes.add(
@@ -59,7 +59,7 @@ class SmkSectionRedeclarationInspection : SnakemakeInspection() {
         }
     }
 
-    private class RemoveSectionQuickFix : LocalQuickFix {
+    private object RemoveSectionQuickFix : LocalQuickFix {
         override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.remove.section.family")
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
