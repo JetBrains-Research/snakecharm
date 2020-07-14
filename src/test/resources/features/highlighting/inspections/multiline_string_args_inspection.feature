@@ -43,7 +43,7 @@ Feature: Inspection for multiline arguments in same section
       | rule      | input   | "foo" + "boo" + "doo" \n        "roo" | "doo" \n        "roo" |
       | rule      | input   | "a" + ("b" \n        "c" + "d")       | "b" \n        "c"     |
 
-  Scenario Outline: Multiple strings (one line) argument in execution section
+  Scenario Outline: Single line strings consisted of several fragments
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -54,11 +54,26 @@ Feature: Inspection for multiline arguments in same section
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
-      | rule_like  | section | args                           |
-      | rule       | output  | "a" "b"                        |
-      | rule       | log     | "a""b"                         |
-      | rule       | input   | f"a""b"                        |
-      | rule       | input   | foo("bar" \n "abc" \n "123")   |
-      | checkpoint | input   | """a \n        "b" \n """  'c' |
-      | checkpoint | output  | "a"        "b"                 |
-      | checkpoint | log     | "{input}"        "{output}"    |
+      | rule_like  | section | args                        |
+      | rule       | output  | "a" "b"                     |
+      | rule       | log     | "a""b"                      |
+      | rule       | input   | f"a""b"                     |
+      | checkpoint | output  | "a"        "b"              |
+      | checkpoint | log     | "{input}"        "{output}" |
+
+
+  Scenario Outline: Permitted multiline string args
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+        <section>: <args>
+    """
+    And SmkSectionMultilineStringArgsInspection inspection is enabled
+    Then I expect no inspection weak warnings
+    When I check highlighting weak warnings
+    Examples:
+      | rule_like  | section | args                                             |
+      | rule       | input   | foo("bar" \n "abc" \n "123"), "c"                |
+      | rule       | shell   | "echo foo;"\n        "ls \ "\n        "&& echo done" |
+      | checkpoint | input   | """a \n        "b" \n """  'c', "c"              |

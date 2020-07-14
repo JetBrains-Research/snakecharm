@@ -5,8 +5,12 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.util.PsiTreeUtil
-import com.jetbrains.python.psi.*
+import com.jetbrains.python.psi.PyBinaryExpression
+import com.jetbrains.python.psi.PyElementVisitor
+import com.jetbrains.python.psi.PyParenthesizedExpression
+import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
@@ -24,15 +28,22 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
         }
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
-            checkArgumentList(st.argumentList)
+            checkArgsSection(st)
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            checkArgumentList(st.argumentList)
+            checkArgsSection(st)
         }
 
-        private fun checkArgumentList(argumentList: PyArgumentList?) {
-            argumentList?.arguments?.forEach { arg ->
+        private fun checkArgsSection(st: SmkArgsSection) {
+            val argumentList = st.argumentList
+            val keyword = st.sectionKeyword
+
+            if (argumentList == null || keyword == null || keyword == SnakemakeNames.SECTION_SHELL) {
+                return
+            }
+
+            argumentList.arguments.forEach { arg ->
                 arg.accept(stringVisitor)
             }
         }
@@ -68,13 +79,12 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
 
             val section = PsiTreeUtil.getParentOfType(strExpr, SmkArgsSection::class.java)
             val sectionKeyword = section?.sectionKeyword
+            requireNotNull(sectionKeyword) { "Should be called for strings inside SmkArgsSection" }
 
-            if (sectionKeyword != null) {
-                reportSmkProblem(
-                    strExpr,
-                    SnakemakeBundle.message("INSP.NAME.section.multiline.string.args.message", sectionKeyword)
-                )
-            }
+            reportSmkProblem(
+                strExpr,
+                SnakemakeBundle.message("INSP.NAME.section.multiline.string.args.message", sectionKeyword)
+            )
         }
     }
 }
