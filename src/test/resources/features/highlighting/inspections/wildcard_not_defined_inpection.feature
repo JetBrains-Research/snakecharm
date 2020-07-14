@@ -1,5 +1,5 @@
 Feature: Inspection: SmkWildcardNotDefinedInspection
-
+  
   Scenario Outline: No wildcards defining section
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -221,19 +221,20 @@ Feature: Inspection: SmkWildcardNotDefinedInspection
       | checkpoint |
 
   Scenario Outline: Wildcard references which looks like qualified cannot be resolved as wildcards
-     Given a snakemake project
-     Given I open a file "foo.smk" with text
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
        """
        <rule_like> NAME:
            output: "{sample}"
            input: "{wildcards.sample}"
        """
-     And SmkWildcardNotDefinedInspection inspection is enabled
-     Then I expect inspection error on <wildcards.sample> with message
+    And SmkWildcardNotDefinedInspection inspection is enabled
+    Then I expect inspection error on <wildcards> with message
       """
-      Wildcard 'wildcards.sample' isn't defined in 'output' section.
+      Wildcard 'wildcards' isn't defined in 'output' section.
       """
-     Examples:
-       | rule_like  |
-       | rule       |
-       | checkpoint |
+    When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |

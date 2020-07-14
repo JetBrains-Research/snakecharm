@@ -9,6 +9,7 @@ Released on ...
 
 Features:
 - Inspection: Warn users if they have arguments with same value in section (see #263)
+- Inspection: Warn user if rule from 'rulesorder' isn't available in current or included files (see #254)
 - Inspection: Warn about string arguments splitted on several lines (see #259)
 
 

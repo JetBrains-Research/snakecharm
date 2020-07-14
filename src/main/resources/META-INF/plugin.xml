@@ -307,14 +307,14 @@
     />
 
     <localInspection
-            language="Snakemake" shortName="SmkLocalRuleConfusingReference"
+            language="Snakemake" shortName="SmkLocalrulesRuleorderConfusingReference"
             enabledByDefault="true"
             level="WEAK WARNING"
-            suppressId="SmkLocalRuleConfusingReference"
+            suppressId="SmkLocalrulesRuleorderConfusingReference"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.localrules.confusing.ref"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkLocalRuleConfusingReference"
+            key="INSP.NAME.localrules.ruleorder.confusing.ref"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkLocalrulesRuleorderConfusingReference"
     />
     <localInspection
             language="SnakemakeSL" shortName="SmkWildcardNotDefinedInspection"
