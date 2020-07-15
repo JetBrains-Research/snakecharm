@@ -111,7 +111,8 @@ Feature: Inspection for redundant comma in the end of the line
          )
     """
     And SmkRedundantCommaInspection inspection is enabled
-    When I expect no inspection warnings
+    Then I expect no inspection warnings
+    When I check highlighting warnings
 
   Scenario: Check no inspection in python code in call function line
     Given a snakemake project
@@ -125,4 +126,5 @@ Feature: Inspection for redundant comma in the end of the line
         )
     """
     And SmkRedundantCommaInspection inspection is enabled
-    When I expect no inspection warnings
+    Then I expect no inspection warnings
+    When I check highlighting warnings
