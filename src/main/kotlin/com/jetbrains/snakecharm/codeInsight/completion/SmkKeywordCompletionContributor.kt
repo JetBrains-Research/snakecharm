@@ -65,14 +65,14 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
     ) {
         val expression = PsiTreeUtil.getParentOfType(
                 parameters.position, PyExpression::class.java
-        ) as? PyReferenceExpression ?: return
+        ) as? PyReferenceExpression
 
         val statement = PsiTreeUtil.getParentOfType(expression, PyStatement::class.java)
         if (statement is PyImportStatementBase) {
             return
         }
 
-        if (statement?.parent !is SmkFile && PsiTreeUtil.getParentOfType(statement, PyStatementListContainer::class.java) !is PyStatementPart) {
+        if (parameters.position.parent !is SmkFile && statement?.parent !is SmkFile && PsiTreeUtil.getParentOfType(statement, PyStatementListContainer::class.java) !is PyStatementPart) {
             return
         }
 
