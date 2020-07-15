@@ -27,7 +27,7 @@ Feature: Completion in comment
       | w      | workdir              | cwl        |
       | w      | wildcard_constraints | cwl        |
 
-  Scenario Outline: Completion for commented rule/checkpoint/subworkflow sections
+  Scenario Outline: Completion for commented rule/checkpoint sections
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -51,7 +51,23 @@ Feature: Completion in comment
       | checkpoint  | o      | output     | onerror              |
       | checkpoint  | l      | log        | localrules           |
       | checkpoint  | w      | wrapper    | workdir              |
-      | subworkflow | w      | workdir    | wildcard_constraints |
+
+  Scenario Outline: Completion for commented subworkflow section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    subworkflow NAME: # <prefix>#
+    """
+    When I put the caret after # <prefix>
+    Then I invoke autocompletion popup and see a text:
+    """
+    subworkflow NAME: # <full_name> #
+    """
+    Examples:
+      | prefix | full_name   |
+      | workd  | workdir:    |
+      | confi  | configfile: |
+      | snake  | snakefile:  |
 
   Scenario Outline: No completion for commented arguments section
     Given a snakemake project
