@@ -7,6 +7,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.PlatformPatterns.psiElement
+import com.intellij.patterns.PsiElementPattern
+import com.intellij.patterns.StandardPatterns
+import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.PlatformIcons
@@ -18,9 +21,9 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_LIKE
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE
+import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
 import com.jetbrains.snakecharm.lang.psi.*
 
 /**
@@ -34,45 +37,53 @@ class SmkKeywordCompletionContributor : CompletionContributor() {
 
     init {
         extend(
-                CompletionType.BASIC,
-                WorkflowTopLevelKeywordsProvider.CAPTURE,
-                WorkflowTopLevelKeywordsProvider
+            CompletionType.BASIC,
+            WorkflowTopLevelKeywordsProvider.CAPTURE,
+            WorkflowTopLevelKeywordsProvider
         )
 
         extend(
-                CompletionType.BASIC,
-                RuleSectionKeywordsProvider.CAPTURE,
-                RuleSectionKeywordsProvider
+            CompletionType.BASIC,
+            RuleSectionKeywordsProvider.CAPTURE,
+            RuleSectionKeywordsProvider
         )
 
         extend(
-                CompletionType.BASIC,
-                SubworkflowSectionKeywordsProvider.CAPTURE,
-                SubworkflowSectionKeywordsProvider
+            CompletionType.BASIC,
+            SubworkflowSectionKeywordsProvider.CAPTURE,
+            SubworkflowSectionKeywordsProvider
         )
     }
 }
 
 object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
-            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
-            .andNot(psiElement().inside(SmkSection::class.java)!!)
+        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+        .andNot(
+            psiElement().insideOneOf(
+                SmkSection::class.java, PsiComment::class.java
+            )
+        )
 
     override fun addCompletions(
-            parameters: CompletionParameters,
-            context: ProcessingContext,
-            result: CompletionResultSet
+        parameters: CompletionParameters,
+        context: ProcessingContext,
+        result: CompletionResultSet
     ) {
         val expression = PsiTreeUtil.getParentOfType(
-                parameters.position, PyExpression::class.java
-        ) as? PyReferenceExpression
+            parameters.position, PyExpression::class.java
+        ) as? PyReferenceExpression ?: return
 
         val statement = PsiTreeUtil.getParentOfType(expression, PyStatement::class.java)
         if (statement is PyImportStatementBase) {
             return
         }
 
-        if (parameters.position.parent !is SmkFile && statement?.parent !is SmkFile && PsiTreeUtil.getParentOfType(statement, PyStatementListContainer::class.java) !is PyStatementPart) {
+        if (statement?.parent !is SmkFile && PsiTreeUtil.getParentOfType(
+                statement,
+                PyStatementListContainer::class.java
+            ) !is PyStatementPart
+        ) {
             return
         }
 
@@ -81,20 +92,20 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
         }
 
         val tokenType2Name = SnakemakeLexer.KEYWORDS
-                .map { (k, v) -> v to k }
-                .toMap()
+            .map { (k, v) -> v to k }
+            .toMap()
 
         listOf(
-                WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE to ColonAndWhiteSpaceTail,
-                RULE_LIKE to TailType.SPACE
+            WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE to ColonAndWhiteSpaceTail,
+            RULE_LIKE to TailType.SPACE
         ).forEach { (tokenSet, tail) ->
             tokenSet.types.forEach { tt ->
                 val s = tokenType2Name[tt]!!
 
                 result.addElement(
-                        TailTypeDecorator.withTail(
-                                PythonLookupElement(s, true, null), tail
-                        )
+                    TailTypeDecorator.withTail(
+                        PythonLookupElement(s, true, null), tail
+                    )
                 )
             }
         }
@@ -133,23 +144,26 @@ object ColonAndWhiteSpaceTail : TailType() {
 
 object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
-            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
-            .inside(SmkRuleOrCheckpoint::class.java)!!
-            .andNot(psiElement().inside(PyArgumentList::class.java))
-            .andNot(psiElement().inside(SmkRunSection::class.java))
+        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+        .inside(SmkRuleOrCheckpoint::class.java)!!
+        .andNot(
+            psiElement().insideOneOf(
+                PyArgumentList::class.java, SmkRunSection::class.java, PsiComment::class.java
+            )
+        )
 
     override fun addCompletions(
-            parameters: CompletionParameters,
-            context: ProcessingContext,
-            result: CompletionResultSet
+        parameters: CompletionParameters,
+        context: ProcessingContext,
+        result: CompletionResultSet
     ) {
         (RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS + setOf(SnakemakeNames.SECTION_RUN)).forEach { s ->
 
             result.addElement(
-                    TailTypeDecorator.withTail(
-                            PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
-                            ColonAndWhiteSpaceTail
-                    )
+                TailTypeDecorator.withTail(
+                    PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
+                    ColonAndWhiteSpaceTail
+                )
 
             )
         }
@@ -158,22 +172,35 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
 
 object SubworkflowSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
-            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
-            .inside(psiElement().inside(SmkSubworkflow::class.java))!!
-            .andNot(psiElement().inside(PyArgumentList::class.java))
+        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+        .inside(psiElement().inside(SmkSubworkflow::class.java))
+        .andNot(
+            psiElement().insideOneOf(PyArgumentList::class.java, PsiComment::class.java)
+        )
+
 
     override fun addCompletions(
-            parameters: CompletionParameters,
-            context: ProcessingContext,
-            result: CompletionResultSet
+        parameters: CompletionParameters,
+        context: ProcessingContext,
+        result: CompletionResultSet
     ) {
         SUBWORKFLOW_SECTIONS_KEYWORDS.forEach { s ->
             result.addElement(
-                    TailTypeDecorator.withTail(
-                            PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
-                            ColonAndWhiteSpaceTail
-                    )
+                TailTypeDecorator.withTail(
+                    PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
+                    ColonAndWhiteSpaceTail
+                )
             )
         }
     }
 }
+
+fun PsiElementPattern.Capture<PsiElement>.insideOneOf(
+    vararg classes: Class<out PsiElement>
+) = inside(
+    StandardPatterns.or(
+        *classes.map {
+            StandardPatterns.instanceOf(it)
+        }.toTypedArray()
+    )
+)
