@@ -116,8 +116,8 @@ Feature: Completion for snakemake keyword-like things
       | rule_like | text            |
       | rule      | # here          |
       | rule      | input: "in.txt" |
-#      | checkpoint | # here          |  TODO[for darya] uncomment when checkpoint completion is done
-#      | checkpoint | input: "in.txt" |  TODO[for darya] uncomment when checkpoint completion is done
+      | checkpoint | # here          |
+      | checkpoint | input: "in.txt" |
 
   Scenario Outline: Complete at rule/checkpoint level after comma (args on new line)
     Given a snakemake project
@@ -138,8 +138,8 @@ Feature: Completion for snakemake keyword-like things
       | rule_like  | text            |
       | rule       | # here          |
       | rule       | input: "in.txt" |
-#      | checkpoint | # here          | TODO[for darya] uncomment when checkpoint completion is done
-#      | checkpoint | input: "in.txt" | TODO[for darya] uncomment when checkpoint completion is done
+      | checkpoint | # here          |
+      | checkpoint | input: "in.txt" |
 
   Scenario: Complete and replace at subworkflow level
     Given a snakemake project
@@ -464,3 +464,73 @@ Feature: Completion for snakemake keyword-like things
       | 3   |
       | 4   |
       | 5   |
+
+  Scenario Outline: Do not show items from toplevel completion in comments
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    # comment_toplevel
+    <toplevel_section> foo: # comment_in_toplevel_section
+      <section>: "_arg" # comment_subsection
+    """
+    When I put the caret at <signature>
+    And I invoke autocompletion popup
+    And completion list shouldn't contain:
+      | checkpoint           |
+      | configfile           |
+      | rule                 |
+      | subworkflow          |
+      | onsuccess            |
+      | onstart              |
+      | onerror              |
+      | wildcard_constraints |
+      | localrules           |
+      | ruleorder            |
+      | configfile           |
+      | include              |
+      | workdir              |
+      | singularity          |
+      | container            |
+    Examples:
+      | signature                   | toplevel_section | section    |
+      | comment_toplevel            | rule             | input      |
+      | comment_toplevel            | rule             | output     |
+      | comment_toplevel            | rule             | run        |
+      | comment_toplevel            | checkpoint       | log        |
+      | comment_in_toplevel_section | rule             | input      |
+      | comment_in_toplevel_section | checkpoint       | log        |
+      | comment_in_toplevel_section | subworkflow      | configfile |
+      | comment_subsection          | rule             | input      |
+      | comment_subsection          | checkpoint       | log        |
+      | comment_subsection          | subworkflow      | configfile |
+
+
+  Scenario Outline: Do not show items from rule-like or subworkflows completion in comments
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+     """
+     # comment_toplevel
+     <toplevel_section> foo: # comment_in_toplevel_section
+       <section>: "_arg" # comment_subsection
+     """
+    When I put the caret at <signature>
+    And I invoke autocompletion popup
+    And completion list shouldn't contain:
+      | input      |
+      | output     |
+      | log        |
+      | container  |
+      | configfile |
+      | workdir    |
+    Examples:
+      | signature                   | toplevel_section | section    |
+      | comment_toplevel            | rule             | input      |
+      | comment_toplevel            | rule             | output     |
+      | comment_toplevel            | rule             | run        |
+      | comment_toplevel            | checkpoint       | log        |
+      | comment_in_toplevel_section | rule             | input      |
+      | comment_in_toplevel_section | checkpoint       | log        |
+      | comment_in_toplevel_section | subworkflow      | configfile |
+      | comment_subsection          | rule             | input      |
+      | comment_subsection          | checkpoint       | log        |
+      | comment_subsection          | subworkflow      | configfile |
