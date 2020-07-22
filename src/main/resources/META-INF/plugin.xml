@@ -139,6 +139,10 @@
             implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkDictionaryTypesCompletionContributor"
             id="SmkDictionaryTypesCompletionContributor"
     />
+    <completion.contributor
+            language="Python"
+            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkWrapperCompletionContributor"
+    />
 
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.lang.psi.references.SmkPySubscriptionReferenceContributor"/>
     <localInspection

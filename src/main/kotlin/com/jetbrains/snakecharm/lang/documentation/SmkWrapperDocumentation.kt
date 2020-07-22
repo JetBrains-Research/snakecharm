@@ -25,8 +25,10 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
     }
 
     private fun processUrl(node: PyStringLiteralExpression): String {
+//        TODO use regex instead of 2 replace
         val url = "https://snakemake-wrappers.readthedocs.io/en/" +
-                node.stringValue.replace("/bio/", "/wrappers/") + ".html"
+                node.stringValue.replace("/bio/", "/wrappers/").replace("/utils/", "/wrappers/") + ".html"
+//        TODO more info in doc
         return "<a href=\"$url\">$url</a>"
     }
 
