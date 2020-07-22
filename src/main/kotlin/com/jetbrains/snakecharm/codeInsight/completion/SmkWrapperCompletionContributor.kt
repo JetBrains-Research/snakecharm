@@ -42,7 +42,7 @@ object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>()
         if (!File("$WRAPPERS_PATH/$META_FILE_NAME").exists()) {
             localWrapperParser()
         }
-        File("$WRAPPERS_PATH/$META_FILE_NAME").forEachLine {str ->
+        File("$WRAPPERS_PATH/$META_FILE_NAME").forEachLine { str ->
             val substr = str.substringBefore(',')
             if (substr.contains(result.prefixMatcher.prefix, false)) {
 //                TODO use regex that saves version if it is typed
@@ -60,17 +60,17 @@ fun localWrapperParser() {
         if (child.name.endsWith("wrapper.py", false)) {
             wrappers.add(child.toRelativeString(mainFolder).removeSuffix("/wrapper.py"))
             args.add(
-                Regex("\\{snakemake\\.\\S*}")
-                    .findAll(child.readText()).map { str ->
-                        str
-                            .value
-                            .drop(11)
-                            .dropLast(1)
-                    }
-                    .toSortedSet()
-                    .toMutableList()
+                    Regex("\\{snakemake\\.\\S*}")
+                            .findAll(child.readText()).map { str ->
+                                str
+                                        .value
+                                        .drop(11)
+                                        .dropLast(1)
+                            }
+                            .toSortedSet()
+                            .toMutableList()
             )
-      }
+        }
     }
 
     val output = File("${SmkWrapperCompletionProvider.WRAPPERS_PATH}/${SmkWrapperCompletionProvider.META_FILE_NAME}").outputStream().writer()
