@@ -449,6 +449,17 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkRedundantCommaInspection"
     />
 
+    <localInspection
+            language="Snakemake" shortName="SmkCorrectUsingMethodsInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkCorrectUsingMethods"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.correct.use.method.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkCorrectUsingMethodsInspection"
+    />
+
     <findUsagesHandlerFactory
             implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"
             id="Python" order="last, before default"
