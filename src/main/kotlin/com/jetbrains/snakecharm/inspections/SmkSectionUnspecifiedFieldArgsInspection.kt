@@ -22,17 +22,14 @@ class SmkSectionUnspecifiedFieldArgsInspection : SnakemakeInspection() {
         }
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
-            checkArgumentList(st.argumentList, st)
+            checkArgumentList(st.argumentList)
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            checkArgumentList(st.argumentList, st)
+            checkArgumentList(st.argumentList)
         }
 
-        private fun checkArgumentList(
-                argumentList: PyArgumentList?,
-                section: SmkArgsSection
-        ) {
+        private fun checkArgumentList(argumentList: PyArgumentList?) {
             val args = argumentList?.arguments ?: emptyArray()
             args.forEach { arg ->
                 arg.accept(stringVisitor)
