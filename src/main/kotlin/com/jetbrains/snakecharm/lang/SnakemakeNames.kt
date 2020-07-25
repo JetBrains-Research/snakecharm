@@ -57,4 +57,8 @@ object SnakemakeNames {
 
     const val RUN_SECTION_VARIABLE_RULE = "rule"
     const val RUN_SECTION_VARIABLE_JOBID = "jobid"
+
+    const val METHOD_ANCIENT = "ancient"
+    const val METHOD_PROTECTED = "protected"
+    const val METHOD_DIRECTORY = "directory"
 }

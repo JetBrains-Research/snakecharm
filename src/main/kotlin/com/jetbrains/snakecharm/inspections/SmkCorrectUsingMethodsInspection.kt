@@ -6,6 +6,13 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElement
 import com.jetbrains.python.PyElementTypes.CALL_EXPRESSION
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_ANCIENT
+import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_DIRECTORY
+import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_PROTECTED
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_BENCHMARK
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_LOG
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
@@ -16,23 +23,25 @@ class SmkCorrectUsingMethodsInspection: SnakemakeInspection() {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
-        private fun checkAncient(node: PsiElement): PsiElement? {
-            if (node.text != "input")
-                return node
+        private fun checkAncient(psiEl: PsiElement): PsiElement? {
+            if (psiEl.text != SECTION_INPUT)
+                return psiEl
             return null
         }
 
-        private fun checkProtected(node: PsiElement): PsiElement? {
-            if (node.text != "output"
-                    && node.text != "log"
-                    && node.text != "benchmark")
-                return node
+        private fun checkProtected(psiEl: PsiElement): PsiElement? {
+            val psiElText = psiEl.text
+
+            if (psiElText != SECTION_OUTPUT
+                    && psiElText != SECTION_LOG
+                    && psiElText != SECTION_BENCHMARK)
+                return psiEl
             return null
         }
 
-        private fun checkDirectory(node: PsiElement): PsiElement? {
-            if (node.text != "output"){
-                return node
+        private fun checkDirectory(psiEl: PsiElement): PsiElement? {
+            if (psiEl.text != SECTION_OUTPUT){
+                return psiEl
             }
             return null
         }
@@ -43,19 +52,21 @@ class SmkCorrectUsingMethodsInspection: SnakemakeInspection() {
                 return
             }
 
+            val firstChildSection = st.firstChild
+
             st.argumentList?.node?.getChildren(null)
                     ?.filter { node -> node.elementType == CALL_EXPRESSION }
                     ?.forEach { node ->
 
                         val method = when (node.firstChildNode.text) {
-                            "ancient" -> checkAncient(st.firstChild)
-                            "protected" -> checkProtected(st.firstChild)
-                            "directory" -> checkDirectory(st.firstChild)
+                            METHOD_ANCIENT -> checkAncient(firstChildSection)
+                            METHOD_PROTECTED -> checkProtected(firstChildSection)
+                            METHOD_DIRECTORY -> checkDirectory(firstChildSection)
                             else -> null
                         }
 
                         val message = SnakemakeBundle.message("INSP.NAME.correct.use.method.title",
-                                node.firstChildNode.text, st.firstChild.text)
+                                node.text, st.firstChild.text)
 
                         if (method != null) {
                             holder.registerProblem(
