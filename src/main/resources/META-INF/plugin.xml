@@ -89,7 +89,6 @@
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkDumbAwareAnnotatorManager"/>
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkStandardAnnotatorManager"/>
     <annotator language="RegExp" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLRegExpHighlightingAnnotator"/>
-    <annotator language="PythonRegExp" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLPythonRegexpHighlighting"/>
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLAnnotatingVisitor"/>
     <lang.foldingBuilder language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkMakeFoldingBuilder"/>
     <lang.braceMatcher language="SnakemakeSL" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.SmkSLBraceMatcher"/>
