@@ -3,19 +3,14 @@ package com.jetbrains.snakecharm.stringLanguage.lang
 import com.intellij.lang.injection.MultiHostRegistrar
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.util.elementType
 import com.jetbrains.python.codeInsight.PyInjectionUtil
 import com.jetbrains.python.codeInsight.PyInjectorBase
 import com.jetbrains.python.codeInsight.regexp.PythonRegexpLanguage
-import com.jetbrains.python.psi.PyArgumentList
-import com.jetbrains.python.psi.PyCallExpression
-import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.python.psi.impl.PyKeywordArgumentImpl
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
-import org.jetbrains.annotations.Nullable
 
 open class SmkSLPythonRegExpInjector : PyInjectorBase() {
     override fun getInjectedLanguage(element: PsiElement) = PythonRegexpLanguage.INSTANCE
