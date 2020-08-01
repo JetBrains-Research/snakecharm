@@ -18,6 +18,7 @@ Features:
 - Inspection: Warn users if they have keyword arguments in sections that does not expect it (see #196)
 - Inspection: Warn about usage of rule/checkpoint/subworkflow objects as arguments instead of one of its fields (see #257)
 - Action: Correct StatementMover for rule sections (see #174)
+- Action: Correct Up/Down StatementMover for rule sections (see #174)
 
 Fixed:
 - Completion does not suggest top-level keywords in comments (see #178)
