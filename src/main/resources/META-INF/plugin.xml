@@ -107,6 +107,8 @@
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex"/>
     <gotoSymbolContributor implementation="com.jetbrains.snakecharm.actions.SmkGotoSymbolContributor"/>
 
+    <codeBlockProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.SmkCodeBlockProvider"/>
+
     <multiHostInjector implementation="com.jetbrains.snakecharm.stringLanguage.lang.SmkSLInjector"/>
 <!--    <metaDataContributor implementation="com.jetbrains.snakecharm.lang.psi.SmkMetaDataContributor"/>-->
 <!--    <referencesSearch implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkReferencesSearcher"/>-->
