@@ -141,7 +141,7 @@
     />
     <completion.contributor
             language="Python"
-            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkWrapperCompletionContributor"
+            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCompletionContributor"
     />
 
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.lang.psi.references.SmkPySubscriptionReferenceContributor"/>
@@ -425,6 +425,7 @@
             implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"
             id="Python" order="last, before default"
     />
+    <postStartupActivity implementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler"/>
 
     <spellchecker.bundledDictionaryProvider implementation="com.jetbrains.snakecharm.spellchecker.SmkBundledDictionaryProvider"/>
 <!--    <spellchecker.support language="Snakemake" implementationClass="com.jetbrains.snakecharm.spellchecker.SmkSpellcheckerStrategy"/>-->
@@ -436,6 +437,11 @@
     </component>
   </module-components>
 
+  <application-components>
+    <component>
+      <implementation-class>com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage</implementation-class>
+    </component>
+  </application-components>
 
   <extensions defaultExtensionNs="Pythonid">
     <dialectsTokenSetContributor implementation="com.jetbrains.snakecharm.lang.SmkTokenSetContributor"/>

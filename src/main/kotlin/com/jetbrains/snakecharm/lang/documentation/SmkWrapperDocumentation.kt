@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyStringLiteralExpression
+import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
@@ -25,11 +26,20 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
     }
 
     private fun processUrl(node: PyStringLiteralExpression): String {
-//        TODO use regex instead of 2 replace
+        val result = node.text.substringAfter('/')
+        val wrappers = SmkWrapperStorage.getInstance().getStorage()
+        val wrapper =  wrappers.find { wrapper -> wrapper.path.contains(result) }
         val url = "https://snakemake-wrappers.readthedocs.io/en/" +
                 node.stringValue.replace("/bio/", "/wrappers/").replace("/utils/", "/wrappers/") + ".html"
-//        TODO more info in doc
-        return "<a href=\"$url\">$url</a>"
+        return if (wrapper != null)
+            """
+            ${wrapper.name}
+            ${wrapper.author}
+            ${wrapper.description}
+            <a href=\"$url\">$url</a>
+            """
+        else
+            "<a href=\"$url\">$url</a>"
     }
 
     override fun getCustomDocumentationElement(
