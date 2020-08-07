@@ -26,7 +26,7 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
     }
 
     private fun processUrl(node: PyStringLiteralExpression): String {
-        val result = node.text.substringAfter('/')
+        val result = node.text.trim('"').substringAfter("/")
         val wrappers = SmkWrapperStorage.getInstance().getStorage()
         val wrapper =  wrappers.find { wrapper -> wrapper.path.contains(result) }
         val url = "https://snakemake-wrappers.readthedocs.io/en/" +

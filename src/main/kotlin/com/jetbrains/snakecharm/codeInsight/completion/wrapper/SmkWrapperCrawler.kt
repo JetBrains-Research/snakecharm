@@ -54,17 +54,27 @@ fun localWrapperParser() {
                 val args = Regex("\\{snakemake\\.\\S*}")
                         .findAll(wrapperfile.readText()).map { str ->
                             str.value
-                                    .drop(11)
-                                    .dropLast(1)
+                                    .trim('{', '}')
+                                    .substringAfter("snakemake.")
                         }
                         .toSortedSet()
                         .toList()
-                        .joinToString(",")
+                        .map {
+                            val splitted = it.split('.', ignoreCase = false, limit = 2)
+                            if (splitted.size != 2) {
+                                splitted[0] to ""
+                            } else {
+                                splitted[0] to splitted[1]
+                            }
+                        }
+                        .groupBy({it.first}, {it.second})
+
+
                 val versions = "0.64.0"
                 val metatext = metafile.readText()
-                val name = metatext.substringAfter("name:").substringBefore("description")
-                val description = metatext.substringAfter("description:").substringBefore("authors")
-                val authors = metatext.substringAfter("authors:")
+                val name = metatext.substringAfter("name:").substringBefore("description").trim('"', '\n', ' ')
+                val description = metatext.substringAfter("description:").substringBefore("authors").trim('"', '\n', ' ')
+                val authors = metatext.substringAfter("authors:").trim('"', '\n', ' ')
                 wrappers.add(
                     SmkWrapperStorage.Wrapper(
                         name=name,

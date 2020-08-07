@@ -14,12 +14,12 @@ class SmkWrapperStorage : PersistentStateComponent<SmkWrapperStorage> {
     }
 
     data class Wrapper(
-        val name: String = "default_name",
-        val path: String = "default_path",
-        val firstTag: String = "0.64.0",
-        val args: String = "",
-        val description: String = "default_description",
-        val author: String = "default_author"
+        val name: String,
+        val path: String,
+        val firstTag: String,
+        val args: Map<String, List<String>>,
+        val description: String,
+        val author: String
     )
 
     private var wrapperStorage: List<Wrapper> = emptyList()
