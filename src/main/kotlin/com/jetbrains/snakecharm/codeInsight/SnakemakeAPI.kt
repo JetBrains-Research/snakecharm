@@ -149,15 +149,6 @@ object SnakemakeAPI {
     )
 
     /**
-     * Set of rule\checkpoint sections that does not expect keyword arguments
-     */
-    val PROHIBITED_NAMED_ARGS_SECTION_KEYWORDS = setOf(
-            SECTION_BENCHMARK, SECTION_VERSION, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS, SECTION_SINGULARITY,
-            SECTION_PRIORITY, SECTION_GROUP, SECTION_SHADOW, SECTION_CONDA, SECTION_SCRIPT, SECTION_WRAPPER,
-            SECTION_CWL, SECTION_NOTEBOOK, SECTION_CACHE, SECTION_CONTAINER
-    )
-
-    /**
      * Ordered list of sections which defines wildcards
      *
      * TODO: Consider implementing this as PSI interface in order not to compare keyword string each time
@@ -187,5 +178,14 @@ object SnakemakeAPI {
             SECTION_INPUT,
             SMK_VARS_ATTEMPT
         )
+    )
+
+    /**
+     * Set of rule\checkpoint sections that does not expect keyword arguments
+     */
+    val PROHIBITED_NAMED_ARGS_SECTION_KEYWORDS = setOf(
+            SECTION_BENCHMARK, SECTION_VERSION, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS, SECTION_SINGULARITY,
+            SECTION_PRIORITY, SECTION_GROUP, SECTION_SHADOW, SECTION_CONDA, SECTION_SCRIPT, SECTION_WRAPPER,
+            SECTION_CWL, SECTION_NOTEBOOK, SECTION_CACHE, SECTION_CONTAINER
     )
 }
