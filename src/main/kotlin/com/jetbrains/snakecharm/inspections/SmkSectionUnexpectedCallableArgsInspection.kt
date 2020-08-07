@@ -37,11 +37,11 @@ class SmkSectionUnexpectedCallableArgsInspection : SnakemakeInspection() {
             args.forEach { arg ->
                 if (arg is PyReferenceExpression) {
                     registerProblem(
-                            arg,
-                            SnakemakeBundle.message(
-                                    "INSP.NAME.section.unexpected.callable.args.message",
-                                    section.sectionKeyword!!
-                            )
+                        arg,
+                        SnakemakeBundle.message(
+                                "INSP.NAME.section.unexpected.callable.args.message",
+                                section.sectionKeyword!!
+                        )
                     )
                 }
             }
