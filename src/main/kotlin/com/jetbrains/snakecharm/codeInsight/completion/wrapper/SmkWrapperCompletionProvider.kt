@@ -30,7 +30,7 @@ object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>()
                 SnakemakeNames.SECTION_WRAPPER) {
             return
         }
-        val storage = SmkWrapperStorage.getInstance().getStorage()
+        val storage = SmkWrapperStorage.getInstance().wrapperStorage
         storage.forEach { wrapper ->
             if (wrapper.path.contains(result.prefixMatcher.prefix, false)) {
                 result.addElement(LookupElementBuilder.create("${wrapper.firstTag}/${wrapper.path}").withIcon(PlatformIcons.PARAMETER_ICON))

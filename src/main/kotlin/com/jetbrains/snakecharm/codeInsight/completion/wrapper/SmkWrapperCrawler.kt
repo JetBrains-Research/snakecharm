@@ -21,7 +21,7 @@ class SmkWrapperCrawler : StartupActivity {
             ProgressManager.getInstance().run(object: Task.Backgroundable(
                     project,
                     "Downloading wrapper repository data",
-                    false
+                    true
             ) {
                 override fun run(indicator: ProgressIndicator) {
                     val folder = File(SmkWrapperCompletionProvider.WRAPPERS_PATH)
@@ -86,5 +86,5 @@ fun localWrapperParser() {
                     )
                 )
             }
-    storage.setStorage(wrappers.toList())
+    storage.wrapperStorage = wrappers.toList()
 }

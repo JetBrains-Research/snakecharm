@@ -22,15 +22,7 @@ class SmkWrapperStorage : PersistentStateComponent<SmkWrapperStorage> {
         val author: String
     )
 
-    private var wrapperStorage: List<Wrapper> = emptyList()
-
-    fun getStorage() : List<Wrapper> {
-        return wrapperStorage
-    }
-
-    fun setStorage(storage: List<Wrapper>) {
-        wrapperStorage = storage
-    }
+    var wrapperStorage: List<Wrapper> = emptyList()
 
     override fun getState(): SmkWrapperStorage? {
         return this
