@@ -10,7 +10,7 @@ Feature: Inspection for unexpected keyword arguments in section
     And SmkSectionUnexpectedKeywordArgsInspection inspection is enabled
     Then I expect inspection error on <a="foo.bar"> with message
     """
-    Section '<section>' does not support keyword arguments.
+    Section '<section>' does not support keyword arguments
     """
     When I check highlighting errors
     Examples:
@@ -29,7 +29,7 @@ Feature: Inspection for unexpected keyword arguments in section
     And SmkSectionUnexpectedKeywordArgsInspection inspection is enabled
     Then I expect inspection error on <a="foo.bar"> with message
     """
-    Section '<section>' does not support keyword arguments.
+    Section '<section>' does not support keyword arguments
     """
     When I check highlighting errors
     Examples:
