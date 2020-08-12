@@ -13,6 +13,7 @@ Features:
 - Inspection: Warn user if rule from 'rulesorder' isn't available in current or included files (see #254)
 - Inspection: Warn about string arguments split on several lines (see #259)
 - Inspection: Warn users if they have callable arguments in sections that does not expect it (see #198)
+- Inspection: Warn about usage of rule/checkpoint/subworkflow objects as arguments instead of one of its fields (see #257)
 
 Fixed:
 - Completion does not suggest top-level keywords in comments (see #178)
