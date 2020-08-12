@@ -2,8 +2,9 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
-import com.jetbrains.python.psi.PyArgumentList
-import com.jetbrains.python.psi.PyReferenceExpression
+import com.jetbrains.python.psi.*
+import com.jetbrains.python.psi.types.PyFunctionType
+import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_CALLABLE_ARGS
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
@@ -36,13 +37,16 @@ class SmkSectionUnexpectedCallableArgsInspection : SnakemakeInspection() {
             val args = argumentList?.arguments ?: emptyArray()
             args.forEach { arg ->
                 if (arg is PyReferenceExpression) {
-                    registerProblem(
-                        arg,
-                        SnakemakeBundle.message(
-                                "INSP.NAME.section.unexpected.callable.args.message",
-                                section.sectionKeyword!!
+                    val childType = TypeEvalContext.codeAnalysis(section.project, section.containingFile).getType(arg)
+                    if (childType is PyFunctionType) {
+                        registerProblem(
+                                arg,
+                                SnakemakeBundle.message(
+                                        "INSP.NAME.section.unexpected.callable.args.message",
+                                        section.sectionKeyword!!
+                                )
                         )
-                    )
+                    }
                 }
             }
         }
