@@ -10,7 +10,7 @@ Feature: Inspection for arguments accessed via rules with unspecified field
     And SmkSectionUnspecifiedFieldArgsInspection inspection is enabled
     Then I expect inspection error on <<rule_like>s.RULE> with message
     """
-    Expected section name or argument (e.g. 'checkpoints.foo.input' or 'rules.bar.output.arg1'), but '<rule_like>s.RULE' was found
+    Expected section name or argument (e.g. 'rules.foo.input' or 'rules.bar.output.arg1'), but '<rule_like>s.RULE' was found
     """
     When I check highlighting errors
     Examples:
@@ -34,7 +34,7 @@ Feature: Inspection for arguments accessed via rules with unspecified field
     And SmkSectionUnspecifiedFieldArgsInspection inspection is enabled
     Then I expect inspection error on <<rule_like>s.RULE> with message
     """
-    Expected section name or argument (e.g. 'checkpoints.foo.input' or 'rules.bar.output.arg1'), but '<rule_like>s.RULE' was found
+    Expected section name or argument (e.g. 'rules.foo.input' or 'rules.bar.output.arg1'), but '<rule_like>s.RULE' was found
     """
     When I check highlighting errors
     Examples:

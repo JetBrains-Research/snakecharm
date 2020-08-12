@@ -53,7 +53,7 @@ class SmkSectionUnspecifiedFieldArgsInspection : SnakemakeInspection() {
         }
 
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {
-            val childQualified = PsiTreeUtil.getChildOfType(node, PyQualifiedExpression::class.java) ?: return
+            val childQualified = node.qualifier ?: return
             val childType = TypeEvalContext.codeAnalysis(node.project, node.containingFile).getType(childQualified)
             if (childType is SmkRulesType || childType is SmkCheckpointType) {
                 reportSmkProblem(
