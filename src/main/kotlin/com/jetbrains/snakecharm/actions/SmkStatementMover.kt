@@ -1,7 +1,5 @@
 package com.jetbrains.snakecharm.actions
 
-//import com.jetbrains.snakecharm.lang.SnakemakeNames.RULE_KEYWORD
-import com.intellij.codeInsight.editorActions.moveUpDown.LineMover
 import com.intellij.codeInsight.editorActions.moveUpDown.LineRange
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.CaretModel
@@ -17,7 +15,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.elementType
 import com.jetbrains.python.codeInsight.editorActions.moveUpDown.PyStatementMover
 import com.jetbrains.python.psi.*
-import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_KEYWORD
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_LIKE
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 
 open class SmkStatementMover: PyStatementMover() {
@@ -43,7 +41,7 @@ open class SmkStatementMover: PyStatementMover() {
         var elementToMove1 = PyUtil.findNonWhitespaceAtOffset(file, start)
         var elementToMove2 = PyUtil.findNonWhitespaceAtOffset(file, end)
 
-        if (elementToMove1.elementType == RULE_KEYWORD && elementToMove2?.parent?.firstChild.elementType == RULE_KEYWORD){
+        if (elementToMove1.elementType in RULE_LIKE && elementToMove2?.parent?.firstChild.elementType in RULE_LIKE){
             elementToMove1 = elementToMove1?.parent
             elementToMove2 = elementToMove2?.parent
 
@@ -59,23 +57,6 @@ open class SmkStatementMover: PyStatementMover() {
             return true
         }
 
-        return false
-    }
-
-    private fun ifInsideString(document: Document, lineNumber: Int, elementToMove1: PsiElement, down: Boolean): Boolean {
-        val start = document.getLineStartOffset(lineNumber)
-        val end = document.getLineEndOffset(lineNumber)
-        val nearLine = if (down) lineNumber + 1 else lineNumber - 1
-        if (nearLine >= document.lineCount || nearLine <= 0) return false
-        val stringLiteralExpression = PsiTreeUtil.getParentOfType(elementToMove1, PyStringLiteralExpression::class.java)
-        if (stringLiteralExpression != null) {
-            val quotes = PyStringLiteralUtil.getQuotes(stringLiteralExpression.text)
-            if (quotes != null && (quotes.first == "'''" || quotes.first == "\"\"\"")) {
-                val text1 = document.getText(TextRange.create(start, end)).trim { it <= ' ' }
-                val text2 = document.getText(TextRange.create(document.getLineStartOffset(nearLine), document.getLineEndOffset(nearLine))).trim { it <= ' ' }
-                if (!text1.startsWith(quotes.first) && !text1.endsWith(quotes.second) && !text2.startsWith(quotes.first) && !text2.endsWith(quotes.second)) return true
-            }
-        }
         return false
     }
 
