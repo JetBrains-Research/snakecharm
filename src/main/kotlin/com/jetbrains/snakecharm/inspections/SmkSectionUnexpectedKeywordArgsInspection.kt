@@ -5,7 +5,7 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.PROHIBITED_NAMED_ARGS_SECTION_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
@@ -22,7 +22,7 @@ class SmkSectionUnexpectedKeywordArgsInspection : SnakemakeInspection() {
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            if (st.sectionKeyword in PROHIBITED_NAMED_ARGS_SECTION_KEYWORDS) {
+            if (st.sectionKeyword in SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED) {
                 checkArgumentList(st.argumentList, st)
             }
         }
