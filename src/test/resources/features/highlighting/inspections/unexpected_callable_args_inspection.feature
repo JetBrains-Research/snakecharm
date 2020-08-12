@@ -24,6 +24,7 @@ Feature: Inspection for unexpected callable arguments in section
       | rule        | output     |
       | rule        | container  |
       | rule        | cwl        |
+      | rule        | log        |
       | checkpoint  | message    |
       | checkpoint  | notebook   |
       | checkpoint  | priority   |
@@ -50,7 +51,6 @@ Feature: Inspection for unexpected callable arguments in section
       | rule        | input     |
       | rule        | threads   |
       | rule        | params    |
-      | checkpoint  | log       |
       | checkpoint  | resources |
       | checkpoint  | version   |
       | subworkflow | snakefile |
