@@ -61,4 +61,5 @@ object SnakemakeNames {
     const val METHOD_ANCIENT = "ancient"
     const val METHOD_PROTECTED = "protected"
     const val METHOD_DIRECTORY = "directory"
+    const val METHOD_TEMP = "temp"
 }
