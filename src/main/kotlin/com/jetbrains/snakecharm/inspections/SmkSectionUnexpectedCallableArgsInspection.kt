@@ -36,7 +36,7 @@ class SmkSectionUnexpectedCallableArgsInspection : SnakemakeInspection() {
         ) {
             val args = argumentList?.arguments ?: emptyArray()
             args.forEach { arg ->
-                if (arg is PyReferenceExpression) {
+                if (arg is PyReferenceExpression && arg !is PyLambdaExpression) {
                     val childType = TypeEvalContext.codeAnalysis(section.project, section.containingFile).getType(arg)
                     if (childType is PyFunctionType) {
                         registerProblem(

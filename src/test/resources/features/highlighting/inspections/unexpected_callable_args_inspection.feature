@@ -37,21 +37,24 @@ Feature: Inspection for unexpected callable arguments in section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    def bar():
+    def foo():
         return "text"
+    def bar(arg):
+        return str(arg)
+    MSG="msg"
 
     <rule_like> NAME:
-        <section>: bar
+        <section>: <argument>
     """
     And SmkSectionUnexpectedCallableArgsInspection inspection is enabled
     Then I expect no inspection errors
     When I check highlighting errors
     Examples:
-      | rule_like   | section   |
-      | rule        | input     |
-      | rule        | threads   |
-      | rule        | params    |
-      | checkpoint  | resources |
-      | checkpoint  | version   |
-      | subworkflow | snakefile |
-      | subworkflow | workdir   |
+      | rule_like   | section   | argument |
+      | rule        | input     | foo      |
+      | rule        | threads   | bar(1)   |
+      | rule        | params    | MSG      |
+      | checkpoint  | resources | foo      |
+      | checkpoint  | version   | bar(1.0) |
+      | subworkflow | snakefile | MSG      |
+      | subworkflow | workdir   | foo      |
