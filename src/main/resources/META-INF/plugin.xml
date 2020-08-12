@@ -266,6 +266,17 @@
     />
 
     <localInspection
+            language="Snakemake" shortName="SmkSectionUnspecifiedFieldArgsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkSectionUnspecifiedFieldArgs"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.unspecified.field.args"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionUnspecifiedFieldArgsInspection"
+    />
+
+    <localInspection
             language="Snakemake" shortName="SmkSectionDuplicatedArgsInspection"
             enabledByDefault="true"
             level="WARNING"
