@@ -288,6 +288,17 @@
     />
 
     <localInspection
+            language="Snakemake" shortName="SmkSectionUnexpectedKeywordArgsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkSectionUnexpectedKeywordArgs"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.unexpected.keyword.args"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionUnexpectedKeywordArgsInspection"
+    />
+
+    <localInspection
             language="Snakemake"
             shortName="SmkSectionWrapperArgsInspection"
             enabledByDefault="true"
@@ -482,6 +493,7 @@
       <implementation-class>com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider</implementation-class>
     </component>
   </module-components>
+
 
   <extensions defaultExtensionNs="Pythonid">
     <dialectsTokenSetContributor implementation="com.jetbrains.snakecharm.lang.SmkTokenSetContributor"/>
