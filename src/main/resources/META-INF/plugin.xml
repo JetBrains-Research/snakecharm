@@ -263,6 +263,17 @@
     />
 
     <localInspection
+            language="Snakemake" shortName="SmkSectionUnexpectedKeywordArgsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkSectionUnexpectedKeywordArgs"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.unexpected.keyword.args"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionUnexpectedKeywordArgsInspection"
+    />
+
+    <localInspection
             language="Snakemake" shortName="SmkSubworkflowRedeclarationInspection"
             enabledByDefault="true"
             level="WEAK WARNING"
