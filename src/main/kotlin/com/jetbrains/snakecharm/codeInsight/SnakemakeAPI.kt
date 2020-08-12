@@ -187,6 +187,7 @@ object SnakemakeAPI {
         SECTION_INPUT, SECTION_PARAMS, SECTION_THREADS, SECTION_RESOURCES,
         SECTION_CONDA, SECTION_VERSION, SECTION_SINGULARITY, SECTION_GROUP,
         SnakemakeNames.SUBWORKFLOW_WORKDIR_KEYWORD, SnakemakeNames.SUBWORKFLOW_SNAKEFILE_KEYWORD
+    )
       
     /**
      * Set of rule\checkpoint sections that does not expect keyword arguments
