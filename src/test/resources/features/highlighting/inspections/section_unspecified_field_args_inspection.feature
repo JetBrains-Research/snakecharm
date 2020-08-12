@@ -5,12 +5,12 @@ Feature: Inspection for arguments accessed via rules with unspecified field
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-      <section>: rules.RULE
+      <section>: <rule_like>s.RULE
     """
     And SmkSectionUnspecifiedFieldArgsInspection inspection is enabled
-    Then I expect inspection error on <rules.RULE> with message
+    Then I expect inspection error on <<rule_like>s.RULE> with message
     """
-    No field from 'rules.RULE' is specified
+    Expected section name or argument (e.g. 'checkpoints.foo.input' or 'rules.bar.output.arg1'), but '<rule_like>s.RULE' was found
     """
     When I check highlighting errors
     Examples:
@@ -23,21 +23,18 @@ Feature: Inspection for arguments accessed via rules with unspecified field
       | checkpoint  | script     |
       | checkpoint  | threads    |
       | checkpoint  | priority   |
-      | subworkflow | workdir    |
-      | subworkflow | snakefile  |
-      | subworkflow | configfile |
 
   Scenario Outline: Identify rule dependency without field access as subexpression
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-      <section>: rules.RULE <addition>
+      <section>: <rule_like>s.RULE <addition>
     """
     And SmkSectionUnspecifiedFieldArgsInspection inspection is enabled
-    Then I expect inspection error on <rules.RULE> with message
+    Then I expect inspection error on <<rule_like>s.RULE> with message
     """
-    No field from 'rules.RULE' is specified
+    Expected section name or argument (e.g. 'checkpoints.foo.input' or 'rules.bar.output.arg1'), but '<rule_like>s.RULE' was found
     """
     When I check highlighting errors
     Examples:
@@ -54,7 +51,7 @@ Feature: Inspection for arguments accessed via rules with unspecified field
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-      <section>: rules.RULE.<section>
+      <section>: <rule_like>s.RULE.<section>
     """
     And SmkSectionUnspecifiedFieldArgsInspection inspection is enabled
     Then I expect no inspection errors
@@ -69,16 +66,13 @@ Feature: Inspection for arguments accessed via rules with unspecified field
       | checkpoint  | script     |
       | checkpoint  | threads    |
       | checkpoint  | priority   |
-      | subworkflow | workdir    |
-      | subworkflow | snakefile  |
-      | subworkflow | configfile |
 
   Scenario Outline: No errors on rule dependency with field access as subexpression
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-      <section>: rules.RULE.<section> <addition>
+      <section>: <rule_like>s.RULE.<section> <addition>
     """
     And SmkSectionUnspecifiedFieldArgsInspection inspection is enabled
     Then I expect no inspection errors

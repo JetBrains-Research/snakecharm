@@ -3,11 +3,13 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.*
+import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
-import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
+import com.jetbrains.snakecharm.lang.psi.*
+import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
+import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 
 class SmkSectionUnspecifiedFieldArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -50,9 +52,10 @@ class SmkSectionUnspecifiedFieldArgsInspection : SnakemakeInspection() {
             node.acceptChildren(this)
         }
 
-        override fun visitPyReferenceExpression(node: PyReferenceExpression?) {
-            if (node?.firstChild?.textMatches("rules") == true) {
-
+        override fun visitPyReferenceExpression(node: PyReferenceExpression) {
+            val childQualified = PsiTreeUtil.getChildOfType(node, PyQualifiedExpression::class.java) ?: return
+            val childType = TypeEvalContext.codeAnalysis(node.project, node.containingFile).getType(childQualified)
+            if (childType is SmkRulesType || childType is SmkCheckpointType) {
                 reportSmkProblem(
                         node as PsiElement,
                         SnakemakeBundle.message("INSP.NAME.section.unspecified.field.args.message", node.text)
