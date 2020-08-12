@@ -108,7 +108,7 @@
     <gotoSymbolContributor implementation="com.jetbrains.snakecharm.actions.SmkGotoSymbolContributor"/>
 
     <multiHostInjector implementation="com.jetbrains.snakecharm.stringLanguage.lang.SmkSLInjector"/>
-    <multiHostInjector implementation="com.jetbrains.snakecharm.stringLanguage.lang.SmkSLPythonRegExpInjector"/>
+    <multiHostInjector implementation="com.jetbrains.snakecharm.lang.SmkWildcardConstraintsRegExpInjector"/>
 <!--    <metaDataContributor implementation="com.jetbrains.snakecharm.lang.psi.SmkMetaDataContributor"/>-->
 <!--    <referencesSearch implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkReferencesSearcher"/>-->
 

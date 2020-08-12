@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.stringLanguage.lang
+package com.jetbrains.snakecharm.lang
 
 import com.intellij.lang.injection.MultiHostRegistrar
 import com.intellij.psi.PsiElement
@@ -8,11 +8,10 @@ import com.jetbrains.python.codeInsight.PyInjectorBase
 import com.jetbrains.python.codeInsight.regexp.PythonRegexpLanguage
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.python.psi.impl.PyKeywordArgumentImpl
-import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
-open class SmkSLPythonRegExpInjector : PyInjectorBase() {
+open class SmkWildcardConstraintsRegExpInjector : PyInjectorBase() {
     override fun getInjectedLanguage(element: PsiElement) = PythonRegexpLanguage.INSTANCE
 
     override fun elementsToInjectIn() = listOf(PyStringLiteralExpression::class.java)
