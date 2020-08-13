@@ -22,9 +22,11 @@ Feature: Inspection for methods from snakemake library
       | rule        | log         | directory     | ('')     |
       | rule        | benchmark   | ancient       | ('')     |
       | rule        | benchmark   | directory     | ('')     |
-      | rule        | input       | temp          | ('')     |
       | rule        | log         | temp          | ('')     |
       | rule        | benchmark   | temp          | ('')     |
+      | rule        | input       | report        | ('')     |
+      | rule        | log         | report        | ('')     |
+      | rule        | benchmark   | report        | ('')     |
 
   Scenario Outline: Correct using ancient/protected/directory methods
     Given a snakemake project
@@ -43,3 +45,6 @@ Feature: Inspection for methods from snakemake library
       | rule        | output      | protected('') |
       | rule        | log         | protected('') |
       | rule        | output      | directory('') |
+      | rule        | input       | temp('')      |
+      | rule        | output      | temp('')      |
+      | rule        | output      | report('')    |

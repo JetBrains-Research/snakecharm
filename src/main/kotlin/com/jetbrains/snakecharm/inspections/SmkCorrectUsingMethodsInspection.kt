@@ -9,6 +9,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_ANCIENT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_DIRECTORY
 import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_PROTECTED
+import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_REPORT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_TEMP
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_BENCHMARK
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
@@ -29,7 +30,8 @@ class SmkCorrectUsingMethodsInspection: SnakemakeInspection() {
             return when (ruleOrCheckpointSectionName) {
                 METHOD_ANCIENT -> arrayListOf(SECTION_INPUT)
                 METHOD_PROTECTED -> arrayListOf(SECTION_OUTPUT, SECTION_LOG, SECTION_BENCHMARK)
-                METHOD_DIRECTORY, METHOD_TEMP -> arrayListOf(SECTION_OUTPUT)
+                METHOD_DIRECTORY, METHOD_REPORT -> arrayListOf(SECTION_OUTPUT)
+                METHOD_TEMP -> arrayListOf(SECTION_INPUT, SECTION_OUTPUT)
                 else -> null
             }
         }
