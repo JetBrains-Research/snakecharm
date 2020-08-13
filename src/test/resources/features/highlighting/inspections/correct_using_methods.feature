@@ -7,7 +7,7 @@ Feature: Inspection for methods from snakemake library
     <rule_like> NAME:
        <section>: <method><arg_list>
     """
-    And SmkCorrectUsingMethodsInspection inspection is enabled
+    And SmkMisuseUsageIOFlagMethodsInspection inspection is enabled
     Then I expect inspection warning on <<method><arg_list>> in <<section>: <method><arg_list>> with message
     """
     '<method>' isn't supported in '<section>'
@@ -35,7 +35,7 @@ Feature: Inspection for methods from snakemake library
     <rule_like> NAME:
        <section>: <method>
     """
-    And SmkCorrectUsingMethodsInspection inspection is enabled
+    And SmkMisuseUsageIOFlagMethodsInspection inspection is enabled
     Then I expect no inspection warnings
     When I check highlighting warnings
     Examples:

@@ -450,14 +450,14 @@
     />
 
     <localInspection
-            language="Snakemake" shortName="SmkCorrectUsingMethodsInspection"
+            language="Snakemake" shortName="SmkMisuseUsageIOFlagMethodsInspection"
             enabledByDefault="true"
             level="WARNING"
-            suppressId="SmkCorrectUsingMethods"
+            suppressId="SmkMisuseUsageIOFlagMethods"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.correct.use.method.title"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkCorrectUsingMethodsInspection"
+            key="INSP.NAME.misuse.usage.io.flag.methods.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkMisuseUsageIOFlagMethodsInspection"
     />
 
     <findUsagesHandlerFactory

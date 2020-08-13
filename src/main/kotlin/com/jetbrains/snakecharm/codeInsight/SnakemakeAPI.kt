@@ -1,6 +1,11 @@
 package com.jetbrains.snakecharm.codeInsight
 
 import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_ANCIENT
+import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_DIRECTORY
+import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_PROTECTED
+import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_REPORT
+import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_TEMP
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_BENCHMARK
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CACHE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CONDA
@@ -190,5 +195,13 @@ object SnakemakeAPI {
             SECTION_BENCHMARK, SECTION_VERSION, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS, SECTION_SINGULARITY,
             SECTION_PRIORITY, SECTION_GROUP, SECTION_SHADOW, SECTION_CONDA, SECTION_SCRIPT, SECTION_WRAPPER,
             SECTION_CWL, SECTION_NOTEBOOK, SECTION_CACHE, SECTION_CONTAINER
+    )
+
+    val SNAKEMAKE_IO_METHODS_CORRECT_SECTIONS: HashMap<String, List<String>> = hashMapOf(
+            METHOD_ANCIENT to listOf(SECTION_INPUT),
+            METHOD_PROTECTED to listOf(SECTION_OUTPUT, SECTION_LOG, SECTION_BENCHMARK),
+            METHOD_DIRECTORY to listOf(SECTION_OUTPUT),
+            METHOD_REPORT to listOf(SECTION_OUTPUT),
+            METHOD_TEMP to listOf(SECTION_INPUT, SECTION_OUTPUT)
     )
 }
