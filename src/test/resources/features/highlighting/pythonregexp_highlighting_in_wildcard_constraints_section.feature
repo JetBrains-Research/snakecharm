@@ -4,13 +4,17 @@ Feature: This feature checks reference highlighting in wildcard_constraints sect
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    <rule_name> NAME:
+    <rule_block>
       wildcard_constraints:
           <arg>="<pyredexp>"
     """
     When I put the caret after <pyredexp>
-    Then I expect language injection on "<pyredexp>"
+    Then I expect language "PythonRegExp" injection on "<pyredexp>"
     Examples:
-      | rule_name | arg     | pyredexp |
-      | rule      | dataset | \d+      |
-      | rule      | seqfile | \d+      |
+      | rule_block | arg      | pyredexp |
+      | rule NAME: | dataset  | \d+      |
+      | rule NAME: | seqfile  | \d+      |
+      | rule NAME: | wildcard | \d+      |
+      |            | dataset  | \d+      |
+      |            | seqfile  | \d+      |
+      |            | wildcard | \d+      |
