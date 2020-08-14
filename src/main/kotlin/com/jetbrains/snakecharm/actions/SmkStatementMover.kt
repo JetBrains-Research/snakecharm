@@ -17,6 +17,7 @@ import com.jetbrains.python.codeInsight.editorActions.moveUpDown.PyStatementMove
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_LIKE
 import com.jetbrains.snakecharm.lang.psi.SmkFile
+import com.jetbrains.snakecharm.lang.psi.impl.SmkRuleOrCheckpointArgsSectionImpl
 
 open class SmkStatementMover: PyStatementMover() {
     override fun checkAvailable(editor: Editor, file: PsiFile, info: MoveInfo, down: Boolean): Boolean {
@@ -38,15 +39,25 @@ open class SmkStatementMover: PyStatementMover() {
             end = if (selectionEnd == 0) 0 else selectionEnd - 1
         }
 
-        var elementToMove1 = PyUtil.findNonWhitespaceAtOffset(file, start)
-        var elementToMove2 = PyUtil.findNonWhitespaceAtOffset(file, end)
+        var elementToMove1 = PyUtil.findNonWhitespaceAtOffset(file, start) ?: return false
+        var elementToMove2 = PyUtil.findNonWhitespaceAtOffset(file, end) ?: return false
 
-        if (elementToMove1.elementType in RULE_LIKE && elementToMove2?.parent?.firstChild.elementType in RULE_LIKE){
-            elementToMove1 = elementToMove1?.parent
-            elementToMove2 = elementToMove2?.parent
+        val pyStatementList = PsiTreeUtil.getParentOfType(elementToMove1, PyStatementList::class.java)
+        val ruleOrCheckpointSection = PsiTreeUtil.getParentOfType(elementToMove1, SmkRuleOrCheckpointArgsSectionImpl::class.java)
 
-            elementToMove1 = getCommentOrStatement(document, elementToMove1!!)
-            elementToMove2 = getCommentOrStatement(document, elementToMove2!!)
+        if (pyStatementList != null &&
+                ruleOrCheckpointSection != null) {
+            if (ruleOrCheckpointSection == pyStatementList.children[0] && !down) {
+                return true
+            }
+        }
+
+        if (elementToMove1.elementType in RULE_LIKE && elementToMove2.parent?.firstChild.elementType in RULE_LIKE){
+            elementToMove1 = elementToMove1.parent
+            elementToMove2 = elementToMove2.parent
+
+            elementToMove1 = getCommentOrStatement(document, elementToMove1)
+            elementToMove2 = getCommentOrStatement(document, elementToMove2)
 
             info.toMove = elementToMove2.let { MyLineRange(elementToMove1, it) }
             info.toMove2 = getDestinationScope(file, editor, (if (down) elementToMove2 else elementToMove1), down)
