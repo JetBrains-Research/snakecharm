@@ -24,6 +24,7 @@ Feature: Inspection for unexpected callable arguments in rulelike sections
       | rule       | container |
       | rule       | cwl       |
       | rule       | log       |
+      | checkpoint | version   |
       | checkpoint | message   |
       | checkpoint | notebook  |
       | checkpoint | priority  |
@@ -51,7 +52,6 @@ Feature: Inspection for unexpected callable arguments in rulelike sections
       | rule       | params    |
       | rule       | threads   |
       | checkpoint | resources |
-      | checkpoint | version   |
       | checkpoint | group     |
 
   Scenario Outline: No warn on other PyReferenceExpression arguments

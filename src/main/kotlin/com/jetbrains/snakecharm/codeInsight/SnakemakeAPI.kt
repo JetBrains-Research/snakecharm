@@ -184,8 +184,7 @@ object SnakemakeAPI {
      * Set of rule\checkpoint sections that supports callable arguments
      */
     val ALLOWED_CALLABLE_ARGS = setOf(
-        SECTION_INPUT, SECTION_PARAMS, SECTION_THREADS,
-        SECTION_RESOURCES, SECTION_VERSION, SECTION_GROUP
+        SECTION_INPUT, SECTION_PARAMS, SECTION_THREADS, SECTION_RESOURCES, SECTION_GROUP
     )
       
     /**
