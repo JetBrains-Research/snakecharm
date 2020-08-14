@@ -1,4 +1,4 @@
-Feature: Inspection for unexpected callable arguments in section
+Feature: Inspection for unexpected callable arguments in rulelike sections
 
   Scenario Outline: Unexpected callable arguments
     Given a snakemake project
@@ -17,23 +17,44 @@ Feature: Inspection for unexpected callable arguments in section
     """
     When I check highlighting errors
     Examples:
-      | rule_like   | section    |
-      | subworkflow | configfile |
-      | rule        | benchmark  |
-      | rule        | cache      |
-      | rule        | output     |
-      | rule        | container  |
-      | rule        | cwl        |
-      | rule        | log        |
-      | checkpoint  | message    |
-      | checkpoint  | notebook   |
-      | checkpoint  | priority   |
-      | checkpoint  | script     |
-      | checkpoint  | shadow     |
-      | checkpoint  | shell      |
-      | checkpoint  | wrapper    |
+      | rule_like  | section   |
+      | rule       | benchmark |
+      | rule       | cache     |
+      | rule       | output    |
+      | rule       | container |
+      | rule       | cwl       |
+      | rule       | log       |
+      | checkpoint | message   |
+      | checkpoint | notebook  |
+      | checkpoint | priority  |
+      | checkpoint | script    |
+      | checkpoint | shadow    |
+      | checkpoint | shell     |
+      | checkpoint | wrapper   |
 
   Scenario Outline: No warn on expected callable arguments
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    def foo(wildcards):
+        return "text"
+
+    <rule_like> NAME:
+        <section>: foo
+    """
+    And SmkSectionUnexpectedCallableArgsInspection inspection is enabled
+    Then I expect no inspection errors
+    When I check highlighting errors
+    Examples:
+      | rule_like  | section   |
+      | rule       | input     |
+      | rule       | params    |
+      | rule       | threads   |
+      | checkpoint | resources |
+      | checkpoint | version   |
+      | checkpoint | group     |
+
+  Scenario Outline: No warn on other PyReferenceExpression arguments
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -50,11 +71,10 @@ Feature: Inspection for unexpected callable arguments in section
     Then I expect no inspection errors
     When I check highlighting errors
     Examples:
-      | rule_like   | section   | argument |
-      | rule        | input     | foo      |
-      | rule        | threads   | bar(1)   |
-      | rule        | params    | MSG      |
-      | checkpoint  | resources | foo      |
-      | checkpoint  | version   | bar(1.0) |
-      | subworkflow | snakefile | MSG      |
-      | subworkflow | workdir   | foo      |
+      | rule_like  | section   | argument |
+      | rule       | message   | MSG      |
+      | rule       | output    | foo()    |
+      | rule       | priority  | bar(1)   |
+      | checkpoint | log       | MSG      |
+      | checkpoint | benchmark | foo()    |
+      | checkpoint | cache     | bar(0)   |

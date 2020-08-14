@@ -181,12 +181,11 @@ object SnakemakeAPI {
     )
 
     /**
-     * Set of rule\checkpoint\subworkflow sections that supports callable arguments
+     * Set of rule\checkpoint sections that supports callable arguments
      */
     val ALLOWED_CALLABLE_ARGS = setOf(
-        SECTION_INPUT, SECTION_PARAMS, SECTION_THREADS, SECTION_RESOURCES,
-        SECTION_CONDA, SECTION_VERSION, SECTION_SINGULARITY, SECTION_GROUP,
-        SnakemakeNames.SUBWORKFLOW_WORKDIR_KEYWORD, SnakemakeNames.SUBWORKFLOW_SNAKEFILE_KEYWORD
+        SECTION_INPUT, SECTION_PARAMS, SECTION_THREADS,
+        SECTION_RESOURCES, SECTION_VERSION, SECTION_GROUP
     )
       
     /**
