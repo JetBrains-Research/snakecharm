@@ -1,11 +1,6 @@
 package com.jetbrains.snakecharm.codeInsight
 
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_ANCIENT
-import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_DIRECTORY
-import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_PROTECTED
-import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_REPORT
-import com.jetbrains.snakecharm.lang.SnakemakeNames.METHOD_TEMP
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_BENCHMARK
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CACHE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CONDA
@@ -28,6 +23,16 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_THREADS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_VERSION
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_WRAPPER
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_ANCIENT
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_DIRECTORY
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_DYNAMIC
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_PIPE
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_PROTECTED
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_REPEAT
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_REPORT
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_TEMP
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_TOUCH
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_UNPACK
 
 /**
  * Also see [ImplicitPySymbolsProvider] class
@@ -198,10 +203,15 @@ object SnakemakeAPI {
     )
 
     val SNAKEMAKE_IO_METHODS_CORRECT_SECTIONS: HashMap<String, List<String>> = hashMapOf(
-            METHOD_ANCIENT to listOf(SECTION_INPUT),
-            METHOD_PROTECTED to listOf(SECTION_OUTPUT, SECTION_LOG, SECTION_BENCHMARK),
-            METHOD_DIRECTORY to listOf(SECTION_OUTPUT),
-            METHOD_REPORT to listOf(SECTION_OUTPUT),
-            METHOD_TEMP to listOf(SECTION_INPUT, SECTION_OUTPUT)
+            SNAKEMAKE_IO_METHOD_ANCIENT to listOf(SECTION_INPUT),
+            SNAKEMAKE_IO_METHOD_PROTECTED to listOf(SECTION_OUTPUT, SECTION_LOG, SECTION_BENCHMARK),
+            SNAKEMAKE_IO_METHOD_DIRECTORY to listOf(SECTION_OUTPUT),
+            SNAKEMAKE_IO_METHOD_REPORT to listOf(SECTION_OUTPUT),
+            SNAKEMAKE_IO_METHOD_TEMP to listOf(SECTION_INPUT, SECTION_OUTPUT),
+            SNAKEMAKE_IO_METHOD_TOUCH to listOf(SECTION_OUTPUT),
+            SNAKEMAKE_IO_METHOD_PIPE to listOf(SECTION_OUTPUT),
+            SNAKEMAKE_IO_METHOD_REPEAT to listOf(SECTION_BENCHMARK),
+            SNAKEMAKE_IO_METHOD_UNPACK to listOf(SECTION_INPUT),
+            SNAKEMAKE_IO_METHOD_DYNAMIC to listOf(SECTION_OUTPUT)
     )
 }
