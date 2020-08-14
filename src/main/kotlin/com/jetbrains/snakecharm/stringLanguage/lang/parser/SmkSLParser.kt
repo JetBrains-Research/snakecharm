@@ -40,7 +40,7 @@ class SmkSLParser : PsiParser {
                     SnakemakeBundle.message("SMKSL.PARSE.expected.regexp"))
 
             // RegExp will be parsed automatically, because its token
-            // type extends ILazyParseableElementType
+            // type extends ILazyParsableElementType
         }
 
         // Skipping '}'
