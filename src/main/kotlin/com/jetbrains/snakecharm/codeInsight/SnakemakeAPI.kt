@@ -157,7 +157,10 @@ object SnakemakeAPI {
             SECTION_OUTPUT, SECTION_LOG, SECTION_BENCHMARK
     )
 
-    val ALLOWED_LAMBDA_ARGS = mapOf(
+    /**
+     * Set of rule/checkpoint sections that supports lambdas/callable arguments
+     */
+    val ALLOWED_LAMBDA_OR_CALLABLE_ARGS = mapOf(
         SECTION_INPUT to arrayOf(SMK_VARS_WILDCARDS),
         SECTION_GROUP to arrayOf(SMK_VARS_WILDCARDS),
         SECTION_PARAMS to arrayOf(
@@ -180,13 +183,6 @@ object SnakemakeAPI {
         )
     )
 
-    /**
-     * Set of rule\checkpoint sections that supports callable arguments
-     */
-    val ALLOWED_CALLABLE_ARGS = setOf(
-        SECTION_INPUT, SECTION_PARAMS, SECTION_THREADS, SECTION_RESOURCES, SECTION_GROUP
-    )
-      
     /**
      * Set of rule\checkpoint sections that does not expect keyword arguments
      */

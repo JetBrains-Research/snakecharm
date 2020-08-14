@@ -2,11 +2,13 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
-import com.jetbrains.python.psi.*
+import com.jetbrains.python.psi.PyArgumentList
+import com.jetbrains.python.psi.PyLambdaExpression
+import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.types.PyFunctionType
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_CALLABLE_ARGS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_OR_CALLABLE_ARGS
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
@@ -19,13 +21,13 @@ class SmkSectionUnexpectedCallableArgsInspection : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
-            if (st.sectionKeyword !in ALLOWED_CALLABLE_ARGS) {
+            if (st.sectionKeyword !in ALLOWED_LAMBDA_OR_CALLABLE_ARGS) {
                 checkArgumentList(st.argumentList, st)
             }
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            if (st.sectionKeyword !in ALLOWED_CALLABLE_ARGS) {
+            if (st.sectionKeyword !in ALLOWED_LAMBDA_OR_CALLABLE_ARGS) {
                 checkArgumentList(st.argumentList, st)
             }
         }

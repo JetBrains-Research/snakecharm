@@ -8,7 +8,7 @@ import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_ARGS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_OR_CALLABLE_ARGS
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
@@ -29,7 +29,7 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
             // for more info on which sections are allowed to use callables and why
 
             val sectionKeyword = st.sectionKeyword
-            val allowedArgs = ALLOWED_LAMBDA_ARGS[sectionKeyword]
+            val allowedArgs = ALLOWED_LAMBDA_OR_CALLABLE_ARGS[sectionKeyword]
             if (allowedArgs != null) {
                 registerParamsProblemsForLambdasWithWildcards(
                         allLambdas,
