@@ -6,13 +6,14 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.elementType
 import com.jetbrains.python.psi.PyStatement
-import com.jetbrains.snakecharm.lang.psi.SmkRule
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.python.psi.PyStatementList
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT
 
 class SmkCodeBlockProvider: CodeBlockProvider {
     override fun getCodeBlockRange(editor: Editor?, psiFile: PsiFile?): TextRange? {
-        var caretOffset = editor?.getCaretModel()?.getOffset()
+        var caretOffset = editor?.caretModel?.offset
 
         var element = caretOffset?.let { psiFile?.findElementAt(it) } ?: return null
 
@@ -24,26 +25,27 @@ class SmkCodeBlockProvider: CodeBlockProvider {
         var statement = PsiTreeUtil.getParentOfType(element, PyStatement::class.java)
 
         if (statement != null) {
-            var statementList = PsiTreeUtil.findChildOfType(statement, SmkRuleOrCheckpointArgsSection::class.java)
 
-            // if the statement above caret is not a block statement, look above for a statement list and then find the statement above
-            // that statement list
-            if (statementList == null) {
-                statementList = PsiTreeUtil.getParentOfType(statement, SmkRuleOrCheckpointArgsSection::class.java)
-                if (statementList != null) {
-                    statement = PsiTreeUtil.getParentOfType(statementList, SmkRuleOrCheckpointArgsSection::class.java)
+            if (statement.elementType != RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT) {
+                var statementList = PsiTreeUtil.findChildOfType(statement, PyStatementList::class.java)
+
+                // if the statement above caret is not a block statement, look above for a statement list and then find the statement above
+                // that statement list
+                if (statementList == null) {
+                    statementList = PsiTreeUtil.getParentOfType(statement, PyStatementList::class.java)
+                    if (statementList != null) {
+                        statement = PsiTreeUtil.getParentOfType(statementList, PyStatement::class.java)
+                    }
                 }
             }
 
             if (statement != null) {
                 // if we're in the beginning of the statement already, pressing Ctrl-[ again should move the caret one statement higher
                 val statementStart = statement.textRange.startOffset
-                var statementEnd = statement.textRange.endOffset
-                while (statementEnd > statementStart && psiFile!!.findElementAt(statementEnd) is PsiWhiteSpace) {
-                    statementEnd--
-                }
+                val statementEnd = statement.textRange.endOffset
+
                 if (caretOffset == statementStart || caretOffset == statementEnd) {
-                    val statementAbove = PsiTreeUtil.getParentOfType(statement, SmkRule::class.java)
+                    val statementAbove = PsiTreeUtil.getParentOfType(statement, PyStatement::class.java)
                     if (statementAbove != null) {
                         return if (caretOffset == statementStart) {
                             TextRange(statementAbove.textRange.startOffset, statementEnd)

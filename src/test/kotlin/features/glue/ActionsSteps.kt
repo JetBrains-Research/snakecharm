@@ -2,13 +2,20 @@ package features.glue
 
 import com.google.common.collect.ImmutableMap
 import com.intellij.codeInsight.documentation.DocumentationManager
+import com.intellij.codeInsight.editorActions.CodeBlockEndAction
+import com.intellij.codeInsight.editorActions.CodeBlockStartAction
 import com.intellij.codeInsight.highlighting.BraceMatchingUtil
+import com.intellij.ide.DataManager
 import com.intellij.ide.util.gotoByName.GotoSymbolModel2
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.CommandProcessor
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.CaretModel
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.text.StringUtil
@@ -20,6 +27,7 @@ import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.FakeSnakemakeInjector
 import features.glue.SnakemakeWorld.findPsiElementUnderCaret
 import features.glue.SnakemakeWorld.fixture
+import features.glue.SnakemakeWorld.myFixture
 import features.glue.SnakemakeWorld.myGeneratedDocPopupText
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
@@ -349,6 +357,59 @@ class ActionsSteps {
                )
            }
        }
+
+    @Given("^I invoke (EditorCodeBlockStart|EditorCodeBlockEnd) action and see text with markers:")
+    fun iInvokeCodeBlockSelectionAction(actionId: String, text: String) {
+        // See ids in: IdeActions
+        ApplicationManager.getApplication().invokeAndWait({
+            ApplicationManager.getApplication().runWriteAction {
+                val editor = myFixture!!.editor
+                val textWithMarkers = textWithMarkers(editor)
+
+                assertEquals(textWithMarkers, text)
+
+            }
+        }, ModalityState.NON_MODAL)
+    }
+
+    private fun textWithMarkers(editor: Editor): String{
+        val caretModel: CaretModel = editor.caretModel
+        val caretsOffsets: List<Int> = ContainerUtil.map(caretModel.allCarets, Caret::getOffset)
+        caretModel.removeSecondaryCarets()
+        val documentSequence = editor.document.charsSequence
+        val result = StringBuilder()
+        for (caretOffset in caretsOffsets) {
+            val markers: MutableList<Pair<Int, String>> = mutableListOf()
+
+            markers.add(Pair(caretOffset, "<caret>"))
+            caretModel.moveToOffset(caretOffset)
+
+            val endActionHandler: EditorActionHandler = CodeBlockEndAction().handler
+            endActionHandler.execute(myFixture!!.editor, null, DataManager.getInstance().dataContext)
+            markers.add(Pair(caretModel.offset, "<end>"))
+            caretModel.moveToOffset(caretOffset)
+
+            val startActionHandler: EditorActionHandler = CodeBlockStartAction().handler
+            startActionHandler.execute(myFixture!!.editor, null, DataManager.getInstance().dataContext)
+            markers.add(Pair(caretModel.offset, "<start>"))
+
+            val sb = StringBuilder(documentSequence)
+            var i=0
+            while (i <= sb.length) {
+                for (m in markers.withIndex()) {
+                    val (offset, marker) = m.value
+                    if (i == offset) {
+                        result.append(marker)
+                    }
+                }
+                if (i != sb.length) {
+                    result.append(sb[i])
+                }
+                i++
+            }
+        }
+        return result.toString()
+    }
 
     @Then("^I expect no language injection")
     fun iExpectNoLanguageInjection() {
