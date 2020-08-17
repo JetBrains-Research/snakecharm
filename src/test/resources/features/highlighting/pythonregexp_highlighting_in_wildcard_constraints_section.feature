@@ -9,7 +9,7 @@ Feature: This feature checks reference highlighting in wildcard_constraints sect
           <arg>="<pyredexp>"
     """
     When I put the caret after <pyredexp>
-    Then I expect language "PythonRegExp" injection on "<pyredexp>"
+    Then I expect language PythonRegExp injection on "<pyredexp>"
     Examples:
       | rule_block | arg      | pyredexp |
       | rule NAME: | dataset  | \d+      |
