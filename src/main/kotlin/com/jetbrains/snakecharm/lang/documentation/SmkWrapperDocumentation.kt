@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.documentation
 
 import com.intellij.lang.documentation.AbstractDocumentationProvider
+import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -27,19 +28,21 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
 
     private fun processUrl(node: PyStringLiteralExpression): String {
         val result = node.text.trim('"').substringAfter("/")
-        val wrappers = SmkWrapperStorage.getInstance().wrapperStorage
+        val wrappers = node.project.service<SmkWrapperStorage>().wrapperStorage
         val wrapper =  wrappers.find { wrapper -> wrapper.path.contains(result) }
         val url = "https://snakemake-wrappers.readthedocs.io/en/" +
-                node.stringValue.replace("/bio/", "/wrappers/").replace("/utils/", "/wrappers/") + ".html"
+                node.stringValue.
+                replace("/bio/", "/wrappers/")
+                .replace("/utils/", "/wrappers/") + ".html"
         return if (wrapper != null)
             """
-            ${wrapper.name}
-            ${wrapper.author}
-            ${wrapper.description}
-            <a href=\"$url\">$url</a>
+            <p>${wrapper.name}</p>
+            <p>${wrapper.author}</p>
+            <p>${wrapper.description}</p>
+            <p><a href="$url">$url</a></p>
             """
         else
-            "<a href=\"$url\">$url</a>"
+            "<p><a href=\"$url\">$url</a></p>"
     }
 
     override fun getCustomDocumentationElement(

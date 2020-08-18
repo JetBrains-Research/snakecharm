@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.*
+import com.intellij.openapi.components.service
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage
@@ -22,7 +23,7 @@ class SmkSectionWrapperArgsInspection : SnakemakeInspection() {
 
         fun visitSmkRulelike(rulelike: SmkRuleOrCheckpoint) {
             val wrapper = rulelike.getSectionByName("wrapper") ?: return
-            val wrappers = SmkWrapperStorage.getInstance().wrapperStorage
+            val wrappers = rulelike.project.service<SmkWrapperStorage>().wrapperStorage
             val wrname = wrapper.argumentList?.text ?: return
             val ideal = wrappers.find { wrname.contains(it.path) } ?: return
 

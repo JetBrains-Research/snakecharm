@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.codeInsight.completion.wrapper
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -29,62 +30,62 @@ class SmkWrapperCrawler : StartupActivity {
                         val file = URLUtil.urlToFile(URL("https://github.com/snakemake/snakemake-wrappers/archive/master.zip"))
                         ZipUtil.unzip(null, folder, file, null, null, true)
                     }
-                    localWrapperParser()
+                    localWrapperParser(project)
                 }
             })
         }
     }
-}
 
-fun localWrapperParser() {
-    val storage = SmkWrapperStorage.getInstance()
-    val wrappers = mutableListOf<SmkWrapperStorage.Wrapper>()
-    var mainFolder = File(SmkWrapperCompletionProvider.WRAPPERS_PATH)
-    while (mainFolder.isDirectory && !mainFolder.list()!!.contains("bio")) {
-        mainFolder = mainFolder.listFiles()!![0]
-    }
-    mainFolder.walkTopDown()
-            .filter { it.path.endsWith("meta.yaml") }
-            .forEach { metafile ->
-                var wrapperfile = metafile.resolveSibling("wrapper.py")
-                if (!wrapperfile.exists()) {
-                    wrapperfile = metafile.resolveSibling("wrapper.R")
-                }
-                val path = metafile.parentFile.toRelativeString(mainFolder)
-                val args = Regex("\\{snakemake\\.\\S*}")
-                        .findAll(wrapperfile.readText()).map { str ->
-                            str.value
-                                    .trim('{', '}')
-                                    .substringAfter("snakemake.")
-                        }
-                        .toSortedSet()
-                        .toList()
-                        .map {
-                            val splitted = it.split('.', ignoreCase = false, limit = 2)
-                            if (splitted.size != 2) {
-                                splitted[0] to ""
-                            } else {
-                                splitted[0] to splitted[1]
+    fun localWrapperParser(project: Project) {
+        val storage = project.service<SmkWrapperStorage>()
+        val wrappers = mutableListOf<SmkWrapperStorage.Wrapper>()
+        var mainFolder = File(SmkWrapperCompletionProvider.WRAPPERS_PATH)
+        while (mainFolder.isDirectory && !mainFolder.list()!!.contains("bio")) {
+            mainFolder = mainFolder.listFiles()!![0]
+        }
+        mainFolder.walkTopDown()
+                .filter { it.path.endsWith("meta.yaml") }
+                .forEach { metafile ->
+                    var wrapperfile = metafile.resolveSibling("wrapper.py")
+                    if (!wrapperfile.exists()) {
+                        wrapperfile = metafile.resolveSibling("wrapper.R")
+                    }
+                    val path = metafile.parentFile.toRelativeString(mainFolder)
+                    val args = Regex("\\{snakemake\\.\\S*}")
+                            .findAll(wrapperfile.readText()).map { str ->
+                                str.value
+                                        .trim('{', '}')
+                                        .substringAfter("snakemake.")
                             }
-                        }
-                        .groupBy({it.first}, {it.second})
+                            .toSortedSet()
+                            .toList()
+                            .map {
+                                val splitted = it.split('.', ignoreCase = false, limit = 2)
+                                if (splitted.size != 2) {
+                                    splitted[0] to ""
+                                } else {
+                                    splitted[0] to splitted[1]
+                                }
+                            }
+                            .groupBy({it.first}, {it.second})
 
 
-                val versions = "0.64.0"
-                val metatext = metafile.readText()
-                val name = metatext.substringAfter("name:").substringBefore("description").trim('"', '\n', ' ')
-                val description = metatext.substringAfter("description:").substringBefore("authors").trim('"', '\n', ' ')
-                val authors = metatext.substringAfter("authors:").trim('"', '\n', ' ')
-                wrappers.add(
-                    SmkWrapperStorage.Wrapper(
-                        name=name,
-                        path=path,
-                        firstTag=versions,
-                        args=args,
-                        description=description,
-                        author=authors
+                    val versions = "0.64.0"
+                    val metatext = metafile.readText()
+                    val name = metatext.substringAfter("name:").substringBefore("description").trim('"', '\n', ' ')
+                    val description = metatext.substringAfter("description:").substringBefore("authors").trim('"', '\n', ' ')
+                    val authors = metatext.substringAfter("authors:").trim('"', '\n', ' ')
+                    wrappers.add(
+                            SmkWrapperStorage.Wrapper(
+                                    name=name,
+                                    path=path,
+                                    firstTag=versions,
+                                    args=args,
+                                    description=description,
+                                    author=authors
+                            )
                     )
-                )
-            }
-    storage.wrapperStorage = wrappers.toList()
+                }
+        storage.wrapperStorage = wrappers.toList()
+    }
 }
