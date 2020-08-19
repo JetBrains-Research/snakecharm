@@ -19,7 +19,7 @@ class SmkWrapperCrawler : StartupActivity {
         }
 
         ApplicationManager.getApplication().invokeLater {
-            ProgressManager.getInstance().run(object: Task.Backgroundable(
+            ProgressManager.getInstance().run(object : Task.Backgroundable(
                     project,
                     "Downloading wrapper repository data",
                     true
@@ -46,29 +46,45 @@ class SmkWrapperCrawler : StartupActivity {
         mainFolder.walkTopDown()
                 .filter { it.path.endsWith("meta.yaml") }
                 .forEach { metafile ->
-                    var wrapperfile = metafile.resolveSibling("wrapper.py")
-                    if (!wrapperfile.exists()) {
+                    val wrapperfile: File
+                    val args: Map<String, List<String>>
+                    if (metafile.resolveSibling("wrapper.py").exists()) {
+                        wrapperfile = metafile.resolveSibling("wrapper.py")
+                        args = Regex("snakemake\\.\\w*(\\.(get\\(\"\\w*\"|\\{\\^get\\(\\}\\w*)|\\[\\d+\\])")
+                                .findAll(wrapperfile.readText()).map { str ->
+                                    str.value
+                                            .substringAfter("snakemake.")
+                                }
+                                .toSortedSet()
+                                .toList()
+                                .map {
+                                    val splitted = it.split('.', ignoreCase = false, limit = 2)
+                                    when {
+                                        splitted.size != 2
+                                        -> splitted[0].substringBefore('[') to ""
+                                        splitted[1].startsWith("get")
+                                        -> splitted[0] to splitted[1].removeSurrounding("get(\"", "\"")
+                                        else
+                                        -> splitted[0] to splitted[1]
+                                    }
+                                }
+                                .groupBy({ it.first }, { it.second })
+
+                    } else {
                         wrapperfile = metafile.resolveSibling("wrapper.R")
+                        args = Regex("snakemake@\\w*\\[\\[\"\\w*\"]]")
+                                .findAll(wrapperfile.readText()).map { str ->
+                                    str.value
+                                            .substringAfter("snakemake@")
+                                }
+                                .toSortedSet()
+                                .toList()
+                                .map {
+                                    it.substringBefore("[") to it.substringAfter('"').substringBefore('"')
+                                }
+                                .groupBy({ it.first }, { it.second })
                     }
                     val path = metafile.parentFile.toRelativeString(mainFolder)
-                    val args = Regex("\\{snakemake\\.\\S*}")
-                            .findAll(wrapperfile.readText()).map { str ->
-                                str.value
-                                        .trim('{', '}')
-                                        .substringAfter("snakemake.")
-                            }
-                            .toSortedSet()
-                            .toList()
-                            .map {
-                                val splitted = it.split('.', ignoreCase = false, limit = 2)
-                                if (splitted.size != 2) {
-                                    splitted[0] to ""
-                                } else {
-                                    splitted[0] to splitted[1]
-                                }
-                            }
-                            .groupBy({it.first}, {it.second})
-
 
                     val versions = "0.64.0"
                     val metatext = metafile.readText()

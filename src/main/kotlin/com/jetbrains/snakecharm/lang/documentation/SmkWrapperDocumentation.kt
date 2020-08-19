@@ -31,8 +31,8 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
         val wrappers = node.project.service<SmkWrapperStorage>().wrapperStorage
         val wrapper =  wrappers.find { wrapper -> wrapper.path.contains(result) }
         val url = "https://snakemake-wrappers.readthedocs.io/en/" +
-                node.stringValue.
-                replace("/bio/", "/wrappers/")
+                node.stringValue
+                .replace("/bio/", "/wrappers/")
                 .replace("/utils/", "/wrappers/") + ".html"
         return if (wrapper != null)
             """

@@ -260,7 +260,7 @@
             language="Snakemake"
             shortName="SmkSectionWrapperArgsInspection"
             enabledByDefault="true"
-            level="WARNING"
+            level="WEAK WARNING"
             suppressId="SmkSectionWrapperArgsInspection"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
