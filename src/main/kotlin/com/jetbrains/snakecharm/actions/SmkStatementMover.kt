@@ -52,6 +52,52 @@ open class SmkStatementMover: PyStatementMover() {
             }
         }
 
+        val pyArgumentList = PsiTreeUtil.getParentOfType(elementToMove1, PyArgumentList::class.java)
+
+        if (pyArgumentList != null) {
+            if (elementToMove1.parent in pyArgumentList.arguments) {
+                val args = pyArgumentList.arguments
+
+                for (arg in args.withIndex()) {
+                    if (arg.value.textMatches(elementToMove1)) {
+                        if (down) {
+                            if(args.getOrNull(arg.index+1) != null){
+                                elementToMove2 = args[arg.index+1]
+                            } else {
+                                elementToMove2 = args.first()
+                            }
+                        }
+
+                        if (!down) {
+                            if(args.getOrNull(arg.index-1) != null){
+                                elementToMove2 = args[arg.index-1]
+                            } else {
+                                elementToMove2 = args.last()
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            elementToMove1 = getCommentOrStatement(document, elementToMove1)
+            elementToMove2 = getCommentOrStatement(document, elementToMove2)
+
+            if (PsiTreeUtil.isAncestor(elementToMove1, elementToMove2, false)) {
+                elementToMove2 = elementToMove1
+            } else if (PsiTreeUtil.isAncestor(elementToMove2, elementToMove1, false)) {
+                elementToMove1 = elementToMove2
+            }
+
+            info.toMove = MyLineRange(elementToMove1, elementToMove2)
+            info.toMove2 = getDestinationScope(file, editor, if (down) elementToMove2 else elementToMove1, down)
+
+            info.indentTarget = false
+            info.indentSource = false
+
+            return true
+        }
+
         if (elementToMove1.elementType in RULE_LIKE && elementToMove2.parent?.firstChild.elementType in RULE_LIKE){
             elementToMove1 = elementToMove1.parent
             elementToMove2 = elementToMove2.parent
@@ -244,7 +290,7 @@ open class SmkStatementMover: PyStatementMover() {
     @Suppress("NAME_SHADOWING")
     private fun getCommentOrStatement(document: Document, destination: PsiElement): PsiElement {
         var destination = destination
-        val statement = PsiTreeUtil.getParentOfType(destination, PyStatement::class.java, false)
+        val statement = destination.parent
                 ?: return destination
         if (destination is PsiComment) {
             if (document.getLineNumber(destination.getTextOffset()) == document.getLineNumber(statement.textOffset)) {
