@@ -11,7 +11,6 @@ import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.CommandProcessor
-import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.CaretModel
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
@@ -384,73 +383,6 @@ class ActionsSteps {
                 assertEquals(caretModel.offset, actionedOffset)
             }
         }, ModalityState.NON_MODAL)
-    }
-
-    @Given("^I expect caret at start$")
-    fun iExpectCaretAtStart() {
-        ApplicationManager.getApplication().invokeAndWait({
-            val editor = myFixture!!.editor
-            val caretModel: CaretModel = editor.caretModel
-            val curCaretOffset = editor.caretModel.offset
-
-            val startActionHandler: EditorActionHandler = CodeBlockStartAction().handler
-            startActionHandler.execute(myFixture!!.editor, null, DataManager.getInstance().dataContext)
-
-            assertEquals(caretModel.offset, curCaretOffset)
-        }, ModalityState.NON_MODAL)
-    }
-
-    @Given("^I expect caret at the end$")
-    fun iExpectCaretAtEnd() {
-        ApplicationManager.getApplication().invokeAndWait({
-            val editor = myFixture!!.editor
-            val caretModel: CaretModel = editor.caretModel
-            val curCaretOffset = editor.caretModel.offset
-
-            val endActionHandler: EditorActionHandler = CodeBlockEndAction().handler
-            endActionHandler.execute(myFixture!!.editor, null, DataManager.getInstance().dataContext)
-
-            assertEquals(caretModel.offset, curCaretOffset)
-        }, ModalityState.NON_MODAL)
-    }
-
-    private fun textWithMarkers(editor: Editor): String{
-        val caretModel: CaretModel = editor.caretModel
-        val caretsOffsets: List<Int> = ContainerUtil.map(caretModel.allCarets, Caret::getOffset)
-        caretModel.removeSecondaryCarets()
-        val documentSequence = editor.document.charsSequence
-        val result = StringBuilder()
-        for (caretOffset in caretsOffsets) {
-            val markers: MutableList<Pair<Int, String>> = mutableListOf()
-
-            markers.add(Pair(caretOffset, "<caret>"))
-            caretModel.moveToOffset(caretOffset)
-
-            val endActionHandler: EditorActionHandler = CodeBlockEndAction().handler
-            endActionHandler.execute(myFixture!!.editor, null, DataManager.getInstance().dataContext)
-            markers.add(Pair(caretModel.offset, "<end>"))
-            caretModel.moveToOffset(caretOffset)
-
-            val startActionHandler: EditorActionHandler = CodeBlockStartAction().handler
-            startActionHandler.execute(myFixture!!.editor, null, DataManager.getInstance().dataContext)
-            markers.add(Pair(caretModel.offset, "<start>"))
-
-            val sb = StringBuilder(documentSequence)
-            var i=0
-            while (i <= sb.length) {
-                for (m in markers.withIndex()) {
-                    val (offset, marker) = m.value
-                    if (i == offset) {
-                        result.append(marker)
-                    }
-                }
-                if (i != sb.length) {
-                    result.append(sb[i])
-                }
-                i++
-            }
-        }
-        return result.toString()
     }
 
     @Then("^I expect no language injection")
