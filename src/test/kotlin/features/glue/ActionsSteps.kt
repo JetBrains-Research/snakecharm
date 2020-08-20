@@ -2,10 +2,7 @@ package features.glue
 
 import com.google.common.collect.ImmutableMap
 import com.intellij.codeInsight.documentation.DocumentationManager
-import com.intellij.codeInsight.editorActions.CodeBlockEndAction
-import com.intellij.codeInsight.editorActions.CodeBlockStartAction
 import com.intellij.codeInsight.highlighting.BraceMatchingUtil
-import com.intellij.ide.DataManager
 import com.intellij.ide.util.gotoByName.GotoSymbolModel2
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.application.ApplicationManager
@@ -14,7 +11,6 @@ import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.CaretModel
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.text.StringUtil
@@ -357,31 +353,36 @@ class ActionsSteps {
            }
        }
 
-    @Given("^I invoke (EditorCodeBlockStart|EditorCodeBlockEnd) action and check result$")
+    @Given("^I invoke (EditorCodeBlockStart|EditorCodeBlockEnd) action$")
     fun iInvokeCodeBlockSelectionAction(actionId: String) {
         ApplicationManager.getApplication().invokeAndWait({
-            val editor = myFixture!!.editor
+            ApplicationManager.getApplication().runWriteAction {
+                myFixture?.performEditorAction(actionId)
+            }
+        }, ModalityState.NON_MODAL)
+    }
+
+    @Given("^I expect caret at (.+)$")
+    fun iExpectCaretAtStart(marker: String) {
+        ApplicationManager.getApplication().invokeAndWait({
+            val editor = fixture().editor
             val caretModel: CaretModel = editor.caretModel
-            val curCaretOffset = editor.caretModel.offset
 
-            myFixture?.performEditorAction(actionId)
-            val actionedOffset = editor.caretModel.offset
+            val pos = CompletionResolveSteps.getPositionBySignature(editor, marker, false)
 
-            caretModel.moveToOffset(curCaretOffset)
+            assertEquals(pos, caretModel.offset)
+        }, ModalityState.NON_MODAL)
+    }
 
-            if (actionId == "EditorCodeBlockStart") {
-                val startActionHandler: EditorActionHandler = CodeBlockStartAction().handler
-                startActionHandler.execute(myFixture!!.editor, null, DataManager.getInstance().dataContext)
+    @Given("^I expect caret after (.+)$")
+    fun iExpectCaretAtEnd(marker: String) {
+        ApplicationManager.getApplication().invokeAndWait({
+            val editor = fixture().editor
+            val caretModel: CaretModel = editor.caretModel
 
-                assertEquals(caretModel.offset, actionedOffset)
-            }
+            val pos = CompletionResolveSteps.getPositionBySignature(editor, marker, true)
 
-            if (actionId == "EditorCodeBlockEnd") {
-                val startActionHandler: EditorActionHandler = CodeBlockEndAction().handler
-                startActionHandler.execute(myFixture!!.editor, null, DataManager.getInstance().dataContext)
-
-                assertEquals(caretModel.offset, actionedOffset)
-            }
+            assertEquals(pos, caretModel.offset)
         }, ModalityState.NON_MODAL)
     }
 

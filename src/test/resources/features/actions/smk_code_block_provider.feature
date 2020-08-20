@@ -10,7 +10,9 @@ Feature: Code block provider test
       wildcard_constraints: wildcard="/d+1"
     """
     When I put the caret after input: repeat("",
-    When I invoke EditorCodeBlockStart action and check result
+    When I invoke EditorCodeBlockStart action
+    When I expect caret at input: repeat("", 5)
+
 
   Scenario: Go to end of block
     Given a snakemake project
@@ -21,4 +23,5 @@ Feature: Code block provider test
       wildcard_constraints: wildcard="/d+1"
     """
     When I put the caret after wildcard_constraints:
-    When I invoke EditorCodeBlockEnd action and check result
+    When I invoke EditorCodeBlockEnd action
+    When I expect caret after wildcard="/d+1"
