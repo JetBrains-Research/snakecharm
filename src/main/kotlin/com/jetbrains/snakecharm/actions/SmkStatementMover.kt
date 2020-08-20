@@ -13,11 +13,13 @@ import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.impl.source.PostprocessReformattingAspect
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.elementType
+import com.intellij.psi.util.parents
 import com.jetbrains.python.codeInsight.editorActions.moveUpDown.PyStatementMover
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_LIKE
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.impl.SmkRuleOrCheckpointArgsSectionImpl
+import com.jetbrains.python.psi.PyCallExpression as PyCallExpression1
 
 open class SmkStatementMover: PyStatementMover() {
     override fun checkAvailable(editor: Editor, file: PsiFile, info: MoveInfo, down: Boolean): Boolean {
@@ -47,7 +49,7 @@ open class SmkStatementMover: PyStatementMover() {
 
         if (pyStatementList != null &&
                 ruleOrCheckpointSection != null) {
-            if (ruleOrCheckpointSection == pyStatementList.children[0] && !down) {
+            if (ruleOrCheckpointSection == pyStatementList.children.first() && !down) {
                 return true
             }
         }
@@ -55,47 +57,27 @@ open class SmkStatementMover: PyStatementMover() {
         val pyArgumentList = PsiTreeUtil.getParentOfType(elementToMove1, PyArgumentList::class.java)
 
         if (pyArgumentList != null) {
-            if (elementToMove1.parent in pyArgumentList.arguments) {
-                val args = pyArgumentList.arguments
+            val args = pyArgumentList.arguments
 
-                for (arg in args.withIndex()) {
-                    if (arg.value.textMatches(elementToMove1)) {
-                        if (down) {
-                            if(args.getOrNull(arg.index+1) != null){
-                                elementToMove2 = args[arg.index+1]
-                            } else {
-                                elementToMove2 = args.first()
-                            }
+            for (arg in args.withIndex()) {
+                if (arg.value in elementToMove1.parents) {
+                    elementToMove1 = arg.value
+                    if (down) {
+                        if(args.getOrNull(arg.index.plus(1)) != null){
+                            elementToMove2 = args[arg.index.plus(1)]
+                        } else {
+                            elementToMove2 = args.first()
                         }
-
-                        if (!down) {
-                            if(args.getOrNull(arg.index-1) != null){
-                                elementToMove2 = args[arg.index-1]
-                            } else {
-                                elementToMove2 = args.last()
-                            }
+                    }
+                    if (!down) {
+                        if(args.getOrNull(arg.index.minus(1)) != null){
+                            elementToMove2 = args[arg.index.minus(1)]
+                        } else {
+                            elementToMove2 = args.last()
                         }
-
                     }
                 }
             }
-
-            elementToMove1 = getCommentOrStatement(document, elementToMove1)
-            elementToMove2 = getCommentOrStatement(document, elementToMove2)
-
-            if (PsiTreeUtil.isAncestor(elementToMove1, elementToMove2, false)) {
-                elementToMove2 = elementToMove1
-            } else if (PsiTreeUtil.isAncestor(elementToMove2, elementToMove1, false)) {
-                elementToMove1 = elementToMove2
-            }
-
-            info.toMove = MyLineRange(elementToMove1, elementToMove2)
-            info.toMove2 = getDestinationScope(file, editor, if (down) elementToMove2 else elementToMove1, down)
-
-            info.indentTarget = false
-            info.indentSource = false
-
-            return true
         }
 
         if (elementToMove1.elementType in RULE_LIKE && elementToMove2.parent?.firstChild.elementType in RULE_LIKE){
@@ -290,7 +272,20 @@ open class SmkStatementMover: PyStatementMover() {
     @Suppress("NAME_SHADOWING")
     private fun getCommentOrStatement(document: Document, destination: PsiElement): PsiElement {
         var destination = destination
-        val statement = destination.parent
+        val statement = PsiTreeUtil.getParentOfType(destination, PyStatement::class.java, false)
+                ?: return destination
+        if (destination is PsiComment) {
+            if (document.getLineNumber(destination.getTextOffset()) == document.getLineNumber(statement.textOffset)) {
+                destination = statement
+            }
+        } else destination = statement
+        return destination
+    }
+
+    @Suppress("NAME_SHADOWING")
+    private fun getCommentOrExpression(document: Document, destination: PsiElement): PsiElement {
+        var destination = destination
+        val statement = PsiTreeUtil.getParentOfType(destination, PyExpression::class.java, false)
                 ?: return destination
         if (destination is PsiComment) {
             if (document.getLineNumber(destination.getTextOffset()) == document.getLineNumber(statement.textOffset)) {
