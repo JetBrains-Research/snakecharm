@@ -358,17 +358,59 @@ class ActionsSteps {
            }
        }
 
-    @Given("^I invoke (EditorCodeBlockStart|EditorCodeBlockEnd) action and see text with markers:")
-    fun iInvokeCodeBlockSelectionAction(actionId: String, text: String) {
-        // See ids in: IdeActions
+    @Given("^I invoke (EditorCodeBlockStart|EditorCodeBlockEnd) action and check result$")
+    fun iInvokeCodeBlockSelectionAction(actionId: String) {
         ApplicationManager.getApplication().invokeAndWait({
-            ApplicationManager.getApplication().runWriteAction {
-                val editor = myFixture!!.editor
-                val textWithMarkers = textWithMarkers(editor)
+            val editor = myFixture!!.editor
+            val caretModel: CaretModel = editor.caretModel
+            val curCaretOffset = editor.caretModel.offset
 
-                assertEquals(textWithMarkers, text)
+            myFixture?.performEditorAction(actionId)
+            val actionedOffset = editor.caretModel.offset
 
+            caretModel.moveToOffset(curCaretOffset)
+
+            if (actionId == "EditorCodeBlockStart") {
+                val startActionHandler: EditorActionHandler = CodeBlockStartAction().handler
+                startActionHandler.execute(myFixture!!.editor, null, DataManager.getInstance().dataContext)
+
+                assertEquals(caretModel.offset, actionedOffset)
             }
+
+            if (actionId == "EditorCodeBlockEnd") {
+                val startActionHandler: EditorActionHandler = CodeBlockEndAction().handler
+                startActionHandler.execute(myFixture!!.editor, null, DataManager.getInstance().dataContext)
+
+                assertEquals(caretModel.offset, actionedOffset)
+            }
+        }, ModalityState.NON_MODAL)
+    }
+
+    @Given("^I expect caret at start$")
+    fun iExpectCaretAtStart() {
+        ApplicationManager.getApplication().invokeAndWait({
+            val editor = myFixture!!.editor
+            val caretModel: CaretModel = editor.caretModel
+            val curCaretOffset = editor.caretModel.offset
+
+            val startActionHandler: EditorActionHandler = CodeBlockStartAction().handler
+            startActionHandler.execute(myFixture!!.editor, null, DataManager.getInstance().dataContext)
+
+            assertEquals(caretModel.offset, curCaretOffset)
+        }, ModalityState.NON_MODAL)
+    }
+
+    @Given("^I expect caret at the end$")
+    fun iExpectCaretAtEnd() {
+        ApplicationManager.getApplication().invokeAndWait({
+            val editor = myFixture!!.editor
+            val caretModel: CaretModel = editor.caretModel
+            val curCaretOffset = editor.caretModel.offset
+
+            val endActionHandler: EditorActionHandler = CodeBlockEndAction().handler
+            endActionHandler.execute(myFixture!!.editor, null, DataManager.getInstance().dataContext)
+
+            assertEquals(caretModel.offset, curCaretOffset)
         }, ModalityState.NON_MODAL)
     }
 
