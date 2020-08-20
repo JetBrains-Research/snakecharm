@@ -67,6 +67,22 @@
             class="com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes"
             externalIdPrefix="py.SMK_"
     />
+    <facetType implementation="com.jetbrains.snakecharm.facet.SmkFacetType"/>
+    <framework.detector implementation="com.jetbrains.snakecharm.facet.SmkFrameworkDetector"/>
+    <frameworkSupport implementation="com.jetbrains.snakecharm.facet.SmkFrameworkSupportProvider"/>
+    <projectConfigurable
+            groupId="language"
+            id="com.jetbrains.snakecharm.facet.SmkSupportModuleConfigurable"
+            bundle="SnakemakeBundle"
+            key="facet.configurable.display.name"
+            instance="com.jetbrains.snakecharm.facet.SmkSupportModuleConfigurable"
+            nonDefaultProject="true"
+    />
+    <directoryProjectConfigurator
+            implementation="com.jetbrains.snakecharm.facet.SmkFacetConfigurator"
+            order="after sdk"
+    />
+
     <lang.parserDefinition
             language="Snakemake"
             implementationClass="com.jetbrains.snakecharm.lang.parser.SmkParserDefinition"

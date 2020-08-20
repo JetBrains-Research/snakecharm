@@ -8,4 +8,5 @@ import com.intellij.openapi.util.IconLoader
  */
 object SnakemakeIcons {
     val FILE = IconLoader.getIcon("/icons/snakemake_16.png")
+    val FACET = FILE
 }
