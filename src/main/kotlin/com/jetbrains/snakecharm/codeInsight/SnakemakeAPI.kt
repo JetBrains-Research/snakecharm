@@ -23,6 +23,16 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_THREADS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_VERSION
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_WRAPPER
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_ANCIENT
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_DIRECTORY
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_DYNAMIC
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_PIPE
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_PROTECTED
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_REPEAT
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_REPORT
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_TEMP
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_TOUCH
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_UNPACK
 
 /**
  * Also see [ImplicitPySymbolsProvider] class
@@ -190,5 +200,18 @@ object SnakemakeAPI {
             SECTION_BENCHMARK, SECTION_VERSION, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS, SECTION_SINGULARITY,
             SECTION_PRIORITY, SECTION_GROUP, SECTION_SHADOW, SECTION_CONDA, SECTION_SCRIPT, SECTION_WRAPPER,
             SECTION_CWL, SECTION_NOTEBOOK, SECTION_CACHE, SECTION_CONTAINER
+    )
+
+    val IO_FLAG_2_SUPPORTED_SECTION: HashMap<String, List<String>> = hashMapOf(
+            SNAKEMAKE_IO_METHOD_ANCIENT to listOf(SECTION_INPUT),
+            SNAKEMAKE_IO_METHOD_PROTECTED to listOf(SECTION_OUTPUT, SECTION_LOG, SECTION_BENCHMARK),
+            SNAKEMAKE_IO_METHOD_DIRECTORY to listOf(SECTION_OUTPUT),
+            SNAKEMAKE_IO_METHOD_REPORT to listOf(SECTION_OUTPUT),
+            SNAKEMAKE_IO_METHOD_TEMP to listOf(SECTION_INPUT, SECTION_OUTPUT),
+            SNAKEMAKE_IO_METHOD_TOUCH to listOf(SECTION_OUTPUT),
+            SNAKEMAKE_IO_METHOD_PIPE to listOf(SECTION_OUTPUT),
+            SNAKEMAKE_IO_METHOD_REPEAT to listOf(SECTION_BENCHMARK),
+            SNAKEMAKE_IO_METHOD_UNPACK to listOf(SECTION_INPUT),
+            SNAKEMAKE_IO_METHOD_DYNAMIC to listOf(SECTION_OUTPUT)
     )
 }
