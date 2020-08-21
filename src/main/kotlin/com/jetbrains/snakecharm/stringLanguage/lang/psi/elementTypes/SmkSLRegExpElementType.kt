@@ -17,7 +17,7 @@ class SmkSLRegExpElementType(debugName: String) : ILazyParseableElementType(debu
         // Our choice of capabilities is based on
         // pattern for matching regular expressions in Snakemake:
         // ([^{}]+ | \{\d+(,\d+)?\})*
-        // See snakemake/io.py:486
+        // See snakemake/io.py:628 (Snakemake 5.20.1)
         val CAPABILITIES: EnumSet<RegExpCapability> = EnumSet.of(
                 RegExpCapability.OCTAL_NO_LEADING_ZERO,
                 RegExpCapability.MIN_OCTAL_3_DIGITS

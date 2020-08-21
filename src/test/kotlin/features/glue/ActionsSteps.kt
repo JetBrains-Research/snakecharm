@@ -336,6 +336,17 @@ class ActionsSteps {
         }
     }
 
+    @Then("^I expect language (.+) injection on \"(.*)\"")
+    fun iExpectCertainLanguageInjectionOn(language: String, str: String) {
+        ApplicationManager.getApplication().invokeAndWait {
+            val fixture = SnakemakeWorld.injectionFixture()
+            val injectedFile = fixture.injectedElement?.containingFile
+            assertNotNull(injectedFile, "No language was injected at caret position")
+            assertEquals(language, injectedFile.language.displayName)
+            assertEquals(str, injectedFile.text)
+        }
+    }
+
     @Then("^I inject SmkSL at a caret")
        fun iInjectSmkSLAtCaret() {
            ApplicationManager.getApplication().invokeAndWait {
