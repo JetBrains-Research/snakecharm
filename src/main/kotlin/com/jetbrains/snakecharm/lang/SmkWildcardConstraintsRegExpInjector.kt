@@ -13,7 +13,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
 
 open class SmkWildcardConstraintsRegExpInjector : PyInjectorBase() {
-    override fun getInjectedLanguage(element: PsiElement) = PythonRegexpLanguage.INSTANCE
+    override fun getInjectedLanguage(element: PsiElement) = PythonRegexpLanguage.INSTANCE!!
 
     override fun elementsToInjectIn() = listOf(PyStringLiteralExpression::class.java)
 
