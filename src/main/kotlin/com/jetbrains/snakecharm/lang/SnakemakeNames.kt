@@ -57,4 +57,15 @@ object SnakemakeNames {
 
     const val RUN_SECTION_VARIABLE_RULE = "rule"
     const val RUN_SECTION_VARIABLE_JOBID = "jobid"
+
+    const val SNAKEMAKE_IO_METHOD_ANCIENT = "ancient"
+    const val SNAKEMAKE_IO_METHOD_PROTECTED = "protected"
+    const val SNAKEMAKE_IO_METHOD_DIRECTORY = "directory"
+    const val SNAKEMAKE_IO_METHOD_TEMP = "temp"
+    const val SNAKEMAKE_IO_METHOD_REPORT = "report"
+    const val SNAKEMAKE_IO_METHOD_TOUCH = "touch"
+    const val SNAKEMAKE_IO_METHOD_PIPE = "pipe"
+    const val SNAKEMAKE_IO_METHOD_REPEAT = "repeat"
+    const val SNAKEMAKE_IO_METHOD_UNPACK = "unpack"
+    const val SNAKEMAKE_IO_METHOD_DYNAMIC = "dynamic"
 }
