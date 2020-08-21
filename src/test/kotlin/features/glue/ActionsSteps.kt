@@ -18,6 +18,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.FakeSnakemakeInjector
+import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler
 import features.glue.SnakemakeWorld.findPsiElementUnderCaret
 import features.glue.SnakemakeWorld.fixture
 import features.glue.SnakemakeWorld.myGeneratedDocPopupText
@@ -380,6 +381,21 @@ class ActionsSteps {
                         targetElement, element
                 )
             }
+        }
+    }
+
+    @When("^I check wrapper args parsing for \"(.+)\" resulting in \"(.+)\" with text$")
+    fun checkWrapperArgsParsing(language: String, filename: String, text :String) {
+        ApplicationManager.getApplication().invokeAndWait {
+            val args = when (language) {
+                "Python" -> SmkWrapperCrawler.parseArgsPython(text)
+                "R" -> SmkWrapperCrawler.parseArgsR(text)
+                else -> return@invokeAndWait
+            }
+            val mapped = args.map { (key, value) ->
+                "$key: ${value.joinToString(", ")}"
+            }
+            FilesSteps().aFileWithText(filename, mapped.joinToString("\n"))
         }
     }
 

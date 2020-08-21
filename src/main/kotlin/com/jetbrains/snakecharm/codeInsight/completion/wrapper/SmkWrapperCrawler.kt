@@ -12,7 +12,7 @@ import com.intellij.util.io.URLUtil
 import java.io.File
 import java.net.URL
 
-class SmkWrapperCrawler : StartupActivity {
+object SmkWrapperCrawler : StartupActivity {
     override fun runActivity(project: Project) {
         if (ApplicationManager.getApplication().isUnitTestMode) {
             return
@@ -50,39 +50,10 @@ class SmkWrapperCrawler : StartupActivity {
                     val args: Map<String, List<String>>
                     if (metafile.resolveSibling("wrapper.py").exists()) {
                         wrapperfile = metafile.resolveSibling("wrapper.py")
-                        args = Regex("snakemake\\.\\w*(\\.(get\\(\"\\w*\"|\\{\\^get\\(\\}\\w*)|\\[\\d+\\])")
-                                .findAll(wrapperfile.readText()).map { str ->
-                                    str.value
-                                            .substringAfter("snakemake.")
-                                }
-                                .toSortedSet()
-                                .toList()
-                                .map {
-                                    val splitted = it.split('.', ignoreCase = false, limit = 2)
-                                    when {
-                                        splitted.size != 2
-                                        -> splitted[0].substringBefore('[') to ""
-                                        splitted[1].startsWith("get")
-                                        -> splitted[0] to splitted[1].removeSurrounding("get(\"", "\"")
-                                        else
-                                        -> splitted[0] to splitted[1]
-                                    }
-                                }
-                                .groupBy({ it.first }, { it.second })
-
+                        args = parseArgsPython(wrapperfile.readText())
                     } else {
                         wrapperfile = metafile.resolveSibling("wrapper.R")
-                        args = Regex("snakemake@\\w*\\[\\[\"\\w*\"]]")
-                                .findAll(wrapperfile.readText()).map { str ->
-                                    str.value
-                                            .substringAfter("snakemake@")
-                                }
-                                .toSortedSet()
-                                .toList()
-                                .map {
-                                    it.substringBefore("[") to it.substringAfter('"').substringBefore('"')
-                                }
-                                .groupBy({ it.first }, { it.second })
+                        args = parseArgsR(wrapperfile.readText())
                     }
                     val path = metafile.parentFile.toRelativeString(mainFolder)
 
@@ -93,15 +64,51 @@ class SmkWrapperCrawler : StartupActivity {
                     val authors = metatext.substringAfter("authors:").trim('"', '\n', ' ')
                     wrappers.add(
                             SmkWrapperStorage.Wrapper(
-                                    name=name,
-                                    path=path,
-                                    firstTag=versions,
-                                    args=args,
-                                    description=description,
-                                    author=authors
+                                    name = name,
+                                    path = path,
+                                    firstTag = versions,
+                                    args = args,
+                                    description = description,
+                                    author = authors
                             )
                     )
                 }
         storage.wrapperStorage = wrappers.toList()
+    }
+
+    fun parseArgsPython(text: String): Map<String, List<String>> {
+        return Regex("snakemake\\.\\w*(\\.(get\\(\"\\w*\"|\\{\\^get\\(\\}\\w*)|\\[\\d+\\])")
+                .findAll(text).map { str ->
+                    str.value
+                            .substringAfter("snakemake.")
+                }
+                .toSortedSet()
+                .toList()
+                .map {
+                    val splitted = it.split('.', ignoreCase = false, limit = 2)
+                    when {
+                        splitted.size != 2
+                        -> splitted[0].substringBefore('[') to ""
+                        splitted[1].startsWith("get")
+                        -> splitted[0] to splitted[1].removeSurrounding("get(\"", "\"")
+                        else
+                        -> splitted[0] to splitted[1]
+                    }
+                }
+                .groupBy({ it.first }, { it.second })
+    }
+
+    fun parseArgsR(text: String): Map<String, List<String>> {
+        return Regex("snakemake@\\w*\\[\\[\"\\w*\"]]")
+                .findAll(text).map { str ->
+                    str.value
+                            .substringAfter("snakemake@")
+                }
+                .toSortedSet()
+                .toList()
+                .map {
+                    it.substringBefore("[") to it.substringAfter('"').substringBefore('"')
+                }
+                .groupBy({ it.first }, { it.second })
     }
 }

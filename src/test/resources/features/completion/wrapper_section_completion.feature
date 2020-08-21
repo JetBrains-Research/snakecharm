@@ -13,7 +13,7 @@ Feature: Completion for wrapper name
       | <full_name> |
     Examples:
       | rule_like  | short_name         | full_name                              |
-      | rule       | bismark2report     | 0.63.0/bio/bismark/bismark2report      |
-      | rule       | fastqc             | 0.63.0/bio/fastqc                      |
-      | checkpoint | cairosvg           | 0.63.0/utils/cairosvg                  |
-      | checkpoint | bam2fq/interleaved | 0.63.0/bio/samtools/bam2fq/interleaved |
+      | rule       | bismark2report     | 0.64.0/bio/bismark/bismark2report      |
+      | rule       | fastqc             | 0.64.0/bio/fastqc                      |
+      | checkpoint | cairosvg           | 0.64.0/utils/cairosvg                  |
+      | checkpoint | bam2fq/interleaved | 0.64.0/bio/samtools/bam2fq/interleaved |
