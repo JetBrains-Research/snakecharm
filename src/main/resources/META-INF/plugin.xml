@@ -486,6 +486,17 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkRedundantCommaInspection"
     />
 
+    <localInspection
+            language="Snakemake" shortName="SmkMisuseUsageIOFlagMethodsInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkMisuseUsageIOFlagMethods"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.misuse.usage.io.flag.methods.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkMisuseUsageIOFlagMethodsInspection"
+    />
+
     <findUsagesHandlerFactory
             implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"
             id="Python" order="last, before default"
