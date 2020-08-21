@@ -2,35 +2,32 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.psi.PsiElement
-import com.intellij.psi.tree.TokenSet
-import com.intellij.psi.util.PsiTreeUtil
-import com.jetbrains.python.PyElementTypes.CALL_EXPRESSION
+import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyReferenceExpression
-import com.jetbrains.python.psi.impl.PyReferenceExpressionImpl
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SNAKEMAKE_IO_METHODS_CORRECT_SECTIONS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.IO_FLAG_2_SUPPORTED_SECTION
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
-class SmkMisuseUsageIOFlagMethodsInspection: SnakemakeInspection() {
+class SmkMisuseUsageIOFlagMethodsInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
-        private fun getAllowedSectionNames(ruleOrCheckpointSectionName: String): List<String>? {
-            return SNAKEMAKE_IO_METHODS_CORRECT_SECTIONS[ruleOrCheckpointSectionName]
-        }
-
-        private fun checkMethod(callReferenceExpression: PyReferenceExpression, ruleOrCheckpointSection: SmkRuleOrCheckpointArgsSection): PsiElement? {
-            val allowedSectionNames = getAllowedSectionNames(callReferenceExpression.name!!) ?: return null
-
-            if (!allowedSectionNames.contains(ruleOrCheckpointSection.name)) {
-                return callReferenceExpression
+        private fun getSupportedSectionIfMisuse(
+            flagCallName: String,
+            section: SmkRuleOrCheckpointArgsSection
+        ): List<String> {
+            val supportedSections = IO_FLAG_2_SUPPORTED_SECTION[flagCallName]
+            if (supportedSections != null) {
+                if (section.sectionKeyword !in supportedSections) {
+                    return supportedSections
+                }
             }
-            return null
+            // check N/A here
+            return emptyList()
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
@@ -40,28 +37,33 @@ class SmkMisuseUsageIOFlagMethodsInspection: SnakemakeInspection() {
             }
 
             val argList = st.argumentList ?: return
+            argList.arguments
+                .filterIsInstance<PyCallExpression>()
+                .forEach { callExpr -> 
+                    val callee = callExpr.callee
+                    if (callee is PyReferenceExpression) {
+                        // We don't need qualified refs here (e.g. like `foo.boo.ancient`)
+                        val callName = when (callee.qualifier) {
+                            null -> callee.referencedName
+                            else -> null
+                        }
 
-            argList.node.getChildren(callExpressionToken)
-                    .forEach { node ->
-
-                        val callReferenceExpression = PsiTreeUtil.getChildOfType(node.psi, PyReferenceExpressionImpl::class.java) ?: return
-
-                        val method = checkMethod(callReferenceExpression, st)
-
-                        val message = SnakemakeBundle.message("INSP.NAME.misuse.usage.io.flag.methods.warning.message",
-                                callReferenceExpression.name!!, st.name!!)
-
-                        if (method != null) {
-                            holder.registerProblem(
-                                    node.psi,
-                                    message
-                            )
+                        if (callName != null) {
+                            val supportedSectionIfMisuse = getSupportedSectionIfMisuse(callName, st)
+                            if (supportedSectionIfMisuse.isNotEmpty()) {
+                                holder.registerProblem(
+                                    callExpr,
+                                    SnakemakeBundle.message(
+                                        "INSP.NAME.misuse.usage.io.flag.methods.warning.message",
+                                        callName,
+                                        st.sectionKeyword!!,
+                                        supportedSectionIfMisuse.sorted().joinToString { "'$it'"}
+                                    )
+                                )
+                            }
                         }
                     }
+                }
         }
-    }
-
-    companion object {
-        val callExpressionToken = TokenSet.create(CALL_EXPRESSION)
     }
 }

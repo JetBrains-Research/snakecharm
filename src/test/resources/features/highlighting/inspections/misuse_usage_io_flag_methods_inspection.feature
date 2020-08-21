@@ -10,31 +10,31 @@ Feature: Inspection for methods from snakemake library
     And SmkMisuseUsageIOFlagMethodsInspection inspection is enabled
     Then I expect inspection warning on <<method><arg_list>> in <<section>: <method><arg_list>> with message
     """
-    '<method>' isn't supported in '<section>'
+    '<method>' isn't supported in '<section>' section, expected in sections: <expected>.
     """
     When I check highlighting warnings
     Examples:
-      | rule_like   | section     | method        | arg_list |
-      | rule        | input       | directory     | ('')     |
-      | rule        | input       | pipe          | ('')     |
-      | rule        | input       | protected     | ('')     |
-      | rule        | input       | dynamic       | ('')     |
-      | rule        | input       | touch         | ('')     |
-      | rule        | input       | repeat        | ('')     |
-      | rule        | input       | report        | ('')     |
-      | rule        | output      | ancient       | ('')     |
-      | rule        | output      | unpack        | ('')     |
-      | rule        | output      | repeat        | ('')     |
-      | checkpoint  | input       | directory     | ('')     |
-      | checkpoint  | input       | pipe          | ('')     |
-      | checkpoint  | input       | protected     | ('')     |
-      | checkpoint  | input       | dynamic       | ('')     |
-      | checkpoint  | input       | touch         | ('')     |
-      | checkpoint  | input       | repeat        | ('')     |
-      | checkpoint  | input       | report        | ('')     |
-      | checkpoint  | output      | ancient       | ('')     |
-      | checkpoint  | output      | unpack        | ('')     |
-      | checkpoint  | output      | repeat        | ('')     |
+      | rule_like  | section | method    | arg_list | expected                     |
+      | rule       | input   | directory | ('')     | 'output'                     |
+      | rule       | input   | pipe      | ('')     | 'output'                     |
+      | rule       | input   | protected | ('')     | 'benchmark', 'log', 'output' |
+      | rule       | log     | temp      | ('')     | 'input', 'output'            |
+      | rule       | input   | dynamic   | ('')     | 'output'                     |
+      | rule       | input   | touch     | ('')     | 'output'                     |
+      | rule       | input   | repeat    | ('')     | 'benchmark'                  |
+      | rule       | input   | report    | ('')     | 'output'                     |
+      | rule       | output  | ancient   | ('')     | 'input'                      |
+      | rule       | output  | unpack    | ('')     | 'input'                     |
+      | checkpoint | input   | directory | ('')     | 'output'                     |
+      | checkpoint | input   | pipe      | ('')     | 'output'                     |
+      | checkpoint | input   | protected | ('')     | 'benchmark', 'log', 'output' |
+      | checkpoint | log     | temp      | ('')     | 'input', 'output'            |
+      | checkpoint | input   | dynamic   | ('')     | 'output'                     |
+      | checkpoint | input   | touch     | ('')     | 'output'                     |
+      | checkpoint | input   | repeat    | ('')     | 'benchmark'                  |
+      | checkpoint | input   | report    | ('')     | 'output'                     |
+      | checkpoint | output  | ancient   | ('')     | 'input'                      |
+      | checkpoint | output  | unpack    | ('')     | 'input'                     |
 
   Scenario Outline: Correct using ancient/protected/directory methods
     Given a snakemake project
@@ -70,3 +70,19 @@ Feature: Inspection for methods from snakemake library
       | checkpoint  | output      | report('')    |
       | checkpoint  | benchmark   | repeat('')    |
       | checkpoint  | benchmark   | protected('') |
+
+
+  Scenario Outline: Complex cases not be confused
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+       <section>: <method>
+    """
+    And SmkMisuseUsageIOFlagMethodsInspection inspection is enabled
+    Then I expect no inspection warnings
+    When I check highlighting warnings
+    Examples:
+      | rule_like   | section     | method        |
+      | rule        | output      | foo.ancient('')   |
+      | rule        | output      | ancient.foo('')   |
