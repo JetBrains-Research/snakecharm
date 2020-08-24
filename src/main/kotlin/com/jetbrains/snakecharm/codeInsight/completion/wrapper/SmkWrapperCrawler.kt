@@ -77,7 +77,7 @@ object SmkWrapperCrawler : StartupActivity {
     }
 
     fun parseArgsPython(text: String): Map<String, List<String>> {
-        return Regex("snakemake\\.\\w*(\\.(get\\(\"\\w*\"|\\{\\^get\\(\\}\\w*)|\\[\\d+\\])")
+        return Regex("snakemake\\.\\w*(\\.(get\\(\"\\w*\"|[^get]\\w*)|\\[\\d+\\])?")
                 .findAll(text).map { str ->
                     str.value
                             .substringAfter("snakemake.")
@@ -99,7 +99,7 @@ object SmkWrapperCrawler : StartupActivity {
     }
 
     fun parseArgsR(text: String): Map<String, List<String>> {
-        return Regex("snakemake@\\w*\\[\\[\"\\w*\"]]")
+        return Regex("snakemake@\\w*(\\[\\[\"\\w*\"\\]\\])?")
                 .findAll(text).map { str ->
                     str.value
                             .substringAfter("snakemake@")
@@ -107,7 +107,12 @@ object SmkWrapperCrawler : StartupActivity {
                 .toSortedSet()
                 .toList()
                 .map {
-                    it.substringBefore("[") to it.substringAfter('"').substringBefore('"')
+                    val splitted = it.split('[', ignoreCase = false, limit = 2)
+                    if (splitted.size == 2) {
+                        splitted[0] to splitted[1].substringAfter('"').substringBefore('"')
+                    } else {
+                        splitted[0] to ""
+                    }
                 }
                 .groupBy({ it.first }, { it.second })
     }
