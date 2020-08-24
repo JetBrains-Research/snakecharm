@@ -6,7 +6,9 @@ import com.intellij.codeInsight.highlighting.BraceMatchingUtil
 import com.intellij.ide.util.gotoByName.GotoSymbolModel2
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.CommandProcessor
+import com.intellij.openapi.editor.CaretModel
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
@@ -21,6 +23,7 @@ import com.jetbrains.snakecharm.FakeSnakemakeInjector
 import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler
 import features.glue.SnakemakeWorld.findPsiElementUnderCaret
 import features.glue.SnakemakeWorld.fixture
+import features.glue.SnakemakeWorld.myFixture
 import features.glue.SnakemakeWorld.myGeneratedDocPopupText
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
@@ -361,6 +364,29 @@ class ActionsSteps {
                )
            }
        }
+
+    @Given("^I invoke (EditorCodeBlockStart|EditorCodeBlockEnd) action$")
+    fun iInvokeCodeBlockSelectionAction(actionId: String) {
+        ApplicationManager.getApplication().invokeAndWait({
+            ApplicationManager.getApplication().runWriteAction {
+                myFixture?.performEditorAction(actionId)
+            }
+        }, ModalityState.NON_MODAL)
+    }
+
+    @Given("^I expect caret (at|after) (.+)$")
+    fun iExpectCaretAtAfterStart(placeHolder: String, marker: String) {
+        ApplicationManager.getApplication().invokeAndWait({
+            val editor = fixture().editor
+            val caretModel: CaretModel = editor.caretModel
+
+            val pos = CompletionResolveSteps.getPositionBySignature(
+                editor, marker, "after" == placeHolder
+            )
+
+            assertEquals(pos, caretModel.offset)
+        }, ModalityState.NON_MODAL)
+    }
 
     @Then("^I expect no language injection")
     fun iExpectNoLanguageInjection() {
