@@ -14,10 +14,10 @@ import com.intellij.psi.impl.source.PostprocessReformattingAspect
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.codeInsight.editorActions.moveUpDown.PyStatementMover
 import com.jetbrains.python.psi.*
-import com.jetbrains.snakecharm.lang.psi.SmkFile
-import com.jetbrains.snakecharm.lang.psi.SmkRule
-import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
-import com.jetbrains.snakecharm.lang.psi.SmkSection
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_TYPE_ACCESSIBLE_SECTIONS
+import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer.Companion.KEYWORDS
+import com.jetbrains.snakecharm.lang.psi.*
 
 open class SmkStatementMover: PyStatementMover() {
     override fun checkAvailable(editor: Editor, file: PsiFile, info: MoveInfo, down: Boolean): Boolean {
@@ -42,23 +42,16 @@ open class SmkStatementMover: PyStatementMover() {
         var elementToMove1 = PyUtil.findNonWhitespaceAtOffset(file, start) ?: return false
         var elementToMove2 = PyUtil.findNonWhitespaceAtOffset(file, end) ?: return false
 
-        val smkSection = PsiTreeUtil.getParentOfType(elementToMove1, SmkSection::class.java, false)
+        elementToMove1 = getCommentOrStatement(document, elementToMove1)
+        elementToMove2 = getCommentOrStatement(document, elementToMove2)
 
-        if (smkSection != null){
+        info.toMove = elementToMove2.let { MyLineRange(elementToMove1, it) }
+        info.toMove2 = getDestinationScope(file, editor, (if (down) elementToMove2 else elementToMove1), down)
 
-            elementToMove1 = getCommentOrStatement(document, elementToMove1)
-            elementToMove2 = getCommentOrStatement(document, elementToMove2)
+        info.indentTarget = false
+        info.indentSource = false
 
-            info.toMove = elementToMove2.let { MyLineRange(elementToMove1, it) }
-            info.toMove2 = getDestinationScope(file, editor, (if (down) elementToMove2 else elementToMove1), down)
-
-            info.indentTarget = false
-            info.indentSource = false
-
-            return true
-        }
-
-        return false
+        return true
     }
 
     private fun getDestinationScope(file: PsiFile, editor: Editor,
@@ -81,7 +74,9 @@ open class SmkStatementMover: PyStatementMover() {
 
         if (elementToMove is PyClass || elementToMove is PyFunction ||
                 (elementToMove is SmkRuleLike<*> && destination is SmkSection ||
-                        elementToMove is SmkRuleLike<*> && destination is PyFunction)) {
+                        elementToMove is SmkRuleLike<*> && destination is PyFunction) ||
+                (elementToMove !is SmkSection && destination is SmkSection) ||
+                isNotAvailableForMoveInto(elementToMove, destination)) {
             val scope = statementList ?: elementToMove.containingFile as PyElement
             if (destination != null) return ScopeRange(scope, destination, !down, true)
         }
@@ -89,6 +84,8 @@ open class SmkStatementMover: PyStatementMover() {
         val lineText = document.getText(TextRange.create(startOffset, lineEndOffset))
         val isEmptyLine = StringUtil.isEmptyOrSpaces(lineText)
         if (isEmptyLine && moveToEmptyLine(elementToMove, down)) return LineRange(lineNumber, lineNumber + 1)
+
+        if (!isAvailableForMoveOut(elementToMove, down)) return null
 
         var scopeRange: LineRange? = moveOut(elementToMove, editor, down)
         if (scopeRange != null) return scopeRange
@@ -128,6 +125,27 @@ open class SmkStatementMover: PyStatementMover() {
         return PsiTreeUtil.getParentOfType(elementToMove, PyStatementList::class.java, true,
                 PyStatementWithElse::class.java, PyLoopStatement::class.java,
                 PyFunction::class.java, PyClass::class.java)
+    }
+
+    private fun isNotAvailableForMoveInto(elementToMove: PsiElement, destination: PsiElement?): Boolean =
+            (elementToMove is SmkSection &&
+                        ((destination is SmkRuleOrCheckpoint &&
+                                elementToMove.sectionKeyword !in RULE_TYPE_ACCESSIBLE_SECTIONS) ||
+                                (destination is SmkSubworkflow &&
+                                        elementToMove.sectionKeyword !in SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS)))
+
+    private fun isAvailableForMoveOut(elementToMove: PsiElement, down: Boolean): Boolean {
+        val statementList = getStatementList(elementToMove) ?: return true
+        val statements = statementList.statements
+
+        if(elementToMove is SmkRuleOrCheckpointArgsSection &&
+                elementToMove.sectionKeyword !in KEYWORDS &&
+                ((!down && statements.first() == elementToMove)
+                        || (down && statements.last() == elementToMove))){
+                return false
+        }
+
+        return true
     }
 
     private fun moveOut(elementToMove: PsiElement, editor: Editor, down: Boolean): ScopeRange? {
@@ -199,7 +217,7 @@ open class SmkStatementMover: PyStatementMover() {
         val element = getCommentOrStatement(document, rawElement)
         val statementList2: PyStatementList?
 
-        if (element is SmkRule) {
+        if (element is SmkRuleLike<*>) {
             statementList2 = element.statementList
         } else {
             statementList2 = getStatementList(element)
