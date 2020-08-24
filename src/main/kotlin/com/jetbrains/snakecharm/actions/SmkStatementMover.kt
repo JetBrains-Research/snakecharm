@@ -12,14 +12,12 @@ import com.intellij.psi.*
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.impl.source.PostprocessReformattingAspect
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.util.elementType
-import com.intellij.psi.util.parents
 import com.jetbrains.python.codeInsight.editorActions.moveUpDown.PyStatementMover
 import com.jetbrains.python.psi.*
-import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_LIKE
 import com.jetbrains.snakecharm.lang.psi.SmkFile
-import com.jetbrains.snakecharm.lang.psi.impl.SmkRuleOrCheckpointArgsSectionImpl
-import com.jetbrains.python.psi.PyCallExpression as PyCallExpression1
+import com.jetbrains.snakecharm.lang.psi.SmkRule
+import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
+import com.jetbrains.snakecharm.lang.psi.SmkSection
 
 open class SmkStatementMover: PyStatementMover() {
     override fun checkAvailable(editor: Editor, file: PsiFile, info: MoveInfo, down: Boolean): Boolean {
@@ -44,45 +42,9 @@ open class SmkStatementMover: PyStatementMover() {
         var elementToMove1 = PyUtil.findNonWhitespaceAtOffset(file, start) ?: return false
         var elementToMove2 = PyUtil.findNonWhitespaceAtOffset(file, end) ?: return false
 
-        val pyStatementList = PsiTreeUtil.getParentOfType(elementToMove1, PyStatementList::class.java)
-        val ruleOrCheckpointSection = PsiTreeUtil.getParentOfType(elementToMove1, SmkRuleOrCheckpointArgsSectionImpl::class.java)
+        val smkSection = PsiTreeUtil.getParentOfType(elementToMove1, SmkSection::class.java, false)
 
-        if (pyStatementList != null &&
-                ruleOrCheckpointSection != null) {
-            if (ruleOrCheckpointSection == pyStatementList.children.first() && !down) {
-                return true
-            }
-        }
-
-        val pyArgumentList = PsiTreeUtil.getParentOfType(elementToMove1, PyArgumentList::class.java)
-
-        if (pyArgumentList != null) {
-            val args = pyArgumentList.arguments
-
-            for (arg in args.withIndex()) {
-                if (arg.value in elementToMove1.parents) {
-                    elementToMove1 = arg.value
-                    if (down) {
-                        if(args.getOrNull(arg.index.plus(1)) != null){
-                            elementToMove2 = args[arg.index.plus(1)]
-                        } else {
-                            elementToMove2 = args.first()
-                        }
-                    }
-                    if (!down) {
-                        if(args.getOrNull(arg.index.minus(1)) != null){
-                            elementToMove2 = args[arg.index.minus(1)]
-                        } else {
-                            elementToMove2 = args.last()
-                        }
-                    }
-                }
-            }
-        }
-
-        if (elementToMove1.elementType in RULE_LIKE && elementToMove2.parent?.firstChild.elementType in RULE_LIKE){
-            elementToMove1 = elementToMove1.parent
-            elementToMove2 = elementToMove2.parent
+        if (smkSection != null){
 
             elementToMove1 = getCommentOrStatement(document, elementToMove1)
             elementToMove2 = getCommentOrStatement(document, elementToMove2)
@@ -105,25 +67,35 @@ open class SmkStatementMover: PyStatementMover() {
         val offset = if (down) elementToMove.textRange.endOffset else elementToMove.textRange.startOffset
         val lineNumber = if (down) document.getLineNumber(offset) + 1 else document.getLineNumber(offset) - 1
         if (moveOutsideFile(document, lineNumber)) return null
+
         val lineEndOffset = document.getLineEndOffset(lineNumber)
         val startOffset = document.getLineStartOffset(lineNumber)
+
         val statementList = getStatementList(elementToMove)
         val destination = getDestinationElement(elementToMove, document, lineEndOffset, down)
+
         val start = destination?.textRange?.startOffset ?: lineNumber
         val end = destination?.textRange?.endOffset ?: lineNumber
-        val startLine = document.getLineNumber(start)
         val endLine = document.getLineNumber(end)
-        if (elementToMove is PyClass || elementToMove is PyFunction) {
+        val startLine = document.getLineNumber(start)
+
+        if (elementToMove is PyClass || elementToMove is PyFunction ||
+                (elementToMove is SmkRuleLike<*> && destination is SmkSection ||
+                        elementToMove is SmkRuleLike<*> && destination is PyFunction)) {
             val scope = statementList ?: elementToMove.containingFile as PyElement
             if (destination != null) return ScopeRange(scope, destination, !down, true)
         }
+
         val lineText = document.getText(TextRange.create(startOffset, lineEndOffset))
         val isEmptyLine = StringUtil.isEmptyOrSpaces(lineText)
         if (isEmptyLine && moveToEmptyLine(elementToMove, down)) return LineRange(lineNumber, lineNumber + 1)
+
         var scopeRange: LineRange? = moveOut(elementToMove, editor, down)
         if (scopeRange != null) return scopeRange
+
         scopeRange = moveInto(elementToMove, file, editor, down, lineEndOffset)
         if (scopeRange != null) return scopeRange
+
         if (elementToMove is PsiComment && PsiTreeUtil.isAncestor(destination, elementToMove, true) ||
                 destination is PsiComment) {
             return LineRange(lineNumber, lineNumber + 1)
@@ -160,7 +132,9 @@ open class SmkStatementMover: PyStatementMover() {
 
     private fun moveOut(elementToMove: PsiElement, editor: Editor, down: Boolean): ScopeRange? {
         val statementList = getStatementList(elementToMove) ?: return null
-        if ((!down || statementList.lastChild !== elementToMove) && (down || statementList.firstChild !== elementToMove)) {
+        val statements = statementList.statements
+
+        if ((!down || statements.last() != elementToMove) && (down || statements.first() != elementToMove)) {
             return null
         }
         val addBefore = !down
@@ -201,8 +175,7 @@ open class SmkStatementMover: PyStatementMover() {
     private fun moveUpInto(elementToMove: PsiElement, editor: Editor,
                                 rawElement: PsiElement, down: Boolean): LineRange? {
         val document = editor.document
-//        var element: PsiElement? = getCommentOrStatement(document, rawElement)
-        var element: PsiElement? = rawElement
+        var element: PsiElement? = getCommentOrStatement(document, rawElement)
         val statementList = getStatementList(elementToMove)
         val scopeForComment = if (statementList == null) null else getScopeForComment(elementToMove, editor, elementToMove, down)
         var statementList2 = getStatementList(element!!)
@@ -224,12 +197,19 @@ open class SmkStatementMover: PyStatementMover() {
 
     private fun moveDownInto(document: Document, rawElement: PsiElement): LineRange? {
         val element = getCommentOrStatement(document, rawElement)
-        val statementList2 = getStatementList(element)
+        val statementList2: PyStatementList?
+
+        if (element is SmkRule) {
+            statementList2 = element.statementList
+        } else {
+            statementList2 = getStatementList(element)
+        }
+
         if (statementList2 != null) {                     // move to one-line conditional/loop statement
             val number = document.getLineNumber(element.textOffset)
             val number2 = document.getLineNumber(statementList2.parent.textOffset)
             if (number == number2) {
-                return ScopeRange(statementList2, statementList2.firstChild, true)
+                return ScopeRange(statementList2, statementList2.statements.first(), true)
             }
         }
         val statementPart = PsiTreeUtil.getParentOfType(rawElement, PyStatementPart::class.java, true, PyStatement::class.java,
@@ -241,7 +221,7 @@ open class SmkStatementMover: PyStatementMover() {
         var list: PyStatementList? = null
         if (statementPart != null) list = statementPart.statementList else if (functionDefinition != null) list = functionDefinition.statementList else if (classDefinition != null) list = classDefinition.statementList
         return if (list != null) {
-            ScopeRange(list, list.firstChild, true)
+            ScopeRange(list, list.statements.first(), true)
         } else null
     }
 
