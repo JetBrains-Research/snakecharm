@@ -362,25 +362,15 @@ class ActionsSteps {
         }, ModalityState.NON_MODAL)
     }
 
-    @Given("^I expect caret at (.+)$")
-    fun iExpectCaretAtStart(marker: String) {
+    @Given("^I expect caret (at|after) (.+)$")
+    fun iExpectCaretAtAfterStart(placeHolder: String, marker: String) {
         ApplicationManager.getApplication().invokeAndWait({
             val editor = fixture().editor
             val caretModel: CaretModel = editor.caretModel
 
-            val pos = CompletionResolveSteps.getPositionBySignature(editor, marker, false)
-
-            assertEquals(pos, caretModel.offset)
-        }, ModalityState.NON_MODAL)
-    }
-
-    @Given("^I expect caret after (.+)$")
-    fun iExpectCaretAtEnd(marker: String) {
-        ApplicationManager.getApplication().invokeAndWait({
-            val editor = fixture().editor
-            val caretModel: CaretModel = editor.caretModel
-
-            val pos = CompletionResolveSteps.getPositionBySignature(editor, marker, true)
+            val pos = CompletionResolveSteps.getPositionBySignature(
+                editor, marker, "after" == placeHolder
+            )
 
             assertEquals(pos, caretModel.offset)
         }, ModalityState.NON_MODAL)
