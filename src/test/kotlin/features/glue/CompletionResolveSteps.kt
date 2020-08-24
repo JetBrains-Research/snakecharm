@@ -552,16 +552,6 @@ class CompletionResolveSteps {
                 """.trimIndent())
     }
 
-    private fun getPositionBySignature(editor: Editor, marker: String, after: Boolean): Int {
-        val text = editor.document.text
-        val pos = text.indexOf(marker)
-        require(pos >= 0) {
-            "Marker <$marker> not found in <$text>"
-        }
-        require(pos == text.lastIndexOf(marker)) { "Multiple marker entries" }
-        return if (after) pos + marker.length else pos
-    }
-
     private fun checkCompletionResult(
             fixture: CodeInsightTestFixture,
             checkByFilePath: Boolean,
@@ -625,6 +615,16 @@ class CompletionResolveSteps {
             val host = fixture.injectedLanguageManager.getInjectionHost(element) as PyStringLiteralExpression? ?: return null
             val offset = getOffsetUnderCaret() - (host.stringValueTextRange.startOffset + host.textOffset)
             return element.containingFile?.findReferenceAt(offset)
+        }
+
+        fun getPositionBySignature(editor: Editor, marker: String, after: Boolean): Int {
+            val text = editor.document.text
+            val pos = text.indexOf(marker)
+            require(pos >= 0) {
+                "Marker <$marker> not found in <$text>"
+            }
+            require(pos == text.lastIndexOf(marker)) { "Multiple marker entries" }
+            return if (after) pos + marker.length else pos
         }
     }
 }
