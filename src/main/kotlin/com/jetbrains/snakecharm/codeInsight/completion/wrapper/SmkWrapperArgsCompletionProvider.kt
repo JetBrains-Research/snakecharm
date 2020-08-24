@@ -28,7 +28,7 @@ object SmkWrapperArgsCompletionProvider : CompletionProvider<CompletionParameter
                .getParentOfType(parameters.position, SmkRuleOrCheckpoint::class.java)
                ?.getSectionByName("wrapper") ?: return
 
-        val storage = parameters.position.project.service<SmkWrapperStorage>().wrapperStorage.find { wrapper.argumentList!!.text.contains(it.path) } ?: return
+        val storage = parameters.position.project.service<SmkWrapperStorage>().wrappers.find { wrapper.argumentList!!.text.contains(it.path) } ?: return
         val name = PsiTreeUtil.getParentOfType(parameters.position, SmkRuleOrCheckpointArgsSection::class.java)?.name ?: return
         if (name in storage.args.keys) {
             storage.args[name]?.forEach {

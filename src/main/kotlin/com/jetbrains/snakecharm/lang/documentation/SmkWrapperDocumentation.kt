@@ -28,21 +28,23 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
 
     private fun processUrl(node: PyStringLiteralExpression): String {
         val result = node.text.trim('"').substringAfter("/")
-        val wrappers = node.project.service<SmkWrapperStorage>().wrapperStorage
+        val wrappers = node.project.service<SmkWrapperStorage>().wrappers
         val wrapper =  wrappers.find { wrapper -> wrapper.path.contains(result) }
-        val url = "https://snakemake-wrappers.readthedocs.io/en/" +
+        val urlDocs = "https://snakemake-wrappers.readthedocs.io/en/" +
                 node.stringValue
                 .replace("/bio/", "/wrappers/")
                 .replace("/utils/", "/wrappers/") + ".html"
+        val urlCode = "https://github.com/snakemake/snakemake-wrappers/tree/" +
+                node.stringValue
         return if (wrapper != null)
             """
-            <p>${wrapper.name}</p>
-            <p>${wrapper.author}</p>
-            <p>${wrapper.description}</p>
-            <p><a href="$url">$url</a></p>
+            <p><a href="$urlDocs">Documentation</a>, <a href="$urlCode">Source Code</a></p>
+            ${wrapper.description.lineSequence().map { "<p>$it</p>"  }.joinToString(System.lineSeparator())}
             """
         else
-            "<p><a href=\"$url\">$url</a></p>"
+            """
+            <p><a href="$urlDocs">Documentation</a>, <a href="$urlCode">Source Code</a></p>
+            """
     }
 
     override fun getCustomDocumentationElement(

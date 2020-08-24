@@ -57,23 +57,16 @@ object SmkWrapperCrawler : StartupActivity {
                     }
                     val path = metafile.parentFile.toRelativeString(mainFolder)
 
-                    val versions = "0.64.0"
-                    val metatext = metafile.readText()
-                    val name = metatext.substringAfter("name:").substringBefore("description").trim('"', '\n', ' ')
-                    val description = metatext.substringAfter("description:").substringBefore("authors").trim('"', '\n', ' ')
-                    val authors = metatext.substringAfter("authors:").trim('"', '\n', ' ')
+                    val description = metafile.readText()
                     wrappers.add(
                             SmkWrapperStorage.Wrapper(
-                                    name = name,
                                     path = path,
-                                    firstTag = versions,
                                     args = args,
-                                    description = description,
-                                    author = authors
+                                    description = description
                             )
                     )
                 }
-        storage.wrapperStorage = wrappers.toList()
+        storage.wrappers = wrappers.toList()
     }
 
     fun parseArgsPython(text: String): Map<String, List<String>> {

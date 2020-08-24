@@ -23,7 +23,7 @@ class SmkSectionWrapperArgsInspection : SnakemakeInspection() {
 
         fun visitSmkRulelike(rulelike: SmkRuleOrCheckpoint) {
             val wrapper = rulelike.getSectionByName("wrapper") ?: return
-            val wrappers = rulelike.project.service<SmkWrapperStorage>().wrapperStorage
+            val wrappers = rulelike.project.service<SmkWrapperStorage>().wrappers
             val wrname = wrapper.argumentList?.text ?: return
             val ideal = wrappers.find { wrname.contains(it.path) } ?: return
 

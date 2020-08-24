@@ -31,10 +31,11 @@ object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>()
                 SnakemakeNames.SECTION_WRAPPER) {
             return
         }
-        val storage = parameters.position.project.service<SmkWrapperStorage>().wrapperStorage
-        storage.forEach { wrapper ->
+
+        val storage = parameters.position.project.service<SmkWrapperStorage>()
+        storage.wrappers.forEach { wrapper ->
             if (wrapper.path.contains(result.prefixMatcher.prefix, false)) {
-                result.addElement(LookupElementBuilder.create("${wrapper.firstTag}/${wrapper.path}").withIcon(PlatformIcons.PARAMETER_ICON))
+                result.addElement(LookupElementBuilder.create("${storage.version}/${wrapper.path}").withIcon(PlatformIcons.PARAMETER_ICON))
             }
         }
     }
