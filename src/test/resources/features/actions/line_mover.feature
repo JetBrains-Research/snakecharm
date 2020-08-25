@@ -1,5 +1,5 @@
 Feature: Line mover
-  Scenario Outline: Permutation up/down between rules sections
+  Scenario Outline: Swap rule like toplevel sections
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
@@ -44,7 +44,7 @@ Feature: Line mover
       | checkpoint  | def         | input          | n              | "file.txt"  | NAME1 | NAME2() | int        |
       | subworkflow | def         | workdir        | n              | "file.txt"  | NAME1 | NAME2() | int        |
 
-  Scenario Outline: Permutation up/down between rule and comment sections
+  Scenario Outline: Swap rule like section and comment
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
@@ -89,7 +89,7 @@ Feature: Line mover
       | checkpoint  | input          | ""      | # comment |
       | subworkflow | workdir        | ""      | # comment |
 
-  Scenario Outline: Permutation up/down inside rule section
+  Scenario Outline: Swap rule like single line subsections
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
@@ -127,7 +127,7 @@ Feature: Line mover
       | checkpoint  | input          | output        | "file.txt"      | "file2.txt"      |
       | subworkflow | workdir        | configfile    | "/"             | "/"              |
 
-  Scenario Outline: Permutation up/down inside rule section with complex content
+  Scenario Outline: Swap rule like multi line subsections
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
@@ -171,7 +171,7 @@ Feature: Line mover
       | checkpoint  | input          | output        | "file.txt"      | "file2.txt"      |
       | subworkflow | workdir        | configfile    | "/dir"          | "/"              |
 
-  Scenario Outline: Permutation up/down between rule and statement sections on top level
+  Scenario Outline: Swap rule like with toplevel section
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
@@ -223,7 +223,7 @@ Feature: Line mover
       | subworkflow | workdir        | ruleorder            | "/dir"          | NAME1             |
       | subworkflow | workdir        | wildcard_constraints | "/dir"          | wildcard="/d+1"   |
 
-  Scenario Outline: Move in/out rule
+  Scenario Outline: Move section in/out rule (e.g. wildcards)
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
@@ -300,7 +300,7 @@ Feature: Line mover
       | rule        | input        | wildcard_constraints | "file.txt"      | wildcard="/d+1"   |
       | checkpoint  | input        | wildcard_constraints | "file.txt"      | wildcard="/d+1"   |
 
-  Scenario Outline: Move in/out doesn't work for last rule argument
+  Scenario Outline: Move section in/out rule doesn't work for rule with one section
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
