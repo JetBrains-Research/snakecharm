@@ -299,3 +299,117 @@ Feature: Line mover
       | rule_like   | rule_section | statement_name       | content         | statement_content |
       | rule        | input        | wildcard_constraints | "file.txt"      | wildcard="/d+1"   |
       | checkpoint  | input        | wildcard_constraints | "file.txt"      | wildcard="/d+1"   |
+
+  Scenario Outline: Move in/out doesn't work for last rule argument
+    Given a snakemake project
+    Given I open a file "foo1.smk" with text
+    """
+    <rule_like> NAME1:
+        <statement_name>: <statement_content>
+    """
+    When I put the caret at <statement_name>: <statement_content>
+    And I invoke MoveStatementUp action
+    Then editor content will be
+    """
+    <rule_like> NAME1:
+        <statement_name>: <statement_content>
+    """
+    When I put the caret at <statement_name>: <statement_content>
+    And I invoke MoveStatementDown action
+    Then editor content will be
+    """
+    <rule_like> NAME1:
+        <statement_name>: <statement_content>
+    """
+    Examples:
+      | rule_like   | statement_name       | statement_content |
+      | rule        | wildcard_constraints | wildcard="/d+1"   |
+      | checkpoint  | wildcard_constraints | wildcard="/d+1"   |
+
+  Scenario Outline: Move in/out if/else statement for rule like.
+    Given a snakemake project
+    Given I open a file "foo1.smk" with text
+    """
+    if True:
+        pass
+    else:
+        pass
+    <rule_like> NAME1:
+        <statement_name>: <statement_content>
+    """
+    When I put the caret at <rule_like> NAME1:
+    And I invoke MoveStatementUp action
+    Then editor content will be
+    """
+    if True:
+        pass
+    else:
+        <rule_like> NAME1:
+            <statement_name>: <statement_content>
+
+    """
+    When I put the caret at <rule_like> NAME1:
+    And I invoke MoveStatementUp action
+    Then editor content will be
+    """
+    if True:
+        <rule_like> NAME1:
+            <statement_name>: <statement_content>
+    else:
+        pass
+
+    """
+    When I put the caret at <rule_like> NAME1:
+    And I invoke MoveStatementUp action
+    Then editor content will be
+    """
+    <rule_like> NAME1:
+        <statement_name>: <statement_content>
+    if True:
+        pass
+    else:
+        pass
+
+    """
+    When I put the caret at <rule_like> NAME1:
+    And I invoke MoveStatementDown action
+    Then editor content will be
+    """
+
+    if True:
+        <rule_like> NAME1:
+            <statement_name>: <statement_content>
+    else:
+        pass
+
+    """
+    When I put the caret at <rule_like> NAME1:
+    And I invoke MoveStatementDown action
+    Then editor content will be
+    """
+
+    if True:
+        pass
+    else:
+        <rule_like> NAME1:
+            <statement_name>: <statement_content>
+
+    """
+    When I put the caret at <rule_like> NAME1:
+    And I invoke MoveStatementDown action
+    Then editor content will be
+    """
+
+    if True:
+        pass
+    else:
+        pass
+    <rule_like> NAME1:
+        <statement_name>: <statement_content>
+
+    """
+    Examples:
+      | rule_like   | statement_name       | statement_content |
+      | rule        | wildcard_constraints | wildcard="/d+1"   |
+      | checkpoint  | wildcard_constraints | wildcard="/d+1"   |
+      | subworkflow | workdir              | "/dir"            |

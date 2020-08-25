@@ -98,7 +98,11 @@ open class SmkStatementMover: PyStatementMover() {
             return LineRange(lineNumber, lineNumber + 1)
         }
         val scope = statementList ?: elementToMove.containingFile as PyElement
-        return if (elementToMove is PyClass || elementToMove is PyFunction) ScopeRange(scope, scope.firstChild, !down, true) else LineRange(startLine, endLine + 1)
+        if (elementToMove is PyClass || elementToMove is PyFunction) {
+            return ScopeRange(scope, scope.firstChild, !down, true)
+        } else {
+            return LineRange(startLine, endLine + 1)
+        }
     }
 
     private fun moveOutsideFile(document: Document, lineNumber: Int): Boolean {
@@ -138,10 +142,13 @@ open class SmkStatementMover: PyStatementMover() {
         val statementList = getStatementList(elementToMove) ?: return true
         val statements = statementList.statements
 
-        if(elementToMove is SmkRuleOrCheckpointArgsSection &&
+        if((elementToMove is SmkRuleOrCheckpointArgsSection &&
                 elementToMove.sectionKeyword !in KEYWORDS &&
                 ((!down && statements.first() == elementToMove)
-                        || (down && statements.last() == elementToMove))){
+                        || (down && statements.last() == elementToMove))) ||
+                (statements.size == 1 && statements.first() == elementToMove &&
+                        (elementToMove is SmkRuleOrCheckpointArgsSection ||
+                                elementToMove is SmkSubworkflowArgsSection))){
                 return false
         }
 
@@ -223,7 +230,7 @@ open class SmkStatementMover: PyStatementMover() {
             statementList2 = getStatementList(element)
         }
 
-        if (statementList2 != null) {                     // move to one-line conditional/loop statement
+        if (statementList2 != null && !statementList2.statements.isEmpty()) {                     // move to one-line conditional/loop statement
             val number = document.getLineNumber(element.textOffset)
             val number2 = document.getLineNumber(statementList2.parent.textOffset)
             if (number == number2) {
@@ -237,8 +244,15 @@ open class SmkStatementMover: PyStatementMover() {
         val classDefinition = PsiTreeUtil.getParentOfType(rawElement, PyClass::class.java, true, PyStatement::class.java,
                 PyStatementList::class.java)
         var list: PyStatementList? = null
-        if (statementPart != null) list = statementPart.statementList else if (functionDefinition != null) list = functionDefinition.statementList else if (classDefinition != null) list = classDefinition.statementList
-        return if (list != null) {
+        if (statementPart != null) {
+            list = statementPart.statementList
+        } else if (functionDefinition != null) {
+            list = functionDefinition.statementList
+        } else if (classDefinition != null) {
+            list = classDefinition.statementList
+        }
+
+         return if (list != null) {
             ScopeRange(list, list.statements.first(), true)
         } else null
     }
