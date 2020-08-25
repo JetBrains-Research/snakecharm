@@ -142,6 +142,27 @@ open class SmkStatementMover: PyStatementMover() {
         val statementList = getStatementList(elementToMove) ?: return true
         val statements = statementList.statements
 
+        if(elementToMove is SmkRuleOrCheckpointArgsSection) {
+            val parent = PsiTreeUtil.getParentOfType(elementToMove, SmkRuleOrCheckpoint::class.java)
+            if (!down && statements.first() == elementToMove || down && statements.last() == elementToMove) {
+
+                var sibling = if(!down) parent?.prevSibling else parent?.nextSibling
+
+                while(sibling != null) {
+                    if(sibling !is PsiWhiteSpace && sibling !is PsiComment){
+                        val parentSibling = PsiTreeUtil.getParentOfType(sibling, SmkRuleOrCheckpoint::class.java, false)
+
+                        if (parentSibling != null){
+                            return true
+                        } else {
+                            break
+                        }
+                    }
+                    sibling = if(!down) sibling.prevSibling else sibling.nextSibling
+                }
+            }
+        }
+
         if((elementToMove is SmkRuleOrCheckpointArgsSection &&
                 elementToMove.sectionKeyword !in KEYWORDS &&
                 ((!down && statements.first() == elementToMove)
@@ -162,6 +183,34 @@ open class SmkStatementMover: PyStatementMover() {
         if ((!down || statements.last() != elementToMove) && (down || statements.first() != elementToMove)) {
             return null
         }
+
+        if(elementToMove is SmkRuleOrCheckpointArgsSection) {
+            val parent = PsiTreeUtil.getParentOfType(elementToMove, SmkRuleOrCheckpoint::class.java)
+            if (!down && statements.first() == elementToMove || down && statements.last() == elementToMove) {
+                var sibling = if(!down) parent?.prevSibling else parent?.nextSibling
+
+                while(sibling != null) {
+                    if(sibling !is PsiWhiteSpace && sibling !is PsiComment){
+                        val parentSibling = PsiTreeUtil.getParentOfType(sibling, SmkRuleOrCheckpoint::class.java, false)
+
+                        if (parentSibling != null){
+                            val list = parentSibling.statementList
+                            return if (down) {
+                                ScopeRange(list, list.statements.first(), true)
+                            } else {
+                                ScopeRange(list, list.statements.last(), false)
+                            }
+
+                        } else {
+                            break
+                        }
+                    }
+                    sibling = if(!down) sibling.prevSibling else sibling.nextSibling
+                }
+            }
+        }
+
+
         val addBefore = !down
         val parent = statementList.parent
         val sibling = if (down) PsiTreeUtil.getNextSiblingOfType(parent, PyStatementPart::class.java) else PsiTreeUtil.getPrevSiblingOfType(parent, PyStatementPart::class.java)
@@ -243,6 +292,8 @@ open class SmkStatementMover: PyStatementMover() {
                 PyStatementList::class.java)
         val classDefinition = PsiTreeUtil.getParentOfType(rawElement, PyClass::class.java, true, PyStatement::class.java,
                 PyStatementList::class.java)
+        val smkRuleOrCheckpointDefinition = PsiTreeUtil.getParentOfType(rawElement, SmkRuleOrCheckpoint::class.java, true, PyStatement::class.java,
+                PyStatementList::class.java)
         var list: PyStatementList? = null
         if (statementPart != null) {
             list = statementPart.statementList
@@ -250,6 +301,8 @@ open class SmkStatementMover: PyStatementMover() {
             list = functionDefinition.statementList
         } else if (classDefinition != null) {
             list = classDefinition.statementList
+        } else if (smkRuleOrCheckpointDefinition != null) {
+            list = smkRuleOrCheckpointDefinition.statementList
         }
 
          return if (list != null) {
@@ -260,7 +313,12 @@ open class SmkStatementMover: PyStatementMover() {
     private fun getDestinationElement(elementToMove: PsiElement, document: Document,
                                            lineEndOffset: Int, down: Boolean): PsiElement? {
         var destination = PyUtil.findPrevAtOffset(elementToMove.containingFile, lineEndOffset, PsiWhiteSpace::class.java)
-        val sibling: PsiElement? = if (down) PsiTreeUtil.getNextSiblingOfType(elementToMove, PyStatement::class.java) else PsiTreeUtil.getPrevSiblingOfType(elementToMove, PyStatement::class.java)
+
+        val sibling: PsiElement? = if (down) {
+            PsiTreeUtil.getNextSiblingOfType(elementToMove, PyStatement::class.java)
+        } else PsiTreeUtil.getPrevSiblingOfType(elementToMove, PyStatement::class.java)
+
+
         if (destination == null) {
             destination = if (elementToMove is PyClass) {
                 sibling
@@ -275,6 +333,8 @@ open class SmkStatementMover: PyStatementMover() {
             sibling
         } else if (elementToMove is PyFunction) {
             if (sibling !is PyClass) sibling else null
+        } else if (elementToMove is SmkRuleOrCheckpointArgsSection) {
+            if (sibling !is PyFunction && sibling !is PyClass) sibling else null
         } else {
             getCommentOrStatement(document, (sibling ?: destination)!!)
         }
