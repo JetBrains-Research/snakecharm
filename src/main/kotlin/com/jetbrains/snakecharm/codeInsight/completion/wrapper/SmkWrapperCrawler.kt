@@ -20,7 +20,7 @@ object SmkWrapperCrawler : StartupActivity {
     override fun runActivity(project: Project) {
         if (ApplicationManager.getApplication().isUnitTestMode) {
             val storage = project.service<SmkWrapperStorage>()
-            storage.version = "0.64.0"
+            storage.version = SnakemakeBundle.message("wrapper.bundled.storage.version")
             storage.wrappers = Cbor
                     .decodeFromByteArray(
                             SmkWrapperStorage::class.java
@@ -33,7 +33,7 @@ object SmkWrapperCrawler : StartupActivity {
             ProgressManager.getInstance().run(object : Task.Backgroundable(
                     project,
                     "Preparing wrapper data",
-                    false
+                    true
             ) {
                 override fun run(indicator: ProgressIndicator) {
                     ModuleManager
