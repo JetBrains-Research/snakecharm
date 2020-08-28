@@ -116,7 +116,9 @@ task buildWrappersBundle() {
         }
     }
 }
-jar.dependsOn(buildWrappersBundle)
+// XXX: dependency temporary disabled, need re-configure TC to include
+//    snakemake wrappers checkout step
+//jar.dependsOn(buildWrappersBundle)
 
 
 test {
