@@ -15,7 +15,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.codeInsight.editorActions.moveUpDown.PyStatementMover
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_TYPE_ACCESSIBLE_SECTIONS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer.Companion.KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.*
 
@@ -132,15 +132,15 @@ open class SmkStatementMover: PyStatementMover() {
     }
 
     private fun isNotAvailableForMoveInto(elementToMove: PsiElement, destination: PsiElement?): Boolean =
-            (elementToMove is SmkSection &&
+            (elementToMove is SmkSection && elementToMove !is SmkRunSection &&
                         ((destination is SmkRuleOrCheckpoint &&
-                                elementToMove.sectionKeyword !in RULE_TYPE_ACCESSIBLE_SECTIONS) ||
+                                elementToMove.sectionKeyword !in RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS) ||
                                 (destination is SmkSubworkflow &&
                                         elementToMove.sectionKeyword !in SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS)))
 
     private fun isAvailableForMoveOut(elementToMove: PsiElement, down: Boolean): Boolean {
         val statementList = getStatementList(elementToMove) ?: return true
-        val statements = statementList.statements
+        val statements = statementList.children
 
         if(elementToMove is SmkRuleOrCheckpointArgsSection) {
             val parent = PsiTreeUtil.getParentOfType(elementToMove, SmkRuleOrCheckpoint::class.java)
@@ -163,8 +163,9 @@ open class SmkStatementMover: PyStatementMover() {
             }
         }
 
-        if((elementToMove is SmkRuleOrCheckpointArgsSection &&
-                elementToMove.sectionKeyword !in KEYWORDS &&
+        if((((elementToMove is SmkRuleOrCheckpointArgsSection &&
+                elementToMove.sectionKeyword !in KEYWORDS) ||
+                        (elementToMove is SmkRunSection)) &&
                 ((!down && statements.first() == elementToMove)
                         || (down && statements.last() == elementToMove))) ||
                 (statements.size == 1 && statements.first() == elementToMove &&

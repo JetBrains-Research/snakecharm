@@ -1,5 +1,5 @@
 Feature: Line mover
-  Scenario Outline: Swap rule like toplevel and function sections
+  Scenario Outline: Swap rule like toplevel sections
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
@@ -37,9 +37,6 @@ Feature: Line mover
       | rule        | subworkflow | input          | workdir        | "file1.txt"    | "file2.txt"   |
       | checkpoint  | subworkflow | input          | workdir        | "file1.txt"    | "file2.txt"   |
       | subworkflow | subworkflow | workdir        | workdir        | "file1.txt"    | "file2.txt"   |
-      | rule        | def         | input          | n              | "file1.txt"    | int           |
-      | checkpoint  | def         | input          | n              | "file1.txt"    | int           |
-      | subworkflow | def         | workdir        | n              | "file1.txt"    | int           |
       | rule        | rule        | input          | output         | "file1.txt"    | \n"file2.txt" |
       | checkpoint  | rule        | input          | output         | "file1.txt"    | \n"file2.txt" |
       | subworkflow | rule        | workdir        | output         | "file1.txt"    | \n"file2.txt" |
@@ -67,6 +64,57 @@ Feature: Line mover
       | rule        | subworkflow | input          | workdir        | \n"file1.txt"  | \n"file2.txt" |
       | checkpoint  | subworkflow | input          | workdir        | \n"file1.txt"  | \n"file2.txt" |
       | subworkflow | subworkflow | workdir        | workdir        | \n"file1.txt"  | \n"file2.txt" |
+
+  Scenario Outline: Swap rule like toplevel and python function sections
+    Given a snakemake project
+    Given I open a file "foo1.smk" with text
+    """
+    <def>
+        <def_section>: <def_content>
+    <rule_like1> NAME1:
+        <rule_section1>: <content1>
+    """
+    When I put the caret at <rule_like1> NAME1:
+    And I invoke MoveStatementUp action
+    Then editor content will be
+    """
+    <rule_like1> NAME1:
+        <rule_section1>: <content1>
+    <def>
+        <def_section>: <def_content>
+    """
+    When I put the caret at <rule_like1> NAME1:
+    And I invoke MoveStatementDown action
+    Then editor content will be
+    """
+    <def>
+        <def_section>: <def_content>
+    <rule_like1> NAME1:
+        <rule_section1>: <content1>
+    """
+    When I put the caret at <def>
+    And I invoke MoveStatementDown action
+    Then editor content will be
+    """
+    <rule_like1> NAME1:
+        <rule_section1>: <content1>
+    <def>
+        <def_section>: <def_content>
+    """
+    When I put the caret at <def>
+    And I invoke MoveStatementUp action
+    Then editor content will be
+    """
+    <def>
+        <def_section>: <def_content>
+    <rule_like1> NAME1:
+        <rule_section1>: <content1>
+    """
+    Examples:
+      | rule_like1  | def           | rule_section1  | def_section  | content1       | def_content   |
+      | rule        | def NAME2():  | input          | n            | "file1.txt"    | int           |
+      | checkpoint  | def NAME2():  | input          | n            | "file1.txt"    | int           |
+      | subworkflow | def NAME2():  | workdir        | n            | "file1.txt"    | int           |
 
   Scenario Outline: Swap rule like section and comment
     Given a snakemake project
@@ -199,7 +247,6 @@ Feature: Line mover
     Examples:
       | rule_like   | rule_section   | statement_name       | content         | statement_content |
       | rule        | input          | config               | "file.txt"      | "d"               |
-      | rule        | input          | singularity          | "file.txt"      | ""                |
       | rule        | input          | workdir              | "file.txt"      | "/d"              |
       | rule        | input          | include              | "file.txt"      | ""                |
       | rule        | input          | localrules           | "file.txt"      | NAME1             |
@@ -207,7 +254,6 @@ Feature: Line mover
       | rule        | input          | snakefile            | "file.txt"      | ""                |
       | rule        | input          | configfile           | "file.txt"      | ""                |
       | checkpoint  | input          | config               | "file.txt"      | "d"               |
-      | checkpoint  | input          | singularity          | "file.txt"      | ""                |
       | checkpoint  | input          | workdir              | "file.txt"      | "/d"              |
       | checkpoint  | input          | include              | "file.txt"      | ""                |
       | checkpoint  | input          | localrules           | "file.txt"      | NAME1             |
@@ -215,13 +261,11 @@ Feature: Line mover
       | checkpoint  | input          | snakefile            | "file.txt"      | ""                |
       | checkpoint  | input          | configfile           | "file.txt"      | ""                |
       | subworkflow | workdir        | config               | "/dir"          | "d"               |
-      | subworkflow | workdir        | singularity          | "/dir"          | ""                |
       | subworkflow | workdir        | include              | "/dir"          | ""                |
       | subworkflow | workdir        | localrules           | "/dir"          | NAME1             |
       | subworkflow | workdir        | ruleorder            | "/dir"          | NAME1             |
       | subworkflow | workdir        | wildcard_constraints | "/dir"          | wildcard="/d+1"   |
       | rule        | input          | config               | \n"file.txt"    | "d"               |
-      | rule        | input          | singularity          | \n"file.txt"    | ""                |
       | rule        | input          | workdir              | \n"file.txt"    | "/d"              |
       | rule        | input          | include              | \n"file.txt"    | ""                |
       | rule        | input          | localrules           | \n"file.txt"    | NAME1             |
@@ -229,7 +273,6 @@ Feature: Line mover
       | rule        | input          | snakefile            | \n"file.txt"    | ""                |
       | rule        | input          | configfile           | \n"file.txt"    | ""                |
       | checkpoint  | input          | config               | \n"file.txt"    | "d"               |
-      | checkpoint  | input          | singularity          | \n"file.txt"    | ""                |
       | checkpoint  | input          | workdir              | \n"file.txt"    | "/d"              |
       | checkpoint  | input          | include              | \n"file.txt"    | ""                |
       | checkpoint  | input          | localrules           | \n"file.txt"    | NAME1             |
@@ -237,13 +280,11 @@ Feature: Line mover
       | checkpoint  | input          | snakefile            | \n"file.txt"    | ""                |
       | checkpoint  | input          | configfile           | \n"file.txt"    | ""                |
       | subworkflow | workdir        | config               | \n"/dir"        | "d"               |
-      | subworkflow | workdir        | singularity          | \n"/dir"        | ""                |
       | subworkflow | workdir        | include              | \n"/dir"        | ""                |
       | subworkflow | workdir        | localrules           | \n"/dir"        | NAME1             |
       | subworkflow | workdir        | ruleorder            | \n"/dir"        | NAME1             |
       | subworkflow | workdir        | wildcard_constraints | \n"/dir"        | wildcard="/d+1"   |
       | rule        | input          | config               | \n"file.txt"\n  | "d"               |
-      | rule        | input          | singularity          | \n"file.txt"\n  | ""                |
       | rule        | input          | workdir              | \n"file.txt"\n  | "/d"              |
       | rule        | input          | include              | \n"file.txt"\n  | ""                |
       | rule        | input          | localrules           | \n"file.txt"\n  | NAME1             |
@@ -251,7 +292,6 @@ Feature: Line mover
       | rule        | input          | snakefile            | \n"file.txt"\n  | ""                |
       | rule        | input          | configfile           | \n"file.txt"\n  | ""                |
       | checkpoint  | input          | config               | \n"file.txt"\n  | "d"               |
-      | checkpoint  | input          | singularity          | \n"file.txt"\n  | ""                |
       | checkpoint  | input          | workdir              | \n"file.txt"\n  | "/d"              |
       | checkpoint  | input          | include              | \n"file.txt"\n  | ""                |
       | checkpoint  | input          | localrules           | \n"file.txt"\n  | NAME1             |
@@ -259,7 +299,6 @@ Feature: Line mover
       | checkpoint  | input          | snakefile            | \n"file.txt"\n  | ""                |
       | checkpoint  | input          | configfile           | \n"file.txt"\n  | ""                |
       | subworkflow | workdir        | config               | \n"/dir"\n      | "d"               |
-      | subworkflow | workdir        | singularity          | \n"/dir"\n      | ""                |
       | subworkflow | workdir        | include              | \n"/dir"\n      | ""                |
       | subworkflow | workdir        | localrules           | \n"/dir"\n      | NAME1             |
       | subworkflow | workdir        | ruleorder            | \n"/dir"\n      | NAME1             |
@@ -753,3 +792,221 @@ Feature: Line mover
       | checkpoint  | rule        | \n"file1.txt"  | \n"file2.txt" |
       | rule        | checkpoint  | \n"file1.txt"  | \n"file2.txt" |
       | checkpoint  | checkpoint  | \n"file1.txt"  | \n"file2.txt" |
+
+  Scenario Outline: Swap python functions inside run section
+    Given a snakemake project
+    Given I open a file "foo1.smk" with text
+    """
+    <rule_like>
+      <run_section>:
+                     <section1>
+                         <section1_content>
+                     <section2>
+                         <section2_content>
+    """
+    When I put the caret at <section2>
+    And I invoke MoveStatementUp action
+    Then editor content will be
+    """
+    <rule_like>
+      <run_section>:
+                     <section2>
+                         <section2_content>
+                     <section1>
+                         <section1_content>
+    """
+    When I put the caret at <section2>
+    And I invoke MoveStatementDown action
+    Then editor content will be
+    """
+    <rule_like>
+      <run_section>:
+                     <section1>
+                         <section1_content>
+                     <section2>
+                         <section2_content>
+    """
+    Examples:
+      | rule_like | run_section | section1    | section1_content | section2  | section2_content |
+      | rule      | run         | def f1():   | pass             | def f2(): | pass             |
+      | rule      | run         | def f1():   | a: int           | def f2(): | b: int           |
+
+  Scenario Outline: Swap sections in python functions inside run section
+    Given a snakemake project
+    Given I open a file "foo1.smk" with text
+    """
+    <rule_like>
+      <run_section>:
+                     <section>
+                         <section_content1>
+                         <section_content2>
+    """
+    When I put the caret at <section_content2>
+    And I invoke MoveStatementUp action
+    Then editor content will be
+    """
+    <rule_like>
+      <run_section>:
+                     <section>
+                         <section_content2>
+                         <section_content1>
+
+    """
+    When I put the caret at <section_content2>
+    And I invoke MoveStatementDown action
+    Then editor content will be
+    """
+    <rule_like>
+      <run_section>:
+                     <section>
+                         <section_content1>
+                         <section_content2>
+
+    """
+    Examples:
+      | rule_like | run_section | section     | section_content1                 | section_content2         |
+      | rule      | run         | def f1():   | pass                             | b: int                   |
+      | rule      | run         | def f1():   | a: int                           | b: int                   |
+
+  Scenario: Complex example for swap sections in python functions inside run section
+    Given a snakemake project
+    Given I open a file "foo1.smk" with text
+    """
+    rule NAME:
+      run:
+            def target(self, paths):
+                if not_iterable(paths):
+                    path = paths
+                    path = (
+                        path
+                        if os.path.isabs(path) or path.startswith("root://")
+                        else os.path.join(self.workdir, path)
+                    )
+                    return flag(path, "subworkflow", self)
+                return [self.target(path) for path in paths]
+    """
+    When I put the caret at return flag(path, "subworkflow", self)
+    And I invoke MoveStatementUp action
+    Then editor content will be
+    """
+    rule NAME:
+      run:
+            def target(self, paths):
+                if not_iterable(paths):
+                    path = paths
+                    return flag(path, "subworkflow", self)
+                    path = (
+                        path
+                        if os.path.isabs(path) or path.startswith("root://")
+                        else os.path.join(self.workdir, path)
+                    )
+                return [self.target(path) for path in paths]
+    """
+    When I put the caret at return flag(path, "subworkflow", self)
+    And I invoke MoveStatementDown action
+    Then editor content will be
+    """
+    rule NAME:
+      run:
+            def target(self, paths):
+                if not_iterable(paths):
+                    path = paths
+                    path = (
+                        path
+                        if os.path.isabs(path) or path.startswith("root://")
+                        else os.path.join(self.workdir, path)
+                    )
+                    return flag(path, "subworkflow", self)
+                return [self.target(path) for path in paths]
+    """
+
+  Scenario: Complex example for moving python functions inside run section
+    Given a snakemake project
+    Given I open a file "foo1.smk" with text
+    """
+    rule NAME:
+      run:
+            def target(self, paths):
+                if not_iterable(paths):
+                    path = paths
+                    path = (
+                        path
+                        if os.path.isabs(path) or path.startswith("root://")
+                        else os.path.join(self.workdir, path)
+                    )
+                    return flag(path, "subworkflow", self)
+                return [self.target(path) for path in paths]
+
+            def targets(self, dag):
+              def relpath(f):
+                  if f.startswith(self.workdir):
+                      return os.path.relpath(f, start=self.workdir)
+                  # do not adjust absolute targets outside of workdir
+                  return f
+              return [
+                  relpath(f)
+                  for job in dag.jobs
+                  for f in job.subworkflow_input
+                  if job.subworkflow_input[f] is self
+              ]
+    """
+    When I put the caret at def targets(self, dag):
+    And I invoke MoveStatementUp action
+    Then editor content will be
+    """
+    rule NAME:
+      run:
+            def targets(self, dag):
+              def relpath(f):
+                  if f.startswith(self.workdir):
+                      return os.path.relpath(f, start=self.workdir)
+                  # do not adjust absolute targets outside of workdir
+                  return f
+              return [
+                  relpath(f)
+                  for job in dag.jobs
+                  for f in job.subworkflow_input
+                  if job.subworkflow_input[f] is self
+              ]
+
+            def target(self, paths):
+                if not_iterable(paths):
+                    path = paths
+                    path = (
+                        path
+                        if os.path.isabs(path) or path.startswith("root://")
+                        else os.path.join(self.workdir, path)
+                    )
+                    return flag(path, "subworkflow", self)
+                return [self.target(path) for path in paths]
+    """
+    When I put the caret at def targets(self, dag):
+    And I invoke MoveStatementDown action
+    Then editor content will be
+    """
+    rule NAME:
+      run:
+            def target(self, paths):
+                if not_iterable(paths):
+                    path = paths
+                    path = (
+                        path
+                        if os.path.isabs(path) or path.startswith("root://")
+                        else os.path.join(self.workdir, path)
+                    )
+                    return flag(path, "subworkflow", self)
+                return [self.target(path) for path in paths]
+
+            def targets(self, dag):
+              def relpath(f):
+                  if f.startswith(self.workdir):
+                      return os.path.relpath(f, start=self.workdir)
+                  # do not adjust absolute targets outside of workdir
+                  return f
+              return [
+                  relpath(f)
+                  for job in dag.jobs
+                  for f in job.subworkflow_input
+                  if job.subworkflow_input[f] is self
+              ]
+    """
