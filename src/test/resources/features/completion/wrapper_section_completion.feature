@@ -1,6 +1,6 @@
 Feature: Completion for wrapper name
 
-  Scenario Outline: Complete wrapper name with 0.63.0 version tag
+  Scenario Outline: Complete wrapper name with 0.64.0 version tag
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """

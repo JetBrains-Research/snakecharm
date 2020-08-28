@@ -9,6 +9,7 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
+import com.jetbrains.python.statistics.modules
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.facet.SnakemakeFacet
 import kotlinx.serialization.*
@@ -19,14 +20,16 @@ object SmkWrapperCrawler : StartupActivity {
     @ExperimentalSerializationApi
     override fun runActivity(project: Project) {
         if (ApplicationManager.getApplication().isUnitTestMode) {
-            val storage = project.service<SmkWrapperStorage>()
-            storage.version = SnakemakeBundle.message("wrapper.bundled.storage.version")
-            storage.wrappers = Cbor
-                    .decodeFromByteArray(
-                            SmkWrapperStorage::class.java
-                                    .getResourceAsStream("/smk-wrapper-storage.cbor")
-                                    .readBytes()
-                    )
+            project.modules.forEach {
+                val storage = it.getService(SmkWrapperStorage::class.java)
+                storage.version = SnakemakeBundle.message("wrapper.bundled.storage.version")
+                storage.wrappers = Cbor
+                        .decodeFromByteArray(
+                                SmkWrapperStorage::class.java
+                                        .getResourceAsStream("/smk-wrapper-storage.cbor")
+                                        .readBytes()
+                        )
+            }
         }
 
         ApplicationManager.getApplication().invokeLater {
