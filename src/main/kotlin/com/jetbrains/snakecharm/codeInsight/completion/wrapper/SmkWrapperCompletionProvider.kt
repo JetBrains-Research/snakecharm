@@ -35,9 +35,20 @@ object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>()
                 .findModuleForPsiElement(parameters.position)
                 ?.getService(SmkWrapperStorage::class.java) ?: return
 
+        val version: String
+        val prefix: String
+
+        if (Regex("\\d+\\.\\d+\\.\\d+.*").matches(result.prefixMatcher.prefix)) {
+            version = result.prefixMatcher.prefix.substringBefore('/')
+            prefix = result.prefixMatcher.prefix.substringAfter('/')
+        } else {
+            version = storage.version
+            prefix = result.prefixMatcher.prefix
+        }
+
         storage.wrappers.forEach { wrapper ->
-            if (wrapper.path.contains(result.prefixMatcher.prefix, false)) {
-                result.addElement(LookupElementBuilder.create("${storage.version}/${wrapper.path}").withIcon(PlatformIcons.PARAMETER_ICON))
+            if (wrapper.path.contains(prefix, false)) {
+                result.addElement(LookupElementBuilder.create("$version/${wrapper.path}").withIcon(PlatformIcons.PARAMETER_ICON))
             }
         }
     }

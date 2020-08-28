@@ -15,13 +15,13 @@ Feature: Inspection for missed wrapper arguments
     """
     When I check highlighting weak warnings ignoring extra highlighting
     Examples:
-      | rulelike   | section   | wrapper   | argument |
-      | rule       | input     | bio/fastp | sample   |
-      | rule       | output     | bio/last/lastal | maf      |
-      | rule       | input     | bio/picard/bedtointervallist | bed   |
-      | checkpoint | resources | bio/pear  | mem_mb   |
-      | checkpoint | params | bio/vcftools/filter  | extra   |
-      | checkpoint | input | bio/gatk3/printreads  | recal_data   |
+      | rulelike   | section   | wrapper                      | argument   |
+      | rule       | input     | bio/fastp                    | sample     |
+      | rule       | output    | bio/last/lastal              | maf        |
+      | rule       | input     | bio/picard/bedtointervallist | bed        |
+      | checkpoint | resources | bio/pear                     | mem_mb     |
+      | checkpoint | params    | bio/vcftools/filter          | extra      |
+      | checkpoint | input     | bio/gatk3/printreads         | recal_data |
 
   Scenario Outline: Missed section with arguments for bundled wrappers
     Given a snakemake project

@@ -8,9 +8,11 @@ Feature: Completion for wrapper name
       wrapper: "0.64.0/<short_name>"
     """
     When I put the caret after <short_name>
-    And I invoke autocompletion popup
-    Then completion list should contain:
-      | <full_name> |
+    And I invoke autocompletion popup and see a text:
+    """
+    <rule_like> NAME:
+      wrapper: "0.64.0/<full_name>"
+    """
     Examples:
       | rule_like  | short_name         | full_name                       |
       | rule       | bismark2report     | bio/bismark/bismark2report      |
