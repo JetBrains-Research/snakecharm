@@ -99,13 +99,29 @@ task cucumber() {
     }
 }
 
+// XXX: An alternative to `buildWrappersBundle` task, not clear which way is better at the moment.
+//jar {
+//    doFirst {
+//        javaexec {
+//                    main = "com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler"
+//                    classpath =  project.sourceSets.main.runtimeClasspath + files(intellij.ideaDependency.jarFiles)
+//                    enableAssertions = true
+//                    args = [
+//                            "${System.getenv("HOME")}/snakemake-wrappers",
+//                            "${project.buildDir}/bundledWrappers/smk-wrapper-storage2.cbor"
+//                    ]
+//                    maxHeapSize = '1024m' // Not much RAM is available on TC agents
+//                }
+//    }
+//    from { "${project.buildDir}/bundledWrappers/smk-wrapper-storage2.cbor" }
+//}
+
 task buildWrappersBundle() {
     dependsOn  compileKotlin, compileJava
-
     doLast {
         javaexec {
             main = "com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler"
-            classpath =  project.sourceSets.main.runtimeClasspath
+            classpath =  project.sourceSets.main.runtimeClasspath + files(intellij.ideaDependency.jarFiles)
             enableAssertions = true
             args = [
                     "${System.getenv("HOME")}/snakemake-wrappers",

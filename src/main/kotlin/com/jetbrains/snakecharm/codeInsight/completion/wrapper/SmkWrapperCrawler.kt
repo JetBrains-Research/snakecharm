@@ -1,7 +1,9 @@
 package com.jetbrains.snakecharm.codeInsight.completion.wrapper
 
+import com.intellij.util.io.exists
+import com.intellij.util.io.isDirectory
+import com.intellij.util.io.write
 import java.io.File
-import java.nio.file.Files
 import java.nio.file.Paths
 
 object SmkWrapperCrawler {
@@ -15,10 +17,10 @@ object SmkWrapperCrawler {
 
         val wrappersFolder = args[0]
         val wrappersFolderPath = Paths.get(wrappersFolder)
-        require(Files.exists(wrappersFolderPath)) {
+        require(wrappersFolderPath.exists()) {
             "Wrappers src folder doesn't exist: $wrappersFolder"
         }
-        require(Files.isDirectory(wrappersFolderPath)) {
+        require(wrappersFolderPath.isDirectory()) {
             "Wrappers src folder isn't a folder: $wrappersFolder"
         }
 
@@ -35,10 +37,7 @@ object SmkWrapperCrawler {
         println("Found ${wrappers.size} wrappers")
 
         // TODO[simon]: fix me
-        Files.write(Paths.get(outputFile), "wrappers number: ${wrappers.size}".toByteArray())
-
-        // XXX Cannot use IDEA API here at the moment (gradle + classpath issues_
-        //            Paths.get(outputFile).write("wrappers number: ${wrappers.size}")
+        Paths.get(outputFile).write("wrappers number: ${wrappers.size}")
     }
 
 
@@ -82,42 +81,42 @@ object SmkWrapperCrawler {
 
     fun parseArgsPython(text: String): Map<String, List<String>> {
         return Regex("snakemake\\.\\w*(\\.(get\\(\"\\w*\"|[^get]\\w*)|\\[\\d+\\])?")
-                .findAll(text).map { str ->
-                    str.value
-                            .substringAfter("snakemake.")
+            .findAll(text).map { str ->
+                str.value
+                    .substringAfter("snakemake.")
+            }
+            .toSortedSet()
+            .toList()
+            .map {
+                val splitted = it.split('.', ignoreCase = false, limit = 2)
+                when {
+                    splitted.size != 2
+                    -> splitted[0].substringBefore('[') to ""
+                    splitted[1].startsWith("get")
+                    -> splitted[0] to splitted[1].removeSurrounding("get(\"", "\"")
+                    else
+                    -> splitted[0] to splitted[1]
                 }
-                .toSortedSet()
-                .toList()
-                .map {
-                    val splitted = it.split('.', ignoreCase = false, limit = 2)
-                    when {
-                        splitted.size != 2
-                        -> splitted[0].substringBefore('[') to ""
-                        splitted[1].startsWith("get")
-                        -> splitted[0] to splitted[1].removeSurrounding("get(\"", "\"")
-                        else
-                        -> splitted[0] to splitted[1]
-                    }
-                }
-                .groupBy({ it.first }, { it.second })
+            }
+            .groupBy({ it.first }, { it.second })
     }
 
     fun parseArgsR(text: String): Map<String, List<String>> {
         return Regex("snakemake@\\w*(\\[\\[\"\\w*\"\\]\\])?")
-                .findAll(text).map { str ->
-                    str.value
-                            .substringAfter("snakemake@")
+            .findAll(text).map { str ->
+                str.value
+                    .substringAfter("snakemake@")
+            }
+            .toSortedSet()
+            .toList()
+            .map {
+                val splitted = it.split('[', ignoreCase = false, limit = 2)
+                if (splitted.size == 2) {
+                    splitted[0] to splitted[1].substringAfter('"').substringBefore('"')
+                } else {
+                    splitted[0] to ""
                 }
-                .toSortedSet()
-                .toList()
-                .map {
-                    val splitted = it.split('[', ignoreCase = false, limit = 2)
-                    if (splitted.size == 2) {
-                        splitted[0] to splitted[1].substringAfter('"').substringBefore('"')
-                    } else {
-                        splitted[0] to ""
-                    }
-                }
-                .groupBy({ it.first }, { it.second })
+            }
+            .groupBy({ it.first }, { it.second })
     }
 }
