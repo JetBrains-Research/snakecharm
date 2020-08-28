@@ -45,7 +45,7 @@ open class SmkStatementMover: PyStatementMover() {
         elementToMove1 = getCommentOrStatement(document, elementToMove1)
         elementToMove2 = getCommentOrStatement(document, elementToMove2)
 
-        info.toMove = elementToMove2.let { MyLineRange(elementToMove1, it) }
+        info.toMove = MyLineRange(elementToMove1, elementToMove2)
         info.toMove2 = getDestinationScope(file, editor, (if (down) elementToMove2 else elementToMove1), down)
 
         info.indentTarget = false
@@ -98,10 +98,10 @@ open class SmkStatementMover: PyStatementMover() {
             return LineRange(lineNumber, lineNumber + 1)
         }
         val scope = statementList ?: elementToMove.containingFile as PyElement
-        if (elementToMove is PyClass || elementToMove is PyFunction) {
-            return ScopeRange(scope, scope.firstChild, !down, true)
+        return if (elementToMove is PyClass || elementToMove is PyFunction) {
+            ScopeRange(scope, scope.firstChild, !down, true)
         } else {
-            return LineRange(startLine, endLine + 1)
+            LineRange(startLine, endLine + 1)
         }
     }
 
@@ -244,15 +244,15 @@ open class SmkStatementMover: PyStatementMover() {
     private fun moveInto(elementToMove: PsiElement, file: PsiFile,
                               editor: Editor, down: Boolean, offset: Int): LineRange? {
         val rawElement = PyUtil.findNonWhitespaceAtOffset(file, offset) ?: return null
-        return if (down) moveDownInto(editor.document, rawElement) else moveUpInto(elementToMove, editor, rawElement, false)
+        return if (down) moveDownInto(editor.document, rawElement) else moveUpInto(elementToMove, editor, rawElement)
     }
 
     private fun moveUpInto(elementToMove: PsiElement, editor: Editor,
-                                rawElement: PsiElement, down: Boolean): LineRange? {
+                                rawElement: PsiElement): LineRange? {
         val document = editor.document
         var element: PsiElement? = getCommentOrStatement(document, rawElement)
         val statementList = getStatementList(elementToMove)
-        val scopeForComment = if (statementList == null) null else getScopeForComment(elementToMove, editor, elementToMove, down)
+        val scopeForComment = if (statementList == null) null else getScopeForComment(elementToMove, editor, elementToMove, false)
         var statementList2 = getStatementList(element!!)
         val start1 = elementToMove.textOffset - document.getLineStartOffset(document.getLineNumber(elementToMove.textOffset))
         val start2 = element.textOffset - document.getLineStartOffset(document.getLineNumber(element.textOffset))
@@ -274,13 +274,13 @@ open class SmkStatementMover: PyStatementMover() {
         val element = getCommentOrStatement(document, rawElement)
         val statementList2: PyStatementList?
 
-        if (element is SmkRuleLike<*>) {
-            statementList2 = element.statementList
+        statementList2 = if (element is SmkRuleLike<*>) {
+            element.statementList
         } else {
-            statementList2 = getStatementList(element)
+            getStatementList(element)
         }
 
-        if (statementList2 != null && !statementList2.statements.isEmpty()) {                     // move to one-line conditional/loop statement
+        if (statementList2 != null && statementList2.statements.isNotEmpty()) {                     // move to one-line conditional/loop statement
             val number = document.getLineNumber(element.textOffset)
             val number2 = document.getLineNumber(statementList2.parent.textOffset)
             if (number == number2) {
@@ -296,14 +296,19 @@ open class SmkStatementMover: PyStatementMover() {
         val smkRuleOrCheckpointDefinition = PsiTreeUtil.getParentOfType(rawElement, SmkRuleOrCheckpoint::class.java, true, PyStatement::class.java,
                 PyStatementList::class.java)
         var list: PyStatementList? = null
-        if (statementPart != null) {
-            list = statementPart.statementList
-        } else if (functionDefinition != null) {
-            list = functionDefinition.statementList
-        } else if (classDefinition != null) {
-            list = classDefinition.statementList
-        } else if (smkRuleOrCheckpointDefinition != null) {
-            list = smkRuleOrCheckpointDefinition.statementList
+        when {
+            statementPart != null -> {
+                list = statementPart.statementList
+            }
+            functionDefinition != null -> {
+                list = functionDefinition.statementList
+            }
+            classDefinition != null -> {
+                list = classDefinition.statementList
+            }
+            smkRuleOrCheckpointDefinition != null -> {
+                list = smkRuleOrCheckpointDefinition.statementList
+            }
         }
 
          return if (list != null) {
@@ -355,19 +360,6 @@ open class SmkStatementMover: PyStatementMover() {
         return destination
     }
 
-    @Suppress("NAME_SHADOWING")
-    private fun getCommentOrExpression(document: Document, destination: PsiElement): PsiElement {
-        var destination = destination
-        val statement = PsiTreeUtil.getParentOfType(destination, PyExpression::class.java, false)
-                ?: return destination
-        if (destination is PsiComment) {
-            if (document.getLineNumber(destination.getTextOffset()) == document.getLineNumber(statement.textOffset)) {
-                destination = statement
-            }
-        } else destination = statement
-        return destination
-    }
-
     override fun beforeMove(editor: Editor, info: MoveInfo, down: Boolean) {
         val toMove = info.toMove
         val toMove2 = info.toMove2
@@ -383,8 +375,7 @@ open class SmkStatementMover: PyStatementMover() {
                 val selectionLen = getSelectionLenContainer(editor, toMove)
                 val shift = getCaretShift(startToMove, endToMove, caretModel, isSelectionStartAtCaret)
                 val hasSelection = selectionModel.hasSelection()
-                val offset: Int
-                offset = if (toMove2.isTheSameLevel) {
+                val offset: Int = if (toMove2.isTheSameLevel) {
                     moveTheSameLevel(toMove2, toMove)
                 } else {
                     moveInOut(toMove, editor, info)
