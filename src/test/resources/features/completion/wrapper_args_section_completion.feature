@@ -41,3 +41,24 @@ Feature: Completion for arguments used in wrapper
       | import | field2    | field1 |
       | shell  | params    | input  |
       | script | resources | log    |
+
+  Scenario Outline: Simple completion for bundled wrappers
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rulelike> foo:
+      <section>:
+      wrapper: "0.64.0/<wrapper>"
+    """
+    When I put the caret after <section>:
+    And I invoke autocompletion popup
+    Then completion list should contain:
+    |<completion>|
+    Examples:
+      | rulelike   | section | wrapper               | completion |
+      | rule       | input   | bio/bcftools/reheader | vcf        |
+      | rule       | input   | bio/bwa/mem           | reads      |
+      | rule       | params  | bio/gatk/applybqsr    | java_opts  |
+      | checkpoint | params  | bio/bcftools/call     | mpileup    |
+      | checkpoint | params  | utils/cairosvg        | extra      |
+      | checkpoint | output  | bio/last/lastal       | blasttab   |
