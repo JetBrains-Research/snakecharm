@@ -1,8 +1,8 @@
 package com.jetbrains.snakecharm.lang.documentation
 
 import com.intellij.lang.documentation.AbstractDocumentationProvider
-import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.module.ModuleUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
@@ -27,24 +27,44 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
     }
 
     private fun processUrl(node: PyStringLiteralExpression): String {
-        val result = node.text.trim('"').substringAfter("/")
-        val wrappers = node.project.service<SmkWrapperStorage>().wrappers
+        val text = node.stringValue
+        val result = if (text.startsWith("file://")) {
+            text.substringAfter("file://")
+        } else {
+            text.substringAfter("/")
+        }
+        val wrappers = ModuleUtil
+                .findModuleForPsiElement(node.navigationElement)
+                ?.getService(SmkWrapperStorage::class.java)
+                ?.wrappers ?: return ""
         val wrapper =  wrappers.find { wrapper -> wrapper.path.contains(result) }
-        val urlDocs = "https://snakemake-wrappers.readthedocs.io/en/" +
-                node.stringValue
-                .replace("/bio/", "/wrappers/")
-                .replace("/utils/", "/wrappers/") + ".html"
-        val urlCode = "https://github.com/snakemake/snakemake-wrappers/tree/" +
-                node.stringValue
-        return if (wrapper != null)
-            """
-            <p><a href="$urlDocs">Documentation</a>, <a href="$urlCode">Source Code</a></p>
-            ${wrapper.description.lineSequence().map { "<p>$it</p>"  }.joinToString(System.lineSeparator())}
-            """
-        else
-            """
-            <p><a href="$urlDocs">Documentation</a>, <a href="$urlCode">Source Code</a></p>
-            """
+        if (text.startsWith("file://")) {
+            return if (wrapper != null)
+                """
+                <p><a href="$text">Folder</a></p>
+                ${wrapper.description.lineSequence().map { "<p>$it</p>"  }.joinToString(System.lineSeparator())}
+                """.trimIndent()
+            else
+                """
+                <p><a href="$text">Folder</a></p>
+                """.trimIndent()
+        } else {
+            val urlDocs = "https://snakemake-wrappers.readthedocs.io/en/" +
+                    node.stringValue
+                            .replace("/bio/", "/wrappers/")
+                            .replace("/utils/", "/wrappers/") + ".html"
+            val urlCode = "https://github.com/snakemake/snakemake-wrappers/tree/" +
+                    node.stringValue
+            return if (wrapper != null)
+                """
+                <p><a href="$urlDocs">Documentation</a>, <a href="$urlCode">Source Code</a></p>
+                ${wrapper.description.lineSequence().map { "<p>$it</p>"  }.joinToString(System.lineSeparator())}
+                """.trimIndent()
+            else
+                """
+                <p><a href="$urlDocs">Documentation</a>, <a href="$urlCode">Source Code</a></p>
+                """.trimIndent()
+        }
     }
 
     override fun getCustomDocumentationElement(

@@ -4,7 +4,7 @@ import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.openapi.components.service
+import com.intellij.openapi.module.ModuleUtil
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
@@ -25,11 +25,21 @@ object SmkWrapperArgsCompletionProvider : CompletionProvider<CompletionParameter
             result: CompletionResultSet
     ) {
         val wrapper = PsiTreeUtil
-               .getParentOfType(parameters.position, SmkRuleOrCheckpoint::class.java)
-               ?.getSectionByName("wrapper") ?: return
+               .getParentOfType(
+                       parameters.position,
+                       SmkRuleOrCheckpoint::class.java
+               )?.getSectionByName("wrapper") ?: return
+        val wrappers = ModuleUtil
+                .findModuleForPsiElement(parameters.position)
+                ?.getService(SmkWrapperStorage::class.java)
+                ?.wrappers ?: return
 
-        val storage = parameters.position.project.service<SmkWrapperStorage>().wrappers.find { wrapper.argumentList!!.text.contains(it.path) } ?: return
-        val name = PsiTreeUtil.getParentOfType(parameters.position, SmkRuleOrCheckpointArgsSection::class.java)?.name ?: return
+        val storage = wrappers.find { wrapper.argumentList!!.text.contains(it.path) } ?: return
+        val name = PsiTreeUtil
+                .getParentOfType(
+                        parameters.position,
+                        SmkRuleOrCheckpointArgsSection::class.java
+                )?.name ?: return
         if (name in storage.args.keys) {
             storage.args[name]?.forEach {
                 result.addElement(LookupElementBuilder.create(it))

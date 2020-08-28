@@ -43,9 +43,11 @@ public class SmkFacetSettingsPanel extends JPanel {
         setLayout(new BorderLayout());
         add(myContentPane, BorderLayout.CENTER);
 
-        // TODO [simon]: insert proper bundled info version
         wrappersBundledRB.setText(
-                SnakemakeBundle.message("facet.settings.wrappers.bundled", "<?????>")
+                SnakemakeBundle.message(
+                        "facet.settings.wrappers.bundled",
+                        SnakemakeBundle.message("wrapper.bundled.storage.version")
+                )
         );
 
         addFolderChooser(

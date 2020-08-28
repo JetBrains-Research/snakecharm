@@ -463,7 +463,7 @@
 
     <postStartupActivity implementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler"/>
 
-    <projectService serviceImplementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage"/>
+    <moduleService serviceImplementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage"/>
   </extensions>
 
   <module-components>
