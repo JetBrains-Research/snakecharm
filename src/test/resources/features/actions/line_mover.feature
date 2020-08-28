@@ -716,7 +716,7 @@ Feature: Line mover
       | checkpoint  | checkpoint  | \n"file1.txt"  | \n"file2.txt" |           |
       | rule        | rule        | \n"file1.txt"  | \n"file2.txt" |           |
 
-  Scenario Outline: Swap rule between rule sections
+  Scenario Outline: Swap rule between rule sections doesn't work with content between them
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
