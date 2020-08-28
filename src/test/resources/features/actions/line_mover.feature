@@ -868,145 +868,39 @@ Feature: Line mover
       | rule      | run         | def f1():   | pass                             | b: int                   |
       | rule      | run         | def f1():   | a: int                           | b: int                   |
 
-  Scenario: Complex example for swap sections in python functions inside run section
+  Scenario Outline: Complex example for swap sections in python functions inside run section
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
     rule NAME:
       run:
             def target(self, paths):
-                if not_iterable(paths):
-                    path = paths
-                    path = (
-                        path
-                        if os.path.isabs(path) or path.startswith("root://")
-                        else os.path.join(self.workdir, path)
-                    )
-                    return flag(path, "subworkflow", self)
-                return [self.target(path) for path in paths]
+                <section1>
+                <section2>
     """
-    When I put the caret at return flag(path, "subworkflow", self)
+    When I put the caret at <section2>
     And I invoke MoveStatementUp action
     Then editor content will be
     """
     rule NAME:
       run:
             def target(self, paths):
-                if not_iterable(paths):
-                    path = paths
-                    return flag(path, "subworkflow", self)
-                    path = (
-                        path
-                        if os.path.isabs(path) or path.startswith("root://")
-                        else os.path.join(self.workdir, path)
-                    )
-                return [self.target(path) for path in paths]
+                <section2>
+                <section1>
+
     """
-    When I put the caret at return flag(path, "subworkflow", self)
+    When I put the caret at <section2>
     And I invoke MoveStatementDown action
     Then editor content will be
     """
     rule NAME:
       run:
             def target(self, paths):
-                if not_iterable(paths):
-                    path = paths
-                    path = (
-                        path
-                        if os.path.isabs(path) or path.startswith("root://")
-                        else os.path.join(self.workdir, path)
-                    )
-                    return flag(path, "subworkflow", self)
-                return [self.target(path) for path in paths]
-    """
+                <section1>
+                <section2>
 
-  Scenario: Complex example for moving python functions inside run section
-    Given a snakemake project
-    Given I open a file "foo1.smk" with text
     """
-    rule NAME:
-      run:
-            def target(self, paths):
-                if not_iterable(paths):
-                    path = paths
-                    path = (
-                        path
-                        if os.path.isabs(path) or path.startswith("root://")
-                        else os.path.join(self.workdir, path)
-                    )
-                    return flag(path, "subworkflow", self)
-                return [self.target(path) for path in paths]
-
-            def targets(self, dag):
-              def relpath(f):
-                  if f.startswith(self.workdir):
-                      return os.path.relpath(f, start=self.workdir)
-                  # do not adjust absolute targets outside of workdir
-                  return f
-              return [
-                  relpath(f)
-                  for job in dag.jobs
-                  for f in job.subworkflow_input
-                  if job.subworkflow_input[f] is self
-              ]
-    """
-    When I put the caret at def targets(self, dag):
-    And I invoke MoveStatementUp action
-    Then editor content will be
-    """
-    rule NAME:
-      run:
-            def targets(self, dag):
-              def relpath(f):
-                  if f.startswith(self.workdir):
-                      return os.path.relpath(f, start=self.workdir)
-                  # do not adjust absolute targets outside of workdir
-                  return f
-              return [
-                  relpath(f)
-                  for job in dag.jobs
-                  for f in job.subworkflow_input
-                  if job.subworkflow_input[f] is self
-              ]
-
-            def target(self, paths):
-                if not_iterable(paths):
-                    path = paths
-                    path = (
-                        path
-                        if os.path.isabs(path) or path.startswith("root://")
-                        else os.path.join(self.workdir, path)
-                    )
-                    return flag(path, "subworkflow", self)
-                return [self.target(path) for path in paths]
-    """
-    When I put the caret at def targets(self, dag):
-    And I invoke MoveStatementDown action
-    Then editor content will be
-    """
-    rule NAME:
-      run:
-            def target(self, paths):
-                if not_iterable(paths):
-                    path = paths
-                    path = (
-                        path
-                        if os.path.isabs(path) or path.startswith("root://")
-                        else os.path.join(self.workdir, path)
-                    )
-                    return flag(path, "subworkflow", self)
-                return [self.target(path) for path in paths]
-
-            def targets(self, dag):
-              def relpath(f):
-                  if f.startswith(self.workdir):
-                      return os.path.relpath(f, start=self.workdir)
-                  # do not adjust absolute targets outside of workdir
-                  return f
-              return [
-                  relpath(f)
-                  for job in dag.jobs
-                  for f in job.subworkflow_input
-                  if job.subworkflow_input[f] is self
-              ]
-    """
+    Examples:
+      | section1  | section2    |
+      | a: int    | b: int      |
+      | s1 = "s"  | s2 = "s"    |

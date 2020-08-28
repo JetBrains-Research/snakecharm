@@ -20,7 +20,10 @@ import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer.Companion.KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.*
 
 open class SmkStatementMover: PyStatementMover() {
-    override fun checkAvailable(editor: Editor, file: PsiFile, info: MoveInfo, down: Boolean): Boolean {
+    override fun checkAvailable(editor: Editor,
+                                file: PsiFile,
+                                info: MoveInfo,
+                                down: Boolean): Boolean {
 
         if (file !is SmkFile) {
             return false
@@ -54,8 +57,10 @@ open class SmkStatementMover: PyStatementMover() {
         return true
     }
 
-    private fun getDestinationScope(file: PsiFile, editor: Editor,
-                                    elementToMove: PsiElement, down: Boolean): LineRange? {
+    private fun getDestinationScope(file: PsiFile,
+                                    editor: Editor,
+                                    elementToMove: PsiElement,
+                                    down: Boolean): LineRange? {
         val document = file.viewProvider.document ?: return null
         val offset = if (down) elementToMove.textRange.endOffset else elementToMove.textRange.startOffset
         val lineNumber = if (down) document.getLineNumber(offset) + 1 else document.getLineNumber(offset) - 1
@@ -144,7 +149,8 @@ open class SmkStatementMover: PyStatementMover() {
         val statements = statementList.children
 
         if(elementToMove is SmkRuleOrCheckpointArgsSection) {
-            val parent = PsiTreeUtil.getParentOfType(elementToMove, SmkRuleOrCheckpoint::class.java)
+            val parent =
+                    PsiTreeUtil.getParentOfType(elementToMove, SmkRuleOrCheckpoint::class.java)
             if (!down && statements.first() == elementToMove || down && statements.last() == elementToMove) {
 
                 var sibling = if(!down) parent?.prevSibling else parent?.nextSibling
@@ -188,13 +194,15 @@ open class SmkStatementMover: PyStatementMover() {
         }
 
         if(elementToMove is SmkRuleOrCheckpointArgsSection) {
-            val parent = PsiTreeUtil.getParentOfType(elementToMove, SmkRuleOrCheckpoint::class.java)
+            val parent =
+                    PsiTreeUtil.getParentOfType(elementToMove, SmkRuleOrCheckpoint::class.java)
             if (!down && statements.first() == elementToMove || down && statements.last() == elementToMove) {
                 var sibling = if(!down) parent?.prevSibling else parent?.nextSibling
 
                 while(sibling != null) {
                     if(sibling !is PsiWhiteSpace && sibling !is PsiComment){
-                        val parentSibling = PsiTreeUtil.getParentOfType(sibling, SmkRuleOrCheckpoint::class.java, false)
+                        val parentSibling =
+                                PsiTreeUtil.getParentOfType(sibling, SmkRuleOrCheckpoint::class.java, false)
 
                         if (parentSibling != null){
                             val list = parentSibling.statementList
@@ -232,12 +240,16 @@ open class SmkStatementMover: PyStatementMover() {
         }
     }
 
-    private fun getScopeForComment(elementToMove: PsiElement, editor: Editor,
-                                        parent: PsiElement?, down: Boolean): PsiElement? {
+    private fun getScopeForComment(elementToMove: PsiElement,
+                                   editor: Editor,
+                                   parent: PsiElement?,
+                                   down: Boolean): PsiElement? {
         var scope: PsiElement? = PsiTreeUtil.getParentOfType(parent, PyStatementList::class.java, PyFile::class.java)
         val offset = elementToMove.textOffset
         var sibling: PsiElement? = elementToMove
-        while (scope != null && elementToMove is PsiComment) { // stupid workaround for PY-6408. Related to PSI structure
+
+        // stupid workaround for PY-6408. Related to PSI structure
+        while (scope != null && elementToMove is PsiComment) {
             val prevSibling = (if (down) {
                 PsiTreeUtil.getNextSiblingOfType(sibling, PyStatement::class.java)
             } else {
@@ -251,8 +263,11 @@ open class SmkStatementMover: PyStatementMover() {
         return scope
     }
 
-    private fun moveInto(elementToMove: PsiElement, file: PsiFile,
-                              editor: Editor, down: Boolean, offset: Int): LineRange? {
+    private fun moveInto(elementToMove: PsiElement,
+                         file: PsiFile,
+                         editor: Editor,
+                         down: Boolean,
+                         offset: Int): LineRange? {
         val rawElement = PyUtil.findNonWhitespaceAtOffset(file, offset) ?: return null
         return if (down) moveDownInto(editor.document, rawElement) else moveUpInto(elementToMove, editor, rawElement)
     }
@@ -268,7 +283,8 @@ open class SmkStatementMover: PyStatementMover() {
             getScopeForComment(elementToMove, editor, elementToMove, false)
         }
         var statementList2 = getStatementList(element!!)
-        val start1 = elementToMove.textOffset - document.getLineStartOffset(document.getLineNumber(elementToMove.textOffset))
+        val start1 =
+                elementToMove.textOffset - document.getLineStartOffset(document.getLineNumber(elementToMove.textOffset))
         val start2 = element.textOffset - document.getLineStartOffset(document.getLineNumber(element.textOffset))
         if (start1 != start2) {
             var parent2 = PsiTreeUtil.getParentOfType(statementList2, PyStatementList::class.java)
@@ -279,7 +295,8 @@ open class SmkStatementMover: PyStatementMover() {
             }
         }
         return if (statementList2 != null && scopeForComment !== statementList2 &&
-                (statementList2.lastChild === element || statementList2.lastChild === elementToMove) && element != null) {
+                  (statementList2.lastChild === element ||
+                        statementList2.lastChild === elementToMove) && element != null) {
             ScopeRange(statementList2, element, false)
         } else null
     }
@@ -294,21 +311,26 @@ open class SmkStatementMover: PyStatementMover() {
             getStatementList(element)
         }
 
-        if (statementList2 != null && statementList2.statements.isNotEmpty()) {  // move to one-line conditional/loop statement
+        // move to one-line conditional/loop statement
+        if (statementList2 != null && statementList2.statements.isNotEmpty()) {
             val number = document.getLineNumber(element.textOffset)
             val number2 = document.getLineNumber(statementList2.parent.textOffset)
             if (number == number2) {
                 return ScopeRange(statementList2, statementList2.statements.first(), true)
             }
         }
-        val statementPart = PsiTreeUtil.getParentOfType(rawElement, PyStatementPart::class.java,
-                true, PyStatement::class.java, PyStatementList::class.java)
-        val functionDefinition = PsiTreeUtil.getParentOfType(rawElement, PyFunction::class.java, true,
-                PyStatement::class.java, PyStatementList::class.java)
-        val classDefinition = PsiTreeUtil.getParentOfType(rawElement, PyClass::class.java, true,
-                PyStatement::class.java, PyStatementList::class.java)
-        val smkRuleOrCheckpointDefinition = PsiTreeUtil.getParentOfType(rawElement,
-                SmkRuleOrCheckpoint::class.java, true, PyStatement::class.java, PyStatementList::class.java)
+        val statementPart =
+                PsiTreeUtil.getParentOfType(rawElement, PyStatementPart::class.java,true,
+                        PyStatement::class.java, PyStatementList::class.java)
+        val functionDefinition =
+                PsiTreeUtil.getParentOfType(rawElement, PyFunction::class.java, true,
+                        PyStatement::class.java, PyStatementList::class.java)
+        val classDefinition =
+                PsiTreeUtil.getParentOfType(rawElement, PyClass::class.java, true,
+                        PyStatement::class.java, PyStatementList::class.java)
+        val smkRuleOrCheckpointDefinition =
+                PsiTreeUtil.getParentOfType(rawElement, SmkRuleOrCheckpoint::class.java, true,
+                        PyStatement::class.java, PyStatementList::class.java)
         var list: PyStatementList? = null
         when {
             statementPart != null -> {
@@ -330,9 +352,12 @@ open class SmkStatementMover: PyStatementMover() {
         } else null
     }
 
-    private fun getDestinationElement(elementToMove: PsiElement, document: Document,
-                                           lineEndOffset: Int, down: Boolean): PsiElement? {
-        var destination = PyUtil.findPrevAtOffset(elementToMove.containingFile, lineEndOffset, PsiWhiteSpace::class.java)
+    private fun getDestinationElement(elementToMove: PsiElement,
+                                      document: Document,
+                                      lineEndOffset: Int,
+                                      down: Boolean): PsiElement? {
+        var destination =
+                PyUtil.findPrevAtOffset(elementToMove.containingFile, lineEndOffset, PsiWhiteSpace::class.java)
 
         val sibling: PsiElement? = if (down) {
             PsiTreeUtil.getNextSiblingOfType(elementToMove, PyStatement::class.java)
@@ -411,9 +436,11 @@ open class SmkStatementMover: PyStatementMover() {
         val column = editor.offsetToLogicalPosition(selectionStart).column
         val additionalSelection = if (range.startOffset > selectionStart) range.startOffset - selectionStart else 0
         if (startToMove === endToMove) {
-            return SelectionContainer(selectionEnd - range.startOffset, additionalSelection, column == 0)
+            return SelectionContainer(selectionEnd - range.startOffset,
+                    additionalSelection, column == 0)
         }
-        var len = if (range.startOffset <= selectionStart) range.endOffset - selectionStart else startToMove.textLength
+        var len =
+                if (range.startOffset <= selectionStart) range.endOffset - selectionStart else startToMove.textLength
         var tmp = startToMove.nextSibling
         while (tmp !== endToMove && tmp != null) {
             if (tmp !is PsiWhiteSpace) len += tmp.textLength
@@ -424,9 +451,14 @@ open class SmkStatementMover: PyStatementMover() {
     }
 
     @Suppress("NAME_SHADOWING")
-    private fun restoreCaretAndSelection(file: PsiFile, editor: Editor, selectionStartAtCaret: Boolean,
-                                              hasSelection: Boolean, selectionContainer: SelectionContainer, shift: Int,
-                                              offset: Int, toMove: MyLineRange) {
+    private fun restoreCaretAndSelection(file: PsiFile,
+                                         editor: Editor,
+                                         selectionStartAtCaret: Boolean,
+                                         hasSelection: Boolean,
+                                         selectionContainer: SelectionContainer,
+                                         shift: Int,
+                                         offset: Int,
+                                         toMove: MyLineRange) {
         var shift = shift
         val document = editor.document
         val selectionModel = editor.selectionModel
@@ -471,8 +503,10 @@ open class SmkStatementMover: PyStatementMover() {
         }
     }
 
-    private fun getCaretShift(startToMove: PsiElement, endToMove: PsiElement,
-                              caretModel: CaretModel, selectionStartAtCaret: Boolean): Int {
+    private fun getCaretShift(startToMove: PsiElement,
+                              endToMove: PsiElement,
+                              caretModel: CaretModel,
+                              selectionStartAtCaret: Boolean): Int {
         var shift: Int
         if (selectionStartAtCaret) {
             shift = caretModel.offset - startToMove.textRange.startOffset
@@ -510,7 +544,9 @@ open class SmkStatementMover: PyStatementMover() {
         return addedElement.textRange.startOffset
     }
 
-    private fun moveInOut(toMove: MyLineRange, editor: Editor, info: MoveInfo): Int {
+    private fun moveInOut(toMove: MyLineRange,
+                          editor: Editor,
+                          info: MoveInfo): Int {
         var removePass = false
         val toMove2 = info.toMove2 as ScopeRange
         val scope = toMove2.scope
@@ -576,8 +612,11 @@ open class SmkStatementMover: PyStatementMover() {
     }
 
     @Suppress("NAME_SHADOWING")
-    private fun adjustLineIndents(editor: Editor, scope: PsiElement, project: Project,
-                                  addedElement: PsiElement, size: Int) {
+    private fun adjustLineIndents(editor: Editor,
+                                  scope: PsiElement,
+                                  project: Project,
+                                  addedElement: PsiElement,
+                                  size: Int) {
         var size = size
         val codeStyleManager = CodeStyleManager.getInstance(project)
         val document = editor.document
@@ -614,7 +653,8 @@ open class SmkStatementMover: PyStatementMover() {
     }
 
     // use to keep elements
-    internal class MyLineRange(val myStartElement: PsiElement, val myEndElement: PsiElement) : LineRange(myStartElement, myEndElement) {
+    internal class MyLineRange(val myStartElement: PsiElement,
+                               val myEndElement: PsiElement) : LineRange(myStartElement, myEndElement) {
         var size = 0
         var statementsSize = 0
 
