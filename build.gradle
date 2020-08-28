@@ -15,6 +15,8 @@ plugins {
 
     // Serialization
     id 'org.jetbrains.kotlin.plugin.serialization' version "1.4.0"
+
+    id 'java'
 }
 
 apply plugin: 'java'
@@ -96,6 +98,26 @@ task cucumber() {
         }
     }
 }
+
+task buildWrappersBundle() {
+    dependsOn  compileKotlin, compileJava
+
+    doLast {
+        javaexec {
+            main = "com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler"
+            classpath =  project.sourceSets.main.runtimeClasspath
+            enableAssertions = true
+            args = [
+                    "${System.getenv("HOME")}/snakemake-wrappers",
+                    //TODO[simon] fix me
+                    "${project.projectDir}/src/main/resources/smk-wrapper-storage2.cbor"
+            ]
+            maxHeapSize = '1024m' // Not much RAM is available on TC agents
+        }
+    }
+}
+jar.dependsOn(buildWrappersBundle)
+
 
 test {
     reports {

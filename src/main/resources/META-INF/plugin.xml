@@ -461,7 +461,7 @@
     <spellchecker.bundledDictionaryProvider implementation="com.jetbrains.snakecharm.spellchecker.SmkBundledDictionaryProvider"/>
     <!--    <spellchecker.support language="Snakemake" implementationClass="com.jetbrains.snakecharm.spellchecker.SmkSpellcheckerStrategy"/>-->
 
-    <postStartupActivity implementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler"/>
+    <postStartupActivity implementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperLoaderStartupActivity"/>
 
     <moduleService serviceImplementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage"/>
   </extensions>

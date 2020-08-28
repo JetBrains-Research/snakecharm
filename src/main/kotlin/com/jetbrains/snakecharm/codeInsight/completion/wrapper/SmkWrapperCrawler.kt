@@ -1,117 +1,81 @@
 package com.jetbrains.snakecharm.codeInsight.completion.wrapper
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.service
-import com.intellij.openapi.module.Module
-import com.intellij.openapi.module.ModuleManager
-import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.Task
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupActivity
-import com.jetbrains.python.statistics.modules
-import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.facet.SnakemakeFacet
-import kotlinx.serialization.*
-import kotlinx.serialization.cbor.Cbor
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
 
-object SmkWrapperCrawler : StartupActivity {
-    @ExperimentalSerializationApi
-    override fun runActivity(project: Project) {
-        if (ApplicationManager.getApplication().isUnitTestMode) {
-            project.modules.forEach {
-                val storage = it.getService(SmkWrapperStorage::class.java)
-                storage.version = SnakemakeBundle.message("wrapper.bundled.storage.version")
-                storage.wrappers = Cbor
-                        .decodeFromByteArray(
-                                SmkWrapperStorage::class.java
-                                        .getResourceAsStream("/smk-wrapper-storage.cbor")
-                                        .readBytes()
-                        )
-            }
+object SmkWrapperCrawler {
+    @JvmStatic
+    fun main(args: Array<String>) {
+        println("Usage: SmkWrapperCrawler {WRAPPERS_SRC_ROOT_FOLDER} {WRAPPERS_INFO_CBOR_OUTPUT}")
+        println("Smk wrapper crawler args: ${args.joinToString()}")
+        require(args.size == 2) {
+            "2 input args expected, but was: ${args.size}"
         }
 
-        ApplicationManager.getApplication().invokeLater {
-            ProgressManager.getInstance().run(object : Task.Backgroundable(
-                    project,
-                    "Preparing wrapper data",
-                    true
-            ) {
-                override fun run(indicator: ProgressIndicator) {
-                    ModuleManager
-                            .getInstance(project)
-                            .modules
-                            .forEach { runActivityModule(it) }
-                }
-            })
+        val wrappersFolder = args[0]
+        val wrappersFolderPath = Paths.get(wrappersFolder)
+        require(Files.exists(wrappersFolderPath)) {
+            "Wrappers src folder doesn't exist: $wrappersFolder"
         }
+        require(Files.isDirectory(wrappersFolderPath)) {
+            "Wrappers src folder isn't a folder: $wrappersFolder"
+        }
+
+        val outputFile = args[1]
+
+        println("Launching smk wrappers crawler...")
+        val wrappers = localWrapperParser(wrappersFolder)
+        // TODO[simon]: example, cleanup
+        wrappers.forEach { wrapper ->
+            println(wrapper.path)
+        }
+        ///////////////////////
+
+        println("Found ${wrappers.size} wrappers")
+
+        // TODO[simon]: fix me
+        Files.write(Paths.get(outputFile), "wrappers number: ${wrappers.size}".toByteArray())
+
+        // XXX Cannot use IDEA API here at the moment (gradle + classpath issues_
+        //            Paths.get(outputFile).write("wrappers number: ${wrappers.size}")
     }
 
-    @ExperimentalSerializationApi
-    fun runActivityModule(module: Module, forced: Boolean = false) {
-        val mod = SnakemakeFacet.getInstance(module)?.configuration?.state ?: return
-        val storage = module.getService(SmkWrapperStorage::class.java)
-        if (forced || storage.wrappers.isEmpty() || storage.wrappers.any {it.path == ""}) {
-            if (mod.useBundledWrappersInfo) {
-                storage.version = SnakemakeBundle.message("wrapper.bundled.storage.version")
-                storage.wrappers = Cbor
-                        .decodeFromByteArray(
-                                SmkWrapperStorage::class.java
-                                        .getResourceAsStream("/smk-wrapper-storage.cbor")
-                                        .readBytes()
-                        )
-            } else {
-                storage.version = "file://"
-                storage.wrappers = localWrapperParser(mod.wrappersCustomSourcesFolder)
 
-                /*
-                 * To update bundled wrapper storage uncomment code below
-                 * and launch "runIde" with facet setting wrapperCustomSourcesFolder="snakemake-wrappers-master".
-                 * Generated "smk-wrapper-storage.cbor" move to "/snakecharm/src/main/resources".
-                 * Then change wrapper.bundled.storage.version in "SnakemakeBundle.properties".
-                 */
-
-                /*
-                val serialized = Cbor.encodeToByteArray(localWrapperParser(mod.wrappersCustomSourcesFolder, true))
-                File(module.project.basePath + "/smk-wrapper-storage.cbor").writeBytes(serialized)
-                */
-            }
-        }
-    }
-
-    private fun localWrapperParser(folder: String, relative: Boolean = false): List<SmkWrapperStorage.Wrapper> {
+    fun localWrapperParser(folder: String, relative: Boolean = false): List<SmkWrapperStorage.Wrapper> {
         val wrappers = mutableListOf<SmkWrapperStorage.Wrapper>()
         val mainFolder = File(folder)
 
         mainFolder.walkTopDown()
-                .filter { it.isFile && it.name.startsWith("wrapper") }
-                .forEach { wrapperFile ->
+            .filter { it.isFile && it.name.startsWith("wrapper") }
+            .forEach { wrapperFile ->
 
-                    val path = if (relative) {
-                        wrapperFile.parentFile.absolutePath
-                    } else {
-                        wrapperFile.parentFile.toRelativeString(mainFolder)
-                    }
-
-                    val args = when (wrapperFile.extension) {
-                        "py" -> parseArgsPython(wrapperFile.readText())
-                        "R" -> parseArgsR(wrapperFile.readText())
-                        else -> emptyMap()
-                    }
-
-                    val description = wrapperFile
-                            .resolveSibling("meta.yaml")
-                            .readText()
-
-                    wrappers.add(
-                            SmkWrapperStorage.Wrapper(
-                                    path = path,
-                                    args = args,
-                                    description = description
-                            )
-                    )
+                val path = if (relative) {
+                    wrapperFile.parentFile.absolutePath
+                } else {
+                    wrapperFile.parentFile.toRelativeString(mainFolder)
                 }
+
+                val args = when (wrapperFile.extension) {
+                    "py" -> parseArgsPython(wrapperFile.readText())
+                    "R" -> parseArgsR(wrapperFile.readText())
+                    else -> emptyMap()
+                }
+
+                val metaYaml = wrapperFile.resolveSibling("meta.yaml")
+                val description = when {
+                    metaYaml.exists() -> metaYaml.readText()
+                    else -> "N/A"
+                }
+
+                wrappers.add(
+                    SmkWrapperStorage.Wrapper(
+                        path = path,
+                        args = args,
+                        description = description
+                    )
+                )
+            }
 
         return wrappers.toList()
     }
