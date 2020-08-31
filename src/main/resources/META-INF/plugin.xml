@@ -312,7 +312,7 @@
             key="INSP.NAME.section.unexpected.callable.args"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionUnexpectedCallableArgsInspection"
      />
-
+    
     <localInspection
             language="Snakemake" shortName="SmkSectionUnexpectedKeywordArgsInspection"
             enabledByDefault="true"
