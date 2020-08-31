@@ -49,12 +49,12 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
                 <p><a href="$text">Folder</a></p>
                 """.trimIndent()
         } else {
-            val urlDocs = "https://snakemake-wrappers.readthedocs.io/en/" +
-                    node.stringValue
-                            .replace("/bio/", "/wrappers/")
-                            .replace("/utils/", "/wrappers/") + ".html"
-            val urlCode = "https://github.com/snakemake/snakemake-wrappers/tree/" +
-                    node.stringValue
+            val urlDocs = "https://snakemake-wrappers.readthedocs.io/en/${node.stringValue}"
+                    .replace("/master/", "/latest/")
+                    .replace("/bio/", "/wrappers/")
+                    .replace("/utils/", "/wrappers/") + ".html"
+            val urlCode = "https://github.com/snakemake/snakemake-wrappers/tree/${node.stringValue}"
+                    .replace("/latest/", "/master/")
             return if (wrapper != null)
                 """
                 <p><a href="$urlDocs">Documentation</a>, <a href="$urlCode">Source Code</a></p>
