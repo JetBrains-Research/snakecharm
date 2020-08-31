@@ -64,9 +64,9 @@ object SmkWrapperCrawler {
                     wrapperFile.parentFile.absolutePath
                 }
 
-                val args = when (wrapperFile.extension) {
+                val args = when (wrapperFile.extension.toLowerCase()) {
                     "py" -> parseArgsPython(wrapperFile.readText())
-                    "R" -> parseArgsR(wrapperFile.readText())
+                    "r" -> parseArgsR(wrapperFile.readText())
                     else -> emptyMap()
                 }
 
