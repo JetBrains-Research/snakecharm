@@ -3,10 +3,14 @@ package com.jetbrains.snakecharm.codeInsight.completion.wrapper
 import com.intellij.util.io.exists
 import com.intellij.util.io.isDirectory
 import com.intellij.util.io.write
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.encodeToByteArray
 import java.io.File
 import java.nio.file.Paths
 
 object SmkWrapperCrawler {
+    @ExperimentalSerializationApi
     @JvmStatic
     fun main(args: Array<String>) {
         println("Usage: SmkWrapperCrawler {WRAPPERS_SRC_ROOT_FOLDER} {WRAPPERS_INFO_CBOR_OUTPUT}")
@@ -23,21 +27,17 @@ object SmkWrapperCrawler {
         require(wrappersFolderPath.isDirectory()) {
             "Wrappers src folder isn't a folder: $wrappersFolder"
         }
+        require(Paths.get("$wrappersFolder/bio").exists()) {
+            "Wrappers src folder doesn't contain \"bio\" folder: $wrappersFolder"
+        }
 
         val outputFile = args[1]
 
         println("Launching smk wrappers crawler...")
-        val wrappers = localWrapperParser(wrappersFolder)
-        // TODO[simon]: example, cleanup
-        wrappers.forEach { wrapper ->
-            println(wrapper.path)
-        }
-        ///////////////////////
+        val wrappers = localWrapperParser(wrappersFolder, true)
 
         println("Found ${wrappers.size} wrappers")
-
-        // TODO[simon]: fix me
-        Paths.get(outputFile).write("wrappers number: ${wrappers.size}")
+        Paths.get(outputFile).write(Cbor.encodeToByteArray(wrappers))
     }
 
 

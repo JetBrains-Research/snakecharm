@@ -29,21 +29,21 @@ class SmkWrapperLoaderStartupActivity : StartupActivity {
                             .readBytes()
                     )
             }
-        }
-
-        ApplicationManager.getApplication().invokeLater {
-            ProgressManager.getInstance().run(object : Task.Backgroundable(
-                project,
-                "Preparing wrapper data",
-                true
-            ) {
-                override fun run(indicator: ProgressIndicator) {
-                    ModuleManager
-                        .getInstance(project)
-                        .modules
-                        .forEach { runActivityModule(it) }
-                }
-            })
+        } else {
+            ApplicationManager.getApplication().invokeLater {
+                ProgressManager.getInstance().run(object : Task.Backgroundable(
+                        project,
+                        "Preparing wrapper data",
+                        true
+                ) {
+                    override fun run(indicator: ProgressIndicator) {
+                        ModuleManager
+                                .getInstance(project)
+                                .modules
+                                .forEach { runActivityModule(it) }
+                    }
+                })
+            }
         }
     }
 
@@ -73,7 +73,7 @@ class SmkWrapperLoaderStartupActivity : StartupActivity {
                      */
 
                     /*
-                    val serialized = Cbor.encodeToByteArray(localWrapperParser(mod.wrappersCustomSourcesFolder, true))
+                    val serialized = Cbor.encodeToByteArray(SmkWrapperCrawler.localWrapperParser(mod.wrappersCustomSourcesFolder, true))
                     File(module.project.basePath + "/smk-wrapper-storage.cbor").writeBytes(serialized)
                     */
                 }

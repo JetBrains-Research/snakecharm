@@ -125,8 +125,7 @@ task buildWrappersBundle() {
             enableAssertions = true
             args = [
                     "${System.getenv("HOME")}/snakemake-wrappers",
-                    //TODO[simon] fix me
-                    "${project.projectDir}/src/main/resources/smk-wrapper-storage2.cbor"
+                    "${project.projectDir}/src/main/resources/smk-wrapper-storage.cbor"
             ]
             maxHeapSize = '1024m' // Not much RAM is available on TC agents
         }
