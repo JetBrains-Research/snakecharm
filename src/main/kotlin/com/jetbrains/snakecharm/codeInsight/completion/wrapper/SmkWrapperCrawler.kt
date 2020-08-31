@@ -35,6 +35,9 @@ object SmkWrapperCrawler {
 
         println("Launching smk wrappers crawler...")
         val wrappers = localWrapperParser(wrappersFolder, true)
+        wrappers.forEach { wrapper ->
+            println(wrapper.path)
+        }
 
         println("Found ${wrappers.size} wrappers")
         Paths.get(outputFile).write(Cbor.encodeToByteArray(wrappers))
@@ -48,6 +51,12 @@ object SmkWrapperCrawler {
         mainFolder.walkTopDown()
             .filter { it.isFile && it.name.startsWith("wrapper") }
             .forEach { wrapperFile ->
+                val metaYaml = wrapperFile.resolveSibling("meta.yaml")
+
+                if (!metaYaml.exists()) {
+                    // not a wrapper
+                    return@forEach
+                }
 
                 val path = if (relativePath) {
                     wrapperFile.parentFile.toRelativeString(mainFolder)
@@ -61,11 +70,8 @@ object SmkWrapperCrawler {
                     else -> emptyMap()
                 }
 
-                val metaYaml = wrapperFile.resolveSibling("meta.yaml")
-                val description = when {
-                    metaYaml.exists() -> metaYaml.readText()
-                    else -> "N/A"
-                }
+
+                val description = metaYaml.readText()
 
                 wrappers.add(
                     SmkWrapperStorage.Wrapper(
