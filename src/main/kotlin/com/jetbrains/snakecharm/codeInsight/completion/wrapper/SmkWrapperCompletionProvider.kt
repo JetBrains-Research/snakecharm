@@ -38,7 +38,7 @@ object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>()
         val version: String
         val prefix: String
 
-        if (Regex("\\d+\\.\\d+\\.\\d+.*").matches(result.prefixMatcher.prefix)) {
+        if (Regex("(\\d+\\.\\d+\\.\\d+|master|latest).*").matches(result.prefixMatcher.prefix)) {
             version = result.prefixMatcher.prefix.substringBefore('/')
             prefix = result.prefixMatcher.prefix.substringAfter('/')
         } else {
