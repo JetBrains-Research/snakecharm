@@ -291,18 +291,6 @@
     />
 
     <localInspection
-            language="Snakemake"
-            shortName="SmkSectionWrapperArgsInspection"
-            enabledByDefault="true"
-            level="WARNING"
-            suppressId="SmkSectionWrapperArgsInspection"
-            bundle="SnakemakeBundle"
-            groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.wrapper.args.missed"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionWrapperArgsInspection"
-    />
-
-    <localInspection
             language="Snakemake" shortName="SmkSectionUnexpectedCallableArgsInspection"
             enabledByDefault="true"
             level="ERROR"
