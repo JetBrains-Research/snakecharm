@@ -108,7 +108,7 @@ task cucumber() {
 //                    enableAssertions = true
 //                    args = [
 //                            "${System.getenv("HOME")}/snakemake-wrappers",
-//                            "${project.buildDir}/bundledWrappers/smk-wrapper-storage2.cbor"
+//                            "${project.buildDir}/bundledWrappers/smk-wrapper-storage.cbor"
 //                    ]
 //                    maxHeapSize = '1024m' // Not much RAM is available on TC agents
 //                }

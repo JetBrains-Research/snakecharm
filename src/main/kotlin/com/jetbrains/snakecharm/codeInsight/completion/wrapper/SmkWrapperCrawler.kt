@@ -41,7 +41,7 @@ object SmkWrapperCrawler {
     }
 
 
-    fun localWrapperParser(folder: String, relative: Boolean = false): List<SmkWrapperStorage.Wrapper> {
+    fun localWrapperParser(folder: String, relativePath: Boolean = false): List<SmkWrapperStorage.Wrapper> {
         val wrappers = mutableListOf<SmkWrapperStorage.Wrapper>()
         val mainFolder = File(folder)
 
@@ -49,10 +49,10 @@ object SmkWrapperCrawler {
             .filter { it.isFile && it.name.startsWith("wrapper") }
             .forEach { wrapperFile ->
 
-                val path = if (relative) {
-                    wrapperFile.parentFile.absolutePath
-                } else {
+                val path = if (relativePath) {
                     wrapperFile.parentFile.toRelativeString(mainFolder)
+                } else {
+                    wrapperFile.parentFile.absolutePath
                 }
 
                 val args = when (wrapperFile.extension) {
