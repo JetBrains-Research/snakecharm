@@ -20,6 +20,7 @@ Features:
 
 Fixed:
 - Completion does not suggest top-level keywords in comments (see #178)
+- Suppress inspection doesn't work in some cases (see #313)
 
 Version 0.8.0 build #0.8.0.214
 -------------
