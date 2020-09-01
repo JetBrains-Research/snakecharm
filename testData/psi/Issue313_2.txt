@@ -1,0 +1,87 @@
+SnakemakeFile: Issue313_2.smk
+  PsiComment(Py:END_OF_LINE_COMMENT)('# noinspection PyUnresolvedReferences')
+  PsiWhiteSpace('\n')
+  SmkWorkflowRuleorderSection
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression: rule_313
+        PsiElement(Py:IDENTIFIER)('rule_313')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression: rule_313_1
+        PsiElement(Py:IDENTIFIER)('rule_313_1')
+  PsiWhiteSpace('\n\n')
+  PsiComment(Py:END_OF_LINE_COMMENT)('# noinspection PyUnresolvedReferences')
+  PsiWhiteSpace('\n')
+  SmkWorkflowRuleorderSection
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      SmkReferenceExpression: rule_313
+        PsiElement(Py:IDENTIFIER)('rule_313')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression: rule_313_1
+        PsiElement(Py:IDENTIFIER)('rule_313_1')
+  PsiWhiteSpace('\n\n')
+  PsiComment(Py:END_OF_LINE_COMMENT)('# noinspection PyUnresolvedReferences')
+  PsiWhiteSpace('\n')
+  SmkWorkflowRuleorderSection
+    PsiElement(Py:WORKFLOW_RULEORDER_KEYWORD)('ruleorder')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      SmkReferenceExpression: rule_313
+        PsiElement(Py:IDENTIFIER)('rule_313')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:GT)('>')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression: rule_313_1
+        PsiElement(Py:IDENTIFIER)('rule_313_1')
+  PsiWhiteSpace('\n\n\n')
+  PsiComment(Py:END_OF_LINE_COMMENT)('# noinspection PyUnresolvedReferences')
+  PsiWhiteSpace('\n')
+  SmkWorkflowLocalrulesSection
+    PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('  ')
+      SmkReferenceExpression: rule_313
+        PsiElement(Py:IDENTIFIER)('rule_313')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression: rule_313_1
+        PsiElement(Py:IDENTIFIER)('rule_313_1')
+  PsiWhiteSpace('\n\n')
+  PsiComment(Py:END_OF_LINE_COMMENT)('# noinspection PyUnresolvedReferences')
+  PsiWhiteSpace('\n')
+  SmkWorkflowLocalrulesSection
+    PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      SmkReferenceExpression: rule_313
+        PsiElement(Py:IDENTIFIER)('rule_313')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression: rule_313_1
+        PsiElement(Py:IDENTIFIER)('rule_313_1')
+  PsiWhiteSpace('\n\n')
+  PsiComment(Py:END_OF_LINE_COMMENT)('# noinspection PyUnresolvedReferences')
+  PsiWhiteSpace('\n')
+  SmkWorkflowLocalrulesSection
+    PsiElement(Py:WORKFLOW_LOCALRULES_KEYWORD)('localrules')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      SmkReferenceExpression: rule_313
+        PsiElement(Py:IDENTIFIER)('rule_313')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression: rule_313_1
+        PsiElement(Py:IDENTIFIER)('rule_313_1')

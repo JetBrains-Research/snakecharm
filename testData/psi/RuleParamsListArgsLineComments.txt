@@ -13,8 +13,8 @@ SnakemakeFile: RuleParamsListArgsLineComments.smk
           PsiWhiteSpace('\n        ')
           PyStringLiteralExpression: echo foo
             PsiElement(Py:SINGLE_QUOTED_STRING)('"echo foo"')
-          PsiWhiteSpace('\n        ')
-          PsiComment(Py:END_OF_LINE_COMMENT)('# tod')
+      PsiWhiteSpace('\n        ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# tod')
   PsiWhiteSpace('\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
@@ -68,10 +68,10 @@ SnakemakeFile: RuleParamsListArgsLineComments.smk
           PsiWhiteSpace(' ')
           PyStringLiteralExpression: arg
             PsiElement(Py:SINGLE_QUOTED_STRING)('"arg"')
-          PsiWhiteSpace('\n          ')
-          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
-          PsiWhiteSpace('\n               ')
-          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+      PsiWhiteSpace('\n          ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+      PsiWhiteSpace('\n               ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
   PsiWhiteSpace('\n    ')
   PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
   PsiWhiteSpace('\n')
@@ -130,8 +130,8 @@ SnakemakeFile: RuleParamsListArgsLineComments.smk
             PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
           PsiWhiteSpace(' ')
           PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
-          PsiWhiteSpace('\n           ')
-          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+      PsiWhiteSpace('\n           ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
   PsiWhiteSpace('\n    ')
   PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
   PsiWhiteSpace('\n        ')
@@ -211,8 +211,8 @@ SnakemakeFile: RuleParamsListArgsLineComments.smk
           PsiWhiteSpace(' ')
           PyStringLiteralExpression: echo boo
             PsiElement(Py:SINGLE_QUOTED_STRING)('"echo boo"')
-          PsiWhiteSpace(' ')
-          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+      PsiWhiteSpace(' ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
   PsiWhiteSpace('\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
@@ -267,8 +267,8 @@ SnakemakeFile: RuleParamsListArgsLineComments.smk
           PsiWhiteSpace(' ')
           PyStringLiteralExpression: echo boo
             PsiElement(Py:SINGLE_QUOTED_STRING)('"echo boo"')
-          PsiWhiteSpace(' ')
-          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+      PsiWhiteSpace(' ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
   PsiWhiteSpace('\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
@@ -327,5 +327,5 @@ SnakemakeFile: RuleParamsListArgsLineComments.smk
           PsiWhiteSpace(' ')
           PyStringLiteralExpression: echo foo
             PsiElement(Py:SINGLE_QUOTED_STRING)('"echo foo"')
-          PsiWhiteSpace('\n    ')
-          PsiComment(Py:END_OF_LINE_COMMENT)('# end of file comment')
+      PsiWhiteSpace('\n    ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# end of file comment')

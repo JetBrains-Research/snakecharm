@@ -82,8 +82,11 @@ class SmkStatementParsing(
             tt in SmkTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
-                parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
+                val result = parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
                 workflowParam.done(SmkElementTypes.WORKFLOW_ARGS_SECTION_STATEMENT)
+                if (result) {
+                    nextToken()
+                }
             }
             tt === SmkTokenTypes.WORKFLOW_LOCALRULES_KEYWORD -> {
                 val workflowParam = myBuilder.mark()
@@ -100,6 +103,9 @@ class SmkStatementParsing(
                 }
 
                 workflowParam.done(SmkElementTypes.WORKFLOW_LOCALRULES_SECTION_STATEMENT)
+                if (res) {
+                    nextToken()
+                }
             }
             tt === SmkTokenTypes.WORKFLOW_RULEORDER_KEYWORD  -> {
                 val workflowParam = myBuilder.mark()
@@ -116,6 +122,9 @@ class SmkStatementParsing(
                 }
 
                 workflowParam.done(SmkElementTypes.WORKFLOW_RULEORDER_SECTION_STATEMENT)
+                if (res) {
+                    nextToken()
+                }
             }
             tt in SmkTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS -> {
                 myContext.pushScope(scope.withPythonicSection())
@@ -243,6 +252,9 @@ class SmkStatementParsing(
                 // for keyword not in `section.parameters` instead of parsing errors..
                 result = parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
                 ruleParam.done(section.parameterListStatement)
+                if (result) {
+                    nextToken()
+                }
             }
             section.sectionKeyword in RULE_OR_CHECKPOINT && keyword == SnakemakeNames.SECTION_RUN -> {
                 val scope = myContext.scope as SmkParsingScope
