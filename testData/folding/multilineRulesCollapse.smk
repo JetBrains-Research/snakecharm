@@ -4,6 +4,8 @@ rule rule_314_1:<fold text='...'>
         key2="value",
         key3="value",
         key4="value"</fold>
+    log:<fold text='...'>
+        key1="value", key2="value", key3="value"</fold>
     output:<fold text='...'>
         "value1",
         "value2",
