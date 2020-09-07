@@ -17,6 +17,7 @@ Features:
 - Inspection: Warn users if they have callable arguments in sections that does not expect it (see #198)
 - Inspection: Warn users if they have keyword arguments in sections that does not expect it (see #196)
 - Inspection: Warn about usage of rule/checkpoint/subworkflow objects as arguments instead of one of its fields (see #257)
+- Action: Show folding for multiline rule sections (input, output, etc) (see #314)
 
 Fixed:
 - Completion does not suggest top-level keywords in comments (see #178)
