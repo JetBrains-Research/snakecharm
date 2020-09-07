@@ -24,6 +24,7 @@ Fixed:
 - Suppress inspection doesn't work in some cases (see #313)
 - Don't show multiline string arg, may be comma is missing for sections with single arg (see #315)
 - Expected `collections.iterable` but got `output:` false positive (see #317)
+- Expected type `Iterable` (..), git `input: ` instead (see #320)
 
 Version 0.8.0 build #0.8.0.214
 -------------

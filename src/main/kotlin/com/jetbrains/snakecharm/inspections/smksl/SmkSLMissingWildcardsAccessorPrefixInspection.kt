@@ -47,7 +47,7 @@ class SmkSLMissingWildcardsAccessorPrefixInspection : SnakemakeInspection() {
             val typeEvalContext = TypeEvalContext.codeAnalysis(host.project, host.containingFile)
             val type = typeEvalContext.getType(ruleLike.wildcardsElement)
             if (type is SmkWildcardsType) {
-                val wildcards = type.getWildcards()
+                val wildcards = type.wildcards
                 if (wildcards != null) {
                     // check if our expr has a name as one of wildcards:
                     if (referencedName in wildcards) {
