@@ -17,6 +17,8 @@ Feature: Fixes for PyTypeCheckerInspection related false positives
             with open(output[0], 'w') as out:
                 for p in input:
                     print(p, file=out)
+            for i,s in enumerate(output):
+                        print(i, s)
     """
     And PyTypeCheckerInspection inspection is enabled
     # warning only for `1`, not for `rules.rule_317_1.output` and not for `for p in input`
