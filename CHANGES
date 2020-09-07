@@ -21,6 +21,7 @@ Features:
 Fixed:
 - Completion does not suggest top-level keywords in comments (see #178)
 - Suppress inspection doesn't work in some cases (see #313)
+- Don't show multiline string arg, may be comma is missing for sections with single arg (see #315)
 
 Version 0.8.0 build #0.8.0.214
 -------------
