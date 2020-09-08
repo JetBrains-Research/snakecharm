@@ -26,6 +26,7 @@ Fixed:
 - Expected `collections.iterable` but got `output:` false positive (see #317)
 - Expected type `Iterable` (..), git `input: ` instead (see #319)
 - Expected type `Iterable` (..), git `input: ` instead (see #320)
+- Workaround for: 'Shadows built-in name `input`' inspection on lambda parameters (see #133)
 
 Version 0.8.0 build #0.8.0.214
 -------------
