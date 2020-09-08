@@ -32,16 +32,6 @@ class SmkExpressionParsing(context: SmkParserContext) : ExpressionParsing(contex
             errorMessage: String,
             parsingFunction: () -> Boolean
     ): Boolean {
-        return doParseRuleParamArgumentList(separatorTokenText, separatorTokenType) {
-            parseArgumentAndReportErrors(errorMessage, separatorTokenType, parsingFunction)
-        }
-    }
-
-    private fun doParseRuleParamArgumentList(
-            separatorTokenText: String,
-            separatorTokenType: PyElementType,
-            parseArgumentFunction: () -> Unit
-    ): Boolean {
         // let's make ':' part of arg list, similar as '(', ')' are parts of arg list
         // helps with formatting, e.g. enter handler
         val hasColon = myBuilder.tokenType == PyTokenTypes.COLON
@@ -135,15 +125,24 @@ class SmkExpressionParsing(context: SmkParserContext) : ExpressionParsing(contex
             if (atToken(PyTokenTypes.INCONSISTENT_DEDENT) && incorrectUnindentMarker == null) {
                 incorrectUnindentMarker = myBuilder.mark()
             }
-            parseArgumentFunction()
+
+            if (!parsingFunction()) {
+                recoverUntilMatches(errorMessage, separatorTokenType, PyTokenTypes.STATEMENT_BREAK)
+            }
+
             // mark everything that was incorrectly unindented
             incorrectUnindentMarker?.error(SnakemakeBundle.message("PARSE.incorrect.unindent"))
             incorrectUnindentMarker = null
         }
 
+        // Comments are skipped after STATEMENT_BREAK, but we'd like to
+        // Have 'next' comment out of current section
+        var beforeArgListDone: SyntaxTreeBuilder.Marker = myBuilder.mark()
         if (atToken(PyTokenTypes.STATEMENT_BREAK)) {
             nextToken()
             while (indents > 0 && !myBuilder.eof()) {
+                beforeArgListDone.drop()
+                beforeArgListDone = myBuilder.mark()
                 if (checkMatches(PyTokenTypes.DEDENT, SnakemakeBundle.message("PARSE.expected.dedent"))) {
                     indents--
                 } else {
@@ -151,18 +150,9 @@ class SmkExpressionParsing(context: SmkParserContext) : ExpressionParsing(contex
                 }
             }
         }
+        beforeArgListDone.rollbackTo()
         argList.done(PyElementTypes.ARGUMENT_LIST)
         return true
-    }
-
-    private fun parseArgumentAndReportErrors(
-            errorMessage: String,
-            separatorToken: PyElementType,
-            parseArgumentFunction: () -> Boolean
-    ) {
-        if (!parseArgumentFunction()) {
-            recoverUntilMatches(errorMessage, separatorToken, PyTokenTypes.STATEMENT_BREAK)
-        }
     }
 
     private fun parseRuleParamArgument(): Boolean {

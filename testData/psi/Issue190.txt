@@ -34,5 +34,5 @@ SnakemakeFile: Issue190.smk
             PsiElement(Py:EQ)('=')
             PyStringLiteralExpression: --buffer_size 20G
               PsiElement(Py:SINGLE_QUOTED_STRING)('"--buffer_size 20G"')
-          PsiWhiteSpace('          \n       ')
-          PsiComment(Py:END_OF_LINE_COMMENT)('# fooo')
+      PsiWhiteSpace('          \n       ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# fooo')

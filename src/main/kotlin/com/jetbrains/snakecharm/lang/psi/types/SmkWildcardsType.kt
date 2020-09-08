@@ -9,7 +9,7 @@ import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
-import com.jetbrains.python.psi.types.PyType
+import com.jetbrains.python.psi.types.PyStructuralType
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
@@ -17,7 +17,10 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
-class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyType, SmkAvailableForSubscriptionType {
+class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyStructuralType(
+    emptySet(), false
+), SmkAvailableForSubscriptionType {
+
     private val typeName = "Rule ${ruleOrCheckpoint.name?.let { "'$it' " } ?: ""}wildcards"
 
     /**
@@ -123,7 +126,11 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PyTy
         }.toTypedArray()
     }
 
-    fun getWildcards() = wildcardsDeclarations?.map { it.text }
+    val wildcards: Set<String>?  by lazy {
+        wildcardsDeclarations?.map { it.text }?.toHashSet()
+    }
+
+    override fun getAttributeNames(): Set<String> = wildcards ?: emptySet()
 
     override fun getCompletionVariantsAndPriority(
             completionPrefix: String?, location: PsiElement, context: ProcessingContext?
