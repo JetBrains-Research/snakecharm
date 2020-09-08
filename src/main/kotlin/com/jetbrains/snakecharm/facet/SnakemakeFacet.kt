@@ -43,7 +43,7 @@ class SnakemakeFacet(
         // Subscribe on facet added/removed/facetConfigurationChanged (e.g. wrappers settings changed changed)
         connection.subscribe(FacetManager.FACETS_TOPIC, object : FacetManagerAdapter() {
             override fun facetConfigurationChanged(facet: Facet<*>) {
-                SmkWrapperLoaderStartupActivity.runActivityModule(facet.module, true)
+                SmkWrapperLoaderStartupActivity.loadOrCollectLocalWrappers(facet.module, true)
             }
         })
 

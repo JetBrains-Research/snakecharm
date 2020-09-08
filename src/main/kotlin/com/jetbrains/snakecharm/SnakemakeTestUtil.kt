@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm
 
 import com.intellij.openapi.application.PathManager
-import com.jetbrains.snakecharm.lang.parser.SnakemakeParsingTest
 import java.io.File
 import java.nio.file.Path
 
@@ -11,7 +10,7 @@ import java.nio.file.Path
  */
 object SnakemakeTestUtil {
     fun getTestDataPath(): Path {
-        val homePath = projectHomePath(SnakemakeParsingTest::class.java)
+        val homePath = projectHomePath(SnakemakeTestUtil::class.java)
         checkNotNull(homePath)
         return homePath.resolve("testData")
     }

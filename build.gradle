@@ -99,23 +99,6 @@ task cucumber() {
     }
 }
 
-// XXX: An alternative to `buildWrappersBundle` task, not clear which way is better at the moment.
-//jar {
-//    doFirst {
-//        javaexec {
-//                    main = "com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler"
-//                    classpath =  project.sourceSets.main.runtimeClasspath + files(intellij.ideaDependency.jarFiles)
-//                    enableAssertions = true
-//                    args = [
-//                            "${System.getenv("HOME")}/snakemake-wrappers",
-//                            "${project.buildDir}/bundledWrappers/smk-wrapper-storage.cbor"
-//                    ]
-//                    maxHeapSize = '1024m' // Not much RAM is available on TC agents
-//                }
-//    }
-//    from { "${project.buildDir}/bundledWrappers/smk-wrapper-storage2.cbor" }
-//}
-
 task buildWrappersBundle() {
     dependsOn  compileKotlin, compileJava
     doLast {
@@ -125,16 +108,36 @@ task buildWrappersBundle() {
             enableAssertions = true
             args = [
                     "${System.getenv("HOME")}/snakemake-wrappers",
-                    "${project.projectDir}/src/main/resources/smk-wrapper-storage.cbor"
+                    "${project.buildDir}/bundledWrappers/smk-wrapper-storage.cbor"
             ]
             maxHeapSize = '1024m' // Not much RAM is available on TC agents
         }
     }
 }
-// XXX: dependency temporary disabled, need re-configure TC to include
-//    snakemake wrappers checkout step
-//jar.dependsOn(buildWrappersBundle)
 
+// TODO: Uncomment: Reconfigure Teamcity + remove resource/smk-wrapper-storage.cbor from version control
+// jar.dependsOn(buildWrappersBundle)
+jar {
+    from { "${project.buildDir}/bundledWrappers/smk-wrapper-storage.cbor" }
+}
+
+
+task buildTestWrappersBundle() {
+    dependsOn  compileKotlin, compileJava
+    doLast {
+        javaexec {
+            main = "com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler"
+            classpath =  project.sourceSets.main.runtimeClasspath + files(intellij.ideaDependency.jarFiles)
+            enableAssertions = true
+            args = [
+                    "${project.projectDir}/testData/wrappers_storage",
+                    "${project.buildDir}/bundledWrappers/smk-wrapper-storage.test.cbor"
+            ]
+            maxHeapSize = '1024m' // Not much RAM is available on TC agents
+        }
+    }
+}
+test.dependsOn(buildTestWrappersBundle)
 
 test {
     reports {
