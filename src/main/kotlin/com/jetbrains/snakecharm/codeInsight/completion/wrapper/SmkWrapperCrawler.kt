@@ -86,7 +86,7 @@ object SmkWrapperCrawler {
     }
 
     fun parseArgsPython(text: String): Map<String, List<String>> {
-        return Regex("snakemake\\.\\w*(\\.(get\\(\"\\w*\"|[^get]\\w*)|\\[\\d+\\])?")
+        return Regex("(?<!from\\s|import\\s)snakemake\\.\\w*(\\.(get\\(\"\\w*\"|[^get]\\w*)|\\[\\d+\\])?")
             .findAll(text).map { str ->
                 str.value
                     .substringAfter("snakemake.")
@@ -94,21 +94,25 @@ object SmkWrapperCrawler {
             .toSortedSet()
             .toList()
             .map {
-                val splitted = it.split('.', ignoreCase = false, limit = 2)
+                val chunks = it.split('.', ignoreCase = false, limit = 2)
                 when {
-                    splitted.size != 2
-                    -> splitted[0].substringBefore('[') to ""
-                    splitted[1].startsWith("get")
-                    -> splitted[0] to splitted[1].removeSurrounding("get(\"", "\"")
-                    else
-                    -> splitted[0] to splitted[1]
+                    chunks.size != 2 -> {
+                        chunks[0].substringBefore('[') to ""
+                    }
+                    chunks[1].startsWith("get") -> {
+                        chunks[0] to chunks[1].removeSurrounding("get(\"", "\"")
+                    }
+                    else -> {
+                        chunks[0] to chunks[1]
+                    }
                 }
             }
+//            .filter { it.first in SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS }
             .groupBy({ it.first }, { it.second })
     }
 
     fun parseArgsR(text: String): Map<String, List<String>> {
-        return Regex("snakemake@\\w*(\\[\\[\"\\w*\"\\]\\])?")
+        return Regex("(?<!from\\s)snakemake@\\w*(\\[\\[\"\\w*\"\\]\\])?")
             .findAll(text).map { str ->
                 str.value
                     .substringAfter("snakemake@")
