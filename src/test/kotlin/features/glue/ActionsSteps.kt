@@ -451,7 +451,9 @@ class ActionsSteps {
             val mapped = args.map { (key, values) ->
                 "$key:${values.filterNot { it.isEmpty() }.joinToString(", ")}"
             }
-            FilesSteps().aFileWithText(filename, mapped.joinToString("\n"))
+            performAction(fixture().project) {
+                FilesSteps().aFileWithText(filename, mapped.joinToString("\n"))
+            }
         }
     }
 

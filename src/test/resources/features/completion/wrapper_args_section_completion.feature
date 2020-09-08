@@ -22,6 +22,36 @@ Feature: Completion for arguments used in wrapper
       | import snakemake.shell              | params    | output  | input |
       | from snakemake.script import script | resources | message | log   |
 
+  Scenario Outline: Consider only supported section names from wrapper.py, ignore other api, see #311
+     Given a snakemake project
+     When I check wrapper args parsing for "Python" resulting in "out.txt" with text
+     """
+     log_append = snakemake.<call>(stdout=True, stderr=True, append=True)
+     log_append = snakemake.<call>.foo(stdout=True, stderr=True, append=True)
+     """
+     Then the file "out.txt" should have text
+     """
+     """
+     Examples:
+       | call          |
+       | log_fmt_shell |
+       | smth_else_foo |
+
+  Scenario Outline: Consider only supported section names from wrapper.R ignore other api, see #311
+    Given a snakemake project
+    When I check wrapper args parsing for "R" resulting in "out.txt" with text
+    """
+    log_append = snakemake@<call>(1)
+    log_append = snakemake@<call>[["jar"]]
+    """
+    Then the file "out.txt" should have text
+    """
+    """
+    Examples:
+      | call          |
+      | log_fmt_shell |
+      | smth_else_foo |
+
   Scenario Outline: Parsing arguments from wrapper.R
     Given a snakemake project
     When I check wrapper args parsing for "R" resulting in "out" with text

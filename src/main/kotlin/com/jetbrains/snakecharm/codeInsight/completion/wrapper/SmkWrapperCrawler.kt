@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.codeInsight.completion.wrapper
 import com.intellij.util.io.exists
 import com.intellij.util.io.isDirectory
 import com.intellij.util.io.write
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.encodeToByteArray
@@ -96,7 +97,7 @@ object SmkWrapperCrawler {
             .map {
                 val chunks = it.split('.', ignoreCase = false, limit = 2)
                 when {
-                    chunks.size != 2 -> {
+                    chunks.size < 2 -> {
                         chunks[0].substringBefore('[') to ""
                     }
                     chunks[1].startsWith("get") -> {
@@ -107,7 +108,7 @@ object SmkWrapperCrawler {
                     }
                 }
             }
-//            .filter { it.first in SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS }
+            .filter { it.first in SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS }
             .groupBy({ it.first }, { it.second })
     }
 
@@ -120,13 +121,14 @@ object SmkWrapperCrawler {
             .toSortedSet()
             .toList()
             .map {
-                val splitted = it.split('[', ignoreCase = false, limit = 2)
-                if (splitted.size == 2) {
-                    splitted[0] to splitted[1].substringAfter('"').substringBefore('"')
+                val chunks = it.split('[', ignoreCase = false, limit = 2)
+                if (chunks.size == 2) {
+                    chunks[0] to chunks[1].substringAfter('"').substringBefore('"')
                 } else {
-                    splitted[0] to ""
+                    chunks[0] to ""
                 }
             }
+            .filter { it.first in SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS }
             .groupBy({ it.first }, { it.second })
     }
 }
