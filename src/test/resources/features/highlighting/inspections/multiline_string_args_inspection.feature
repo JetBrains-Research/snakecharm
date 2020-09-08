@@ -73,7 +73,9 @@ Feature: Inspection for multiline arguments in same section
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
-      | rule_like  | section | args                                             |
-      | rule       | input   | foo("bar" \n "abc" \n "123"), "c"                |
+      | rule_like  | section | args                                                 |
+      | rule       | input   | foo("bar" \n "abc" \n "123"), "c"                    |
       | rule       | shell   | "echo foo;"\n        "ls \ "\n        "&& echo done" |
-      | checkpoint | input   | """a \n        "b" \n """  'c', "c"              |
+      | rule       | wrapper   | "echo foo;"\n        "ls \ "\n        "&& echo done" |
+      | rule       | message | "line1"\n        "line2"\n        "line3"            |
+      | checkpoint | input   | """a \n        "b" \n """  'c', "c"                  |

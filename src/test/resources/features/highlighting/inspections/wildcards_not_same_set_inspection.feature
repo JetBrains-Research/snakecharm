@@ -4,7 +4,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
-      <section> NAME:
+      <rule_like> NAME:
         log:
           log1 = "{a}.log1",
           log2 = "{a}/{b}.log2",
@@ -35,7 +35,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
       """
     When I check highlighting errors
     Examples:
-      | section    |
+      | rule_like  |
       | rule       |
       | checkpoint |
 
@@ -43,7 +43,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
-      <section> NAME:
+      <rule_like> NAME:
         benchmark: "{b}.{c}"
         log: "{a}.{b}.{c}.{d}"
       """
@@ -54,7 +54,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
       """
     When I check highlighting errors
     Examples:
-      | section    |
+      | rule_like  |
       | rule       |
       | checkpoint |
 
@@ -62,7 +62,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    <section> NAME:
+    <rule_like> NAME:
       output: "{a}.{b}"
       benchmark: "{a}.{b}"
       log: "{a}.{b}"
@@ -71,7 +71,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     Then I expect no inspection errors
     When I check highlighting errors
     Examples:
-      | section    |
+      | rule_like  |
       | rule       |
       | checkpoint |
 
@@ -79,7 +79,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
-      <section> NAME:
+      <rule_like> NAME:
         output: "{a}"
         log:
           log2 = "{a}",
@@ -97,7 +97,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
       """
     When I check highlighting errors
     Examples:
-      | section    |
+      | rule_like  |
       | rule       |
       | checkpoint |
 
@@ -105,11 +105,11 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
-      <section> NAME1:
+      <rule_like> NAME1:
         output: "{a}.{b}"
         log: "{a}.{d}"
 
-      <section> NAME2:
+      <rule_like> NAME2:
         output: "{x}.{y}"
         log: "{x}.{z}"
       """
@@ -132,7 +132,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
       """
     When I check highlighting errors
     Examples:
-      | section    |
+      | rule_like  |
       | rule       |
       | checkpoint |
 
@@ -140,7 +140,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    <section> NAME1:
+    <rule_like> NAME1:
       input: "{z}"
       output: "{a}.{b}"
       log: "{a}.{z}"
@@ -156,7 +156,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     """
     When I check highlighting errors
     Examples:
-      | section    |
+      | rule_like  |
       | rule       |
       | checkpoint |
 
@@ -164,7 +164,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
-      <section> NAME:
+      <rule_like> NAME:
           <def1>: "{foo}"
           <def2>: <def2_body>
       """
@@ -172,7 +172,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     Then I expect no inspection errors
     When I check highlighting errors
     Examples:
-      | section    | def1   | def2      | def2_body   |
+      | rule_like  | def1   | def2      | def2_body   |
       | rule       | output | log       | **foo()     |
       | rule       | output | benchmark | foo()       |
       | rule       | log    | benchmark | unpack(foo) |
@@ -182,7 +182,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
-      <section> NAME:
+      <rule_like> NAME:
           output: **foo()
           log: "{foo}"
           benchmark: "{sample}.txt"
@@ -198,7 +198,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
       """
     When I check highlighting errors
     Examples:
-      | section    |
+      | rule_like  |
       | rule       |
       | checkpoint |
 
@@ -206,7 +206,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
-      <section> NAME:
+      <rule_like> NAME:
          output: ""
          log: "{foo}"
          benchmark: "{sample}.txt"
@@ -226,7 +226,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
       """
     When I check highlighting errors
     Examples:
-      | section    |
+      | rule_like  |
       | rule       |
       | checkpoint |
 
@@ -235,7 +235,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
-      <section> NAME:
+      <rule_like> NAME:
          output: "{sample}"
          run:
             shell("curl {config} {output} | gunzip > {output[0]}")
@@ -243,16 +243,16 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     And SmkNotSameWildcardsSetInspection inspection is enabled
     Then I expect no inspection errors
     When I check highlighting errors
-      Examples:
-        | section    |
-        | rule       |
-        | checkpoint |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
-  Scenario Outline: Issue 266 No error
+  Scenario Outline: Issue 266: No error if cannot detect any wildcards in argument
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
-      <section> a:
+      <rule_like> a:
           output:
               **foo(""),
               o1 = foo("{wd} "),
@@ -268,16 +268,16 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
          Cannot check missing wildcards here.
          """
     When I check highlighting weak warnings
-      Examples:
-        | section    |
-        | rule       |
-        | checkpoint |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
 #  Scenario Outline: Issue 266 Weak warning
 #    Given a snakemake project
 #    Given I open a file "foo.smk" with text
 #      """
-#      <section> a:
+#      <rule_like> a:
 #          output:
 #              **foo(""),
 #              o1 = foo("{wd} "),
@@ -287,6 +287,24 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
 #    Then I expect no inspection errors
 #    When I check highlighting errors
 #      Examples:
-#        | section    |
+#        | rule_like    |
 #        | rule       |
 #        | checkpoint |
+
+  Scenario Outline: Issue 307 - No warning if not wildcards in rule
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+       """
+       <rule_like> foo:
+           input: "dd"
+           output:
+               "",
+               temp("ddd")
+       """
+    And SmkNotSameWildcardsSetInspection inspection is enabled
+    Then I expect no inspection weak warnings
+    When I check highlighting weak warnings
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |

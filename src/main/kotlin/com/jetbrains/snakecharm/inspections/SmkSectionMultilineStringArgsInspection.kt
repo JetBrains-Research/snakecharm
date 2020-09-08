@@ -10,7 +10,7 @@ import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyParenthesizedExpression
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
@@ -38,8 +38,7 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
         private fun checkArgsSection(st: SmkArgsSection) {
             val argumentList = st.argumentList
             val keyword = st.sectionKeyword
-
-            if (argumentList == null || keyword == null || keyword == SnakemakeNames.SECTION_SHELL) {
+            if (argumentList == null || keyword == null || keyword in SnakemakeAPI.SINGLE_ARGUMENT_SECTIONS_KEYWORDS) {
                 return
             }
 

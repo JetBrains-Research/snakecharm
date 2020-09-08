@@ -126,6 +126,8 @@
 
     <codeBlockProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.SmkCodeBlockProvider"/>
 
+    <statementUpDownMover order="first" implementation="com.jetbrains.snakecharm.actions.SmkStatementMover"/>
+
     <multiHostInjector implementation="com.jetbrains.snakecharm.stringLanguage.lang.SmkSLInjector"/>
     <multiHostInjector implementation="com.jetbrains.snakecharm.lang.SmkWildcardConstraintsRegExpInjector"/>
 <!--    <metaDataContributor implementation="com.jetbrains.snakecharm.lang.psi.SmkMetaDataContributor"/>-->
@@ -168,6 +170,9 @@
     />
 
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.lang.psi.references.SmkPySubscriptionReferenceContributor"/>
+
+    <lang.inspectionSuppressor language="Snakemake" implementationClass="com.jetbrains.snakecharm.inspections.SmkInspectionsSuppressor"/>
+
     <localInspection
         language="Snakemake"
         shortName="SmkResourcesKeywordArgsInspection"

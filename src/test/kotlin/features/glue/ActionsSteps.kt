@@ -397,6 +397,25 @@ class ActionsSteps {
         }
     }
 
+    @Given("^I invoke (MoveStatementUp|MoveStatementDown) action$")
+    fun iInvokeLineMoverAction(actionId: String) {
+        // See ids in: IdeActions
+        ApplicationManager.getApplication().invokeAndWait({
+            ApplicationManager.getApplication().runWriteAction {
+                SnakemakeWorld.myFixture?.performEditorAction(actionId)
+            }
+        }, ModalityState.NON_MODAL)
+    }
+
+    @Given("^editor content will be$")
+    fun editorContentWillBe(text: String) {
+        ApplicationManager.getApplication().invokeAndWait({
+            ApplicationManager.getApplication().runWriteAction {
+                fixture().checkResult(text)
+            }
+        }, ModalityState.NON_MODAL)
+    }
+
     private fun findTargetElementFor(element: PsiElement, editor: Editor) =
             DocumentationManager.getInstance(element.project)
                     .findTargetElement(editor, element.containingFile, element)

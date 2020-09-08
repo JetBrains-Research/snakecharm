@@ -20,9 +20,18 @@ Features:
 - Inspection: Warn about missed arguments needed for wrapper (see #18)
 - Resolve\completion for wrapper path and for arguments that wrapper use (see #18)
 - Wrapper section documentation popup (see #18)
+- Action: Correct Up/Down StatementMover for rule sections (see #174)
+- Action: Show folding for multiline rule sections (input, output, etc) (see #314)
 
 Fixed:
 - Completion does not suggest top-level keywords in comments (see #178)
+- Suppress inspection doesn't work in some cases (see #313)
+- Don't show multiline string arg, may be comma is missing for sections with single arg (see #315)
+- Expected `collections.iterable` but got `output:` false positive (see #317)
+- Expected type `Iterable` (..), git `input: ` instead (see #319)
+- Expected type `Iterable` (..), git `input: ` instead (see #320)
+- Workaround for: 'Shadows built-in name `input`' inspection on lambda parameters (see #133)
+- Confusing 'Cannot check missing wildcards here.' warning (see #307)
 
 Version 0.8.0 build #0.8.0.214
 -------------

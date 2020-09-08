@@ -10,7 +10,7 @@ import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.impl.ResolveResultList
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
-import com.jetbrains.python.psi.types.PyType
+import com.jetbrains.python.psi.types.PyStructuralType
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.UNPACK_FUNCTION
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
@@ -20,9 +20,20 @@ import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
 
 class SmkRuleLikeSectionArgsType(
         val section: SmkRuleOrCheckpointArgsSection
-) : PyType, SmkAvailableForSubscriptionType {
+) : PyStructuralType(
+    getSectionArgsNames(getSectionArgs(section)),
+    false
+), SmkAvailableForSubscriptionType {
+
+    companion object {
+        private fun getSectionArgs(section: SmkRuleOrCheckpointArgsSection)
+                = section.argumentList?.arguments
+        private fun getSectionArgsNames(args: Array<PyExpression>?)
+                = args?.filterIsInstance<PyKeywordArgument>()?.mapNotNull { it.name }?.toSet() ?: emptySet()
+    }
 
     private val typeName: String = section.sectionKeyword?.let { "$it:" } ?: "section"
+    private val sectionArgs: Array<out PyExpression>? = getSectionArgs(section)
 
     override fun getName() = typeName
 
@@ -42,15 +53,13 @@ class SmkRuleLikeSectionArgsType(
             return emptyList()
         }
 
-        val args = getSectionArgs()
-
         @Suppress("FoldInitializerAndIfToElvis")
-        if (args == null) {
+        if (sectionArgs == null) {
             return emptyList()
         }
 
         val resolveResult = ResolveResultList()
-        args.filterIsInstance<PyKeywordArgument>()
+        sectionArgs.filterIsInstance<PyKeywordArgument>()
                 .filter { it.name == name }
                 .forEach {
                     resolveResult.poke(it, SmkResolveUtil.RATE_NORMAL)
@@ -65,19 +74,15 @@ class SmkRuleLikeSectionArgsType(
             direction: AccessDirection,
             resolveContext: PyResolveContext
     ): List<RatedResolveResult> {
-        val args = getSectionArgs()
-
-        if (args != null && isSimpleArgsList(args)) {
+        if (sectionArgs != null && isSimpleArgsList(sectionArgs)) {
             val resolveResult = ResolveResultList()
-            if (idx in args.indices) {
-                resolveResult.poke(args[idx], SmkResolveUtil.RATE_NORMAL)
+            if (idx in sectionArgs.indices) {
+                resolveResult.poke(sectionArgs[idx], SmkResolveUtil.RATE_NORMAL)
             }
             return resolveResult
         }
         return emptyList()
     }
-
-    private fun getSectionArgs(): Array<out PyExpression>? = section.argumentList?.arguments
 
     override fun getCompletionVariants(
             completionPrefix: String?,
@@ -106,20 +111,19 @@ class SmkRuleLikeSectionArgsType(
         }
 
         val results = arrayListOf<LookupElementBuilder>()
-        val args = getSectionArgs()
 
         @Suppress("FoldInitializerAndIfToElvis")
-        if (args == null) {
+        if (sectionArgs == null) {
             return emptyList<LookupElementBuilder>() to priority
         }
 
         val sectionKeyword = section.sectionKeyword
         val typeText = "$sectionKeyword section key"
-        args.filterIsInstance<PyKeywordArgument>().forEach {
+        attributeNames.forEach { name ->
             val item = LookupElementBuilder
-                    .create(it.name!!)
+                    .create(name)
                     .withTypeText(typeText)
-                    .withIcon(PlatformIcons.PARAMETER_ICON)
+                    .withIcon(PlatformIcons.FIELD_ICON)
             results.add(item)
         }
 
@@ -134,13 +138,11 @@ class SmkRuleLikeSectionArgsType(
             return 0
         }
 
-        val args = getSectionArgs()
-
-        if (args == null || !isSimpleArgsList(args)) {
+        if (sectionArgs == null || !isSimpleArgsList(sectionArgs)) {
             return 0
         }
 
-        return args.size
+        return sectionArgs.size
     }
 
     private fun isSimpleArgsList(args: Array<out PyExpression>): Boolean {

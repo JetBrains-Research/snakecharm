@@ -364,6 +364,14 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testIssue313_1() {
+        doTest()
+    }
+
+    fun testIssue313_2() {
+        doTest()
+    }
+
     private fun doTest() {
         // Actually snakemake requires python 3.x and no need to have it working with python 2.x
         //doTest(LanguageLevel.fromPythonVersion("2"))

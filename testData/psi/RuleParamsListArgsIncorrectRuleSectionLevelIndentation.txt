@@ -16,8 +16,8 @@ SnakemakeFile: RuleParamsListArgsIncorrectRuleSectionLevelIndentation.smk
           PyStringLiteralExpression: file.txt
             PsiElement(Py:SINGLE_QUOTED_STRING)('"file.txt"')
           PsiElement(Py:COMMA)(',')
-          PsiWhiteSpace('\n         ')
-          PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
+      PsiWhiteSpace('\n         ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# comment')
       PsiErrorElement:Rule parameter identifier is expected
         <empty list>
       PsiWhiteSpace('\n  ')

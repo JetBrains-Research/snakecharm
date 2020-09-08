@@ -74,7 +74,7 @@ SnakemakeFile: KeywordIdentifierWithNoIndent.smk
               PsiElement(Py:LPAR)('(')
               PsiErrorElement:expression expected
                 <empty list>
-          PsiWhiteSpace('\n')
+      PsiWhiteSpace('\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiErrorElement:Rule name identifier or ':' expected
