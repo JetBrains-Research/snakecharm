@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.InspectionSuppressor
 import com.intellij.codeInspection.SuppressQuickFix
 import com.intellij.codeInspection.SuppressionUtil
+import com.intellij.openapi.vfs.impl.http.HttpVirtualFile
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
@@ -10,6 +11,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.inspections.quickfix.PySuppressInspectionFix
 import com.jetbrains.python.psi.PyElement
 import com.jetbrains.python.psi.PyExpression
+import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
@@ -22,8 +24,15 @@ import java.util.regex.Pattern
  */
 class SmkInspectionsSuppressor : InspectionSuppressor {
     override fun isSuppressedFor(element: PsiElement, toolId: String): Boolean {
-        // Here Could be any QuickFix, not only registered via #getSuppressActions
+        // Workaround for: Exception on opening raw files via URL #236
+        if (element is PyFile &&
+            element.parent?.virtualFile is HttpVirtualFile &&
+            toolId in SUPPRESSED_FOR_DOWNLOADED_FILES_TOOLS
+        ) {
+            return true
+        }
 
+        // Here Could be any QuickFix, not only registered via #getSuppressActions
         val containingArgsSection = getContainingArgsSection(element)
         if (containingArgsSection != null) {
             // allow only for Snakemake Section arguments
@@ -96,6 +105,8 @@ class SmkInspectionsSuppressor : InspectionSuppressor {
         PsiTreeUtil.getParentOfType(context, SmkArgsSection::class.java)
 
     companion object {
+        private val SUPPRESSED_FOR_DOWNLOADED_FILES_TOOLS = setOf("SpellCheckingInspection")
+
         // TODO: as for PyCharm API
         private val SUPPRESS_PATTERN =
             Pattern.compile("\\s*noinspection\\s+([a-zA-Z_0-9.-]+(\\s*,\\s*[a-zA-Z_0-9.-]+)*)\\s*\\w*")
