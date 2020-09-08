@@ -1,0 +1,28 @@
+SnakemakeFile: WorkflowContainer.smk
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_CONTAINER_KEYWORD)('container')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('  ')
+      PyStringLiteralExpression: ddd
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"ddd"')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('aaa')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('params')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PyKeywordArgumentImpl: container
+            PsiElement(Py:IDENTIFIER)('container')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:EQ)('=')
+            PsiWhiteSpace(' ')
+            PyStringLiteralExpression: foo10
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"foo10"')

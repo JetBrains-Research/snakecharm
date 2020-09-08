@@ -48,7 +48,15 @@ SnakemakeFile: RuleParamsListArgsKeywords.smk
             PsiElement(Py:EQ)('=')
             PyNumericLiteralExpression
               PsiElement(Py:INTEGER_LITERAL)('100')
-      PsiWhiteSpace('\n\n  ')
+      PsiWhiteSpace('\n  ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('cache')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyBoolLiteralExpression
+            PsiElement(Py:TRUE_KEYWORD)('True')
+      PsiWhiteSpace('\n  ')
       SmkRuleOrCheckpointArgsSection
         PsiElement(Py:IDENTIFIER)('threads')
         PyArgumentList

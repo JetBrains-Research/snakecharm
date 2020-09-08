@@ -22,8 +22,22 @@ class SnakemakeFoldingTest : SnakemakeTestCase() {
     fun testRule() {
         doTest()
     }
+    
+    fun testCheckpoint() {
+        doTest()
+    }
 
     fun testWorkflowTopLevel() {
         doTest()
     }
+
+    fun testMultilineRulesCollapse() {
+        doTest()
+    }
+
+    fun testMultilineRulesDoNotCollapse() {
+        doTest()
+    }
+
+    // TODO... https://github.com/JetBrains-Research/snakecharm/issues/314
 }

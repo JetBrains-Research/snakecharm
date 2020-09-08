@@ -1,20 +1,50 @@
 <idea-plugin>
-  <id>SnakeCharm</id>
-  <name>SnakeCharm</name>
-  <vendor email="roman.chernyatchik@jetbrains.com"
-          url="https://research.jetbrains.org/groups/biolabs">
-    JetBrains Research
-  </vendor>
+    <id>SnakeCharm</id>
+    <name>SnakeCharm</name>
+    <vendor email="roman.chernyatchik@jetbrains.com"
+            url="https://jetbrains-research.github.io/snakecharm/">
+        JetBrains Research
+    </vendor>
 
-  <description><![CDATA[
-    Adds Snakemake language support.<br>
-    <a href="https://snakemake.readthedocs.io/en/stable/">Snakemake</a> is a language for workflow management.
+    <change-notes><![CDATA[
+         See changes at <a href="https://github.com/JetBrains-Research/snakecharm/releases">GitHub Releases Page</a>
+    ]]></change-notes>
+
+    <description><![CDATA[
+    <br>
+    This plugin adds syntax highlighting and code insight support for python-based language used in
+    <a href="https://snakemake.readthedocs.io/en/stable/">Snakemake</a> workflow management system. Bioinformaticians widely use
+     Snakemake to create reproducible and scalable data analyses pipelines for their research.
     <br>
     <br>
-    <a href="https://github.com/JetBrains-Research/snakecharm">SnakeCharm at GitHub</a><br>
-    <a href="https://github.com/JetBrains-Research/snakecharm/issues">Issue tracker</a><br>
-    <a href="https://github.com/JetBrains-Research/snakecharm/releases">Releases</a><br>
-    <a href="https://github.com/JetBrains-Research/snakecharm/blob/master/CHANGES">Changelog</a><br>
+    Main features are:
+    <ul>
+        <li>Snakemake syntax highlighting: both python and snakemake specifix syntax.</li>
+        <li>Syntax highlighting for snakemake string format language.</li>
+        <li>Special highlighting for rule wildcards.</li>
+        <li>Code completion and goto to declaration for:
+            <ul>
+                <li>Snakemake specific methods and variables (e.g. config, rules, expand(), etc);</li>
+                <li>Rules names, rules sections and section arguments;</li>
+                <li>Wildcard names;</li>
+                <li>Python methods and variables.</li>
+                <li>Paths in sections: configfile, workdir, conda, include</li>
+            </ul>
+        </li>
+        <li>Open rule declaration by name using 'Navigate|Symbol...'</li>
+        <li>Structure view for Snakemake files</li>
+        <li>Inspections for undeclared wildcards usage.</li>
+        <li>Multiple inspections for different possibles bugs in the pipeline.</li>
+    </ul>
+    <br>
+    Please report features suggestions or found bugs to project <a href="https://github.com/JetBrains-Research/snakecharm/issues">issue tracker</a><br>
+    <br>
+    Useful links: <ul>
+        <li><a href="https://research.jetbrains.org/groups/biolabs/projects?project_id=57">Project Home Page</a><br></li>
+        <li><a href="https://github.com/JetBrains-Research/snakecharm/blob/master/CHANGES">Changelog</a><br></li>
+        <li><a href="https://github.com/JetBrains-Research/snakecharm">SnakeCharm at GitHub</a><br></li>
+        <li><a href="https://plugins.jetbrains.com/plugin/11947-snakecharm">SnakeCharm in JetBrains Plugin Repository</a><br></li>
+    </ul>
     ]]></description>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
@@ -22,15 +52,32 @@
 
   <!-- PyCharm / Python plugin dependency -->
   <depends>com.intellij.modules.lang</depends>
-  <depends optional="true">com.intellij.modules.python</depends>
+  <depends>com.intellij.modules.python</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <fileTypeFactory implementation="com.jetbrains.snakecharm.SmkFileTypeFactory"/>
+    <fileType
+                name="Snakemake"
+                extensions="smk;rule;rules"
+                fileNames="Snakefile"
+                language="Snakemake"
+                implementationClass="com.jetbrains.snakecharm.SmkFileType"
+                fieldName="INSTANCE"
+        />
+    <stubElementTypeHolder
+            class="com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes"
+            externalIdPrefix="py.SMK_"
+    />
     <lang.parserDefinition
             language="Snakemake"
-            implementationClass="com.jetbrains.snakecharm.lang.parser.SnakemakeParserDefinition"
+            implementationClass="com.jetbrains.snakecharm.lang.parser.SmkParserDefinition"
     />
-    <fileTypeFactory implementation="com.jetbrains.snakecharm.stringLanguage.SmkSLFileTypeFactory"/>
+    <fileType
+            name="SmkSL"
+            extensions="smkStringLanguage"
+            language="SnakemakeSL"
+            implementationClass="com.jetbrains.snakecharm.stringLanguage.SmkSLFileType"
+            fieldName="INSTANCE"
+    />
     <lang.parserDefinition
             language="SnakemakeSL"
             implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLParserDefinition"
@@ -42,20 +89,32 @@
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkDumbAwareAnnotatorManager"/>
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkStandardAnnotatorManager"/>
     <annotator language="RegExp" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLRegExpHighlightingAnnotator"/>
-    <annotator language="Python" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLHighlightingAnnotator"/>
-    <lang.foldingBuilder language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.SmkMakeFoldingBuilder"/>
-    <lang.braceMatcher language="SnakemakeSL" implementationClass="com.jetbrains.snakecharm.stringLanguage.SmkSLBraceMatcher"/>
-    <renamePsiElementProcessor implementation="com.jetbrains.snakecharm.stringLanguage.RenameWildcardsProcessor"/>
+    <annotator language="Python" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLAnnotatingVisitor"/>
+    <lang.foldingBuilder language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkMakeFoldingBuilder"/>
+    <lang.braceMatcher language="SnakemakeSL" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.SmkSLBraceMatcher"/>
+    <lang.findUsagesProvider
+            language="Python" implementationClass="com.jetbrains.snakecharm.codeInsight.refactoring.SmkAndSmkSLFindUsagesProvider"
+            order="first"
+            id="smkElements"
+    />
+    <renamePsiElementProcessor implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkRenamePsiElementProcessor" id="smkSection"/>
+    <renamePsiElementProcessor implementation="com.jetbrains.snakecharm.stringLanguage.codeInsight.SmkSLRenameWildcardsProcessor"/>
     <!--<enterBetweenBracesDelegate language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.editorActions.EnterInRuleParamsListDelegate"/>-->
     <codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>
     <lang.documentationProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.documentation.SmkShadowSettingsDocumentation"/>
     <lang.psiStructureViewFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.structureView.SmkStructureViewFactory"/>
-    <stubElementTypeHolder class="com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes"/>
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex"/>
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex"/>
     <gotoSymbolContributor implementation="com.jetbrains.snakecharm.actions.SmkGotoSymbolContributor"/>
 
-    <multiHostInjector implementation="com.jetbrains.snakecharm.stringLanguage.SmkSLInjector"/>
+    <codeBlockProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.SmkCodeBlockProvider"/>
+
+    <statementUpDownMover order="first" implementation="com.jetbrains.snakecharm.actions.SmkStatementMover"/>
+
+    <multiHostInjector implementation="com.jetbrains.snakecharm.stringLanguage.lang.SmkSLInjector"/>
+    <multiHostInjector implementation="com.jetbrains.snakecharm.lang.SmkWildcardConstraintsRegExpInjector"/>
+<!--    <metaDataContributor implementation="com.jetbrains.snakecharm.lang.psi.SmkMetaDataContributor"/>-->
+<!--    <referencesSearch implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkReferencesSearcher"/>-->
 
     <completion.contributor
             language="Python"
@@ -76,8 +135,18 @@
     <completion.contributor
             language="Python"
             implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkRulesAndCheckpointsCompletionContributor"
-            order="first" id="SmkRulesAndCheckpointsCompletionContributor"
+            order="first"
+            id="SmkRulesAndCheckpointsCompletionContributor"
     />
+    <completion.contributor
+            language="Python"
+            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkDictionaryTypesCompletionContributor"
+            id="SmkDictionaryTypesCompletionContributor"
+    />
+
+    <psi.referenceContributor implementation="com.jetbrains.snakecharm.lang.psi.references.SmkPySubscriptionReferenceContributor"/>
+
+    <lang.inspectionSuppressor language="Snakemake" implementationClass="com.jetbrains.snakecharm.inspections.SmkInspectionsSuppressor"/>
 
     <localInspection
             language="Snakemake"
@@ -114,24 +183,13 @@
     />
 
     <localInspection
-            language="SnakemakeSL" shortName="SmkWildcardNotDefinedInspection"
-            enabledByDefault="true"
-            level="ERROR"
-            suppressId="SmkWildcardNotDefinedInspection"
-            bundle="SnakemakeBundle"
-            groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.wildcard.not.defined"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkWildcardNotDefinedInspection"
-    />
-
-    <localInspection
             language="Snakemake" shortName="SmkNotSameWildcardsSetInspection"
             enabledByDefault="true"
             level="ERROR"
-            suppressId="SmkNotSameWildcardsSetInspection"
+            suppressId="SmkNotSameWildcardsSet"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.not.same.wildcards.set"
+            key="INSP.NAME.not.same.wildcards.set.title"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkNotSameWildcardsSetInspection"
     />
 
@@ -139,7 +197,7 @@
             language="Snakemake" shortName="SmkShadowSettingsInspection"
             enabledByDefault="true"
             level="WARNING"
-            suppressId="SmkShadowSettingsInspection"
+            suppressId="SmkShadowSettings"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.shadow.settings"
@@ -150,18 +208,40 @@
             language="Snakemake" shortName="SmkSectionRedeclarationInspection"
             enabledByDefault="true"
             level="WEAK WARNING"
-            suppressId="SmkSectionRedeclarationInspection"
+            suppressId="SmkSectionRedeclaration"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.section.redeclaration"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionRedeclarationInspection"
+    />
+    <localInspection
+            language="Snakemake" shortName="SmkCondaSectionNotAllowedWithRun"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkCondaSectionNotAllowedWithRun"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.conda.section.not.allowed.with.run"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkCondaSectionNotAllowedWithRun"
+    />
+
+
+    <localInspection
+            language="Snakemake" shortName="SmkSectionMultilineStringArgsInspection"
+            enabledByDefault="true"
+            level="WEAK WARNING"
+            suppressId="SmkSectionMultilineStringArgs"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.multiline.string.args"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionMultilineStringArgsInspection"
     />
 
     <localInspection
             language="Snakemake" shortName="SmkSectionMultipleArgsInspection"
             enabledByDefault="true"
             level="ERROR"
-            suppressId="SmkSectionMultipleArgsInspection"
+            suppressId="SmkSectionMultipleArgs"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.section.multiple.args"
@@ -169,10 +249,54 @@
     />
 
     <localInspection
+            language="Snakemake" shortName="SmkSectionUnspecifiedFieldArgsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkSectionUnspecifiedFieldArgs"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.unspecified.field.args"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionUnspecifiedFieldArgsInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkSectionDuplicatedArgsInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkSectionDuplicatedArgs"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.duplicated.args"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionDuplicatedArgsInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkSectionUnexpectedCallableArgsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkSectionUnexpectedCallableArgs"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.unexpected.callable.args"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionUnexpectedCallableArgsInspection"
+     />
+    
+    <localInspection
+            language="Snakemake" shortName="SmkSectionUnexpectedKeywordArgsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkSectionUnexpectedKeywordArgs"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.unexpected.keyword.args"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionUnexpectedKeywordArgsInspection"
+    />
+
+    <localInspection
             language="Snakemake" shortName="SmkSubworkflowRedeclarationInspection"
             enabledByDefault="true"
             level="WEAK WARNING"
-            suppressId="SmkSubworkflowRedeclarationInspection"
+            suppressId="SmkSubworkflowRedeclaration"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.subworkflow.redeclaration"
@@ -183,7 +307,7 @@
             language="Snakemake" shortName="SmkRuleOrCheckpointNameYetUndefinedInspection"
             enabledByDefault="true"
             level="ERROR"
-            suppressId="SmkRuleOrCheckpointNameYetUndefinedInspection"
+            suppressId="SmkRuleOrCheckpointNameYetUndefined"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.rule.or.checkpoint.name.yet.undefined"
@@ -191,10 +315,21 @@
     />
 
     <localInspection
+            language="Snakemake" shortName="SmkAvoidTabWhitespace"
+            enabledByDefault="true"
+            level="WEAK WARNING"
+            suppressId="SmkAvoidTabWhitespace"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.codestyle.avoid.whitespace.tab"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkAvoidTabWhitespace"
+    />
+
+    <localInspection
             language="Snakemake" shortName="SmkLocalrulesRuleorderRepeatedRuleInspection"
             enabledByDefault="true"
-            level="ERROR"
-            suppressId="SmkLocalrulesRuleoderRepeatedRuleInspectoin"
+            level="WARNING"
+            suppressId="SmkLocalrulesRuleorderRepeatedRule"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.localrules.ruleorder.repeated.rule"
@@ -205,11 +340,132 @@
             language="Snakemake" shortName="SmkLambdaRuleParamsInspection"
             enabledByDefault="true"
             level="ERROR"
-            suppressId="SmkLambdaRuleParamsInspection"
+            suppressId="SmkLambdaRuleParams"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.only.specific.lambda.params"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkLambdaRuleParamsInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkLocalrulesRuleorderConfusingReference"
+            enabledByDefault="true"
+            level="WEAK WARNING"
+            suppressId="SmkLocalrulesRuleorderConfusingReference"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.localrules.ruleorder.confusing.ref"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkLocalrulesRuleorderConfusingReference"
+    />
+    <localInspection
+            language="SnakemakeSL" shortName="SmkWildcardNotDefinedInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkWildcardNotDefined"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.wildcard.not.defined.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkWildcardNotDefinedInspection"
+    />
+
+    <localInspection
+            language="SnakemakeSL" shortName="SmkSLWildcardNameIsConfusingInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkSLWildcardNameIsConfusing"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.wildcards.confusing.name.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkSLWildcardNameIsConfusingInspection"
+    />
+
+    <localInspection
+            language="SnakemakeSL" shortName="SmkSLMissingWildcardsAccessorPrefixInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkSLMissingWildcardsAccessorPrefix"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.wildcards.prefix.missing.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkSLMissingWildcardsAccessorPrefixInspection"
+    />
+
+    <localInspection
+            language="SnakemakeSL" shortName="SmkSLSubscriptionIndexOutOfBoundsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkSLSubscriptionIndexOutOfBounds"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.arg.idx.aiobe.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkSLSubscriptionIndexOutOfBoundsInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkSubscriptionIndexOutOfBoundsInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkSubscriptionIndexOutOfBounds"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.arg.idx.aiobe.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSubscriptionIndexOutOfBoundsInspection"
+    />
+
+    <localInspection
+            language="SnakemakeSL" shortName="SmkSLUndeclaredSectionInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkSLUndeclaredSectionInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.undeclared.section.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkSLUndeclaredSectionInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkUndeclaredSectionInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkUndeclaredSectionInspection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.undeclared.section.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkUndeclaredSectionInspection"
+    />
+
+    <localInspection
+            language="Python"
+            shortName="SmkPyUnboundLocalVariableInspection"
+            suppressId="PyUnboundLocalVariable"
+            bundle="SnakemakeBundle"
+            key="INSP.NAME.unbound"
+            groupKey="INSP.GROUP.snakemake"
+            enabledByDefault="true"
+            level="WARNING"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkPyUnboundLocalVariableInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkRedundantCommaInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkRedundantComma"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.redundant.comma.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkRedundantCommaInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkMisuseUsageIOFlagMethodsInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkMisuseUsageIOFlagMethods"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.misuse.usage.io.flag.methods.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkMisuseUsageIOFlagMethodsInspection"
     />
 
     <findUsagesHandlerFactory
@@ -217,7 +473,12 @@
             id="Python" order="last, before default"
     />
 
+
     <lang.inspectionSuppressor language="Python" implementationClass="com.jetbrains.snakecharm.inspections.SnakecharmPyInspectionSuppressor"/>
+
+    <spellchecker.bundledDictionaryProvider implementation="com.jetbrains.snakecharm.spellchecker.SmkBundledDictionaryProvider"/>
+<!--    <spellchecker.support language="Snakemake" implementationClass="com.jetbrains.snakecharm.spellchecker.SmkSpellcheckerStrategy"/>-->
+
   </extensions>
 
   <module-components>
@@ -237,5 +498,7 @@
             language="Snakemake"
             implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeVisitorFilter"
     />
+    <inspectionExtension
+            implementation="com.jetbrains.snakecharm.inspections.SmkIgnorePyInspectionExtension"/>
   </extensions>
 </idea-plugin>

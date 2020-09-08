@@ -6,13 +6,13 @@ import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.stubs.NamedStub
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyNames.UNNAMED_ELEMENT
-import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyBaseElementImpl
 import com.jetbrains.python.psi.impl.PyElementPresentation
 import com.jetbrains.python.psi.impl.PyPsiUtils
 import com.jetbrains.snakecharm.SnakemakeIcons
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
 import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
 import com.jetbrains.snakecharm.lang.psi.SmkSection
@@ -28,8 +28,6 @@ abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT: SmkRuleLike<S>, ou
 {
     constructor(node: ASTNode): super(node)
     constructor(stub: StubT, nodeType: IStubElementType<StubT, PsiT>): super(stub, nodeType)
-
-    abstract val sectionTokenType: PyElementType
 
     override fun getName(): String? {
         val stub = stub
@@ -59,9 +57,15 @@ abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT: SmkRuleLike<S>, ou
 
     private fun getNameNode() = getIdentifierNode(node)
 
-    override fun getSectionByName(sectionName: String) = getSections().find {
-        it.sectionKeyword == sectionName
-    } as? S
+    override fun getSectionByName(sectionName: String): S? {
+        require(sectionName != SnakemakeNames.SECTION_RUN) {
+            "Run section not supported here"
+        }
+
+        return getSections().find {
+            it.sectionKeyword == sectionName
+        } as? S
+    }
 
     override fun getStatementList() = childToPsiNotNull<PyStatementList>(PyElementTypes.STATEMENT_LIST)
 

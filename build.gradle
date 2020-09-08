@@ -8,40 +8,42 @@ plugins {
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
     // See https://github.com/JetBrains/gradle-intellij-plugin
-    id 'org.jetbrains.intellij' version '0.4.9'
+    id 'org.jetbrains.intellij' version '0.4.21'
 
     // Kotlin
-    id "org.jetbrains.kotlin.jvm" version "1.3.11"
+    id "org.jetbrains.kotlin.jvm" version "1.3.72"
 }
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
 
-def hasPythonPlugin = project.hasProperty('pythonPlugin')
+version "${project.version}.${project.buildCounter}"
 
-version "${project.version}.${project.buildCounter}.${project.sincePlatform}"
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
+// ----------------------------------------------------------------------
 intellij {
     pluginName 'snakecharm'
     version ideVersion
-    type ideType
-    def usePyCharm = "PC" == ideType || "PY" == ideType
 
-    plugins = []
-    if (usePyCharm && hasPythonPlugin)  {
-        throw new StopActionException("Cannot install python plugin in PyCharm. Use PyCharm or IDEA with defined pythonPlugin.")
-    } else if (hasPythonPlugin) {
+    def isPyCharm = ideVersion.contains('PY') || ideVersion.contains('PC')
+
+    plugins=[] // add "terminal", xdebug plugin?
+    if (ideVersion.contains('PC')) {
+        plugins += ['python-ce']
+    } else if (ideVersion.contains('PY')) {
+        plugins += ['python']
+    } else {
         plugins += [pythonPlugin]
-    } else if (!usePyCharm) {
-        throw new StopActionException("Define either PyCharm build or other ide with pythonPlugin in your gradle.properties")
     }
 
-    sandboxDirectory "${project.rootDir}/.sandbox${usePyCharm ? "_pycharm" : "" }"
-    ideaDependencyCachePath  "${project.rootDir}/.idea_distrib_cache"
+    sandboxDirectory "${project.rootDir}/.sandbox${isPyCharm ? "_pycharm" : "" }"
+    // ideaDependencyCachePath  "${project.rootDir}/.idea_distrib_cache"  // Useful for Windows due to short cmdline path
     updateSinceUntilBuild false
     instrumentCode Boolean.valueOf(instrumentPluginCode)
-    downloadSources Boolean.valueOf(downloadIdeaSources)
-    // intellijRepo "https://www.jetbrains.com/intellij-repository"
+    downloadSources Boolean.valueOf(downloadIdeSources)
+    intellijRepo "https://www.jetbrains.com/intellij-repository"
 }
 
 publishPlugin {
@@ -56,35 +58,36 @@ patchPluginXml {
     untilBuild "${project.untilBuild}"
 }
 
-sourceCompatibility = javaVersion
-targetCompatibility = sourceCompatibility
-compileKotlin { kotlinOptions.jvmTarget = sourceCompatibility }
-compileTestKotlin { kotlinOptions.jvmTarget = sourceCompatibility }
+compileKotlin {
+  kotlinOptions {
+    jvmTarget = "1.8"
+  }
+}
+
+compileTestKotlin {
+  kotlinOptions {
+    jvmTarget = "1.8"
+  }
+}
 
 repositories {
     mavenCentral()
 }
                        
 dependencies {
-//    testImplementation 'io.cucumber:cucumber-java:4.2.6'
-//    testImplementation 'io.cucumber:cucumber-junit:4.2.6'
-    testImplementation 'info.cukes:cucumber-java:1.2.4'
-    testImplementation 'info.cukes:cucumber-junit:1.2.4'
+    testImplementation 'io.cucumber:cucumber-java:5.6.0'
+    testImplementation 'io.cucumber:cucumber-junit:5.6.0'
 }
 
 task cucumber() {
     dependsOn assemble, compileTestKotlin
     doLast {
         javaexec {
-            main = "cucumber.api.cli.Main"
+            main = "io.cucumber.core.cli.Main"
 
             classpath =  project.sourceSets.test.runtimeClasspath
 
-            // for cucumber 4.2.6: remove old version from classpath, it is there from idea platform dependency
-//            classpath =  project.sourceSets.test.runtimeClasspath.filter {
-//                 it.parentFile.name != "lib" || !it.name.startsWith("cucumber-")
-//            }
-            args = ['--plugin', 'pretty', '--glue', 'com.jetbrains.snakecharm.cucumber', 'src/test/resources']
+            args = ['--plugin', 'pretty', '--glue', 'features.glue', 'src/test/resources']
         }
     }
 }
@@ -95,15 +98,13 @@ test {
         junitXml.enabled = true
         html.enabled = false
     }
+
     include '**/*Test.class'
-    //exclude '**/AllCucumberFeaturesTest.class'
-    classpath = project.sourceSets.test.runtimeClasspath.filter {
-        it.parentFile.name != "lib" || !it.name.startsWith("cucumber-")
-    }
+    // exclude '**/AllCucumberFeaturesTest.class'  // Uncomment to disable gradle tests
 
 }
 
 wrapper {
-    gradleVersion = '5.4'
-    distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
+    gradleVersion = '6.2.1'
+    distributionUrl = "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }

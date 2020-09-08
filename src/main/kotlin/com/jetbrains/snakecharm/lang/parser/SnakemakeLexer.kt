@@ -14,8 +14,6 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
  * @date 2018-12-31
  */
 class SnakemakeLexer : PythonIndentingLexer() {
-    private val recoveryTokens = PythonDialectsTokenSetProvider.INSTANCE.unbalancedBracesRecoveryTokens
-
     // number of spaces between line start and the first non-whitespace token on the line
     private var myCurrentNewlineIndent = 0
     // end offset of the last line break before the first non-whitespace token on the line,
@@ -77,20 +75,22 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 .build()!!
 
         val KEYWORDS = ImmutableMap.Builder<String, PyElementType>()
-                .put(SnakemakeNames.RULE_KEYWORD, SnakemakeTokenTypes.RULE_KEYWORD)
-                .put(SnakemakeNames.CHECKPOINT_KEYWORD, SnakemakeTokenTypes.CHECKPOINT_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD, SnakemakeTokenTypes.WORKFLOW_CONFIGFILE_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_REPORT_KEYWORD, SnakemakeTokenTypes.WORKFLOW_REPORT_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD, SnakemakeTokenTypes.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_SINGULARITY_KEYWORD, SnakemakeTokenTypes.WORKFLOW_SINGULARITY_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD, SnakemakeTokenTypes.WORKFLOW_INCLUDE_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD, SnakemakeTokenTypes.WORKFLOW_WORKDIR_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_LOCALRULES_KEYWORD, SnakemakeTokenTypes.WORKFLOW_LOCALRULES_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_RULEORDER_KEYWORD, SnakemakeTokenTypes.WORKFLOW_RULEORDER_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_ONSUCCESS_KEYWORD, SnakemakeTokenTypes.WORKFLOW_ONSUCCESS_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD, SnakemakeTokenTypes.WORKFLOW_ONERROR_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_ONSTART_KEYWORD, SnakemakeTokenTypes.WORKFLOW_ONSTART_KEYWORD)
-                .put(SnakemakeNames.SUBWORKFLOW_KEYWORD, SnakemakeTokenTypes.SUBWORKFLOW_KEYWORD)
+                .put(SnakemakeNames.RULE_KEYWORD, SmkTokenTypes.RULE_KEYWORD)
+                .put(SnakemakeNames.CHECKPOINT_KEYWORD, SmkTokenTypes.CHECKPOINT_KEYWORD)
+                .put(SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD, SmkTokenTypes.WORKFLOW_CONFIGFILE_KEYWORD)
+                .put(SnakemakeNames.WORKFLOW_REPORT_KEYWORD, SmkTokenTypes.WORKFLOW_REPORT_KEYWORD)
+                .put(SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD, SmkTokenTypes.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD)
+                .put(SnakemakeNames.WORKFLOW_SINGULARITY_KEYWORD, SmkTokenTypes.WORKFLOW_SINGULARITY_KEYWORD)
+                .put(SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD, SmkTokenTypes.WORKFLOW_INCLUDE_KEYWORD)
+                .put(SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD, SmkTokenTypes.WORKFLOW_WORKDIR_KEYWORD)
+                .put(SnakemakeNames.WORKFLOW_ENVVARS_KEYWORD, SmkTokenTypes.WORKFLOW_ENVVARS_KEYWORD)
+                .put(SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD, SmkTokenTypes.WORKFLOW_CONTAINER_KEYWORD)
+                .put(SnakemakeNames.WORKFLOW_LOCALRULES_KEYWORD, SmkTokenTypes.WORKFLOW_LOCALRULES_KEYWORD)
+                .put(SnakemakeNames.WORKFLOW_RULEORDER_KEYWORD, SmkTokenTypes.WORKFLOW_RULEORDER_KEYWORD)
+                .put(SnakemakeNames.WORKFLOW_ONSUCCESS_KEYWORD, SmkTokenTypes.WORKFLOW_ONSUCCESS_KEYWORD)
+                .put(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD, SmkTokenTypes.WORKFLOW_ONERROR_KEYWORD)
+                .put(SnakemakeNames.WORKFLOW_ONSTART_KEYWORD, SmkTokenTypes.WORKFLOW_ONSTART_KEYWORD)
+                .put(SnakemakeNames.SUBWORKFLOW_KEYWORD, SmkTokenTypes.SUBWORKFLOW_KEYWORD)
                 .build()!!
 
         val KEYWORDS_2_TEXT = KEYWORDS.map { it.value to it.key }.toMap()
@@ -174,6 +174,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 if (text[i] == ' ') {
                     spaces++
                 } else if (text[i] == '\t') {
+                    // Size 8 is used in com.jetbrains.python.lexer.PythonIndentingProcessor.advance()
+                    // AFAIU is default continuation indent
                     spaces += 8
                 }
             }
@@ -206,6 +208,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 isInPythonSection = false
             }
         } else if (atToken(PyTokenTypes.TAB)) {
+            // Size 8 is used in com.jetbrains.python.lexer.PythonIndentingProcessor.advance()
+            // AFAIU is default continuation indent
             myCurrentNewlineIndent += 8
         }
 
@@ -232,6 +236,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
             tokenType in PyTokenTypes.OPEN_BRACES -> myBraceLevel++
             tokenType in PyTokenTypes.CLOSE_BRACES -> myBraceLevel--
             myBraceLevel != 0 -> {
+                 val recoveryTokens = PythonDialectsTokenSetProvider.getInstance().unbalancedBracesRecoveryTokens
+
                 val leftPreviousSection = myCurrentNewlineIndent <= ruleLikeSectionIndent ||
                         ruleLikeSectionIndent == -1 && myCurrentNewlineIndent <= topLevelSectionIndent
                 val isInPythonCode = isInPythonSection || topLevelSectionIndent == -1
@@ -271,7 +277,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         advanceBase()
         // is currently the last word in the file or is followed by a colon or a whitespace, an identifier and a colon
         var isToplevelSection = (tokenType == PyTokenTypes.COLON || tokenType == null) &&
-                (previousToken == null || previousToken == PyTokenTypes.LINE_BREAK)
+                (previousToken == null || previousToken == PyTokenTypes.LINE_BREAK || previousToken == PyTokenTypes.INDENT)
 
         if (isToplevelSection && possibleToplevelSectionKeyword !in RULE_LIKE_KEYWORDS) {
             restore(possibleKeywordPosition)
@@ -301,6 +307,11 @@ class SnakemakeLexer : PythonIndentingLexer() {
         return isToplevelSection
     }
 
+    // TODO: it seems restore not always work ok, may be also resore some part of our complicated state?
+    //override fun restore(position: LexerPosition) {
+    //    super.restore(position)
+    //}
+
     override fun processLineBreak(startPos: Int) {
         if ((ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections)
                 && !isInPythonSection && !beforeFirstArgumentInSection) {
@@ -315,7 +326,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             val isAtComment = atBaseToken(commentTokenType)
             restore(indentPos)
             if (isAtComment) {
-                processComments()
+                processComments(startPos)
                 return
             }
             myLineHasSignificantTokens = hasSignificantTokens
@@ -378,14 +389,15 @@ class SnakemakeLexer : PythonIndentingLexer() {
     }
 
     // consumes comments and line breaks and processes the next line depending on the current section
-    private fun processComments() {
+    private fun processComments(startPos: Int) {
+        var currentLineBreakStart = startPos
         while (atBaseToken(PyTokenTypes.LINE_BREAK)) {
             val linebreakPosition = currentPosition
             val hasSignificantTokens = myLineHasSignificantTokens
             val indent = nextLineIndent
             myLineHasSignificantTokens = hasSignificantTokens
             restore(linebreakPosition)
-            processInsignificantLineBreak(baseTokenStart, false)
+            processInsignificantLineBreak(currentLineBreakStart, false)
             if (atBaseToken(commentTokenType)) {
                 if (linebreakBeforeFirstComment == -1) {
                     linebreakBeforeFirstComment = myTokenQueue.size - 1
@@ -396,6 +408,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 restore(linebreakPosition)
                 break
             }
+            currentLineBreakStart = baseTokenStart
         }
 
         val position = currentPosition

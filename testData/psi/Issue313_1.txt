@@ -1,0 +1,58 @@
+SnakemakeFile: Issue313_1.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('rule_313')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: dd
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"dd"')
+  PsiWhiteSpace('\n\n')
+  PsiComment(Py:END_OF_LINE_COMMENT)('# noinspection SmkRuleRedeclaration')
+  PsiWhiteSpace('\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('rule_313')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: dd
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"dd"')
+      PsiWhiteSpace('\n    ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# noinspection SmkSectionMultilineStringArgs')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PyStringLiteralExpression: iiiiiiii
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"iiii"')
+            PsiWhiteSpace('\n        ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"iiii"')
+      PsiWhiteSpace('\n\n    ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# XXX: suppressed here !!!!!')
+      PsiWhiteSpace('\n    ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# noinspection SmkSectionMultilineStringArgs')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('log')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PyStringLiteralExpression: llllllllll
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"lllll"')
+            PsiWhiteSpace('\n        ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"lllll"')

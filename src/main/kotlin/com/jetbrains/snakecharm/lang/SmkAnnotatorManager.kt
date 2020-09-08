@@ -6,6 +6,7 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.psi.PsiElement
 import com.jetbrains.python.validation.PyAnnotator
 import com.jetbrains.snakecharm.lang.highlighter.SmkSyntaxAnnotator
+import com.jetbrains.snakecharm.lang.highlighter.SmkWildcardsAnnotator
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.validation.SmkReturnAnnotator
 import com.jetbrains.snakecharm.lang.validation.SmkSyntaxErrorAnnotator
@@ -44,6 +45,7 @@ class SmkStandardAnnotatorManager : SmkAnnotatorManager() {
 class SmkDumbAwareAnnotatorManager : SmkAnnotatorManager(), DumbAware {
     override val annotators = listOf(
             SmkSyntaxAnnotator,
-            SmkSyntaxErrorAnnotator
+            SmkSyntaxErrorAnnotator,
+            SmkWildcardsAnnotator
     )
 }

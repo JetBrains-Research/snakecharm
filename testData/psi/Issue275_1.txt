@@ -1,0 +1,24 @@
+SnakemakeFile: Issue275_1.smk
+  PyIfStatement
+    PyIfPartIf
+      PsiElement(Py:IF_KEYWORD)('if')
+      PsiWhiteSpace(' ')
+      PyBoolLiteralExpression
+        PsiElement(Py:TRUE_KEYWORD)('True')
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      PyStatementList
+        SmkRule
+          PsiElement(Py:RULE_KEYWORD)('rule')
+          PsiElement(Py:COLON)(':')
+          PyStatementList
+            PsiWhiteSpace('\n        ')
+            SmkRuleOrCheckpointArgsSection
+              PsiElement(Py:IDENTIFIER)('shell')
+              PyArgumentList
+                PsiElement(Py:COLON)(':')
+                PsiWhiteSpace(' ')
+                PyStringLiteralExpression: 23
+                  PsiElement(Py:SINGLE_QUOTED_STRING)('"2"')
+                  PsiWhiteSpace('\n               ')
+                  PsiElement(Py:SINGLE_QUOTED_STRING)('"3"')

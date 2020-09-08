@@ -8,10 +8,13 @@ import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
+import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil.RATE_IMPLICIT_SYMBOLS
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
-import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_JOBID
+import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_RULE
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_THREADS
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
     override fun resolveName(
@@ -19,33 +22,53 @@ class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
             context: TypeEvalContext
     ): List<RatedResolveResult> {
         if (SnakemakeLanguageDialect.isInsideSmkFile(context.origin)) {
+
+            val contextScope = SmkCodeInsightScope[element]
+            val referencedName = element.referencedName
+            val items = arrayListOf<RatedResolveResult>()
+
+            if (contextScope == SmkCodeInsightScope.RULELIKE_RUN_SECTION) {
+                val ruleOrCheckpoint = PsiTreeUtil.getParentOfType(element, SmkRuleOrCheckpoint::class.java)!!
+
+                when (referencedName) {
+                    SMK_VARS_WILDCARDS -> {
+                        items.add(RatedResolveResult(RATE_IMPLICIT_SYMBOLS, ruleOrCheckpoint.wildcardsElement))
+                    }
+
+                    SECTION_THREADS -> {
+                        val threadsSection = ruleOrCheckpoint.getSectionByName(SECTION_THREADS)
+
+                        items.add(
+                                RatedResolveResult(
+                                    RATE_IMPLICIT_SYMBOLS, threadsSection ?: ruleOrCheckpoint)
+                        )
+                    }
+
+                    RUN_SECTION_VARIABLE_RULE -> {
+                        items.add(RatedResolveResult(RATE_IMPLICIT_SYMBOLS, ruleOrCheckpoint))
+                    }
+
+                    RUN_SECTION_VARIABLE_JOBID -> {
+                        items.add(RatedResolveResult(RATE_IMPLICIT_SYMBOLS, null))
+                    }
+                }
+            }
+
             val module = ModuleUtilCore.findModuleForPsiElement(element)
             if (module != null) {
-                val contextScope = SmkCodeInsightScope[element]
                 val cache = ImplicitPySymbolsProvider.instance(module).cache
 
-                val items = SmkCodeInsightScope.values().asSequence()
+                SmkCodeInsightScope.values().asSequence()
                         .filter { symbolScope -> contextScope.includes(symbolScope) }
                         .flatMap { symbolScope -> cache.filter(symbolScope, element.name!!).asSequence() }
                         .map {
-                            RatedResolveResult(SmkResolveUtil.IMPLICIT_SYMBOLS_PRIORITY, it.psiDeclaration)
-                        }.toMutableList()
+                            RatedResolveResult(RATE_IMPLICIT_SYMBOLS, it.psiDeclaration)
+                        }.forEach {
+                            items.add(it)
 
-                if (contextScope == SmkCodeInsightScope.RULELIKE_RUN_SECTION) {
-                    if (element.referencedName == SnakemakeNames.SECTION_THREADS) {
-                        val ruleOrCheckpoint = PsiTreeUtil.getParentOfType(
-                                element, SmkRuleOrCheckpoint::class.java
-                        )!!
-
-                        val threadsSection = ruleOrCheckpoint.statementList.statements.asSequence()
-                                .filterIsInstance<SmkRuleOrCheckpointArgsSection>()
-                                .filter { it.name == SnakemakeNames.SECTION_THREADS }.firstOrNull()
-
-                         items.add(RatedResolveResult(SmkResolveUtil.IMPLICIT_SYMBOLS_PRIORITY, threadsSection ?: ruleOrCheckpoint))
-                    }
-                }
-                return items
+                        }
             }
+            return items
         }
         return emptyList()
     }

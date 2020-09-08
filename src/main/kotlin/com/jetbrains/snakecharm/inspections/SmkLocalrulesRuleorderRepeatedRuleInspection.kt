@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
-import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -25,12 +24,12 @@ class SmkLocalrulesRuleorderRepeatedRuleInspection  : SnakemakeInspection() {
 
         private fun checkArgumentRepetition(argumentList: PyArgumentList?) {
             val ruleNames = mutableSetOf<String>()
-            argumentList?.arguments?.forEach {
-                val name = it.name ?: return
+            argumentList?.arguments?.forEach { expr ->
+                val name = expr.name ?: return
                 if (!ruleNames.add(name)) {
-                    registerProblem(it,
-                            SnakemakeBundle.message("INSP.NAME.localrules.ruleorder.repeated.rule"),
-                            ProblemHighlightType.WEAK_WARNING)
+                    registerProblem(
+                            expr,
+                            SnakemakeBundle.message("INSP.NAME.localrules.ruleorder.repeated.rule"))
                 }
             }
         }

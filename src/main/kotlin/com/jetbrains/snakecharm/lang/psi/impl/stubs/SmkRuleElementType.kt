@@ -8,7 +8,7 @@ import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex.Companion.KEY
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleStub
 
 class SmkRuleElementType
-    : SmkRuleLikeElementType<SmkRuleStub, SmkRule>("SMK_RULE_DECLARATION_STATEMENT", KEY){
+    : SmkRuleLikeElementType<SmkRuleStub, SmkRule>("SMK_RULE_DECLARATION_STATEMENT", KEY) {
 
     override fun createPsi(stub: SmkRuleStub) = SmkRuleImpl(stub)
 

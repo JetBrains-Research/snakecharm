@@ -1,13 +1,12 @@
 package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
-import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiReference
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes
 import com.jetbrains.snakecharm.lang.psi.*
 
 /**
@@ -30,18 +29,33 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
     }
 
     override fun getSectionKeywordNode()= node
-            .findChildByType(SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
+            .findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
 
     override fun getPresentation() = getPresentation(this)
     override fun getIcon(flags: Int) = getIcon(this, flags)
 
-    private fun createReference(textRange: TextRange, path: String) =
-            when (keywordName) {
-                SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD -> SmkConfigfileReference(this, textRange, path)
-                SnakemakeNames.WORKFLOW_REPORT_KEYWORD -> SmkReportReference(this, textRange, path)
-                SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD -> SmkWorkDirReference(this, textRange, path)
-                else -> SmkIncludeReference(this, textRange, path)
+    private fun createReference(strExpr: PyStringLiteralExpression): SmkFileReference {
+        val offsetInParent = keywordName!!.length + strExpr.startOffsetInParent
+        val textRange = SmkPsiUtil.getReferenceRange(strExpr).shiftRight(offsetInParent)
+        val path = strExpr.stringValue
+
+        return when (keywordName) {
+            SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD -> {
+                SmkConfigfileReference(
+                        this, textRange, strExpr, path
+                )
             }
+            SnakemakeNames.WORKFLOW_REPORT_KEYWORD -> SmkReportReference(
+                    this, textRange, strExpr, path
+            )
+            SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD -> SmkWorkDirReference(
+                    this, textRange, strExpr, path
+            )
+            else -> SmkIncludeReference(
+                    this, textRange, strExpr, path
+            )
+        }
+    }
 
     override fun getReferences(): Array<PsiReference> {
         if (keywordName !in WORKFLOWS_WITH_FILE_REFERENCES) {
@@ -51,17 +65,11 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
         val stringLiteralArgs =
                 argumentList?.arguments?.filterIsInstance<PyStringLiteralExpression>() ?: return emptyArray()
 
-        return stringLiteralArgs.map {
-            val offsetInParent = keywordName!!.length + it.startOffsetInParent
-            createReference(
-                    SmkPsiUtil.getReferenceRange(it).shiftRight(offsetInParent),
-                    it.stringValue
-            )
-        }.toTypedArray()
+        return stringLiteralArgs.map { createReference(it) }.toTypedArray()
     }
 
     private val keywordName: String?
         get() = getKeywordNode()?.text
 
-    private fun getKeywordNode() = node.findChildByType(SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
+    private fun getKeywordNode() = node.findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
 }

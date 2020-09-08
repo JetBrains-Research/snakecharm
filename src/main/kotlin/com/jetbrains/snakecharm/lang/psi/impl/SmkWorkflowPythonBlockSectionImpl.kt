@@ -6,7 +6,7 @@ import com.jetbrains.python.documentation.docstrings.DocStringUtil
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.python.psi.impl.PyElementImpl
-import com.jetbrains.snakecharm.lang.parser.SnakemakeTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_PYTHON_BLOCK_PARAMETER_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkWorkflowPythonBlockSection
 import com.jetbrains.snakecharm.lang.psi.getIcon

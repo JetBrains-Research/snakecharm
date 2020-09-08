@@ -1,10 +1,13 @@
 package com.jetbrains.snakecharm.lang.psi
 
-import com.intellij.psi.PsiElement
 import com.jetbrains.python.psi.PyTypedElement
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
+import com.jetbrains.snakecharm.lang.psi.impl.SmkWildcardFakePsiElement
 
-interface SmkRuleOrCheckpoint : SmkRuleLike<SmkRuleOrCheckpointArgsSection>, PyTypedElement {
-    fun collectWildcards(): List<Pair<PsiElement, String>>
+interface SmkRuleOrCheckpoint : SmkRuleLike<SmkRuleOrCheckpointArgsSection>,
+        //consider PyQualifiedNameOwner,
+        PyTypedElement {
+    val wildcardsElement: SmkWildcardFakePsiElement
 
     /**
      * Snakemake wildcards can be defined by 3 sections.
@@ -15,6 +18,6 @@ interface SmkRuleOrCheckpoint : SmkRuleLike<SmkRuleOrCheckpointArgsSection>, PyT
     fun getWildcardDefiningSection() =
         statementList.statements
                 .filterIsInstance<SmkRuleOrCheckpointArgsSection>()
-                .filter { it.sectionKeyword in SmkRuleOrCheckpointArgsSection.SECTIONS_DEFINING_WILDCARDS }
-                .minBy { SmkRuleOrCheckpointArgsSection.SECTIONS_DEFINING_WILDCARDS.indexOf(it.sectionKeyword) }
+                .filter { it.isWildcardsDefiningSection() }
+                .minBy { WILDCARDS_DEFINING_SECTIONS_KEYWORDS.indexOf(it.sectionKeyword) }
 }

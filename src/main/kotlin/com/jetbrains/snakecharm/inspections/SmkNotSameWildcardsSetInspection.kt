@@ -1,9 +1,10 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
+import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.openapi.util.Ref
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
@@ -21,44 +22,69 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
         }
 
         fun processRuleOrCheckpointLike(ruleOrCheckpoint: SmkRuleOrCheckpoint) {
-            var wildcards: List<String>? = null
+            var wildcardsRef: Ref<List<String>?>? = null
 
             ruleOrCheckpoint.getSections().forEach { section ->
-                if (section !is SmkRuleOrCheckpointArgsSection) {
+                if (section !is SmkRuleOrCheckpointArgsSection || !section.isWildcardsDefiningSection()) {
                     return@forEach
                 }
 
-                // consider non-output wildcards defining sections:
-                val sectionKeyword = section.sectionKeyword
-                if (sectionKeyword == SnakemakeNames.SECTION_OUTPUT ||
-                        sectionKeyword !in SmkRuleOrCheckpointArgsSection.SECTIONS_DEFINING_WILDCARDS) {
-                    return@forEach
+                if (wildcardsRef == null) {
+                    // Cannot do via types, we'd like to have wildcards only from
+                    // defining sections and ensure that defining sections could be parsed
+                    val collector = SmkWildcardsCollector(
+                            visitDefiningSections = true,
+                            visitExpandingSections = false
+                    )
+                    ruleOrCheckpoint.accept(collector)
+                    wildcardsRef = Ref.create(collector.getWildcardsNames())
                 }
 
-                if (wildcards == null) {
-                    wildcards = ruleOrCheckpoint.collectWildcards().map { it.second }
+                val wildcards = wildcardsRef!!.get()
+                if (wildcards != null) {
+                    // show warnings only if wildcards defined
+                    processSection(section, wildcards)
                 }
-
-                processSection(section, wildcards!!)
             }
         }
 
-        private fun processSection(section: SmkRuleOrCheckpointArgsSection, ruleWildcards: List<String>) {
-
+        private fun processSection(
+                section: SmkRuleOrCheckpointArgsSection,
+                wildcards: List<String>
+        ) {
             val sectionArgs = section.argumentList?.arguments ?: return
             sectionArgs.forEach { arg ->
-                val argWildcards = SmkWildcardsCollector().also {
-                    arg.accept(it)
-                }.getWildcards().asSequence().map { it.second }.distinct().toList()
+                // collect wildcards in section arguments:
+                val collector = SmkWildcardsCollector(
+                        visitDefiningSections = false,
+                        visitExpandingSections = false
+                )
+                arg.accept(collector)
+                val argWildcards = collector.getWildcardsNames()
 
-                val missingWildcards = ruleWildcards.filter { it !in argWildcards }
-                if (missingWildcards.isNotEmpty()) {
-                    registerProblem(
+                if (argWildcards != null) {
+                    // if wildcards defined for args section
+                    val missingWildcards = wildcards.filter { it !in argWildcards }
+                    if (missingWildcards.isNotEmpty()) {
+                        registerProblem(
+                                arg,
+                                SnakemakeBundle.message(
+                                        "INSP.NAME.not.same.wildcards.set",
+                                        missingWildcards.sorted().joinToString() { "'$it'"}
+                                )
+                        )
+                    }
+                } else {
+                    if (wildcards.isNotEmpty()) {
+                        // no injections, cannot check
+                        registerProblem(
                             arg,
                             SnakemakeBundle.message(
-                                    "INSP.NAME.not.same.wildcards.set", missingWildcards.joinToString()
-                            )
-                    )
+                                "INSP.NAME.not.same.wildcards.set.cannot.check"
+                            ),
+                            ProblemHighlightType.WEAK_WARNING
+                        )
+                    }
                 }
             }
         }

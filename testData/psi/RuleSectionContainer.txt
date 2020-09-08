@@ -1,0 +1,23 @@
+SnakemakeFile: RuleSectionContainer.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('container')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: docker://joseespinosa/docker-r-ggplot2
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"docker://joseespinosa/docker-r-ggplot2"')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('script')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PyStringLiteralExpression: foo.R
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"foo.R"')

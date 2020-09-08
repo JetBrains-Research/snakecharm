@@ -8,8 +8,6 @@ object SnakemakeNames {
     const val RULE_KEYWORD = "rule"
     const val CHECKPOINT_KEYWORD = "checkpoint"
 
-    const val SUBWORKFLOW_KEYWORD = "subworkflow"
-
     const val WORKFLOW_CONFIGFILE_KEYWORD = "configfile"
     const val WORKFLOW_REPORT_KEYWORD = "report"
     const val WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD = "wildcard_constraints"
@@ -24,6 +22,14 @@ object SnakemakeNames {
     const val WORKFLOW_ONSUCCESS_KEYWORD = "onsuccess"
     const val WORKFLOW_ONERROR_KEYWORD = "onerror"
     const val WORKFLOW_ONSTART_KEYWORD = "onstart"
+
+    const val SUBWORKFLOW_KEYWORD = "subworkflow"
+    const val SUBWORKFLOW_WORKDIR_KEYWORD  = WORKFLOW_WORKDIR_KEYWORD
+    const val SUBWORKFLOW_CONFIGFILE_KEYWORD  = WORKFLOW_CONFIGFILE_KEYWORD
+    const val SUBWORKFLOW_SNAKEFILE_KEYWORD = "snakefile"
+
+    const val WORKFLOW_ENVVARS_KEYWORD = "envvars"
+    const val WORKFLOW_CONTAINER_KEYWORD = "container"
 
     const val SECTION_INPUT = "input"
     const val SECTION_OUTPUT = "output"
@@ -45,9 +51,21 @@ object SnakemakeNames {
     const val SECTION_CWL = "cwl"
     const val SECTION_SHADOW = "shadow"
     const val SECTION_RUN = "run"
+    const val SECTION_CACHE = "cache" // >= 5.12.0
+    const val SECTION_CONTAINER = "container"
+    const val SECTION_NOTEBOOK = "notebook"
 
-    const val SMK_VARS_RULES = "rules"
-    const val SMK_VARS_CHECKPOINTS = "checkpoints"
-    const val SMK_VARS_WILDCARDS = "wildcards"
-    const val SMK_VARS_ATTEMPT = "attempt"
+    const val RUN_SECTION_VARIABLE_RULE = "rule"
+    const val RUN_SECTION_VARIABLE_JOBID = "jobid"
+
+    const val SNAKEMAKE_IO_METHOD_ANCIENT = "ancient"
+    const val SNAKEMAKE_IO_METHOD_PROTECTED = "protected"
+    const val SNAKEMAKE_IO_METHOD_DIRECTORY = "directory"
+    const val SNAKEMAKE_IO_METHOD_TEMP = "temp"
+    const val SNAKEMAKE_IO_METHOD_REPORT = "report"
+    const val SNAKEMAKE_IO_METHOD_TOUCH = "touch"
+    const val SNAKEMAKE_IO_METHOD_PIPE = "pipe"
+    const val SNAKEMAKE_IO_METHOD_REPEAT = "repeat"
+    const val SNAKEMAKE_IO_METHOD_UNPACK = "unpack"
+    const val SNAKEMAKE_IO_METHOD_DYNAMIC = "dynamic"
 }

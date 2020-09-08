@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.lang.parser
 import com.intellij.lexer.Lexer
 import com.intellij.testFramework.PlatformLiteFixture
 import com.jetbrains.python.PythonDialectsTokenSetContributor
-import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.PythonTokenSetContributor
 import junit.framework.TestCase
 
@@ -16,10 +15,9 @@ import junit.framework.TestCase
 abstract class PyLexerTestCase  : PlatformLiteFixture() {
     override fun setUp() {
         super.setUp()
-
+        initApplication()
         registerExtensionPoint(PythonDialectsTokenSetContributor.EP_NAME, PythonDialectsTokenSetContributor::class.java)
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
-        PythonDialectsTokenSetProvider.reset()
     }
 
     fun doLexerTest(text: String, lexer: Lexer, vararg expectedTokens: String) {
@@ -37,7 +35,7 @@ abstract class PyLexerTestCase  : PlatformLiteFixture() {
             if (idx >= expectedTokens.size) {
                 val remainingTokens = StringBuilder()
                 while (lexer.tokenType != null) {
-                    if (remainingTokens.length != 0) {
+                    if (remainingTokens.isNotEmpty()) {
                         remainingTokens.append(", ")
                     }
                     remainingTokens.append("\"").append(if (checkTokenText) lexer.tokenText else lexer.tokenType!!.toString()).append("\"")
@@ -45,7 +43,12 @@ abstract class PyLexerTestCase  : PlatformLiteFixture() {
                 }
                 TestCase.fail("Too many tokens. Following tokens: " + remainingTokens.toString())
             }
-            TestCase.assertEquals("Token offset mismatch at position $idx", tokenPos, lexer.tokenStart)
+            TestCase.assertEquals(
+                "Token offset mismatch at lexeme $idx ${expectedTokens[idx]}, " +
+                        "tokenText: <${lexer.tokenText}>; tokenType: ${lexer.tokenType};" +
+                        " prev token end: ${tokenPos}; current token start: ${lexer.tokenStart}",
+                tokenPos,  lexer.tokenStart
+            )
             val tokenName = if (checkTokenText) lexer.tokenText else lexer.tokenType!!.toString()
             TestCase.assertEquals("Token mismatch at position $idx", expectedTokens[idx], tokenName)
             idx++

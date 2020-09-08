@@ -16,8 +16,6 @@
 package com.jetbrains.python.fixtures
 
 import com.intellij.openapi.application.PathManager
-import com.intellij.openapi.module.ModuleType
-import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -25,9 +23,7 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightProjectDescriptor
 import com.jetbrains.python.PythonMockSdk
-import com.jetbrains.python.PythonModuleTypeBase
 import java.nio.file.Path
-import java.nio.file.Paths
 
 /**
  * Project descriptor (extracted from [com.jetbrains.python.fixtures.PyTestCase]) and should be used with it.
@@ -47,13 +43,7 @@ class PyLightProjectDescriptor(
                 .map { VfsUtil.findFile(it, true)!! }
                 .toTypedArray()
 
-    override fun getModuleType(): ModuleType<*> {
-        return PythonModuleTypeBase.getInstance()
-    }
-
-    override fun getSdk(): Sdk? {
-        return PythonMockSdk.create(testDataRoot, myPythonVersion, *additionalRoots)
-    }
+    override fun getSdk() = PythonMockSdk.create(testDataRoot, myPythonVersion, *additionalRoots)
 
     protected fun createLibrary(model: ModifiableRootModel, name: String, path: String) {
         val modifiableModel = model.moduleLibraryTable.createLibrary(name).modifiableModel

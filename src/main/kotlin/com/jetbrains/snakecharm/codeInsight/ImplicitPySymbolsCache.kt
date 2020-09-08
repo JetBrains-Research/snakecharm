@@ -15,6 +15,11 @@ interface ImplicitPySymbolsCache {
             .filter { symbol -> symbol.identifier == name }
             .toList()
 
+    fun contains(smkScope: SmkCodeInsightScope, name: String) = this[smkScope]
+            .asSequence()
+            .any { symbol -> symbol.identifier == name }
+
+
     companion object {
         fun emptyCache() = object : ImplicitPySymbolsCache {
             override val contentVersion = 0
@@ -26,5 +31,10 @@ interface ImplicitPySymbolsCache {
 data class ImplicitPySymbol(
         val identifier: String,
         val psiDeclaration: PyElement,
-        val scope: SmkCodeInsightScope
+        val scope: SmkCodeInsightScope,
+        val usageType: ImplicitPySymbolUsageType
 )
+enum class ImplicitPySymbolUsageType {
+    VARIABLE,
+    METHOD,
+}

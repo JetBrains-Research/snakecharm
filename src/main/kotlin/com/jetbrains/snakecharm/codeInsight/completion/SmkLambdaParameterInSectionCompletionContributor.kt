@@ -12,7 +12,8 @@ import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.python.psi.PyParameterList
-import com.jetbrains.snakecharm.inspections.SmkLambdaRuleParamsInspection
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_OR_CALLABLE_ARGS
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
@@ -48,14 +49,14 @@ object SMKLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
             SnakemakeNames.SECTION_INPUT, SnakemakeNames.SECTION_GROUP -> {
                 result.addElement(
                         TailTypeDecorator.withTail(
-                                LookupElementBuilder.create(SnakemakeNames.SMK_VARS_WILDCARDS)
+                                LookupElementBuilder.create(SnakemakeAPI.SMK_VARS_WILDCARDS)
                                         .withIcon(PlatformIcons.PARAMETER_ICON),
                                 ColonAndWhiteSpaceTail
                         )
                 )
             }
             else -> {
-                val args = SmkLambdaRuleParamsInspection.ALLOWED_LAMBDA_ARGS[sectionName]
+                val args = ALLOWED_LAMBDA_OR_CALLABLE_ARGS[sectionName]
                 if (args != null) {
                     addCompletionResultsForSection(element, args, result)
                 }
@@ -70,11 +71,11 @@ object SMKLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
     ) {
         val lambdaExpression = PsiTreeUtil.getParentOfType(element, PyLambdaExpression::class.java)!!
         val presentParameters = lambdaExpression.parameterList.parameters.map { it.name }
-        if (SnakemakeNames.SMK_VARS_WILDCARDS !in presentParameters) {
+        if (SnakemakeAPI.SMK_VARS_WILDCARDS !in presentParameters) {
             result.addElement(
                     PrioritizedLookupElement.withPriority(
                             LookupElementBuilder
-                                    .create(SnakemakeNames.SMK_VARS_WILDCARDS)
+                                    .create(SnakemakeAPI.SMK_VARS_WILDCARDS)
                                     .withIcon(PlatformIcons.PARAMETER_ICON)
                             , SmkCompletionUtil.WILDCARDS_LAMBDA_PARAMETER_PRIORITY
 
@@ -83,7 +84,7 @@ object SMKLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
         }
 
         val variants = allowedVariants
-                .filterNot { it == SnakemakeNames.SMK_VARS_WILDCARDS }
+                .filterNot { it == SnakemakeAPI.SMK_VARS_WILDCARDS }
                 .filterNot { it in presentParameters }
         if (variants.size == 1) {
             result.addElement(TailTypeDecorator.withTail(

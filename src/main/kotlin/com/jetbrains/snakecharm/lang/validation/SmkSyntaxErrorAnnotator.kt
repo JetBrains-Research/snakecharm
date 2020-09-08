@@ -1,8 +1,10 @@
 package com.jetbrains.snakecharm.lang.validation
 
+import com.intellij.lang.annotation.HighlightSeverity.ERROR
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.python.psi.PyStarArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.inspections.quickfix.IntroduceKeywordArgument
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.*
@@ -25,19 +27,18 @@ object SmkSyntaxErrorAnnotator : SmkAnnotator() {
                             // arg value is nullable, let's take arg text which isn't null
                             seenKeywords2Value[keyword] = arg.text
                         } else {
-                            holder.createErrorAnnotation(
-                                    arg.keywordNode?.textRange!!,
-                                    SnakemakeBundle.message("ANN.keyword.argument.already.provided", keywordValue)
-                            )
+                            holder.newAnnotation(
+                                ERROR,
+                                SnakemakeBundle.message("ANN.keyword.argument.already.provided", keywordValue)
+                            ).range(arg.keywordNode!!).create()
                         }
                     }
                     encounteredKeywordArgument = true
                 }
                 !is PyStarArgument -> if (encounteredKeywordArgument) {
-                    holder.createErrorAnnotation(
-                            arg,
-                            SnakemakeBundle.message("ANN.positional.argument.after.keyword.argument")
-                    ).registerFix(IntroduceKeywordArgument(arg))
+                    holder.newAnnotation(
+                        ERROR, SnakemakeBundle.message("ANN.positional.argument.after.keyword.argument")
+                    ).range(arg).withFix(IntroduceKeywordArgument(arg)).create()
                 }
             }
         }
@@ -52,28 +53,33 @@ object SmkSyntaxErrorAnnotator : SmkAnnotator() {
     }
 
     private fun checkMultipleExecutionSections(ruleOrCheckpoint: SmkRuleOrCheckpoint) {
-        var executionSectionOccurred = false
+        var seenExecutionSection: String? = null
 
         val sections = ruleOrCheckpoint.getSections()
         for (st in sections) {
             when (st) {
                 is SmkRuleOrCheckpointArgsSection -> {
                     val sectionName = st.sectionKeyword
-                    val isExecutionSection = sectionName in SmkRuleOrCheckpointArgsSection.EXECUTION_KEYWORDS
-
-                    if (executionSectionOccurred && isExecutionSection) {
-                        holder.createErrorAnnotation(st, SnakemakeBundle.message("ANN.multiple.execution.sections"))
-                    }
+                    val isExecutionSection = sectionName in EXECUTION_SECTIONS_KEYWORDS
 
                     if (isExecutionSection) {
-                        executionSectionOccurred = true
+                        if (seenExecutionSection != null) {
+                            holder.newAnnotation(
+                                ERROR, SnakemakeBundle.message("ANN.multiple.execution.sections", seenExecutionSection)
+                            ).range(st).create()
+                        } else {
+                            seenExecutionSection = sectionName
+                        }
                     }
                 }
                 is SmkRunSection -> {
-                    if (executionSectionOccurred) {
-                        holder.createErrorAnnotation(st, SnakemakeBundle.message("ANN.multiple.execution.sections"))
+                    if (seenExecutionSection != null) {
+                        holder.newAnnotation(
+                            ERROR, SnakemakeBundle.message("ANN.multiple.execution.sections", seenExecutionSection)
+                        ).range(st).create()
+                    } else {
+                        seenExecutionSection = st.sectionKeyword!!
                     }
-                    executionSectionOccurred = true
                 }
             }
         }

@@ -8,20 +8,22 @@ import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.util.ProcessingContext
 import com.intellij.util.Processors
-import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
+import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
+import gnu.trove.THashSet
 
 
 abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
@@ -43,6 +45,11 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
 
     override fun assertValid(message: String?) {
         // [romeo] Not sure is our type always valid or check whether any element is invalid
+        containingRule?.let {
+            if (!it.isValid) {
+                throw PsiInvalidElementAccessException(it, message)
+            }
+        }
     }
 
     override fun resolveMember(
@@ -55,14 +62,16 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
             return emptyList()
         }
 
-        val results = findAvailableRuleLikeElementByName(location.originalElement, name, indexKey, clazz) { currentFileDeclarations }
+        val results = findAvailableRuleLikeElementByName(
+                location.originalElement, name, indexKey, clazz
+        ) { currentFileDeclarations }
 
         if (results.isEmpty()) {
             return emptyList()
         }
 
         return results.map { element ->
-            RatedResolveResult(RatedResolveResult.RATE_NORMAL, element)
+            RatedResolveResult(SmkResolveUtil.RATE_NORMAL, element)
         }
     }
 
@@ -127,7 +136,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
             val results = mutableListOf<Psi>()
             val project = module.project
             val stubIndex = StubIndex.getInstance()
-            val allKeys = ContainerUtil.newTroveSet<String>()
+            val allKeys = THashSet<String>()
             stubIndex.processAllKeys(
                     indexKey, Processors.cancelableCollectProcessor<String>(allKeys), scope, null
             )

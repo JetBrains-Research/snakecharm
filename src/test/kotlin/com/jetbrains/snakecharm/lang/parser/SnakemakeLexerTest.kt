@@ -1,21 +1,11 @@
 package com.jetbrains.snakecharm.lang.parser
 
-import com.jetbrains.python.PythonDialectsTokenSetContributor
-import com.jetbrains.python.PythonDialectsTokenSetProvider
-import com.jetbrains.snakecharm.lang.SmkTokenSetContributor
-
 /**
  * @author Roman.Chernyatchik
  * @date 2018-12-31
  */
 
 class SnakemakeLexerTest : PyLexerTestCase() {
-    override fun setUp() {
-        super.setUp()
-        registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SmkTokenSetContributor())
-        PythonDialectsTokenSetProvider.reset()
-    }
-
     fun testPythonExprAssignment() {
         doTest(
                 "TRACK = 'hg19.gtf'\n",
@@ -40,6 +30,23 @@ class SnakemakeLexerTest : PyLexerTestCase() {
                 "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
                 "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
                 "Py:STATEMENT_BREAK")
+    }
+
+    fun testContainer() {
+        doTest("""
+            |container:  "ddd":
+            |""".trimMargin().trimStart(),
+            "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK", "Py:STATEMENT_BREAK"
+        )
+    }
+
+    fun testEnvvars() {
+        doTest("""
+            |envvars:
+            |    "SOME_VARIABLE"           
+            |""".trimMargin().trimStart(),
+            "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK", "Py:INDENT", "Py:SINGLE_QUOTED_STRING", "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK", "Py:STATEMENT_BREAK"
+        )
     }
 
     fun testRuleWithParams() {
@@ -196,6 +203,53 @@ class SnakemakeLexerTest : PyLexerTestCase() {
                 "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
                 "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
                 "Py:STATEMENT_BREAK")
+    }
+
+    fun testIssue190() {
+        // https//github.com/JetBrains-Research/snakecharm/issues/190
+        doTest("""
+            |rule all:    
+            |   params:
+            |       extra="--buffer_size 20G"     
+            |       # fooo
+            |""".trimMargin().trimStart()
+            ,
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:EQ", "Py:SINGLE_QUOTED_STRING", "Py:LINE_BREAK", "Py:END_OF_LINE_COMMENT", "Py:LINE_BREAK", "Py:STATEMENT_BREAK"
+        )
+    }
+
+    fun testIssue275_1() {
+        doTest(
+            """
+            |if True:
+            |   rule:
+            |       shell: "2"
+            |              "3"
+            |""".trimMargin().trimStart(),
+            "Py:IF_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING", "Py:LINE_BREAK",
+            "Py:SINGLE_QUOTED_STRING", "Py:STATEMENT_BREAK",
+            "Py:DEDENT", "Py:DEDENT", "Py:LINE_BREAK", "Py:STATEMENT_BREAK"
+        )
+    }
+    fun testIssue275_2() {
+        doTest("""
+            |if True:
+            |   pass
+            |   rule:
+            |       shell: "2"
+            |              "3"
+            |""".trimMargin().trimStart(),
+            "Py:IF_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:PASS_KEYWORD", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING", "Py:LINE_BREAK",
+            "Py:SINGLE_QUOTED_STRING", "Py:STATEMENT_BREAK",
+            "Py:DEDENT", "Py:DEDENT", "Py:LINE_BREAK", "Py:STATEMENT_BREAK"
+        )
     }
 
     private fun doTest(text: String, vararg expectedTokens: String) {

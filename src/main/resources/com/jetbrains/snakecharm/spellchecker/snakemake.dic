@@ -1,0 +1,16 @@
+localrules
+ruleorder
+checkpoint
+configfile
+workdir
+wildcard_constraints
+singularity
+onsuccess
+onerror
+onstart
+subworkflow
+snakefile
+conda
+cwl
+snakemake
+snakefile

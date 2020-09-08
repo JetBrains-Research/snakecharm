@@ -12,17 +12,17 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyReferenceExpression
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionAfterRulesAndCheckpointsObjectProvider.Companion.IN_SMK_RULES_OR_CHECKPOINTS_OBJECT
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionInLocalRulesAndRuleOrderSectionsProvider.Companion.IN_SMK_LOCALRULES_OR_RULEORDER_RULE_NAME_REFERENCE
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
-import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType.Companion.getVariantsFromIndex
-import com.jetbrains.snakecharm.stringLanguage.SmkSL
+import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
 
 class SmkRulesAndCheckpointsCompletionContributor : CompletionContributor() {
     init {
@@ -55,14 +55,16 @@ private class SmkCompletionInLocalRulesAndRuleOrderSectionsProvider : Completion
             context: ProcessingContext,
             result: CompletionResultSet
     ) {
-        val rules = collectVariantsForElement(parameters.position, isCheckPoint = false)
-        val checkpoints = collectVariantsForElement(parameters.position, isCheckPoint = true)
+        val position = parameters.position
+        val rules = collectVariantsForElement(position, isCheckPoint = false)
+        val checkpoints = collectVariantsForElement(position, isCheckPoint = true)
         val elements = rules + checkpoints
 
-        val section = (PsiTreeUtil.getParentOfType(parameters.position, SmkWorkflowRuleorderSection::class.java)
-                ?: PsiTreeUtil.getParentOfType(parameters.position, SmkWorkflowLocalrulesSection::class.java))
+        val ruleorderSection = PsiTreeUtil.getParentOfType(position, SmkWorkflowRuleorderSection::class.java)
+        val ruleOrderOrLocalRulesSection: SmkArgsSection?
+                = (ruleorderSection ?: PsiTreeUtil.getParentOfType(position, SmkWorkflowLocalrulesSection::class.java))
 
-        val references = section?.argumentList?.arguments
+        val references = ruleOrderOrLocalRulesSection?.argumentList?.arguments
                 ?.filterIsInstance<SmkReferenceExpression>()
                 ?.map { it.name }
 
@@ -84,8 +86,8 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
                         .withParent(
                                 psiElement(PyReferenceExpression::class.java)
                                         .withChild(psiElement().andOr(
-                                                psiElement().withText(SnakemakeNames.SMK_VARS_CHECKPOINTS),
-                                                psiElement().withText(SnakemakeNames.SMK_VARS_RULES)
+                                                psiElement().withText(SnakemakeAPI.SMK_VARS_CHECKPOINTS),
+                                                psiElement().withText(SnakemakeAPI.SMK_VARS_RULES)
                                         ))
                         )
     }
@@ -104,8 +106,8 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
                 ?.parent as? PyReferenceExpression ?: return
 
         val variants = when (rulesOrCheckpointsObject.name) {
-            SnakemakeNames.SMK_VARS_RULES -> collectVariantsForElement(parameters.position, isCheckPoint = false)
-            SnakemakeNames.SMK_VARS_CHECKPOINTS -> collectVariantsForElement(parameters.position, isCheckPoint = true)
+            SnakemakeAPI.SMK_VARS_RULES -> collectVariantsForElement(parameters.position, isCheckPoint = false)
+            SnakemakeAPI.SMK_VARS_CHECKPOINTS -> collectVariantsForElement(parameters.position, isCheckPoint = true)
             else -> return
         }
 
@@ -182,7 +184,7 @@ private fun addVariantsToCompletionResultSet(
     */
     val position = parameters.position
     val originalFile = when {
-        SmkSL.isInsideSmkSLFile(position) -> {
+        SmkSLanguage.isInsideSmkSLFile(position) -> {
             val originalPosition = parameters.originalPosition ?: return
             val languageManager = InjectedLanguageManager.getInstance(position.project)
             languageManager.getTopLevelFile(originalPosition)

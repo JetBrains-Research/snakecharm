@@ -4,7 +4,7 @@ SnakemakeFile: WorkflowRuleorderHangingSeparator.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: rule1
         PsiElement(Py:IDENTIFIER)('rule1')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
@@ -14,12 +14,12 @@ SnakemakeFile: WorkflowRuleorderHangingSeparator.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: rule1
         PsiElement(Py:IDENTIFIER)('rule1')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: rule2
         PsiElement(Py:IDENTIFIER)('rule2')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
@@ -29,12 +29,12 @@ SnakemakeFile: WorkflowRuleorderHangingSeparator.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: rule1
         PsiElement(Py:IDENTIFIER)('rule1')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      SmkReferenceExpression
+      SmkReferenceExpression: rule2
         PsiElement(Py:IDENTIFIER)('rule2')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')

@@ -1,0 +1,24 @@
+FILE
+  SmkSLLanguageElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    SmkSLReferenceExpressionImpl: foo
+      PsiElement(Py:IDENTIFIER)('foo')
+    PsiErrorElement:Unexpected character
+      PsiElement(BAD_CHARACTER)(' ')
+    PsiErrorElement:Unexpected character
+      PsiElement(BAD_CHARACTER)('boo')
+    PsiElement(RBRACE)('}')
+  SmkSLElementImpl(STRING_CONTENT)
+    PsiElement(STRING_CONTENT)('\n')
+  SmkSLLanguageElement(LANGUAGE)
+    PsiElement(LBRACE)('{')
+    SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
+      SmkSLReferenceExpressionImpl: foo1
+        PsiElement(Py:IDENTIFIER)('foo1')
+      PsiElement(LBRACKET)('[')
+      SmkSLSubscriptionKeyExpression: [key]
+        PsiElement(ACCESS_KEY)('key')
+      PsiElement(RBRACKET)(']')
+    PsiErrorElement:Unexpected character
+      PsiElement(BAD_CHARACTER)('foo2')
+    PsiElement(RBRACE)('}')

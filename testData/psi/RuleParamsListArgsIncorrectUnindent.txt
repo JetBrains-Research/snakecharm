@@ -244,5 +244,5 @@ SnakemakeFile: RuleParamsListArgsIncorrectUnindent.smk
             PsiWhiteSpace(' ')
             PyReferenceExpression: arg2
               PsiElement(Py:IDENTIFIER)('arg2')
-          PsiWhiteSpace(' ')
-          PsiComment(Py:END_OF_LINE_COMMENT)('# correct unindent')
+      PsiWhiteSpace(' ')
+      PsiComment(Py:END_OF_LINE_COMMENT)('# correct unindent')

@@ -9,7 +9,7 @@ import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
-import com.jetbrains.snakecharm.stringLanguage.SmkSL
+import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
 
 object SmkPsiUtil {
     fun getIdentifierNode(node: ASTNode): ASTNode? {
@@ -18,7 +18,7 @@ object SmkPsiUtil {
             val error = node.findChildByType(TokenType.ERROR_ELEMENT)
             if (error != null) {
                 // TODO: do we need this? it is like in PyFunction
-                id = error.findChildByType(PythonDialectsTokenSetProvider.INSTANCE.keywordTokens)
+                 id = error.findChildByType(PythonDialectsTokenSetProvider.getInstance().keywordTokens)
             }
         }
         return id
@@ -48,5 +48,5 @@ object SmkPsiUtil {
 
     fun isInsideSnakemakeOrSmkSLFile(foothold: PsiElement?) =
             isInsideFileWithLanguage(foothold, SnakemakeLanguageDialect) ||
-                    isInsideFileWithLanguage(foothold, SmkSL)
+                    isInsideFileWithLanguage(foothold, SmkSLanguage)
 }

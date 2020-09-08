@@ -6,7 +6,7 @@ rule foo1:
   log: "logs/abc.log"
   resources:
       mem_mb=100
-
+  cache: True
   threads: 50
   priority: 50
   version: "1.0"

@@ -28,30 +28,30 @@ class SmkSectionRedeclarationInspection : SnakemakeInspection() {
         private fun visitSMKRuleLike(rule: SmkRuleLike<SmkArgsSection>) {
             val sectionNamesSet = HashSet<String>()
 
-            rule.getSections().forEach {
-                val name = it.name ?: return
+            rule.getSections().forEach { section ->
+                val name = section.name ?: return
+
                 if (sectionNamesSet.contains(name)) {
-                    val sectionElement = it.getSectionKeywordNode()?.psi
-                    val fixes =
-                            arrayOf(
-                                    RemoveSectionQuickFix(),
-                                    if (sectionElement != null) {
-                                        RenameElementWithoutUsagesQuickFix(
-                                                it,
-                                                sectionElement.textRangeInParent.startOffset,
-                                                sectionElement.textRangeInParent.endOffset
-                                        )
-                                    } else {
-                                        null
-                                    }
+                    val fixes: ArrayList<LocalQuickFix> = arrayListOf(
+                        RemoveSectionQuickFix
+                    )
+                    section.getSectionKeywordNode()?.psi?.let { sectionElement ->
+                        fixes.add(
+                            RenameElementWithoutUsagesQuickFix(
+                                section,
+                                sectionElement.textRangeInParent.startOffset,
+                                sectionElement.textRangeInParent.endOffset
                             )
+                        )
+                    }
 
                     registerProblem(
-                            it,
+                            section,
                             SnakemakeBundle.message("INSP.NAME.section.redeclaration.message", name),
+                            // No suitable severity, so is WEAK WARNING in plugin.xml
                             ProblemHighlightType.LIKE_UNUSED_SYMBOL,
                             null,
-                            *fixes
+                            *fixes.toTypedArray()
                     )
                 }
                 sectionNamesSet.add(name)
@@ -59,7 +59,7 @@ class SmkSectionRedeclarationInspection : SnakemakeInspection() {
         }
     }
 
-    private class RemoveSectionQuickFix : LocalQuickFix {
+    private object RemoveSectionQuickFix : LocalQuickFix {
         override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.remove.section.family")
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
