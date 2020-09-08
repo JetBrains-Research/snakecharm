@@ -1,4 +1,6 @@
-Feature: Line mover
+Feature: Statement mover
+  Issue 174
+
   Scenario Outline: Swap rule like toplevel sections
     Given a snakemake project
     Given I open a file "foo1.smk" with text
@@ -69,52 +71,52 @@ Feature: Line mover
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
-    <def>
-        <def_section>: <def_content>
+    def NAME2():
+        n = 1
     <rule_like1> NAME1:
-        <rule_section1>: <content1>
+        <rule_section1>: "file1.txt"
     """
     When I put the caret at <rule_like1> NAME1:
     And I invoke MoveStatementUp action
     Then editor content will be
     """
     <rule_like1> NAME1:
-        <rule_section1>: <content1>
-    <def>
-        <def_section>: <def_content>
+        <rule_section1>: "file1.txt"
+    def NAME2():
+        n = 1
     """
     When I put the caret at <rule_like1> NAME1:
     And I invoke MoveStatementDown action
     Then editor content will be
     """
-    <def>
-        <def_section>: <def_content>
+    def NAME2():
+        n = 1
     <rule_like1> NAME1:
-        <rule_section1>: <content1>
+        <rule_section1>: "file1.txt"
     """
-    When I put the caret at <def>
+    When I put the caret at def NAME2()
     And I invoke MoveStatementDown action
     Then editor content will be
     """
     <rule_like1> NAME1:
-        <rule_section1>: <content1>
-    <def>
-        <def_section>: <def_content>
+        <rule_section1>: "file1.txt"
+    def NAME2():
+        n = 1
     """
-    When I put the caret at <def>
+    When I put the caret at def NAME2()
     And I invoke MoveStatementUp action
     Then editor content will be
     """
-    <def>
-        <def_section>: <def_content>
+    def NAME2():
+        n = 1
     <rule_like1> NAME1:
-        <rule_section1>: <content1>
+        <rule_section1>: "file1.txt"
     """
     Examples:
-      | rule_like1  | def           | rule_section1  | def_section  | content1       | def_content   |
-      | rule        | def NAME2():  | input          | n            | "file1.txt"    | int           |
-      | checkpoint  | def NAME2():  | input          | n            | "file1.txt"    | int           |
-      | subworkflow | def NAME2():  | workdir        | n            | "file1.txt"    | int           |
+      | rule_like1  | rule_section1  |
+      | rule        | input          |
+      | checkpoint  | input          |
+      | subworkflow | workdir        |
 
   Scenario Outline: Swap rule like section and comment
     Given a snakemake project
@@ -154,18 +156,6 @@ Feature: Line mover
       | rule        | input          | ""      |
       | checkpoint  | input          | ""      |
       | subworkflow | workdir        | ""      |
-      | rule        | input          | ""      |
-      | checkpoint  | input          | ""      |
-      | subworkflow | workdir        | ""      |
-      | rule        | input          | ""      |
-      | checkpoint  | input          | ""      |
-      | subworkflow | workdir        | ""      |
-      | rule        | input          | \n""    |
-      | checkpoint  | input          | \n""    |
-      | subworkflow | workdir        | \n""    |
-      | rule        | input          | \n""    |
-      | checkpoint  | input          | \n""    |
-      | subworkflow | workdir        | \n""    |
       | rule        | input          | \n""    |
       | checkpoint  | input          | \n""    |
       | subworkflow | workdir        | \n""    |
@@ -201,18 +191,6 @@ Feature: Line mover
       | rule        | input          | output        | "file.txt"      | "file2.txt"      |
       | checkpoint  | input          | output        | "file.txt"      | "file2.txt"      |
       | subworkflow | workdir        | configfile    | "/"             | "/"              |
-      | rule        | input          | output        | "file.txt"      | "file2.txt"      |
-      | checkpoint  | input          | output        | "file.txt"      | "file2.txt"      |
-      | subworkflow | workdir        | configfile    | "/"             | "/"              |
-      | rule        | input          | output        | "file.txt"      | "file2.txt"      |
-      | checkpoint  | input          | output        | "file.txt"      | "file2.txt"      |
-      | subworkflow | workdir        | configfile    | "/"             | "/"              |
-      | rule        | input          | output        | "file.txt"      | \n"file2.txt"    |
-      | checkpoint  | input          | output        | "file.txt"      | \n"file2.txt"    |
-      | subworkflow | workdir        | configfile    | "/dir"          | \n"/"            |
-      | rule        | input          | output        | "file.txt"      | \n"file2.txt"    |
-      | checkpoint  | input          | output        | "file.txt"      | \n"file2.txt"    |
-      | subworkflow | workdir        | configfile    | "/dir"          | \n"/"            |
       | rule        | input          | output        | "file.txt"      | \n"file2.txt"    |
       | checkpoint  | input          | output        | "file.txt"      | \n"file2.txt"    |
       | subworkflow | workdir        | configfile    | "/dir"          | \n"/"            |
@@ -254,12 +232,7 @@ Feature: Line mover
       | rule        | input          | snakefile            | "file.txt"      | ""                |
       | rule        | input          | configfile           | "file.txt"      | ""                |
       | checkpoint  | input          | config               | "file.txt"      | "d"               |
-      | checkpoint  | input          | workdir              | "file.txt"      | "/d"              |
-      | checkpoint  | input          | include              | "file.txt"      | ""                |
-      | checkpoint  | input          | localrules           | "file.txt"      | NAME1             |
       | checkpoint  | input          | ruleorder            | "file.txt"      | NAME1             |
-      | checkpoint  | input          | snakefile            | "file.txt"      | ""                |
-      | checkpoint  | input          | configfile           | "file.txt"      | ""                |
       | subworkflow | workdir        | config               | "/dir"          | "d"               |
       | subworkflow | workdir        | include              | "/dir"          | ""                |
       | subworkflow | workdir        | localrules           | "/dir"          | NAME1             |
@@ -274,11 +247,6 @@ Feature: Line mover
       | rule        | input          | configfile           | \n"file.txt"    | ""                |
       | checkpoint  | input          | config               | \n"file.txt"    | "d"               |
       | checkpoint  | input          | workdir              | \n"file.txt"    | "/d"              |
-      | checkpoint  | input          | include              | \n"file.txt"    | ""                |
-      | checkpoint  | input          | localrules           | \n"file.txt"    | NAME1             |
-      | checkpoint  | input          | ruleorder            | \n"file.txt"    | NAME1             |
-      | checkpoint  | input          | snakefile            | \n"file.txt"    | ""                |
-      | checkpoint  | input          | configfile           | \n"file.txt"    | ""                |
       | subworkflow | workdir        | config               | \n"/dir"        | "d"               |
       | subworkflow | workdir        | include              | \n"/dir"        | ""                |
       | subworkflow | workdir        | localrules           | \n"/dir"        | NAME1             |
@@ -293,11 +261,6 @@ Feature: Line mover
       | rule        | input          | configfile           | \n"file.txt"\n  | ""                |
       | checkpoint  | input          | config               | \n"file.txt"\n  | "d"               |
       | checkpoint  | input          | workdir              | \n"file.txt"\n  | "/d"              |
-      | checkpoint  | input          | include              | \n"file.txt"\n  | ""                |
-      | checkpoint  | input          | localrules           | \n"file.txt"\n  | NAME1             |
-      | checkpoint  | input          | ruleorder            | \n"file.txt"\n  | NAME1             |
-      | checkpoint  | input          | snakefile            | \n"file.txt"\n  | ""                |
-      | checkpoint  | input          | configfile           | \n"file.txt"\n  | ""                |
       | subworkflow | workdir        | config               | \n"/dir"\n      | "d"               |
       | subworkflow | workdir        | include              | \n"/dir"\n      | ""                |
       | subworkflow | workdir        | localrules           | \n"/dir"\n      | NAME1             |
@@ -309,34 +272,34 @@ Feature: Line mover
     Given I open a file "foo1.smk" with text
     """
     <rule_like> NAME1:
-        <rule_section>: <content>
-    <statement_name>: <statement_content>
+        input: <content>
+    wildcard_constraints: <statement_content>
     """
-    When I put the caret at <statement_name>: <statement_content>
+    When I put the caret at wildcard_constraints: <statement_content>
     And I invoke MoveStatementUp action
     Then editor content will be
     """
     <rule_like> NAME1:
-        <rule_section>: <content>
-        <statement_name>: <statement_content>
+        input: <content>
+        wildcard_constraints: <statement_content>
 
     """
-    When I put the caret at <statement_name>: <statement_content>
+    When I put the caret at wildcard_constraints: <statement_content>
     And I invoke MoveStatementUp action
     Then editor content will be
     """
     <rule_like> NAME1:
-        <statement_name>: <statement_content>
-        <rule_section>: <content>
+        wildcard_constraints: <statement_content>
+        input: <content>
 
     """
     When I put the caret at <statement_content>
     And I invoke MoveStatementUp action
     Then editor content will be
     """
-    <statement_name>: <statement_content>
+    wildcard_constraints: <statement_content>
     <rule_like> NAME1:
-        <rule_section>: <content>
+        input: <content>
 
     """
     When I put the caret at <statement_content>
@@ -345,8 +308,8 @@ Feature: Line mover
     """
 
     <rule_like> NAME1:
-        <statement_name>: <statement_content>
-        <rule_section>: <content>
+        wildcard_constraints: <statement_content>
+        input: <content>
 
     """
     When I put the caret at <statement_content>
@@ -355,8 +318,8 @@ Feature: Line mover
     """
 
     <rule_like> NAME1:
-        <rule_section>: <content>
-        <statement_name>: <statement_content>
+        input: <content>
+        wildcard_constraints: <statement_content>
 
     """
     When I put the caret at <statement_content>
@@ -365,20 +328,20 @@ Feature: Line mover
     """
 
     <rule_like> NAME1:
-        <rule_section>: <content>
-    <statement_name>: <statement_content>
+        input: <content>
+    wildcard_constraints: <statement_content>
 
     """
     Examples:
-      | rule_like   | rule_section | statement_name       | content         | statement_content |
-      | rule        | input        | wildcard_constraints | "file.txt"      | wildcard="/d+1"   |
-      | checkpoint  | input        | wildcard_constraints | "file.txt"      | wildcard="/d+1"   |
-      | rule        | input        | wildcard_constraints | \n"file.txt"    | wildcard="/d+1"   |
-      | checkpoint  | input        | wildcard_constraints | \n"file.txt"    | wildcard="/d+1"   |
-      | rule        | input        | wildcard_constraints | "file.txt"      | \nwildcard="/d+1" |
-      | checkpoint  | input        | wildcard_constraints | "file.txt"      | \nwildcard="/d+1" |
-      | rule        | input        | wildcard_constraints | \n"file.txt"    | \nwildcard="/d+1" |
-      | checkpoint  | input        | wildcard_constraints | \n"file.txt"    | \nwildcard="/d+1" |
+      | rule_like   | content         | statement_content |
+      | rule        | "file.txt"      | wildcard="/d+1"   |
+      | checkpoint  | "file.txt"      | wildcard="/d+1"   |
+      | rule        | \n"file.txt"    | wildcard="/d+1"   |
+      | checkpoint  | \n"file.txt"    | wildcard="/d+1"   |
+      | rule        | "file.txt"      | \nwildcard="/d+1" |
+      | checkpoint  | "file.txt"      | \nwildcard="/d+1" |
+      | rule        | \n"file.txt"    | \nwildcard="/d+1" |
+      | checkpoint  | \n"file.txt"    | \nwildcard="/d+1" |
 
   Scenario Outline: Move section in/out rule doesn't work for rule with one section
     Given a snakemake project
@@ -509,7 +472,7 @@ Feature: Line mover
     Given I open a file "foo1.smk" with text
     """
     <rule_like> NAME1:
-        <rule_section>: <content>
+        input: <content>
         <statement_name>: <statement_content>
     """
     When I put the caret at <statement_name>: <statement_content>
@@ -518,7 +481,7 @@ Feature: Line mover
     """
     <rule_like> NAME1:
         <statement_name>: <statement_content>
-        <rule_section>: <content>
+        input: <content>
 
     """
     When I put the caret at <statement_name>: <statement_content>
@@ -527,7 +490,7 @@ Feature: Line mover
     """
     <rule_like> NAME1:
         <statement_name>: <statement_content>
-        <rule_section>: <content>
+        input: <content>
 
     """
     When I put the caret at <statement_content>
@@ -535,7 +498,7 @@ Feature: Line mover
     Then editor content will be
     """
     <rule_like> NAME1:
-        <rule_section>: <content>
+        input: <content>
         <statement_name>: <statement_content>
 
     """
@@ -544,100 +507,58 @@ Feature: Line mover
     Then editor content will be
     """
     <rule_like> NAME1:
-        <rule_section>: <content>
+        input: <content>
         <statement_name>: <statement_content>
 
     """
     Examples:
-      | rule_like   | rule_section | statement_name       | content         | statement_content |
-      | rule        | input        | input                | "file.txt"      | ""                |
-      | rule        | input        | output               | "file.txt"      | ""                |
-      | rule        | input        | shell                | "file.txt"      | ""                |
-      | rule        | input        | log                  | "file.txt"      | ""                |
-      | rule        | input        | params               | "file.txt"      | ""                |
-      | rule        | input        | resources            | "file.txt"      | ""                |
-      | rule        | input        | version              | "file.txt"      | ""                |
-      | rule        | input        | message              | "file.txt"      | ""                |
-      | rule        | input        | benchmark            | "file.txt"      | ""                |
-      | rule        | input        | priority             | "file.txt"      | ""                |
-      | rule        | input        | wrapper              | "file.txt"      | ""                |
-      | rule        | input        | input                | \n"file.txt"    | ""                |
-      | rule        | input        | output               | \n"file.txt"    | ""                |
-      | rule        | input        | shell                | \n"file.txt"    | ""                |
-      | rule        | input        | log                  | \n"file.txt"    | ""                |
-      | rule        | input        | params               | \n"file.txt"    | ""                |
-      | rule        | input        | resources            | \n"file.txt"    | ""                |
-      | rule        | input        | version              | \n"file.txt"    | ""                |
-      | rule        | input        | message              | \n"file.txt"    | ""                |
-      | rule        | input        | benchmark            | \n"file.txt"    | ""                |
-      | rule        | input        | priority             | \n"file.txt"    | ""                |
-      | rule        | input        | wrapper              | \n"file.txt"    | ""                |
-      | rule        | input        | input                | "file.txt"      | \n""              |
-      | rule        | input        | output               | "file.txt"      | \n""              |
-      | rule        | input        | shell                | "file.txt"      | \n""              |
-      | rule        | input        | log                  | "file.txt"      | \n""              |
-      | rule        | input        | params               | "file.txt"      | \n""              |
-      | rule        | input        | resources            | "file.txt"      | \n""              |
-      | rule        | input        | version              | "file.txt"      | \n""              |
-      | rule        | input        | message              | "file.txt"      | \n""              |
-      | rule        | input        | benchmark            | "file.txt"      | \n""              |
-      | rule        | input        | priority             | "file.txt"      | \n""              |
-      | rule        | input        | wrapper              | "file.txt"      | \n""              |
-      | rule        | input        | input                | \n"file.txt"    | \n""              |
-      | rule        | input        | output               | \n"file.txt"    | \n""              |
-      | rule        | input        | shell                | \n"file.txt"    | \n""              |
-      | rule        | input        | log                  | \n"file.txt"    | \n""              |
-      | rule        | input        | params               | \n"file.txt"    | \n""              |
-      | rule        | input        | resources            | \n"file.txt"    | \n""              |
-      | rule        | input        | version              | \n"file.txt"    | \n""              |
-      | rule        | input        | message              | \n"file.txt"    | \n""              |
-      | rule        | input        | benchmark            | \n"file.txt"    | \n""              |
-      | rule        | input        | priority             | \n"file.txt"    | \n""              |
-      | rule        | input        | wrapper              | \n"file.txt"    | \n""              |
-      | checkpoint  | input        | input                | "file.txt"      | ""                |
-      | checkpoint  | input        | output               | "file.txt"      | ""                |
-      | checkpoint  | input        | shell                | "file.txt"      | ""                |
-      | checkpoint  | input        | log                  | "file.txt"      | ""                |
-      | checkpoint  | input        | params               | "file.txt"      | ""                |
-      | checkpoint  | input        | resources            | "file.txt"      | ""                |
-      | checkpoint  | input        | version              | "file.txt"      | ""                |
-      | checkpoint  | input        | message              | "file.txt"      | ""                |
-      | checkpoint  | input        | benchmark            | "file.txt"      | ""                |
-      | checkpoint  | input        | priority             | "file.txt"      | ""                |
-      | checkpoint  | input        | wrapper              | "file.txt"      | ""                |
-      | checkpoint  | input        | input                | \n"file.txt"    | ""                |
-      | checkpoint  | input        | output               | \n"file.txt"    | ""                |
-      | checkpoint  | input        | shell                | \n"file.txt"    | ""                |
-      | checkpoint  | input        | log                  | \n"file.txt"    | ""                |
-      | checkpoint  | input        | params               | \n"file.txt"    | ""                |
-      | checkpoint  | input        | resources            | \n"file.txt"    | ""                |
-      | checkpoint  | input        | version              | \n"file.txt"    | ""                |
-      | checkpoint  | input        | message              | \n"file.txt"    | ""                |
-      | checkpoint  | input        | benchmark            | \n"file.txt"    | ""                |
-      | checkpoint  | input        | priority             | \n"file.txt"    | ""                |
-      | checkpoint  | input        | wrapper              | \n"file.txt"    | ""                |
-      | checkpoint  | input        | input                | "file.txt"      | \n""              |
-      | checkpoint  | input        | output               | "file.txt"      | \n""              |
-      | checkpoint  | input        | shell                | "file.txt"      | \n""              |
-      | checkpoint  | input        | log                  | "file.txt"      | \n""              |
-      | checkpoint  | input        | params               | "file.txt"      | \n""              |
-      | checkpoint  | input        | resources            | "file.txt"      | \n""              |
-      | checkpoint  | input        | version              | "file.txt"      | \n""              |
-      | checkpoint  | input        | message              | "file.txt"      | \n""              |
-      | checkpoint  | input        | benchmark            | "file.txt"      | \n""              |
-      | checkpoint  | input        | priority             | "file.txt"      | \n""              |
-      | checkpoint  | input        | wrapper              | "file.txt"      | \n""              |
-      | checkpoint  | input        | input                | \n"file.txt"    | \n""              |
-      | checkpoint  | input        | output               | \n"file.txt"    | \n""              |
-      | checkpoint  | input        | shell                | \n"file.txt"    | \n""              |
-      | checkpoint  | input        | log                  | \n"file.txt"    | \n""              |
-      | checkpoint  | input        | params               | \n"file.txt"    | \n""              |
-      | checkpoint  | input        | resources            | \n"file.txt"    | \n""              |
-      | checkpoint  | input        | version              | \n"file.txt"    | \n""              |
-      | checkpoint  | input        | message              | \n"file.txt"    | \n""              |
-      | checkpoint  | input        | benchmark            | \n"file.txt"    | \n""              |
-      | checkpoint  | input        | priority             | \n"file.txt"    | \n""              |
-      | checkpoint  | input        | wrapper              | \n"file.txt"    | \n""              |
+      | rule_like   | statement_name       | content         | statement_content |
+      | rule        | input                | "file.txt"      | ""                |
+      | rule        | output               | "file.txt"      | ""                |
+      | rule        | shell                | "file.txt"      | ""                |
+      | rule        | log                  | "file.txt"      | ""                |
+      | rule        | params               | "file.txt"      | ""                |
+      | rule        | resources            | "file.txt"      | ""                |
+      | rule        | version              | "file.txt"      | ""                |
+      | rule        | message              | "file.txt"      | ""                |
+      | rule        | benchmark            | "file.txt"      | ""                |
+      | rule        | priority             | "file.txt"      | ""                |
+      | rule        | wrapper              | "file.txt"      | ""                |
+      | rule        | input                | \n"file.txt"    | ""                |
+      | rule        | output               | \n"file.txt"    | ""                |
+      | rule        | shell                | \n"file.txt"    | ""                |
+      | rule        | log                  | \n"file.txt"    | ""                |
+      | rule        | params               | \n"file.txt"    | ""                |
+      | rule        | resources            | \n"file.txt"    | ""                |
+      | rule        | version              | \n"file.txt"    | ""                |
+      | rule        | message              | \n"file.txt"    | ""                |
+      | rule        | benchmark            | \n"file.txt"    | ""                |
+      | rule        | priority             | \n"file.txt"    | ""                |
+      | rule        | wrapper              | \n"file.txt"    | ""                |
+      | rule        | input                | "file.txt"      | \n""              |
+      | rule        | output               | "file.txt"      | \n""              |
+      | rule        | shell                | "file.txt"      | \n""              |
+      | rule        | log                  | "file.txt"      | \n""              |
+      | rule        | params               | "file.txt"      | \n""              |
+      | rule        | resources            | "file.txt"      | \n""              |
+      | rule        | version              | "file.txt"      | \n""              |
+      | rule        | message              | "file.txt"      | \n""              |
+      | rule        | benchmark            | "file.txt"      | \n""              |
+      | rule        | priority             | "file.txt"      | \n""              |
+      | rule        | wrapper              | "file.txt"      | \n""              |
+      | rule        | input                | \n"file.txt"    | \n""              |
+      | rule        | output               | \n"file.txt"    | \n""              |
+      | rule        | shell                | \n"file.txt"    | \n""              |
+      | rule        | log                  | \n"file.txt"    | \n""              |
+      | rule        | params               | \n"file.txt"    | \n""              |
+      | rule        | resources            | \n"file.txt"    | \n""              |
+      | rule        | version              | \n"file.txt"    | \n""              |
+      | rule        | message              | \n"file.txt"    | \n""              |
+      | rule        | benchmark            | \n"file.txt"    | \n""              |
+      | rule        | priority             | \n"file.txt"    | \n""              |
+      | rule        | wrapper              | \n"file.txt"    | \n""              |
+      | checkpoint  | input                | "file.txt"      | ""                |
+      | checkpoint  | output               | "file.txt"      | ""                |
 
   Scenario Outline: Swap rule between rule sections
     Given a snakemake project
@@ -793,80 +714,114 @@ Feature: Line mover
       | rule        | checkpoint  | \n"file1.txt"  | \n"file2.txt" |
       | checkpoint  | checkpoint  | \n"file1.txt"  | \n"file2.txt" |
 
-  Scenario Outline: Swap python functions inside run section
+  Scenario Outline: Swap statements in run section
+      Given a snakemake project
+      Given I open a file "foo1.smk" with text
+      """
+      <rule_like> NAME:
+        run:
+            <section_content1>
+            <section_content2>
+      """
+      When I put the caret at <section_content2>
+      And I invoke MoveStatementUp action
+      Then editor content will be
+      """
+      <rule_like> NAME:
+        run:
+            <section_content2>
+            <section_content1>
+
+      """
+      When I put the caret at <section_content2>
+      And I invoke MoveStatementDown action
+      Then editor content will be
+      """
+      <rule_like> NAME:
+        run:
+            <section_content1>
+            <section_content2>
+
+      """
+      Examples:
+        | rule_like  | section_content1 | section_content2 |
+        | rule       | pass             | b: int           |
+        | checkpoint | a: int           | b: int           |
+
+  Scenario Outline: Swap python functions in run section
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
     <rule_like>
-      <run_section>:
-                     <section1>
-                         <section1_content>
-                     <section2>
-                         <section2_content>
+        run:
+          def f1():
+              <section1_content>
+          def f2():
+              <section2_content>
     """
-    When I put the caret at <section2>
+    When I put the caret at def f2():
     And I invoke MoveStatementUp action
     Then editor content will be
     """
     <rule_like>
-      <run_section>:
-                     <section2>
-                         <section2_content>
-                     <section1>
-                         <section1_content>
+        run:
+          def f2():
+              <section2_content>
+          def f1():
+              <section1_content>
     """
-    When I put the caret at <section2>
+    When I put the caret at def f2():
     And I invoke MoveStatementDown action
     Then editor content will be
     """
     <rule_like>
-      <run_section>:
-                     <section1>
-                         <section1_content>
-                     <section2>
-                         <section2_content>
+        run:
+          def f1():
+              <section1_content>
+          def f2():
+              <section2_content>
     """
     Examples:
-      | rule_like | run_section | section1    | section1_content | section2  | section2_content |
-      | rule      | run         | def f1():   | pass             | def f2(): | pass             |
-      | rule      | run         | def f1():   | a: int           | def f2(): | b: int           |
+      | rule_like  | section1_content | section2_content |
+      | rule       | pass             | pass             |
+      | checkpoint | a: int           | b: int           |
 
-  Scenario Outline: Swap sections in python functions inside run section
+  Scenario Outline: Swap python function statements in run section
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
-    <rule_like>
-      <run_section>:
-                     <section>
-                         <section_content1>
-                         <section_content2>
+    <rule_like> NAME:
+      run:
+          def f1():
+              <section_content1>
+              <section_content2>
     """
     When I put the caret at <section_content2>
     And I invoke MoveStatementUp action
     Then editor content will be
     """
-    <rule_like>
-      <run_section>:
-                     <section>
-                         <section_content2>
-                         <section_content1>
+    <rule_like> NAME:
+      run:
+          def f1():
+              <section_content2>
+              <section_content1>
 
     """
     When I put the caret at <section_content2>
     And I invoke MoveStatementDown action
     Then editor content will be
     """
-    <rule_like>
-      <run_section>:
-                     <section>
-                         <section_content1>
-                         <section_content2>
+    <rule_like> NAME:
+      run:
+          def f1():
+              <section_content1>
+              <section_content2>
 
     """
     Examples:
-      | rule_like | run_section | section     | section_content1                 | section_content2         |
-      | rule      | run         | def f1():   | pass                             | b: int                   |
-      | rule      | run         | def f1():   | a: int                           | b: int                   |
+      | rule_like  | section_content1 | section_content2 |
+      | rule       | pass             | b: int           |
+      | checkpoint | a: int           | b: int           |
 
   Scenario Outline: Complex example for swap sections in python functions inside run section
     Given a snakemake project
