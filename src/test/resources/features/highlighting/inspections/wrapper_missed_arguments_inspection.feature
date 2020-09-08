@@ -4,7 +4,7 @@ Feature: Inspection for missed wrapper arguments
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    <rulelike> foo:
+    <rule_like> foo:
       <section>: ""
       wrapper: "0.64.0/<wrapper>"
     """
@@ -15,7 +15,7 @@ Feature: Inspection for missed wrapper arguments
     """
     When I check highlighting weak warnings ignoring extra highlighting
     Examples:
-      | rulelike   | section   | wrapper                      | argument   |
+      | rule_like  | section   | wrapper                      | argument   |
       | rule       | input     | bio/fastp                    | sample     |
       | rule       | output    | bio/last/lastal              | maf        |
       | rule       | input     | bio/picard/bedtointervallist | bed        |
@@ -27,7 +27,7 @@ Feature: Inspection for missed wrapper arguments
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    <rulelike> foo:
+    <rule_like> foo:
       wrapper: "0.64.0/<wrapper>"
     """
     And SmkSectionWrapperArgsInspection inspection is enabled
@@ -37,7 +37,7 @@ Feature: Inspection for missed wrapper arguments
     """
     When I check highlighting weak warnings ignoring extra highlighting
     Examples:
-      | rulelike   | section | wrapper                  | arguments          |
+      | rule_like  | section | wrapper                  | arguments          |
       | rule       | input   | bio/fastp                | sample             |
       | rule       | output  | bio/arriba               | fusions, discarded |
       | rule       | params  | bio/gatk3/printreads     | extra, java_opts   |
