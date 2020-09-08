@@ -75,14 +75,16 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
                         )
                     }
                 } else {
-                    // no injections, cannot check
-                    registerProblem(
-                        arg,
-                        SnakemakeBundle.message(
-                            "INSP.NAME.not.same.wildcards.set.cannot.check"
-                        ),
-                        ProblemHighlightType.WEAK_WARNING
-                    )
+                    if (wildcards.isNotEmpty()) {
+                        // no injections, cannot check
+                        registerProblem(
+                            arg,
+                            SnakemakeBundle.message(
+                                "INSP.NAME.not.same.wildcards.set.cannot.check"
+                            ),
+                            ProblemHighlightType.WEAK_WARNING
+                        )
+                    }
                 }
             }
         }
