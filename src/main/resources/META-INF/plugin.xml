@@ -109,6 +109,8 @@
 
     <codeBlockProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.SmkCodeBlockProvider"/>
 
+    <statementUpDownMover order="first" implementation="com.jetbrains.snakecharm.actions.SmkStatementMover"/>
+
     <multiHostInjector implementation="com.jetbrains.snakecharm.stringLanguage.lang.SmkSLInjector"/>
     <multiHostInjector implementation="com.jetbrains.snakecharm.lang.SmkWildcardConstraintsRegExpInjector"/>
 <!--    <metaDataContributor implementation="com.jetbrains.snakecharm.lang.psi.SmkMetaDataContributor"/>-->
