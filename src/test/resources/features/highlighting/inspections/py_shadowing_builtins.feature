@@ -1,7 +1,8 @@
 Feature: Fixes PyShadowingBuiltinsInspection related false positives
   Issue #133
 
-  @ignore("Is disabled dut to a workaround for #133")
+  #  Is disabled dut to a workaround for #133
+  @ignore
   Scenario: PyShadowingBuiltinsInspection works in snakemake files
      Given a snakemake project
      Given I open a file "foo.smk" with text
@@ -14,7 +15,7 @@ Feature: Fixes PyShadowingBuiltinsInspection related false positives
      Shadows built-in name 'input'
      """
      When I check highlighting weak warnings
-    
+
   Scenario Outline: Lambda params do not shadow builtin names
     Given a snakemake project
     Given I open a file "foo.smk" with text

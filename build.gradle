@@ -80,6 +80,9 @@ dependencies {
 }
 
 task cucumber() {
+    // Cucumber tests are executed using `AllCucumberFeaturesTest` JUnit runner
+    // this task is an alternative if `AllCucumberFeaturesTest` stop working for
+    // some reason, normally we don't need this
     dependsOn assemble, compileTestKotlin
     doLast {
         javaexec {
@@ -87,7 +90,7 @@ task cucumber() {
 
             classpath =  project.sourceSets.test.runtimeClasspath
 
-            args = ['--plugin', 'pretty', '--glue', 'features.glue', 'src/test/resources']
+            args = ['--plugin', 'pretty', '--glue', 'features.glue', '--tags', 'not @ignore', 'src/test/resources']
         }
     }
 }
