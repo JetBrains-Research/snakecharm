@@ -13,7 +13,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SmkRule
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
-class SmkSectionWrapperArgsInspection : SnakemakeInspection() {
+class SmkWrapperMissedArgumentsInspection : SnakemakeInspection() {
     override fun buildVisitor(
             holder: ProblemsHolder,
             isOnTheFly: Boolean,

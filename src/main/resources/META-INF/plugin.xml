@@ -319,14 +319,14 @@
 
     <localInspection
             language="Snakemake"
-            shortName="SmkSectionWrapperArgsInspection"
+            shortName="SmkWrapperMissedArgumentsInspection"
             enabledByDefault="true"
             level="WEAK WARNING"
-            suppressId="SmkSectionWrapperArgsInspection"
+            suppressId="SmkWrapperMissedArguments"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.wrapper.args.missed"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionWrapperArgsInspection"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkWrapperMissedArgumentsInspection"
     />
 
     <localInspection
