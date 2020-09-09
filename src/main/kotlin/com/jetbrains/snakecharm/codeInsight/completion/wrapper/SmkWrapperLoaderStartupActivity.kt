@@ -63,10 +63,10 @@ class SmkWrapperLoaderStartupActivity : StartupActivity {
     companion object {
         @ExperimentalSerializationApi
         fun loadOrCollectLocalWrappers(module: Module, forced: Boolean = false) {
-            val mod = SnakemakeFacet.getInstance(module)?.configuration?.state ?: return
+            val facetSettings = SnakemakeFacet.getInstance(module)?.configuration?.state ?: return
             val storage = module.getService(SmkWrapperStorage::class.java)
             if (forced || storage.wrappers.isEmpty() || storage.wrappers.any { it.path == "" }) {
-                if (mod.useBundledWrappersInfo) {
+                if (facetSettings.useBundledWrappersInfo) {
                     storage.version = SnakemakeBundle.message("wrapper.bundled.storage.version")
                     storage.wrappers = Cbor
                         .decodeFromByteArray(
@@ -76,7 +76,7 @@ class SmkWrapperLoaderStartupActivity : StartupActivity {
                         )
                 } else {
                     storage.version = "file://"
-                    storage.wrappers = SmkWrapperCrawler.localWrapperParser(mod.wrappersCustomSourcesFolder)
+                    storage.wrappers = SmkWrapperCrawler.localWrapperParser(facetSettings.wrappersCustomSourcesFolder)
 
                     /* TODO: cleanup
                      * To update bundled wrapper storage uncomment code below

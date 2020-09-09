@@ -1,11 +1,17 @@
 package com.jetbrains.snakecharm.inspections
 
-import com.intellij.codeInspection.*
+import com.intellij.codeInspection.LocalInspectionToolSession
+import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.module.ModuleUtil
 import com.jetbrains.python.psi.PyArgumentList
+import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage
-import com.jetbrains.snakecharm.lang.psi.*
+import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
+import com.jetbrains.snakecharm.lang.psi.SmkRule
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
 class SmkSectionWrapperArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -14,39 +20,48 @@ class SmkSectionWrapperArgsInspection : SnakemakeInspection() {
             session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         override fun visitSmkRule(rule: SmkRule) {
-            visitSmkRulelike(rule)
+            visitSmkRuleOrCheckpoint(rule)
         }
 
         override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
-            visitSmkRulelike(checkPoint)
+            visitSmkRuleOrCheckpoint(checkPoint)
         }
 
-        fun visitSmkRulelike(rulelike: SmkRuleOrCheckpoint) {
-            val wrapper = rulelike.getSectionByName("wrapper") ?: return
+        fun visitSmkRuleOrCheckpoint(ruleOrCheckpoint: SmkRuleOrCheckpoint) {
+            val wrapper = ruleOrCheckpoint.getSectionByName(SnakemakeNames.SECTION_WRAPPER) ?: return
 
             val wrappers = ModuleUtil
-                    .findModuleForPsiElement(rulelike)
+                    .findModuleForPsiElement(ruleOrCheckpoint)
                     ?.getService(SmkWrapperStorage::class.java)
                     ?.wrappers ?: return
-            val wrname = wrapper.argumentList?.text ?: return
-            val ideal = wrappers.find { wrname.contains(it.path) } ?: return
+            val wrapperName = wrapper.argumentList?.text ?: return
+            val wrapperInfo = wrappers.find { wrapperName.contains(it.path) } ?: return
 
-            ideal.args.forEach { (key, value) ->
-                val section = rulelike.getSectionByName(key)
-                if (section != null) {
-                    if (value.size == 1 && value[0].isBlank()) {
-                        return
-                    } else {
-                        checkArgumentList(section.argumentList!!, section, value)
+            wrapperInfo.args.keys.sorted().forEach { sectionName ->
+                val expectedArgs = wrapperInfo.args[sectionName] ?: error("Cannot be null")
+                val psiSection = ruleOrCheckpoint.getSectionByName(sectionName)
+                if (psiSection != null) {
+                    if (expectedArgs.isNotEmpty()) {
+                        val psiArgList = psiSection.argumentList
+                        if (psiArgList != null) {
+                            checkArgumentList(psiArgList, psiSection, expectedArgs)
+                        }
                     }
                 } else {
-                    registerProblem(
-                        rulelike.nameIdentifier?.originalElement,
-                        SnakemakeBundle.message(
+                    val message = when {
+                        expectedArgs.isEmpty() -> SnakemakeBundle.message(
                             "INSP.NAME.wrapper.args.section.missed.message",
-                            key,
-                            value.joinToString(", ")
+                            sectionName,
                         )
+                        else -> SnakemakeBundle.message(
+                            "INSP.NAME.wrapper.args.section.with.args.missed.message",
+                            sectionName,
+                            expectedArgs.joinToString(", ")
+                        )
+                    }
+                    registerProblem(
+                        ruleOrCheckpoint.nameIdentifier?.originalElement,
+                        message
                     )
                 }
             }
@@ -57,8 +72,9 @@ class SmkSectionWrapperArgsInspection : SnakemakeInspection() {
                 section: SmkArgsSection,
                 required: List<String>
         ) {
+            val usedKeywords = argumentList.arguments.filterIsInstance<PyKeywordArgument>().map { it.keyword }
             required.forEach { arg ->
-                if (argumentList.getKeywordArgument(arg) == null) {
+                if (arg !in usedKeywords) {
                     registerProblem(
                         section.nameIdentifier?.originalElement,
                             SnakemakeBundle.message(

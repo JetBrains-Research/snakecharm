@@ -10,6 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.snakecharm.codeInsight.completion.SmkKeywordCompletionContributor
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
@@ -28,20 +29,21 @@ object SmkWrapperArgsCompletionProvider : CompletionProvider<CompletionParameter
                .getParentOfType(
                        parameters.position,
                        SmkRuleOrCheckpoint::class.java
-               )?.getSectionByName("wrapper") ?: return
+               )?.getSectionByName(SnakemakeNames.SECTION_WRAPPER) ?: return
+
         val wrappers = ModuleUtil
                 .findModuleForPsiElement(parameters.position)
                 ?.getService(SmkWrapperStorage::class.java)
                 ?.wrappers ?: return
 
         val storage = wrappers.find { wrapper.argumentList!!.text.contains(it.path) } ?: return
-        val name = PsiTreeUtil
+        val sectionKeyword = PsiTreeUtil
                 .getParentOfType(
                         parameters.position,
                         SmkRuleOrCheckpointArgsSection::class.java
-                )?.name ?: return
-        if (name in storage.args.keys) {
-            storage.args[name]?.forEach {
+                )?.sectionKeyword ?: return
+        if (sectionKeyword in storage.args.keys) {
+            storage.args[sectionKeyword]?.forEach {
                 result.addElement(LookupElementBuilder.create(it))
             }
         }

@@ -15,6 +15,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>() {
+    private val WRAPPER_VERSION_REGEXP = Regex("(\\d+\\.\\d+\\.\\d+|master|latest).*")
 
     val CAPTURE = PlatformPatterns.psiElement()
             .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
@@ -26,8 +27,12 @@ object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>()
             context: ProcessingContext,
             result: CompletionResultSet
     ) {
-        if (PsiTreeUtil.getParentOfType(parameters.position, SmkRuleOrCheckpointArgsSection::class.java)?.name !=
-                SnakemakeNames.SECTION_WRAPPER) {
+        val parentSection = PsiTreeUtil.getParentOfType(
+            parameters.position,
+            SmkRuleOrCheckpointArgsSection::class.java
+        )
+
+        if (SnakemakeNames.SECTION_WRAPPER != parentSection?.sectionKeyword) {
             return
         }
 
@@ -38,7 +43,7 @@ object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>()
         val version: String
         val prefix: String
 
-        if (Regex("(\\d+\\.\\d+\\.\\d+|master|latest).*").matches(result.prefixMatcher.prefix)) {
+        if (WRAPPER_VERSION_REGEXP.matches(result.prefixMatcher.prefix)) {
             version = result.prefixMatcher.prefix.substringBefore('/')
             prefix = result.prefixMatcher.prefix.substringAfter('/')
         } else {
@@ -48,7 +53,11 @@ object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>()
 
         storage.wrappers.forEach { wrapper ->
             if (wrapper.path.contains(prefix, false)) {
-                result.addElement(LookupElementBuilder.create("$version/${wrapper.path}").withIcon(PlatformIcons.PARAMETER_ICON))
+                result.addElement(
+                    LookupElementBuilder
+                        .create("$version/${wrapper.path}")
+                        .withIcon(PlatformIcons.PARAMETER_ICON)
+                )
             }
         }
     }

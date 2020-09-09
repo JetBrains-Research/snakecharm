@@ -448,11 +448,12 @@ class ActionsSteps {
                 "R" -> SmkWrapperCrawler.parseArgsR(text)
                 else -> return@invokeAndWait
             }
-            val mapped = args.map { (key, values) ->
-                "$key:${values.filterNot { it.isEmpty() }.joinToString(", ")}"
+            val mapped = args.keys.sorted().map { key ->
+                val values = args[key]!!
+                "$key:${values.joinToString(", ", prefix = "[", postfix = "]"){ "'$it'" }}"
             }
             performAction(fixture().project) {
-                FilesSteps().aFileWithText(filename, mapped.joinToString("\n"))
+                FilesSteps().aFileWithText(filename, mapped.joinToString("\n") )
             }
         }
     }

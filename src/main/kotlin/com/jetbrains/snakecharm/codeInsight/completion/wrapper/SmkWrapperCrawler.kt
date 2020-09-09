@@ -87,7 +87,7 @@ object SmkWrapperCrawler {
     }
 
     fun parseArgsPython(text: String): Map<String, List<String>> {
-        return Regex("(?<!from\\s|import\\s)snakemake\\.\\w*(\\.(get\\(\"\\w*\"|[^get]\\w*)|\\[\\d+\\])?")
+        val sectionAndArgPairs = Regex("(?<!from\\s|import\\s)snakemake\\.\\w*(\\.(get\\(\"\\w*\"|[^get]\\w*)|\\[\\d+\\])?")
             .findAll(text).map { str ->
                 str.value
                     .substringAfter("snakemake.")
@@ -108,12 +108,11 @@ object SmkWrapperCrawler {
                     }
                 }
             }
-            .filter { it.first in SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS }
-            .groupBy({ it.first }, { it.second })
+        return toParamsMapping(sectionAndArgPairs)
     }
 
     fun parseArgsR(text: String): Map<String, List<String>> {
-        return Regex("(?<!from\\s)snakemake@\\w*(\\[\\[\"\\w*\"\\]\\])?")
+        val sectionAndArgPairs = Regex("(?<!from\\s)snakemake@\\w*(\\[\\[\"\\w*\"\\]\\])?")
             .findAll(text).map { str ->
                 str.value
                     .substringAfter("snakemake@")
@@ -128,7 +127,19 @@ object SmkWrapperCrawler {
                     chunks[0] to ""
                 }
             }
-            .filter { it.first in SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS }
-            .groupBy({ it.first }, { it.second })
+        return toParamsMapping(sectionAndArgPairs)
+    }
+
+    private fun toParamsMapping(sectionAndArgPairs: List<Pair<String, String>>): Map<String, List<String>> {
+        val map = HashMap<String, ArrayList<String>>()
+        sectionAndArgPairs
+            .filter { (section, _) -> section in SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS }
+            .forEach { (section, arg) ->
+                map.putIfAbsent(section, arrayListOf())
+                if (arg.isNotEmpty()) {
+                    map[section]!!.add(arg)
+                }
+            }
+        return map
     }
 }

@@ -44,3 +44,21 @@ Feature: Inspection for missed wrapper arguments
       | checkpoint | input   | bio/bedtools/coveragebed | a, b               |
       | checkpoint | input   | bio/pear                 | read1, read2       |
       | checkpoint | input   | bio/samtools/depth       | bams, bed          |
+
+  Scenario Outline: Missed section without arguments for bundled wrappers
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> foo:
+      wrapper: "0.64.0/<wrapper>"
+    """
+    And SmkSectionWrapperArgsInspection inspection is enabled
+    Then I expect inspection weak warning on <foo> with message
+    """
+    Section '<section>' is missed
+    """
+    When I check highlighting weak warnings ignoring extra highlighting
+    Examples:
+      | rule_like | section | wrapper           |
+      | rule      | log     | bio/bcftools/call |
+      | rule      | output  | bio/bcftools/call |
