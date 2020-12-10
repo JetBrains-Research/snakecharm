@@ -87,6 +87,7 @@ Feature: Completion for sections/variables in SmkSL injections
       | benchmark            |
       | shadow               |
       | group                |
+      | envmodules           |
       | singularity          |
       | cwl                  |
       | priority             |

@@ -350,6 +350,10 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testRuleSectionEnvmodules() {
+        doTest()
+    }
+
     fun testIssue275() {
         doTest()
     }

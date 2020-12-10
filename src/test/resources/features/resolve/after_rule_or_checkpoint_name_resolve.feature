@@ -149,6 +149,7 @@ Feature: Resolve for section after rule/checkpoint name e.g. rules.NAME.input
          shadow: "full"
          output: ""
          group: ""
+         envmodules: ""
          singularity: ""
          cwl: ""
          log: ""
@@ -166,17 +167,18 @@ Feature: Resolve for section after rule/checkpoint name e.g. rules.NAME.input
     When I put the caret after rules.NAME.
     Then reference should not resolve
     Examples:
-      | section              |
-      | conda                |
-      | shell                |
-      | threads              |
-      | shadow               |
-      | group                |
-      | singularity          |
-      | cwl                  |
-      | run                  |
-      | script               |
-      | cache                |
+      | section     |
+      | conda       |
+      | shell       |
+      | threads     |
+      | shadow      |
+      | group       |
+      | envmodules  |
+      | singularity |
+      | cwl         |
+      | run         |
+      | script      |
+      | cache       |
 
   Scenario Outline: Resolve for available sections
     Given a snakemake project
@@ -194,6 +196,7 @@ Feature: Resolve for section after rule/checkpoint name e.g. rules.NAME.input
          shadow: "full"
          output: ""
          group: ""
+         envmodules: ""
          singularity: ""
          cwl: ""
          log: ""

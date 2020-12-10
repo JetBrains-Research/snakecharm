@@ -12,6 +12,7 @@ Feature: Completion for wildcards
       log: "{wildcard5}"
       output: "{wildcard6}"
       params: "{wildcard7}"
+      envmodules: "{wildcard8}"
       input: "{}"
       message: "{non-wildcard1}"
       cwl: "{non-wildcard2}"
@@ -30,6 +31,7 @@ Feature: Completion for wildcards
       | wildcard2 |
       | wildcard3 |
       | wildcard7 |
+      | wildcard8 |
     And completion list shouldn't contain:
       | non-wildcard1 |
       | non-wildcard2 |

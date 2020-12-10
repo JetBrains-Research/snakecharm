@@ -6,6 +6,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CACHE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CONDA
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CONTAINER
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CWL
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_ENVMODULES
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_GROUP
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_LOG
@@ -93,7 +94,8 @@ object SnakemakeAPI {
             SECTION_CONDA,
             SECTION_SCRIPT, SECTION_WRAPPER, SECTION_CWL, SECTION_NOTEBOOK,
             SECTION_CACHE,
-            SECTION_CONTAINER
+            SECTION_CONTAINER,
+            SECTION_ENVMODULES
     )
 
     /**
@@ -153,7 +155,7 @@ object SnakemakeAPI {
      * TODO: Consider implementing this as PSI interface in order not to compare keyword string each time
      */
     val WILDCARDS_EXPANDING_SECTIONS_KEYWORDS = setOf(
-            SECTION_INPUT, SECTION_OUTPUT, SECTION_CONDA,
+            SECTION_INPUT, SECTION_OUTPUT, SECTION_CONDA, SECTION_ENVMODULES,
             SECTION_RESOURCES, SECTION_GROUP, SECTION_BENCHMARK,
             SECTION_LOG, SECTION_PARAMS
     )
@@ -199,7 +201,7 @@ object SnakemakeAPI {
     val SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED = setOf(
             SECTION_BENCHMARK, SECTION_VERSION, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS, SECTION_SINGULARITY,
             SECTION_PRIORITY, SECTION_GROUP, SECTION_SHADOW, SECTION_CONDA, SECTION_SCRIPT, SECTION_WRAPPER,
-            SECTION_CWL, SECTION_NOTEBOOK, SECTION_CACHE, SECTION_CONTAINER
+            SECTION_CWL, SECTION_NOTEBOOK, SECTION_CACHE, SECTION_CONTAINER, SECTION_ENVMODULES
     )
 
     val IO_FLAG_2_SUPPORTED_SECTION: HashMap<String, List<String>> = hashMapOf(

@@ -84,6 +84,7 @@ Feature: Annotate additional syntax
       | rule       | benchmark            | ""         | PY.DECORATOR             |
       | rule       | wildcard_constraints | ""         | PY.DECORATOR             |
       | rule       | group                | ""         | PY.DECORATOR             |
+      | rule       | envmodules           | ""         | PY.DECORATOR             |
       | rule       | shadow               | ""         | PY.DECORATOR             |
       | rule       | conda                | ""         | PY.DECORATOR             |
       | rule       | cwl                  | ""         | PY.DECORATOR             |

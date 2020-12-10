@@ -190,7 +190,7 @@ Feature: Completion for snakemake keyword-like things
       | subworkflow |
       | rule        |
 
-  Scenario Outline: Complete at rule/checkpoint level
+  Scenario Outline: Complete at rule/checkpoint level (single variant)
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
@@ -204,35 +204,37 @@ Feature: Completion for snakemake keyword-like things
         <result>: 
       """
     Examples:
-      | rule_like  | str | result               |
-      | rule       | inp | input                |
-      | checkpoint | inp | input                |
-      | rule       | out | output               |
-      | checkpoint | out | output               |
-      | rule       | par | params               |
-      | checkpoint | par | params               |
-      | rule       | lo  | log                  |
-      | checkpoint | lo  | log                  |
-      | rule       | be  | benchmark            |
-      | checkpoint | be  | benchmark            |
-      | rule       | ve  | version              |
-      | checkpoint | ve  | version              |
-      | rule       | cac  | cache                |
-      | checkpoint | cac  | cache                |
-      | rule       | me  | message              |
-      | checkpoint | me  | message              |
-      | rule       | pr  | priority             |
-      | checkpoint | pr  | priority             |
-      | rule       | gr  | group                |
-      | checkpoint | gr  | group                |
-      | rule       | cw  | cwl                  |
-      | checkpoint | cw  | cwl                  |
-      | rule       | sc  | script               |
-      | checkpoint | sc  | script               |
-      | rule       | run | run                  |
-      | checkpoint | run | run                  |
-      | rule       | wr  | wrapper              |
-      | checkpoint | wr  | wrapper              |
+      | rule_like  | str  | result     |
+      | rule       | inp  | input      |
+      | checkpoint | inp  | input      |
+      | rule       | out  | output     |
+      | checkpoint | out  | output     |
+      | rule       | par  | params     |
+      | checkpoint | par  | params     |
+      | rule       | lo   | log        |
+      | checkpoint | lo   | log        |
+      | rule       | be   | benchmark  |
+      | checkpoint | be   | benchmark  |
+      | rule       | ve   | version    |
+      | checkpoint | ve   | version    |
+      | rule       | cac  | cache      |
+      | checkpoint | cac  | cache      |
+      | rule       | me   | message    |
+      | checkpoint | me   | message    |
+      | rule       | pr   | priority   |
+      | checkpoint | pr   | priority   |
+      | rule       | gr   | group      |
+      | checkpoint | gr   | group      |
+      | rule       | envm | envmodules |
+      | checkpoint | envm | envmodules |
+      | rule       | cw   | cwl        |
+      | checkpoint | cw   | cwl        |
+      | rule       | sc   | script     |
+      | checkpoint | sc   | script     |
+      | rule       | run  | run        |
+      | checkpoint | run  | run        |
+      | rule       | wr   | wrapper    |
+      | checkpoint | wr   | wrapper    |
 
   Scenario Outline: Complete at rule/checkpoint level
     Given a snakemake project

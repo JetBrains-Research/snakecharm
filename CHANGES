@@ -8,6 +8,8 @@ Version 0.8.1 build #0.8.1.xxx
 Released on ...
 
 Features:
+- PyCharm 2020.3 compatibility (see #337)
+- `envmodules` parsing (see #332)
 - Inspection: Warn users if they have arguments with same value in section (see #263)
 - Inspection: Comma in the end of section arg list isn't needed (see #255)
 - Inspection: Warn user if rule from 'rulesorder' isn't available in current or included files (see #254)

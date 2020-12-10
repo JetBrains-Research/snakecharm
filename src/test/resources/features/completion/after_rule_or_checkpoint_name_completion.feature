@@ -23,6 +23,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
          params: a=""
          priority: 1
          resources: a=""
+         envmodules: "foo"
          script: ""
          shell: ""
          run:
@@ -45,15 +46,16 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
       | priority             |
       | resources            |
     And completion list shouldn't contain:
-      | conda                |
-      | shell                |
-      | threads              |
-      | shadow               |
-      | group                |
-      | singularity          |
-      | cwl                  |
-      | run                  |
-      | script               |
+      | conda       |
+      | envmodules  |
+      | shell       |
+      | threads     |
+      | shadow      |
+      | group       |
+      | singularity |
+      | cwl         |
+      | run         |
+      | script      |
     Examples:
       | rule_like  | injection_left | injection_right |
       | rule       |                |                 |
@@ -112,6 +114,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
       | threads              |
       | shadow               |
       | group                |
+      | envmodules           |
       | singularity          |
       | cwl                  |
       | run                  |
