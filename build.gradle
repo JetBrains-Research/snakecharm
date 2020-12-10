@@ -11,16 +11,14 @@ plugins {
     id 'org.jetbrains.intellij' version '0.4.21'
 
     // Kotlin
-    id "org.jetbrains.kotlin.jvm" version "1.3.72"
+    id "org.jetbrains.kotlin.jvm" version "1.4.21"
 }
+
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
 
 version "${project.version}.${project.buildCounter}"
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
 // ----------------------------------------------------------------------
 intellij {
@@ -60,13 +58,13 @@ patchPluginXml {
 
 compileKotlin {
   kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "11"
   }
 }
 
 compileTestKotlin {
   kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "11"
   }
 }
 
@@ -75,8 +73,8 @@ repositories {
 }
                        
 dependencies {
-    testImplementation 'io.cucumber:cucumber-java:5.6.0'
-    testImplementation 'io.cucumber:cucumber-junit:5.6.0'
+    testImplementation 'io.cucumber:cucumber-java:6.8.1'
+    testImplementation 'io.cucumber:cucumber-junit:6.8.1'
 }
 
 task cucumber() {

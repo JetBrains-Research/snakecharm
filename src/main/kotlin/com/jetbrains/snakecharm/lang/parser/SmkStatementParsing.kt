@@ -21,9 +21,8 @@ import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.*
  * @date 2018-12-31
  */
 class SmkStatementParsing(
-        context: SmkParserContext,
-        futureFlag: FUTURE?
-) : StatementParsing(context, futureFlag) {
+        context: SmkParserContext
+) : StatementParsing(context) {
 
     private val ruleSectionParsingData = SectionParsingData(
             declaration = RULE_DECLARATION_STATEMENT,

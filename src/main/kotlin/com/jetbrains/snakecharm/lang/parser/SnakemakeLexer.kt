@@ -250,14 +250,14 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 myBraceLevel = 0
                 val pos = tokenStart
                 pushToken(PyTokenTypes.STATEMENT_BREAK, pos, pos)
-                val indents = myIndentStack.size()
+                val indents = myIndentStack.size
                 for (i in 0 until indents - 1) {
-                    val indent = myIndentStack.peek()
+                    val indent = myIndentStack.topInt()
                     if (myCurrentNewlineIndent >= indent) {
                         break
                     }
-                    if (myIndentStack.size() > 1) {
-                        myIndentStack.pop()
+                    if (myIndentStack.size > 1) {
+                        myIndentStack.popInt()
                         pushToken(PyTokenTypes.DEDENT, pos, pos)
                     }
                 }
@@ -307,7 +307,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         return isToplevelSection
     }
 
-    // TODO: it seems restore not always work ok, may be also resore some part of our complicated state?
+    // TODO: it seems restore not always work ok, may be also restore some part of our complicated state?
     //override fun restore(position: LexerPosition) {
     //    super.restore(position)
     //}
@@ -346,12 +346,12 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
     /** Adds dedents where necessary. A simplified version of [closeDanglingSuitesWithComments] */
     private fun closeDanglingSuites(indent: Int, whiteSpaceStart: Int) {
-        var lastIndent = myIndentStack.peek()
+        var lastIndent = myIndentStack.topInt()
 
         var insertIndex = myTokenQueue.size
         while (indent < lastIndent) {
-            myIndentStack.pop()
-            lastIndent = myIndentStack.peek()
+            myIndentStack.popInt()
+            lastIndent = myIndentStack.topInt()
             myTokenQueue.add(insertIndex, PendingToken(PyTokenTypes.DEDENT, whiteSpaceStart, whiteSpaceStart))
             ++insertIndex
         }
@@ -362,14 +362,14 @@ class SnakemakeLexer : PythonIndentingLexer() {
         if (insideSnakemakeArgumentList(indent) { currentIndent, sectionIndent -> currentIndent < sectionIndent}) {
             closeDanglingSuites(indent, startPos)
             myTokenQueue.add(PendingToken(PyTokenTypes.LINE_BREAK, startPos, whiteSpaceEnd))
-        } else if (indent < myIndentStack.peek()) {
-            var lastIndent = myIndentStack.peek()
+        } else if (indent < myIndentStack.topInt()) {
+            var lastIndent = myIndentStack.topInt()
 
             // handle incorrect unindents if necessary
             while (indent < lastIndent) {
-                myIndentStack.pop()
+                myIndentStack.topInt()
                 if (insertedIndentsCount > 0) insertedIndentsCount--
-                lastIndent = myIndentStack.peek()
+                lastIndent = myIndentStack.topInt()
                 if (indent > lastIndent) {
                     myTokenQueue.add(PendingToken(PyTokenTypes.INCONSISTENT_DEDENT, startPos, startPos))
                     if (lastIndent <= ruleLikeSectionIndent ||
@@ -382,7 +382,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             if (myTokenQueue.find { it.start >= startPos } == null) {
                 myTokenQueue.add(PendingToken(PyTokenTypes.LINE_BREAK, startPos, whiteSpaceEnd))
             }
-        } else if (indent > myIndentStack.peek()) {
+        } else if (indent > myIndentStack.topInt()) {
             myIndentStack.push(indent)
             insertedIndentsCount++
         }
@@ -471,10 +471,10 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
     private fun popIndentStackWhilePossible() {
         while (insertedIndentsCount > 0) {
-            if (myIndentStack.size() == 1) { // don't pop the very first indent
+            if (myIndentStack.size == 1) { // don't pop the very first indent
                 insertedIndentsCount = 0
             } else {
-                myIndentStack.pop()
+                myIndentStack.popInt()
                 insertedIndentsCount--
             }
         }
