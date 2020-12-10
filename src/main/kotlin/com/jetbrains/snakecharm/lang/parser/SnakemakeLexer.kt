@@ -252,7 +252,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 pushToken(PyTokenTypes.STATEMENT_BREAK, pos, pos)
                 val indents = myIndentStack.size
                 for (i in 0 until indents - 1) {
-                    val indent = myIndentStack.topInt()
+                    val indent = myIndentStack.peekInt(0)
                     if (myCurrentNewlineIndent >= indent) {
                         break
                     }
@@ -346,12 +346,12 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
     /** Adds dedents where necessary. A simplified version of [closeDanglingSuitesWithComments] */
     private fun closeDanglingSuites(indent: Int, whiteSpaceStart: Int) {
-        var lastIndent = myIndentStack.topInt()
+        var lastIndent = myIndentStack.peekInt(0)
 
         var insertIndex = myTokenQueue.size
         while (indent < lastIndent) {
             myIndentStack.popInt()
-            lastIndent = myIndentStack.topInt()
+            lastIndent = myIndentStack.peekInt(0)
             myTokenQueue.add(insertIndex, PendingToken(PyTokenTypes.DEDENT, whiteSpaceStart, whiteSpaceStart))
             ++insertIndex
         }
@@ -362,14 +362,14 @@ class SnakemakeLexer : PythonIndentingLexer() {
         if (insideSnakemakeArgumentList(indent) { currentIndent, sectionIndent -> currentIndent < sectionIndent}) {
             closeDanglingSuites(indent, startPos)
             myTokenQueue.add(PendingToken(PyTokenTypes.LINE_BREAK, startPos, whiteSpaceEnd))
-        } else if (indent < myIndentStack.topInt()) {
-            var lastIndent = myIndentStack.topInt()
+        } else if (indent < myIndentStack.peekInt(0)) {
+            var lastIndent = myIndentStack.peekInt(0)
 
             // handle incorrect unindents if necessary
             while (indent < lastIndent) {
-                myIndentStack.topInt()
+                myIndentStack.popInt()
                 if (insertedIndentsCount > 0) insertedIndentsCount--
-                lastIndent = myIndentStack.topInt()
+                lastIndent = myIndentStack.peekInt(0)
                 if (indent > lastIndent) {
                     myTokenQueue.add(PendingToken(PyTokenTypes.INCONSISTENT_DEDENT, startPos, startPos))
                     if (lastIndent <= ruleLikeSectionIndent ||
@@ -382,7 +382,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             if (myTokenQueue.find { it.start >= startPos } == null) {
                 myTokenQueue.add(PendingToken(PyTokenTypes.LINE_BREAK, startPos, whiteSpaceEnd))
             }
-        } else if (indent > myIndentStack.topInt()) {
+        } else if (indent > myIndentStack.peekInt(0)) {
             myIndentStack.push(indent)
             insertedIndentsCount++
         }

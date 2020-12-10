@@ -20,9 +20,9 @@ SnakemakeFile: RuleParamsListArgsStringMultilineIncorrectUnindent.smk
             PsiWhiteSpace('\n                 ')
             PsiElement(Py:SINGLE_QUOTED_STRING)('"1"')
           PsiErrorElement:Unindent does not match any outer indentation level.
-            PsiErrorElement:expression expected
+            PsiErrorElement:Expression expected
               <empty list>
-            PsiErrorElement:expression expected
+            PsiErrorElement:Expression expected
               PsiElement(Py:INCONSISTENT_DEDENT)('\n              ')
               PsiElement(Py:SINGLE_QUOTED_STRING)('".txt"')
           PsiWhiteSpace('\n            ')
@@ -52,9 +52,9 @@ SnakemakeFile: RuleParamsListArgsStringMultilineIncorrectUnindent.smk
             PsiWhiteSpace('\n                    ')
             PsiElement(Py:SINGLE_QUOTED_STRING)('"15"')
           PsiErrorElement:Unindent does not match any outer indentation level.
-            PsiErrorElement:expression expected
+            PsiErrorElement:Expression expected
               <empty list>
-            PsiErrorElement:expression expected
+            PsiErrorElement:Expression expected
               PsiElement(Py:INCONSISTENT_DEDENT)('\n           ')
               PsiElement(Py:SINGLE_QUOTED_STRING)('"_copy"')
               PsiWhiteSpace('\n                 ')

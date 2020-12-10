@@ -72,7 +72,7 @@ SnakemakeFile: KeywordIdentifierWithNoIndent.smk
               PsiElement(Py:IDENTIFIER)('foo')
             PyArgumentList
               PsiElement(Py:LPAR)('(')
-              PsiErrorElement:expression expected
+              PsiErrorElement:Expression expected
                 <empty list>
       PsiWhiteSpace('\n')
   SmkRule

@@ -68,9 +68,9 @@ SnakemakeFile: RuleParamsListArgsIncorrectIndentation.smk
             PsiElement(Py:SINGLE_QUOTED_STRING)('"file4.txt"')
           PsiElement(Py:COMMA)(',')
           PsiErrorElement:Unindent does not match any outer indentation level.
-            PsiErrorElement:expression expected
+            PsiErrorElement:Expression expected
               <empty list>
-            PsiErrorElement:expression expected
+            PsiErrorElement:Expression expected
               PsiElement(Py:INCONSISTENT_DEDENT)('\n        ')
               PsiElement(Py:SINGLE_QUOTED_STRING)('"file5.txt"')
           PsiWhiteSpace(' ')

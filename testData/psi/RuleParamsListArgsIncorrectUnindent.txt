@@ -19,9 +19,9 @@ SnakemakeFile: RuleParamsListArgsIncorrectUnindent.smk
             PsiElement(Py:IDENTIFIER)('arg2')
           PsiElement(Py:COMMA)(',')
           PsiErrorElement:Unindent does not match any outer indentation level.
-            PsiErrorElement:expression expected
+            PsiErrorElement:Expression expected
               <empty list>
-            PsiErrorElement:expression expected
+            PsiErrorElement:Expression expected
               PsiElement(Py:INCONSISTENT_DEDENT)('\n                ')
               PsiElement(Py:IDENTIFIER)('arg3')
           PsiWhiteSpace(' ')
@@ -75,12 +75,12 @@ SnakemakeFile: RuleParamsListArgsIncorrectUnindent.smk
                 PsiElement(Py:IDENTIFIER)('arg2')
             PsiWhiteSpace(' ')
             PsiElement(Py:PLUS)('+')
-            PsiErrorElement:expression expected
+            PsiErrorElement:Expression expected
               <empty list>
           PsiErrorElement:Unindent does not match any outer indentation level.
-            PsiErrorElement:expression expected
+            PsiErrorElement:Expression expected
               <empty list>
-            PsiErrorElement:expression expected
+            PsiErrorElement:Expression expected
               PsiElement(Py:INCONSISTENT_DEDENT)('\n                 ')
               PsiElement(Py:IDENTIFIER)('arg3')
           PsiWhiteSpace(' ')
@@ -136,9 +136,9 @@ SnakemakeFile: RuleParamsListArgsIncorrectUnindent.smk
             PyReferenceExpression: arg2
               PsiElement(Py:IDENTIFIER)('arg2')
           PsiErrorElement:Unindent does not match any outer indentation level.
-            PsiErrorElement:expression expected
+            PsiErrorElement:Expression expected
               <empty list>
-            PsiErrorElement:expression expected
+            PsiErrorElement:Expression expected
               PsiElement(Py:INCONSISTENT_DEDENT)('\n                 ')
               PsiElement(Py:PLUS)('+')
               PsiWhiteSpace(' ')
@@ -198,12 +198,12 @@ SnakemakeFile: RuleParamsListArgsIncorrectUnindent.smk
                 PsiElement(Py:IDENTIFIER)('condition1')
               PsiWhiteSpace(' ')
               PsiElement(Py:OR_KEYWORD)('or')
-              PsiErrorElement:expression expected
+              PsiErrorElement:Expression expected
                 <empty list>
           PsiErrorElement:Unindent does not match any outer indentation level.
-            PsiErrorElement:expression expected
+            PsiErrorElement:Expression expected
               <empty list>
-            PsiErrorElement:expression expected
+            PsiErrorElement:Expression expected
               PsiElement(Py:INCONSISTENT_DEDENT)('\n               ')
               PsiElement(Py:IDENTIFIER)('condition2')
               PsiWhiteSpace(' ')
