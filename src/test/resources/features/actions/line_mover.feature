@@ -375,8 +375,8 @@ Feature: Statement mover
       | rule_like   | content         | statement_content | caret |
       | rule        | "file.txt"      | wildcard="/d+1"   | wildcard= |
       | checkpoint  | "file.txt"      | wildcard="/d+1"   | wildcard= |
-      | rule        | \n         "file.txt"    | wildcard="/d+1"   | wildcard= |
-      | checkpoint  | \n         "file.txt"    | wildcard="/d+1"   | wildcard= |
+      | rule        | \n        "file.txt"    | wildcard="/d+1"   | wildcard= |
+      | checkpoint  | \n        "file.txt"    | wildcard="/d+1"   | wildcard= |
 
 
   Scenario Outline: Move wildcard_constraints in/out rule (wildcard_constraints)
@@ -395,7 +395,7 @@ Feature: Statement mover
       <rule_like> NAME1:
           input:<content>
           wildcard_constraints:
-                              <statement_content>
+              <statement_content>
 
       """
       When I put the caret at <caret>
@@ -404,7 +404,7 @@ Feature: Statement mover
       """
       <rule_like> NAME1:
           wildcard_constraints:
-                              <statement_content>
+              <statement_content>
           input:<content>
 
       """
@@ -413,7 +413,7 @@ Feature: Statement mover
       Then editor content will be
       """
       wildcard_constraints:
-                          <statement_content>
+          <statement_content>
       <rule_like> NAME1:
           input:<content>
 
@@ -425,7 +425,7 @@ Feature: Statement mover
 
       <rule_like> NAME1:
           wildcard_constraints:
-                              <statement_content>
+              <statement_content>
           input:<content>
 
       """
@@ -437,7 +437,7 @@ Feature: Statement mover
       <rule_like> NAME1:
           input:<content>
           wildcard_constraints:
-                              <statement_content>
+              <statement_content>
 
       """
       When I put the caret at <caret>
@@ -448,15 +448,15 @@ Feature: Statement mover
       <rule_like> NAME1:
           input:<content>
       wildcard_constraints:
-                          <statement_content>
+          <statement_content>
 
       """
       Examples:
         | rule_like   | content         | statement_content | caret |
         | rule        | "file.txt"      | wildcard="/d+1" |  wildcard= |
         | checkpoint  | "file.txt"      | wildcard="/d+1" |             wildcard= |
-        | rule       | \n         "file.txt" | wildcard="/d+1" | wildcard= |
-        | checkpoint | \n         "file.txt" | wildcard="/d+1" | wildcard= |
+        | rule       | \n        "file.txt" | wildcard="/d+1" | wildcard= |
+        | checkpoint | \n        "file.txt" | wildcard="/d+1" | wildcard= |
 
 
   Scenario Outline: Move section in/out rule doesn't work for rule with one section
@@ -793,9 +793,9 @@ Feature: Statement mover
     """
     <rule_like2> NAME2:
         input:
-             <content2>
+            <content2>
         output:
-              <content2>
+            <content2>
         input: <content1>
 
     <comment>
@@ -809,9 +809,9 @@ Feature: Statement mover
     """
     <rule_like2> NAME2:
         input:
-             <content2>
+            <content2>
         output:
-              <content2>
+            <content2>
 
     <comment>
 
@@ -850,7 +850,7 @@ Feature: Statement mover
         input: <content2>
         output: <content2>
         input: #here
-             <content1>
+            <content1>
 
     <comment>
 
@@ -870,9 +870,9 @@ Feature: Statement mover
 
     <rule_like1> NAME1:
         input: #here
-             <content1>
+            <content1>
         output:
-              <content1>
+            <content1>
     """
     Examples:
       | rule_like1  | rule_like2  | content1       | content2      | comment   |
@@ -905,11 +905,11 @@ Feature: Statement mover
     """
     <rule_like2> NAME2:
         input:
-             <content2>
+            <content2>
         output:
-              <content2>
+            <content2>
         input: #here
-             <content1>
+            <content1>
 
     <comment>
 
@@ -923,17 +923,17 @@ Feature: Statement mover
     """
     <rule_like2> NAME2:
         input:
-             <content2>
+            <content2>
         output:
-              <content2>
+            <content2>
 
     <comment>
 
     <rule_like1> NAME1:
         input: #here
-             <content1>
+            <content1>
         output:
-              <content1>
+            <content1>
     """
     Examples:
       | rule_like1  | rule_like2  | content1       | content2      | comment   |
