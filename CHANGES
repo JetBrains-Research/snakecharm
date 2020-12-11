@@ -9,6 +9,7 @@ Released on ...
 
 Features:
 - PyCharm 2020.3 compatibility (see #337)
+- Snakemake specific formatter settings (see #338)
 - `envmodules` parsing (see #332)
 - Inspection: Warn users if they have arguments with same value in section (see #263)
 - Inspection: Comma in the end of section arg list isn't needed (see #255)
