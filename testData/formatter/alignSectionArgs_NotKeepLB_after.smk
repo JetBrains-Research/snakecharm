@@ -1,3 +1,2 @@
 rule r:
-    input:
-        "a","b"
+    input: "a","b"
