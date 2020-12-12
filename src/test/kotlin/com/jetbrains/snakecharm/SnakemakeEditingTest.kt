@@ -12,6 +12,11 @@ class SnakemakeEditingTest : SnakemakeTestCase() {
         doTypingTest("\nfoo")
     }
 
+    // TODO: fix, test for #339
+    // fun testEnterAfterRuleParamsIncomplete2() {
+    //     doTypingTest("\nfoo")
+    // }
+
     private fun doTypingTest(text: String) {
 //        val testDataDir = SnakemakeTestUtil.getTestDataPath().resolve("folding")
 //        fixture!!.testFolding("$testDataDir/${getTestName(true)}.smk")
