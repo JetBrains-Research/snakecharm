@@ -52,7 +52,7 @@ Feature: Annotate syntax errors
     And I invoke quick fix Name argument and see text:
     """
     <rule_like> NAME:
-      params: a="a", arg="b", c="c"
+      params: a="a",arg="b", c="c"
     """
     Examples:
       | rule_like  |

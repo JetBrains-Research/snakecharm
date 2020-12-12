@@ -1,3 +1,3 @@
 rule foo:
     input:
-         foo
+        foo
