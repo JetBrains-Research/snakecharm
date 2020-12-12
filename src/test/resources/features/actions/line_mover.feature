@@ -1,6 +1,7 @@
 Feature: Statement mover
   Issue 174
-
+   # TODO: cleanup case 1 ... 4
+  
   Scenario Outline: Swap rule like toplevel sections
     Given a snakemake project
     Given I open a file "foo1.smk" with text
@@ -306,7 +307,7 @@ Feature: Statement mover
       | subworkflow | workdir      | ruleorder            | \n        "/dir"     | NAME1             |              |
       | subworkflow | workdir      | wildcard_constraints | \n        "/dir"     | wildcard="/d+1"   |              |
 
-  Scenario Outline: Move wildcard_constraints in/out rule (wildcard_constraints single line))
+  Scenario Outline: Move wildcard_constraints in/out rule (wildcard_constraints single line)
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
@@ -587,7 +588,7 @@ Feature: Statement mover
         input: <content>
         <statement_name>: <statement_content>
     """
-    When I put the caret at <statement_name>: <statement_content>
+    When I put the caret at <statement_name>: <sign>
     And I invoke MoveStatementUp action
     Then editor content will be
     """
@@ -596,7 +597,7 @@ Feature: Statement mover
         input: <content>
 
     """
-    When I put the caret at <statement_name>: <statement_content>
+    When I put the caret at <statement_name>: <sign>
     And I invoke MoveStatementUp action
     Then editor content will be
     """
@@ -605,7 +606,7 @@ Feature: Statement mover
         input: <content>
 
     """
-    When I put the caret at <statement_content>
+    When I put the caret at ""
     And I invoke MoveStatementDown action
     Then editor content will be
     """
@@ -614,7 +615,7 @@ Feature: Statement mover
         <statement_name>: <statement_content>
 
     """
-    When I put the caret at <statement_content>
+    When I put the caret at ""
     And I invoke MoveStatementDown action
     Then editor content will be
     """
@@ -624,325 +625,90 @@ Feature: Statement mover
 
     """
     Examples:
-      | rule_like   | statement_name       | content         | statement_content |
-      | rule        | input                | "file.txt"      | ""                |
-      | rule        | output               | "file.txt"      | ""                |
-      | rule        | shell                | "file.txt"      | ""                |
-      | rule        | log                  | "file.txt"      | ""                |
-      | rule        | params               | "file.txt"      | ""                |
-      | rule        | resources            | "file.txt"      | ""                |
-      | rule        | version              | "file.txt"      | ""                |
-      | rule        | message              | "file.txt"      | ""                |
-      | rule        | benchmark            | "file.txt"      | ""                |
-      | rule        | priority             | "file.txt"      | ""                |
-      | rule        | wrapper              | "file.txt"      | ""                |
-      | rule        | input                | \n        "file.txt"    | ""                |
-      | rule        | output               | \n        "file.txt"    | ""                |
-      | rule        | shell                | \n        "file.txt"    | ""                |
-      | rule        | log                  | \n        "file.txt"    | ""                |
-      | rule        | params               | \n        "file.txt"    | ""                |
-      | rule        | resources            | \n        "file.txt"    | ""                |
-      | rule        | version              | \n        "file.txt"    | ""                |
-      | rule        | message              | \n        "file.txt"    | ""                |
-      | rule        | benchmark            | \n        "file.txt"    | ""                |
-      | rule        | priority             | \n        "file.txt"    | ""                |
-      | rule        | wrapper              | \n        "file.txt"    | ""                |
+      | rule_like | statement_name | content              | statement_content | sign  |
+      | rule      | input          | "file.txt"           | ""                | ""    |
+      | rule      | output         | "file.txt"           | ""                | ""    |
+      | rule      | shell          | "file.txt"           | ""                | ""    |
+      | rule      | log            | "file.txt"           | ""                | ""    |
+      | rule      | params         | "file.txt"           | ""                | ""    |
+      | rule      | resources      | "file.txt"           | ""                | ""    |
+      | rule      | version        | "file.txt"           | ""                | ""    |
+      | rule      | message        | "file.txt"           | ""                | ""    |
+      | rule      | benchmark      | "file.txt"           | ""                | ""    |
+      | rule      | priority       | "file.txt"           | ""                | ""    |
+      | rule      | wrapper        | "file.txt"           | ""                | ""    |
+      | rule      | input          | \n        "file.txt" | ""                | ""    |
+      | rule      | output         | \n        "file.txt" | ""                | ""    |
+      | rule      | shell          | \n        "file.txt" | ""                | ""    |
+      | rule      | input          | "file.txt"           | #here\n        "" | #here |
+      | rule      | output         | "file.txt"           | #here\n        "" | #here |
+      | rule      | shell          | "file.txt"           | #here\n        "" | #here |
+      | rule      | input          | \n        "file.txt" | #here\n        "" | #here |
+      | rule      | output         | \n        "file.txt" | #here\n        "" | #here |
+      | rule      | shell          | \n        "file.txt" | #here\n        "" | #here |
 
-  Scenario Outline: Move section inside rule (case2)
-     Given a snakemake project
-     Given I open a file "foo1.smk" with text
-     """
-     <rule_like> NAME1:
-         input: <content>
-         <statement_name>: #here
-             <statement_content>
-     """
-     When I put the caret at <statement_name>: #here
-     And I invoke MoveStatementUp action
-     Then editor content will be
-     """
-     <rule_like> NAME1:
-         <statement_name>: #here
-             <statement_content>
-         input: <content>
-
-     """
-     When I put the caret at <statement_name>: #here
-     And I invoke MoveStatementUp action
-     Then editor content will be
-     """
-     <rule_like> NAME1:
-         <statement_name>: #here
-             <statement_content>
-         input: <content>
-
-     """
-     When I put the caret at <statement_content>
-     And I invoke MoveStatementDown action
-     Then editor content will be
-     """
-     <rule_like> NAME1:
-         input: <content>
-         <statement_name>: #here
-             <statement_content>
-
-     """
-     When I put the caret at <statement_content>
-     And I invoke MoveStatementDown action
-     Then editor content will be
-     """
-     <rule_like> NAME1:
-         input: <content>
-         <statement_name>: #here
-             <statement_content>
-
-     """
-     Examples:
-       | rule_like   | statement_name       | content         | statement_content |
-       | rule        | input                | "file.txt"      | ""                |
-       | rule        | output               | "file.txt"      | ""                |
-       | rule        | shell                | "file.txt"      | ""                |
-       | rule        | log                  | "file.txt"      | ""                |
-       | rule        | params               | "file.txt"      | ""                |
-       | rule        | resources            | "file.txt"      | ""                |
-       | rule        | version              | "file.txt"      | ""                |
-       | rule        | message              | "file.txt"      | ""                |
-       | rule        | benchmark            | "file.txt"      | ""                |
-       | rule        | priority             | "file.txt"      | ""                |
-       | rule        | wrapper              | "file.txt"      | ""                |
-       | rule        | input                | \n        "file.txt"    | ""                |
-       | rule        | output               | \n        "file.txt"    | ""                |
-       | rule        | shell                | \n        "file.txt"    | ""                |
-       | rule        | log                  | \n        "file.txt"    | ""                |
-       | rule        | params               | \n        "file.txt"    | ""                |
-       | rule        | resources            | \n        "file.txt"    | ""                |
-       | rule        | version              | \n        "file.txt"    | ""                |
-       | rule        | message              | \n        "file.txt"    | ""                |
-       | rule        | benchmark            | \n        "file.txt"    | ""                |
-       | rule        | priority             | \n        "file.txt"    | ""                |
-       | rule        | wrapper              | \n        "file.txt"    | ""                |
-
-  Scenario Outline: Swap rule between rule sections (case1)
+  Scenario Outline: Swap rule between rule sections
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
     <rule_like2> NAME2:
-        input: <content2>
-        output: <content2>
+        input:<content2>
+        output:<content2>
 
-    <comment>
+    # comment
 
     <rule_like1> NAME1:
-        input: <content1>
-        output: <content1>
+        log:<content1>
+        message:<content1>
     """
-    When I put the caret at input: <content1>
+    When I put the caret at log:
     And I invoke MoveStatementUp action
     Then editor content will be
     """
     <rule_like2> NAME2:
-        input: <content2>
-        output: <content2>
-        input: <content1>
+        input:<content2>
+        output:<content2>
+        log:<content1>
 
-    <comment>
+    # comment
 
     <rule_like1> NAME1:
-        output: <content1>
+        message:<content1>
     """
-    When I put the caret at input: <content1>
+    When I put the caret at log:
     And I invoke MoveStatementDown action
     Then editor content will be
     """
     <rule_like2> NAME2:
-        input: <content2>
-        output: <content2>
+        input:<content2>
+        output:<content2>
 
-    <comment>
+    # comment
 
     <rule_like1> NAME1:
-        input: <content1>
-        output: <content1>
+        log:<content1>
+        message:<content1>
     """
     Examples:
-      | rule_like1  | rule_like2  | content1       | content2      | comment   |
-      | rule        | rule        | "file1.txt"    | "file2.txt"   | # comment |
-      | checkpoint  | rule        | "file1.txt"    | "file2.txt"   | # comment |
-      | rule        | checkpoint  | "file1.txt"    | "file2.txt"   | # comment |
-      | checkpoint  | checkpoint  | "file1.txt"    | "file2.txt"   | # comment |
+      | rule_like1  | rule_like2  | content1       | content2      |
+      | rule       | rule       | "file1.txt"           | "file2.txt"           |
+      | checkpoint | rule       | "file1.txt"           | "file2.txt"           |
+      | rule       | checkpoint | "file1.txt"           | "file2.txt"           |
+      | checkpoint | checkpoint | "file1.txt"           | "file2.txt"           |
+      | rule       | rule       | \n        "file1.txt" | "file2.txt"           |
+      | checkpoint | rule       | \n        "file1.txt" | "file2.txt"           |
+      | rule       | checkpoint | \n        "file1.txt" | "file2.txt"           |
+      | checkpoint | checkpoint | \n        "file1.txt" | "file2.txt"           |
+      | rule       | rule       | "file1.txt"           | \n        "file2.txt" |
+      | checkpoint | rule       | "file1.txt"           | \n        "file2.txt" |
+      | rule       | checkpoint | "file1.txt"           | \n        "file2.txt" |
+      | checkpoint | checkpoint | "file1.txt"           | \n        "file2.txt" |
+      | rule       | rule       | \n        "file1.txt" | \n        "file2.txt" |
+      | checkpoint | rule       | \n        "file1.txt" | \n        "file2.txt" |
+      | rule       | checkpoint | \n        "file1.txt" | \n        "file2.txt" |
+      | checkpoint | checkpoint | \n        "file1.txt" | \n        "file2.txt" |
 
-  Scenario Outline: Swap rule between rule sections (case2)
-    Given a snakemake project
-    Given I open a file "foo1.smk" with text
-    """
-    <rule_like2> NAME2:
-        input:
-            <content2>
-        output:
-            <content2>
-
-    <comment>
-
-    <rule_like1> NAME1:
-        input: <content1>
-        output: <content1>
-    """
-    When I put the caret at input: <content1>
-    And I invoke MoveStatementUp action
-    Then editor content will be
-    """
-    <rule_like2> NAME2:
-        input:
-            <content2>
-        output:
-            <content2>
-        input: <content1>
-
-    <comment>
-
-    <rule_like1> NAME1:
-        output: <content1>
-    """
-    When I put the caret at input: <content1>
-    And I invoke MoveStatementDown action
-    Then editor content will be
-    """
-    <rule_like2> NAME2:
-        input:
-            <content2>
-        output:
-            <content2>
-
-    <comment>
-
-    <rule_like1> NAME1:
-        input: <content1>
-        output: <content1>
-    """
-    Examples:
-      | rule_like1  | rule_like2  | content1       | content2      | comment   |
-      | rule        | rule        | "file1.txt"    | "file2.txt"   | # comment |
-      | checkpoint  | rule        | "file1.txt"    | "file2.txt"   | # comment |
-      | rule        | checkpoint  | "file1.txt"    | "file2.txt"   | # comment |
-      | checkpoint  | checkpoint  | "file1.txt"    | "file2.txt"   | # comment |
-
-  Scenario Outline: Swap rule between rule sections (case3)
-    Given a snakemake project
-    Given I open a file "foo1.smk" with text
-    """
-    <rule_like2> NAME2:
-        input: <content2>
-        output: <content2>
-
-    <comment>
-
-    <rule_like1> NAME1:
-        input: #here
-            <content1>
-        output:
-            <content1>
-    """
-    When I put the caret at input: #here
-    And I invoke MoveStatementUp action
-    Then editor content will be
-    """
-    <rule_like2> NAME2:
-        input: <content2>
-        output: <content2>
-        input: #here
-            <content1>
-
-    <comment>
-
-    <rule_like1> NAME1:
-        output:
-            <content1>
-    """
-    When I put the caret at input: #here
-    And I invoke MoveStatementDown action
-    Then editor content will be
-    """
-    <rule_like2> NAME2:
-        input: <content2>
-        output: <content2>
-
-    <comment>
-
-    <rule_like1> NAME1:
-        input: #here
-            <content1>
-        output:
-            <content1>
-    """
-    Examples:
-      | rule_like1  | rule_like2  | content1       | content2      | comment   |
-      | rule        | rule        | "file1.txt"    | "file2.txt"   | # comment |
-      | checkpoint  | rule        | "file1.txt"    | "file2.txt"   | # comment |
-      | rule        | checkpoint  | "file1.txt"    | "file2.txt"   | # comment |
-      | checkpoint  | checkpoint  | "file1.txt"    | "file2.txt"   | # comment |
-
-  Scenario Outline: Swap rule between rule sections (case4)
-    Given a snakemake project
-    Given I open a file "foo1.smk" with text
-    """
-    <rule_like2> NAME2:
-        input:
-            <content2>
-        output:
-            <content2>
-
-    <comment>
-
-    <rule_like1> NAME1:
-        input: #here
-            <content1>
-        output:
-            <content1>
-    """
-    When I put the caret at input: #here
-    And I invoke MoveStatementUp action
-    Then editor content will be
-    """
-    <rule_like2> NAME2:
-        input:
-            <content2>
-        output:
-            <content2>
-        input: #here
-            <content1>
-
-    <comment>
-
-    <rule_like1> NAME1:
-        output:
-            <content1>
-    """
-    When I put the caret at input: #here
-    And I invoke MoveStatementDown action
-    Then editor content will be
-    """
-    <rule_like2> NAME2:
-        input:
-            <content2>
-        output:
-            <content2>
-
-    <comment>
-
-    <rule_like1> NAME1:
-        input: #here
-            <content1>
-        output:
-            <content1>
-    """
-    Examples:
-      | rule_like1  | rule_like2  | content1       | content2      | comment   |
-      | rule        | rule        | "file1.txt"    | "file2.txt"   | # comment |
-      | checkpoint  | rule        | "file1.txt"    | "file2.txt"   | # comment |
-      | rule        | checkpoint  | "file1.txt"    | "file2.txt"   | # comment |
-      | checkpoint  | checkpoint  | "file1.txt"    | "file2.txt"   | # comment |
-
-  Scenario Outline: Swap rule between rule sections doesn't work with content between them  (case1)
+  Scenario Outline: Swap rule between rule sections doesn't work with content between them
      Given a snakemake project
      Given I open a file "foo1.smk" with text
      """
@@ -953,10 +719,10 @@ Feature: Statement mover
      pass
 
      <rule_like1> NAME1:
-         input: <content1>
-         output: <content1>
+         message: <content1>
+         log: <content1>
      """
-     When I put the caret at input: <content1>
+     When I put the caret at input:
      And I invoke MoveStatementUp action
      Then editor content will be
      """
@@ -967,10 +733,10 @@ Feature: Statement mover
      pass
 
      <rule_like1> NAME1:
-         input: <content1>
-         output: <content1>
+         message: <content1>
+         log: <content1>
      """
-     When I put the caret at output: <content2>
+     When I put the caret at output:
      And I invoke MoveStatementDown action
      Then editor content will be
      """
@@ -981,186 +747,28 @@ Feature: Statement mover
      pass
 
      <rule_like1> NAME1:
-         input: <content1>
-         output: <content1>
+         message: <content1>
+         log: <content1>
      """
      Examples:
-       | rule_like1  | rule_like2  | content1       | content2      |
-       | rule        | rule        | "file1.txt"    | "file2.txt"   |
-       | checkpoint  | rule        | "file1.txt"    | "file2.txt"   |
-       | rule        | checkpoint  | "file1.txt"    | "file2.txt"   |
-       | checkpoint  | checkpoint  | "file1.txt"    | "file2.txt"   |
+       | rule_like1 | rule_like2 | content1              | content2              |
+       | rule       | rule       | "file1.txt"           | "file2.txt"           |
+       | checkpoint | rule       | "file1.txt"           | "file2.txt"           |
+       | rule       | checkpoint | "file1.txt"           | "file2.txt"           |
+       | checkpoint | checkpoint | "file1.txt"           | "file2.txt"           |
+       | rule       | rule       | \n        "file1.txt" | "file2.txt"           |
+       | checkpoint | rule       | \n        "file1.txt" | "file2.txt"           |
+       | rule       | checkpoint | \n        "file1.txt" | "file2.txt"           |
+       | checkpoint | checkpoint | \n        "file1.txt" | "file2.txt"           |
+       | rule       | rule       | "file1.txt"           | \n        "file2.txt" |
+       | checkpoint | rule       | "file1.txt"           | \n        "file2.txt" |
+       | rule       | checkpoint | "file1.txt"           | \n        "file2.txt" |
+       | checkpoint | checkpoint | "file1.txt"           | \n        "file2.txt" |
+       | rule       | rule       | \n        "file1.txt" | \n        "file2.txt" |
+       | checkpoint | rule       | \n        "file1.txt" | \n        "file2.txt" |
+       | rule       | checkpoint | \n        "file1.txt" | \n        "file2.txt" |
+       | checkpoint | checkpoint | \n        "file1.txt" | \n        "file2.txt" |
 
-  Scenario Outline: Swap rule between rule sections doesn't work with content between them  (case2)
-     Given a snakemake project
-     Given I open a file "foo1.smk" with text
-     """
-     <rule_like2> NAME2:
-         input:
-             <content2>
-         output: #here
-             <content2>
-
-     pass
-
-     <rule_like1> NAME1:
-         input: <content1>
-         output: <content1>
-     """
-     When I put the caret at input: <content1>
-     And I invoke MoveStatementUp action
-     Then editor content will be
-     """
-     <rule_like2> NAME2:
-         input:
-             <content2>
-         output: #here
-             <content2>
-
-     pass
-
-     <rule_like1> NAME1:
-         input: <content1>
-         output: <content1>
-     """
-     When I put the caret at output: #here
-     And I invoke MoveStatementDown action
-     Then editor content will be
-     """
-     <rule_like2> NAME2:
-         input:
-             <content2>
-         output: #here
-             <content2>
-
-     pass
-
-     <rule_like1> NAME1:
-         input: <content1>
-         output: <content1>
-     """
-     Examples:
-       | rule_like1  | rule_like2  | content1       | content2      |
-       | rule        | rule        | "file1.txt"    | "file2.txt"   |
-       | checkpoint  | rule        | "file1.txt"    | "file2.txt"   |
-       | rule        | checkpoint  | "file1.txt"    | "file2.txt"   |
-       | checkpoint  | checkpoint  | "file1.txt"    | "file2.txt"   |
-
-  Scenario Outline: Swap rule between rule sections doesn't work with content between them  (case3)
-     Given a snakemake project
-     Given I open a file "foo1.smk" with text
-     """
-     <rule_like2> NAME2:
-         input: <content2>
-         output: <content2>
-
-     pass
-
-     <rule_like1> NAME1:
-         input: #here
-             <content1>
-         output:
-             <content1>
-     """
-     When I put the caret at input: #here
-     And I invoke MoveStatementUp action
-     Then editor content will be
-     """
-     <rule_like2> NAME2:
-         input: <content2>
-         output: <content2>
-
-     pass
-
-     <rule_like1> NAME1:
-         input: #here
-             <content1>
-         output:
-             <content1>
-     """
-     When I put the caret at output: <content2>
-     And I invoke MoveStatementDown action
-     Then editor content will be
-     """
-     <rule_like2> NAME2:
-         input: <content2>
-         output: <content2>
-
-     pass
-
-     <rule_like1> NAME1:
-         input: #here
-             <content1>
-         output:
-             <content1>
-     """
-     Examples:
-       | rule_like1  | rule_like2  | content1       | content2      |
-       | rule        | rule        | "file1.txt"    | "file2.txt"   |
-       | checkpoint  | rule        | "file1.txt"    | "file2.txt"   |
-       | rule        | checkpoint  | "file1.txt"    | "file2.txt"   |
-       | checkpoint  | checkpoint  | "file1.txt"    | "file2.txt"   |
-
-  Scenario Outline: Swap rule between rule sections doesn't work with content between them  (case4)
-     Given a snakemake project
-     Given I open a file "foo1.smk" with text
-     """
-     <rule_like2> NAME2:
-         input:
-             <content2>
-         output: #here
-             <content2>
-
-     pass
-
-     <rule_like1> NAME1:
-         input: #here
-             <content1>
-         output:
-             <content1>
-     """
-     When I put the caret at input: #here
-     And I invoke MoveStatementUp action
-     Then editor content will be
-     """
-     <rule_like2> NAME2:
-         input:
-             <content2>
-         output: #here
-             <content2>
-
-     pass
-
-     <rule_like1> NAME1:
-         input: #here
-             <content1>
-         output:
-             <content1>
-     """
-     When I put the caret at output: #here
-     And I invoke MoveStatementDown action
-     Then editor content will be
-     """
-     <rule_like2> NAME2:
-         input:
-             <content2>
-         output: #here
-             <content2>
-
-     pass
-
-     <rule_like1> NAME1:
-         input: #here
-             <content1>
-         output:
-             <content1>
-     """
-     Examples:
-       | rule_like1  | rule_like2  | content1       | content2      |
-       | rule        | rule        | "file1.txt"    | "file2.txt"   |
-       | checkpoint  | rule        | "file1.txt"    | "file2.txt"   |
-       | rule        | checkpoint  | "file1.txt"    | "file2.txt"   |
-       | checkpoint  | checkpoint  | "file1.txt"    | "file2.txt"   |
 
   Scenario Outline: Swap statements in run section
       Given a snakemake project
