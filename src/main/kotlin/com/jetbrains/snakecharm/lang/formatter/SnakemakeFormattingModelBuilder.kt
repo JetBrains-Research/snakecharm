@@ -30,6 +30,8 @@ class SnakemakeFormattingModelBuilder: PythonFormattingModelBuilder() {
             .before(PyTokenTypes.END_OF_LINE_COMMENT).spacing(2, 0, 0,  klb, kblic)
             .after(PyTokenTypes.END_OF_LINE_COMMENT).spacing(0, 0, 1,  klb, kblic)
             .around(RULE_LIKE_STATEMENTS).blankLines(commonSettings.BLANK_LINES_AROUND_METHOD)
+            // TODO: add setting: linebreak after args section keyword, i.e args on new line
+            .afterInside(PyTokenTypes.COLON, PyElementTypes.ARGUMENT_LIST).spacing(1, 0, 0, klb, kblic)
 
             // XXX:  ideas what to fix:
             //.aroundInside(PyTokenTypes.EQ, PyElementTypes.ASSIGNMENT_STATEMENT).spaceIf(commonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS)

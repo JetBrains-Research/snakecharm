@@ -48,6 +48,10 @@ class SnakemakeFormatterTest : SnakemakeTestCase() {
         doTest()
     }
 
+    fun testSpaceAfterSectionKeywordColon() {
+        doTest()
+    }
+
     private fun doTest() {
         doTest(false)
     }
