@@ -163,7 +163,7 @@ class SmkStatementParsing(
 
         // Skipping a docstring
         if (myBuilder.tokenType.isPythonString()) {
-            parsingContext.expressionParser.parseExpression()
+            parsingContext.expressionParser.parseStringLiteralExpression()
         }
 
         // Wile typing new rule at some moment is could be incomplete, e.g. missing indent and
@@ -219,11 +219,19 @@ class SmkStatementParsing(
 
         // Skipping a docstring
         if (myBuilder.tokenType.isPythonString()) {
-            parsingContext.expressionParser.parseExpression()
+            parsingContext.expressionParser.parseStringLiteralExpression()
 
-            if (myBuilder.tokenType === PyTokenTypes.STATEMENT_BREAK) {
+            if (!atToken(PyTokenTypes.IDENTIFIER)) {
+                // section expected on next line
+                if (!atToken(PyTokenTypes.STATEMENT_BREAK)) {
+                    val errorMarker = myBuilder.mark()
+                    while (!atToken(PyTokenTypes.STATEMENT_BREAK)) {
+                        nextToken()
+                    }
+                    errorMarker.error(SnakemakeBundle.message("PARSE.rule.expected.rule.commend.to.docstring"))
+                }
                 nextToken()
-            }
+            } // else docstring on same line as next section
 
             if (myBuilder.eof()) {
                 myBuilder.error(SnakemakeBundle.message("PARSE.eof.docstring"))

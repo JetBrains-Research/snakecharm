@@ -1,4 +1,6 @@
 SnakemakeFile: CrazyDocstrings.smk
+  PsiComment(Py:END_OF_LINE_COMMENT)('# only first section doc is taken')
+  PsiWhiteSpace('\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
@@ -34,3 +36,86 @@ SnakemakeFile: CrazyDocstrings.smk
           PsiWhiteSpace(' ')
           PyStringLiteralExpression: output.txt
             PsiElement(Py:SINGLE_QUOTED_STRING)('"output.txt"')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('boo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: doc-2
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''doc-2'')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: doc-{1}
+        PyFormattedStringElement
+          PsiElement(Py:FSTRING_START)('f'')
+          PsiElement(Py:FSTRING_TEXT)('doc-')
+          PyFStringFragment
+            PsiElement(Py:FSTRING_FRAGMENT_START)('{')
+            PyNumericLiteralExpression
+              PsiElement(Py:INTEGER_LITERAL)('1')
+            PsiElement(Py:FSTRING_FRAGMENT_END)('}')
+          PsiElement(Py:FSTRING_END)(''')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: doc-3
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"doc-3"')
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: doc-4
+        PsiElement(Py:TRIPLE_QUOTED_STRING)('"""doc-4"""')
+      PsiWhiteSpace('\n    ')
+      SmkRunSection
+        PsiElement(Py:IDENTIFIER)('run')
+        PsiElement(Py:COLON)(':')
+        PsiWhiteSpace('\n        ')
+        PyStatementList
+          PyForStatement
+            PyForPart
+              PsiElement(Py:FOR_KEYWORD)('for')
+              PsiWhiteSpace(' ')
+              PyTargetExpression: rule
+                PsiElement(Py:IDENTIFIER)('rule')
+              PsiWhiteSpace(' ')
+              PsiElement(Py:IN_KEYWORD)('in')
+              PsiWhiteSpace(' ')
+              PyReferenceExpression: rules
+                PyReferenceExpression: workflow
+                  PsiElement(Py:IDENTIFIER)('workflow')
+                PsiElement(Py:DOT)('.')
+                PsiElement(Py:IDENTIFIER)('rules')
+              PsiElement(Py:COLON)(':')
+              PsiWhiteSpace('\n            ')
+              PyStatementList
+                PyExpressionStatement
+                  PyCallExpression: print
+                    PyReferenceExpression: print
+                      PsiElement(Py:IDENTIFIER)('print')
+                    PyArgumentList
+                      PsiElement(Py:LPAR)('(')
+                      PyStringLiteralExpression: RULE
+                        PsiElement(Py:SINGLE_QUOTED_STRING)('"RULE"')
+                      PsiElement(Py:COMMA)(',')
+                      PsiWhiteSpace(' ')
+                      PyReferenceExpression: name
+                        PyReferenceExpression: rule
+                          PsiElement(Py:IDENTIFIER)('rule')
+                        PsiElement(Py:DOT)('.')
+                        PsiElement(Py:IDENTIFIER)('name')
+                      PsiElement(Py:RPAR)(')')
+                PsiWhiteSpace('\n            ')
+                PyExpressionStatement
+                  PyCallExpression: print
+                    PyReferenceExpression: print
+                      PsiElement(Py:IDENTIFIER)('print')
+                    PyArgumentList
+                      PsiElement(Py:LPAR)('(')
+                      PyStringLiteralExpression: DOCSTRING
+                        PsiElement(Py:SINGLE_QUOTED_STRING)('"DOCSTRING"')
+                      PsiElement(Py:COMMA)(',')
+                      PsiWhiteSpace(' ')
+                      PyReferenceExpression: docstring
+                        PyReferenceExpression: rule
+                          PsiElement(Py:IDENTIFIER)('rule')
+                        PsiElement(Py:DOT)('.')
+                        PsiElement(Py:IDENTIFIER)('docstring')
+                      PsiElement(Py:RPAR)(')')

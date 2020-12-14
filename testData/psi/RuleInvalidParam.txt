@@ -20,13 +20,10 @@ SnakemakeFile: RuleInvalidParam.smk
       PsiWhiteSpace('\n    ')
       PyStringLiteralExpression: input
         PsiElement(Py:SINGLE_QUOTED_STRING)(''input'')
-      PsiErrorElement:Rule parameter identifier is expected
-        <empty list>
-      PsiElement(Py:COLON)(':')
-  PsiWhiteSpace(' ')
-  PsiElement(Py:SINGLE_QUOTED_STRING)(''foo2'')
-  PsiErrorElement:Statement expected, found Py:DEDENT
-    <empty list>
+      PsiErrorElement:Expecting rule keyword, comment or docstrings inside a rule definition.
+        PsiElement(Py:COLON)(':')
+        PsiWhiteSpace(' ')
+        PsiElement(Py:SINGLE_QUOTED_STRING)(''foo2'')
   PsiWhiteSpace('\n\n')
   SmkRule
     PsiElement(Py:RULE_KEYWORD)('rule')
