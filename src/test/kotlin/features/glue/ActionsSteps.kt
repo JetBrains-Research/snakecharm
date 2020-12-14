@@ -210,6 +210,7 @@ class ActionsSteps {
             "weak warning" -> fixture.checkHighlighting(false, false, true, ignoreExtra)
             else -> fail("Unknown highlighting type: $level")
         }
+        SnakemakeWorld.myInspectionChecked = true
     }
 
     @When("^I invoke quick documentation popup$")
@@ -285,8 +286,18 @@ class ActionsSteps {
     }
 
     @Then("^I invoke quick fix ([^\\]]+) and see text:")
-    fun iInvokeQuickFixAndSeeText(quickFixName: String, text: String) {
-        val quickFix = fixture().getAllQuickFixes().first { it.familyName == quickFixName }
+    fun iInvokeQuickFixAndSeeText(quickFixFamilyName: String, text: String) {
+        require(SnakemakeWorld.myInspectionChecked) {
+            "First call step: I check highlighting ..."
+        }
+        val allQuickFixes = fixture().getAllQuickFixes()
+        val quickFix = allQuickFixes.firstOrNull { it.familyName == quickFixFamilyName }
+            ?: fail(
+                "Cannot find quickfix '${quickFixFamilyName}', available quick fixes:[\n${
+                    allQuickFixes.joinToString(separator = "\n") { it.familyName }
+                }\n]"
+            )
+
         ApplicationManager.getApplication().invokeAndWait {
             fixture().launchAction(quickFix)
         }

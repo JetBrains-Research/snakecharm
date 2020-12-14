@@ -17,6 +17,7 @@ class Hooks {
     fun initParamdefs() {
         // todo: most likely we should remove this call
         TestApplicationManager.getInstance()
+        SnakemakeWorld.myInspectionChecked = false
     }
 
     @After(order = 1)

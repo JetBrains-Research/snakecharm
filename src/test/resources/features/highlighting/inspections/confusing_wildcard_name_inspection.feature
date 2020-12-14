@@ -119,6 +119,7 @@ Feature: Inspection warns about confusing wildcard names.
       params: "{input}.foo"
     """
     And SmkSLWildcardNameIsConfusingInspection inspection is enabled
+    # PyRenameElementQuickFix
     And I invoke quick fix Rename element and see text:
     """
     rule foo:

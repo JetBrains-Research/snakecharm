@@ -20,6 +20,7 @@ object SnakemakeWorld {
     @JvmField var myFoundUsages: List<UsageInfo> = emptyList()
     @JvmField var myTestRootDisposable: TestDisposable? = null
     @JvmField var myInspectionProblemsCounts: MutableMap<String, Int>? = null
+    @JvmField var myInspectionChecked: Boolean = false
 
     fun injectionFixture() = myInjectionFixture!!
     fun fixture()= myFixture!!

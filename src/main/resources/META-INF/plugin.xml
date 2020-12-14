@@ -396,6 +396,17 @@
     />
 
     <localInspection
+            language="SnakemakeSL" shortName="SmkSLQuotingMisuseInGetAccessorInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkSLQuotingMisuseInGetAccessor"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.quoting.misuse.in.get.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkSLQuotingMisuseInGetAccessorInspection"
+    />
+
+    <localInspection
             language="SnakemakeSL" shortName="SmkSLSubscriptionIndexOutOfBoundsInspection"
             enabledByDefault="true"
             level="ERROR"
