@@ -146,7 +146,7 @@ object SnakemakeAPI {
             SECTION_WRAPPER,
             SECTION_VERSION, SECTION_THREADS,
             SECTION_PRIORITY, SECTION_SINGULARITY, SECTION_CACHE,
-            SECTION_CONTAINER, SECTION_NOTEBOOK
+            SECTION_CONTAINER, SECTION_NOTEBOOK, SECTION_ENVMODULES
     )
 
     /**
@@ -155,7 +155,7 @@ object SnakemakeAPI {
      * TODO: Consider implementing this as PSI interface in order not to compare keyword string each time
      */
     val WILDCARDS_EXPANDING_SECTIONS_KEYWORDS = setOf(
-            SECTION_INPUT, SECTION_OUTPUT, SECTION_CONDA, SECTION_ENVMODULES,
+            SECTION_INPUT, SECTION_OUTPUT, SECTION_CONDA,
             SECTION_RESOURCES, SECTION_GROUP, SECTION_BENCHMARK,
             SECTION_LOG, SECTION_PARAMS
     )

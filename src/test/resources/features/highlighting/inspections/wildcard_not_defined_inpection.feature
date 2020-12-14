@@ -17,7 +17,6 @@ Feature: Inspection: SmkWildcardNotDefinedInspection
       | section    | usage      |
       | rule       | input      |
       | rule       | group      |
-      | rule       | envmodules |
       | checkpoint | input      |
 
   Scenario Outline: Cannot parse wildcard defining section
