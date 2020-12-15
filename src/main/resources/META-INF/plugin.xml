@@ -239,6 +239,16 @@
             key="INSP.NAME.envmodules.section.not.allowed.with.title"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkEnvmodulesNotAllowedSectionInspection"
     />
+    <localInspection
+            language="Snakemake" shortName="SmkFileEndsWithCommentInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkFileEndsWithComment"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.file.ends.with.comment.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkFileEndsWithCommentInspection"
+    />
 
 
     <localInspection

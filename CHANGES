@@ -11,6 +11,7 @@ Features:
 - PyCharm 2020.3 compatibility (see #337)
 - Snakemake specific formatter settings (see #338)
 - `envmodules` parsing (see #332)
+- Inspection: Comment at the end of Snakefile is treated as syntax error (see #58)
 - Inspection: envmodules directive is only allowed with shell, script, notebook, or wrapper directives (not with run) (see #340)
 - Inspection: Warn about double quotation on runtime in cases like {config['foo']} for snakemake string injections (see #329)
 - Inspection: Warn users if they have arguments with same value in section (see #263)
