@@ -13,7 +13,7 @@ Feature: Rule section access requires lambda
     #noinspection CucumberUndefinedStep
     Then I expect inspection error on <<var_name>> in <<section_context>> with message
        """
-       To access '<var_name>' section use lambda here, e.g. `lambda wildcards, input: input.foo`.
+       To access '<var_name>' section use lambda here, e.g. `lambda wildcards, <var_name>: <var_name>.foo`.
        """
     # Weak warning check includes error check, use `weak warning` because our inspection returns both types
     When I check highlighting weak warnings
@@ -46,23 +46,23 @@ Feature: Rule section access requires lambda
           """
           rule all:
             <section_context>
-            shell: "echo {<ref_section_name>} {params.p}"
+            shell: "echo {<var_name>} {params.p}"
           """
     And SmkSectionVariableRequiresLambdaAccessInspection inspection is enabled
     #noinspection CucumberUndefinedStep
-    Then I expect inspection error on <<ref_section_name>> in <<section_context>> with message
+    Then I expect inspection error on <<var_name>> in <<section_context>> with message
          """
-         To access '<ref_section_name>' section use lambda here, e.g. `lambda wildcards, input: input.foo`.
+         To access '<var_name>' section use lambda here, e.g. `lambda wildcards, <var_name>: <var_name>.foo`.
          """
     # Weak warning check includes error check, use `weak warning` because our inspection returns both types
     When I check highlighting weak warnings
     Examples:
-      | section_context                    | ref_section_name |
-      | params: p=output                   | output           |
-      | params: p=threads                  | threads          |
-      | params: p=resources                | resources        |
-      | resources: p=threads               | threads          |
-      | params: p=lambda wildcards: output | output           |
+      | section_context                    | var_name  |
+      | params: p=output                   | output    |
+      | params: p=threads                  | threads   |
+      | params: p=resources                | resources |
+      | resources: p=threads               | threads   |
+      | params: p=lambda wildcards: output | output    |
 
   Scenario Outline: Variable name matches undeclared section and hidden by outer variable
     Given a snakemake project
@@ -77,20 +77,20 @@ Feature: Rule section access requires lambda
     #noinspection CucumberUndefinedStep
     Then I expect inspection weak warning on <<var_name>> in <<section_context>> with message
          """
-         Access to outer scope '<var_name>' object with the name similar to snakemake specific variable. To use snakemake '<var_name>' variable, use lambda expression here, e.g. `lambda wildcards, input: input.foo`.
+         Access to outer scope '<var_name>' object with the name similar to snakemake specific variable. To use snakemake '<var_name>' variable, use lambda expression here, e.g. `lambda wildcards, <var_name>: <var_name>.foo`.
          """
     # Weak warning check includes error check, use `weak warning` because our inspection returns both types
     When I check highlighting weak warnings
 
     Examples:
-      | section_context                      | var_name  | outer_context |
-      | params: p=input                     | input     |               |
-      | params: p=output                    | output    | output = 2    |
-      | params: p=threads                   | threads   | threads = 2   |
-      | params: p=resources                 | resources | resources = 2 |
-      | resources: p=input                  | input     |               |
-      | resources: p=threads                | threads   | threads = 2   |
-      | threads: p=input                    | input     |               |
+      | section_context                    | var_name  | outer_context |
+      | params: p=input                    | input     |               |
+      | params: p=output                   | output    | output = 2    |
+      | params: p=threads                  | threads   | threads = 2   |
+      | params: p=resources                | resources | resources = 2 |
+      | resources: p=input                 | input     |               |
+      | resources: p=threads               | threads   | threads = 2   |
+      | threads: p=input                   | input     |               |
       | params: p=lambda wildcards: input  | input     |               |
       | params: p=lambda wildcards: output | output    | output = 2    |
 
@@ -98,31 +98,31 @@ Feature: Rule section access requires lambda
     Given a snakemake project
     Given I open a file "foo.smk" with text
         """
-        <ref_section_name> = 2
+        <var_name> = 2
         rule all:
           <ref_section>
           <section_context>
-          shell: "echo {<ref_section_name>} {params.p}"
+          shell: "echo {<var_name>} {params.p}"
         """
     And SmkSectionVariableRequiresLambdaAccessInspection inspection is enabled
     # XXX Due to current behavior of resolve when section is in rule, `ref_section_name` is considered as unresolved
     # XXX it isn't correct, and here is desired warning that Possible a rule is.
     #noinspection CucumberUndefinedStep
-    Then I expect inspection error on <<ref_section_name>> in <<section_context>> with message
+    Then I expect inspection error on <<var_name>> in <<section_context>> with message
        """
-       To access '<ref_section_name>' section use lambda here, e.g. `lambda wildcards, input: input.foo`.
+       To access '<var_name>' section use lambda here, e.g. `lambda wildcards, <var_name>: <var_name>.foo`.
        """
     # Weak warning check includes error check, use `weak warning` because our inspection returns both types
     When I check highlighting weak warnings
     Examples:
-      | section_context                    | ref_section_name | ref_section    |
-      | params: p=input                    | input            | input: f=""    |
-      | params: p=output                   | output           | output: f=""   |
-      | params: p=threads                  | threads          | threads: 2     |
-      | params: p=resources                | resources        | resources: f=2 |
-      | resources: p=input                 | input            | input: f=""    |
-      | resources: p=threads               | threads          | threads: 2     |
-      | threads: p=input                   | input            | input: f=""    |
+      | section_context      | var_name  | ref_section    |
+      | params: p=input      | input     | input: f=""    |
+      | params: p=output     | output    | output: f=""   |
+      | params: p=threads    | threads   | threads: 2     |
+      | params: p=resources  | resources | resources: f=2 |
+      | resources: p=input   | input     | input: f=""    |
+      | resources: p=threads | threads   | threads: 2     |
+      | threads: p=input     | input     | input: f=""    |
 
   Scenario Outline: Variable name matches declared section and referenced section is hidden by outer variable (case 2)
     Given a snakemake project
@@ -138,14 +138,14 @@ Feature: Rule section access requires lambda
     #noinspection CucumberUndefinedStep
     Then I expect inspection error on <<var_name>> in <<section_context>> with message
        """
-       Access to outer scope '<var_name>' object with the name similar to snakemake specific variable. To use snakemake '<var_name>' variable, use lambda expression here, e.g. `lambda wildcards, input: input.foo`.
+       Access to outer scope '<var_name>' object with the name similar to snakemake specific variable. To use snakemake '<var_name>' variable, use lambda expression here, e.g. `lambda wildcards, <var_name>: <var_name>.foo`.
        """
     # Weak warning check includes error check, use `weak warning` because our inspection returns both types
     When I check highlighting weak warnings
     Examples:
-      | section_context                    | var_name | ref_section    |
-      | params: p=lambda wildcards: input  | input            | input: f=""    |
-      | params: p=lambda wildcards: output | output           | output: f=""   |
+      | section_context                    | var_name | ref_section  |
+      | params: p=lambda wildcards: input  | input    | input: f=""  |
+      | params: p=lambda wildcards: output | output   | output: f="" |
 
   Scenario Outline: Variable not matches section and not hidden by outer variable
     Given a snakemake project
@@ -159,21 +159,21 @@ Feature: Rule section access requires lambda
     #noinspection CucumberUndefinedStep
     Then I expect inspection error on <<var_name>> in <<section_context>> with message
          """
-         To access '<var_name>' section use lambda here, e.g. `lambda wildcards, input: input.foo`.
+         To access '<var_name>' section use lambda here, e.g. `<lambda_example_prefix> <var_name>: <var_name>.foo`.
          """
     # Weak warning check includes error check, use `weak warning` because our inspection returns both types
     When I check highlighting weak warnings
 
     Examples:
-      | section_context                      | var_name  |
-      | input: p=wildcards                   | wildcards |
-      | group: p=wildcards                   | wildcards |
-      | params: p=wildcards                  | wildcards |
-      | resources: p=wildcards               | wildcards |
-      | resources: p=attempt                 | attempt   |
-      | threads: p=wildcards                 | wildcards |
-      | threads: p=attempt                   | attempt   |
-      | threads: p=lambda wildcards: attempt | attempt   |
+      | section_context                      | var_name  | lambda_example_prefix |
+      | input: p=wildcards                   | wildcards | lambda                |
+      | group: p=wildcards                   | wildcards | lambda                |
+      | params: p=wildcards                  | wildcards | lambda                |
+      | resources: p=wildcards               | wildcards | lambda                |
+      | resources: p=attempt                 | attempt   | lambda wildcards,     |
+      | threads: p=wildcards                 | wildcards | lambda                |
+      | threads: p=attempt                   | attempt   | lambda wildcards,     |
+      | threads: p=lambda wildcards: attempt | attempt   | lambda wildcards,     |
 
   Scenario Outline: Variable not matches section and hidden by outer variable
     Given a snakemake project
@@ -188,20 +188,20 @@ Feature: Rule section access requires lambda
     #noinspection CucumberUndefinedStep
     Then I expect inspection weak warning on <<var_name>> in <<section_context>> with message
        """
-       Access to outer scope '<var_name>' object with the name similar to snakemake specific variable. To use snakemake '<var_name>' variable, use lambda expression here, e.g. `lambda wildcards, input: input.foo`.
+       Access to outer scope '<var_name>' object with the name similar to snakemake specific variable. To use snakemake '<var_name>' variable, use lambda expression here, e.g. `<lambda_example_prefix> <var_name>: <var_name>.foo`.
        """
     # Weak warning check includes error check, use `weak warning` because our inspection returns both types
     When I check highlighting weak warnings
     Examples:
-      | section_context | var_name  | outer_context |
-      | input: p=wildcards                   | wildcards | wildcards = 2 |
-      | group: p=wildcards                   | wildcards | wildcards = 2 |
-      | params: p=wildcards                  | wildcards | wildcards = 2 |
-      | resources: p=wildcards               | wildcards | wildcards = 2 |
-      | resources: p=attempt                 | attempt   | attempt = 2   |
-      | threads: p=wildcards                 | wildcards | wildcards = 2 |
-      | threads: p=attempt                   | attempt   | attempt = 2   |
-      | threads: p=lambda wildcards: attempt | attempt   | attempt = 2   |
+      | section_context                      | var_name  | outer_context | lambda_example_prefix |
+      | input: p=wildcards                   | wildcards | wildcards = 2 | lambda                |
+      | group: p=wildcards                   | wildcards | wildcards = 2 | lambda                |
+      | params: p=wildcards                  | wildcards | wildcards = 2 | lambda                |
+      | resources: p=wildcards               | wildcards | wildcards = 2 | lambda                |
+      | resources: p=attempt                 | attempt   | attempt = 2   | lambda wildcards,     |
+      | threads: p=wildcards                 | wildcards | wildcards = 2 | lambda                |
+      | threads: p=attempt                   | attempt   | attempt = 2   | lambda wildcards,     |
+      | threads: p=lambda wildcards: attempt | attempt   | attempt = 2   | lambda wildcards,     |
 
   Scenario Outline: No error
     Given a snakemake project
