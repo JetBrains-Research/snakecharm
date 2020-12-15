@@ -3,9 +3,12 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
-Version 0.8.1 build #0.8.1.xxx
+Version 0.9.0 build #0.9.0.xxx
 -------------
 Released on ...
+
+Special thanks to our contributors Simon Tsirikov (@SimonTsirikov) and Artem Davletov (@ArtemDavletov). Without their help this major plugin
+update won't be possible.
 
 Features:
 - PyCharm 2020.3 compatibility (see #337)
