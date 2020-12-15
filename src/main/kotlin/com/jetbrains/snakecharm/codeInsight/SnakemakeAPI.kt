@@ -194,6 +194,9 @@ object SnakemakeAPI {
             SMK_VARS_ATTEMPT
         )
     )
+    val SECTION_LAMBDA_ARG_POSSIBLE_PARAMS: Set<String> = ALLOWED_LAMBDA_OR_CALLABLE_ARGS.values.flatMap { it.asIterable() }.toMutableSet().also {
+        it.addAll(RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS)
+    }
 
     /**
      * Set of rule\checkpoint sections that does not expect keyword arguments

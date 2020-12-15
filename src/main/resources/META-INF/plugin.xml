@@ -382,6 +382,18 @@
             key="INSP.NAME.localrules.ruleorder.confusing.ref"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkLocalrulesRuleorderConfusingReference"
     />
+
+    <localInspection
+            language="Snakemake" shortName="SmkSectionVariableRequiresLambdaAccessInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkSectionVariableRequiresLambdaAccess"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.var.requires.lambda.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionVariableRequiresLambdaAccessInspection"
+    />
+
     <localInspection
             language="SnakemakeSL" shortName="SmkWildcardNotDefinedInspection"
             enabledByDefault="true"
