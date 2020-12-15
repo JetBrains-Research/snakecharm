@@ -229,6 +229,16 @@
             key="INSP.NAME.conda.section.not.allowed.with.run"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkCondaSectionNotAllowedWithRun"
     />
+    <localInspection
+            language="Snakemake" shortName="SmkEnvmodulesNotAllowedSectionInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkEnvmodulesNotAllowedSection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.envmodules.section.not.allowed.with.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkEnvmodulesNotAllowedSectionInspection"
+    />
 
 
     <localInspection
