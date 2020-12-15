@@ -27,6 +27,7 @@ Features:
 - Action: Show folding for multiline rule sections (input, output, etc) (see #314)
 
 Fixed:
+- PluginException: Inspection #SmkAvoidTabWhitespace has no description [Plugin: SnakeCharm]
 - Do not warn about 'touch' misuse in benchmark and log sections
 - Completion does not suggest top-level keywords in comments (see #178)
 - Suppress inspection doesn't work in some cases (see #313)
