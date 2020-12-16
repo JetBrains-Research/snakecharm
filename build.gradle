@@ -8,24 +8,22 @@ plugins {
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
     // See https://github.com/JetBrains/gradle-intellij-plugin
-    id 'org.jetbrains.intellij' version '0.4.21'
+    id 'org.jetbrains.intellij' version '0.6.5'
 
     // Kotlin
-    id "org.jetbrains.kotlin.jvm" version "1.4.0"
+    id "org.jetbrains.kotlin.jvm" version "1.4.21"
 
     // Serialization
-    id 'org.jetbrains.kotlin.plugin.serialization' version "1.4.0"
+    id 'org.jetbrains.kotlin.plugin.serialization' version "1.4.21"
 
     id 'java'
 }
+
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
 
 version "${project.version}.${project.buildCounter}"
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
 // ----------------------------------------------------------------------
 intellij {
@@ -65,13 +63,13 @@ patchPluginXml {
 
 compileKotlin {
   kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "11"
   }
 }
 
 compileTestKotlin {
   kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "11"
   }
 }
 
@@ -80,8 +78,8 @@ repositories {
 }
                        
 dependencies {
-    testImplementation 'io.cucumber:cucumber-java:5.6.0'
-    testImplementation 'io.cucumber:cucumber-junit:5.6.0'
+    testImplementation 'io.cucumber:cucumber-java:6.8.1'
+    testImplementation 'io.cucumber:cucumber-junit:6.8.1'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.0.0-RC'
 }

@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm
 
+import com.intellij.application.options.CodeStyle
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.roots.impl.FilePropertyPusher
 import com.intellij.testFramework.TestApplicationManager
@@ -11,7 +12,9 @@ import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.impl.PythonLanguageLevelPusher
+import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import javax.swing.SwingUtilities
+
 
 /**
  * @author Roman.Chernyatchik
@@ -100,4 +103,12 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
             setLanguageLevel(null)
         }
     }
+
+    protected open fun getCommonCodeStyleSettings() =
+        getCodeStyleSettings().getCommonSettings(SnakemakeLanguageDialect)
+
+    protected open fun getCodeStyleSettings() = CodeStyle.getSettings(fixture!!.project)
+
+    protected open fun getIndentOptions() = getCommonCodeStyleSettings().indentOptions
+
 }

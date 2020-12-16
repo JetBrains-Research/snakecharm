@@ -14,10 +14,10 @@ Feature: Inspection: SmkWildcardNotDefinedInspection
     """
     When I check highlighting errors
     Examples:
-      | section    | usage |
-      | rule       | input |
-      | rule       | group |
-      | checkpoint | input |
+      | section    | usage      |
+      | rule       | input      |
+      | rule       | group      |
+      | checkpoint | input      |
 
   Scenario Outline: Cannot parse wildcard defining section
     Given a snakemake project

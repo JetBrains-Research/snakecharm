@@ -3,11 +3,21 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
-Version 0.8.1 build #0.8.1.xxx
+Version 0.9.0 build #0.9.0.xxx
 -------------
 Released on ...
 
+Special thanks to our contributors Simon Tsirikov (@SimonTsirikov) and Artem Davletov (@ArtemDavletov). Without their help this major plugin
+update won't be possible.
+
 Features:
+- PyCharm 2020.3 compatibility (see #337)
+- Snakemake specific formatter settings (see #338)
+- `envmodules` parsing (see #332)
+- Inspection: `input`, `output` can't be used in `params` sections directly (see #153)
+- Inspection: Comment at the end of Snakefile is treated as syntax error (see #58)
+- Inspection: envmodules directive is only allowed with shell, script, notebook, or wrapper directives (not with run) (see #340)
+- Inspection: Warn about double quotation on runtime in cases like {config['foo']} for snakemake string injections (see #329)
 - Inspection: Warn users if they have arguments with same value in section (see #263)
 - Inspection: Comma in the end of section arg list isn't needed (see #255)
 - Inspection: Warn user if rule from 'rulesorder' isn't available in current or included files (see #254)
@@ -24,6 +34,8 @@ Features:
 - Action: Show folding for multiline rule sections (input, output, etc) (see #314)
 
 Fixed:
+- PluginException: Inspection #SmkAvoidTabWhitespace has no description [Plugin: SnakeCharm]
+- Do not warn about 'touch' misuse in benchmark and log sections
 - Completion does not suggest top-level keywords in comments (see #178)
 - Suppress inspection doesn't work in some cases (see #313)
 - Don't show multiline string arg, may be comma is missing for sections with single arg (see #315)

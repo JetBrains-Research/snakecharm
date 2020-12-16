@@ -33,6 +33,7 @@ Feature: Resolve for sections/variables in SmkSL injections
          shadow: "full"
          output: ""
          group: ""
+         envmodules: ""
          singularity: ""
          cwl: ""
          log: ""
@@ -55,6 +56,7 @@ Feature: Resolve for sections/variables in SmkSL injections
       | benchmark            |
       | shadow               |
       | group                |
+      | envmodules           |
       | singularity          |
       | cwl                  |
       | priority             |

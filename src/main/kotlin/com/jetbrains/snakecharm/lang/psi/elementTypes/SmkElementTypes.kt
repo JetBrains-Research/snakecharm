@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.lang.psi.elementTypes
 
+import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.lang.psi.impl.*
 
@@ -61,4 +62,8 @@ object SmkElementTypes {
     ) {
         SmkPyReferenceExpressionImpl(it)
     }
+
+    val RULE_LIKE_STATEMENTS = TokenSet.create(
+        SmkStubElementTypes.RULE_DECLARATION_STATEMENT, SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT, SmkStubElementTypes.SUBWORKFLOW_DECLARATION_STATEMENT
+    )
 }

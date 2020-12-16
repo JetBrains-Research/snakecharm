@@ -1,0 +1,37 @@
+SnakemakeFile: RuleSectionEnvmodules.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('rule_332')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('envmodules')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PySubscriptionExpression
+            PyReferenceExpression: config
+              PsiElement(Py:IDENTIFIER)('config')
+            PsiElement(Py:LBRACKET)('[')
+            PyStringLiteralExpression: FOO
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"FOO"')
+            PsiElement(Py:RBRACKET)(']')
+          PsiElement(Py:COMMA)(',')
+          PsiWhiteSpace('\n        ')
+          PySubscriptionExpression
+            PyReferenceExpression: config
+              PsiElement(Py:IDENTIFIER)('config')
+            PsiElement(Py:LBRACKET)('[')
+            PyStringLiteralExpression: BOO
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"BOO"')
+            PsiElement(Py:RBRACKET)(']')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('script')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('""')

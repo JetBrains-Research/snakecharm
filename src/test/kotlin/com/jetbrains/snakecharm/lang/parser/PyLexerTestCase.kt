@@ -41,7 +41,7 @@ abstract class PyLexerTestCase  : PlatformLiteFixture() {
                     remainingTokens.append("\"").append(if (checkTokenText) lexer.tokenText else lexer.tokenType!!.toString()).append("\"")
                     lexer.advance()
                 }
-                TestCase.fail("Too many tokens. Following tokens: " + remainingTokens.toString())
+                TestCase.fail("Too many tokens in file. Remaining unexpected tokens: $remainingTokens")
             }
             TestCase.assertEquals(
                 "Token offset mismatch at lexeme $idx ${expectedTokens[idx]}, " +
@@ -56,6 +56,8 @@ abstract class PyLexerTestCase  : PlatformLiteFixture() {
             lexer.advance()
         }
 
-        if (idx < expectedTokens.size) TestCase.fail("Not enough tokens")
+        if (idx < expectedTokens.size) TestCase.fail("Not enough tokens in file, expected: ${
+            (idx until expectedTokens.size).joinToString { expectedTokens[it] }
+        }")
     }
 }

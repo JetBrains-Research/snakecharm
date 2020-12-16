@@ -16,6 +16,7 @@ Feature: Resolve for section names in rules and checkpoints
          shadow: "full"
          output: ""
          group: ""
+         envmodules: ""
          singularity: ""
          cwl: ""
          log: ""

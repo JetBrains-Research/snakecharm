@@ -49,7 +49,7 @@ class SmkWildcardsCollector(
         }
     }
 
-    override fun visitPyLambdaExpression(node: PyLambdaExpression?) {
+    override fun visitPyLambdaExpression(node: PyLambdaExpression) {
         // #249 do not collect wildcards in lambdas
         // Do nothing here
     }

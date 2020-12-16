@@ -6,6 +6,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CACHE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CONDA
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CONTAINER
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CWL
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_ENVMODULES
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_GROUP
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_LOG
@@ -93,7 +94,8 @@ object SnakemakeAPI {
             SECTION_CONDA,
             SECTION_SCRIPT, SECTION_WRAPPER, SECTION_CWL, SECTION_NOTEBOOK,
             SECTION_CACHE,
-            SECTION_CONTAINER
+            SECTION_CONTAINER,
+            SECTION_ENVMODULES
     )
 
     /**
@@ -144,7 +146,7 @@ object SnakemakeAPI {
             SECTION_WRAPPER,
             SECTION_VERSION, SECTION_THREADS,
             SECTION_PRIORITY, SECTION_SINGULARITY, SECTION_CACHE,
-            SECTION_CONTAINER, SECTION_NOTEBOOK
+            SECTION_CONTAINER, SECTION_NOTEBOOK, SECTION_ENVMODULES
     )
 
     /**
@@ -192,6 +194,9 @@ object SnakemakeAPI {
             SMK_VARS_ATTEMPT
         )
     )
+    val SECTION_LAMBDA_ARG_POSSIBLE_PARAMS: Set<String> = ALLOWED_LAMBDA_OR_CALLABLE_ARGS.values.flatMap { it.asIterable() }.toMutableSet().also {
+        it.addAll(RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS)
+    }
 
     /**
      * Set of rule\checkpoint sections that does not expect keyword arguments
@@ -199,7 +204,7 @@ object SnakemakeAPI {
     val SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED = setOf(
             SECTION_BENCHMARK, SECTION_VERSION, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS, SECTION_SINGULARITY,
             SECTION_PRIORITY, SECTION_GROUP, SECTION_SHADOW, SECTION_CONDA, SECTION_SCRIPT, SECTION_WRAPPER,
-            SECTION_CWL, SECTION_NOTEBOOK, SECTION_CACHE, SECTION_CONTAINER
+            SECTION_CWL, SECTION_NOTEBOOK, SECTION_CACHE, SECTION_CONTAINER, SECTION_ENVMODULES
     )
 
     val IO_FLAG_2_SUPPORTED_SECTION: HashMap<String, List<String>> = hashMapOf(
@@ -208,7 +213,7 @@ object SnakemakeAPI {
             SNAKEMAKE_IO_METHOD_DIRECTORY to listOf(SECTION_OUTPUT),
             SNAKEMAKE_IO_METHOD_REPORT to listOf(SECTION_OUTPUT),
             SNAKEMAKE_IO_METHOD_TEMP to listOf(SECTION_INPUT, SECTION_OUTPUT),
-            SNAKEMAKE_IO_METHOD_TOUCH to listOf(SECTION_OUTPUT),
+            SNAKEMAKE_IO_METHOD_TOUCH to listOf(SECTION_OUTPUT, SECTION_LOG, SECTION_BENCHMARK),
             SNAKEMAKE_IO_METHOD_PIPE to listOf(SECTION_OUTPUT),
             SNAKEMAKE_IO_METHOD_REPEAT to listOf(SECTION_BENCHMARK),
             SNAKEMAKE_IO_METHOD_UNPACK to listOf(SECTION_INPUT),

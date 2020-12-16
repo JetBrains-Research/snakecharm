@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.lang.parser
 import com.intellij.lang.SyntaxTreeBuilder
 import com.intellij.lang.impl.PsiBuilderImpl
 import com.jetbrains.python.parsing.ParsingContext
-import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.python.psi.LanguageLevel
 
 /**
@@ -12,9 +11,8 @@ import com.jetbrains.python.psi.LanguageLevel
  */
 class SmkParserContext(
     builder: SyntaxTreeBuilder,
-    languageLevel: LanguageLevel,
-    futureFlag: StatementParsing.FUTURE?
-): ParsingContext(builder, languageLevel, futureFlag) {
+    languageLevel: LanguageLevel
+): ParsingContext(builder, languageLevel) {
 
     init {
         require(builder is PsiBuilderImpl) {
@@ -23,7 +21,7 @@ class SmkParserContext(
 
     }
 
-    private val stmtParser = SmkStatementParsing(this, futureFlag)
+    private val stmtParser = SmkStatementParsing(this)
     private val exprParser = SmkExpressionParsing(this)
     private val funParser = SmkFunctionParsing(this)
 

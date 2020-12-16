@@ -14,7 +14,7 @@ Feature: Fixes for PyTypeCheckerInspection related false positives
     And PyTypeCheckerInspection inspection is enabled
     Then I expect inspection warning on <1> in <[s for s in 1]> with message
     """
-    Expected 'collections.Iterable', got 'int' instead
+    Expected type 'collections.Iterable', got 'int' instead
     """
     When I check highlighting warnings
 

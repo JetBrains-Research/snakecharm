@@ -252,6 +252,39 @@ class SnakemakeLexerTest : PyLexerTestCase() {
         )
     }
 
+
+    fun testRuleSectionIncomplete1() {
+        doTest("""
+            |rule foo:
+            |    input:
+            |       
+        """.trimMargin().trimStart(),
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK",
+            "Py:DEDENT", "Py:LINE_BREAK", "Py:STATEMENT_BREAK")
+    }
+
+    fun testRuleSectionIncomplete2() {
+        doTest("""
+            |rule foo:
+            |    input:
+        """.trimMargin().trimStart(),
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK")
+    }
+
+    fun testRuleSectionIncomplete3() {
+        doTest("""
+            |rule foo:
+            |    input:
+            |pass
+        """.trimMargin().trimStart(),
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK",
+            "Py:DEDENT", "Py:LINE_BREAK",
+            "Py:PASS_KEYWORD", "Py:STATEMENT_BREAK")
+    }
+
     private fun doTest(text: String, vararg expectedTokens: String) {
         doLexerTest(text, SnakemakeLexer(), *expectedTokens)
     }

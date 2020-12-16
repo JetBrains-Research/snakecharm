@@ -40,6 +40,7 @@ Feature: Inspection for unexpected keyword arguments in section
       | rule       | container   |
       | rule       | cwl         |
       | rule       | group       |
+      | rule       | envmodules  |
       | rule       | singularity |
       | rule       | threads     |
       | checkpoint | message     |

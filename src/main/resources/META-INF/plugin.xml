@@ -173,6 +173,11 @@
 
     <lang.inspectionSuppressor language="Snakemake" implementationClass="com.jetbrains.snakecharm.inspections.SmkInspectionsSuppressor"/>
 
+    <!--Formatting-->
+    <langCodeStyleSettingsProvider implementation="com.jetbrains.snakecharm.lang.formatter.SmkCodeStyleProvider"/>
+    <lang.formatter language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.formatter.SnakemakeFormattingModelBuilder"/>
+    <!-- TODO   <lang.lineWrapStrategy language="Markdown" implementationClass="org.intellij.plugins.markdown.editor.MarkdownLineWrapPositionStrategy"/>-->
+
     <localInspection
         language="Snakemake"
         shortName="SmkResourcesKeywordArgsInspection"
@@ -248,6 +253,26 @@
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.conda.section.not.allowed.with.run"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkCondaSectionNotAllowedWithRun"
+    />
+    <localInspection
+            language="Snakemake" shortName="SmkEnvmodulesNotAllowedSectionInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkEnvmodulesNotAllowedSection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.envmodules.section.not.allowed.with.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkEnvmodulesNotAllowedSectionInspection"
+    />
+    <localInspection
+            language="Snakemake" shortName="SmkFileEndsWithCommentInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkFileEndsWithComment"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.file.ends.with.comment.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkFileEndsWithCommentInspection"
     />
 
 
@@ -394,6 +419,18 @@
             key="INSP.NAME.localrules.ruleorder.confusing.ref"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkLocalrulesRuleorderConfusingReference"
     />
+
+    <localInspection
+            language="Snakemake" shortName="SmkSectionVariableRequiresLambdaAccessInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkSectionVariableRequiresLambdaAccess"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.section.var.requires.lambda.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionVariableRequiresLambdaAccessInspection"
+    />
+
     <localInspection
             language="SnakemakeSL" shortName="SmkWildcardNotDefinedInspection"
             enabledByDefault="true"
@@ -425,6 +462,17 @@
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.wildcards.prefix.missing.title"
             implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkSLMissingWildcardsAccessorPrefixInspection"
+    />
+
+    <localInspection
+            language="SnakemakeSL" shortName="SmkSLQuotingMisuseInGetAccessorInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkSLQuotingMisuseInGetAccessor"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.quoting.misuse.in.get.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.smksl.SmkSLQuotingMisuseInGetAccessorInspection"
     />
 
     <localInspection

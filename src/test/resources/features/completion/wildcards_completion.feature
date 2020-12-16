@@ -12,6 +12,7 @@ Feature: Completion for wildcards
       log: "{wildcard5}"
       output: "{wildcard6}"
       params: "{wildcard7}"
+      envmodules: "{non-wildcard8}"
       input: "{}"
       message: "{non-wildcard1}"
       cwl: "{non-wildcard2}"
@@ -35,6 +36,7 @@ Feature: Completion for wildcards
       | non-wildcard2 |
       | non-wildcard3 |
       | non-wildcard4 |
+      | non-wildcard8 |
     Examples:
       | rule_like  |
       | rule       |

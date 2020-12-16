@@ -1,0 +1,43 @@
+SnakemakeFile: Issue175.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('boo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: world
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"world"')
+      PsiErrorElement:Expecting rule keyword, comment or docstrings inside a rule definition.
+        PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: echo hello
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"echo hello"')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('boo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      PyStringLiteralExpression: wo
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"wo"')
+      PsiWhiteSpace(' ')
+      PsiErrorElement:Expecting rule keyword, comment or docstrings inside a rule definition.
+        PsiElement(Py:PLUS)('+')
+        PsiWhiteSpace(' ')
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"rld"')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: echo hello
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"echo hello"')

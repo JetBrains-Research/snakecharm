@@ -74,7 +74,7 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
           PsiWhiteSpace('\n                          ')
           PsiErrorElement:',' expected
             PsiElement(Py:IDENTIFIER)('foo0')
-          PsiErrorElement:expression expected
+          PsiErrorElement:Expression expected
             <empty list>
   PsiWhiteSpace('\n')
   SmkRule
@@ -152,7 +152,7 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
           PsiWhiteSpace('\n                          ')
           PsiErrorElement:',' expected
             PsiElement(Py:IDENTIFIER)('rule')
-          PsiErrorElement:expression expected
+          PsiErrorElement:Expression expected
             <empty list>
   PsiWhiteSpace('\n')
   SmkRule
