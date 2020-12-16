@@ -53,14 +53,16 @@ class SmkFacetEditorTab(
         fun validateWrappersPath(state: SmkFacetState): ValidationResult {
             if (!state.useBundledWrappersInfo) {
                 val folderPathStr = state.wrappersCustomSourcesFolder
-                if (!folderPathStr.isBlank()) {
-                    val path = Paths.get(folderPathStr)
-                    if (!path.exists()) {
-                        return ValidationResult(SnakemakeBundle.message("facet.settings.wrappers.sources.path.not.exist"))
-                    }
-                    if (!path.isDirectory()) {
-                        return ValidationResult(SnakemakeBundle.message("facet.settings.wrappers.sources.path.not.directory"))
-                    }
+                if (folderPathStr.isBlank()) {
+                    return ValidationResult(SnakemakeBundle.message("facet.settings.wrappers.sources.path.is.blank"))
+                }
+
+                val path = Paths.get(folderPathStr)
+                if (!path.exists()) {
+                    return ValidationResult(SnakemakeBundle.message("facet.settings.wrappers.sources.path.not.exist"))
+                }
+                if (!path.isDirectory()) {
+                    return ValidationResult(SnakemakeBundle.message("facet.settings.wrappers.sources.path.not.directory"))
                 }
             }
            return ValidationResult.OK

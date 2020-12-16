@@ -13,6 +13,7 @@ import com.intellij.util.io.readBytes
 import com.jetbrains.python.statistics.modules
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.SnakemakeTestUtil
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_WRAPPERS_BUNDLED_REPO
 import com.jetbrains.snakecharm.facet.SnakemakeFacet
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
@@ -39,14 +40,15 @@ class SmkWrapperLoaderStartupActivity : StartupActivity {
                 )
             project.modules.forEach {
                 val storage = it.getService(SmkWrapperStorage::class.java)
-                storage.version = "0.64.0"
+                storage.version = SMK_WRAPPERS_BUNDLED_REPO // todo, test repo - fixed version?
+                storage.version = "test" // todo, test repo - fixed version?
                 storage.wrappers = wrappers
             }
         } else {
             ApplicationManager.getApplication().invokeLater {
                 ProgressManager.getInstance().run(object : Task.Backgroundable(
                         project,
-                        "Preparing wrapper data",
+                        SnakemakeBundle.message("wrappers.parsing.progress.collecting.data"),
                         true
                 ) {
                     override fun run(indicator: ProgressIndicator) {
@@ -67,11 +69,14 @@ class SmkWrapperLoaderStartupActivity : StartupActivity {
             val storage = module.getService(SmkWrapperStorage::class.java)
             if (forced || storage.wrappers.isEmpty() || storage.wrappers.any { it.path == "" }) {
                 if (facetSettings.useBundledWrappersInfo) {
-                    storage.version = SnakemakeBundle.message("wrapper.bundled.storage.version")
+                    // TODO: version specific repo!!
+                    val wrappersRepoVersion = SMK_WRAPPERS_BUNDLED_REPO
+
+                    storage.version = wrappersRepoVersion
                     storage.wrappers = Cbor
                         .decodeFromByteArray(
                             SmkWrapperStorage::class.java
-                                .getResourceAsStream("/smk-wrapper-storage.cbor")
+                                .getResourceAsStream("/smk-wrapper-storage-$wrappersRepoVersion.cbor")
                                 .readBytes()
                         )
                 } else {

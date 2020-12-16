@@ -15,6 +15,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.xml.util.XmlStringUtil;
 import com.jetbrains.snakecharm.SnakemakeBundle;
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -46,7 +47,7 @@ public class SmkFacetSettingsPanel extends JPanel {
         wrappersBundledRB.setText(
                 SnakemakeBundle.message(
                         "facet.settings.wrappers.bundled",
-                        SnakemakeBundle.message("wrapper.bundled.storage.version")
+                        SnakemakeAPI.SMK_WRAPPERS_BUNDLED_REPO
                 )
         );
 

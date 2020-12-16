@@ -9,8 +9,9 @@ import com.jetbrains.snakecharm.SnakemakeBundle
  * Registers project settings tab for facet. E.g. for PyCharm project settings tab ('supported frameworks'), because
  * PyCharm doesn't show facets in UI.
  */
-class SmkSupportModuleConfigurable(project: Project) : ModuleAwareProjectConfigurable<SmkConfigurable>(
+class SmkSupportedFrameworksProjectConfigurable(project: Project) : ModuleAwareProjectConfigurable<SmkSupportedFrameworksModuleConfigurable>(
     project, SnakemakeBundle.message("facet.configurable.display.name"), "snakemake_support"
 ) {
-    override fun createModuleConfigurable(module: Module): SmkConfigurable = SmkConfigurable(module)
+    override fun createModuleConfigurable(module: Module): SmkSupportedFrameworksModuleConfigurable =
+        SmkSupportedFrameworksModuleConfigurable(module)
 }

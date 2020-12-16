@@ -70,7 +70,7 @@ object SnakemakeAPI {
             "snakemake.io.Resources" to "resources"
     )
     const val SNAKEMAKE_MODULE_NAME_IO_PY = "io.py"
-    
+
     val EXECUTION_SECTIONS_KEYWORDS = setOf(
             SECTION_SHELL, SECTION_SCRIPT,
             SECTION_WRAPPER, SECTION_CWL, SECTION_NOTEBOOK
@@ -219,4 +219,7 @@ object SnakemakeAPI {
             SNAKEMAKE_IO_METHOD_UNPACK to listOf(SECTION_INPUT),
             SNAKEMAKE_IO_METHOD_DYNAMIC to listOf(SECTION_OUTPUT)
     )
+
+    @JvmField
+    val SMK_WRAPPERS_BUNDLED_REPO="master"     // prev 0.64.0
 }

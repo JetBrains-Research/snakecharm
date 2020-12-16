@@ -16,16 +16,18 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
+ * Facet settings component used by Supported Frameworks project configurable
+ *
  * Let's rewrite it in Kotlin in some distant future, especially if IDEA will improve *.form integration with Kotlin
  */
-public class SmkConfigurable implements SearchableConfigurable {
+public class SmkSupportedFrameworksModuleConfigurable implements SearchableConfigurable {
     private final Module module;
     private JPanel mainPanel;
     private JCheckBox enableSmkSupportCB;
     private JPanel settingsPanelPlaceHolder; // fake panel in GUI builder where settings panel is inserted
     private final SmkFacetSettingsPanel settingsPanel;
 
-    public SmkConfigurable(@NotNull Module module) {
+    public SmkSupportedFrameworksModuleConfigurable(@NotNull Module module) {
         this.module = module;
         settingsPanel = new SmkFacetSettingsPanel(module.getProject());
         settingsPanelPlaceHolder.add(settingsPanel, BorderLayout.CENTER);
@@ -63,6 +65,10 @@ public class SmkConfigurable implements SearchableConfigurable {
         return false;
     }
 
+    /**
+     * Is called only for modified configurables
+     * @throws ConfigurationException if validation error
+     */
     @Override
     public void apply() throws ConfigurationException {
         try {
@@ -70,9 +76,13 @@ public class SmkConfigurable implements SearchableConfigurable {
                 // add facet or change settings
                 final SnakemakeFacet facet = SnakemakeFacet.getInstance(module);
                 if (facet != null) {
+                    // update settings
                     final SmkFacetConfiguration configuration = facet.getConfiguration();
                     settingsPanel.apply(configuration);
+                    ApplicationManager.getApplication().runWriteAction(()
+                            -> FacetManager.getInstance(module).facetConfigurationChanged(facet));
                 } else {
+                    // add facet
                     final SmkFacetConfiguration configuration = SmkFacetType.createDefaultConfiguration(module.getProject());
                     settingsPanel.apply(configuration);
                     SmkFacetType.createAndAddFacet(module, configuration);

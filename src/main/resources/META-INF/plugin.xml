@@ -72,10 +72,10 @@
     <frameworkSupport implementation="com.jetbrains.snakecharm.facet.SmkFrameworkSupportProvider"/>
     <projectConfigurable
             groupId="language"
-            id="com.jetbrains.snakecharm.facet.SmkSupportModuleConfigurable"
+            id="com.jetbrains.snakecharm.facet.SmkSupportedFrameworksProjectConfigurable"
             bundle="SnakemakeBundle"
             key="facet.configurable.display.name"
-            instance="com.jetbrains.snakecharm.facet.SmkSupportModuleConfigurable"
+            instance="com.jetbrains.snakecharm.facet.SmkSupportedFrameworksProjectConfigurable"
             nonDefaultProject="true"
     />
     <directoryProjectConfigurator
@@ -345,7 +345,7 @@
     <localInspection
             language="Snakemake"
             shortName="SmkWrapperMissedArgumentsInspection"
-            enabledByDefault="true"
+            enabledByDefault="false"
             level="WEAK WARNING"
             suppressId="SmkWrapperMissedArguments"
             bundle="SnakemakeBundle"
