@@ -8,7 +8,7 @@ Feature: Inspection for missed wrapper arguments
       <section>: ""
       wrapper: "0.64.0/<wrapper>"
     """
-    And SmkSectionWrapperArgsInspection inspection is enabled
+    And SmkWrapperMissedArgumentsInspection inspection is enabled
     Then I expect inspection weak warning on <<section>> with message
     """
     Argument '<argument>' missed in '<section>'
@@ -30,7 +30,7 @@ Feature: Inspection for missed wrapper arguments
     <rule_like> foo:
       wrapper: "0.64.0/<wrapper>"
     """
-    And SmkSectionWrapperArgsInspection inspection is enabled
+    And SmkWrapperMissedArgumentsInspection inspection is enabled
     Then I expect inspection weak warning on <foo> with message
     """
     Section '<section>' with args '<arguments>' is missed
@@ -52,7 +52,7 @@ Feature: Inspection for missed wrapper arguments
     <rule_like> foo:
       wrapper: "0.64.0/<wrapper>"
     """
-    And SmkSectionWrapperArgsInspection inspection is enabled
+    And SmkWrapperMissedArgumentsInspection inspection is enabled
     Then I expect inspection weak warning on <foo> with message
     """
     Section '<section>' is missed
