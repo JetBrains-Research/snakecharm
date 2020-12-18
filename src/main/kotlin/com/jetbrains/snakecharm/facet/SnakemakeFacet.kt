@@ -5,7 +5,6 @@ import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetManagerAdapter
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -15,6 +14,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperLoaderStartupActivity
 import kotlinx.serialization.ExperimentalSerializationApi
 
+// XXX: Not sure that 'Facet' is needed, maybe project service + project framework configurable page + FrameworkDetector is enough here
 class SnakemakeFacet(
     facetType: SmkFacetType,
     module: Module,
@@ -50,9 +50,22 @@ class SnakemakeFacet(
 
         // Subscribe on facet added/removed/facetConfigurationChanged (e.g. wrappers settings changed changed)
         connection.subscribe(FacetManager.FACETS_TOPIC, object : FacetManagerAdapter() {
+            override fun facetAdded(facet: Facet<*>) {
+                if (ApplicationManager.getApplication().isUnitTestMode) {
+                    // Do now, in in BG
+                    forceLoadOrCollectWrappers(facet)
+                }
+            }
+
             // IDEA: ModulesConfigurator -> ProjectFacetsConfigurator.commitFacets() -> this event
             // PYCHARM: SmkSupportedFrameworksModuleConfigurable.apply() -> this event
             override fun facetConfigurationChanged(facet: Facet<*>) {
+                if (ApplicationManager.getApplication().isUnitTestMode) {
+                    // Do now, in in BG
+                    forceLoadOrCollectWrappers(facet)
+                    return
+                }
+
                 ApplicationManager.getApplication().invokeLater {
                     ProgressManager.getInstance().run(object : Task.Backgroundable(
                         facet.module.project,
@@ -60,10 +73,14 @@ class SnakemakeFacet(
                         true
                     ) {
                         override fun run(indicator: ProgressIndicator) {
-                            SmkWrapperLoaderStartupActivity.loadOrCollectLocalWrappers(facet.module, true)
+                            forceLoadOrCollectWrappers(facet)
                         }
                     })
                 }
+            }
+
+            private fun forceLoadOrCollectWrappers(facet: Facet<*>) {
+                SmkWrapperLoaderStartupActivity.loadOrCollectLocalWrappers(facet.module, true)
             }
         })
 

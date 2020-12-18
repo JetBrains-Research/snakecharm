@@ -17,7 +17,7 @@ class SmkFacetEditorTab(
 
     lateinit var settingsPanel: SmkFacetSettingsPanel
 
-    override fun isModified() = settingsPanel.isModified(configuration.state)
+    override fun isModified() = settingsPanel.isModified(configuration)
 
     @Nls(capitalization = Nls.Capitalization.Title)
     override fun getDisplayName(): String {
@@ -26,6 +26,7 @@ class SmkFacetEditorTab(
 
     override fun createComponent(): JComponent {
         settingsPanel = SmkFacetSettingsPanel(context.project)
+
         validator.registerValidator(object : FacetEditorValidator() {
             override fun check(): ValidationResult {
                 return validateWrappersPath(settingsPanel.uiState)
@@ -46,14 +47,14 @@ class SmkFacetEditorTab(
     }
 
     override fun reset() {
-        settingsPanel.reset(configuration.state)
+        settingsPanel.reset(configuration)
     }
 
     companion object {
-        fun validateWrappersPath(state: SmkFacetState): ValidationResult {
+        fun validateWrappersPath(state: SmkFacetConfiguration.State): ValidationResult {
             if (!state.useBundledWrappersInfo) {
                 val folderPathStr = state.wrappersCustomSourcesFolder
-                if (folderPathStr.isBlank()) {
+                if (folderPathStr!!.isBlank()) {
                     return ValidationResult(SnakemakeBundle.message("facet.settings.wrappers.sources.path.is.blank"))
                 }
 

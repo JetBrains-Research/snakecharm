@@ -1,0 +1,15 @@
+name: custom_wr1
+description: |
+ Desc
+authors:
+  - Author Name Surname
+input:
+  - custom_1: Custome 1
+  - custom_2: Custome 2
+
+params:
+  - custom_params_1: Params 1
+
+output:
+  - output1: Output 1
+  - output2: Output 2

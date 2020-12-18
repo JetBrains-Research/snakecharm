@@ -15,6 +15,9 @@ import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
+import com.jetbrains.snakecharm.facet.SmkFacetConfiguration
+import com.jetbrains.snakecharm.facet.SmkFacetType
+import com.jetbrains.snakecharm.facet.SmkFacetType.Companion.createDefaultConfiguration
 import io.cucumber.java.en.Given
 import javax.swing.SwingUtilities
 import kotlin.test.fail
@@ -25,7 +28,7 @@ import kotlin.test.fail
  * @date 2019-04-28
  */
 class StepDefs {
-    @Given("^a (snakemake|python)? project$")
+    @Given("^a (snakemake|snakemake with wrappers|python) project$")
     @Throws(Exception::class)
     fun configureSnakemakeProject(projectType: String) {
         require(SnakemakeWorld.myFixture == null) {
@@ -44,7 +47,7 @@ class StepDefs {
         //if (enabledInspections != null) {
         //    InspectionProfileImpl.INIT_INSPECTIONS = true
         //}
-        val additionalRoots = if (projectType == "snakemake") {
+        val additionalRoots = if (projectType.startsWith("snakemake")) {
             arrayOf(SnakemakeTestUtil.getTestDataPath().resolve("MockPackages3"))
         } else {
             emptyArray()
@@ -61,17 +64,31 @@ class StepDefs {
         val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor)
         val tmpDirFixture = LightTempDirTestFixtureImpl(true) // "tmp://" dir by default
 
+//        val setupFacetClosure = { fixture: CodeInsightTestFixture ->
+//            val module = fixture.module
+//            val config = createDefaultConfiguration(module.project)
+//            if (projectType == "snakemake with facet") {
+//                val storage = module.getService(SmkWrapperStorage::class.java)
+//                storage.initFrom("\${TEST}", emptyList())
+//            }
+//            SmkFacetType.createAndAddFacet(module, config)
+//        }
+
         SnakemakeWorld.myFixture = factory.createCodeInsightFixture(
             fixtureBuilder.fixture, tmpDirFixture
         ).apply {
             testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
 
             if (SwingUtilities.isEventDispatchThread()) {
+                // todo: add facet?
                 setUp()
+//                setupFacetClosure(this)
             } else {
                 ApplicationManager.getApplication().invokeAndWait {
                     try {
+                        // todo: add facet?
                         setUp()
+//                        setupFacetClosure(this)
                     } catch (e: java.lang.Exception) {
                         throw RuntimeException("Error running setup", e)
                     }
@@ -90,6 +107,26 @@ class StepDefs {
         // languageExtension.clearCache(PythonLanguage.INSTANCE)
 
         SnakemakeWorld.myInjectionFixture = InjectionTestFixture(SnakemakeWorld.fixture())
+    }
+
+    @Given("^add snakemake facet (with|without) wrappers loaded")
+    fun withSnakemakeFacet(withWrappersStr: String) {
+        ApplicationManager.getApplication().invokeAndWait {
+            val module = SnakemakeWorld.fixture().module
+
+//            val testStorage = SnakemakeTestUtil.getTestDataPath().parent
+//                .resolve("build/bundledWrappers/smk-wrapper-storage.test.cbor")
+
+            val config = createDefaultConfiguration(module.project)
+            if (withWrappersStr != "with") {
+                val state = SmkFacetConfiguration.State()
+                state.useBundledWrappersInfo = false
+                state.wrappersCustomSourcesFolder = ""
+
+                config.loadState(state)
+            }
+            SmkFacetType.createAndAddFacet(module, config)
+        }
     }
 
     @Given("^I expect controlflow")

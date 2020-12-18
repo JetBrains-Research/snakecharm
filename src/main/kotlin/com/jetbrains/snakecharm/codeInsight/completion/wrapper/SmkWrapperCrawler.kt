@@ -44,9 +44,55 @@ object SmkWrapperCrawler {
         Paths.get(outputFile).write(Cbor.encodeToByteArray(wrappers))
     }
 
-
-    fun localWrapperParser(folder: String, relativePath: Boolean = false): List<SmkWrapperStorage.Wrapper> {
+    /*
+    fun localWrapperParserVFS(folder: String, relativePath: Boolean = false): List<SmkWrapperStorage.Wrapper> {
         val wrappers = mutableListOf<SmkWrapperStorage.Wrapper>()
+
+        val root = VfsUtil.findFile(Paths.get(folder), true)
+        if (root == null) {
+            // TODO
+            return emptyList()
+        }
+
+        VfsUtilCore.iterateChildrenRecursively(
+            root,
+            { it.name.startsWith("wrapper") }
+        ) { wrapperFile ->
+            val metaYaml = wrapperFile.parent.findChild("meta.yaml")
+
+            if (metaYaml != null && metaYaml.exists()) {
+                val path = if (relativePath) {
+                    VfsUtil.getRelativePath(wrapperFile, root)  ?: ""
+                } else {
+                    wrapperFile.parent.path
+                }
+
+                val args = when (wrapperFile.extension?.toLowerCase() ?: "") {
+                    "py" -> parseArgsPython(VfsUtil.loadText(wrapperFile))
+                    "r" -> parseArgsR(VfsUtil.loadText(wrapperFile))
+                    else -> emptyMap()
+                }
+
+                val description = VfsUtil.loadText(metaYaml)
+
+                wrappers.add(
+                    SmkWrapperStorage.Wrapper(
+                        path = path,
+                        args = args,
+                        description = description
+                    )
+                )
+            }
+            true
+        }
+
+        return wrappers.toList()
+    }
+
+     */
+
+    fun localWrapperParser(folder: String, relativePath: Boolean = false): List<SmkWrapperStorage.WrapperInfo> {
+        val wrappers = mutableListOf<SmkWrapperStorage.WrapperInfo>()
         val mainFolder = File(folder)
 
         mainFolder.walkTopDown()
@@ -59,11 +105,7 @@ object SmkWrapperCrawler {
                     return@forEach
                 }
 
-                val path = if (relativePath) {
-                    wrapperFile.parentFile.toRelativeString(mainFolder)
-                } else {
-                    wrapperFile.parentFile.absolutePath
-                }
+                val path = wrapperFile.parentFile.toRelativeString(mainFolder)
 
                 val args = when (wrapperFile.extension.toLowerCase()) {
                     "py" -> parseArgsPython(wrapperFile.readText())
@@ -75,7 +117,7 @@ object SmkWrapperCrawler {
                 val description = metaYaml.readText()
 
                 wrappers.add(
-                    SmkWrapperStorage.Wrapper(
+                    SmkWrapperStorage.WrapperInfo(
                         path = path,
                         args = args,
                         description = description

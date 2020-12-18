@@ -42,17 +42,27 @@ object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>()
 
         val version: String
         val prefix: String
+        var doNotFilterByPrefix: Boolean = false
 
         if (WRAPPER_VERSION_REGEXP.matches(result.prefixMatcher.prefix)) {
             version = result.prefixMatcher.prefix.substringBefore('/')
             prefix = result.prefixMatcher.prefix.substringAfter('/')
         } else {
             version = storage.version
-            prefix = result.prefixMatcher.prefix
+            val rawPrefix = result.prefixMatcher.prefix
+            when {
+                rawPrefix.startsWith("${version}/") -> {
+                    prefix = rawPrefix.substring(version.length + 1)
+                }
+                else -> {
+                    doNotFilterByPrefix = version.startsWith(rawPrefix)
+                    prefix = rawPrefix.substringAfterLast('/')
+                }
+            }
         }
 
         storage.wrappers.forEach { wrapper ->
-            if (wrapper.path.contains(prefix, false)) {
+            if (doNotFilterByPrefix || wrapper.path.contains(prefix, false)) {
                 result.addElement(
                     LookupElementBuilder
                         .create("$version/${wrapper.path}")

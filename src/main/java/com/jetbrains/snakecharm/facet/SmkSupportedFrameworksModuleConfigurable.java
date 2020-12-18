@@ -59,7 +59,7 @@ public class SmkSupportedFrameworksModuleConfigurable implements SearchableConfi
         }
         if (selected) {
             final SnakemakeFacet facet = SnakemakeFacet.Companion.getInstance(module);
-            return facet == null || settingsPanel.isModified(facet.getConfiguration().getState());
+            return facet == null || settingsPanel.isModified(facet.getConfiguration());
         }
 
         return false;
@@ -81,6 +81,7 @@ public class SmkSupportedFrameworksModuleConfigurable implements SearchableConfi
                     settingsPanel.apply(configuration);
                     ApplicationManager.getApplication().runWriteAction(()
                             -> FacetManager.getInstance(module).facetConfigurationChanged(facet));
+                    // TODO: or SmkFacetConfiguration.setStateAndFireEvent(snakemakeFacet, newState) ?
                 } else {
                     // add facet
                     final SmkFacetConfiguration configuration = SmkFacetType.createDefaultConfiguration(module.getProject());
@@ -109,7 +110,7 @@ public class SmkSupportedFrameworksModuleConfigurable implements SearchableConfi
         if (instance != null) {
             enableSmkSupportCB.setSelected(true);
             settingsPanel.setEnabled(true);
-            settingsPanel.reset(instance.getConfiguration().getState());
+            settingsPanel.reset(instance.getConfiguration());
         } else {
             enableSmkSupportCB.setSelected(false);
             settingsPanel.setEnabled(false);

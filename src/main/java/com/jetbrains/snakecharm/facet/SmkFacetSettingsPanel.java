@@ -94,33 +94,35 @@ public class SmkFacetSettingsPanel extends JPanel {
         return folderChooserDescriptor;
     }
 
-    public boolean isModified(@NotNull SmkFacetState state) {
-        return !getUIState().equals(state);
+    public boolean isModified(@NotNull SmkFacetConfiguration configuration) {
+        return !getUIState().equals(configuration.getState());
     }
 
     public void apply(@NotNull SmkFacetConfiguration configuration) throws ConfigurationException {
-        final SmkFacetState newState = getUIState();
+        final SmkFacetConfiguration.State newState = getUIState();
 
         final ValidationResult validationResult = SmkFacetEditorTab.Companion.validateWrappersPath(newState);
         if (!validationResult.isOk()) {
             throw new ConfigurationException(validationResult.getErrorMessage());
         }
-        configuration.setStateInternal$snakecharm(newState);
+        configuration.loadState(newState);
     }
 
     @NotNull
-    public SmkFacetState getUIState() {
-        return new SmkFacetState(
-                wrappersBundledRB.isSelected(),
-                FileUtil.toSystemIndependentName(wrappersSrcPathTF.getText().trim())
-        );
+    public SmkFacetConfiguration.State getUIState() {
+        final SmkFacetConfiguration.State st = new SmkFacetConfiguration.State();
+        st.setUseBundledWrappersInfo(wrappersBundledRB.isSelected());
+        st.setWrappersCustomSourcesFolder(FileUtil.toSystemIndependentName(wrappersSrcPathTF.getText().trim()));
+        return st;
     }
 
-    public void reset(@NotNull SmkFacetState state) {
-        setUIWrappersSrcFolderPath(state.getWrappersCustomSourcesFolder());
-        final boolean useBundledWrappersInfo = state.getUseBundledWrappersInfo();
+    public void reset(@NotNull SmkFacetConfiguration configuration) {
+        setUIWrappersSrcFolderPath(configuration.getWrappersCustomSourcesFolder());
+
+        final boolean useBundledWrappersInfo = configuration.getUseBundledWrappersInfo();
         wrappersBundledRB.setSelected(useBundledWrappersInfo);
         wrappersFromSrcRB.setSelected(!useBundledWrappersInfo);
+
         updateWrappersSrcPanelEnabled();
     }
 
