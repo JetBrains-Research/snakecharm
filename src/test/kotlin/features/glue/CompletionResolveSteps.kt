@@ -13,6 +13,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.TextRange
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.*
@@ -438,7 +439,7 @@ class CompletionResolveSteps {
                 }
 
                 val cleanText = StringUtil.convertLineSeparators(
-                    text.replace("\${TEST_DATA}", fixture.testDataPath)
+                    text.replace("\${TEST_DATA}", FileUtil.toSystemIndependentName(fixture.testDataPath))
                 )
                 checkCompletionResult(fixture, false, cleanText)
             },

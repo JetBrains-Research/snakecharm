@@ -1,5 +1,6 @@
 package features.glue
 
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.io.exists
 import com.intellij.util.io.isDirectory
 import com.jetbrains.snakecharm.facet.SmkFacetConfiguration
@@ -21,7 +22,7 @@ class WrappersSteps {
 
         val newState = SmkFacetConfiguration.State()
         newState.useBundledWrappersInfo = false
-        newState.wrappersCustomSourcesFolder = path.toString()
+        newState.wrappersCustomSourcesFolder = FileUtil.toSystemIndependentName(path.toString())
 
         val snakemakeFacet = SnakemakeFacet.getInstance(module)!!
         SmkFacetConfiguration.setStateAndFireEvent(snakemakeFacet, newState)

@@ -20,7 +20,7 @@ class SmkWrapperStorage  {
 
     @Serializable
     data class WrapperInfo(
-        val path: String = "",
+        val path: String = "", // system independent separators
         val args: Map<String, List<String>> = emptyMap(),
         val description: String = ""
     )

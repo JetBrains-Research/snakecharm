@@ -81,7 +81,7 @@ dependencies {
     testImplementation 'io.cucumber:cucumber-java:6.8.1'
     testImplementation 'io.cucumber:cucumber-junit:6.8.1'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.0.0-RC'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.0.1'
 }
 
 task cucumber() {

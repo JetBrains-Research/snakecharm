@@ -38,9 +38,9 @@ Feature: Completion for wrapper name
     Examples:
       | rule_like  | tag     | short_name         | full_name                       |
       | rule       | master  | bismark2report     | bio/bismark/bismark2report      |
-#      | rule       | latest  | fastqc             | bio/fastqc                      |
-#      | checkpoint | 0.54.3  | cairosvg           | utils/cairosvg                  |
-#      | checkpoint | 0.30.10 | bam2fq/interleaved | bio/samtools/bam2fq/interleaved |
+      | rule       | latest  | fastqc             | bio/fastqc                      |
+      | checkpoint | 0.54.3  | cairosvg           | utils/cairosvg                  |
+      | checkpoint | 0.30.10 | bam2fq/interleaved | bio/samtools/bam2fq/interleaved |
 
   # TODO: configure temp wrappers dir using VFS & light fixture, e.g.
 #  Scenario Outline: Complete for custom wrappers repo folder wrappers

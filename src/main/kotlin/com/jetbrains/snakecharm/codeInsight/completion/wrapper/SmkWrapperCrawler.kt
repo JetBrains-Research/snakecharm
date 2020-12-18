@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.codeInsight.completion.wrapper
 
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.io.exists
 import com.intellij.util.io.isDirectory
 import com.intellij.util.io.write
@@ -118,7 +119,7 @@ object SmkWrapperCrawler {
 
                 wrappers.add(
                     SmkWrapperStorage.WrapperInfo(
-                        path = path,
+                        path = FileUtil.toSystemIndependentName(path),
                         args = args,
                         description = description
                     )
