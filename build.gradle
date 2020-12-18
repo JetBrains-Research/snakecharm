@@ -150,6 +150,7 @@ test {
 
     include '**/*Test.class'
     // exclude '**/AllCucumberFeaturesTest.class'  // Uncomment to disable gradle tests
+    // include '**/AllCucumberFeaturesTest.class'  // Uncomment to disable gradle tests
 
 }
 
