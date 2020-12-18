@@ -20,6 +20,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.FakeSnakemakeInjector
+import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler
 import features.glue.SnakemakeWorld.findPsiElementUnderCaret
 import features.glue.SnakemakeWorld.fixture
 import features.glue.SnakemakeWorld.myFixture
@@ -446,6 +447,24 @@ class ActionsSteps {
                 else -> documentationProvider.generateDoc(
                         targetElement, element
                 )
+            }
+        }
+    }
+
+    @When("^I check wrapper args parsing for \"(.+)\" resulting in \"(.+)\" with text$")
+    fun checkWrapperArgsParsing(language: String, filename: String, text :String) {
+        ApplicationManager.getApplication().invokeAndWait {
+            val args = when (language) {
+                "Python" -> SmkWrapperCrawler.parseArgsPython(text)
+                "R" -> SmkWrapperCrawler.parseArgsR(text)
+                else -> return@invokeAndWait
+            }
+            val mapped = args.keys.sorted().map { key ->
+                val values = args[key]!!
+                "$key:${values.joinToString(", ", prefix = "[", postfix = "]"){ "'$it'" }}"
+            }
+            performAction(fixture().project) {
+                FilesSteps().aFileWithText(filename, mapped.joinToString("\n") )
             }
         }
     }

@@ -12,6 +12,11 @@ plugins {
 
     // Kotlin
     id "org.jetbrains.kotlin.jvm" version "1.4.21"
+
+    // Serialization
+    id 'org.jetbrains.kotlin.plugin.serialization' version "1.4.21"
+
+    id 'java'
 }
 
 
@@ -75,6 +80,8 @@ repositories {
 dependencies {
     testImplementation 'io.cucumber:cucumber-java:6.8.1'
     testImplementation 'io.cucumber:cucumber-junit:6.8.1'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.0.1'
 }
 
 task cucumber() {
@@ -93,6 +100,47 @@ task cucumber() {
     }
 }
 
+task buildWrappersBundle() {
+    dependsOn  compileKotlin, compileJava
+    doLast {
+        javaexec {
+            main = "com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler"
+            classpath =  project.sourceSets.main.runtimeClasspath + files(intellij.ideaDependency.jarFiles)
+            enableAssertions = true
+            args = [
+                    "${snakemakeWrappersRepoPath}",
+                    "${project.buildDir}/bundledWrappers/smk-wrapper-storage-${snakemakeWrappersRepoVersion}.cbor"
+            ]
+            maxHeapSize = '1024m' // Not much RAM is available on TC agents
+        }
+    }
+}
+
+// TODO: Uncomment: Reconfigure Teamcity + remove resource/smk-wrapper-storage.cbor from version control
+// jar.dependsOn(buildWrappersBundle)
+jar {
+    // :runIde task launches the plugin from *.jar, so it is required also for development
+    from { "${project.buildDir}/bundledWrappers/smk-wrapper-storage-${snakemakeWrappersRepoVersion}.cbor" }
+}
+
+task buildTestWrappersBundle() {
+    // Builds storage based on test data
+    dependsOn  compileKotlin, compileJava
+    doLast {
+        javaexec {
+            main = "com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler"
+            classpath =  project.sourceSets.main.runtimeClasspath + files(intellij.ideaDependency.jarFiles)
+            enableAssertions = true
+            args = [
+                    "${project.projectDir}/testData/wrappers_storage",
+                    "${project.buildDir}/bundledWrappers/smk-wrapper-storage.test.cbor"
+            ]
+            maxHeapSize = '1024m' // Not much RAM is available on TC agents
+        }
+    }
+}
+test.dependsOn(buildTestWrappersBundle)
+
 test {
     reports {
         // turn off html reports... windows can't handle certain cucumber test name characters.
@@ -102,6 +150,7 @@ test {
 
     include '**/*Test.class'
     // exclude '**/AllCucumberFeaturesTest.class'  // Uncomment to disable gradle tests
+    // include '**/AllCucumberFeaturesTest.class'  // Uncomment to disable gradle tests
 
 }
 

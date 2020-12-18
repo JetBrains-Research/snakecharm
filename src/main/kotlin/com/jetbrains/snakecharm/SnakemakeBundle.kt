@@ -24,6 +24,7 @@ class SnakemakeBundle {
                 return bundle
             }
 
+        @JvmStatic
         fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any): String {
             return AbstractBundle.message(bundle!!, key, *params)
         }

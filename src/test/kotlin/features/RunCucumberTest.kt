@@ -8,8 +8,7 @@ import org.junit.runner.RunWith
 @CucumberOptions(
         plugin = ["pretty", "summary"],
         tags="not @ignore"
-//        glue = ["features.glue"]
-        // plugin = ["pretty", "json:target/cucumber-report.json"]
-        //plugin = ["json:target/cucumber-report.json"]
+//        tags="not @ignore and @here"
+//        tags="@ignore"
 )
 class AllCucumberFeaturesTest

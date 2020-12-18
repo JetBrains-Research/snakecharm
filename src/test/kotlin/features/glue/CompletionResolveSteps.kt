@@ -13,6 +13,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.TextRange
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.*
@@ -28,10 +29,7 @@ import io.cucumber.java.en.When
 import junit.framework.TestCase
 import java.lang.Integer.max
 import java.util.*
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 /**
  * @author Roman.Chernyatchik
@@ -417,35 +415,35 @@ class CompletionResolveSteps {
         val lookupElements = fixture.lookupElements?.filterNotNull()?.toTypedArray()
 
         ApplicationManager.getApplication().invokeAndWait(
-                Runnable {
-                    if (lookupText == null) {
-                        assertNull(
-                                lookupElements,
-                                message = "Autocompletion to a single possible variant didn't happen " +
-                                        "because either the completion list was not empty, or given " +
-                                        "prefix didn't match any variants. Lookup elements: <${
-                                            lookupElements?.joinToString { le ->
-                                                "${le.lookupString} [${le.psiElement?.javaClass?.simpleName}]"
-                                            }
-                                        }>\n")
-                    } else {
-                        assertNotNull(
-                                lookupElements,
-                                message = "Completion resulted in a single possible variant, so it was impossible " +
-                                        "to check whether \"$lookupText\" was in the completion list. " +
-                                        "Try using this step: Then I invoke autocompletion popup and see a text")
-                        assertTrue(lookupElements.isNotEmpty(), message = "Completion list was empty")
-
-                        selectItem(LookupFilter.create(lookupText).findElement(lookupElements), ch, fixture.project)
+            {
+                if (lookupText == null) {
+                    if (lookupElements != null) {
+                        fail("Autocompletion to a single possible variant didn't happen " +
+                                "because either the completion list was not empty, or given " +
+                                "prefix didn't match any variants. Lookup elements: <${
+                                    lookupElements.joinToString { le ->
+                                        "${le.lookupString} [${le.psiElement?.javaClass?.simpleName}]"
+                                    }
+                                }>\n")
                     }
-
-                    checkCompletionResult(
-                            fixture,
-                            false,
-                            StringUtil.convertLineSeparators(text)
+                } else {
+                    assertNotNull(
+                        lookupElements,
+                        message = "Completion resulted in a single possible variant, so it was impossible " +
+                                "to check whether \"$lookupText\" was in the completion list. " +
+                                "Try using this step: Then I invoke autocompletion popup and see a text"
                     )
-                },
-                ModalityState.NON_MODAL)
+                    assertTrue(lookupElements.isNotEmpty(), message = "Completion list was empty")
+
+                    selectItem(LookupFilter.create(lookupText).findElement(lookupElements), ch, fixture.project)
+                }
+
+                val cleanText = StringUtil.convertLineSeparators(
+                    text.replace("\${TEST_DATA}", FileUtil.toSystemIndependentName(fixture.testDataPath))
+                )
+                checkCompletionResult(fixture, false, cleanText)
+            },
+            ModalityState.NON_MODAL)
     }
     /*
     @When("^I press Enter$")
