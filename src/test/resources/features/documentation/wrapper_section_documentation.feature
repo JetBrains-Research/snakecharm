@@ -7,6 +7,7 @@ Feature: Documentation for wrapper section
     rule NAME:
       wrapper: <quote><example><quote>
     """
+    And add snakemake facet with wrappers loaded
     When I put the caret at <example>
     And I invoke quick documentation popup
     Then Documentation text should contain <doc_link>
