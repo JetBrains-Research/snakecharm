@@ -57,7 +57,7 @@ class SmkFrameworkSupportDirProjectConfigurator : DirectoryProjectConfigurator {
         SmkSupportProjectSettings.addSupport(project)
 
         ApplicationManager.getApplication().invokeLater({
-            SmkNotifier().notifySnakefileDetected(module)
+            SmkNotifier.notifySnakefileDetected(module)
         }, ModalityState.current(), module.disposed)
     }
 

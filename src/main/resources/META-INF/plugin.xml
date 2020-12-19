@@ -77,6 +77,12 @@
             instance="com.jetbrains.snakecharm.framework.SmkFrameworkConfigurableProvider"
             nonDefaultProject="true"
     />
+    <notificationGroup
+            id="SnakeCharmPluginNotifier"
+            displayType="BALLOON"
+            bundle="SnakemakeBundle"
+            key="notifier.group.title"
+    />
     <directoryProjectConfigurator
             implementation="com.jetbrains.snakecharm.framework.SmkFrameworkSupportDirProjectConfigurator"
             order="after sdk"

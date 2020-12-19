@@ -1,23 +1,20 @@
 package com.jetbrains.snakecharm
 
-import com.intellij.notification.*
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.jetbrains.snakecharm.framework.SmkFrameworkConfigurableProvider
 
-class SmkNotifier {
-    companion object {
-        val NOTIFICATION_GROUP = NotificationGroup(
-            SnakemakeBundle.message("notifier.group.title"),
-            NotificationDisplayType.BALLOON,
-            true
-        )
-    }
+object SmkNotifier {
+    private const val NOTIFICATION_GROUP_ID = "SnakeCharmPluginNotifier" // see plugin xml
 
     fun notifySnakefileDetected(module: Module) {
-        NOTIFICATION_GROUP.createNotification(
+        NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID).createNotification(
             title = SnakemakeBundle.message("notifier.msg.framework.by.snakefile.title"),
             content = SnakemakeBundle.message("notifier.msg.framework.by.snakefile", module.name)
         ).addAction(object : NotificationAction(
@@ -33,7 +30,8 @@ class SmkNotifier {
     }
 
     fun notify(content: String, type: NotificationType = NotificationType.INFORMATION, project: Project? = null) =
-        NOTIFICATION_GROUP.createNotification(content, type).also {
-            it.notify(project)
-        }
+        NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID)
+            .createNotification(content, type).also {
+                it.notify(project)
+            }
 }
