@@ -4,7 +4,6 @@ import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.openapi.module.ModuleUtil
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
@@ -31,10 +30,9 @@ object SmkWrapperArgsCompletionProvider : CompletionProvider<CompletionParameter
                        SmkRuleOrCheckpoint::class.java
                )?.getSectionByName(SnakemakeNames.SECTION_WRAPPER) ?: return
 
-        val wrappers = ModuleUtil
-                .findModuleForPsiElement(parameters.position)
-                ?.getService(SmkWrapperStorage::class.java)
-                ?.wrappers ?: return
+        val wrappers = parameters.position.project
+            .getService(SmkWrapperStorage::class.java)
+            ?.wrappers ?: return
 
         val storage = wrappers.find { wrapper.argumentList!!.text.contains(it.path) } ?: return
         val sectionKeyword = PsiTreeUtil

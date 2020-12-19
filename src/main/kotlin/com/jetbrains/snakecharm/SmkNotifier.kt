@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
-import com.jetbrains.snakecharm.facet.SmkSupportedFrameworksProjectConfigurable
+import com.jetbrains.snakecharm.facet.SmkSupportedFrameworksConfigurableProvider
 
 class SmkNotifier {
     companion object {
@@ -26,7 +26,7 @@ class SmkNotifier {
             override fun actionPerformed(e: AnActionEvent, notification: Notification) {
                 ShowSettingsUtil.getInstance().showSettingsDialog(
                     module.project,
-                    SmkSupportedFrameworksProjectConfigurable::class.java
+                    SmkSupportedFrameworksConfigurableProvider::class.java
                 )
             }
         }).notify(module.project)

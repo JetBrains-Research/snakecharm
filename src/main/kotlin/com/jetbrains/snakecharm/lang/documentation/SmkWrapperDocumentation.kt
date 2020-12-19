@@ -2,7 +2,6 @@ package com.jetbrains.snakecharm.lang.documentation
 
 import com.intellij.lang.documentation.AbstractDocumentationProvider
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.module.ModuleUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
@@ -33,9 +32,8 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
         } else {
             text.substringAfter("/")
         }
-        val wrappers = ModuleUtil
-                .findModuleForPsiElement(node.navigationElement)
-                ?.getService(SmkWrapperStorage::class.java)
+        val wrappers = node.navigationElement.project
+                .getService(SmkWrapperStorage::class.java)
                 ?.wrappers ?: return ""
         val wrapper =  wrappers.find { wrapper -> wrapper.path.contains(result) }
         if (text.startsWith("file://")) {

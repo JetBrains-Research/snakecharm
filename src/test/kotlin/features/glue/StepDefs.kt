@@ -15,9 +15,7 @@ import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
-import com.jetbrains.snakecharm.facet.SmkFacetConfiguration
-import com.jetbrains.snakecharm.facet.SmkFacetType
-import com.jetbrains.snakecharm.facet.SmkFacetType.Companion.createDefaultConfiguration
+import com.jetbrains.snakecharm.facet.SmkSupportProjectSettings
 import io.cucumber.java.en.Given
 import javax.swing.SwingUtilities
 import kotlin.test.fail
@@ -112,20 +110,14 @@ class StepDefs {
     @Given("^add snakemake facet (with|without) wrappers loaded")
     fun withSnakemakeFacet(withWrappersStr: String) {
         ApplicationManager.getApplication().invokeAndWait {
-            val module = SnakemakeWorld.fixture().module
+            val project = SnakemakeWorld.fixture().project
 
-//            val testStorage = SnakemakeTestUtil.getTestDataPath().parent
-//                .resolve("build/bundledWrappers/smk-wrapper-storage.test.cbor")
-
-            val config = createDefaultConfiguration(module.project)
+            val state = SmkSupportProjectSettings.State()
+            state.snakemakeSupportEnabled = true
             if (withWrappersStr != "with") {
-                val state = SmkFacetConfiguration.State()
                 state.useBundledWrappersInfo = false
-                state.wrappersCustomSourcesFolder = ""
-
-                config.loadState(state)
             }
-            SmkFacetType.createAndAddFacet(module, config)
+            SmkSupportProjectSettings.updateStateAndFireEvent(project, state)
         }
     }
 

@@ -3,8 +3,7 @@ package features.glue
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.io.exists
 import com.intellij.util.io.isDirectory
-import com.jetbrains.snakecharm.facet.SmkFacetConfiguration
-import com.jetbrains.snakecharm.facet.SnakemakeFacet
+import com.jetbrains.snakecharm.facet.SmkSupportProjectSettings
 import io.cucumber.java.en.Given
 import java.nio.file.Paths
 
@@ -20,11 +19,11 @@ class WrappersSteps {
         }
         val module = SnakemakeWorld.fixture().module
 
-        val newState = SmkFacetConfiguration.State()
+        val newState = SmkSupportProjectSettings.State()
+        newState.snakemakeSupportEnabled = true
         newState.useBundledWrappersInfo = false
         newState.wrappersCustomSourcesFolder = FileUtil.toSystemIndependentName(path.toString())
 
-        val snakemakeFacet = SnakemakeFacet.getInstance(module)!!
-        SmkFacetConfiguration.setStateAndFireEvent(snakemakeFacet, newState)
+        SmkSupportProjectSettings.updateStateAndFireEvent(SnakemakeWorld.fixture().project, newState)
        }
 }

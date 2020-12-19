@@ -1,8 +1,6 @@
 package com.jetbrains.snakecharm.codeInsight.completion.wrapper
 
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.module.Module
-import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -13,7 +11,7 @@ import com.intellij.util.io.readBytes
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_WRAPPERS_BUNDLED_REPO
-import com.jetbrains.snakecharm.facet.SnakemakeFacet
+import com.jetbrains.snakecharm.facet.SmkSupportProjectSettings
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
@@ -39,10 +37,9 @@ class SmkWrapperLoaderStartupActivity : StartupActivity {
                 true
             ) {
                 override fun run(indicator: ProgressIndicator) {
-                    ModuleManager
-                        .getInstance(project)
-                        .modules
-                        .forEach { loadOrCollectLocalWrappers(it) }
+                    if (SmkSupportProjectSettings.getInstance(project).snakemakeSupportEnabled) {
+                        loadOrCollectLocalWrappers(project)
+                    }
                 }
             })
         }
@@ -50,10 +47,17 @@ class SmkWrapperLoaderStartupActivity : StartupActivity {
 
     companion object {
         @ExperimentalSerializationApi
-        fun loadOrCollectLocalWrappers(module: Module, forced: Boolean = false) {
-            val config = SnakemakeFacet.getInstance(module)?.configuration ?: return
+        fun loadOrCollectLocalWrappers(project: Project, forced: Boolean = false) {
+            val storage = project.getService(SmkWrapperStorage::class.java)
 
-            val storage = module.getService(SmkWrapperStorage::class.java)
+            val config = SmkSupportProjectSettings.getInstance(project)
+            if (!config.snakemakeSupportEnabled) {
+                // remove wrappers
+                storage.initFrom("", emptyList())
+                return
+            }
+            require(config.snakemakeSupportEnabled)
+
             if (!forced && storage.wrappers.isNotEmpty()) {
                 // Do nothing
                 return

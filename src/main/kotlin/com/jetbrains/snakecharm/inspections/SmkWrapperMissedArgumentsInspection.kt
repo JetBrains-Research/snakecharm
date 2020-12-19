@@ -2,7 +2,6 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.openapi.module.ModuleUtil
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -30,9 +29,8 @@ class SmkWrapperMissedArgumentsInspection : SnakemakeInspection() {
         fun visitSmkRuleOrCheckpoint(ruleOrCheckpoint: SmkRuleOrCheckpoint) {
             val wrapper = ruleOrCheckpoint.getSectionByName(SnakemakeNames.SECTION_WRAPPER) ?: return
 
-            val wrappers = ModuleUtil
-                    .findModuleForPsiElement(ruleOrCheckpoint)
-                    ?.getService(SmkWrapperStorage::class.java)
+            val wrappers = ruleOrCheckpoint.project
+                    .getService(SmkWrapperStorage::class.java)
                     ?.wrappers ?: return
             val wrapperName = wrapper.argumentList?.text ?: return
             val wrapperInfo = wrappers.find { wrapperName.contains(it.path) } ?: return
