@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.facet
+package com.jetbrains.snakecharm.framework
 
 import com.intellij.framework.detection.*
 import com.intellij.openapi.application.ApplicationManager
@@ -39,7 +39,7 @@ class SmkFrameworkDetector : FrameworkDetector("snakemake") {
 
         val supportedFiles = ArrayList<VirtualFile>();
         for (module in filesByModule.keySet()) {
-            if (!SmkSupportFrameworkType.isSuitableModuleType(module)) {
+            if (!SmkFrameworkType.isSuitableModuleType(module)) {
                 continue
             }
 
@@ -84,13 +84,13 @@ class SmkFrameworkDetector : FrameworkDetector("snakemake") {
             ApplicationManager.getApplication().invokeLater() {
                 ShowSettingsUtil.getInstance().showSettingsDialog(
                     project,
-                    SmkSupportedFrameworksConfigurableProvider::class.java
+                    SmkFrameworkConfigurableProvider::class.java
                 )
             }
         }
 
     }
 
-    override fun getFrameworkType() = SmkSupportFrameworkType()
+    override fun getFrameworkType() = SmkFrameworkType()
 }
 

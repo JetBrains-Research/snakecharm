@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.facet
+package com.jetbrains.snakecharm.framework
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
@@ -17,7 +17,7 @@ import com.jetbrains.snakecharm.SmkNotifier
  * snakemake support if 'Snakefile' exists in project. For some reason in PyCharm facet detector
  * doesn't work, so this workaround helps in existing projects.
  */
-class SmkFacetConfigurator : DirectoryProjectConfigurator {
+class SmkFrameworkSupportDirProjectConfigurator : DirectoryProjectConfigurator {
     override fun configureProject(
         project: Project,
         baseDir: VirtualFile,
@@ -25,7 +25,7 @@ class SmkFacetConfigurator : DirectoryProjectConfigurator {
         isProjectCreatedWithWizard: Boolean
     ) {
         val module = moduleRef.get()
-        if (module != null && SmkSupportFrameworkType.isSuitableModuleType(module)) {
+        if (module != null && SmkFrameworkType.isSuitableModuleType(module)) {
             ApplicationManager.getApplication().invokeLater({
                 if (detectSnakemake(baseDir)) {
                     StartupManager.getInstance(project).runWhenProjectIsInitialized {

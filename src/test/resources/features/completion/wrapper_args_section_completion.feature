@@ -8,7 +8,7 @@ Feature: Completion for arguments used in wrapper
       <section>:
       wrapper: "0.64.0/<wrapper>"
     """
-    And add snakemake facet with wrappers loaded
+    And add snakemake framework support with wrappers loaded
     When I put the caret after <section>:
     And I invoke autocompletion popup
     Then completion list should contain:

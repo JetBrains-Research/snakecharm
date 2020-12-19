@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.facet
+package com.jetbrains.snakecharm.framework
 
 import com.intellij.framework.FrameworkType
 import com.intellij.openapi.module.Module
@@ -6,7 +6,7 @@ import com.intellij.openapi.module.ModuleType
 import com.jetbrains.python.PythonModuleTypeBase
 import com.jetbrains.snakecharm.SnakemakeBundle
 
-class SmkSupportFrameworkType : FrameworkType(ID) {
+class SmkFrameworkType : FrameworkType(ID) {
     override fun getPresentableName() = SnakemakeBundle.message("smk.framework.display.name")
     override fun getIcon() = SmkSupportProjectSettings.getIcon()
 

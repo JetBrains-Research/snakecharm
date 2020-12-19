@@ -67,18 +67,18 @@
             class="com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes"
             externalIdPrefix="py.SMK_"
     />
-    <framework.detector implementation="com.jetbrains.snakecharm.facet.SmkFrameworkDetector"/>
-    <frameworkSupport implementation="com.jetbrains.snakecharm.facet.SmkFrameworkSupportWizardProvider"/>
+    <framework.detector implementation="com.jetbrains.snakecharm.framework.SmkFrameworkDetector"/>
+    <frameworkSupport implementation="com.jetbrains.snakecharm.framework.SmkFrameworkSupportWizardProvider"/>
     <projectConfigurable
             groupId="language"
-            id="com.jetbrains.snakecharm.facet.SmkSupportedFrameworksConfigurableProvider"
+            id="com.jetbrains.snakecharm.framework.SmkFrameworkConfigurableProvider"
             bundle="SnakemakeBundle"
             key="smk.framework.configurable.display.name"
-            instance="com.jetbrains.snakecharm.facet.SmkSupportedFrameworksConfigurableProvider"
+            instance="com.jetbrains.snakecharm.framework.SmkFrameworkConfigurableProvider"
             nonDefaultProject="true"
     />
     <directoryProjectConfigurator
-            implementation="com.jetbrains.snakecharm.facet.SmkFacetConfigurator"
+            implementation="com.jetbrains.snakecharm.framework.SmkFrameworkSupportDirProjectConfigurator"
             order="after sdk"
     />
 
@@ -565,7 +565,7 @@
 <!--    <moduleService serviceImplementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage"/>-->
     <projectService serviceImplementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage"/>
 
-    <projectService serviceImplementation="com.jetbrains.snakecharm.facet.SmkSupportProjectSettings"/>
+    <projectService serviceImplementation="com.jetbrains.snakecharm.framework.SmkSupportProjectSettings"/>
   </extensions>
 
   <module-components>

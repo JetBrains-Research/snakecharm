@@ -11,7 +11,7 @@ import com.intellij.util.io.readBytes
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_WRAPPERS_BUNDLED_REPO
-import com.jetbrains.snakecharm.facet.SmkSupportProjectSettings
+import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray

@@ -7,7 +7,7 @@ Feature: Completion for wrapper name
     <rule_like> NAME:
       wrapper: "0.64.0/<short_name>"
     """
-    And add snakemake facet with wrappers loaded
+    And add snakemake framework support with wrappers loaded
     When I put the caret after <short_name>
     And I invoke autocompletion popup and see a text:
     """
@@ -28,7 +28,7 @@ Feature: Completion for wrapper name
     <rule_like> NAME:
       wrapper: "<prefix>"
     """
-    And add snakemake facet with wrappers loaded
+    And add snakemake framework support with wrappers loaded
     When I put the caret after <prefix>
     And I invoke autocompletion popup, select "<lookup>" lookup item and see a text:
     """
@@ -52,7 +52,7 @@ Feature: Completion for wrapper name
     <rule_like> NAME:
       wrapper: "<tag>/<short_name>"
     """
-    And add snakemake facet with wrappers loaded
+    And add snakemake framework support with wrappers loaded
     When I put the caret after <short_name>
     And I invoke autocompletion popup and see a text:
     """
@@ -88,7 +88,7 @@ Feature: Completion for wrapper name
     <rule_like> NAME:
       wrapper: "<prefix>"
     """
-    And add snakemake facet without wrappers loaded
+    And add snakemake framework support without wrappers loaded
     And wrapper repo path in test dir "wrappers_storage2"
     When I put the caret after <prefix>
     And I invoke autocompletion popup and see a text:

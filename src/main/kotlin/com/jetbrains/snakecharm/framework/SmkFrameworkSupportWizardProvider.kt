@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.facet
+package com.jetbrains.snakecharm.framework
 
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportConfigurable
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel
@@ -20,11 +20,11 @@ import com.jetbrains.snakecharm.SnakemakeBundle
  *  - Project is always null, so be careful with impl
  */
 class SmkFrameworkSupportWizardProvider : FrameworkSupportProviderBase(
-    "framework:${SmkSupportFrameworkType.ID}", SnakemakeBundle.message("smk.framework.display.name")
+    "framework:${SmkFrameworkType.ID}", SnakemakeBundle.message("smk.framework.display.name")
 ) {
 
     override fun isEnabledForModuleType(moduleType: ModuleType<*>) =
-        SmkSupportFrameworkType.isSuitableModuleType(moduleType)
+        SmkFrameworkType.isSuitableModuleType(moduleType)
 
     override fun addSupport(
         module: Module,
@@ -40,7 +40,7 @@ class SmkFrameworkSupportWizardProvider : FrameworkSupportProviderBase(
 }
 
 class SmkFrameworkSupportWizardConfigurable(project: Project?) : FrameworkSupportConfigurable() {
-    private val settingsPanel = SmkFacetSettingsPanel(project)
+    private val settingsPanel = SmkFrameworkSettingsPanel(project)
 
     override fun getComponent() = settingsPanel
 
@@ -51,7 +51,7 @@ class SmkFrameworkSupportWizardConfigurable(project: Project?) : FrameworkSuppor
         settingsPanel.apply(uiState)
 
         // apply
-        SmkProjectConfigurable.applyUIStateToProject(uiState, model.project)
+        SmkFrameworkConfigurable.applyUIStateToProject(uiState, model.project)
     }
 
     override fun onFrameworkSelectionChanged(selected: Boolean) {

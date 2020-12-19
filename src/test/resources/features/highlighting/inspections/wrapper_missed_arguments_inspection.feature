@@ -8,7 +8,7 @@ Feature: Inspection for missed wrapper arguments
       <section>: ""
       wrapper: "0.64.0/<wrapper>"
     """
-    And add snakemake facet with wrappers loaded
+    And add snakemake framework support with wrappers loaded
     And SmkWrapperMissedArgumentsInspection inspection is enabled
     Then I expect inspection weak warning on <<section>> with message
     """
@@ -31,7 +31,7 @@ Feature: Inspection for missed wrapper arguments
     <rule_like> foo:
       wrapper: "0.64.0/<wrapper>"
     """
-     And add snakemake facet with wrappers loaded
+     And add snakemake framework support with wrappers loaded
     And SmkWrapperMissedArgumentsInspection inspection is enabled
     Then I expect inspection weak warning on <foo> with message
     """
@@ -54,7 +54,7 @@ Feature: Inspection for missed wrapper arguments
     <rule_like> foo:
       wrapper: "0.64.0/<wrapper>"
     """
-    And add snakemake facet with wrappers loaded
+    And add snakemake framework support with wrappers loaded
     And SmkWrapperMissedArgumentsInspection inspection is enabled
     Then I expect inspection weak warning on <foo> with message
     """

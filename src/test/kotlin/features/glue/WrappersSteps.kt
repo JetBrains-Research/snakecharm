@@ -3,7 +3,7 @@ package features.glue
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.io.exists
 import com.intellij.util.io.isDirectory
-import com.jetbrains.snakecharm.facet.SmkSupportProjectSettings
+import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import io.cucumber.java.en.Given
 import java.nio.file.Paths
 

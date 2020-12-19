@@ -15,7 +15,7 @@ import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
-import com.jetbrains.snakecharm.facet.SmkSupportProjectSettings
+import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import io.cucumber.java.en.Given
 import javax.swing.SwingUtilities
 import kotlin.test.fail
@@ -107,7 +107,7 @@ class StepDefs {
         SnakemakeWorld.myInjectionFixture = InjectionTestFixture(SnakemakeWorld.fixture())
     }
 
-    @Given("^add snakemake facet (with|without) wrappers loaded")
+    @Given("^add snakemake framework support (with|without) wrappers loaded")
     fun withSnakemakeFacet(withWrappersStr: String) {
         ApplicationManager.getApplication().invokeAndWait {
             val project = SnakemakeWorld.fixture().project

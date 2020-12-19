@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.facet
+package com.jetbrains.snakecharm.framework
 
 import com.intellij.facet.ui.ValidationResult
 import com.intellij.openapi.options.Configurable
@@ -13,7 +13,7 @@ import javax.swing.JComponent
 /**
  * Registers project settings tab for snakemake settings ('supported framework')
  */
-class SmkSupportedFrameworksConfigurableProvider(
+class SmkFrameworkConfigurableProvider(
     val project: Project
 ) : Configurable, Configurable.NoScroll {
 
@@ -24,7 +24,7 @@ class SmkSupportedFrameworksConfigurableProvider(
             return null
         }
 
-        projConfigurable = SmkProjectConfigurable(project)
+        projConfigurable = SmkFrameworkConfigurable(project)
         return projConfigurable.createComponent()
     }
 

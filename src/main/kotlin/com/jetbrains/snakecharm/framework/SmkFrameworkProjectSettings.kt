@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.facet
+package com.jetbrains.snakecharm.framework
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.BaseState

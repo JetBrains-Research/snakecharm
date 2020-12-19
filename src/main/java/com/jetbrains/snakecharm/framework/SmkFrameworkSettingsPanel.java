@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.facet;
+package com.jetbrains.snakecharm.framework;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -27,7 +27,7 @@ import java.awt.event.MouseEvent;
  *
  * Let's rewrite it in Kotlin in some distant future, especially if IDEA will improve *.form integration with Kotlin
  */
-public class SmkFacetSettingsPanel extends JPanel {
+public class SmkFrameworkSettingsPanel extends JPanel {
     //// instantiated using reflection + xml based *.form settings:
     private JPanel myContentPane;
     private JRadioButton wrappersBundledRB;
@@ -39,7 +39,7 @@ public class SmkFacetSettingsPanel extends JPanel {
 
     // TODO [romeo]: add SdkCombobox, see IdeaGradleProjectSettingsControlBuilder impl
 
-    public SmkFacetSettingsPanel(@Nullable final Project project) {
+    public SmkFrameworkSettingsPanel(@Nullable final Project project) {
         setLayout(new BorderLayout());
         add(myContentPane, BorderLayout.CENTER);
 

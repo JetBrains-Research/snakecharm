@@ -1,4 +1,4 @@
-package com.jetbrains.snakecharm.facet;
+package com.jetbrains.snakecharm.framework;
 
 import com.intellij.facet.ui.ValidationResult;
 import com.intellij.openapi.options.ConfigurationException;
@@ -18,7 +18,7 @@ import java.awt.*;
  * <p>
  * Let's rewrite it in Kotlin in some distant future, especially if IDEA will improve *.form integration with Kotlin
  */
-public class SmkProjectConfigurable implements SearchableConfigurable {
+public class SmkFrameworkConfigurable implements SearchableConfigurable {
     @NotNull
     public Project project;
 
@@ -27,14 +27,14 @@ public class SmkProjectConfigurable implements SearchableConfigurable {
     private JCheckBox enableSmkSupportCB;
     private JPanel settingsPanelPlaceHolder;
     //////
-    private final SmkFacetSettingsPanel settingsPanel;
+    private final SmkFrameworkSettingsPanel settingsPanel;
 
-    public SmkProjectConfigurable(@NotNull Project project) {
+    public SmkFrameworkConfigurable(@NotNull Project project) {
         this.project = project;
 
         enableSmkSupportCB.addActionListener(e -> updateCompEnabledPropertyRecursively());
 
-        settingsPanel = new SmkFacetSettingsPanel(project);
+        settingsPanel = new SmkFrameworkSettingsPanel(project);
         settingsPanelPlaceHolder.add(settingsPanel, BorderLayout.CENTER);
 
         updateCompEnabledPropertyRecursively();
@@ -77,7 +77,7 @@ public class SmkProjectConfigurable implements SearchableConfigurable {
     ) throws ConfigurationException {
         try {
 
-            final ValidationResult validationResult = SmkSupportedFrameworksConfigurableProvider.Companion.validateWrappersPath(uiState);
+            final ValidationResult validationResult = SmkFrameworkConfigurableProvider.Companion.validateWrappersPath(uiState);
             if (!validationResult.isOk()) {
                 throw new ConfigurationException(validationResult.getErrorMessage());
             }

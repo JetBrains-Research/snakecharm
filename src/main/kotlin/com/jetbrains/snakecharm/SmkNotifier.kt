@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
-import com.jetbrains.snakecharm.facet.SmkSupportedFrameworksConfigurableProvider
+import com.jetbrains.snakecharm.framework.SmkFrameworkConfigurableProvider
 
 class SmkNotifier {
     companion object {
@@ -18,15 +18,15 @@ class SmkNotifier {
 
     fun notifySnakefileDetected(module: Module) {
         NOTIFICATION_GROUP.createNotification(
-            title = SnakemakeBundle.message("notifier.msg.facet.by.snakefile.title"),
-            content = SnakemakeBundle.message("notifier.msg.facet.by.snakefile", module.name)
+            title = SnakemakeBundle.message("notifier.msg.framework.by.snakefile.title"),
+            content = SnakemakeBundle.message("notifier.msg.framework.by.snakefile", module.name)
         ).addAction(object : NotificationAction(
-            SnakemakeBundle.message("notifier.msg.facet.by.snakefile.action.configure")
+            SnakemakeBundle.message("notifier.msg.framework.by.snakefile.action.configure")
         ) {
             override fun actionPerformed(e: AnActionEvent, notification: Notification) {
                 ShowSettingsUtil.getInstance().showSettingsDialog(
                     module.project,
-                    SmkSupportedFrameworksConfigurableProvider::class.java
+                    SmkFrameworkConfigurableProvider::class.java
                 )
             }
         }).notify(module.project)
