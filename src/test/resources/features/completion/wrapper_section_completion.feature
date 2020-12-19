@@ -21,6 +21,30 @@ Feature: Completion for wrapper name
       | checkpoint | cairosvg           | utils/cairosvg                  |
       | checkpoint | bam2fq/interleaved | bio/samtools/bam2fq/interleaved |
 
+  Scenario Outline: Complete wrapper name for non-standard version tag (multiple lookup items)
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      wrapper: "<prefix>"
+    """
+    And add snakemake facet with wrappers loaded
+    When I put the caret after <prefix>
+    And I invoke autocompletion popup, select "<lookup>" lookup item and see a text:
+    """
+    <rule_like> NAME:
+      wrapper: "<lookup>"
+    """
+    Examples:
+      | rule_like  | prefix  | lookup                            |
+      | rule       | 0.64.0/ | 0.64.0/bio/fastqc                 |
+      | rule       | 0.64.0  | 0.64.0/bio/fastqc                 |
+      | rule       | master  | master/bio/fastqc                 |
+      | rule       | latest  | latest/bio/fastqc                 |
+      | rule       | 0.54.3  | 0.54.3/bio/fastqc                 |
+      | rule       | 0.30.10 | 0.30.10/bio/fastqc                |
+      | checkpoint | 0.64.0/ | 0.64.0/bio/bismark/bismark2report |
+
   Scenario Outline: Complete wrapper name for non-standard version tag
     Given a snakemake project
     And I open a file "foo.smk" with text
@@ -73,12 +97,12 @@ Feature: Completion for wrapper name
       wrapper: "<tag>/bio/bismark/custom_wr1"
     """
     Examples:
-      | rule_like  | tag     | prefix         |
-      | rule       | master  | master/custom_wr1         |
-      | rule       | latest  | latest/custom_wr1         |
-      | checkpoint | 0.54.3  | 0.54.3/custom_wr1         |
-      | checkpoint | 0.54.3  | 0.54.3/bismark            |
-      | checkpoint | 0.30.10 | 0.30.10/bismark/custom |
-      | checkpoint | file://${TEST_DATA}/wrappers_storage2 | file:// |
-      | checkpoint | file://${TEST_DATA}/wrappers_storage2 | file://custom |
-      | checkpoint | file://${TEST_DATA}/wrappers_storage2  | file://custom_wr1 |
+      | rule_like  | tag                                   | prefix                 |
+      | rule       | master                                | master/custom_wr1      |
+      | rule       | latest                                | latest/custom_wr1      |
+      | checkpoint | 0.54.3                                | 0.54.3/custom_wr1      |
+      | checkpoint | 0.54.3                                | 0.54.3/bismark         |
+      | checkpoint | 0.30.10                               | 0.30.10/bismark/custom |
+      | checkpoint | file://${TEST_DATA}/wrappers_storage2 | file://                |
+      | checkpoint | file://${TEST_DATA}/wrappers_storage2 | file://custom          |
+      | checkpoint | file://${TEST_DATA}/wrappers_storage2 | file://custom_wr1      |

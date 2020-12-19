@@ -46,7 +46,7 @@ object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>()
 
         if (WRAPPER_VERSION_REGEXP.matches(result.prefixMatcher.prefix)) {
             version = result.prefixMatcher.prefix.substringBefore('/')
-            prefix = result.prefixMatcher.prefix.substringAfter('/')
+            prefix = result.prefixMatcher.prefix.substringAfter('/', "")
         } else {
             version = storage.version
             val rawPrefix = result.prefixMatcher.prefix
