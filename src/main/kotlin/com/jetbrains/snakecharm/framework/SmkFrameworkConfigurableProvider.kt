@@ -41,19 +41,33 @@ class SmkFrameworkConfigurableProvider(
     }
 
     companion object {
-        fun validateWrappersPath(state: SmkSupportProjectSettings.State): ValidationResult {
-            if (state.snakemakeSupportEnabled && !state.useBundledWrappersInfo) {
-                val folderPathStr: String? = state.wrappersCustomSourcesFolder
-                if (folderPathStr == null || folderPathStr.isBlank()) {
-                    return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.wrappers.sources.path.is.blank"))
+        fun validateWrappersPath(
+            project: Project,
+            state: SmkSupportProjectSettings.State
+        ): ValidationResult {
+            if (state.snakemakeSupportEnabled) {
+                if (!state.useBundledWrappersInfo) {
+                    val folderPathStr: String? = state.wrappersCustomSourcesFolder
+                    if (folderPathStr == null || folderPathStr.isBlank()) {
+                        return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.wrappers.sources.path.is.blank"))
+                    }
+
+                    val path = Paths.get(folderPathStr)
+                    if (!path.exists()) {
+                        return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.wrappers.sources.path.not.exist"))
+                    }
+                    if (!path.isDirectory()) {
+                        return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.wrappers.sources.path.not.directory"))
+                    }
                 }
 
-                val path = Paths.get(folderPathStr)
-                if (!path.exists()) {
-                    return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.wrappers.sources.path.not.exist"))
-                }
-                if (!path.isDirectory()) {
-                    return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.wrappers.sources.path.not.directory"))
+                val sdkName = state.pythonSdkName
+                val sdk = SmkSupportProjectSettings.findPythonSdk(project, sdkName)
+                if (sdk == null) {
+                    if (sdkName.isNullOrBlank()) {
+                        return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.sdk.project.not.valid"))
+                    }
+                    return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.sdk.not.valid", sdkName))
                 }
             }
             return ValidationResult.OK

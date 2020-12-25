@@ -42,6 +42,7 @@ object PythonMockSdk {
     fun create(
             testDataRoot: String,
             version: String,
+            sdkNameSuffix: String = "",
             vararg additionalRoots: VirtualFile
     ): Sdk {
         val mockPath = "$testDataRoot/MockSdk$version/"
@@ -81,7 +82,7 @@ object PythonMockSdk {
                 )
         roots.putValues(classes, listOf(*additionalRoots))
 
-        val sdk = MockSdk("$MOCK_SDK_NAME $version", sdkHome, "Python $version Mock SDK", roots, sdkType)
+        val sdk = MockSdk("$MOCK_SDK_NAME $version$sdkNameSuffix", sdkHome, "Python $version Mock SDK", roots, sdkType)
 
         // com.jetbrains.python.psi.resolve.PythonSdkPathCache.getInstance() corrupts SDK, so have to clone
         return sdk.clone()

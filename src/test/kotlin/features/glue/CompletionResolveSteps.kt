@@ -10,6 +10,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.TextRange
@@ -101,6 +102,7 @@ class CompletionResolveSteps {
 
     @Then("^reference in injection should resolve to \"(.+)\" in \"(.+)\"$")
     fun referenceInInjectionShouldResolveToIn(targetPrefix: String, file: String) {
+        DumbService.getInstance(SnakemakeWorld.fixture().project).waitForSmartMode()
         ApplicationManager.getApplication().runReadAction {
             tryToResolveRef(targetPrefix, targetPrefix, file, getReferenceInInjectedLanguageAtOffset())
         }
@@ -108,6 +110,7 @@ class CompletionResolveSteps {
 
     @Then("^reference in injection should resolve to \"(.+)\" in context \"(.+)\" in file \"(.+)\"$")
     fun referenceInInjectionShouldResolveToAtInFile(targetPrefix: String, context: String, file: String) {
+        DumbService.getInstance(SnakemakeWorld.fixture().project).waitForSmartMode()
         ApplicationManager.getApplication().runReadAction {
             tryToResolveRef(targetPrefix, context, file, getReferenceInInjectedLanguageAtOffset())
         }
@@ -115,6 +118,7 @@ class CompletionResolveSteps {
 
     @Then("^reference should resolve to \"(.+)\" in context \"(.+)\" in file \"(.+)\"$")
     fun referenceShouldResolveToAtInFile(resultSubstr: String, context: String, file: String) {
+        DumbService.getInstance(SnakemakeWorld.fixture().project).waitForSmartMode()
         ApplicationManager.getApplication().runReadAction {
             tryToResolveRef(resultSubstr, context, file, getReferenceAtOffset())
         }
@@ -122,6 +126,7 @@ class CompletionResolveSteps {
 
     @Then("^reference should resolve to \"(.+)\" in \"(.+)\"$")
     fun referenceShouldResolveToIn(targetPrefix: String, file: String) {
+        DumbService.getInstance(SnakemakeWorld.fixture().project).waitForSmartMode()
         ApplicationManager.getApplication().runReadAction {
             tryToResolveRef(targetPrefix, targetPrefix, file, getReferenceAtOffset())
         }

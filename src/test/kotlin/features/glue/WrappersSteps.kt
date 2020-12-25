@@ -1,9 +1,11 @@
 package features.glue
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.io.exists
 import com.intellij.util.io.isDirectory
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
+import features.glue.StepDefs.Companion.waitEDTEventsDispatching
 import io.cucumber.java.en.Given
 import java.nio.file.Paths
 
@@ -24,6 +26,10 @@ class WrappersSteps {
         newState.useBundledWrappersInfo = false
         newState.wrappersCustomSourcesFolder = FileUtil.toSystemIndependentName(path.toString())
 
-        SmkSupportProjectSettings.updateStateAndFireEvent(SnakemakeWorld.fixture().project, newState)
+        ApplicationManager.getApplication().invokeAndWait {
+            SmkSupportProjectSettings.updateStateAndFireEvent(SnakemakeWorld.fixture().project, newState)
+        }
+
+        waitEDTEventsDispatching()
        }
 }

@@ -8,8 +8,8 @@ Version 0.10.0 build #0.10.0.xxx
 Released on ...
 
 Features:
--
-
+- Snakemake Support Settings page (see #346)
+    
 
 Version 0.9.0 build #0.9.0.387
 -------------

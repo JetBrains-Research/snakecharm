@@ -1,6 +1,5 @@
 package com.jetbrains.snakecharm.codeInsight.resolve
 
-import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyQualifiedExpression
 import com.jetbrains.python.psi.resolve.PyReferenceResolveProvider
@@ -39,8 +38,9 @@ class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
                         val threadsSection = ruleOrCheckpoint.getSectionByName(SECTION_THREADS)
 
                         items.add(
-                                RatedResolveResult(
-                                    RATE_IMPLICIT_SYMBOLS, threadsSection ?: ruleOrCheckpoint)
+                            RatedResolveResult(
+                                RATE_IMPLICIT_SYMBOLS, threadsSection ?: ruleOrCheckpoint
+                            )
                         )
                     }
 
@@ -54,20 +54,17 @@ class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
                 }
             }
 
-            val module = ModuleUtilCore.findModuleForPsiElement(element)
-            if (module != null) {
-                val cache = ImplicitPySymbolsProvider.instance(module).cache
+            val cache = ImplicitPySymbolsProvider.instance(element.project).cache
 
-                SmkCodeInsightScope.values().asSequence()
-                        .filter { symbolScope -> contextScope.includes(symbolScope) }
-                        .flatMap { symbolScope -> cache.filter(symbolScope, element.name!!).asSequence() }
-                        .map {
-                            RatedResolveResult(RATE_IMPLICIT_SYMBOLS, it.psiDeclaration)
-                        }.forEach {
-                            items.add(it)
+            SmkCodeInsightScope.values().asSequence()
+                .filter { symbolScope -> contextScope.includes(symbolScope) }
+                .flatMap { symbolScope -> cache.filter(symbolScope, element.name!!).asSequence() }
+                .map {
+                    RatedResolveResult(RATE_IMPLICIT_SYMBOLS, it.psiDeclaration)
+                }.forEach {
+                    items.add(it)
 
-                        }
-            }
+                }
             return items
         }
         return emptyList()

@@ -566,19 +566,13 @@
     <spellchecker.bundledDictionaryProvider implementation="com.jetbrains.snakecharm.spellchecker.SmkBundledDictionaryProvider"/>
     <!--    <spellchecker.support language="Snakemake" implementationClass="com.jetbrains.snakecharm.spellchecker.SmkSpellcheckerStrategy"/>-->
 
-    <postStartupActivity implementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperLoaderStartupActivity"/>
+    <postStartupActivity implementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SnakemakeStartupActivity"/>
 
-<!--    <moduleService serviceImplementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage"/>-->
     <projectService serviceImplementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage"/>
 
     <projectService serviceImplementation="com.jetbrains.snakecharm.framework.SmkSupportProjectSettings"/>
+    <projectService serviceImplementation="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider"/>
   </extensions>
-
-  <module-components>
-    <component>
-      <implementation-class>com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider</implementation-class>
-    </component>
-  </module-components>
 
 
   <extensions defaultExtensionNs="Pythonid">

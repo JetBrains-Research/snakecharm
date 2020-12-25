@@ -1,6 +1,7 @@
 package features.glue
 
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.psi.PsiReference
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.InjectionTestFixture
@@ -21,6 +22,8 @@ object SnakemakeWorld {
     @JvmField var myTestRootDisposable: TestDisposable? = null
     @JvmField var myInspectionProblemsCounts: MutableMap<String, Int>? = null
     @JvmField var myInspectionChecked: Boolean = false
+    @JvmField var myPythonSnakemakeSdk: Sdk? = null
+    @JvmField var myPythonOnlySdk: Sdk? = null
 
     fun injectionFixture() = myInjectionFixture!!
     fun fixture()= myFixture!!

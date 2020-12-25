@@ -1,6 +1,39 @@
 Feature: Resolve implicitly imported python names
   Resolve runtime magic from snakemake
 
+  Scenario Outline: Check different SDK settings
+    Given a snakemake with disabled framework project
+    Given I open a file "foo.smk" with text
+    """
+    <text>
+    """
+    When I put the caret at <ptn>
+    Then reference should not resolve
+    When add snakemake framework support without wrappers loaded
+    Then reference should resolve to "<symbol_name>" in "<file>"
+    When set project sdk as none interpreter
+    Then reference should not resolve
+    When set project sdk as python with snakemake interpreter
+    Then reference should resolve to "<symbol_name>" in "<file>"
+    When set snakemake framework sdk to invalid interpreter
+    Then reference should not resolve
+    When set snakemake framework sdk to python with snakemake interpreter
+    Then reference should resolve to "<symbol_name>" in "<file>"
+    When set project sdk as none interpreter
+    When set snakemake framework sdk to project interpreter
+    Then reference should not resolve
+    When set project sdk as python with snakemake interpreter
+    Then reference should resolve to "<symbol_name>" in "<file>"
+    When set project sdk as python only interpreter
+    Then reference should not resolve
+
+    Examples:
+      | ptn | text        | symbol_name | file         |
+      | exp | expand()    | expand      | io.py        |
+
+  Scenario: Do not resolve at top-level if no python sdk
+  Scenario: Resolve at top-level if custom python sdk
+
   Scenario Outline: Resolve at top-level
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -13,19 +46,19 @@ Feature: Resolve implicitly imported python names
     Examples:
       | ptn | text        | symbol_name | file         |
       | exp | expand()    | expand      | io.py        |
-      | tem | temp()      | temp        | io.py        |
-      | dir | directory() | directory   | io.py        |
-      | dir | directory() | directory   | io.py        |
-      | pro | protected() | protected   | io.py        |
-      | tou | touch()     | touch       | io.py        |
-      | dyn | dynamic()   | dynamic     | io.py        |
-      | un  | unpack()    | unpack      | io.py        |
-      | anc | ancient()   | ancient     | io.py        |
-      | con | config      | config      | workflow.py  |
-      | con | config["a"] | config      | workflow.py  |
-      | ru  | rules       | rules       | workflow.py  |
-      | ru  | rules.foo   | rules       | workflow.py  |
-      | inp | input       | input       | builtins.pyi |
+#      | tem | temp()      | temp        | io.py        |
+#      | dir | directory() | directory   | io.py        |
+#      | dir | directory() | directory   | io.py        |
+#      | pro | protected() | protected   | io.py        |
+#      | tou | touch()     | touch       | io.py        |
+#      | dyn | dynamic()   | dynamic     | io.py        |
+#      | un  | unpack()    | unpack      | io.py        |
+#      | anc | ancient()   | ancient     | io.py        |
+#      | con | config      | config      | workflow.py  |
+#      | con | config["a"] | config      | workflow.py  |
+#      | ru  | rules       | rules       | workflow.py  |
+#      | ru  | rules.foo   | rules       | workflow.py  |
+#      | inp | input       | input       | builtins.pyi |
 
   Scenario: Resolve at top-level: shell()
     Given a snakemake project

@@ -3,6 +3,7 @@ package features.glue
 import com.intellij.codeInspection.LocalInspectionEP
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Disposer
 import com.intellij.testFramework.TestApplicationManager
@@ -10,6 +11,7 @@ import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.InjectionTestFixture
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
+import com.jetbrains.python.PythonMockSdk
 import com.jetbrains.python.codeInsight.controlflow.ControlFlowCache
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.psi.PyFile
@@ -26,7 +28,7 @@ import kotlin.test.fail
  * @date 2019-04-28
  */
 class StepDefs {
-    @Given("^a (snakemake|snakemake with wrappers|python) project$")
+    @Given("^a (snakemake|snakemake with disabled framework|python) project$")
     @Throws(Exception::class)
     fun configureSnakemakeProject(projectType: String) {
         require(SnakemakeWorld.myFixture == null) {
@@ -52,15 +54,28 @@ class StepDefs {
         }
 
         // Write code here that turns the phrase above into concrete actions
+        val testDataRoot = SnakemakeTestUtil.getTestDataPath().toString()
         val projectDescriptor = PyLightProjectDescriptor(
             SnakemakeTestCase.PYTHON_3_MOCK_SDK,
-            SnakemakeTestUtil.getTestDataPath().toString(),
+            testDataRoot,
             *additionalRoots
+        )
+
+        SnakemakeWorld.myPythonOnlySdk = PythonMockSdk.create(
+            testDataRoot, SnakemakeTestCase.PYTHON_3_MOCK_SDK, sdkNameSuffix = "_wo_snakemake"
         )
 
         val factory = IdeaTestFixtureFactory.getFixtureFactory()
         val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor)
         val tmpDirFixture = LightTempDirTestFixtureImpl(true) // "tmp://" dir by default
+
+//        val configureSdk = { fixture: CodeInsightTestFixture ->
+//            // An alternative is to force set SDK in module settings.
+//            // TODO: tests on that!!!!
+//            ApplicationManager.getApplication().runWriteAction {
+//                ProjectRootManager.getInstance(fixture.project).projectSdk = projectDescriptor.sdk
+//            }
+//        }
 
 //        val setupFacetClosure = { fixture: CodeInsightTestFixture ->
 //            val module = fixture.module
@@ -71,22 +86,20 @@ class StepDefs {
 //            }
 //            SmkFacetType.createAndAddFacet(module, config)
 //        }
-
+        SnakemakeWorld.myPythonSnakemakeSdk = projectDescriptor.sdk
         SnakemakeWorld.myFixture = factory.createCodeInsightFixture(
             fixtureBuilder.fixture, tmpDirFixture
         ).apply {
-            testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
+            testDataPath = testDataRoot
 
             if (SwingUtilities.isEventDispatchThread()) {
-                // todo: add facet?
                 setUp()
-//                setupFacetClosure(this)
+                //configureSdk(this)
             } else {
                 ApplicationManager.getApplication().invokeAndWait {
                     try {
-                        // todo: add facet?
                         setUp()
-//                        setupFacetClosure(this)
+                        //configureSdk(this)
                     } catch (e: java.lang.Exception) {
                         throw RuntimeException("Error running setup", e)
                     }
@@ -105,20 +118,60 @@ class StepDefs {
         // languageExtension.clearCache(PythonLanguage.INSTANCE)
 
         SnakemakeWorld.myInjectionFixture = InjectionTestFixture(SnakemakeWorld.fixture())
+
+        setProjectSdk("python with snakemake")
+
+        if (projectType != "snakemake with disabled framework") {
+            withSnakemakeFacet("without")
+        }
+    }
+
+    @Given("^set project sdk as (none|python with snakemake|python only) interpreter")
+    fun setProjectSdk(mode: String) {
+        ApplicationManager.getApplication().invokeAndWait {
+            ApplicationManager.getApplication().runWriteAction {
+                val sdk = when (mode) {
+                    "none" -> null
+                    "python with snakemake" -> SnakemakeWorld.myPythonSnakemakeSdk
+                    "python only" -> SnakemakeWorld.myPythonOnlySdk
+                    else -> fail("Unsupported mode: $mode")
+                }
+                val project = SnakemakeWorld.fixture().project
+                ProjectRootManager.getInstance(project).projectSdk = sdk
+            }
+        }
+        waitEDTEventsDispatching()
+    }
+
+    @Given("^set snakemake framework sdk to (python with snakemake|project|invalid) interpreter")
+    fun setSnakemakeFrameworkSdk(mode: String) {
+        val newState = SmkSupportProjectSettings.getInstance(SnakemakeWorld.fixture().project).stateSnapshot()
+        when (mode) {
+            "invalid" -> newState.pythonSdkName = "invalid sdk"
+            "python with snakemake" -> newState.pythonSdkName = SnakemakeWorld.myPythonSnakemakeSdk!!.name
+            "project" -> newState.pythonSdkName = ""
+            else -> fail("Not expected: $mode")
+        }
+        ApplicationManager.getApplication().invokeAndWait {
+            SmkSupportProjectSettings.updateStateAndFireEvent(SnakemakeWorld.fixture().project, newState)
+        }
+
+        waitEDTEventsDispatching()
     }
 
     @Given("^add snakemake framework support (with|without) wrappers loaded")
     fun withSnakemakeFacet(withWrappersStr: String) {
-        ApplicationManager.getApplication().invokeAndWait {
-            val project = SnakemakeWorld.fixture().project
+        val project = SnakemakeWorld.fixture().project
 
-            val state = SmkSupportProjectSettings.State()
-            state.snakemakeSupportEnabled = true
-            if (withWrappersStr != "with") {
-                state.useBundledWrappersInfo = false
-            }
+        val state = SmkSupportProjectSettings.State()
+        state.snakemakeSupportEnabled = true
+        if (withWrappersStr != "with") {
+            state.useBundledWrappersInfo = false
+        }
+        ApplicationManager.getApplication().invokeAndWait {
             SmkSupportProjectSettings.updateStateAndFireEvent(project, state)
         }
+        waitEDTEventsDispatching()
     }
 
     @Given("^I expect controlflow")
@@ -147,5 +200,13 @@ class StepDefs {
     @Given("^TODO")
     fun todo() {
         TODO()
+    }
+
+    companion object {
+        fun waitEDTEventsDispatching() {
+            ApplicationManager.getApplication().invokeAndWait() {
+                // Do nothing, wait for events in EDT
+            }
+        }
     }
 }

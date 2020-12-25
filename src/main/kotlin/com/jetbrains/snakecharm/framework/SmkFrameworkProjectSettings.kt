@@ -1,67 +1,29 @@
 package com.jetbrains.snakecharm.framework
 
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.BaseState
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
-import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.projectRoots.ProjectJdkTable
+import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Disposer
 import com.intellij.util.messages.Topic
 import com.intellij.util.xmlb.annotations.Attribute
-import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.python.sdk.PythonSdkType
 import com.jetbrains.snakecharm.SnakemakeIcons
-import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperLoaderStartupActivity
-import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage
 
-@State(name = "SmkProjectSettings", storages=[Storage("snakemake-settings.xml")] )
-class SmkSupportProjectSettings(project: Project) : PersistentStateComponent<SmkSupportProjectSettings.State> {
+@State(name = "SmkProjectSettings", storages = [Storage("snakemake-settings.xml")])
+class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent<SmkSupportProjectSettings.State>,
+    Disposable {
     private var internalState = State()
 
-    init {
-        val connection = project.messageBus.connect()
-        connection.subscribe(TOPIC, object : SmkSupportProjectSettingsListener {
-            override fun stateChanged(newSettings: SmkSupportProjectSettings) {
-                if (!newSettings.snakemakeSupportEnabled) {
-                    // clean wrappers
-                    project.getService(SmkWrapperStorage::class.java).initFrom(
-                        "", emptyList()
-                    )
-                    return
-                }
-
-                if (ApplicationManager.getApplication().isUnitTestMode) {
-                    // Do now, in in BG
-                    forceLoadOrCollectWrappers(project)
-                    return
-                }
-                ApplicationManager.getApplication().invokeLater {
-                    ProgressManager.getInstance().run(object : Task.Backgroundable(
-                        project,
-                        SnakemakeBundle.message("wrappers.parsing.progress.collecting.data"),
-                        true
-                    ) {
-                        override fun run(indicator: ProgressIndicator) {
-                            forceLoadOrCollectWrappers(project)
-                        }
-                    })
-                }
-            }
-
-            private fun forceLoadOrCollectWrappers(project: Project) {
-                SmkWrapperLoaderStartupActivity.loadOrCollectLocalWrappers(project, true)
-            }
-
-
-        })
-        Disposer.register(project, connection)
-    }
-
     /**
-     * Used for serialization to project settings
+     * Please do not use this, use [stateSnapshot] instead or filed getters. This method is only platform API endpoint
+     * for serialization to project settings
      */
     override fun getState(): State {
         return internalState
@@ -82,6 +44,37 @@ class SmkSupportProjectSettings(project: Project) : PersistentStateComponent<Smk
             return internalState.useBundledWrappersInfo
         }
 
+    val useProjectSdk: Boolean
+        get() {
+            return internalState.pythonSdkName.isNullOrEmpty()
+        }
+
+    val sdkName: String?
+        get() {
+            return internalState.pythonSdkName
+        }
+
+    fun getActiveSdk() = when {
+        !snakemakeSupportEnabled -> null
+        else -> findPythonSdk(project, internalState.pythonSdkName)
+    }
+
+    fun isSdkValid(): Boolean {
+        val sdkName = internalState.pythonSdkName
+        val sdk = findPythonSdk(project, sdkName)
+
+        return when {
+            sdkName.isNullOrEmpty() -> sdk != null // i.e. project sdk exists
+            else -> sdkName == sdk?.name  // sdk with requested name was found in sdks table
+        }
+    }
+
+    fun stateSnapshot(): State {
+        val snapshot = State()
+        snapshot.copyFrom(state)
+        return snapshot
+    }
+
     /**
      * Internal method, do not use it in user code, use [SmkSupportProjectSettings.updateStateAndFireEvent]
      *
@@ -93,6 +86,34 @@ class SmkSupportProjectSettings(project: Project) : PersistentStateComponent<Smk
         internalState = state
     }
 
+    fun initOnStartup() {
+        val connection = project.messageBus.connect()
+        //TODO: project JDR e
+        
+        // Listen SDK removed changed
+        connection.subscribe(ProjectJdkTable.JDK_TABLE_TOPIC, object : ProjectJdkTable.Listener {
+            override fun jdkNameChanged(jdk: Sdk, previousName: String) {
+                if (sdkName == previousName) {
+                    val newState = stateSnapshot()
+                    newState.pythonSdkName = jdk.name
+                    
+                    updateStateAndFireEvent(project, newState, sdkRenamed = true, sdkRemoved = false)
+                }
+            }
+
+            override fun jdkRemoved(jdk: Sdk) {
+                // happens before sdk removal
+                if (sdkName == jdk.name) {
+                    // leave invalid settings here
+                    updateStateAndFireEvent(project, stateSnapshot(), sdkRenamed = false, sdkRemoved = true)
+                }
+            }
+
+        })
+
+        Disposer.register(this, connection)
+    }
+
     class State : BaseState() {
         @get:Attribute("enabled")
         var snakemakeSupportEnabled by property(false)
@@ -102,10 +123,13 @@ class SmkSupportProjectSettings(project: Project) : PersistentStateComponent<Smk
 
         @get:Attribute("use_custom_wrappers")
         var wrappersCustomSourcesFolder by string("")
+
+        @get:Attribute("sdk")
+        var pythonSdkName by string("")
     }
 
     companion object {
-        private val TOPIC = Topic(SmkSupportProjectSettingsListener::class.java, Topic.BroadcastDirection.TO_PARENT)
+        val TOPIC = Topic(SmkSupportProjectSettingsListener::class.java, Topic.BroadcastDirection.TO_PARENT)
 
         fun getInstance(project: Project) = project.getService(SmkSupportProjectSettings::class.java)!!
 
@@ -116,21 +140,62 @@ class SmkSupportProjectSettings(project: Project) : PersistentStateComponent<Smk
         }
 
         fun updateStateAndFireEvent(project: Project, newState: State) {
+            ApplicationManager.getApplication().runWriteAction {
+                updateStateAndFireEvent(project, newState, false, false)
+            }
+        }
+
+        private fun updateStateAndFireEvent(
+            project: Project, newState: State,
+            sdkRenamed: Boolean,
+            sdkRemoved: Boolean
+        ) {
             val settings = getInstance(project)
 
             val publisher = project.messageBus.syncPublisher(TOPIC)
             // no before* event in facets topic
+
+            val oldState = settings.stateSnapshot()
+
             settings.loadState(newState)
-            publisher.stateChanged(settings)
+
+            if (oldState.snakemakeSupportEnabled && !newState.snakemakeSupportEnabled) {
+                // disabled
+                publisher.disabled(settings)
+            } else if (!oldState.snakemakeSupportEnabled && newState.snakemakeSupportEnabled) {
+                // enabled
+                publisher.enabled(settings)
+            } else {
+                publisher.stateChanged(settings, oldState, sdkRenamed, sdkRemoved)
+            }
+
             // no after* event in facets topic
         }
 
+        fun findPythonSdk(project: Project, sdkName: String?): Sdk? {
+            val sdk: Sdk? = if (sdkName.isNullOrEmpty()) {
+                ProjectRootManager.getInstance(project).projectSdk;
+            } else {
+                ProjectJdkTable.getInstance().findJdk(sdkName)
+            }
+            return if (sdk != null && sdk.sdkType is PythonSdkType) sdk else null
+        }
+
         fun getIcon() = SnakemakeIcons.FACET
+    }
+
+    override fun dispose() {
+        // Do nothing
     }
 }
 
 interface SmkSupportProjectSettingsListener {
     fun stateChanged(
-        newSettings: SmkSupportProjectSettings
-    )
+        newSettings: SmkSupportProjectSettings,
+        oldState: SmkSupportProjectSettings.State,
+        sdkRenamed: Boolean,
+        sdkRemoved: Boolean
+    ) {}
+    fun enabled(newSettings: SmkSupportProjectSettings)  {}
+    fun disabled(newSettings: SmkSupportProjectSettings) {}
 }

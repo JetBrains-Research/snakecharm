@@ -46,11 +46,14 @@ class SmkFrameworkDetector : FrameworkDetector("snakemake") {
             supportedFiles.addAll(filesByModule.get(module))
         }
 
-        if (supportedFiles.isNotEmpty()) {
-            if (SmkSupportProjectSettings.getInstance(project).snakemakeSupportEnabled) {
-                // [DetectedFrameworksData.updateFrameworksList] expects mutable list here
-                return mutableListOf()
-            }
+        if (supportedFiles.isEmpty()) {
+            // N/A
+            return mutableListOf()
+        }
+
+        if (SmkSupportProjectSettings.getInstance(project).snakemakeSupportEnabled) {
+            // [DetectedFrameworksData.updateFrameworksList] expects mutable list here
+            return mutableListOf()
         }
 
         return mutableListOf(FrameworkDescription(supportedFiles, context, project, this));
@@ -63,7 +66,7 @@ class SmkFrameworkDetector : FrameworkDetector("snakemake") {
         private val frameworkDetector: SmkFrameworkDetector
     ) : DetectedFrameworkDescription() {
 
-        override fun equals(other: Any?)  = supportedFiles == other
+        override fun equals(other: Any?) = supportedFiles == other
 
         override fun hashCode() = supportedFiles.hashCode()
 

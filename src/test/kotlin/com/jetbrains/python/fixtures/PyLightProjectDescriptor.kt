@@ -23,6 +23,7 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightProjectDescriptor
 import com.jetbrains.python.PythonMockSdk
+import com.jetbrains.python.module.PythonModuleType
 import java.nio.file.Path
 
 /**
@@ -43,7 +44,7 @@ class PyLightProjectDescriptor(
                 .map { VfsUtil.findFile(it, true)!! }
                 .toTypedArray()
 
-    override fun getSdk() = PythonMockSdk.create(testDataRoot, myPythonVersion, *additionalRoots)
+    override fun getSdk() = PythonMockSdk.create(testDataRoot, myPythonVersion, "", *additionalRoots)
 
     protected fun createLibrary(model: ModifiableRootModel, name: String, path: String) {
         val modifiableModel = model.moduleLibraryTable.createLibrary(name).modifiableModel
@@ -51,5 +52,11 @@ class PyLightProjectDescriptor(
 
         modifiableModel.addRoot(home!!, OrderRootType.CLASSES)
         modifiableModel.commit()
+    }
+
+    override fun getModuleTypeId(): String {
+        return PythonModuleType.getInstance().id
+        // return "EMPTY_MODULE"
+        //return "PYTHON_MODULE"
     }
 }

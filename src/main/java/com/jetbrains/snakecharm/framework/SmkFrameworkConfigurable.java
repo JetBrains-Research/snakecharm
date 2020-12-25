@@ -58,7 +58,7 @@ public class SmkFrameworkConfigurable implements SearchableConfigurable {
     @Override
     public boolean isModified() {
         final SmkSupportProjectSettings settings = SmkSupportProjectSettings.Companion.getInstance(project);
-        return !getUIState().equals(settings.getState());
+        return !getUIState().equals(settings.stateSnapshot());
     }
 
     /**
@@ -76,8 +76,7 @@ public class SmkFrameworkConfigurable implements SearchableConfigurable {
             @NotNull final Project project
     ) throws ConfigurationException {
         try {
-
-            final ValidationResult validationResult = SmkFrameworkConfigurableProvider.Companion.validateWrappersPath(uiState);
+            final ValidationResult validationResult = SmkFrameworkConfigurableProvider.Companion.validateWrappersPath(project, uiState);
             if (!validationResult.isOk()) {
                 throw new ConfigurationException(validationResult.getErrorMessage());
             }
@@ -93,7 +92,7 @@ public class SmkFrameworkConfigurable implements SearchableConfigurable {
     @Override
     public void reset() {
         final SmkSupportProjectSettings conf = SmkSupportProjectSettings.Companion.getInstance(project);
-        final SmkSupportProjectSettings.State state = conf.getState();
+        final SmkSupportProjectSettings.State state = conf.stateSnapshot();
 
         // support enabled
         enableSmkSupportCB.setSelected(state.getSnakemakeSupportEnabled());

@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.stringLanguage.lang.psi.references
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.lang.injection.InjectedLanguageManager
-import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLanguageInjectionHost
 import com.intellij.psi.util.PsiTreeUtil
@@ -16,10 +15,7 @@ import com.jetbrains.python.psi.impl.references.PyQualifiedReference
 import com.jetbrains.python.psi.resolve.*
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolUsageType
-import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
-import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+import com.jetbrains.snakecharm.codeInsight.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
@@ -74,22 +70,19 @@ class SmkSLInitialReference(
             }
 
             // Implicit Symbols
-            val module = ModuleUtilCore.findModuleForPsiElement(element)
-            if (module != null) {
-                val contextScope = getSmkScopeForInjection(host)
+            val contextScope = getSmkScopeForInjection(host)
 
-                val cache = ImplicitPySymbolsProvider.instance(module).cache
-                SmkCodeInsightScope.values().asSequence()
-                        .filter { symbolScope -> contextScope.includes(symbolScope) }
-                        .flatMap { symbolScope -> cache.filter(symbolScope, element.name!!).asSequence() }
-                        .filter { symbol -> symbol.usageType == ImplicitPySymbolUsageType.VARIABLE }
-                        .forEach {
-                            ret.poke(it.psiDeclaration, SmkResolveUtil.RATE_IMPLICIT_SYMBOLS)
-                        }
-
-                if (ret.isNotEmpty()) {
-                    return ret
+            val cache = ImplicitPySymbolsProvider.instance(element.project).cache
+            SmkCodeInsightScope.values().asSequence()
+                .filter { symbolScope -> contextScope.includes(symbolScope) }
+                .flatMap { symbolScope -> cache.filter(symbolScope, element.name!!).asSequence() }
+                .filter { symbol -> symbol.usageType == ImplicitPySymbolUsageType.VARIABLE }
+                .forEach {
+                    ret.poke(it.psiDeclaration, SmkResolveUtil.RATE_IMPLICIT_SYMBOLS)
                 }
+
+            if (ret.isNotEmpty()) {
+                return ret
             }
 
             // Resolve to python: : XXX consider possible reuse of PyReference resolve list + filter items
@@ -155,10 +148,10 @@ class SmkSLInitialReference(
             // Wildcards
             parentDeclaration?.let {
                 val element = SmkCompletionUtil.createPrioritizedLookupElement(
-                        SMK_VARS_WILDCARDS,
-                        parentDeclaration.wildcardsElement,
-                        typeText = SnakemakeBundle.message("TYPES.rule.wildcard.type.text"),
-                        priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
+                    SMK_VARS_WILDCARDS,
+                    parentDeclaration.wildcardsElement,
+                    typeText = SnakemakeBundle.message("TYPES.rule.wildcard.type.text"),
+                    priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
                 )
                 variants.add(element)
             }
@@ -167,24 +160,21 @@ class SmkSLInitialReference(
             val seenImplicitSymbols = accessibleSections.asSequence().map { it.sectionKeyword }.toMutableSet()
             seenImplicitSymbols.add(SMK_VARS_WILDCARDS)
 
-            val module = ModuleUtilCore.findModuleForPsiElement(element)
-            if (module != null) {
-                val contextScope = getSmkScopeForInjection(host)
-                // perhaps processor should be from 'element', not clear
-                val processor = SmkCompletionVariantsProcessor(host)
+            val contextScope = getSmkScopeForInjection(host)
+            // perhaps processor should be from 'element', not clear
+            val implicitsProcessor = SmkCompletionVariantsProcessor(host)
 
-                val cache = ImplicitPySymbolsProvider.instance(module).cache
-                SmkCodeInsightScope.values().asSequence()
-                        .filter { symbolScope -> contextScope.includes(symbolScope) }
-                        .flatMap { symbolScope -> cache[symbolScope].asSequence() }
-                        .filter { symbol -> symbol.usageType == ImplicitPySymbolUsageType.VARIABLE }
-                        .filter { symbol -> symbol.identifier !in seenImplicitSymbols }
-                        .forEach { symbol ->
-                            // processor.execute(it, ResolveState.initial())
-                            processor.addElement(symbol.identifier, symbol.psiDeclaration)
-                        }
-                variants.addAll(processor.resultList )
-            }
+            val cache = ImplicitPySymbolsProvider.instance(element.project).cache
+            SmkCodeInsightScope.values().asSequence()
+                .filter { symbolScope -> contextScope.includes(symbolScope) }
+                .flatMap { symbolScope -> cache[symbolScope].asSequence() }
+                .filter { symbol -> symbol.usageType == ImplicitPySymbolUsageType.VARIABLE }
+                .filter { symbol -> symbol.identifier !in seenImplicitSymbols }
+                .forEach { symbol ->
+                    // processor.execute(it, ResolveState.initial())
+                    implicitsProcessor.addElement(symbol.identifier, symbol.psiDeclaration)
+                }
+            variants.addAll(implicitsProcessor.resultList)
 
             // Python: XXX consider possible reuse of PyReference completion list + filter items
             val builtinCache = PyBuiltinCache.getInstance(host);
@@ -208,9 +198,9 @@ class SmkSLInitialReference(
             //TODO: [ScopeImpl.collectDeclarations.visitPyElement; PsiNameIdentifierOwner is namedElement => added to symbols..]
             PyResolveUtil.scopeCrawlUp(processor, host, null, null);
             processor.resultList
-                    .asSequence()
-                    .filter { isSupportedElementType(it.psiElement) }
-                    .forEach { variants.add(it) }
+                .asSequence()
+                .filter { isSupportedElementType(it.psiElement) }
+                .forEach { variants.add(it) }
 
         }
 

@@ -1,9 +1,29 @@
 package com.jetbrains.snakecharm.codeInsight.completion.wrapper
 
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
+import com.intellij.util.io.exists
+import com.intellij.util.io.readBytes
+import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.SnakemakeTestUtil
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
+import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.decodeFromByteArray
+import java.net.URL
+import java.nio.file.Path
 import java.util.*
+import kotlin.system.exitProcess
 
-class SmkWrapperStorage  {
+class SmkWrapperStorage(val project: Project) : Disposable {
     var version = ""
         private set
 
@@ -18,10 +38,185 @@ class SmkWrapperStorage  {
         this.wrappers = Collections.unmodifiableList(wrappers)
     }
 
+    fun initOnStartup() {
+        subscribeOnEvents()
+
+        if (ApplicationManager.getApplication().isUnitTestMode) {
+            // In tests mode we load wrappers only if requested and not in background
+            return
+        }
+
+        ApplicationManager.getApplication().invokeLater {
+            ProgressManager.getInstance().run(object : Task.Backgroundable(
+                project,
+                SnakemakeBundle.message("wrappers.parsing.progress.collecting.data"),
+                true
+            ) {
+                override fun run(indicator: ProgressIndicator) {
+                    if (SmkSupportProjectSettings.getInstance(project).snakemakeSupportEnabled) {
+                        loadOrCollectLocalWrappers(project)
+                    }
+                }
+            })
+        }
+    }
+
+    private fun subscribeOnEvents() {
+        val connection = project.messageBus.connect()
+        connection.subscribe(SmkSupportProjectSettings.TOPIC, object : SmkSupportProjectSettingsListener {
+            override fun stateChanged(
+                newSettings: SmkSupportProjectSettings,
+                oldState: SmkSupportProjectSettings.State,
+                sdkRenamed: Boolean,
+                sdkRemoved: Boolean
+            ) {
+                val wrappersChanged = if (newSettings.useBundledWrappersInfo) {
+                    !oldState.useBundledWrappersInfo
+                } else {
+                    newSettings.wrappersCustomSourcesFolder != oldState.wrappersCustomSourcesFolder
+                }
+
+                if (wrappersChanged) {
+                    stateChanged(newSettings)
+                }
+            }
+
+            override fun enabled(newSettings: SmkSupportProjectSettings) = stateChanged(newSettings)
+
+            override fun disabled(newSettings: SmkSupportProjectSettings) = stateChanged(newSettings)
+
+            fun stateChanged(newSettings: SmkSupportProjectSettings) {
+                if (!newSettings.snakemakeSupportEnabled) {
+                    // clean wrappers
+                    project.getService(SmkWrapperStorage::class.java).initFrom(
+                        "", emptyList()
+                    )
+                    return
+                }
+
+                val forceLoadOrCollectWrappersAction = {
+                    loadOrCollectLocalWrappers(project, true)
+                }
+
+                if (ApplicationManager.getApplication().isUnitTestMode) {
+                    // Do now, in in BG
+                    forceLoadOrCollectWrappersAction()
+                    return
+                }
+                ApplicationManager.getApplication().invokeLater {
+                    ProgressManager.getInstance().run(object : Task.Backgroundable(
+                        project,
+                        SnakemakeBundle.message("wrappers.parsing.progress.collecting.data"),
+                        true
+                    ) {
+                        override fun run(indicator: ProgressIndicator) {
+                            forceLoadOrCollectWrappersAction()
+                        }
+                    })
+                }
+            }
+
+        })
+        Disposer.register(this, connection)
+    }
+
     @Serializable
     data class WrapperInfo(
         val path: String = "", // system independent separators
         val args: Map<String, List<String>> = emptyMap(),
         val description: String = ""
     )
+
+    companion object {
+
+        @ExperimentalSerializationApi
+        fun loadOrCollectLocalWrappers(project: Project, forced: Boolean = false) {
+            // TODO: scan 'custom' wrappers repo if used and decide force reparse wrappers or used serialized *.cbor representation,
+            //       stored in .idea folder
+
+            val storage = project.getService(SmkWrapperStorage::class.java)
+
+            val config = SmkSupportProjectSettings.getInstance(project)
+            if (!config.snakemakeSupportEnabled) {
+                // remove wrappers
+                storage.initFrom("", emptyList())
+                return
+            }
+            require(config.snakemakeSupportEnabled)
+
+            if (!forced && storage.wrappers.isNotEmpty()) {
+                // Do nothing
+                return
+            }
+
+            val unitTestMode = ApplicationManager.getApplication().isUnitTestMode
+
+            if (config.useBundledWrappersInfo) {
+                when {
+                    unitTestMode -> loadBundledWrappersTestsMode(storage)
+                    else -> loadBundledWrappers(storage)
+                }
+            } else {
+                if (unitTestMode && config.stateSnapshot().wrappersCustomSourcesFolder == null) {
+                    // Special mode when do not load wrappers, here [SmkFacetConfiguration.wrappersCustomSourcesFolder] is
+                    // an empty string, but SmkFacetConfiguration.State treats it as NULL
+                    return
+                }
+                storage.initFrom(
+                    "file://${config.wrappersCustomSourcesFolder}",
+                    SmkWrapperCrawler.localWrapperParser(config.wrappersCustomSourcesFolder)
+                )
+            }
+        }
+
+        @ExperimentalSerializationApi
+        private fun loadBundledWrappersTestsMode(storage: SmkWrapperStorage) {
+            val wrappersInfoBundlerForTests = SnakemakeTestUtil.getTestDataPath().parent
+                .resolve("build/bundledWrappers/smk-wrapper-storage.test.cbor")
+
+            if (!wrappersInfoBundlerForTests.exists()) {
+                System.err.println(
+                    "Generate test data 'build/bundledWrappers/smk-wrapper-storage.test.cbor'" +
+                            " using `buildTestWrappersBundle` gradle task"
+                )
+                exitProcess(1)
+            }
+
+            val vers = "test" // todo, test repo - fixed version?
+            val wrappers = deserializeWrappers(wrappersInfoBundlerForTests)
+
+            storage.initFrom(vers, wrappers)
+        }
+
+        @ExperimentalSerializationApi
+        private fun loadBundledWrappers(storage: SmkWrapperStorage) {
+            // TODO: version specific repo!!
+            val wrappersRepoVersion = SnakemakeAPI.SMK_WRAPPERS_BUNDLED_REPO
+
+            val resource = SmkWrapperStorage::class.java.getResource(
+                "/smk-wrapper-storage-$wrappersRepoVersion.cbor"
+            )
+            requireNotNull(resource) {
+                "Missing '${wrappersRepoVersion}' wrappers bundle"
+            }
+            storage.initFrom(
+                wrappersRepoVersion,
+                deserializeWrappers(resource)
+            )
+        }
+
+        @ExperimentalSerializationApi
+        private fun deserializeWrappers(storagePath: Path) =
+            Cbor.decodeFromByteArray<List<SmkWrapperStorage.WrapperInfo>>(
+                storagePath.readBytes()
+            )
+
+        @ExperimentalSerializationApi
+        private fun deserializeWrappers(url: URL): List<SmkWrapperStorage.WrapperInfo> =
+            Cbor.decodeFromByteArray(url.readBytes())
+    }
+
+    override fun dispose() {
+        // do nothing
+    }
 }

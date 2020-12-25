@@ -42,6 +42,13 @@ class SmkFrameworkSupportWizardProvider : FrameworkSupportProviderBase(
 class SmkFrameworkSupportWizardConfigurable(project: Project?) : FrameworkSupportConfigurable() {
     private val settingsPanel = SmkFrameworkSettingsPanel(project)
 
+    init {
+        if (project != null) {
+            val snapshot = SmkSupportProjectSettings.getInstance(project).stateSnapshot()
+            settingsPanel.reset(snapshot)
+        }
+    }
+
     override fun getComponent() = settingsPanel
 
     override fun addSupport(module: Module, model: ModifiableRootModel, library: Library?) {
