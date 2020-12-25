@@ -1,4 +1,4 @@
-<idea-plugin>
+<idea-plugin require-restart="false">
     <id>SnakeCharm</id>
     <name>SnakeCharm</name>
     <vendor email="roman.chernyatchik@jetbrains.com"
@@ -54,6 +54,10 @@
   <depends>com.intellij.modules.lang</depends>
   <depends>com.intellij.modules.python</depends>
 
+  <applicationListeners>
+    <listener class="com.jetbrains.snakecharm.SnakemakePluginListener" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
+  </applicationListeners>
+  
   <extensions defaultExtensionNs="com.intellij">
     <fileType
                 name="Snakemake"
@@ -68,7 +72,8 @@
             externalIdPrefix="py.SMK_"
     />
     <framework.detector implementation="com.jetbrains.snakecharm.framework.SmkFrameworkDetector"/>
-    <frameworkSupport implementation="com.jetbrains.snakecharm.framework.SmkFrameworkSupportWizardProvider"/>
+<!--    TODO: prevents dynamic load/unload , tmp disabled-->
+<!--    <frameworkSupport implementation="com.jetbrains.snakecharm.framework.SmkFrameworkSupportWizardProvider"/>-->
     <projectConfigurable
             groupId="language"
             id="com.jetbrains.snakecharm.framework.SmkFrameworkConfigurableProvider"
