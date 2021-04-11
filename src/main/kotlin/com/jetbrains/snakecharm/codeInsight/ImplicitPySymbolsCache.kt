@@ -16,7 +16,6 @@ interface ImplicitPySymbolsCache {
             .toList()
 
     fun contains(smkScope: SmkCodeInsightScope, name: String) = this[smkScope]
-            .asSequence()
             .any { symbol -> symbol.identifier == name }
 
 
