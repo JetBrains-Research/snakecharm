@@ -31,15 +31,15 @@ class SnakemakeFormatterTest : SnakemakeTestCase() {
     }
 
     fun testHardWrap20() {
-        getCodeStyleSettings().setRightMargin(SnakemakeLanguageDialect, 20);
-        // getCommonCodeStyleSettings().WRAP_LONG_LINES = true;
+        getCodeStyleSettings().setRightMargin(SnakemakeLanguageDialect, 25)
+        getCommonCodeStyleSettings().WRAP_LONG_LINES = true
         doTest()
     }
 
     fun testHardWrap20_NoWrap() {
         // TODO: not working, let's use large margin workaround
         //getCodeStyleSettings().setRightMargin(SnakemakeLanguageDialect, 20);
-        getCodeStyleSettings().setRightMargin(SnakemakeLanguageDialect, 400);
+        getCodeStyleSettings().setRightMargin(SnakemakeLanguageDialect, 400)
         getCommonCodeStyleSettings().WRAP_LONG_LINES = false
         doTest()
     }
