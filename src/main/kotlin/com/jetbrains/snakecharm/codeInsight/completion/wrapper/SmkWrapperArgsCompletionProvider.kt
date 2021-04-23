@@ -30,9 +30,7 @@ object SmkWrapperArgsCompletionProvider : CompletionProvider<CompletionParameter
                        SmkRuleOrCheckpoint::class.java
                )?.getSectionByName(SnakemakeNames.SECTION_WRAPPER) ?: return
 
-        val wrappers = parameters.position.project
-            .getService(SmkWrapperStorage::class.java)
-            ?.wrappers ?: return
+        val wrappers = SmkWrapperStorage.getInstance(parameters.position.project)?.wrappers ?: return
 
         val storage = wrappers.find { wrapper.argumentList!!.text.contains(it.path) } ?: return
         val sectionKeyword = PsiTreeUtil

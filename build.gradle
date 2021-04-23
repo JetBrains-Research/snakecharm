@@ -109,7 +109,8 @@ task buildWrappersBundle() {
             enableAssertions = true
             args = [
                     "${snakemakeWrappersRepoPath}",
-                    "${project.buildDir}/bundledWrappers/smk-wrapper-storage-${snakemakeWrappersRepoVersion}.cbor"
+                    "${snakemakeWrappersRepoVersion}",
+                    "${project.buildDir}/bundledWrappers/smk-wrapper-storage-bundled.cbor"
             ]
             maxHeapSize = '1024m' // Not much RAM is available on TC agents
         }
@@ -117,10 +118,10 @@ task buildWrappersBundle() {
 }
 
 // TODO: Uncomment: Reconfigure Teamcity + remove resource/smk-wrapper-storage.cbor from version control
-// jar.dependsOn(buildWrappersBundle)
+jar.dependsOn(buildWrappersBundle)
 jar {
     // :runIde task launches the plugin from *.jar, so it is required also for development
-    from { "${project.buildDir}/bundledWrappers/smk-wrapper-storage-${snakemakeWrappersRepoVersion}.cbor" }
+    from { "${project.buildDir}/bundledWrappers/smk-wrapper-storage-bundled.cbor" }
 }
 
 task buildTestWrappersBundle() {
@@ -133,6 +134,7 @@ task buildTestWrappersBundle() {
             enableAssertions = true
             args = [
                     "${project.projectDir}/testData/wrappers_storage",
+                    "${test}",
                     "${project.buildDir}/bundledWrappers/smk-wrapper-storage.test.cbor"
             ]
             maxHeapSize = '1024m' // Not much RAM is available on TC agents

@@ -9,7 +9,7 @@ Released on ...
 
 Features:
 - Snakemake Support Settings page (see #346)
--
+- Bundled meta-data for snakemake-wrappers 0.73.0 code insight features
 
 Fixed:
 - Inspection marks 'rules.' as unresolved in snakemake >= 6.1 (see #352)

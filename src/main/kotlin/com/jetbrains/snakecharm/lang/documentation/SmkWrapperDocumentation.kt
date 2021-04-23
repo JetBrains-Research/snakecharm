@@ -32,8 +32,7 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
         } else {
             text.substringAfter("/")
         }
-        val wrappers = node.navigationElement.project
-                .getService(SmkWrapperStorage::class.java)
+        val wrappers = SmkWrapperStorage.getInstance(node.navigationElement.project)
                 ?.wrappers ?: return ""
         val wrapper =  wrappers.find { wrapper -> wrapper.path.contains(result) }
         if (text.startsWith("file://")) {

@@ -223,9 +223,6 @@ object SnakemakeAPI {
             SNAKEMAKE_IO_METHOD_DYNAMIC to listOf(SECTION_OUTPUT)
     )
 
-    @JvmField
-    val SMK_WRAPPERS_BUNDLED_REPO="master"     // prev 0.64.0
-
     val SMK_API_PKG_NAME_SMK = "snakemake"
     val SMK_API_PKG_NAME_SMK_MINIMAL = "snakemake-minimal"
     val SMK_API_VERS_6_1 = "6.1"

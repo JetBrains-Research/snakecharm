@@ -15,10 +15,10 @@ object SmkWrapperCrawler {
     @ExperimentalSerializationApi
     @JvmStatic
     fun main(args: Array<String>) {
-        println("Usage: SmkWrapperCrawler {WRAPPERS_SRC_ROOT_FOLDER} {WRAPPERS_INFO_CBOR_OUTPUT}")
+        println("Usage: SmkWrapperCrawler {WRAPPERS_SRC_ROOT_FOLDER} {WRAPPERS_REPO_VERSION} {WRAPPERS_INFO_CBOR_OUTPUT}")
         println("Smk wrapper crawler args: ${args.joinToString()}")
-        require(args.size == 2) {
-            "2 input args expected, but was: ${args.size}"
+        require(args.size == 3) {
+            "3 input args expected, but was: ${args.size}"
         }
 
         val wrappersFolder = args[0]
@@ -33,7 +33,10 @@ object SmkWrapperCrawler {
             "Wrappers src folder doesn't contain \"bio\" folder: $wrappersFolder"
         }
 
-        val outputFile = args[1]
+        val version = args[1]
+        println("Repo version: $version")
+
+        val outputFile = args[2]
 
         println("Launching smk wrappers crawler...")
         val wrappers = localWrapperParser(wrappersFolder, true)
@@ -42,7 +45,7 @@ object SmkWrapperCrawler {
         }
 
         println("Found ${wrappers.size} wrappers")
-        Paths.get(outputFile).write(Cbor.encodeToByteArray(wrappers))
+        Paths.get(outputFile).write(Cbor.encodeToByteArray(version to wrappers))
     }
 
     /*

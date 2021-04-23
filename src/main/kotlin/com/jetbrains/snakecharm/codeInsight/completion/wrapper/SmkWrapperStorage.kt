@@ -11,7 +11,6 @@ import com.intellij.util.io.exists
 import com.intellij.util.io.readBytes
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.SnakemakeTestUtil
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -88,7 +87,7 @@ class SmkWrapperStorage(val project: Project) : Disposable {
             fun stateChanged(newSettings: SmkSupportProjectSettings) {
                 if (!newSettings.snakemakeSupportEnabled) {
                     // clean wrappers
-                    project.getService(SmkWrapperStorage::class.java).initFrom(
+                    getInstance(project).initFrom(
                         "", emptyList()
                     )
                     return
@@ -128,13 +127,14 @@ class SmkWrapperStorage(val project: Project) : Disposable {
     )
 
     companion object {
+        fun getInstance(project: Project) = project.getService(SmkWrapperStorage::class.java)
 
         @ExperimentalSerializationApi
         fun loadOrCollectLocalWrappers(project: Project, forced: Boolean = false) {
             // TODO: scan 'custom' wrappers repo if used and decide force reparse wrappers or used serialized *.cbor representation,
             //       stored in .idea folder
 
-            val storage = project.getService(SmkWrapperStorage::class.java)
+            val storage = getInstance(project)
 
             val config = SmkSupportProjectSettings.getInstance(project)
             if (!config.snakemakeSupportEnabled) {
@@ -182,37 +182,29 @@ class SmkWrapperStorage(val project: Project) : Disposable {
                 exitProcess(1)
             }
 
-            val vers = "test" // todo, test repo - fixed version?
-            val wrappers = deserializeWrappers(wrappersInfoBundlerForTests)
-
-            storage.initFrom(vers, wrappers)
+            val (repoVersion, wrappers) = deserializeWrappers(wrappersInfoBundlerForTests)
+            storage.initFrom(repoVersion, wrappers)
         }
 
         @ExperimentalSerializationApi
         private fun loadBundledWrappers(storage: SmkWrapperStorage) {
-            // TODO: version specific repo!!
-            val wrappersRepoVersion = SnakemakeAPI.SMK_WRAPPERS_BUNDLED_REPO
-
-            val resource = SmkWrapperStorage::class.java.getResource(
-                "/smk-wrapper-storage-$wrappersRepoVersion.cbor"
-            )
+            val resourceName = "/smk-wrapper-storage-bundled.cbor"
+            val resource = SmkWrapperStorage::class.java.getResource(resourceName)
             requireNotNull(resource) {
-                "Missing '${wrappersRepoVersion}' wrappers bundle"
+                "Missing '$resourceName' wrappers bundle"
             }
-            storage.initFrom(
-                wrappersRepoVersion,
-                deserializeWrappers(resource)
-            )
+            val (repoVersion, wrappers) = deserializeWrappers(resource)
+            storage.initFrom(repoVersion, wrappers)
         }
 
         @ExperimentalSerializationApi
         private fun deserializeWrappers(storagePath: Path) =
-            Cbor.decodeFromByteArray<List<SmkWrapperStorage.WrapperInfo>>(
+            Cbor.decodeFromByteArray<Pair<String, List<SmkWrapperStorage.WrapperInfo>>>(
                 storagePath.readBytes()
             )
 
         @ExperimentalSerializationApi
-        private fun deserializeWrappers(url: URL): List<SmkWrapperStorage.WrapperInfo> =
+        private fun deserializeWrappers(url: URL): Pair<String, List<SmkWrapperStorage.WrapperInfo>> =
             Cbor.decodeFromByteArray(url.readBytes())
     }
 

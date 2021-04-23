@@ -35,7 +35,7 @@ object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>()
             return
         }
 
-        val storage = parameters.position.project.getService(SmkWrapperStorage::class.java)
+        val storage = SmkWrapperStorage.getInstance(parameters.position.project)
         val version: String
         val prefix: String
         var doNotFilterByPrefix: Boolean = false

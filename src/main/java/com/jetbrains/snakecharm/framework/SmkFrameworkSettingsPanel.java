@@ -23,7 +23,7 @@ import com.jetbrains.python.newProject.steps.PythonSdkChooserCombo;
 import com.jetbrains.python.sdk.PreferredSdkComparator;
 import com.jetbrains.python.sdk.PySdkListCellRenderer;
 import com.jetbrains.snakecharm.SnakemakeBundle;
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI;
+import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,10 +62,12 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
         setLayout(new BorderLayout());
         add(myContentPane, BorderLayout.CENTER);
 
+        final SmkWrapperStorage wrapperStorage = SmkWrapperStorage.Companion.getInstance(this.project);
+        final String wrappersRepoVersion = wrapperStorage != null ? wrapperStorage.getVersion() : null;
         wrappersBundledRB.setText(
                 SnakemakeBundle.message(
                         "smk.framework.configurable.panel.wrappers.bundled",
-                        SnakemakeAPI.SMK_WRAPPERS_BUNDLED_REPO
+                        wrappersRepoVersion == null || wrappersRepoVersion.isEmpty() ? "n/a" : wrappersRepoVersion
                 )
         );
 
