@@ -103,8 +103,11 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
                 val s = tokenType2Name[tt]!!
 
                 result.addElement(
-                    TailTypeDecorator.withTail(
-                        PythonLookupElement(s, true, null), tail
+                    SmkCompletionUtil.createPrioritizedLookupElement(
+                        TailTypeDecorator.withTail(
+                            PythonLookupElement(s, true, null), tail
+                        ),
+                        SmkCompletionUtil.KEYWORDS_PRIORITY
                     )
                 )
             }
@@ -160,11 +163,13 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
         (RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS + setOf(SnakemakeNames.SECTION_RUN)).forEach { s ->
 
             result.addElement(
-                TailTypeDecorator.withTail(
-                    PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
-                    ColonAndWhiteSpaceTail
+                SmkCompletionUtil.createPrioritizedLookupElement(
+                    TailTypeDecorator.withTail(
+                        PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
+                        ColonAndWhiteSpaceTail
+                    ),
+                    priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
                 )
-
             )
         }
     }
@@ -186,9 +191,12 @@ object SubworkflowSectionKeywordsProvider : CompletionProvider<CompletionParamet
     ) {
         SUBWORKFLOW_SECTIONS_KEYWORDS.forEach { s ->
             result.addElement(
-                TailTypeDecorator.withTail(
-                    PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
-                    ColonAndWhiteSpaceTail
+                SmkCompletionUtil.createPrioritizedLookupElement(
+                    TailTypeDecorator.withTail(
+                        PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
+                        ColonAndWhiteSpaceTail
+                    ),
+                    priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
                 )
             )
         }

@@ -616,8 +616,8 @@ class ImplicitPySymbolsProvider(
                 SmkCodeInsightScope.TOP_LEVEL to SmkCompletionUtil.createPrioritizedLookupElement(
                     name,
                     psi,
-                    typeText = "Workflow '${name}' global",
-                    priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
+                    typeText = SnakemakeBundle.message("TYPES.rule.run.workflow.globals.type.text"),
+                    priority = SmkCompletionUtil.WORKFLOW_GLOBALS_PRIORITY
                 )
             )
         }

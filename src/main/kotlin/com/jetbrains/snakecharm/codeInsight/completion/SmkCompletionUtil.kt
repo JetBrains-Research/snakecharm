@@ -11,12 +11,15 @@ import javax.swing.Icon
 
 class SmkCompletionUtil {
     companion object {
-        val RULES_AND_CHECKPOINTS_PRIORITY = Double.MAX_VALUE
-        const val WILDCARDS_LAMBDA_PARAMETER_PRIORITY = 1.0
-        const val SECTIONS_KEYS_PRIORITY = 30.0
-        const val SUBSCRIPTION_INDEXES_PRIORITY = 20.0
-
         const val PYTHON_PRIORITY_WEIGHT = PythonCompletionWeigher.PRIORITY_WEIGHT.toDouble()
+
+        const val KEYWORDS_PRIORITY = PythonCompletionWeigher.WEIGHT_FOR_KEYWORDS.toDouble()
+        const val WORKFLOW_GLOBALS_PRIORITY = 7.0
+        const val WILDCARDS_LAMBDA_PARAMETER_PRIORITY = 15.0
+        const val SUBSCRIPTION_INDEXES_PRIORITY = 20.0
+        const val SECTIONS_KEYS_PRIORITY = 30.0
+        const val SECTIONS_ARGS_PRIORITY = 40.0
+        val RULES_AND_CHECKPOINTS_PRIORITY = Double.MAX_VALUE
 
         fun createPrioritizedLookupElement(
                 item: LookupElement,

@@ -21,3 +21,23 @@ Feature: Completion for arguments used in wrapper
       | checkpoint | params  | bio/bcftools/call     | mpileup    |
       | checkpoint | params  | utils/cairosvg        | extra      |
       | checkpoint | output  | bio/last/lastal       | blasttab   |
+
+  Scenario Outline: No completion for bundled wrappers in wrong context
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> foo:
+      <section>:  <text>
+      wrapper: "0.64.0/<wrapper>"
+    """
+    And add snakemake framework support with wrappers loaded
+    When I put the caret at <signature>
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | <completion> |
+    Examples:
+      | rule_like | section | text      | signature | wrapper        | completion |
+      | rule      | input   | "#here" | #here     | bio/bcftools/reheader | vcf        |
+      | rule      | params  | a=#here   | #here     | utils/cairosvg | extra      |
+      | rule      | params  | a=here    | here      | utils/cairosvg | extra      |
+      | rule      | params  | foo(here) | here      | utils/cairosvg | extra      |
