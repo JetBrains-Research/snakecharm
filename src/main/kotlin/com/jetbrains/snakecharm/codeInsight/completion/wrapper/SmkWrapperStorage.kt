@@ -37,6 +37,8 @@ class SmkWrapperStorage(val project: Project) : Disposable {
         this.wrappers = Collections.unmodifiableList(wrappers)
     }
 
+    fun cleanVersion() = version.removePrefix("refs/tags/").removePrefix("refs/heads/")
+
     fun initOnStartup() {
         subscribeOnEvents()
 

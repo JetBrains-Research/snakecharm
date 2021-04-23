@@ -44,7 +44,7 @@ object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>()
             version = result.prefixMatcher.prefix.substringBefore('/')
             prefix = result.prefixMatcher.prefix.substringAfter('/', "")
         } else {
-            version = storage.version
+            version = storage.cleanVersion()
             val rawPrefix = result.prefixMatcher.prefix
             when {
                 rawPrefix.startsWith("${version}/") -> {
