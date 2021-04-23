@@ -119,6 +119,12 @@ class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
             )
         }
 
+        // Add synthetic symbols
+        SmkCodeInsightScope.values().forEach { symbolScope ->
+            if (contextScope.includes(symbolScope)) {
+                cache.getSynthetic(symbolScope).forEach(result::addElement)
+            }
+        }
 
         val processor = SmkCompletionVariantsProcessor(contextElement)
 

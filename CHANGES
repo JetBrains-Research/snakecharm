@@ -9,7 +9,10 @@ Released on ...
 
 Features:
 - Snakemake Support Settings page (see #346)
-    
+-
+
+Fixed:
+- Inspection marks 'rules.' as unresolved in snakemake >= 6.1 (see #352)
 
 Version 0.9.0 build #0.9.0.387
 -------------

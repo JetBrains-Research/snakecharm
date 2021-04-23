@@ -89,3 +89,35 @@ Feature: This feature is tests for errors/warnings related to implicit symbols
       | rule       | output  |
       | rule       | params  |
       | checkpoint | input   |
+
+
+  Scenario Outline: Cannot find config in section types
+    Given a snakemake project
+    And I open a file "foo.smk" with text
+    """
+    config
+    config.items()
+    config.get("d")
+    config["ff"]
+    config_config_config_config_config
+    o = object()
+    <rulelike> foo1:
+        shell: "{config[d]}"
+    <rulelike> foo2:
+        run:
+            config['ff']
+            config.get("d")
+            config.items()
+    """
+    And PyUnresolvedReferencesInspection inspection is enabled
+      # Ensure Inspection works
+    Then I expect inspection error on <config_config_config_config_config> with message
+      """
+      Unresolved reference 'config_config_config_config_config'
+      """
+      # And no inspection warnings for input!
+    When I check highlighting warnings
+    Examples:
+      | rulelike   |
+      | rule       |
+      | checkpoint |

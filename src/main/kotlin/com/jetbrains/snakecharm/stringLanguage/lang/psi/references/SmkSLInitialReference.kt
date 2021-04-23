@@ -15,11 +15,15 @@ import com.jetbrains.python.psi.impl.references.PyQualifiedReference
 import com.jetbrains.python.psi.resolve.*
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.*
+import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolUsageType
+import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
+import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionVariantsProcessor
+import com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.BaseSmkSLReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
@@ -73,6 +77,9 @@ class SmkSLInitialReference(
             val contextScope = getSmkScopeForInjection(host)
 
             val cache = ImplicitPySymbolsProvider.instance(element.project).cache
+
+            SMKImplicitPySymbolsResolveProvider.addSyntheticSymbols(contextScope, cache, referencedName, ret)
+
             SmkCodeInsightScope.values().asSequence()
                 .filter { symbolScope -> contextScope.includes(symbolScope) }
                 .flatMap { symbolScope -> cache.filter(symbolScope, element.name!!).asSequence() }
@@ -165,6 +172,12 @@ class SmkSLInitialReference(
             val implicitsProcessor = SmkCompletionVariantsProcessor(host)
 
             val cache = ImplicitPySymbolsProvider.instance(element.project).cache
+            SmkCodeInsightScope.values().forEach { symbolScope ->
+                if (contextScope.includes(symbolScope)) {
+                    variants.addAll(cache.getSynthetic(symbolScope))
+                }
+            }
+
             SmkCodeInsightScope.values().asSequence()
                 .filter { symbolScope -> contextScope.includes(symbolScope) }
                 .flatMap { symbolScope -> cache[symbolScope].asSequence() }

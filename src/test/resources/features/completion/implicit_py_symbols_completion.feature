@@ -10,19 +10,31 @@ Feature: Completion in python part of snakemake file
     When I put the caret after foo = 1;
     And I invoke autocompletion popup
     Then completion list should contain:
-    | expand      |
-    | temp        |
-    | directory   |
-    | directory   |
-    | protected   |
-    | touch       |
-    | dynamic     |
-    | unpack      |
-    | ancient     |
-    | shell       |
-    | config      |
-    | rules       |
-    | input       |
+      | expand    |
+      | temp      |
+      | directory |
+      | directory |
+      | protected |
+      | touch     |
+      | dynamic   |
+      | unpack    |
+      | ancient   |
+      | shell     |
+      | config    |
+      | rules     |
+      | input     |
+
+  Scenario: Complete at top-level (GTE 6.1)
+    Given a snakemake:6.1 project
+    Given I open a file "foo.smk" with text
+    """
+    foo = 1;
+    """
+    When I put the caret after foo = 1;
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | scatter |
+      | gather  |
 
   Scenario: Not-completed at top-level
     Given a snakemake project
@@ -67,6 +79,19 @@ Feature: Completion in python part of snakemake file
     | rules       |
     | shell       |
 
+  Scenario: Complete in rules params section (GTE 6.1)
+    Given a snakemake:6.1 project
+    Given I open a file "foo.smk" with text
+    """
+    rule all:
+      input:
+
+    """
+    When I put the caret after input:
+    And I invoke autocompletion popup
+    Then completion list should contain:
+    | scatter |
+    | gather  |
 
   Scenario: Complete in run section
     Given a snakemake project
@@ -94,6 +119,19 @@ Feature: Completion in python part of snakemake file
     | rule      |
     | jobid     |
 
+  Scenario: Complete in run section  (GTE 6.1)
+      Given a snakemake:6.1 project
+    Given I open a file "foo.smk" with text
+    """
+    rule all:
+        output: "path/to/output"
+        run:
+    """
+    When I put the caret after run:
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | scatter |
+      | gather  |
 
   Scenario: Not-completed in rule outside run section
      Given a snakemake project
@@ -166,9 +204,9 @@ Feature: Completion in python part of snakemake file
      Given a snakemake project
      Given I open a file "foo.smk" with text
      """
-     expa
+     expan
      """
-     When I put the caret after expa
+     When I put the caret after expan
      Then I invoke autocompletion popup and see a text:
      """
      expand()

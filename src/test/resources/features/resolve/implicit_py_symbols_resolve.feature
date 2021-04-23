@@ -1,6 +1,11 @@
 Feature: Resolve implicitly imported python names
   Resolve runtime magic from snakemake
 
+
+  # TODO: Resolve config into config.yaml + remove Unresolved inspection suppress
+  #    - config["a"]
+  #    - config
+
   Scenario Outline: Check different SDK settings
     Given a snakemake with disabled framework project
     Given I open a file "foo.smk" with text
@@ -35,7 +40,7 @@ Feature: Resolve implicitly imported python names
   Scenario: Resolve at top-level if custom python sdk
 
   Scenario Outline: Resolve at top-level
-    Given a snakemake project
+    Given a <smk_vers> project
     Given I open a file "foo.smk" with text
     """
     <text>
@@ -44,21 +49,23 @@ Feature: Resolve implicitly imported python names
     Then reference should resolve to "<symbol_name>" in "<file>"
 
     Examples:
-      | ptn | text        | symbol_name | file         |
-      | exp | expand()    | expand      | io.py        |
-#      | tem | temp()      | temp        | io.py        |
-#      | dir | directory() | directory   | io.py        |
-#      | dir | directory() | directory   | io.py        |
-#      | pro | protected() | protected   | io.py        |
-#      | tou | touch()     | touch       | io.py        |
-#      | dyn | dynamic()   | dynamic     | io.py        |
-#      | un  | unpack()    | unpack      | io.py        |
-#      | anc | ancient()   | ancient     | io.py        |
-#      | con | config      | config      | workflow.py  |
-#      | con | config["a"] | config      | workflow.py  |
-#      | ru  | rules       | rules       | workflow.py  |
-#      | ru  | rules.foo   | rules       | workflow.py  |
-#      | inp | input       | input       | builtins.pyi |
+      | smk_vers      | ptn | text        | symbol_name | file         |
+      | snakemake:5x  | ru  | rules       | rules       | workflow.py  |
+      | snakemake:5x  | ru  | rules.foo   | rules       | workflow.py  |
+      | snakemake:6.1 | ru  | rules       | Rules       | common.py    |
+      | snakemake:6.1 | ru  | rules.foo   | Rules       | common.py    |
+      | snakemake     | exp | expand()    | expand      | io.py        |
+      | snakemake     | tem | temp()      | temp        | io.py        |
+      | snakemake     | dir | directory() | directory   | io.py        |
+      | snakemake     | dir | directory() | directory   | io.py        |
+      | snakemake     | pro | protected() | protected   | io.py        |
+      | snakemake     | tou | touch()     | touch       | io.py        |
+      | snakemake     | dyn | dynamic()   | dynamic     | io.py        |
+      | snakemake     | un  | unpack()    | unpack      | io.py        |
+      | snakemake     | anc | ancient()   | ancient     | io.py        |
+      | snakemake     | ru  | rules       | Rules       | common.py    |
+      | snakemake     | ru  | rules.foo   | Rules       | common.py    |
+      | snakemake     | inp | input       | input       | builtins.pyi |
 
   Scenario: Resolve at top-level: shell()
     Given a snakemake project
@@ -68,10 +75,10 @@ Feature: Resolve implicitly imported python names
     """
     When I put the caret at she
     Then reference should multi resolve to name, file, times[, class name]
-      | __new__  | shell.py     | 1 |
+      | shell  | shell.py     | 1 |
 
   Scenario Outline: Also available on top-level at runtime, but not API
-    Given a snakemake project
+    Given a <smk_vers> project
     Given I open a file "foo.smk" with text
     """
     <text>
@@ -80,8 +87,10 @@ Feature: Resolve implicitly imported python names
     Then reference should resolve to "<symbol_name>" in "<file>"
 
     Examples:
-      | ptn | text     | symbol_name | file        |
-      | wor | workflow | workflow    | workflow.py |
+      | smk_vers      | ptn | text     | symbol_name | file        |
+      | snakemake:5x  | wor | workflow | workflow    | workflow.py |
+      | snakemake:6.1 | wor | workflow | Workflow    | workflow.py |
+      | snakemake     | wor | workflow | Workflow    | workflow.py |
 
   Scenario Outline: Not-resolved at top-level
     Given a snakemake project
@@ -100,7 +109,7 @@ Feature: Resolve implicitly imported python names
 
 
   Scenario Outline: Resolve inside rule parameters
-    Given a snakemake project
+    Given a <smk_vers> project
     Given I open a file "foo.smk" with text
     """
     rule all:
@@ -110,10 +119,11 @@ Feature: Resolve implicitly imported python names
     Then reference should resolve to "<symbol_name>" in "<file>"
 
     Examples:
-      | ptn   | text        | symbol_name | file        |
-      | exp   | expand()    | expand      | io.py       |
-      | con   | config["a"] | config      | workflow.py |
-      | rules | rules.foo   | rules       | workflow.py |
+      | smk_vers      | ptn   | text      | symbol_name | file        |
+      | snakemake:5x  | rules | rules.foo | rules       | workflow.py |
+      | snakemake:6.1 | rules | rules.foo | Rules       | common.py   |
+      | snakemake     | exp   | expand()  | expand      | io.py       |
+      | snakemake     | rules | rules.foo | Rules       | common.py   |
 
   Scenario: Resolve inside rule parameters: shell()
     Given a snakemake project
@@ -124,10 +134,10 @@ Feature: Resolve implicitly imported python names
     """
     When I put the caret at she
     Then reference should multi resolve to name, file, times[, class name]
-      | __new__  | shell.py     | 1 |
+      | shell  | shell.py     | 1 |
 
   Scenario Outline: Resolve inside run section
-    Given a snakemake project
+    Given a <smk_vers> project
     Given I open a file "foo.smk" with text
     """
     rule NAME:
@@ -135,22 +145,25 @@ Feature: Resolve implicitly imported python names
         <text> #here
     """
     When I put the caret at <ptn>
-    Then reference should multi resolve to name, file, times[, class name]
+      Then reference should multi resolve to name, file, times[, class name]
       | <symbol_name> | <file> | <times> |
 
     Examples:
-      | ptn         | text        | symbol_name | file        | times |
-      | exp         | expand()    | expand      | io.py       | 1     |
-      | she         | shell()     | __new__     | shell.py    | 1     |
-      | con         | config["a"] | config      | workflow.py | 1     |
-      | rules       | rules.foo   | rules       | workflow.py | 1     |
-      | checkpoints | checkpoints | checkpoints | workflow.py | 1     |
-      | inp         | input[0]    | InputFiles  | io.py       | 1     |
-      | output.foo  | output.foo  | OutputFiles | io.py       | 1     |
-      | par         | params      | Params      | io.py       | 1     |
-      | wil         | wildcards   | Wildcards   | io.py       | 1     |
-      | res         | resources   | Resources   | io.py       | 1     |
-      | lo          | log         | Log         | io.py       | 1     |
+      | smk_vers      | ptn         | text        | symbol_name | file           | times |
+      | snakemake:5x  | checkpoints | checkpoints | checkpoints | workflow.py    | 1     |
+      | snakemake:5x  | rules       | rules.foo   | rules       | workflow.py    | 1     |
+      | snakemake:6.1 | checkpoints | checkpoints | Checkpoints | checkpoints.py | 1     |
+      | snakemake:6.1 | rules       | rules.foo   | Rules       | common.py      | 1     |
+      | snakemake     | exp         | expand()    | expand      | io.py          | 1     |
+      | snakemake     | she         | shell()     | shell       | shell.py       | 1     |
+      | snakemake     | rules       | rules.foo   | Rules       | common.py      | 1     |
+      | snakemake     | checkpoints | checkpoints | Checkpoints | checkpoints.py | 1     |
+      | snakemake     | inp         | input[0]    | InputFiles  | io.py          | 1     |
+      | snakemake     | output.foo  | output.foo  | OutputFiles | io.py          | 1     |
+      | snakemake     | par         | params      | Params      | io.py          | 1     |
+      | snakemake     | wil         | wildcards   | Wildcards   | io.py          | 1     |
+      | snakemake     | res         | resources   | Resources   | io.py          | 1     |
+      | snakemake     | lo          | log         | Log         | io.py          | 1     |
 
   Scenario: Resolve results priority
     Given a snakemake project
@@ -296,21 +309,33 @@ Feature: Resolve implicitly imported python names
       | exp | expand      | pyi |
 
   Scenario Outline: Resolve in injections
-    Given a snakemake project
+    Given a <smk_vers> project
     Given I open a file "foo.smk" with text
         """
         <rule_like> NAME:
            <section>: "{<text>}"
         """
     When I put the caret after "{
-    Then reference in injection should resolve to "<text>" in "<file>"
+    Then reference in injection should resolve to "<result>" in "<file>"
     Examples:
-      | rule_like  | section | text        | file        |
-      | rule       | shell   | rules       | workflow.py |
-      | rule       | shell   | config      | workflow.py |
-      | rule       | shell   | checkpoints | workflow.py |
-      | rule       | message | rules       | workflow.py |
-      | checkpoint | shell   | rules       | workflow.py |
+      | smk_vers      | rule_like  | section | text        | result      | file           |
+      | snakemake:5x  | rule       | shell   | rules       | rules       | workflow.py    |
+      | snakemake:5x  | rule       | shell   | checkpoints | checkpoints | workflow.py    |
+      | snakemake:5x  | rule       | message | rules       | rules       | workflow.py    |
+      | snakemake:5x  | checkpoint | shell   | rules       | rules       | workflow.py    |
+      | snakemake:6.1 | rule       | shell   | rules       | Rules       | common.py      |
+      | snakemake:6.1 | rule       | shell   | checkpoints | Checkpoints | checkpoints.py |
+      | snakemake:6.1 | rule       | message | rules       | Rules       | common.py      |
+      | snakemake:6.1 | rule       | message | scatter     | Scatter     | common.py      |
+      | snakemake:6.1 | rule       | message | gather      | Gather      | common.py      |
+      | snakemake:6.1 | checkpoint | shell   | rules       | Rules       | common.py      |
+      | snakemake     | rule       | shell   | rules       | Rules       | common.py      |
+      | snakemake     | rule       | shell   | checkpoints | Checkpoints | checkpoints.py |
+      | snakemake     | rule       | message | rules       | Rules       | common.py      |
+      | snakemake     | rule       | message | scatter     | Scatter     | common.py      |
+      | snakemake     | rule       | message | gather      | Gather      | common.py      |
+      | snakemake     | checkpoint | shell   | rules       | Rules       | common.py      |
+
 
   Scenario Outline: No resolve in injections for defining expanding sections
     Given a snakemake project

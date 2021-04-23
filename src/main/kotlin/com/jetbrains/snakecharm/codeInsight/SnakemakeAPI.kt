@@ -41,8 +41,11 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_UNPACK
 object SnakemakeAPI {
     const val UNPACK_FUNCTION = "unpack"
 
+    const val SMK_VARS_CONFIG = "config"
     const val SMK_VARS_RULES = "rules"
     const val SMK_VARS_CHECKPOINTS = "checkpoints"
+    const val SMK_VARS_SCATTER = "scatter"
+    const val SMK_VARS_GATHER = "gather"
     const val SMK_VARS_ATTEMPT = "attempt"
     const val SMK_FUN_EXPAND = "expand"
 
@@ -222,4 +225,8 @@ object SnakemakeAPI {
 
     @JvmField
     val SMK_WRAPPERS_BUNDLED_REPO="master"     // prev 0.64.0
+
+    val SMK_API_PKG_NAME_SMK = "snakemake"
+    val SMK_API_PKG_NAME_SMK_MINIMAL = "snakemake-minimal"
+    val SMK_API_VERS_6_1 = "6.1"
 }

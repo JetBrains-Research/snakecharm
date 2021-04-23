@@ -13,7 +13,7 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Disposer
 import com.intellij.util.messages.Topic
 import com.intellij.util.xmlb.annotations.Attribute
-import com.jetbrains.python.sdk.PythonSdkType
+import com.jetbrains.python.PyNames
 import com.jetbrains.snakecharm.SnakemakeIcons
 
 @State(name = "SmkProjectSettings", storages = [Storage("snakemake-settings.xml")])
@@ -25,9 +25,7 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
      * Please do not use this, use [stateSnapshot] instead or filed getters. This method is only platform API endpoint
      * for serialization to project settings
      */
-    override fun getState(): State {
-        return internalState
-    }
+    override fun getState(): State = internalState
 
     val snakemakeSupportEnabled: Boolean
         get() {
@@ -178,11 +176,13 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
             } else {
                 ProjectJdkTable.getInstance().findJdk(sdkName)
             }
-            return if (sdk != null && sdk.sdkType is PythonSdkType) sdk else null
+            return if (sdk != null && isPythonSdk(sdk)) sdk else null
         }
 
+        fun isPythonSdk(sdk: Sdk) = PyNames.PYTHON_SDK_ID_NAME == sdk.sdkType.name
         fun getIcon() = SnakemakeIcons.FACET
     }
+
 
     override fun dispose() {
         // Do nothing

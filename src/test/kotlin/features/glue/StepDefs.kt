@@ -28,7 +28,7 @@ import kotlin.test.fail
  * @date 2019-04-28
  */
 class StepDefs {
-    @Given("^a (snakemake|snakemake with disabled framework|python) project$")
+    @Given("^a (snakemake|snakemake:5x|snakemake:6.1|snakemake with disabled framework|python) project$")
     @Throws(Exception::class)
     fun configureSnakemakeProject(projectType: String) {
         require(SnakemakeWorld.myFixture == null) {
@@ -48,7 +48,13 @@ class StepDefs {
         //    InspectionProfileImpl.INIT_INSPECTIONS = true
         //}
         val additionalRoots = if (projectType.startsWith("snakemake")) {
-            arrayOf(SnakemakeTestUtil.getTestDataPath().resolve("MockPackages3"))
+            val smkModuleRootName = if (projectType.startsWith("snakemake:")) {
+                val suffix = projectType.replace("snakemake:", "")
+                "MockPackages3_smk_${suffix}"
+            }   else {
+                "MockPackages3"
+            }
+            arrayOf(SnakemakeTestUtil.getTestDataPath().resolve(smkModuleRootName))
         } else {
             emptyArray()
         }

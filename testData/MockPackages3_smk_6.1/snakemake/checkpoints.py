@@ -4,10 +4,14 @@ from snakemake.io import checkpoint_target
 
 class Checkpoints:
     """ A namespace for checkpoints so that they can be accessed via dot notation. """
+
     def __init__(self):
         self.future_output = None
 
-    def register(self, rule):
+    def register(self, rule, fallback_name=None):
+        checkpoint = Checkpoint(rule, self)
+        if fallback_name:
+            setattr(self, fallback_name, checkpoint)
         setattr(self, rule.name, Checkpoint(rule, self))
 
 
@@ -22,13 +26,15 @@ class Checkpoint:
         missing = self.rule.wildcard_names.difference(wildcards.keys())
         if missing:
             raise WorkflowError(
-                "Missing wildcard values for {}".format(", ".join(missing)))
+                "Missing wildcard values for {}".format(", ".join(missing))
+            )
 
         output, _ = self.rule.expand_output(wildcards)
-        if (self.checkpoints.future_output is None or
-            any((not f.exists or f in self.checkpoints.future_output)
-                for f in output)):
+        if self.checkpoints.future_output is None or any(
+            (not f.exists or f in self.checkpoints.future_output) for f in output
+        ):
             raise IncompleteCheckpointException(self.rule, checkpoint_target(output[0]))
+
         return CheckpointJob(self.rule, output)
 
 
@@ -36,5 +42,5 @@ class CheckpointJob:
     __slots__ = ["rule", "output"]
 
     def __init__(self, rule, output):
-        self.output = output.plainstrings()
+        self.output = output
         self.rule = rule

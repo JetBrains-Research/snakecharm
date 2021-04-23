@@ -129,7 +129,7 @@ Feature: Inspection warns about confusing wildcard names.
     """
     When I check highlighting warnings
       # PyRenameElementQuickFix
-    Then I invoke quick fix Rename element and see text:
+    Then I invoke quick fix Rename an element and see text:
     """
     rule foo:
       output: "{INPUT}.foo"

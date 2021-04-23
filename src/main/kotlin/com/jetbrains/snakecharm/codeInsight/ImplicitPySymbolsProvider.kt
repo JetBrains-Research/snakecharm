@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.codeInsight
 
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.runReadAction
@@ -14,19 +15,21 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ex.ProjectRootManagerEx
 import com.intellij.openapi.util.Disposer
-import com.intellij.psi.PsiFile
+import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.util.QualifiedName
 import com.jetbrains.extensions.python.inherits
 import com.jetbrains.python.packaging.PyPackageManager
-import com.jetbrains.python.psi.PyElement
-import com.jetbrains.python.psi.PyFile
-import com.jetbrains.python.psi.PyGlobalStatement
-import com.jetbrains.python.psi.PyRecursiveElementVisitor
+import com.jetbrains.python.packaging.pyRequirement
+import com.jetbrains.python.packaging.requirement.PyRequirementRelation.LT
+import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.resolve.fromSdk
 import com.jetbrains.python.psi.resolve.resolveQualifiedName
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_API_VERS_6_1
+import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
 import javax.swing.SwingUtilities
@@ -88,15 +91,22 @@ class ImplicitPySymbolsProvider(
                  *      At the moment we recalculate cache on events, but replace only if smth change.
                  *      Maybe we could recalculate cache less often
                  **/
+                val usedFiles = mutableSetOf<VirtualFile>()
 
-                val usedFiles = arrayListOf<PsiFile>()
-
-                //val elementsCache = ArrayList<Pair<QualifiedName, PyElement>>()
                 val elementsCache = ArrayList<ImplicitPySymbol>()
+                val syntheticElementsCache = ArrayList<Pair<SmkCodeInsightScope, LookupElement>>()
 
                 ///////////////////////////////////////
                 // E.g. rules, config, ... defined in Workflow code as global variables
-                collectWorkflowGlobalVariables(usedFiles, sdk, elementsCache)
+
+                if (isSmkVersLT_6_1(usedFiles, sdk)) {
+                    // legacy globals API in workflow, used before 6.1
+                    collectWorkflowGlobalVariables(usedFiles, sdk, elementsCache)
+                } else {
+                    addWorkflowGlobalVariables(usedFiles, sdk, syntheticElementsCache)
+                }
+
+                // xxx: maybe  properties from 'Workflow'
 
                 ///////////////////////////////////////
                 // E.g. expand, temp, .. from 'snakemake.io'
@@ -116,10 +126,12 @@ class ImplicitPySymbolsProvider(
 
                 ///////////////////////////////////////
                 // Collect hardcoded classes
+
+                // in order to get properly working inspection on shell class constructor, e.g ignore first 'self' arg
+                // let's resolve to class here:
                 collectClasses(
-                    listOf(
-                        "snakemake.shell" to "shell"
-                    ), SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache, ImplicitPySymbolUsageType.METHOD
+                    listOf("snakemake.shell" to "shell"),
+                    SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache, ImplicitPySymbolUsageType.METHOD
                 )
 
                 ///////////////////////////////////////
@@ -152,10 +164,10 @@ class ImplicitPySymbolsProvider(
                 }
 
                 ////////////////////////////////////////
-                val contentVersion = usedFiles.map { it.containingFile.virtualFile.timeStamp }.hashCode()
+                val contentVersion = usedFiles.sortedBy { it.path }.map { it.timeStamp }.hashCode()
                 val cachedContentVersion = cache.contentVersion
                 if (cachedContentVersion == 0 || contentVersion != cachedContentVersion || forceClear) {
-                    cache = ImplicitPySymbolsCacheImpl(project, elementsCache, contentVersion)
+                    cache = ImplicitPySymbolsCacheImpl(project, elementsCache, syntheticElementsCache, contentVersion)
 
                     LOG.debug("[CACHE UPDATED]")
 
@@ -164,6 +176,37 @@ class ImplicitPySymbolsProvider(
                 }
             }
         }
+    }
+
+    @Suppress("FunctionName")
+    private fun isSmkVersLT_6_1(
+        usedFiles: MutableSet<VirtualFile>,
+        sdk: Sdk
+    ): Boolean {
+        val requirement1 = pyRequirement("snakemake-minimal", LT, SMK_API_VERS_6_1)
+        val requirement2 = pyRequirement("snakemake", LT, SMK_API_VERS_6_1)
+
+        if (ApplicationManager.getApplication().isUnitTestMode) {
+            val workflowFile = collectPyFiles("snakemake.workflow", usedFiles, sdk).firstOrNull()?.virtualFile
+            val versionFile = workflowFile?.parent?.findChild("vers.snakecharm.txt")
+            if (versionFile != null) {
+                val smkVersTestMode = VfsUtil.loadText(versionFile)
+                return requirement1.versionSpecs[0].matches(smkVersTestMode)
+            }
+            return false
+        }
+
+        val packages = PyPackageManager.getInstance(sdk).packages
+
+        val pkg1 = packages?.firstOrNull() { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK}
+        if (pkg1 != null) {
+            return pkg1.matches(requirement1)
+        }
+        val pkg2 = packages?.firstOrNull() { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK_MINIMAL}
+        if (pkg2 != null) {
+            return pkg2.matches(requirement2)
+        }
+        return false
     }
 
     private fun refreshAfterSymbolCachesUpdated(project: Project) {
@@ -228,7 +271,7 @@ class ImplicitPySymbolsProvider(
                 if (sdkNameNotChanged && !sdkRemoved) {
                     return
                 }
-                
+
                 doRefresh(true)
             }
 
@@ -276,7 +319,7 @@ class ImplicitPySymbolsProvider(
     private fun collectVars(
         moduleAndVariable: List<Pair<String, String>>,
         scope: SmkCodeInsightScope,
-        usedFiles: MutableList<PsiFile>,
+        usedFiles: MutableSet<VirtualFile>,
         sdk: Sdk,
         elementsCache: MutableList<ImplicitPySymbol>
     ) {
@@ -298,65 +341,95 @@ class ImplicitPySymbolsProvider(
         }
     }
 
-    private fun collectClassConstuctors(
+    private fun collectClassInstanceMethods(
         moduleAndClass: List<Pair<String, String>>,
+        methods: List<String>,
         scope: SmkCodeInsightScope,
-        usedFiles: MutableList<PsiFile>,
+        usedFiles: MutableSet<VirtualFile>,
         sdk: Sdk,
         elementsCache: MutableList<ImplicitPySymbol>,
-        usageType: ImplicitPySymbolUsageType
+        checkInheritedMethods: Boolean = false
     ) {
-        moduleAndClass.forEach { (pyModuleFqn, className) ->
-            val pyFiles = collectPyFiles(pyModuleFqn, usedFiles, sdk)
+        processClasses(moduleAndClass, usedFiles, sdk) { pyClass ->
+            methods.forEach { methodName ->
+                //val ctx = TypeEvalContext.userInitiated(
+                //    pyClass.project,
+                //    pyClass.originalElement.containingFile
+                //)
+                val ctx = null
+                // val ctx = TypeEvalContext.codeInsightFallback(pyClass.project)
+                val method = pyClass.findMethodByName(
+                    methodName, checkInheritedMethods, ctx
+                )
 
-            pyFiles
-                .asSequence()
-                .filter { it.isValid }
-                .mapNotNull { it.findTopLevelClass(className) }
-                .filter { it.name != null }
-                .forEach { pyClass ->
-                    val constructor = pyClass.findInitOrNew(
-                        false,
-                        TypeEvalContext.userInitiated(
-                            pyClass.project,
-                            pyClass.originalElement.containingFile
-                        )
-                    )
-                    if (constructor != null) {
-                        elementsCache.add(ImplicitPySymbol(pyClass.name!!, constructor, scope, usageType))
-                    }
-//                      //XXX: todo do we need 'else' here like:  elementsCache.add(pyClass.name!! to pyClass) ?
+                if (method != null) {
+                    elementsCache.add(ImplicitPySymbol(method.name!!, method, scope, ImplicitPySymbolUsageType.METHOD))
                 }
+
+            }
+        }
+    }
+
+    private fun collectClassConstructors(
+        moduleAndClass: List<Pair<String, String>>,
+        scope: SmkCodeInsightScope,
+        usedFiles: MutableSet<VirtualFile>,
+        sdk: Sdk,
+        elementsCache: MutableList<ImplicitPySymbol>
+    ) {
+
+        processClasses(moduleAndClass, usedFiles, sdk) { pyClass ->
+            //val ctx = TypeEvalContext.userInitiated(
+            //    pyClass.project,
+            //    pyClass.originalElement.containingFile
+            //)
+            val ctx = null
+            // val ctx = TypeEvalContext.codeInsightFallback(pyClass.project)
+            val constructor = pyClass.findInitOrNew(false, ctx)
+            if (constructor != null) {
+                elementsCache.add(ImplicitPySymbol(pyClass.name!!, constructor, scope, ImplicitPySymbolUsageType.METHOD))
+            }
         }
     }
 
     private fun collectClasses(
         moduleAndClass: List<Pair<String, String>>,
         scope: SmkCodeInsightScope,
-        usedFiles: MutableList<PsiFile>,
+        usedFiles: MutableSet<VirtualFile>,
         sdk: Sdk,
         elementsCache: MutableList<ImplicitPySymbol>,
         usageType: ImplicitPySymbolUsageType
     ) {
-        moduleAndClass.forEach { (pyModuleFqn, className) ->
-            val pyFiles = collectPyFiles(pyModuleFqn, usedFiles, sdk)
-
-            pyFiles
-                .asSequence()
-                .filter { it.isValid }
-                .mapNotNull { it.findTopLevelClass(className) }
-                .filter { it.name != null }
-                .forEach { pyClass ->
-                    elementsCache.add(ImplicitPySymbol(pyClass.name!!, pyClass, scope, usageType))
-                }
+        processClasses(moduleAndClass, usedFiles, sdk) { pyClass ->
+            elementsCache.add(ImplicitPySymbol(pyClass.name!!, pyClass, scope, usageType))
         }
     }
+
+    private fun processClasses(
+        moduleAndClass: List<Pair<String, String>>,
+        usedFiles: MutableSet<VirtualFile>,
+        sdk: Sdk,
+        processor: (PyClass) -> Unit
+    ) {
+          moduleAndClass.forEach { (pyModuleFqn, className) ->
+              val pyFiles = collectPyFiles(pyModuleFqn, usedFiles, sdk)
+
+              pyFiles
+                  .asSequence()
+                  .filter { it.isValid }
+                  .mapNotNull { it.findTopLevelClass(className) }
+                  .filter { it.name != null }
+                  .forEach { pyClass ->
+                      processor(pyClass)
+                  }
+          }
+      }
 
     private fun collectTopLevelClassesInheretedFrom(
         pyModuleFqn: String,
         parentClassRequirement: String?,
         scope: SmkCodeInsightScope,
-        usedFiles: MutableList<PsiFile>,
+        usedFiles: MutableSet<VirtualFile>,
         sdk: Sdk,
         elementsCache: MutableList<ImplicitPySymbol>,
         className2VarNameFun: (String) -> String
@@ -390,7 +463,7 @@ class ImplicitPySymbolsProvider(
     private fun collectMethods(
         moduleAndMethod: List<Pair<String, String>>,
         scope: SmkCodeInsightScope,
-        usedFiles: MutableList<PsiFile>,
+        usedFiles: MutableSet<VirtualFile>,
         sdk: Sdk,
         elementsCache: MutableList<ImplicitPySymbol>
     ) {
@@ -417,7 +490,7 @@ class ImplicitPySymbolsProvider(
 
     private fun collectPyFiles(
         pyModuleFqn: String,
-        usedFiles: MutableList<PsiFile>,
+        usedFiles: MutableSet<VirtualFile>,
         sdk: Sdk
     ): List<PyFile> {
         val resolveContext = fromSdk(project, sdk)
@@ -428,14 +501,14 @@ class ImplicitPySymbolsProvider(
             resolveContext
         ).filterIsInstance<PyFile>()
 
-        usedFiles.addAll(pyFiles)
+        pyFiles.forEach { usedFiles.add(it.virtualFile) }
         return pyFiles
     }
 
     private fun collectTopLevelMethodsFrom(
         pyModuleFqn: String,
         scope: SmkCodeInsightScope,
-        usedFiles: MutableList<PsiFile>,
+        usedFiles: MutableSet<VirtualFile>,
         sdk: Sdk,
         elementsCache: MutableList<ImplicitPySymbol>
     ) {
@@ -455,7 +528,7 @@ class ImplicitPySymbolsProvider(
     }
 
     private fun collectWorkflowGlobalVariables(
-        usedFiles: MutableList<PsiFile>,
+        usedFiles: MutableSet<VirtualFile>,
         sdk: Sdk,
         elementsCache: MutableList<ImplicitPySymbol>
     ) {
@@ -467,7 +540,7 @@ class ImplicitPySymbolsProvider(
         val workflowFile = collectPyFiles("snakemake.workflow", usedFiles, sdk).firstOrNull()
 
         if (workflowFile != null) {
-            usedFiles.add(workflowFile)
+            usedFiles.add(workflowFile.virtualFile)
 
             val globals = HashMap<String, PyElement>()
 
@@ -496,6 +569,60 @@ class ImplicitPySymbolsProvider(
         }
     }
 
+    private fun addWorkflowGlobalVariables(
+        usedFiles: MutableSet<VirtualFile>,
+        sdk: Sdk,
+        elementsCache: MutableList<Pair<SmkCodeInsightScope, LookupElement>>
+    ) {
+        // See snakemake/workflow.py
+        //
+        // Workflow.__init__()
+        //     _globals = globals()
+        //     _globals["workflow"] = self
+        //     _globals["cluster_config"] = copy.deepcopy(self.overwrite_clusterconfig)
+        //     _globals["rules"] = Rules()
+        //     _globals["checkpoints"] = Checkpoints()
+        //     _globals["scatter"] = Scatter()
+        //     _globals["gather"] = Gather()
+        //     ...
+        //     self.globals["config"]
+        val globals = HashMap<String, PyElement?>()
+
+        val workflowFile = collectPyFiles("snakemake.workflow", usedFiles, sdk).firstOrNull()
+        if (workflowFile != null) {
+            usedFiles.add(workflowFile.virtualFile)
+        }
+        globals["workflow"] = workflowFile?.findTopLevelClass("Workflow")
+
+        val commonFile = collectPyFiles("snakemake.common", usedFiles, sdk).firstOrNull()
+        if (commonFile != null) {
+            usedFiles.add(commonFile.virtualFile)
+        }
+        globals[SnakemakeAPI.SMK_VARS_CHECKPOINTS] = commonFile?.findTopLevelClass("Checkpoints")
+        globals[SnakemakeAPI.SMK_VARS_RULES] = commonFile?.findTopLevelClass("Rules")
+        globals[SnakemakeAPI.SMK_VARS_SCATTER] = commonFile?.findTopLevelClass("Scatter")
+        globals[SnakemakeAPI.SMK_VARS_GATHER] = commonFile?.findTopLevelClass("Gather")
+        globals[SnakemakeAPI.SMK_VARS_CONFIG] = null
+
+        val checkpointsFile = collectPyFiles("snakemake.checkpoints", usedFiles, sdk).firstOrNull()
+        if (checkpointsFile != null) {
+            usedFiles.add(checkpointsFile.virtualFile)
+        }
+        // TODO: do we need this ?
+        globals["checkpoints"] = checkpointsFile?.findTopLevelClass("Checkpoints")
+
+        globals.forEach { (name, psi) ->
+            elementsCache.add(
+                SmkCodeInsightScope.TOP_LEVEL to SmkCompletionUtil.createPrioritizedLookupElement(
+                    name,
+                    psi,
+                    typeText = "Workflow '${name}' global",
+                    priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
+                )
+            )
+        }
+    }
+
     companion object {
         private val LOG = logger<ImplicitPySymbolsProvider>() // TODO: cleanup
         fun instance(project: Project) = project.service<ImplicitPySymbolsProvider>()
@@ -508,15 +635,25 @@ class ImplicitPySymbolsProvider(
     }
 }
 
+/**
+ * @param project Project
+ * @param symbols Real elements in code which are inserted on runtime in snakemake execution context
+ * @param syntheticSymbols Elements that doesn't have PSI definition in snakemake files but also are dynamically
+ *  inserted in execution context at runtime, e.g. global variables of workflow (rules, config, ..). The could be
+ *  resolved to some PSI elements (e.g. related classes, etc) which cannot be used as definitions in code insight engine.
+ */
 private class ImplicitPySymbolsCacheImpl(
     private val project: Project,
     symbols: List<ImplicitPySymbol>,
+    syntheticSymbols: List<Pair<SmkCodeInsightScope, LookupElement>>,
     override val contentVersion: Int = 0
 ) : ImplicitPySymbolsCache {
 
-    private val scope2Symbols = toMap(symbols)
+    private val scope2Symbols = symbols.groupBy { it.scope}
+    private val scope2SyntheticSymbols = syntheticSymbols.groupBy ({ it.first }, { it.second })
 
-    override operator fun get(scope: SmkCodeInsightScope) = validElements(scope2Symbols.getValue(scope))
+    override operator fun get(scope: SmkCodeInsightScope) = validElements(scope2Symbols[scope] ?: emptyList())
+    override fun getSynthetic(scope: SmkCodeInsightScope) = scope2SyntheticSymbols[scope] ?: emptyList()
 
     private fun validElements(elements: List<ImplicitPySymbol>): List<ImplicitPySymbol> {
         val validElements = elements.filter { it.psiDeclaration.isValid }
@@ -524,15 +661,5 @@ private class ImplicitPySymbolsCacheImpl(
             project.service<ImplicitPySymbolsProvider>().scheduleUpdate()
         }
         return validElements
-    }
-
-    companion object {
-        private fun toMap(symbols: List<ImplicitPySymbol>): Map<SmkCodeInsightScope, List<ImplicitPySymbol>> {
-            val map = SmkCodeInsightScope.values().associate { it to arrayListOf<ImplicitPySymbol>() }
-            symbols.forEach { s ->
-                map.getValue(s.scope).add(s)
-            }
-            return map
-        }
     }
 }

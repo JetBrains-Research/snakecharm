@@ -65,7 +65,7 @@ Feature: Resolve for sections/variables in SmkSL injections
       | cache                |
 
   Scenario Outline: Resolve for python specific variables for sections w/o arguments
-      Given a snakemake project
+      Given a <smk_vers> project
       Given I open a file "foo.smk" with text
       """
       local_var = 1
@@ -76,20 +76,19 @@ Feature: Resolve for sections/variables in SmkSL injections
     When I put the caret after "{
     Then reference in injection should resolve to "<result>" in "<file>"
     Examples:
-      | rule_like  | section | text      | result      | file        |
-      | rule       | shell   | config    | config      | workflow.py |
-      | rule       | shell   | rules     | rules       | workflow.py |
-      | rule       | shell   | local_var | local_var   | foo.smk     |
-      | rule       | shell   | input     | InputFiles  | io.py       |
-      | rule       | shell   | output    | OutputFiles | io.py       |
-      | rule       | shell   | log       | Log         | io.py       |
-      | rule       | shell   | params    | Params      | io.py       |
-      | rule       | shell   | resources | Resources   | io.py       |
-      | rule       | shell   | wildcards | NAME:   | foo.smk       |
-      #| rule       | shell   | wildcards | Wildcards   | io.py       |
-      | checkpoint | shell   | local_var | local_var   | foo.smk     |
-      | rule       | message | config    | config      | workflow.py |
-      | checkpoint | message | local_var | local_var   | foo.smk     |
+      | smk_vers      | rule_like  | section | text      | result      | file        |
+      | snakemake:5x  | rule       | shell   | rules     | rules       | workflow.py |
+      | snakemake:6.1 | rule       | shell   | rules     | Rules       | common.py   |
+      | snakemake     | rule       | shell   | rules     | Rules       | common.py   |
+      | snakemake     | rule       | shell   | local_var | local_var   | foo.smk     |
+      | snakemake     | rule       | shell   | input     | InputFiles  | io.py       |
+      | snakemake     | rule       | shell   | output    | OutputFiles | io.py       |
+      | snakemake     | rule       | shell   | log       | Log         | io.py       |
+      | snakemake     | rule       | shell   | params    | Params      | io.py       |
+      | snakemake     | rule       | shell   | resources | Resources   | io.py       |
+      | snakemake     | rule       | shell   | wildcards | NAME:       | foo.smk     |
+      | snakemake     | checkpoint | shell   | local_var | local_var   | foo.smk     |
+      | snakemake     | checkpoint | message | local_var | local_var   | foo.smk     |
 
   Scenario Outline: No resolve for python specific methods/classes for sections w/o arguments
     Given a snakemake project

@@ -16,75 +16,92 @@
 package com.jetbrains.python
 
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.projectRoots.SdkAdditionalData
+import com.intellij.openapi.projectRoots.SdkTypeId
 import com.intellij.openapi.projectRoots.impl.MockSdk
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.containers.MultiMap
-import com.jetbrains.python.codeInsight.typing.PyTypeShed
+import com.jetbrains.python.codeInsight.typing.PyTypeShed.findRootsForLanguageLevel
 import com.jetbrains.python.codeInsight.userSkeletons.PyUserSkeletonsUtil
 import com.jetbrains.python.psi.LanguageLevel
-import com.jetbrains.python.sdk.PythonSdkType
 import com.jetbrains.python.sdk.PythonSdkUtil
-import org.jetbrains.annotations.NonNls
 import java.io.File
+
 
 /**
  * We cannot re-use PythonMockSdk because api not available in Platform artifacts
- * 
+ *
  * @author yole
  */
 object PythonMockSdk {
-    @NonNls
-    private val MOCK_SDK_NAME = "Mock Python SDK"
-
     fun create(
-            testDataRoot: String,
-            version: String,
-            sdkNameSuffix: String = "",
-            vararg additionalRoots: VirtualFile
+        testDataRoot: String,
+        version: String = LanguageLevel.getLatest().toPythonVersion(),
+        sdkNameSuffix: String = "",
+        vararg additionalRoots: VirtualFile
     ): Sdk {
-        val mockPath = "$testDataRoot/MockSdk$version/"
-
-        val sdkHome = File(mockPath, "bin/python$version").path
-        val sdkType = PythonSdkType.getInstance()
-
-        val roots = MultiMap.create<OrderRootType, VirtualFile>()
-        val classes = OrderRootType.CLASSES
-
-        ContainerUtil.putIfNotNull(
-            classes,
-            LocalFileSystem.getInstance().refreshAndFindFileByIoFile(File(mockPath, "Lib")),
-            roots
-        )
-
-        ContainerUtil.putIfNotNull(
-            classes,
-            PyUserSkeletonsUtil.getUserSkeletonsDirectory(),
-            roots
-        )
-
         val level = LanguageLevel.fromPythonVersion(version)!!
-        val typeShedDir = PyTypeShed.directory!!
-        PyTypeShed.findRootsForLanguageLevel(level).forEach { path ->
-            val file = typeShedDir.findFileByRelativePath(path)
-            if (file != null) {
-                roots.putValue(classes, file)
-            }
-        }
+        return create(
+            "Mock ${PyNames.PYTHON_SDK_ID_NAME} ${level.toPythonVersion()}$sdkNameSuffix",
+            "$testDataRoot/MockSdk$version",
+            PyMockSdkType(level),
+            level,
+            *additionalRoots
+        )
+    }
 
-        val mockStubsPath = mockPath + PythonSdkUtil.SKELETON_DIR_NAME
-        ContainerUtil.putIfNotNull(
-                    classes,
-                    LocalFileSystem.getInstance().refreshAndFindFileByPath(mockStubsPath),
-                    roots
-                )
-        roots.putValues(classes, listOf(*additionalRoots))
+    private fun create(
+         name: String = "MockSdk",
+         mockSdkPath: String,
+         sdkType: SdkTypeId,
+         level: LanguageLevel,
+        vararg additionalRoots:  VirtualFile
+    ): Sdk {
+        val roots = MultiMap.create<OrderRootType, VirtualFile>()
+        roots.putValues(OrderRootType.CLASSES, createRoots(mockSdkPath, level))
+        roots.putValues(OrderRootType.CLASSES, listOf(*additionalRoots))
 
-        val sdk = MockSdk("$MOCK_SDK_NAME $version$sdkNameSuffix", sdkHome, "Python $version Mock SDK", roots, sdkType)
+        val sdk = MockSdk(
+            name,
+            "$mockSdkPath/bin/python${level.toPythonVersion()}",
+            toVersionString(level),
+            roots,
+            sdkType
+        )
 
         // com.jetbrains.python.psi.resolve.PythonSdkPathCache.getInstance() corrupts SDK, so have to clone
         return sdk.clone()
+    }
+
+    private fun toVersionString( level: LanguageLevel) = "Python ${level.toPythonVersion()}"
+
+    private fun createRoots( mockSdkPath: String,  level: LanguageLevel): List<VirtualFile> {
+        val result = ArrayList<VirtualFile>()
+        val localFS = LocalFileSystem.getInstance()
+        ContainerUtil.addIfNotNull(
+            result, localFS.refreshAndFindFileByIoFile(File(mockSdkPath, "Lib"))
+        )
+        ContainerUtil.addIfNotNull(
+            result,
+            localFS.refreshAndFindFileByIoFile(File(mockSdkPath, PythonSdkUtil.SKELETON_DIR_NAME))
+        )
+        ContainerUtil.addIfNotNull(result, PyUserSkeletonsUtil.getUserSkeletonsDirectory())
+        result.addAll(findRootsForLanguageLevel(level))
+        return result
+    }
+
+    private class PyMockSdkType(
+        private val level: LanguageLevel
+    ) : SdkTypeId {
+        override fun getName() =  PyNames.PYTHON_SDK_ID_NAME
+
+        override fun getVersionString(sdk: Sdk) = toVersionString(level)
+
+        override fun saveAdditionalData(currentSdk: SdkAdditionalData, additional: org.jdom.Element) {}
+
+        override fun loadAdditionalData(currentSdk: Sdk, additional: org.jdom.Element): SdkAdditionalData? = null
     }
 }

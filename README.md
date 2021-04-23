@@ -75,11 +75,23 @@ Pull requests are welcome. It is my side project, so I appreciate your help impl
 * Use `*.zip` bundle download from Plugin Manager or built from sources 
 
 **Tests:**
+
+First configure repo with 'snakemake' folder from snakemake sources as test data:
+```shell
+cd ~
+git clone https://github.com/snakemake/snakemake.git
+
+cd ./testData/MockPackages
+ln -s ~/snakemake/snakemake snakemake
+```
+
 Tests are written in [Gherkin](https://cucumber.io/docs/gherkin):
 
 If you get "Unimplemented substep definition" in all `*.feature` files, ensure:
   * Not installed or disabled: `Substeps IntelliJ Plugin` 
   * Plugins installed: `Cucumber Java`, `Gherkin`
+
+Also it is recommended to install `Cucumber+` plugin to get better cucumber features editing/highlighting experience.
   
 **Release plugin:**
 * Fix version in `build.gradle`
