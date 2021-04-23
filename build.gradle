@@ -117,14 +117,17 @@ task buildWrappersBundle() {
     }
 }
 
-// TODO: Uncomment: Reconfigure Teamcity + remove resource/smk-wrapper-storage.cbor from version control
 jar.dependsOn(buildWrappersBundle)
 jar {
-    // :runIde task launches the plugin from *.jar, so it is required also for development
+    // :runIde, :test tasks launches the plugin from *.jar, so it is required also for development
     from { "${project.buildDir}/bundledWrappers/smk-wrapper-storage-bundled.cbor" }
 }
 
 task buildTestWrappersBundle() {
+    // XXX: we could re-use wrappers bundle task for production here and just pass:
+    //  `-PsnakemakeWrappersRepoPath=testData/wrappers_storage' gradle arg
+    // P.S: Wrappers bundle task for production always executed before tests in order to get JAR file
+
     // Builds storage based on test data
     dependsOn  compileKotlin, compileJava
     doLast {
