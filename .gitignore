@@ -132,3 +132,6 @@ hs_err_pid*
 
 # snakemake
 .snakemake
+
+# test data
+testData/MockPackages3/snakemake
