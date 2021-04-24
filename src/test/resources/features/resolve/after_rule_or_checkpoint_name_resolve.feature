@@ -156,6 +156,7 @@ Feature: Resolve for section after rule/checkpoint name e.g. rules.NAME.input
          params: a=""
          priority: 1
          resources: a=""
+         name: "new_rule_name"
          script: ""
          shell: ""
          cache: True
@@ -179,6 +180,7 @@ Feature: Resolve for section after rule/checkpoint name e.g. rules.NAME.input
       | run         |
       | script      |
       | cache       |
+      | name        |
 
   Scenario Outline: Resolve for available sections
     Given a snakemake project
@@ -203,6 +205,7 @@ Feature: Resolve for section after rule/checkpoint name e.g. rules.NAME.input
          params: a=""
          priority: 1
          resources: a=""
+         name: "new_rule_name"
          script: ""
          shell: ""
          run:

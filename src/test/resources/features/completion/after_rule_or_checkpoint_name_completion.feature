@@ -26,6 +26,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
          envmodules: "foo"
          script: ""
          shell: ""
+         name: "new_rule_name"
          run:
 
      <rule_like> ANOTHER_NAME:
@@ -56,6 +57,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
       | cwl         |
       | run         |
       | script      |
+      | name        |
     Examples:
       | rule_like  | injection_left | injection_right |
       | rule       |                |                 |
@@ -119,6 +121,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
       | cwl                  |
       | run                  |
       | script               |
+      | name                 |
     Examples:
       | rule_like  |
       | rule       |

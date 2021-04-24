@@ -17,6 +17,7 @@ Feature: Resolve for section names in rules and checkpoints
          output: ""
          group: ""
          envmodules: ""
+         name: "new_rule_name"
          singularity: ""
          cwl: ""
          log: ""

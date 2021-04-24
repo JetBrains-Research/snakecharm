@@ -121,7 +121,7 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-    fun testRuleUnexpKeyword() {
+    fun testUnexpectedSectionKeyword() {
         doTest()
     }
 
@@ -377,6 +377,11 @@ class SnakemakeParsingTest : ParsingTestCase(
     }
 
     fun testIssue175() {
+        doTest()
+    }
+
+    fun testRuleSectionName() {
+        // issue #351
         doTest()
     }
 

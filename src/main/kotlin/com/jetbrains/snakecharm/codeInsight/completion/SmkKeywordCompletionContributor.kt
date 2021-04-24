@@ -17,10 +17,9 @@ import com.intellij.util.ProcessingContext
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.completion.PythonLookupElement
 import com.jetbrains.python.psi.*
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
-import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_LIKE
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
@@ -160,7 +159,7 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
         context: ProcessingContext,
         result: CompletionResultSet
     ) {
-        (RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS + setOf(SnakemakeNames.SECTION_RUN)).forEach { s ->
+        RULE_OR_CHECKPOINT_SECTION_KEYWORDS.forEach { s ->
 
             result.addElement(
                 SmkCompletionUtil.createPrioritizedLookupElement(

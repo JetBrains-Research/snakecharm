@@ -1,0 +1,75 @@
+SnakemakeFile: UnexpectedSectionKeyword.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('booo')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('''')
+  PsiWhiteSpace('\n\n')
+  SmkCheckPoint
+    PsiElement(Py:CHECKPOINT_KEYWORD)('checkpoint')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('aaa')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('booo')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('''')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('''')
+  PsiWhiteSpace('\n\n')
+  SmkSubworkflow
+    PsiElement(Py:SUBWORKFLOW_KEYWORD)('subworkflow')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkSubworkflowArgsSection
+        PsiElement(Py:IDENTIFIER)('booo')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: 
+            PsiElement(Py:SINGLE_QUOTED_STRING)('''')
+  PsiWhiteSpace('\n\n')
+  PyTypeDeclarationStatement
+    PyTargetExpression: booo
+      PsiElement(Py:IDENTIFIER)('booo')
+    PyAnnotation
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyStringLiteralExpression: 
+        PsiElement(Py:SINGLE_QUOTED_STRING)('''')
+  PsiWhiteSpace('\n')
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyStringLiteralExpression: 
+        PsiElement(Py:SINGLE_QUOTED_STRING)('''')

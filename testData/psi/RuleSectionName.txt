@@ -1,0 +1,163 @@
+SnakemakeFile: RuleSectionName.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('all')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace('\n        ')
+          PyKeywordArgumentImpl: txt
+            PsiElement(Py:IDENTIFIER)('txt')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:EQ)('=')
+            PsiWhiteSpace(' ')
+            PyStringLiteralExpression: out2.txt
+              PsiElement(Py:SINGLE_QUOTED_STRING)(''out2.txt'')
+  PsiWhiteSpace('\n\n')
+  PyAssignmentStatement
+    PyTargetExpression: some_var
+      PsiElement(Py:IDENTIFIER)('some_var')
+    PyAnnotation
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyReferenceExpression: str
+        PsiElement(Py:IDENTIFIER)('str')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:EQ)('=')
+    PsiWhiteSpace(' ')
+    PyStringLiteralExpression: generate_out
+      PsiElement(Py:SINGLE_QUOTED_STRING)(''generate_out'')
+  PsiWhiteSpace('\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('name')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyReferenceExpression: some_var
+            PsiElement(Py:IDENTIFIER)('some_var')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: out1.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''out1.txt'')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: echo {rule} > {output}
+            PsiElement(Py:TRIPLE_QUOTED_STRING)(''''echo {rule} > {output}'''')
+  PsiWhiteSpace('\n\n\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('name1')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('name')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: name2
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"name2"')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyReferenceExpression: output
+            PyReferenceExpression: generate_out
+              PyReferenceExpression: rules
+                PsiElement(Py:IDENTIFIER)('rules')
+              PsiElement(Py:DOT)('.')
+              PsiElement(Py:IDENTIFIER)('generate_out')
+            PsiElement(Py:DOT)('.')
+            PsiElement(Py:IDENTIFIER)('output')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: out2.txt
+            PsiElement(Py:SINGLE_QUOTED_STRING)(''out2.txt'')
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('shell')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: echo {rule} > {output}
+            PsiElement(Py:TRIPLE_QUOTED_STRING)(''''echo {rule} > {output}'''')
+  PsiWhiteSpace('\n\n')
+  PsiComment(Py:END_OF_LINE_COMMENT)('# NameError in ...: name 'not_defined_var' is not defined')
+  PsiWhiteSpace('\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('name')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyReferenceExpression: not_defined_var
+            PsiElement(Py:IDENTIFIER)('not_defined_var')
+  PsiWhiteSpace('\n\n')
+  PsiComment(Py:END_OF_LINE_COMMENT)('# TypeError in ... : attribute name must be string, not 'builtin_function_or_method'')
+  PsiWhiteSpace('\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('name')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyReferenceExpression: print
+            PsiElement(Py:IDENTIFIER)('print')
+  PsiWhiteSpace('\n\n')
+  PsiComment(Py:END_OF_LINE_COMMENT)('# TypeError in ... : attribute name must be string, not 'function'')
+  PsiWhiteSpace('\n')
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('name1')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkRuleOrCheckpointArgsSection
+        PsiElement(Py:IDENTIFIER)('name')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyLambdaExpression
+            PsiElement(Py:LAMBDA_KEYWORD)('lambda')
+            PsiWhiteSpace(' ')
+            PyParameterList
+              PyNamedParameter('x')
+                PsiElement(Py:IDENTIFIER)('x')
+            PsiElement(Py:COLON)(':')
+            PsiWhiteSpace(' ')
+            PyStringLiteralExpression: name2
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"name2"')

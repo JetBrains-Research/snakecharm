@@ -8,8 +8,6 @@ import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_OR_CHECKPOINT
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
@@ -28,7 +26,6 @@ class SmkStatementParsing(
             declaration = RULE_DECLARATION_STATEMENT,
             name = "rule",
             parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
-            parameters = RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS,
             sectionKeyword= SmkTokenTypes.RULE_KEYWORD
     )
 
@@ -36,7 +33,6 @@ class SmkStatementParsing(
             declaration = CHECKPOINT_DECLARATION_STATEMENT,
             name = "checkpoint",
             parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
-            parameters = RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS,
             sectionKeyword= SmkTokenTypes.CHECKPOINT_KEYWORD
     )
 
@@ -44,7 +40,6 @@ class SmkStatementParsing(
             declaration = SUBWORKFLOW_DECLARATION_STATEMENT,
             name = "subworkflow",
             parameterListStatement = SmkElementTypes.SUBWORKFLOW_ARGS_SECTION_STATEMENT,
-            parameters = SUBWORKFLOW_SECTIONS_KEYWORDS,
             sectionKeyword= SmkTokenTypes.SUBWORKFLOW_KEYWORD
     )
 
@@ -73,6 +68,8 @@ class SmkStatementParsing(
         val tt = myBuilder.tokenType
 
         if (tt !in SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
+            // XXX: maybe also allow: `some_new_section: ` case, i.e. indentifier with following ':' in order
+            // to support any section here
             super.parseStatement()
             return
         }
@@ -254,15 +251,6 @@ class SmkStatementParsing(
         var result = false
 
         when {
-            keyword in section.parameters -> {
-                // TODO: probably do this parsing behaviour by default and show inspection error
-                // for keyword not in `section.parameters` instead of parsing errors..
-                result = parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
-                ruleParam.done(section.parameterListStatement)
-                if (result) {
-                    nextToken()
-                }
-            }
             section.sectionKeyword in RULE_OR_CHECKPOINT && keyword == SnakemakeNames.SECTION_RUN -> {
                 val scope = myContext.scope as SmkParsingScope
                 myContext.pushScope(scope.withPythonicSection())
@@ -272,12 +260,13 @@ class SmkStatementParsing(
                 myContext.popScope()
             }
             else -> {
-                // error
-                myBuilder.error("Unexpected ${section.name} parameter '$keyword'") // bundle
-
-                //TODO advance until eof or STATEMENT_END?
-                // checkEndOfStatement()
-                ruleParam.drop()
+                // Snakemeake often adds new sections => let's by default allow all here +
+                //  show inspection error for keyword not in `section.parameters` instead of parsing errors..
+                result = parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
+                ruleParam.done(section.parameterListStatement)
+                if (result) {
+                    nextToken()
+                }
             }
         }
 
@@ -308,6 +297,5 @@ private data class SectionParsingData(
         val declaration: IElementType,
         val name: String,
         val parameterListStatement: PyElementType,
-        val parameters: Set<String>,
         val sectionKeyword: PyElementType
 )

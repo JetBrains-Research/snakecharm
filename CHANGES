@@ -8,11 +8,17 @@ Version 0.10.0 build #0.10.0.xxx
 Released on ...
 
 Features:
-- Snakemake Support Settings page (see #346)
 - Bundled meta-data for snakemake-wrappers 0.73.0 code insight features
+- Snakemake wrappers resolve/completion (see #18)
+- Snakemake Support Settings page (see #346)
+- Support `name:` section argument syntax (see #351)
+- Support any section names syntax in rules, checkpoints, subworkflows (see #334)
 
 Fixed:
 - Inspection marks 'rules.' as unresolved in snakemake >= 6.1 (see #352)
+
+Inspections:
+- Weak warning about sections which are not recognized by SnakeCharm (see #334)
 
 Version 0.9.0 build #0.9.0.387
 -------------

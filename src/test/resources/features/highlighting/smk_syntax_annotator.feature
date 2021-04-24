@@ -43,10 +43,13 @@ Feature: Annotate additional syntax
     """
     When I check highlighting infos
     Examples:
-      | rule_like   | section   | text       | highlighting |
-      | rule        | input     | "file.txt" | PY.DECORATOR |
-      | checkpoint  | input     | "file.txt" | PY.DECORATOR |
-      | subworkflow | snakefile | "file.txt" | PY.DECORATOR |
+      | rule_like   | section                  | text       | highlighting |
+      | rule        | input                    | "file.txt" | PY.DECORATOR |
+      | rule        | new_unrecognized_section | "file.txt" | PY.DECORATOR |
+      | checkpoint  | input                    | "file.txt" | PY.DECORATOR |
+      | checkpoint  | new_unrecognized_section | "file.txt" | PY.DECORATOR |
+      | subworkflow | snakefile                | "file.txt" | PY.DECORATOR |
+      | subworkflow | new_unrecognized_section | "file.txt" | PY.DECORATOR |
 
   Scenario Outline: Annotate Rules and Checkpoints
     Given a snakemake project
@@ -92,6 +95,7 @@ Feature: Annotate additional syntax
       | rule       | shell                | ""         | PY.DECORATOR             |
       | rule       | run                  | ""         | PY.PREDEFINED_DEFINITION |
       | rule       | wrapper              | ""         | PY.DECORATOR             |
+      | rule       | name                 | ""         | PY.DECORATOR             |
       | checkpoint | output               | "file.txt" | PY.DECORATOR             |
       | checkpoint | run                  | ""         | PY.PREDEFINED_DEFINITION |
 

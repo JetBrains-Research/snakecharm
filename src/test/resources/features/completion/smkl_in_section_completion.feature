@@ -72,6 +72,7 @@ Feature: Completion for sections/variables in SmkSL injections
          singularity: ""
          cwl: ""
          priority: 1
+         name: "new_rule_name"
          script: ""
          shell: "{}"
          run: shell("{}")
@@ -94,6 +95,7 @@ Feature: Completion for sections/variables in SmkSL injections
       | run                  |
       | script               |
       | cache                |
+      | name                 |
     Examples:
       | rule_like  | signature     |
       | rule       | shell: "{     |

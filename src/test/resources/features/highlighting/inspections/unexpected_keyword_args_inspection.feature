@@ -43,6 +43,7 @@ Feature: Inspection for unexpected keyword arguments in section
       | rule       | envmodules  |
       | rule       | singularity |
       | rule       | threads     |
+      | rule       | name        |
       | checkpoint | message     |
       | checkpoint | notebook    |
       | checkpoint | priority    |

@@ -11,6 +11,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_GROUP
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_LOG
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_MESSAGE
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_NAME
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_NOTEBOOK
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_PARAMS
@@ -98,8 +99,10 @@ object SnakemakeAPI {
             SECTION_SCRIPT, SECTION_WRAPPER, SECTION_CWL, SECTION_NOTEBOOK,
             SECTION_CACHE,
             SECTION_CONTAINER,
-            SECTION_ENVMODULES
+            SECTION_ENVMODULES,
+            SECTION_NAME
     )
+    val RULE_OR_CHECKPOINT_SECTION_KEYWORDS = (RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS + setOf(SnakemakeNames.SECTION_RUN))
 
     /**
      * For subworkflows parsing
@@ -207,7 +210,7 @@ object SnakemakeAPI {
     val SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED = setOf(
             SECTION_BENCHMARK, SECTION_VERSION, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS, SECTION_SINGULARITY,
             SECTION_PRIORITY, SECTION_GROUP, SECTION_SHADOW, SECTION_CONDA, SECTION_SCRIPT, SECTION_WRAPPER,
-            SECTION_CWL, SECTION_NOTEBOOK, SECTION_CACHE, SECTION_CONTAINER, SECTION_ENVMODULES
+            SECTION_CWL, SECTION_NOTEBOOK, SECTION_CACHE, SECTION_CONTAINER, SECTION_ENVMODULES, SECTION_NAME
     )
 
     val IO_FLAG_2_SUPPORTED_SECTION: HashMap<String, List<String>> = hashMapOf(

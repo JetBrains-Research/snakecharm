@@ -212,6 +212,17 @@
     />
 
     <localInspection
+        language="Snakemake" shortName="SmkUnrecognizedSectionInspection"
+        enabledByDefault="true"
+        level="WEAK WARNING"
+        suppressId="SmkUnrecognizedSection"
+        bundle="SnakemakeBundle"
+        groupKey="INSP.GROUP.snakemake"
+        key="INSP.NAME.section.unrecognized"
+        implementationClass="com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection"
+    />
+
+    <localInspection
             language="Snakemake" shortName="SmkRuleSectionAfterExecutionInspection"
             enabledByDefault="true"
             level="ERROR"

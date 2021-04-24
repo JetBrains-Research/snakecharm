@@ -219,8 +219,8 @@ Feature: Completion for snakemake keyword-like things
       | checkpoint | ve   | version    |
       | rule       | cac  | cache      |
       | checkpoint | cac  | cache      |
-      | rule       | me   | message    |
-      | checkpoint | me   | message    |
+      | rule       | mes  | message    |
+      | checkpoint | mes  | message    |
       | rule       | pr   | priority   |
       | checkpoint | pr   | priority   |
       | rule       | gr   | group      |
@@ -235,6 +235,8 @@ Feature: Completion for snakemake keyword-like things
       | checkpoint | run  | run        |
       | rule       | wr   | wrapper    |
       | checkpoint | wr   | wrapper    |
+      | rule       | na   | name       |
+      | checkpoint | na   | name       |
 
   Scenario Outline: Complete at rule/checkpoint level
     Given a snakemake project

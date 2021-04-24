@@ -15,6 +15,7 @@ Feature: Completion for wildcards
       envmodules: "{non-wildcard8}"
       input: "{}"
       message: "{non-wildcard1}"
+      name: "{non-wildcard9}"
       cwl: "{non-wildcard2}"
       script: "{non-wildcard3}"
       shell: "{non-wildcard4}"
@@ -37,6 +38,7 @@ Feature: Completion for wildcards
       | non-wildcard3 |
       | non-wildcard4 |
       | non-wildcard8 |
+      | non-wildcard9 |
     Examples:
       | rule_like  |
       | rule       |

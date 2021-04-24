@@ -179,6 +179,7 @@ object SmkWrapperCrawler {
     private fun toParamsMapping(sectionAndArgPairs: List<Pair<String, String>>): Map<String, List<String>> {
         val map = HashMap<String, ArrayList<String>>()
         sectionAndArgPairs
+             // TODO: parse all sections here
             .filter { (section, _) -> section in SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS }
             .forEach { (section, arg) ->
                 map.putIfAbsent(section, arrayListOf())

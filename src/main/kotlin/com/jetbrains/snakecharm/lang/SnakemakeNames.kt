@@ -55,6 +55,7 @@ object SnakemakeNames {
     const val SECTION_CONTAINER = "container"
     const val SECTION_NOTEBOOK = "notebook"
     const val SECTION_ENVMODULES = "envmodules" // >= 5.9
+    const val SECTION_NAME = "name" // >= 5.31
 
     const val RUN_SECTION_VARIABLE_RULE = "rule"
     const val RUN_SECTION_VARIABLE_JOBID = "jobid"
