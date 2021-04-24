@@ -39,13 +39,15 @@ Feature: Inspection for missed wrapper arguments
     """
     When I check highlighting weak warnings ignoring extra highlighting
     Examples:
-      | rule_like  | section | wrapper                  | arguments          |
-      | rule       | input   | bio/fastp                | sample             |
-      | rule       | output  | bio/arriba               | fusions, discarded |
-      | rule       | params  | bio/gatk3/printreads     | extra, java_opts   |
-      | checkpoint | input   | bio/bedtools/coveragebed | a, b               |
-      | checkpoint | input   | bio/pear                 | read1, read2       |
-      | checkpoint | input   | bio/samtools/depth       | bams, bed          |
+      | rule_like  | section | wrapper                  | arguments                                |
+      | rule       | input   | bio/fastp                | sample                                   |
+      | rule       | output  | bio/arriba               | discarded, fusions                       |
+      | rule       | input   | bio/arriba               | annotation, bam                          |
+      | rule       | params  | bio/arriba               | blacklist, extra, known_fusions, sv_file |
+      | rule       | params  | bio/gatk3/printreads     | extra, java_opts                         |
+      | checkpoint | input   | bio/bedtools/coveragebed | a, b                                     |
+      | checkpoint | input   | bio/pear                 | read1, read2                             |
+      | checkpoint | input   | bio/samtools/depth       | bams, bed                                |
 
   Scenario Outline: Missed section without arguments for bundled wrappers
     Given a snakemake project

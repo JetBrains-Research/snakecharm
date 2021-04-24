@@ -8,10 +8,14 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.encodeToByteArray
+import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.nio.file.Paths
 
 object SmkWrapperCrawler {
+    private val VERBOSE = false
+    private val YAML_WRAPPER_DETAILS_KEYS = listOf("name", "description", "authors")
+
     @ExperimentalSerializationApi
     @JvmStatic
     fun main(args: Array<String>) {
@@ -110,54 +114,112 @@ object SmkWrapperCrawler {
                 }
 
                 val path = wrapperFile.parentFile.toRelativeString(mainFolder)
-
-                val args = when (wrapperFile.extension.toLowerCase()) {
-                    "py" -> parseArgsPython(wrapperFile.readText())
-                    "r" -> parseArgsR(wrapperFile.readText())
-                    else -> emptyMap()
+                if (VERBOSE) {
+                    println("Parsing: $path")
                 }
 
-
-                val description = metaYaml.readText()
+                val wrapperFileExt = wrapperFile.extension
+                val wrapperFileContent = wrapperFile.readText()
+                val metaYamlContent = metaYaml.readText()
 
                 wrappers.add(
-                    SmkWrapperStorage.WrapperInfo(
-                        path = FileUtil.toSystemIndependentName(path),
-                        args = args,
-                        description = description
-                    )
+                    collectWrapperInfo(path, wrapperFileContent, wrapperFileExt, metaYamlContent)
                 )
             }
 
         return wrappers.toList()
     }
 
-    fun parseArgsPython(text: String): Map<String, List<String>> {
-        val sectionAndArgPairs = Regex("(?<!from\\s|import\\s)snakemake\\.\\w*(\\.(get\\(\"\\w*\"|[^get]\\w*)|\\[\\d+\\])?")
-            .findAll(text).map { str ->
-                str.value
-                    .substringAfter("snakemake.")
+    fun collectWrapperInfo(
+        wrapperFullName: String,
+        wrapperFileContent: String,
+        wrapperFileExt: String,
+        metaYamlContent: String
+    ): SmkWrapperStorage.WrapperInfo {
+        val wrapperArgs: List<Pair<String, String>> = when (wrapperFileExt.toLowerCase()) {
+            "py" -> parseArgsPython(wrapperFileContent)
+            "r" -> parseArgsR(wrapperFileContent)
+            else -> emptyList()
+        }
+
+        val yamlArgs = parseYamlDescription(metaYamlContent)
+
+        return SmkWrapperStorage.WrapperInfo(
+            path = FileUtil.toSystemIndependentName(wrapperFullName),
+            args = toParamsMapping(wrapperArgs + yamlArgs),
+            description = metaYamlContent
+        )
+    }
+
+    private fun parseYamlDescription(
+        metaYamlContent: String,
+    ): List<Pair<String, String>> {
+        val sectAndArgsList = ArrayList<Pair<String, String>>()
+        val metYamlData = Yaml().load<Any>(metaYamlContent)
+        if (metYamlData is Map<*, *>) {
+            if (VERBOSE) {
+                println("     -> ${metYamlData.keys}")
+//                println("     input -> ${metYamlData.getOrDefault("input", "N/A")}")
+//                println("     output -> ${metYamlData.getOrDefault("output", "N/A")}")
+//                println("     params -> ${metYamlData.getOrDefault("params", "N/A")}")
             }
-            .toSortedSet()
-            .toList()
-            .map {
-                val chunks = it.split('.', ignoreCase = false, limit = 2)
-                when {
-                    chunks.size < 2 -> {
-                        chunks[0].substringBefore('[') to ""
-                    }
-                    chunks[1].startsWith("get") -> {
-                        chunks[0] to chunks[1].removeSurrounding("get(\"", "\"")
-                    }
-                    else -> {
-                        chunks[0] to chunks[1]
+
+            metYamlData.forEach { (sectionName, sectionContent) ->
+                val s = "$sectionName"
+                if (s !in YAML_WRAPPER_DETAILS_KEYS) {
+
+                    // register that have section:
+                    sectAndArgsList.add(s to "")
+
+                    // register args:
+                    if (sectionContent is List<*>) {
+                        sectionContent.forEach { item ->
+                            if (item is Map<*, *>) {
+                                if (VERBOSE) {
+                                    println("     $s -> ${item.keys}")
+                                }
+                                item.keys.forEach { sectAndArgsList.add(s to "$it") }
+                            }
+                        }
+                    } else if (sectionContent is Map<*, *>) {
+                        if (VERBOSE) {
+                            println("     $s -> ${sectionContent.keys}")
+                        }
+                        sectionContent.keys.forEach { sectAndArgsList.add(s to "$it") }
                     }
                 }
             }
-        return toParamsMapping(sectionAndArgPairs)
+        }
+        return sectAndArgsList
     }
 
-    fun parseArgsR(text: String): Map<String, List<String>> {
+    fun parseArgsPython(text: String): List<Pair<String, String>> {
+        val sectionAndArgPairs =
+            Regex("(?<!from\\s|import\\s)snakemake\\.\\w*(\\.(get\\(\"\\w*\"|[^get]\\w*)|\\[\\d+\\])?")
+                .findAll(text).map { str ->
+                    str.value
+                        .substringAfter("snakemake.")
+                }
+                .toSortedSet()
+                .toList()
+                .map {
+                    val chunks = it.split('.', ignoreCase = false, limit = 2)
+                    when {
+                        chunks.size < 2 -> {
+                            chunks[0].substringBefore('[') to ""
+                        }
+                        chunks[1].startsWith("get") -> {
+                            chunks[0] to chunks[1].removeSurrounding("get(\"", "\"")
+                        }
+                        else -> {
+                            chunks[0] to chunks[1]
+                        }
+                    }
+                }
+        return sectionAndArgPairs
+    }
+
+    fun parseArgsR(text: String): List<Pair<String, String>> {
         val sectionAndArgPairs = Regex("(?<!from\\s)snakemake@\\w*(\\[\\[\"\\w*\"\\]\\])?")
             .findAll(text).map { str ->
                 str.value
@@ -173,20 +235,22 @@ object SmkWrapperCrawler {
                     chunks[0] to ""
                 }
             }
-        return toParamsMapping(sectionAndArgPairs)
+        return sectionAndArgPairs
     }
 
     private fun toParamsMapping(sectionAndArgPairs: List<Pair<String, String>>): Map<String, List<String>> {
         val map = HashMap<String, ArrayList<String>>()
         sectionAndArgPairs
-             // TODO: parse all sections here
+            // TODO: parse all sections here or not?
             .filter { (section, _) -> section in SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS }
             .forEach { (section, arg) ->
-                map.putIfAbsent(section, arrayListOf())
-                if (arg.isNotEmpty()) {
+                val sectionKeywords = map.getOrPut(section) { arrayListOf() }
+                if (arg.isNotEmpty() && arg !in sectionKeywords) {
                     map[section]!!.add(arg)
                 }
             }
-        return map
+        val sortedMap = HashMap<String, ArrayList<String>>()
+        map.forEach { (k, v) -> sortedMap[k] = ArrayList(v.sorted()) }
+        return sortedMap
     }
 }

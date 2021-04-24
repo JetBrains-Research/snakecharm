@@ -10,6 +10,7 @@ import com.intellij.util.ProcessingContext
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyExpression
+import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.completion.SmkKeywordCompletionContributor
@@ -46,23 +47,32 @@ object SmkWrapperArgsCompletionProvider : CompletionProvider<CompletionParameter
         }
 
         val containingRuleLike = containingSection.parentOfTypes(SmkRuleOrCheckpoint::class)
-        val wrapper = containingRuleLike?.getSectionByName(SnakemakeNames.SECTION_WRAPPER) ?: return
+        val sectionKeyword = containingSection.sectionKeyword ?: return
+
+        val wrapperSection = containingRuleLike?.getSectionByName(SnakemakeNames.SECTION_WRAPPER) ?: return
 
         val wrappers = SmkWrapperStorage.getInstance(parameters.position.project)?.wrappers ?: return
 
-        val storage = wrappers.find { wrapper.argumentList!!.text.contains(it.path) } ?: return
-        val sectionKeyword = containingSection.sectionKeyword ?: return
-
-        if (sectionKeyword in storage.args.keys) {
-            storage.args[sectionKeyword]?.forEach {
-                result.addElement(
-                    SmkCompletionUtil.createPrioritizedLookupElement(
-                        it,
-                        null,
-                        typeText = SnakemakeBundle.message("TYPES.rule.section.arg.type.text"),
-                        priority = SmkCompletionUtil.SECTIONS_ARGS_PRIORITY
+        val wrapperFstArg = wrapperSection.argumentList?.arguments?.firstOrNull()
+        if (wrapperFstArg !is PyStringLiteralExpression) {
+            return
+        }
+        val wrapperNameText = wrapperFstArg.stringValue
+        val matchingWrappers = wrappers.filter { wrapperNameText.endsWith(it.path) }
+        require(matchingWrappers.size <= 1)
+        if (matchingWrappers.size == 1) {
+            val wrapperInfo = matchingWrappers.first()
+            if (sectionKeyword in wrapperInfo.args.keys) {
+                wrapperInfo.args[sectionKeyword]?.forEach {
+                    result.addElement(
+                        SmkCompletionUtil.createPrioritizedLookupElement(
+                            it,
+                            null,
+                            typeText = SnakemakeBundle.message("TYPES.rule.section.arg.type.text"),
+                            priority = SmkCompletionUtil.SECTIONS_ARGS_PRIORITY
+                        )
                     )
-                )
+                }
             }
         }
     }

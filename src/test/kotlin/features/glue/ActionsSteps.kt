@@ -11,6 +11,7 @@ import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.CaretModel
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.text.StringUtil
@@ -29,6 +30,7 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import org.junit.Assert
 import java.io.File.separator
 import java.util.regex.Pattern
 import kotlin.test.*
@@ -451,21 +453,30 @@ class ActionsSteps {
         }
     }
 
-    @When("^I check wrapper args parsing for \"(.+)\" resulting in \"(.+)\" with text$")
-    fun checkWrapperArgsParsing(language: String, filename: String, text :String) {
-        ApplicationManager.getApplication().invokeAndWait {
-            val args = when (language) {
-                "Python" -> SmkWrapperCrawler.parseArgsPython(text)
-                "R" -> SmkWrapperCrawler.parseArgsR(text)
-                else -> return@invokeAndWait
-            }
+    @When("^Parse wrapper args for \"meta.yaml\" and \"wrapper.(py|r)\" result is:$")
+    fun checkWrapperArgsParsing(ext: String, text :String) {
+        ApplicationManager.getApplication().invokeAndWait() {
+            val fixture = fixture()
+
+            val wrapperFileContent = fixture.findFileInTempDir("wrapper.$ext")?.let {
+                FileDocumentManager.getInstance().getDocument(it)!!.text
+            } ?: ""
+
+            val metaYamlContent = fixture.findFileInTempDir("meta.yaml")?.let {
+                FileDocumentManager.getInstance().getDocument(it)!!.text
+            } ?: ""
+
+            val info = SmkWrapperCrawler.collectWrapperInfo(
+                "wrapper", wrapperFileContent, ext, metaYamlContent
+            )
+
+            val args = info.args
             val mapped = args.keys.sorted().map { key ->
                 val values = args[key]!!
-                "$key:${values.joinToString(", ", prefix = "[", postfix = "]"){ "'$it'" }}"
-            }
-            performAction(fixture().project) {
-                FilesSteps().aFileWithText(filename, mapped.joinToString("\n") )
-            }
+                "$key:${values.joinToString(", ", prefix = "(", postfix = ")") { "'$it'" }}"
+            }.joinToString(separator="\n")
+
+            Assert.assertEquals(StringUtil.convertLineSeparators(text.trim()), mapped.trim())
         }
     }
 

@@ -3,13 +3,29 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
-Version 0.10.0 build #0.10.0.xxx
+Version 0.11.0 build #0.11.0.xxx
 -------------
 Released on ...
 
 Features:
-- Bundled meta-data for snakemake-wrappers 0.73.0 code insight features
+
+Version 0.11.0 build #0.11.0.xxx
+-------------
+Released on April 24th 2021
+
+NB: Now Snakemake support is enabled only if Snakemake framework support is selected in
+* PyCharm: `Settings | Languages & Frameworks | Snakemake | Enable Snakemake Support`
+* IDEA: Add `Snakemake` facet
+
+It is possible to use different Python Interpreters for your project and for Snakemake features.
+E.g. you could have a conda environment with all packages required for scripts used in rules, but
+without snakemake module itself.
+
+Features:
+- Support PyCharm 2021.1 build (see #350)
+- Bundled meta-data for snakemake-wrappers (repo version: 0.73.0)
 - Snakemake wrappers resolve/completion (see #18)
+- Wrapper params are taken from 'meta.yaml', 'wrappers.py', 'wrappers.r' (see #324)
 - Snakemake Support Settings page (see #346)
 - Support `name:` section argument syntax (see #351)
 - Support any section names syntax in rules, checkpoints, subworkflows (see #334)
