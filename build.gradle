@@ -8,13 +8,13 @@ plugins {
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
     // See https://github.com/JetBrains/gradle-intellij-plugin
-    id 'org.jetbrains.intellij' version '0.6.5'
+    id 'org.jetbrains.intellij' version '0.7.3'
 
     // Kotlin
-    id "org.jetbrains.kotlin.jvm" version "1.4.21"
+    id "org.jetbrains.kotlin.jvm" version "1.4.32"
 
     // Serialization
-    id 'org.jetbrains.kotlin.plugin.serialization' version "1.4.21"
+    id 'org.jetbrains.kotlin.plugin.serialization' version "1.4.32"
 
     id 'java'
 }
@@ -42,7 +42,7 @@ intellij {
     }
 
     sandboxDirectory "${project.rootDir}/.sandbox${isPyCharm ? "_pycharm" : "" }"
-    // ideaDependencyCachePath  "${project.rootDir}/.idea_distrib_cache"  // Useful for Windows due to short cmdline path
+    ideaDependencyCachePath  "${project.rootDir}/.idea_distrib_cache"  // Useful for Windows due to short cmdline path
     updateSinceUntilBuild false
     instrumentCode Boolean.valueOf(instrumentPluginCode)
     downloadSources Boolean.valueOf(downloadIdeSources)
@@ -80,6 +80,8 @@ repositories {
 dependencies {
     testImplementation 'io.cucumber:cucumber-java:6.8.1'
     testImplementation 'io.cucumber:cucumber-junit:6.8.1'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
+    testImplementation 'org.jetbrains.kotlin:kotlin-reflect'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.0.1'
 }
