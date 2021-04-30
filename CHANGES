@@ -3,13 +3,13 @@ SnakeCharm Changelog
 
 Here you can see the full list of changes between each big release.
 
-Version 0.11.0 build #0.11.0.xxx
+Version 0.11.1 build #0.11.0.xxx
 -------------
 Released on ...
 
 Features:
 
-Version 0.11.0 build #0.11.0.xxx
+Version 0.11.0 build #0.11.0.411
 -------------
 Released on April 24th 2021
 
@@ -23,12 +23,14 @@ without snakemake module itself.
 
 Features:
 - Support PyCharm 2021.1 build (see #350)
-- Bundled meta-data for snakemake-wrappers (repo version: 0.73.0)
-- Snakemake wrappers resolve/completion (see #18)
-- Wrapper params are taken from 'meta.yaml', 'wrappers.py', 'wrappers.r' (see #324)
 - Snakemake Support Settings page (see #346)
-- Support `name:` section argument syntax (see #351)
 - Support any section names syntax in rules, checkpoints, subworkflows (see #334)
+- Support `name:` section argument syntax (see #351)
+- Experimental wrappers smart features (thanks to @SimonTsirikov for help):
+    - Bundled meta-data for snakemake-wrappers (repo version: 0.73.0)
+    - Snakemake wrappers names resolve/completion (see #18)
+    - Rule section keyword arguments completion based on wrappers info (see #18)
+    - Wrapper params are taken from 'wrappers.py', 'wrappers.r', 'meta.yaml' (see #324)
 
 Fixed:
 - Inspection marks 'rules.' as unresolved in snakemake >= 6.1 (see #352)
