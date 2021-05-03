@@ -14,7 +14,7 @@ Version 2021.2.0 build #2021.2.0.414
 Released on May 3th 2021
 
 Features:
-* Compatible with PyCharm 2021.1.1 - 2021.2 EAPs, DataSpell EAPs
+* Compatible with [PyCharm](https://www.jetbrains.com/pycharm/) 2021.1.1 - 2021.2 EAPs, [DataSpell](https://www.jetbrains.com/dataspell/) EAPs
 
 Version number now represents target PyCharm/DataSpell/IntelliJ platform major version for `2021.2.0.414`:
 * `2021.2`  - intellij platform version
