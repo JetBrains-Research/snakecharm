@@ -6,49 +6,8 @@
         JetBrains Research
     </vendor>
 
-    <change-notes><![CDATA[
-         See changes at <a href="https://github.com/JetBrains-Research/snakecharm/releases">GitHub Releases Page</a>
-    ]]></change-notes>
-
-    <description><![CDATA[
-    <br>
-    This plugin adds syntax highlighting and code insight support for python-based language used in
-    <a href="https://snakemake.readthedocs.io/en/stable/">Snakemake</a> workflow management system. Bioinformaticians widely use
-     Snakemake to create reproducible and scalable data analyses pipelines for their research.
-    <br>
-    <br>
-    Main features are:
-    <ul>
-        <li>Snakemake syntax highlighting: both python and snakemake specifix syntax.</li>
-        <li>Syntax highlighting for snakemake string format language.</li>
-        <li>Special highlighting for rule wildcards.</li>
-        <li>Code completion and goto to declaration for:
-            <ul>
-                <li>Snakemake specific methods and variables (e.g. config, rules, expand(), etc);</li>
-                <li>Rules names, rules sections and section arguments;</li>
-                <li>Wildcard names;</li>
-                <li>Python methods and variables.</li>
-                <li>Paths in sections: configfile, workdir, conda, include</li>
-            </ul>
-        </li>
-        <li>Open rule declaration by name using 'Navigate|Symbol...'</li>
-        <li>Structure view for Snakemake files</li>
-        <li>Inspections for undeclared wildcards usage.</li>
-        <li>Multiple inspections for different possibles bugs in the pipeline.</li>
-    </ul>
-    <br>
-    Please report features suggestions or found bugs to project <a href="https://github.com/JetBrains-Research/snakecharm/issues">issue tracker</a><br>
-    <br>
-    Useful links: <ul>
-        <li><a href="https://research.jetbrains.org/groups/biolabs/projects?project_id=57">Project Home Page</a><br></li>
-        <li><a href="https://github.com/JetBrains-Research/snakecharm/blob/master/CHANGES">Changelog</a><br></li>
-        <li><a href="https://github.com/JetBrains-Research/snakecharm">SnakeCharm at GitHub</a><br></li>
-        <li><a href="https://plugins.jetbrains.com/plugin/11947-snakecharm">SnakeCharm in JetBrains Plugin Repository</a><br></li>
-    </ul>
-    ]]></description>
-
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-       on how to target different products -->
+  <!-- Product and plugin compatibility requirements -->
+  <!-- https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
 
   <!-- PyCharm / Python plugin dependency -->
   <depends>com.intellij.modules.lang</depends>
@@ -57,7 +16,7 @@
   <applicationListeners>
     <listener class="com.jetbrains.snakecharm.SnakemakePluginListener" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
   </applicationListeners>
-  
+
   <extensions defaultExtensionNs="com.intellij">
     <fileType
                 name="Snakemake"
@@ -351,7 +310,7 @@
             key="INSP.NAME.section.unexpected.callable.args"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkSectionUnexpectedCallableArgsInspection"
      />
-    
+
     <localInspection
             language="Snakemake" shortName="SmkSectionUnexpectedKeywordArgsInspection"
             enabledByDefault="true"

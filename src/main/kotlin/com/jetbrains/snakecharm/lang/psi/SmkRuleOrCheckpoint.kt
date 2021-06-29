@@ -19,5 +19,5 @@ interface SmkRuleOrCheckpoint : SmkRuleLike<SmkRuleOrCheckpointArgsSection>,
         statementList.statements
                 .filterIsInstance<SmkRuleOrCheckpointArgsSection>()
                 .filter { it.isWildcardsDefiningSection() }
-                .minBy { WILDCARDS_DEFINING_SECTIONS_KEYWORDS.indexOf(it.sectionKeyword) }
+                .minByOrNull { WILDCARDS_DEFINING_SECTIONS_KEYWORDS.indexOf(it.sectionKeyword) }
 }

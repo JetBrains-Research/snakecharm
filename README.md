@@ -4,11 +4,32 @@ Tests Linux [![tests](http://teamcity.jetbrains.com/app/rest/builds/buildType:(i
 Tests Windows [![tests](http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:SnakeCharmPlugin_TestsWindows)/statusIcon.svg)](http://teamcity.jetbrains.com/viewType.html?buildTypeId=SnakeCharmPlugin_TestsWindows&guest=1)
 
 # About
-
-**SnakeCharm** is a plugin for [PyCharm](https://www.jetbrains.com/pycharm/) / [IntelliJ Platform IDEs](https://www.jetbrains.com/products.html?fromMenu#type=ide) which adds support for [Snakemake](https://snakemake.readthedocs.io/en/stable/) workflows language. The plugin is developed by JetBrains Research Team, for more details see [project home page](https://research.jetbrains.org/groups/biolabs/projects?project_id=57).
-
+<!-- Plugin description -->
+**SnakeCharm** plugin for [PyCharm](https://www.jetbrains.com/pycharm/) / [IntelliJ Platform IDEs](https://www.jetbrains.com/products.html?fromMenu#type=ide) adds IDE support for [Snakemake](https://snakemake.readthedocs.io/en/stable/) workflows language, that is widely used in Bioinformatics. The plugin is developed by JetBrains Research Team, for more details see [project home page](https://research.jetbrains.org/groups/biolabs/projects?project_id=57).
 
 Please report features suggestions or found bugs to project [issue tracker](https://github.com/JetBrains-Research/snakecharm/issues).
+
+**Features highlights:**
+* Snakemake syntax highlighting: both python and snakemake specifix syntax.
+* Syntax highlighting for snakemake string format language.
+* Special highlighting for rule wildcards.
+* Code completion and goto to declaration for:
+  * Snakemake specific methods and variables (e.g. config, rules, expand(), etc);
+  * Rules names, rules sections and section arguments;
+  * Wildcard names;
+  * Python methods and variables;
+  * Paths in sections: configfile, workdir, conda, include.
+* Open rule declaration by name using 'Navigate|Symbol...'
+* Structure view for Snakemake files
+* Inspections for undeclared wildcards usage.
+* Multiple inspections for different possibles bugs in the pipeline. 
+  
+**Useful links:**
+* [Project Home Page](https://research.jetbrains.org/groups/biolabs/projects?project_id=57)
+* [Full Changelog](https://github.com/JetBrains-Research/snakecharm/blob/master/CHANGELOG.md)
+* [SnakeCharm at GitHub](https://github.com/JetBrains-Research/snakecharm)           
+* [SnakeCharm in JetBrains Plugin Repository](https://plugins.jetbrains.com/plugin/11947-snakecharm)
+<!-- Plugin description end -->
 
 # Features
 
