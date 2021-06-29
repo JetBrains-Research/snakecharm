@@ -4,7 +4,6 @@ import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProgressIndicator
@@ -19,6 +18,7 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.util.QualifiedName
+import com.intellij.util.SlowOperations
 import com.jetbrains.extensions.python.inherits
 import com.jetbrains.python.packaging.PyPackageManager
 import com.jetbrains.python.packaging.pyRequirement
@@ -51,8 +51,7 @@ class ImplicitPySymbolsProvider(
     fun initOnStartup() {
         LOG.debug("Init: $project")
         subscribeOnEvents()
-
-        onChange(true)
+        scheduleUpdate()
     }
 
     fun scheduleUpdate() {
@@ -74,107 +73,121 @@ class ImplicitPySymbolsProvider(
         }
 
         val project = project
+
         DumbService.getInstance(project).runWhenSmart {
-            runReadAction {
-                if (project.isDisposed) {
-                    return@runReadAction
-                }
+            SlowOperations.allowSlowOperations<Throwable> { doRefreshCache(project, sdk, forceClear, null) }
+        }
+    }
 
-                /**
-                 * TODO 1:
-                 *      Runtime uses Workflow().self.globals from snakemake/workflow.py
-                 *      so let's parse 'includes' and globals instead of hardcoded includes
-                 **/
+    private fun doRefreshCache(
+        project: Project,
+        sdk: Sdk,
+        forceClear: Boolean,
+        progressIndicator: ProgressIndicator?
+    ) {
+        if (project.isDisposed) {
+            return
+        }
 
-                /**
-                 * TODO 2:
-                 *      At the moment we recalculate cache on events, but replace only if smth change.
-                 *      Maybe we could recalculate cache less often
-                 **/
-                val usedFiles = mutableSetOf<VirtualFile>()
+        /**
+         * TODO 1:
+         *      Runtime uses Workflow().self.globals from snakemake/workflow.py
+         *      so let's parse 'includes' and globals instead of hardcoded includes
+         **/
 
-                val elementsCache = ArrayList<ImplicitPySymbol>()
-                val syntheticElementsCache = ArrayList<Pair<SmkCodeInsightScope, LookupElement>>()
+        /**
+         * TODO 2:
+         *      At the moment we recalculate cache on events, but replace only if smth change.
+         *      Maybe we could recalculate cache less often
+         **/
+        val usedFiles = mutableSetOf<VirtualFile>()
 
-                ///////////////////////////////////////
-                // E.g. rules, config, ... defined in Workflow code as global variables
+        val elementsCache = ArrayList<ImplicitPySymbol>()
+        val syntheticElementsCache = ArrayList<Pair<SmkCodeInsightScope, LookupElement>>()
 
-                if (isSmkVersLT_6_1(usedFiles, sdk)) {
-                    // legacy globals API in workflow, used before 6.1
-                    collectWorkflowGlobalVariables(usedFiles, sdk, elementsCache)
-                } else {
-                    addWorkflowGlobalVariables(usedFiles, sdk, syntheticElementsCache)
-                }
+        ///////////////////////////////////////
+        // E.g. rules, config, ... defined in Workflow code as global variables
 
-                // xxx: maybe  properties from 'Workflow'
+        if (isSmkVersLT_6_1(usedFiles, sdk)) {
+            // legacy globals API in workflow, used before 6.1
+            collectWorkflowGlobalVariables(usedFiles, sdk, elementsCache)
+        } else {
+            addWorkflowGlobalVariables(usedFiles, sdk, syntheticElementsCache)
+        }
+        progressIndicator?.checkCanceled()
 
-                ///////////////////////////////////////
-                // E.g. expand, temp, .. from 'snakemake.io'
-                collectTopLevelMethodsFrom(
-                    "snakemake.io", SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache
-                )
+        // xxx: maybe  properties from 'Workflow'
 
-                ///////////////////////////////////////
-                // Collect hardcoded methods
-                collectMethods(
-                    listOf(
-                        "snakemake.utils" to "simplify_path",
-                        "snakemake.wrapper" to "wrapper",
-                        "snakemake.script" to "script"
-                    ), SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache
-                )
+        ///////////////////////////////////////
+        // E.g. expand, temp, .. from 'snakemake.io'
+        collectTopLevelMethodsFrom(
+            "snakemake.io", SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache
+        )
+        progressIndicator?.checkCanceled()
 
-                ///////////////////////////////////////
-                // Collect hardcoded classes
+        ///////////////////////////////////////
+        // Collect hardcoded methods
+        collectMethods(
+            listOf(
+                "snakemake.utils" to "simplify_path",
+                "snakemake.wrapper" to "wrapper",
+                "snakemake.script" to "script"
+            ), SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache
+        )
+        progressIndicator?.checkCanceled()
 
-                // in order to get properly working inspection on shell class constructor, e.g ignore first 'self' arg
-                // let's resolve to class here:
-                collectClasses(
-                    listOf("snakemake.shell" to "shell"),
-                    SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache, ImplicitPySymbolUsageType.METHOD
-                )
+        ///////////////////////////////////////
+        // Collect hardcoded classes
 
-                ///////////////////////////////////////
-                // Collect variables
-                collectVars(
-                    listOf(
-                        "snakemake.logging" to "logger"
-                    ), SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache
-                )
+        // in order to get properly working inspection on shell class constructor, e.g ignore first 'self' arg
+        // let's resolve to class here:
+        collectClasses(
+            listOf("snakemake.shell" to "shell"),
+            SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache, ImplicitPySymbolUsageType.METHOD
+        )
+        progressIndicator?.checkCanceled()
+
+        ///////////////////////////////////////
+        // Collect variables
+        collectVars(
+            listOf(
+                "snakemake.logging" to "logger"
+            ), SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache
+        )
+        progressIndicator?.checkCanceled()
 
 
-                ////////////////////////////////////////
-                // inside 'rule run': input, output, wildcards, params
-                // snakemake.io.InputFiles
-                // snakemake.io.OutputFiles
-                // snakemake.io.Params
-                // snakemake.io.Log
-                // snakemake.io.Wildcards
-                // snakemake.io.Resources
-                collectTopLevelClassesInheretedFrom(
-                    "snakemake.io",
-                    "snakemake.io.Namedlist",
-                    SmkCodeInsightScope.RULELIKE_RUN_SECTION, usedFiles, sdk, elementsCache
-                ) { className ->
-                    when (className) {
-                        "InputFiles" -> "input"
-                        "OutputFiles" -> "output"
-                        else -> className.toLowerCase()
-                    }
-                }
-
-                ////////////////////////////////////////
-                val contentVersion = usedFiles.sortedBy { it.path }.map { it.timeStamp }.hashCode()
-                val cachedContentVersion = cache.contentVersion
-                if (cachedContentVersion == 0 || contentVersion != cachedContentVersion || forceClear) {
-                    cache = ImplicitPySymbolsCacheImpl(project, elementsCache, syntheticElementsCache, contentVersion)
-
-                    LOG.debug("[CACHE UPDATED]")
-
-                    // rerun highlighting/caches
-                    refreshAfterSymbolCachesUpdated(project)
-                }
+        ////////////////////////////////////////
+        // inside 'rule run': input, output, wildcards, params
+        // snakemake.io.InputFiles
+        // snakemake.io.OutputFiles
+        // snakemake.io.Params
+        // snakemake.io.Log
+        // snakemake.io.Wildcards
+        // snakemake.io.Resources
+        collectTopLevelClassesInheretedFrom(
+            "snakemake.io",
+            "snakemake.io.Namedlist",
+            SmkCodeInsightScope.RULELIKE_RUN_SECTION, usedFiles, sdk, elementsCache
+        ) { className ->
+            when (className) {
+                "InputFiles" -> "input"
+                "OutputFiles" -> "output"
+                else -> className.toLowerCase()
             }
+        }
+        progressIndicator?.checkCanceled()
+
+        ////////////////////////////////////////
+        val contentVersion = usedFiles.sortedBy { it.path }.map { it.timeStamp }.hashCode()
+        val cachedContentVersion = cache.contentVersion
+        if (cachedContentVersion == 0 || contentVersion != cachedContentVersion || forceClear) {
+            cache = ImplicitPySymbolsCacheImpl(project, elementsCache, syntheticElementsCache, contentVersion)
+
+            LOG.debug("[CACHE UPDATED]")
+
+            // rerun highlighting/caches
+            refreshAfterSymbolCachesUpdated(project)
         }
     }
 

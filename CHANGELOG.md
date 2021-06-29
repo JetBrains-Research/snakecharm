@@ -7,7 +7,10 @@
 Released on ...
 
 ### Changed
-- Plugin structure changed to [Developing plugins using GitHub Template](https://plugins.jetbrains.com/docs/intellij/github-template.html)
+- Plugin structure changed to [Developing plugins using GitHub Template](https://plugins.jetbrains.com/docs/intellij/github-template.html) (see [#358](https://github.com/JetBrains-Research/snakecharm/issues/358))
+
+### Fixed
+- Slow operations are prohibited on EDT (see [#366](https://github.com/JetBrains-Research/snakecharm/issues/366))
 
 ## [2021.2.418]
 Released on June 22th 2021
