@@ -31,7 +31,7 @@ apply(plugin = "kotlin")
 apply(plugin = "java")
 
 group = properties("pluginGroup")
-version = "${properties("pluginVersion")}.${properties("pluginBuild")}${properties("pluginPreReleaseSuffix")}"
+version = "${properties("pluginVersion")}.${properties("pluginBuildCounter")}${properties("pluginPreReleaseSuffix")}"
 
 // Configure project's dependencies
 repositories {

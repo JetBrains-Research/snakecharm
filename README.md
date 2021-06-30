@@ -10,16 +10,18 @@ Tests Windows [![tests](http://teamcity.jetbrains.com/app/rest/builds/buildType:
 Please report features suggestions or found bugs to project [issue tracker](https://github.com/JetBrains-Research/snakecharm/issues).
 
 **Features highlights:**
-* Snakemake syntax highlighting: both python and snakemake specifix syntax.
-* Syntax highlighting for snakemake string format language.
-* Special highlighting for rule wildcards.
+* Snakemake syntax highlighting: both python and snakemake specific syntax.
+* Syntax highlighting for Snakemake string format language, e.g. in strings like `"results/sample_{genome}.bam"`.
+* Special highlighting for rule wildcards and their usages.
 * Code completion and goto to declaration for:
-  * Snakemake specific methods and variables (e.g. config, rules, expand(), etc);
+  * Snakemake specific methods and variables (e.g. `config`, `rules`, `expand()`, etc);
   * Rules names, rules sections and section arguments;
   * Wildcard names;
   * Python methods and variables;
-  * Paths in sections: configfile, workdir, conda, include.
-* Open rule declaration by name using 'Navigate|Symbol...'
+  * Paths in sections: `configfile`, `workdir`, `conda`, `include`.
+  * Completion for wrappers
+* Quick documentation for wrappers, that includes links to wrapper source code and paga in wrappers repository. 
+* Open rule declaration by name using `Navigate|Symbol...`
 * Structure view for Snakemake files
 * Inspections for undeclared wildcards usage.
 * Multiple inspections for different possibles bugs in the pipeline. 
