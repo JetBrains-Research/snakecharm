@@ -81,7 +81,8 @@ Feature: Resolve for sections/variables in SmkSL injections
       | smk_vers      | rule_like  | section | text      | result      | file        |
       | snakemake:5x  | rule       | shell   | rules     | rules       | workflow.py |
       | snakemake:6.1 | rule       | shell   | rules     | Rules       | common.py   |
-      | snakemake     | rule       | shell   | rules     | Rules       | common.py   |
+      | snakemake:6.5 | rule       | shell   | rules     | Rules       | __init__.py |
+      | snakemake     | rule       | shell   | rules     | Rules       | __init__.py   |
       | snakemake     | rule       | shell   | local_var | local_var   | foo.smk     |
       | snakemake     | rule       | shell   | input     | InputFiles  | io.py       |
       | snakemake     | rule       | shell   | output    | OutputFiles | io.py       |

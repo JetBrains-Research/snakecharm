@@ -11,6 +11,7 @@ Released on ...
 
 ### Fixed
 - Slow operations are prohibited on EDT (see [#366](https://github.com/JetBrains-Research/snakecharm/issues/366))
+- Compatibility with Snakemake 5.6.x, (see [#367](https://github.com/JetBrains-Research/snakecharm/issues/367))
 
 ## [2021.2.418]
 Released on June 22th 2021

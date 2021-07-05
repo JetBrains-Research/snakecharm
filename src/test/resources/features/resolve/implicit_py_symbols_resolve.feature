@@ -54,6 +54,8 @@ Feature: Resolve implicitly imported python names
       | snakemake:5x  | ru  | rules.foo   | rules       | workflow.py  |
       | snakemake:6.1 | ru  | rules       | Rules       | common.py    |
       | snakemake:6.1 | ru  | rules.foo   | Rules       | common.py    |
+      | snakemake:6.5 | ru  | rules       | Rules       | __init__.py    |
+      | snakemake:6.5 | ru  | rules.foo   | Rules       | __init__.py  |
       | snakemake     | exp | expand()    | expand      | io.py        |
       | snakemake     | tem | temp()      | temp        | io.py        |
       | snakemake     | dir | directory() | directory   | io.py        |
@@ -63,8 +65,8 @@ Feature: Resolve implicitly imported python names
       | snakemake     | dyn | dynamic()   | dynamic     | io.py        |
       | snakemake     | un  | unpack()    | unpack      | io.py        |
       | snakemake     | anc | ancient()   | ancient     | io.py        |
-      | snakemake     | ru  | rules       | Rules       | common.py    |
-      | snakemake     | ru  | rules.foo   | Rules       | common.py    |
+      | snakemake     | ru  | rules       | Rules       | __init__.py    |
+      | snakemake     | ru  | rules.foo   | Rules       | __init__.py    |
       | snakemake     | inp | input       | input       | builtins.pyi |
 
   Scenario: Resolve at top-level: shell()
@@ -122,8 +124,9 @@ Feature: Resolve implicitly imported python names
       | smk_vers      | ptn   | text      | symbol_name | file        |
       | snakemake:5x  | rules | rules.foo | rules       | workflow.py |
       | snakemake:6.1 | rules | rules.foo | Rules       | common.py   |
+      | snakemake:6.5 | rules | rules.foo | Rules       | __init__.py |
       | snakemake     | exp   | expand()  | expand      | io.py       |
-      | snakemake     | rules | rules.foo | Rules       | common.py   |
+      | snakemake     | rules | rules.foo | Rules       | __init__.py |
 
   Scenario: Resolve inside rule parameters: shell()
     Given a snakemake project
@@ -154,9 +157,10 @@ Feature: Resolve implicitly imported python names
       | snakemake:5x  | rules       | rules.foo   | rules       | workflow.py    | 1     |
       | snakemake:6.1 | checkpoints | checkpoints | Checkpoints | checkpoints.py | 1     |
       | snakemake:6.1 | rules       | rules.foo   | Rules       | common.py      | 1     |
+      | snakemake:6.5 | rules       | rules.foo   | Rules       | __init__.py    | 1     |
       | snakemake     | exp         | expand()    | expand      | io.py          | 1     |
       | snakemake     | she         | shell()     | shell       | shell.py       | 1     |
-      | snakemake     | rules       | rules.foo   | Rules       | common.py      | 1     |
+      | snakemake     | rules       | rules.foo   | Rules       | __init__.py    | 1     |
       | snakemake     | checkpoints | checkpoints | Checkpoints | checkpoints.py | 1     |
       | snakemake     | inp         | input[0]    | InputFiles  | io.py          | 1     |
       | snakemake     | output.foo  | output.foo  | OutputFiles | io.py          | 1     |
@@ -329,12 +333,17 @@ Feature: Resolve implicitly imported python names
       | snakemake:6.1 | rule       | message | scatter     | Scatter     | common.py      |
       | snakemake:6.1 | rule       | message | gather      | Gather      | common.py      |
       | snakemake:6.1 | checkpoint | shell   | rules       | Rules       | common.py      |
-      | snakemake     | rule       | shell   | rules       | Rules       | common.py      |
+      | snakemake:6.5 | rule       | shell   | rules       | Rules       | __init__.py    |
+      | snakemake:6.5 | rule       | message | rules       | Rules       | __init__.py    |
+      | snakemake:6.5 | rule       | message | scatter     | Scatter     | __init__.py    |
+      | snakemake:6.5 | rule       | message | gather      | Gather      | __init__.py    |
+      | snakemake:6.5 | checkpoint | shell   | rules       | Rules       | __init__.py    |
+      | snakemake     | rule       | shell   | rules       | Rules       | __init__.py    |
       | snakemake     | rule       | shell   | checkpoints | Checkpoints | checkpoints.py |
-      | snakemake     | rule       | message | rules       | Rules       | common.py      |
-      | snakemake     | rule       | message | scatter     | Scatter     | common.py      |
-      | snakemake     | rule       | message | gather      | Gather      | common.py      |
-      | snakemake     | checkpoint | shell   | rules       | Rules       | common.py      |
+      | snakemake     | rule       | message | rules       | Rules       | __init__.py    |
+      | snakemake     | rule       | message | scatter     | Scatter     | __init__.py    |
+      | snakemake     | rule       | message | gather      | Gather      | __init__.py    |
+      | snakemake     | checkpoint | shell   | rules       | Rules       | __init__.py    |
 
 
   Scenario Outline: No resolve in injections for defining expanding sections

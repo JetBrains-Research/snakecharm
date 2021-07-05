@@ -607,10 +607,16 @@ class ImplicitPySymbolsProvider(
         }
         globals["workflow"] = workflowFile?.findTopLevelClass("Workflow")
 
-        val commonFile = collectPyFiles("snakemake.common", usedFiles, sdk).firstOrNull()
+        // Snakemake >= 6.5
+        var commonFile = collectPyFiles("snakemake.common.__init__", usedFiles, sdk).firstOrNull()
+        if (commonFile == null) {
+            // Snakemake 6.1 .. 6.4.x
+            commonFile = collectPyFiles("snakemake.common", usedFiles, sdk).firstOrNull()
+        }
         if (commonFile != null) {
             usedFiles.add(commonFile.virtualFile)
         }
+
         globals[SnakemakeAPI.SMK_VARS_CHECKPOINTS] = commonFile?.findTopLevelClass("Checkpoints")
         globals[SnakemakeAPI.SMK_VARS_RULES] = commonFile?.findTopLevelClass("Rules")
         globals[SnakemakeAPI.SMK_VARS_SCATTER] = commonFile?.findTopLevelClass("Scatter")
