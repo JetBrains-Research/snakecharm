@@ -7,11 +7,20 @@
 Released on ...
 
 ### Changed
+- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
+
+### Fixed
+- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN))
+
+## [2021.2.424]
+Released on July 5th 2021
+
+### Changed
 - Plugin structure changed to [Developing plugins using GitHub Template](https://plugins.jetbrains.com/docs/intellij/github-template.html) (see [#358](https://github.com/JetBrains-Research/snakecharm/issues/358))
 
 ### Fixed
 - Slow operations are prohibited on EDT (see [#366](https://github.com/JetBrains-Research/snakecharm/issues/366))
-- Compatibility with Snakemake 5.6.x, (see [#367](https://github.com/JetBrains-Research/snakecharm/issues/367))
+- Compatibility with Snakemake 5.6.x (see [#367](https://github.com/JetBrains-Research/snakecharm/issues/367))
 
 ## [2021.2.418]
 Released on June 22th 2021

@@ -10,21 +10,31 @@ Tests Windows [![tests](http://teamcity.jetbrains.com/app/rest/builds/buildType:
 Please report features suggestions or found bugs to project [issue tracker](https://github.com/JetBrains-Research/snakecharm/issues).
 
 **Features highlights:**
-* Snakemake syntax highlighting: both python and snakemake specific syntax.
-* Syntax highlighting for Snakemake string format language, e.g. in strings like `"results/sample_{genome}.bam"`.
-* Special highlighting for rule wildcards and their usages.
+> **NB**: To activate all features please enable `Snakemake` support in `Settings | Languages & Frameworks | Snakemake`. Snakemake framework should be configured to use python interpreter with `snakemake` module installed.
+
+Features available in `Snakefile` and `*.smk`, `*.rule`, `*.rules` files:
+* Python code syntax highlighting
+* Snakemake specific syntax highlighting
+    * Highlight rule section names 
+    * Syntax highlighting for Snakemake string format language, e.g. in strings like `"results/sample_{genome}.bam"`.
+    * Special highlighting for rule wildcards and their usages
 * Code completion and goto to declaration for:
-  * Snakemake specific methods and variables (e.g. `config`, `rules`, `expand()`, etc);
-  * Rules names, rules sections and section arguments;
-  * Wildcard names;
-  * Python methods and variables;
+  * Snakemake specific variables (e.g. `config`, `rules`,  etc);
+  * Snakemake api methods like `expand`, `temp`, etc.
+  * Rules names after `rules.`, checkpoints after `checkpoints.`
+  * Rules sections names after `rules.my_rule_name.`
+  * Rule sections keywords arguments, e.g. after `rules.my_rule_name.input.`
+  * Wildcards and sections names in `shell`, `input`, `message`, `params` and other sections
   * Paths in sections: `configfile`, `workdir`, `conda`, `include`.
-  * Completion for wrappers
-* Quick documentation for wrappers, that includes links to wrapper source code and paga in wrappers repository. 
-* Open rule declaration by name using `Navigate|Symbol...`
+  * Completion for wrappers names in `wrapper:` sections
+  * Wrappers with detailed `meta.yaml` provides completion for rule section keyword arguments in `output`, `input`, `params` sections
+  * Python methods and variables
+
 * Structure view for Snakemake files
-* Inspections for undeclared wildcards usage.
-* Multiple inspections for different possibles bugs in the pipeline. 
+* Rules blocks folding
+* Open rule declaration by name using `Navigate|Symbol...`
+* Quick documentation for wrappers, that includes links to wrapper source code and paga in wrappers repository
+* Multiple code inspections for possible errors in snakemake files
   
 **Useful links:**
 * [Project Home Page](https://research.jetbrains.org/groups/biolabs/projects?project_id=57)
@@ -33,33 +43,11 @@ Please report features suggestions or found bugs to project [issue tracker](http
 * [SnakeCharm in JetBrains Plugin Repository](https://plugins.jetbrains.com/plugin/11947-snakecharm)
 <!-- Plugin description end -->
 
-# Features
-
-Features available in `Snakefile` and `*.smk`, `*.rule`, `*.rules` files:
-* Python code syntax highlighting
-* Snakemake specific syntax highlighting
-* Limited resolve and code completion for python code
-* Rules folding
-* Code completion and resolve for:
-   * Rules names after `rules.`, checkpoints after `checkpoints.`
-   * Rules sections names after `rules.my_rule_name.`
-   * Rule sections keywords arguments, e.g. after ``rules.my_rule_name.input.`
-   * Snakemake api methods like `expand`, `temp`, etc.
-   * Wildcards and sections names in `shell` and other sections
-   * Included rules files and conda environment files
-* File structure view with rules
-* Wildcards support (code completion, resolve, usages highligting, inspections)
-* Multiple inspections inspections for possible errors in snakemake file.
-
 # Installation
 
-If you've already configured custom file type for `Snakefile` or `*.smk` files please **delete** it (**or change** file masks to smth else). Otherwise, your custom file type will replace SnakeCharm support in snakemake files.
+> **NB**: If you've already configured custom file type for `Snakefile` or `*.smk` files please **delete** it (**or change** file masks to smth else). Otherwise, your custom file type will replace SnakeCharm support in snakemake files.
 
 In PyCharm (or other `IntelliJ Platfrom` based IDE with `Python Community Edition` plugin installed) open `Preferences|Plugins|Marketplace|SnakeCharm` and press `Install` button.
-
-At the moment the plugin is tested with:
-* IDEA CI 2018.3-2019.2.x, Python Community Edition Plugin: 2018.3.183.4284.36-2019.1.191.7479.19
-* PyCharm 2018.3.1-2020.2.EAP (Professional & Community Editions)
 
 # Setup Snakemake support
 
