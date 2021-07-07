@@ -14,6 +14,7 @@ import com.jetbrains.python.psi.types.PyStructuralType
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.UNPACK_FUNCTION
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
@@ -147,8 +148,13 @@ class SmkRuleLikeSectionArgsType(
             return 0
         }
 
-        //Uses this instead of "sectionsArgs.size" in order to add support for 'multiext' snakemake method
-        return sectionArgs.sumOf { if (it is PyCallExpression) it.arguments.size - 1 else 1 }
+        // Uses this instead of "sectionsArgs.size" in order to add support for 'multiext' snakemake method
+        // It will work incorrectly if there are another function with name 'multiext'
+        return sectionArgs.sumOf {
+            if (it is PyCallExpression
+                && it.callee?.name.equals(SnakemakeNames.SNAKEMAKE_METHOD_MULTIEXT)
+            ) it.arguments.size - 1 else 1
+        }
     }
 
     private fun isSimpleArgsList(args: Array<out PyExpression>): Boolean {
@@ -158,10 +164,10 @@ class SmkRuleLikeSectionArgsType(
     }
 
     /**
-     * Checks if there are any elements which are refer to 'expand' function
+     * Checks if there are any elements which are refer to [SnakemakeNames.SNAKEMAKE_METHOD_EXPAND] function
      */
     private fun isContainsExpandFunc(args: Array<out PyExpression>) = args.firstOrNull {
-        it is PyCallExpression && it.callee?.name.equals("expand")
+        it is PyCallExpression && it.callee?.name.equals(SnakemakeNames.SNAKEMAKE_METHOD_EXPAND)
     } != null
 
     override fun isBuiltin() = false
