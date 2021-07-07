@@ -142,7 +142,13 @@ class SmkRuleLikeSectionArgsType(
             return 0
         }
 
-        return sectionArgs.size
+        // If it's a simple list of arguments which contains 'expand' function - doesn't check it
+        if (isContainsExpandFunc(sectionArgs)) {
+            return 0
+        }
+
+        //Uses this instead of "sectionsArgs.size" in order to add support for 'multiext' snakemake method
+        return sectionArgs.sumOf { if (it is PyCallExpression) it.arguments.size - 1 else 1 }
     }
 
     private fun isSimpleArgsList(args: Array<out PyExpression>): Boolean {
@@ -150,6 +156,13 @@ class SmkRuleLikeSectionArgsType(
             it is PyStarArgument || (it is PyCallExpression && it.callSimpleName() == UNPACK_FUNCTION)
         } == null
     }
+
+    /**
+     * Checks if there are any elements which are refer to 'expand' function
+     */
+    private fun isContainsExpandFunc(args: Array<out PyExpression>) = args.firstOrNull {
+        it is PyCallExpression && it.callee?.name.equals("expand")
+    } != null
 
     override fun isBuiltin() = false
 }

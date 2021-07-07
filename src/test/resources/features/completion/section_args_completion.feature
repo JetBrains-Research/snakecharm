@@ -453,3 +453,32 @@ Feature: Completion for section args after section name
         | .foo    | foo       | arg1 | replace | .arg1     |
 
     #TODO: contributor in foo<here>.bood.doo[aa] ?
+
+  Scenario Outline: Completion for output sections with 'multiext' function in 'shell' and 'run' sections
+    Given a snakemake project
+    And I open a file "foo.smk" with text
+        """
+        rule NAME:
+         output:
+            "any_file.txt",
+            multiext("other-file.", "a", "b", "c", "d"),
+            sth = "tem.csv"
+         <section>:
+            <key>
+        """
+    When I put the caret after <signature>
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | 0 |
+      | 1 |
+      | 2 |
+      | 3 |
+      | 4 |
+      | 5 |
+    And completion list shouldn't contain:
+      | 6 |
+      | 7 |
+    Examples:
+      | section | key          | signature |
+      | shell   | "{output[]}" | t[        |
+      | run     | output[]     | t[        |
