@@ -75,16 +75,16 @@ class SmkRuleLikeSectionArgsType(
             direction: AccessDirection,
             resolveContext: PyResolveContext
     ): List<RatedResolveResult> {
-        if (sectionArgs != null && isSimpleArgsList(sectionArgs)) {
+        if (sectionArgs != null && isSimpleArgsList(sectionArgs) && idx >= 0) {
             val resolveResult = ResolveResultList()
             var pos = idx
 
-            val offset = sectionArgs.firstOrNull {
+            val el = sectionArgs.firstOrNull {
                 pos -= countProducedElements(it)
                 pos < 0
             }
-            if (offset != null) {
-                resolveResult.poke(offset, SmkResolveUtil.RATE_NORMAL)
+            if (el != null) {
+                resolveResult.poke(el, SmkResolveUtil.RATE_NORMAL)
                 return resolveResult
             }
         }

@@ -465,7 +465,8 @@ Feature: Completion for section args after section name
          <data_section>:
             <line1>,
             "file",
-            <line3>
+            <line3>,
+            foo = "ooo.txt"
          <exec_section>:
             <key>
         """
@@ -477,9 +478,10 @@ Feature: Completion for section args after section name
       | 2 |
       | 3 |
       | 4 |
-    And completion list shouldn't contain:
       | 5 |
+    And completion list shouldn't contain:
       | 6 |
+      | 7 |
     Examples:
       | data_section | line1                    | line3                         | exec_section | key          | signature |
       | input        | multiext("f.", "1", "2") | multiext("f.", "1", "2")      | shell        | "{input[]}"  | t[        |
