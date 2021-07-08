@@ -77,10 +77,16 @@ class SmkRuleLikeSectionArgsType(
     ): List<RatedResolveResult> {
         if (sectionArgs != null && isSimpleArgsList(sectionArgs)) {
             val resolveResult = ResolveResultList()
-            if (idx in sectionArgs.indices) {
-                resolveResult.poke(sectionArgs[idx], SmkResolveUtil.RATE_NORMAL)
+            var pos = idx
+
+            val offset = sectionArgs.firstOrNull {
+                pos -= countProducedElements(it)
+                pos < 0
             }
-            return resolveResult
+            if (offset != null) {
+                resolveResult.poke(offset, SmkResolveUtil.RATE_NORMAL)
+                return resolveResult
+            }
         }
         return emptyList()
     }
@@ -143,18 +149,9 @@ class SmkRuleLikeSectionArgsType(
             return 0
         }
 
-        // If it's a simple list of arguments which contains 'expand' function - doesn't check it
-        if (isContainsExpandFunc(sectionArgs)) {
-            return 0
-        }
-
         // Uses this instead of "sectionsArgs.size" in order to add support for 'multiext' snakemake method
         // It will work incorrectly if there are another function with name 'multiext'
-        return sectionArgs.sumOf {
-            if (it is PyCallExpression
-                && it.callee?.name.equals(SnakemakeNames.SNAKEMAKE_METHOD_MULTIEXT)
-            ) it.arguments.size - 1 else 1
-        }
+        return sectionArgs.sumOf { countProducedElements(it) }
     }
 
     private fun isSimpleArgsList(args: Array<out PyExpression>): Boolean {
@@ -164,11 +161,15 @@ class SmkRuleLikeSectionArgsType(
     }
 
     /**
-     * Checks if there are any elements which are refer to [SnakemakeNames.SNAKEMAKE_METHOD_EXPAND] function
+     * Counts a number of elements that [PyExpression] returns.
+     * E.g. "foo.txt" - one element
+     * multiext("f.", "t", "d") - two elements ["f.t", "f.d"]
+     *
+     * Note, that it supports smart counting only for 'multiext' function
      */
-    private fun isContainsExpandFunc(args: Array<out PyExpression>) = args.firstOrNull {
-        it is PyCallExpression && it.callee?.name.equals(SnakemakeNames.SNAKEMAKE_METHOD_EXPAND)
-    } != null
+    private fun countProducedElements(exp: PyExpression) = if (exp is PyCallExpression
+        && exp.callee?.name.equals(SnakemakeNames.SNAKEMAKE_METHOD_MULTIEXT)
+    ) exp.arguments.size - 1 else 1
 
     override fun isBuiltin() = false
 }

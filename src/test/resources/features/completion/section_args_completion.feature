@@ -483,6 +483,6 @@ Feature: Completion for section args after section name
     Examples:
       | data_section | line1                    | line3                         | exec_section | key          | signature |
       | input        | multiext("f.", "1", "2") | multiext("f.", "1", "2")      | shell        | "{input[]}"  | t[        |
-      | input        | multiext("f.", "1", "2") | multiext("f.", "1", "2")      | run          | input[]          | t[        |
+      | input        | multiext("f.", "1", "2") | multiext("f.", "1", "2")      | run          | input[]      | t[        |
       | output       | additional_func(1,2,3,4) | multiext("f.", "1", "2", "5") | shell        | "{output[]}" | t[        |
       | output       | additional_func(1,2,3,4) | multiext("f.", "1", "2", "5") | run          | output[]     | t[        |
