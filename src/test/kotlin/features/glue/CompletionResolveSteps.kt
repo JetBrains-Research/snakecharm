@@ -529,7 +529,7 @@ class CompletionResolveSteps {
         val fixture = SnakemakeWorld.fixture()
         fixture.complete(CompletionType.BASIC, invocationCount)
         SnakemakeWorld.myCompletionList = fixture.lookupElementStrings
-        SnakemakeWorld.myCompletionListPresentations = fixture.lookupElements.map { TestLookupElementPresentation.renderReal(it) }
+        SnakemakeWorld.myCompletionListPresentations = fixture.lookupElements?.map { TestLookupElementPresentation.renderReal(it) }
     }
 
     private fun getCompletionItemsPresentation(): List<LookupElementPresentation> {
