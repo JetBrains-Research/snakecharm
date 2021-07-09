@@ -98,7 +98,7 @@ open class SmkFileReference(
             var file = baseFile
             while (ancestor != file) {
                 buff.append("../")
-                file = file.parent
+                file = file.parent!! // parent cannot be null here by design
             }
             buff.append(VfsUtil.getRelativePath(targetFile, ancestor)!!)
             return buff.toString()
