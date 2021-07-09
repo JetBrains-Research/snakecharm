@@ -4,6 +4,7 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiInvalidElementAccessException
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.*
@@ -17,6 +18,7 @@ import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkSection
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
 
@@ -178,9 +180,19 @@ class SmkRuleLikeSectionArgsType(
 
         // TODO: additional multiext(..) support required, e.g.:
         //      multiext("foo", ".txt", ".log") should return "foo.txt" for [0], not just ".txt"
-        
+
         val textPreview = when (el) {
-            is PyStringLiteralExpression -> el.stringValue
+            is PyStringLiteralExpression -> {
+                val containingCall = PsiTreeUtil.getParentOfType(el, PyCallExpression::class.java, true, SmkSection::class.java)
+                var text = el.stringValue
+                if (containingCall != null && containingCall.isCalleeText(SnakemakeNames.SNAKEMAKE_METHOD_MULTIEXT)) {
+                    val multiExtFirstArg = containingCall.arguments.first()
+                    if (multiExtFirstArg is PyStringLiteralExpression) {
+                        text = "${multiExtFirstArg.stringValue}$text"
+                    }
+                }
+                text
+            }
             else -> el.text
         }
 

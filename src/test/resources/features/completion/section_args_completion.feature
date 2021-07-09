@@ -505,7 +505,7 @@ Feature: Completion for section args after section name
                 call, 1,2,3, other,
                 args
             ),
-            multiext("f.", "1", "2"),
+            multiext(call("f"), ".1", ".2"),
             "last.file",
             foo=111,
             boo=222,
@@ -520,12 +520,12 @@ Feature: Completion for section args after section name
       | 1                       | (...lll/long/name.txt) | '<data_section>:' position arg |
       | 2                       | (...2,3, other, args)) | '<data_section>:' position arg |
       | 3                       | (.../long/name.txt",)) | '<data_section>:' position arg |
-      | 4                       | (.txt)                 | '<data_section>:' position arg |
-      | 5                       | (.log)                 | '<data_section>:' position arg |
+      | 4                       | (file.txt)             | '<data_section>:' position arg |
+      | 5                       | (file.log)             | '<data_section>:' position arg |
       | 6                       | (f.txt)                | '<data_section>:' position arg |
       | 7                       | (...       args    ))  | '<data_section>:' position arg |
-      | 8                       | (1)                    | '<data_section>:' position arg |
-      | 9                       | (2)                    | '<data_section>:' position arg |
+      | 8                       | (.1)                   | '<data_section>:' position arg |
+      | 9                       | (.2)                   | '<data_section>:' position arg |
       | 10                      | (last.file)            | '<data_section>:' position arg |
       | 11                      | (111)                  | '<data_section>:' position arg |
       | 12                      | (222)                  | '<data_section>:' position arg |
