@@ -178,9 +178,6 @@ class SmkRuleLikeSectionArgsType(
             return null
         }
 
-        // TODO: additional multiext(..) support required, e.g.:
-        //      multiext("foo", ".txt", ".log") should return "foo.txt" for [0], not just ".txt"
-
         val textPreview = when (el) {
             is PyStringLiteralExpression -> {
                 val containingCall = PsiTreeUtil.getParentOfType(el, PyCallExpression::class.java, true, SmkSection::class.java)
