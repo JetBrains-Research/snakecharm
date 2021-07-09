@@ -343,12 +343,12 @@ Scenario Outline: Unresolved index if out of bounds
       Then reference in injection should resolve to "<result>" in "foo.smk"
       Examples:
         | data_section | line1                    | line3                    | key           | signature | result                   |
-        | input        | multiext("f.", "1", "2") | multiext("f.", "2", "1") | "{input[1]}"  | 1]}       | multiext("f.", "1", "2") |
-        | input        | multiext("f.", "1", "2") | multiext("f.", "2", "1") | "{input[2]}"  | 2]}       | "file"                   |
-        | input        | multiext("f.", "1", "2") | multiext("f.", "2", "1") | "{input[3]}"  | 3]}       | multiext("f.", "2", "1") |
-        | input        | multiext("f.", "1", "2") | multiext("f.", "2", "1") | "{input[5]}"  | 5]}       | foo                      |
-        | output       | additional_func(1,2,3,4) | multiext("f.", "2", "1") | "{output[0]}" | 0]}       | additional_func(1,2,3,4) |
-        | output       | additional_func(1,2,3,4) | multiext("f.", "2", "1") | "{output[1]}" | 1]}       | "file"                   |
-        | output       | additional_func(1,2,3,4) | multiext("f.", "2", "1") | "{output[2]}" | 2]}       | multiext("f.", "2", "1") |
-        | output       | additional_func(1,2,3,4) | multiext("f.", "2", "1") | "{output[3]}" | 3]}       | multiext("f.", "2", "1") |
-        | output       | additional_func(1,2,3,4) | multiext("f.", "2", "1") | "{output[4]}" | 4]}       | foo                      |
+        | input        | multiext("f.", "1", "2") | multiext("f.", "4", "3") | "{input[1]}"  | 1]}       | "2"                      |
+        | input        | multiext("f.", "1", "2") | multiext("f.", "4", "3") | "{input[2]}"  | 2]}       | "file"                   |
+        | input        | multiext("f.", "1", "2") | multiext("f.", "4", "3") | "{input[3]}"  | 3]}       | "4"                      |
+        | input        | multiext("f.", "1", "2") | multiext("f.", "4", "3") | "{input[5]}"  | 5]}       | foo                      |
+        | output       | additional_func(1,2,3,4) | multiext("f.", "4", "3") | "{output[0]}" | 0]}       | additional_func(1,2,3,4) |
+        | output       | additional_func(1,2,3,4) | multiext("f.", "4", "3") | "{output[1]}" | 1]}       | "file"                   |
+        | output       | additional_func(1,2,3,4) | multiext("f.", "4", "3") | "{output[2]}" | 2]}       | "4"                      |
+        | output       | additional_func(1,2,3,4) | multiext("f.", "4", "3") | "{output[3]}" | 3]}       | "3"                      |
+        | output       | additional_func(1,2,3,4) | multiext("f.", "4", "3") | "{output[4]}" | 4]}       | foo                      |
