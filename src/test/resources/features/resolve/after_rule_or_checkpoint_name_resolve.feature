@@ -160,6 +160,7 @@ Feature: Resolve for section after rule/checkpoint name e.g. rules.NAME.input
          script: ""
          shell: ""
          cache: True
+         handover: True
          run:
 
      rule ANOTHER_NAME:
@@ -181,6 +182,7 @@ Feature: Resolve for section after rule/checkpoint name e.g. rules.NAME.input
       | script      |
       | cache       |
       | name        |
+      | handover    |
 
   Scenario Outline: Resolve for available sections
     Given a snakemake project

@@ -57,3 +57,4 @@ Feature: Inspection for multiple arguments in various sections
       | shadow      |
       | notebook    |
       | container   |
+      | handover    |

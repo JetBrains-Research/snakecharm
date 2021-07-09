@@ -187,6 +187,7 @@ Feature: Tests on snakemake string language injection
     | singularity          |
     | container            |
     | notebook             |
+    |handover              |
 
   Scenario Outline: Inject in snakemake function calls
     Given a snakemake project
