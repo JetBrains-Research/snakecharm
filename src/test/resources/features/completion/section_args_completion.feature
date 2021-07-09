@@ -488,3 +488,50 @@ Feature: Completion for section args after section name
       | input        | multiext("f.", "1", "2") | multiext("f.", "1", "2")      | run          | input[]      | t[        |
       | output       | additional_func(1,2,3,4) | multiext("f.", "1", "2", "5") | shell        | "{output[]}" | t[        |
       | output       | additional_func(1,2,3,4) | multiext("f.", "1", "2", "5") | run          | output[]     | t[        |
+
+  Scenario Outline: Completion for input/output sections with 'multiext' function in 'shell' and 'run' sections (item presentation)
+    Given a snakemake project
+    And I open a file "foo.smk" with text
+        """
+        rule NAME:
+         <data_section>:
+            "in.txt",
+            "in/ver/very/yyyyyyyyyy/llllllll/long/name.txt",
+            some_call1(call, 1,2,3, other, args),
+            some_call2("in/ver/very/yyyyyyyyyy/llllllll/long/name.txt",),
+            multiext("file", ".txt", ".log"),
+            "f.txt",
+            multiline_call(
+                call, 1,2,3, other,
+                args
+            ),
+            multiext("f.", "1", "2"),
+            "last.file",
+            foo=111,
+            boo=222,
+         <exec_section_text>
+        """
+    When I put the caret after t[
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | <escaping>boo<escaping> | null                   | '<data_section>:' keyword arg  |
+      | <escaping>foo<escaping> | null                   | '<data_section>:' keyword arg  |
+      | 0                       | (in.txt)               | '<data_section>:' position arg |
+      | 1                       | (...lll/long/name.txt) | '<data_section>:' position arg |
+      | 2                       | (...2,3, other, args)) | '<data_section>:' position arg |
+      | 3                       | (.../long/name.txt",)) | '<data_section>:' position arg |
+      | 4                       | (.txt)                 | '<data_section>:' position arg |
+      | 5                       | (.log)                 | '<data_section>:' position arg |
+      | 6                       | (f.txt)                | '<data_section>:' position arg |
+      | 7                       | (...       args    ))  | '<data_section>:' position arg |
+      | 8                       | (1)                    | '<data_section>:' position arg |
+      | 9                       | (2)                    | '<data_section>:' position arg |
+      | 10                      | (last.file)            | '<data_section>:' position arg |
+      | 11                      | (111)                  | '<data_section>:' position arg |
+      | 12                      | (222)                  | '<data_section>:' position arg |
+    Examples:
+      | data_section | exec_section_text   | escaping |
+      | input        | shell: "{input[]}"  |         |
+      | input        | run: input[]        | '       |
+      | output       | shell: "{output[]}" |         |
+      | output       | run: output[]       | '       |

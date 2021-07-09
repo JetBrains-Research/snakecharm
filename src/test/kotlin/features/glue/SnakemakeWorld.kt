@@ -1,5 +1,6 @@
 package features.glue
 
+import com.intellij.codeInsight.lookup.LookupElementPresentation
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.psi.PsiReference
@@ -16,6 +17,7 @@ object SnakemakeWorld {
     @JvmField var myInjectionFixture: InjectionTestFixture? = null
     @JvmField var myFixture: CodeInsightTestFixture? = null
     @JvmField var myCompletionList: List<String>? = null
+    @JvmField var myCompletionListPresentations: List<LookupElementPresentation>? = null
     @JvmField var myGeneratedDocPopupText: String? = null
     @JvmField var myFoundRefs: List<PsiReference>? = null
     @JvmField var myFoundUsages: List<UsageInfo> = emptyList()
@@ -32,6 +34,12 @@ object SnakemakeWorld {
             "Completion list not initialized, likely you've forgotten 'I invoke autocompletion popup' step."
         }
         return myCompletionList!!
+    }
+    fun completionListPresentations(): List<LookupElementPresentation> {
+        requireNotNull(myCompletionListPresentations) {
+            "Completion list not initialized, likely you've forgotten 'I invoke autocompletion popup' step."
+        }
+        return myCompletionListPresentations!!
     }
 
     fun getOffsetUnderCaret() = fixture().editor.caretModel.offset

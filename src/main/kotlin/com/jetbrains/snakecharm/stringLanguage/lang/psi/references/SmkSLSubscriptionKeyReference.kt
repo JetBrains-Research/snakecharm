@@ -6,15 +6,14 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.util.ArrayUtil
-import com.intellij.util.PlatformIcons
-import com.intellij.util.ProcessingContext
+ import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PsiReferenceEx
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
+import com.jetbrains.snakecharm.codeInsight.completion.SmkDictionaryTypesCompletionProvider
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionKeyReferenceExpression
 
@@ -24,7 +23,7 @@ class SmkSLSubscriptionKeyReference(
 ) : PsiPolyVariantReferenceBase<SmkSLSubscriptionKeyReferenceExpression>(element), PsiReferenceEx, SmkSLBaseReference {
     companion object {
         fun indexArgTypeText(type: SmkAvailableForSubscriptionType) =
-                "Arg index in ${type.name}"
+            SnakemakeBundle.message("TYPES.rule.section.arg.index.type.text", type.name!!)
 
         fun unresolvedErrorMsg(element: PsiElement) =
                 SnakemakeBundle.message("INSP.NAME.unresolved.subscription.ref", element.text)
@@ -71,18 +70,7 @@ class SmkSLSubscriptionKeyReference(
 
         val variants = arrayListOf<Any>()
         variants.addAll(type.getCompletionVariants(canonicalText, element, ProcessingContext()))
-
-        val typeText = indexArgTypeText(type)
-
-        (0 until type.getPositionArgsNumber(element)).forEach { idx ->
-            val item = SmkCompletionUtil.createPrioritizedLookupElement(
-                    idx.toString(), null,
-                    PlatformIcons.PARAMETER_ICON,
-                    priority = SmkCompletionUtil.SUBSCRIPTION_INDEXES_PRIORITY,
-                    typeText = typeText
-            )
-            variants.add(item)
-        }
+        variants.addAll(SmkDictionaryTypesCompletionProvider.collectLookupItemsForPositionArgs(type, element))
         return variants.toTypedArray()
     }
     override fun calculateDefaultRangeInElement() = TextRange.create(0, element.textLength)

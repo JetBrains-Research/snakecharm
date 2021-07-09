@@ -5,6 +5,7 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementDecorator
 import com.intellij.codeInsight.lookup.LookupElementPresentation
 import com.intellij.patterns.PlatformPatterns.psiElement
+import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
@@ -91,19 +92,26 @@ object SmkDictionaryTypesCompletionProvider: CompletionProvider<CompletionParame
                 result.addElement(SmkCompletionUtil.createPrioritizedLookupElement(item, priority))
             }
 
-            val typeText = indexArgTypeText(type)
-            (0 until type.getPositionArgsNumber(location)).forEach { idx ->
-                val item = SmkCompletionUtil.createPrioritizedLookupElement(
-                        idx.toString(), null,
-                        PlatformIcons.PARAMETER_ICON,
-                        priority = SmkCompletionUtil.SUBSCRIPTION_INDEXES_PRIORITY,
-                        typeText = typeText
-                )
-                result.addElement(item)
-            }
+            collectLookupItemsForPositionArgs(type, location).forEach { result.addElement(it)}
 
         }
 //        val resolvedElement = PyResolveUtil.fullResolveLocally(operand as PyReferenceExpression)
+    }
+
+    fun collectLookupItemsForPositionArgs(
+        type: SmkAvailableForSubscriptionType,
+        location: PsiElement,
+    ) : List<LookupElement> {
+        val typeText = indexArgTypeText(type)
+        return type.getPositionArgsPreviews(location).mapIndexed { idx, textPreview ->
+            SmkCompletionUtil.createPrioritizedLookupElement(
+                idx.toString(), null,
+                PlatformIcons.PARAMETER_ICON,
+                priority = SmkCompletionUtil.SUBSCRIPTION_INDEXES_PRIORITY,
+                typeText = typeText,
+                tailText = "($textPreview)"
+            )
+        }
     }
 }
 
