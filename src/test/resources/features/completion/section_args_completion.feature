@@ -453,3 +453,38 @@ Feature: Completion for section args after section name
         | .foo    | foo       | arg1 | replace | .arg1     |
 
     #TODO: contributor in foo<here>.bood.doo[aa] ?
+
+  Scenario Outline: Completion for input/output sections with 'multiext' function in 'shell' and 'run' sections
+    Given a snakemake project
+    And I open a file "foo.smk" with text
+        """
+        def additional_func(a, b, c, d):
+         return a + b + c + d
+
+        rule NAME:
+         <data_section>:
+            <line1>,
+            "file",
+            <line3>,
+            foo = "ooo.txt"
+         <exec_section>:
+            <key>
+        """
+    When I put the caret after <signature>
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | 0 |
+      | 1 |
+      | 2 |
+      | 3 |
+      | 4 |
+      | 5 |
+    And completion list shouldn't contain:
+      | 6 |
+      | 7 |
+    Examples:
+      | data_section | line1                    | line3                         | exec_section | key          | signature |
+      | input        | multiext("f.", "1", "2") | multiext("f.", "1", "2")      | shell        | "{input[]}"  | t[        |
+      | input        | multiext("f.", "1", "2") | multiext("f.", "1", "2")      | run          | input[]      | t[        |
+      | output       | additional_func(1,2,3,4) | multiext("f.", "1", "2", "5") | shell        | "{output[]}" | t[        |
+      | output       | additional_func(1,2,3,4) | multiext("f.", "1", "2", "5") | run          | output[]     | t[        |

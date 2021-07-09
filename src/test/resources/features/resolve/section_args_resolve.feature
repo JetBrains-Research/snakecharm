@@ -322,3 +322,33 @@ Scenario Outline: Unresolved index if out of bounds
       | rule       | .get('arg1', None) | arg1',    | arg1   |
       | checkpoint | ['arg2']           | rg2']     | arg2   |
       | checkpoint | .get('arg1')       | arg1')    | arg1   |
+
+    Scenario Outline: Resolve index in sections with 'multiext' function
+      Given a snakemake project
+      And I open a file "foo.smk" with text
+      """
+        def additional_func(a, b, c, d):
+         return a + b + c + d
+
+        rule NAME:
+         <data_section>:
+            <line1>,
+            "file",
+            <line3>,
+            foo = "too"
+         shell:
+            <key>
+        """
+      When I put the caret at <signature>
+      Then reference in injection should resolve to "<result>" in "foo.smk"
+      Examples:
+        | data_section | line1                    | line3                    | key           | signature | result                   |
+        | input        | multiext("f.", "1", "2") | multiext("f.", "4", "3") | "{input[1]}"  | 1]}       | "2"                      |
+        | input        | multiext("f.", "1", "2") | multiext("f.", "4", "3") | "{input[2]}"  | 2]}       | "file"                   |
+        | input        | multiext("f.", "1", "2") | multiext("f.", "4", "3") | "{input[3]}"  | 3]}       | "4"                      |
+        | input        | multiext("f.", "1", "2") | multiext("f.", "4", "3") | "{input[5]}"  | 5]}       | foo                      |
+        | output       | additional_func(1,2,3,4) | multiext("f.", "4", "3") | "{output[0]}" | 0]}       | additional_func(1,2,3,4) |
+        | output       | additional_func(1,2,3,4) | multiext("f.", "4", "3") | "{output[1]}" | 1]}       | "file"                   |
+        | output       | additional_func(1,2,3,4) | multiext("f.", "4", "3") | "{output[2]}" | 2]}       | "4"                      |
+        | output       | additional_func(1,2,3,4) | multiext("f.", "4", "3") | "{output[3]}" | 3]}       | "3"                      |
+        | output       | additional_func(1,2,3,4) | multiext("f.", "4", "3") | "{output[4]}" | 4]}       | foo                      |

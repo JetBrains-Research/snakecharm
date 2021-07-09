@@ -71,4 +71,6 @@ object SnakemakeNames {
     const val SNAKEMAKE_IO_METHOD_REPEAT = "repeat"
     const val SNAKEMAKE_IO_METHOD_UNPACK = "unpack"
     const val SNAKEMAKE_IO_METHOD_DYNAMIC = "dynamic"
+
+    const val SNAKEMAKE_METHOD_MULTIEXT = "multiext"
 }

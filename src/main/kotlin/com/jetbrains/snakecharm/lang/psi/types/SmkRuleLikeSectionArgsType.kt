@@ -14,6 +14,7 @@ import com.jetbrains.python.psi.types.PyStructuralType
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.UNPACK_FUNCTION
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
@@ -74,12 +75,18 @@ class SmkRuleLikeSectionArgsType(
             direction: AccessDirection,
             resolveContext: PyResolveContext
     ): List<RatedResolveResult> {
-        if (sectionArgs != null && isSimpleArgsList(sectionArgs)) {
+        if (sectionArgs != null && isSimpleArgsList(sectionArgs) && idx >= 0) {
             val resolveResult = ResolveResultList()
-            if (idx in sectionArgs.indices) {
-                resolveResult.poke(sectionArgs[idx], SmkResolveUtil.RATE_NORMAL)
+            var pos = idx
+
+            for(exp in sectionArgs){
+                val argNumber =  countProducedElements(exp)
+                if(pos < argNumber){
+                    resolveResult.poke(getProducedElementByIndex(exp, pos), SmkResolveUtil.RATE_NORMAL)
+                    return resolveResult
+                }
+                pos -= argNumber
             }
-            return resolveResult
         }
         return emptyList()
     }
@@ -142,7 +149,9 @@ class SmkRuleLikeSectionArgsType(
             return 0
         }
 
-        return sectionArgs.size
+        // Uses this instead of "sectionsArgs.size" in order to add support for 'multiext' snakemake method
+        // It will work incorrectly if there are another function with name 'multiext'
+        return sectionArgs.sumOf { countProducedElements(it) }
     }
 
     private fun isSimpleArgsList(args: Array<out PyExpression>): Boolean {
@@ -150,6 +159,30 @@ class SmkRuleLikeSectionArgsType(
             it is PyStarArgument || (it is PyCallExpression && it.callSimpleName() == UNPACK_FUNCTION)
         } == null
     }
+
+    /**
+     * Counts a number of elements that [PyExpression] returns. E.g.:
+     *  * "foo.txt" - one element
+     *  * multiext("foo.", "txt", "log") - two elements ("foo.txt", "foo.log")
+     *
+     * Note, that at this stage, it supports smart counting only for 'multiext' function
+     */
+    private fun countProducedElements(exp: PyExpression) = if (exp is PyCallExpression
+        && exp.isCalleeText(SnakemakeNames.SNAKEMAKE_METHOD_MULTIEXT)
+    ) exp.arguments.size - 1 else 1
+
+    /**
+     * Returns [ind] produced element of that [PyExpression]. E.g.:
+     *  * ("foo.txt", 0) -> "foo.txt"
+     *  * (multiext("foo.", "txt", "log"), 1) -> "log" argument
+     *
+     * Note, that at this stage, it supports smart access only for 'multiext' function
+     *
+     * @throws IndexOutOfBoundsException if [ind] is out of bounds of list of function produced elements
+     */
+    private fun getProducedElementByIndex(exp: PyExpression, ind: Int) = if (exp is PyCallExpression
+        && exp.isCalleeText(SnakemakeNames.SNAKEMAKE_METHOD_MULTIEXT)
+    ) exp.arguments[ind + 1] else exp
 
     override fun isBuiltin() = false
 }
