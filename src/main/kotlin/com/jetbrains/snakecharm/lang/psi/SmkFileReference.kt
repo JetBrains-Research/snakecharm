@@ -151,8 +151,10 @@ open class SmkFileReference(
 
     private fun couldBeParsed() = stringLiteralExpression.children.all { it !is PyFormattedStringElement }
 
-    // This function is supposed to get parent dir of 'IntelliJIdeaRulezzz' fake element
-    // when autocompletion is invoked
+    /**
+     * This function is supposed to get parent dir of 'IntelliJIdeaRulezzz' fake element
+     * when autocompletion is invoked
+     */
     private fun getParendDirForCompletion() =
             PsiTreeUtil.getParentOfType(element, PsiFile::class.java)?.originalFile?.containingDirectory
 
@@ -166,8 +168,10 @@ open class SmkFileReference(
     override fun getUnresolvedDescription(): String? = null
 }
 
-//must be in subdirectory of makefile parent
-//version 6.5.1
+/**
+ * Must be in subdirectory of makefile parent
+ * version 6.5.1
+ */
 class SmkIncludeReference(
         element: SmkArgsSection,
         textRange: TextRange,
@@ -178,9 +182,10 @@ class SmkIncludeReference(
         it is SmkFile && it.name != element.containingFile.name
     }
 }
-
-//can be in any directory
-//version 6.5.1
+/**
+ *Can be in any directory
+ *version 6.5.1
+ */
 class SmkConfigfileReference(
         element: SmkArgsSection,
         textRange: TextRange,
@@ -197,8 +202,10 @@ class SmkConfigfileReference(
     override fun resolve(): PsiElement? = findPathToResolve(searchFromRoot = true)
 }
 
-//must be in subdirectory of makefile parent
-//version 6.5.1
+/**
+ * Must be in subdirectory of makefile parent
+ * version 6.5.1
+ */
 class SmkCondaEnvReference(
         element: SmkArgsSection,
         textRange: TextRange,
@@ -211,8 +218,10 @@ class SmkCondaEnvReference(
 }
 private fun isYamlFile(it: PsiFileSystemItem) = it.name.endsWith(".yaml") || it.name.endsWith(".yml")
 
-//must be in subdirectory of makefile parent
-//version 6.5.1
+/**
+ * Must be in subdirectory of makefile parent
+ * version 6.5.1
+ */
 class SmkNotebookReference(
         element: SmkArgsSection,
         textRange: TextRange,
@@ -225,8 +234,10 @@ class SmkNotebookReference(
     }
 }
 
-//must be in subdirectory of makefile parent
-//version 6.5.1
+/**
+ * Must be in subdirectory of makefile parent
+ * version 6.5.1
+ */
 class SmkReportReference(
         element: SmkArgsSection,
         textRange: TextRange,
@@ -238,8 +249,10 @@ class SmkReportReference(
     }
 }
 
-//must be in subdirectory of makefile parent
-//version 6.5.1
+/**
+ * Must be in subdirectory of makefile parent
+ * version 6.5.1
+ */
 class SmkWorkDirReference(
         element: SmkArgsSection,
         textRange: TextRange,
