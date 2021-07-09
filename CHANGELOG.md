@@ -11,6 +11,8 @@ Released on ...
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Fixed
+- Support for 'handover' section (see [#362](https://github.com/JetBrains-Research/snakecharm/issues/362))
+- Access by index to input/output sections with 'multiext' function (see [#278](https://github.com/JetBrains-Research/snakecharm/issues/278))
 - Access by index to input/output sections with 'multiext' function (see [#278](https://github.com/JetBrains-Research/snakecharm/issues/278))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN))
 

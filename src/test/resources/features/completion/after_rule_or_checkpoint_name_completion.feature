@@ -58,6 +58,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
       | run         |
       | script      |
       | name        |
+      | handover    |
     Examples:
       | rule_like  | injection_left | injection_right |
       | rule       |                |                 |
@@ -122,6 +123,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
       | run                  |
       | script               |
       | name                 |
+      | handover             |
     Examples:
       | rule_like  |
       | rule       |
