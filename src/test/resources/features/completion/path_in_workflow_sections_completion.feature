@@ -129,7 +129,7 @@ Feature: Complete file names in workflow sections
       | configfile | yaml      |
       | report     | html      |
 
-  Scenario Outline: Completion list doesn't contain files from top-level directories
+  Scenario Outline: Completion list if it isn't configfile doesn't contain files from top-level directories
     Given a snakemake project
     Given a file "boo.<file_type>" with text
     """
@@ -143,11 +143,9 @@ Feature: Complete file names in workflow sections
     Then completion list shouldn't contain:
       | boo.<file_type> |
     Examples:
-      | section    | file_type |
-      | include    | smk       |
-      | configfile | yaml      |
-      | configfile | yml       |
-      | report     | html      |
+      | section | file_type |
+      | include | smk       |
+      | report  | html      |
 
   Scenario: Completion list in 'workdir' section doesn't contain top-level directories
     Given a snakemake project
@@ -251,3 +249,22 @@ Feature: Complete file names in workflow sections
       | include    | smk       |
       | configfile | yaml      |
       | report     | html      |
+
+  Scenario Outline: Completion list to a configfile in different subdirectories
+    Given a snakemake project
+    Given a file "Dir1/boo.<file_type>" with text
+    """
+    """
+    Given I open a file "Dir2/foo.smk" with text
+    """
+    <section>: "D"
+    """
+    When I put the caret after D
+    Then I invoke autocompletion popup and see a text:
+    """
+    <section>: "Dir1/boo.<file_type>"
+    """
+    Examples:
+      | section    | file_type |
+      | configfile | yaml      |
+      | configfile | yml       |

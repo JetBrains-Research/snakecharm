@@ -4,10 +4,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.TextRange
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VfsUtil
-import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.vfs.*
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PsiReferenceEx
@@ -43,6 +40,7 @@ open class SmkFileReference(
     protected fun collectFileSystemItemLike(
             collectFiles: Boolean = true,
             onlyFromParentFolder: Boolean = true,
+            isFromCurrentDir: Boolean = true,
             predicate: (file: PsiFileSystemItem) -> Boolean = { true }): Array<Any> {
         val project = element.project
 
@@ -63,8 +61,12 @@ open class SmkFileReference(
                 .filter(predicate)
                 .map {
                     val vFile = it.virtualFile
+                    val baseFile = when {
+                        isFromCurrentDir -> parentDirVFile
+                        else -> root
+                    }
                     LookupElementBuilder
-                        .create(relativePath(vFile, parentDirVFile) ?: vFile.path)
+                        .create(relativePath(vFile, baseFile) ?: vFile.path)
                         .withIcon(it.getIcon(0))
                 }
                 .toList()
@@ -100,28 +102,45 @@ open class SmkFileReference(
         return null
     }
 
-
-    private fun findVirtualFile(): VirtualFile? {
+    private fun findVirtualFile(searchFromRoot: Boolean = false): VirtualFile? {
         val stringLiteral = element.argumentList?.arguments?.firstOrNull {
             it is PyStringLiteralExpression && it.stringValue == path
         } ?: return null
 
-        val parentFolder = element.containingFile.originalFile.virtualFile?.parent ?: return null
-
-        val filePath = (stringLiteral as? PyStringLiteralExpression)?.stringValue
+        val filePath = (stringLiteral as? PyStringLiteralExpression)?.stringValue!!
         val vfm = VirtualFileManager.getInstance()
-
+        if (searchFromRoot) {
+            //search in all content roots
+            val contentRoots = ProjectRootManager.getInstance(element.project).contentRoots ?: return null
+            for (root in contentRoots) {
+                val file = root.findFileByRelativePath(filePath)
+                if (file != null) {
+                    return file
+                }
+            }
+        } else {
+            val parentFolder = element.containingFile.originalFile.virtualFile?.parent ?: return null
+            val file = parentFolder.findFileByRelativePath(filePath)
+            if (file != null) {
+                return file
+            }
+        }
         // Trying to find the file anywhere
-        return parentFolder.findFileByRelativePath(filePath!!) ?:
-        vfm.getFileSystem(LocalFileSystem.PROTOCOL).findFileByPath(filePath) ?:
+        return vfm.getFileSystem(LocalFileSystem.PROTOCOL).findFileByPath(filePath) ?:
         vfm.findFileByUrl(filePath)
     }
 
-    override fun resolve(): PsiElement? {
+    override fun resolve(): PsiElement? = findPathToResolve()
+
+    /**
+     * If [searchFromRoot] is true - the file sought from the root
+     * else from current file
+     */
+    protected fun findPathToResolve(searchFromRoot: Boolean = false): PsiElement?  {
         if (!couldBeParsed()) {
             return null
         }
-        return findVirtualFile()?.let {
+        return findVirtualFile(searchFromRoot)?.let {
             if (it.isDirectory) {
                 PsiManager.getInstance(element.project).findDirectory(it)
             } else {
@@ -147,6 +166,8 @@ open class SmkFileReference(
     override fun getUnresolvedDescription(): String? = null
 }
 
+//must be in subdirectory of makefile parent
+//version 6.5.1
 class SmkIncludeReference(
         element: SmkArgsSection,
         textRange: TextRange,
@@ -158,17 +179,26 @@ class SmkIncludeReference(
     }
 }
 
+//can be in any directory
+//version 6.5.1
 class SmkConfigfileReference(
         element: SmkArgsSection,
         textRange: TextRange,
         stringLiteralExpression: PyStringLiteralExpression,
         path: String
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
-    override fun getVariants() =  collectFileSystemItemLike() {
+    override fun getVariants() =  collectFileSystemItemLike(
+        onlyFromParentFolder = false,
+        isFromCurrentDir = false
+    ) {
         isYamlFile(it)
     }
+
+    override fun resolve(): PsiElement? = findPathToResolve(searchFromRoot = true)
 }
 
+//must be in subdirectory of makefile parent
+//version 6.5.1
 class SmkCondaEnvReference(
         element: SmkArgsSection,
         textRange: TextRange,
@@ -178,10 +208,11 @@ class SmkCondaEnvReference(
     override fun getVariants() =  collectFileSystemItemLike(onlyFromParentFolder = false) {
         isYamlFile(it)
     }
-
 }
 private fun isYamlFile(it: PsiFileSystemItem) = it.name.endsWith(".yaml") || it.name.endsWith(".yml")
 
+//must be in subdirectory of makefile parent
+//version 6.5.1
 class SmkNotebookReference(
         element: SmkArgsSection,
         textRange: TextRange,
@@ -194,6 +225,8 @@ class SmkNotebookReference(
     }
 }
 
+//must be in subdirectory of makefile parent
+//version 6.5.1
 class SmkReportReference(
         element: SmkArgsSection,
         textRange: TextRange,
@@ -205,6 +238,8 @@ class SmkReportReference(
     }
 }
 
+//must be in subdirectory of makefile parent
+//version 6.5.1
 class SmkWorkDirReference(
         element: SmkArgsSection,
         textRange: TextRange,
