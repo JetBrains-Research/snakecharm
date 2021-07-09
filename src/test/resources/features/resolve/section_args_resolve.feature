@@ -343,6 +343,7 @@ Scenario Outline: Unresolved index if out of bounds
       Then reference in injection should resolve to "<result>" in "foo.smk"
       Examples:
         | data_section | line1                    | line3                    | key           | signature | result                   |
+        | input        | multiext("f.", "1", "2") | multiext("f.", "4", "3") | "{input[0]}"  | 0]}       | "1"                      |
         | input        | multiext("f.", "1", "2") | multiext("f.", "4", "3") | "{input[1]}"  | 1]}       | "2"                      |
         | input        | multiext("f.", "1", "2") | multiext("f.", "4", "3") | "{input[2]}"  | 2]}       | "file"                   |
         | input        | multiext("f.", "1", "2") | multiext("f.", "4", "3") | "{input[3]}"  | 3]}       | "4"                      |

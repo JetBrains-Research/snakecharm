@@ -82,7 +82,7 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
     /**
      * Access by an index not supported
      */
-    override fun getPositionArgsNumber(location: PsiElement) = 0
+    override fun getPositionArgsPreviews(location: PsiElement): List<String?> = emptyList()
 
     private fun resolveToRuleWildcardConstraintsKwarg(name: String) =
             getRuleWildcardConstraintsSection()?.argumentList?.getKeywordArgument(name)

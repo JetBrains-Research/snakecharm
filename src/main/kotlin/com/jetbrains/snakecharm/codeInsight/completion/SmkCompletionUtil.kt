@@ -32,12 +32,16 @@ class SmkCompletionUtil {
                 icon: Icon = PlatformIcons.PROPERTY_ICON,
                 priority: Double = PYTHON_PRIORITY_WEIGHT,
                 typeText: String? = null,
+                tailText: String? = null,
                 insertHandler: InsertHandler<LookupElement>? = null
         ): LookupElement {
             var elementBuilder = LookupElementBuilder.create(name).withPsiElement(psiElement).withIcon(icon)
 
             if (typeText != null) {
                 elementBuilder = elementBuilder.withTypeText(typeText)
+            }
+            if (tailText != null) {
+                elementBuilder = elementBuilder.withTailText(tailText)
             }
 
             if (insertHandler  != null) {
