@@ -55,16 +55,18 @@ Feature: Resolve for section names in rules and checkpoints
       | <section> | <file> | <times> | <class> |
 
     Examples:
-      | rule_like  | text          | section   | file    | times | class                              |
-      | rule       | output: ""    | output    | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
-      | rule       | input: ""     | input     | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
-      | rule       | params: ""    | params    | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
-      | rule       | log: ""       | log       | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
-      | rule       | resources: "" | resources | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
-      | rule       | version: ""   | version   | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
-      | rule       | threads: 1    | threads   | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
-      | checkpoint | output: ""    | output    | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
-      | checkpoint | threads: 1    | threads   | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | rule_like  | text           | section   | file    | times | class                              |
+      | rule       | output: ""     | output    | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | rule       | input: ""      | input     | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | rule       | params: ""     | params    | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | rule       | log: ""        | log       | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | rule       | resources: ""  | resources | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | rule       | version: ""    | version   | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | rule       | threads: 1     | threads   | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | rule       | handover: True | handover  | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | checkpoint | output: ""     | output    | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | checkpoint | threads: 1     | threads   | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | checkpoint | handover: True | handover  | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
 
   Scenario Outline: Do not resolve to section in another rule, part1 (correct filters in SmkPyReferenceImpl)
     Given a snakemake project

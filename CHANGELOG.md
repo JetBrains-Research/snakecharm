@@ -10,6 +10,7 @@ Released on ...
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Fixed
+- Support for 'handover' section (see [#362](https://github.com/JetBrains-Research/snakecharm/issues/362))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN))
 
 ## [2021.2.424]

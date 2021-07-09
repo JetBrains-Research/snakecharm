@@ -44,6 +44,7 @@ Feature: Inspection for unexpected keyword arguments in section
       | rule       | singularity |
       | rule       | threads     |
       | rule       | name        |
+      | rule       | handover    |
       | checkpoint | message     |
       | checkpoint | notebook    |
       | checkpoint | priority    |
@@ -52,6 +53,7 @@ Feature: Inspection for unexpected keyword arguments in section
       | checkpoint | shell       |
       | checkpoint | version     |
       | checkpoint | wrapper     |
+      | checkpoint | handover    |
 
   Scenario Outline: No warn on expected keyword arguments in rule\checkpoint
     Given a snakemake project
