@@ -108,6 +108,7 @@ open class SmkFileReference(
     }
 
     private fun findVirtualFile(): VirtualFile? {
+        // Try to find using relative path
         val relativeFile = if (!makePathRelativelyCurrentFolder) {
             //search in all content roots
             ProjectRootManager.getInstance(element.project).contentRoots.firstNotNullOfOrNull { root ->
@@ -120,6 +121,7 @@ open class SmkFileReference(
         if (relativeFile != null) {
             return relativeFile
         }
+
         // Trying to find the file anywhere
         val vfm = VirtualFileManager.getInstance()
         val localFS = vfm.getFileSystem(LocalFileSystem.PROTOCOL)
