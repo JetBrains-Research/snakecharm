@@ -178,8 +178,8 @@ class SmkIncludeReference(
 }
 
 /**
- *Can be in any directory
- *version 6.5.1
+ * Can be in any directory
+ * version 6.5.1
  */
 class SmkConfigfileReference(
         element: SmkArgsSection,
