@@ -172,7 +172,7 @@ class SmkIncludeReference(
         stringLiteralExpression: PyStringLiteralExpression,
         path: String
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
-    override fun getVariants() =  collectFileSystemItemLike() {
+    override fun getVariants() =  collectFileSystemItemLike {
         it is SmkFile && it.name != element.containingFile.name
     }
 }
@@ -194,7 +194,7 @@ class SmkConfigfileReference(
             searchRelativelyToCurrentFolder = false,
             makePathRelativelyCurrentFolder = false
     ) {
-    override fun getVariants() =  collectFileSystemItemLike() {
+    override fun getVariants() =  collectFileSystemItemLike {
         isYamlFile(it)
     }
 }
@@ -215,7 +215,7 @@ class SmkCondaEnvReference(
             path,
             searchRelativelyToCurrentFolder = false
     ) {
-    override fun getVariants() =  collectFileSystemItemLike() {
+    override fun getVariants() =  collectFileSystemItemLike {
         isYamlFile(it)
     }
 }
@@ -237,7 +237,7 @@ class SmkNotebookReference(
             path,
             searchRelativelyToCurrentFolder = false
     ) {
-    override fun getVariants() =  collectFileSystemItemLike() {
+    override fun getVariants() =  collectFileSystemItemLike {
         val name = it.name.lowercase()
         name.endsWith(".py.ipynb") or name.endsWith(".r.ipynb")
     }
@@ -253,7 +253,7 @@ class SmkReportReference(
         stringLiteralExpression: PyStringLiteralExpression,
         path: String
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
-    override fun getVariants() = collectFileSystemItemLike() {
+    override fun getVariants() = collectFileSystemItemLike {
         it.name.endsWith(".html")
     }
 }
