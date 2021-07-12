@@ -99,7 +99,6 @@ open class SmkFileReference(
             while (ancestor != file) {
                 buff.append("../")
                 file = file.parent
-                requireNotNull(file)
             }
             buff.append(VfsUtil.getRelativePath(targetFile, ancestor)!!)
             return buff.toString()
@@ -237,7 +236,7 @@ class SmkNotebookReference(
             searchRelativelyToCurrentFolder = false
     ) {
     override fun getVariants() =  collectFileSystemItemLike() {
-        val name = it.name.toLowerCase()
+        val name = it.name.lowercase()
         name.endsWith(".py.ipynb") or name.endsWith(".r.ipynb")
     }
 }
