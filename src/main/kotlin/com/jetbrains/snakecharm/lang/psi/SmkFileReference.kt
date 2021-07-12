@@ -109,31 +109,22 @@ open class SmkFileReference(
     }
 
     private fun findVirtualFile(): VirtualFile? {
-        val stringLiteral = element.argumentList?.arguments?.firstOrNull {
-            it is PyStringLiteralExpression && it.stringValue == path
-        } ?: return null
-
-        val filePath = (stringLiteral as? PyStringLiteralExpression)?.stringValue!!
-        val vfm = VirtualFileManager.getInstance()
-        if (makePathRelativelyCurrentFolder) {
-            val parentFolder = element.containingFile.originalFile.virtualFile?.parent ?: return null
-            val file = parentFolder.findFileByRelativePath(filePath)
-            if (file != null) {
-                return file
+        val relativeFile = if (!makePathRelativelyCurrentFolder) {
+            //search in all content roots
+            ProjectRootManager.getInstance(element.project).contentRoots.firstNotNullOfOrNull { root ->
+                root.findFileByRelativePath(path)
             }
         } else {
-            //search in all content roots
-            val contentRoots = ProjectRootManager.getInstance(element.project).contentRoots ?: return null
-            for (root in contentRoots) {
-                val file = root.findFileByRelativePath(filePath)
-                if (file != null) {
-                    return file
-                }
-            }
+            element.containingFile.originalFile.virtualFile?.parent
+                ?.findFileByRelativePath(path)
+        }
+        if (relativeFile != null) {
+            return relativeFile
         }
         // Trying to find the file anywhere
-        return vfm.getFileSystem(LocalFileSystem.PROTOCOL).findFileByPath(filePath) ?:
-        vfm.findFileByUrl(filePath)
+        val vfm = VirtualFileManager.getInstance()
+        val localFS = vfm.getFileSystem(LocalFileSystem.PROTOCOL)
+        return localFS.findFileByPath(path) ?: vfm.findFileByUrl(path)
     }
 
     override fun resolve(): PsiElement? = findPathToResolve()
