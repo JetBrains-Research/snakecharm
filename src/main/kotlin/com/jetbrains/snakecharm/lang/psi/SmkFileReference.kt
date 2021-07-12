@@ -14,10 +14,10 @@ import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.python.psi.types.TypeEvalContext
 
 /**
- * If [searchRelativelyToCurrentFolder] is true - the file sought relative to the current folder
- * else relative to the project root
- * If [makePathRelativelyCurrentFolder] is true - the path built relative to the current folder
- * else relative to the project root
+ * @param [searchRelativelyToCurrentFolder] If is true - the file sought relative to the current folder
+ * else relative to the project root.
+ * @param [makePathRelativelyCurrentFolder] If  is true - the path built relative to the current folder
+ * else relative to the project root.
  */
 open class SmkFileReference(
         element: SmkArgsSection,
