@@ -215,17 +215,6 @@ class StepDefs {
         TODO()
     }
 
-    @Given("^I apply quick fix \"add ignored item\" manually")
-    fun applyFixAddIgnoredElementManually() {
-        val list = (LocalInspectionEP.LOCAL_INSPECTION.extensionList
-            .first { it.shortName == "SmkUnrecognizedSectionInspection" }
-            .instance as SmkUnrecognizedSectionInspection).ignoredItems
-        if("unknown_section" in list){
-            fail("Section \"unknown_section\" is already here, but it shouldn't be")
-        }
-        list.add("unknown_section")
-    }
-
     companion object {
         fun waitEDTEventsDispatching() {
             ApplicationManager.getApplication().invokeAndWait() {

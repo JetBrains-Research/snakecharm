@@ -15,6 +15,7 @@ Feature: Inspection if section isn't recognized by SnakeCharm
       Section 'unrecognized_section' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
       """
     When I check highlighting weak warnings
+    Then I see available quick fix: Ignore an unrecognized section 'unrecognized_section'
     Examples:
       | rule_like   |
       | rule        |
@@ -29,7 +30,7 @@ Feature: Inspection if section isn't recognized by SnakeCharm
           unknown_section: ""
       """
       And SmkUnrecognizedSectionInspection inspection is enabled
-      And I apply quick fix "add ignored item" manually
+      And I emulate quick fix apply: ignore unresolved item 'unknown_section'
       Then I expect no inspection weak warnings
       When I check highlighting weak warnings
       Examples:
@@ -51,7 +52,7 @@ Feature: Inspection if section isn't recognized by SnakeCharm
       Section 'unknown_section' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
       """
     When I check highlighting weak warnings
-    And I apply quick fix "add ignored item" manually
+    And I emulate quick fix apply: ignore unresolved item 'unknown_section'
     Then I check ignored element <unknown_section>
     Examples:
       | rule_like   |
