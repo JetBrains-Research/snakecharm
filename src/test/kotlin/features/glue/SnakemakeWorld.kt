@@ -30,7 +30,9 @@ object SnakemakeWorld {
     fun injectionFixture() = myInjectionFixture!!
     fun fixture()= myFixture!!
 
-    val MSG_COMPLETION_LIST_NOT_INITIALIZED = "Completion list not initialized, likely you've forgotten" +
+    val MSG_COMPLETION_LIST_NOT_INITIALIZED
+        // Cannot use conventional field here due to `Hooks.cleanupMyWorld()` impl
+        get() = "Completion list not initialized, likely you've forgotten" +
             " 'I invoke autocompletion popup' step" +
             " or completion contained single variant matching item prefix so it was automatically inserted. For" +
             " the last scenario use `I invoke autocompletion popup and see a text:` step."
