@@ -3,6 +3,7 @@ package features.glue
 import com.google.common.collect.ImmutableMap
 import com.intellij.codeInsight.documentation.DocumentationManager
 import com.intellij.codeInsight.highlighting.BraceMatchingUtil
+import com.intellij.codeInspection.LocalInspectionEP
 import com.intellij.ide.util.gotoByName.GotoSymbolModel2
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.application.ApplicationManager
@@ -22,6 +23,7 @@ import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.FakeSnakemakeInjector
 import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler
+import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
 import features.glue.SnakemakeWorld.findPsiElementUnderCaret
 import features.glue.SnakemakeWorld.fixture
 import features.glue.SnakemakeWorld.myFixture
@@ -478,6 +480,13 @@ class ActionsSteps {
 
             Assert.assertEquals(StringUtil.convertLineSeparators(text.trim()), mapped.trim())
         }
+    }
+
+    @Then("^I check ignored element <([^>]+)>")
+    fun checkIgnoredElementInInspectionList(el : String){
+        Assert.assertTrue(el in (LocalInspectionEP.LOCAL_INSPECTION.extensionList
+            .first { it.shortName == "SmkUnrecognizedSectionInspection" }
+            .instance as SmkUnrecognizedSectionInspection).ignoredItems)
     }
 
     companion object {

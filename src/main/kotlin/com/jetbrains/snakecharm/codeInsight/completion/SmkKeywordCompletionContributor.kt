@@ -161,10 +161,7 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
         context: ProcessingContext,
         result: CompletionResultSet
     ) {
-        (RULE_OR_CHECKPOINT_SECTION_KEYWORDS + (InspectionProfileManager.getInstance().currentProfile
-            .getUnwrappedTool(
-                SmkUnrecognizedSectionInspection::class.java.simpleName, parameters.originalFile
-            ) as SmkUnrecognizedSectionInspection).ignoredItems).forEach { s ->
+        RULE_OR_CHECKPOINT_SECTION_KEYWORDS.forEach { s ->
 
             result.addElement(
                 SmkCompletionUtil.createPrioritizedLookupElement(

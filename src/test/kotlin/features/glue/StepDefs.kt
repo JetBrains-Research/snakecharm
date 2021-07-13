@@ -18,6 +18,7 @@ import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
+import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
 import io.cucumber.java.en.Given
 import javax.swing.SwingUtilities
 import kotlin.test.fail
@@ -212,6 +213,17 @@ class StepDefs {
     @Given("^TODO")
     fun todo() {
         TODO()
+    }
+
+    @Given("^I apply quick fix \"add ignored item\" manually")
+    fun applyFixAddIgnoredElementManually() {
+        val list = (LocalInspectionEP.LOCAL_INSPECTION.extensionList
+            .first { it.shortName == "SmkUnrecognizedSectionInspection" }
+            .instance as SmkUnrecognizedSectionInspection).ignoredItems
+        if("unknown_section" in list){
+            fail("Section \"unknown_section\" is already here, but it shouldn't be")
+        }
+        list.add("unknown_section")
     }
 
     companion object {

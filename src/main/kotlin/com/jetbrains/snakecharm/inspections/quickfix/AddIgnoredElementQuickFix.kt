@@ -32,7 +32,7 @@ class AddIgnoredElementQuickFix(element: PsiElement) : LocalQuickFixAndIntention
         val virtualFile = startElement.containingFile.virtualFile
         if (virtualFile != null) {
             val text = startElement.text
-            val inspectionProfileManager = InspectionProfileManager.getInstance()
+            val inspectionProfileManager = InspectionProfileManager.getInstance(startElement.project)
             val inspectionProfileImpl = inspectionProfileManager.currentProfile
             val model = InspectionProfileModifiableModel(inspectionProfileImpl)
             model.modifyProfile {

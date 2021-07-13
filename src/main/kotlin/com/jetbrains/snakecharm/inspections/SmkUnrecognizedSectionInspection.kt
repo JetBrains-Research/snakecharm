@@ -25,10 +25,13 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
             val sectionNamePsi = st.nameIdentifier
             val sectionKeyword = st.sectionKeyword
 
-            if (sectionNamePsi != null && sectionKeyword != null && sectionKeyword !in SUBWORKFLOW_SECTIONS_KEYWORDS) {
+            if (sectionNamePsi != null && sectionKeyword != null && sectionKeyword !in SUBWORKFLOW_SECTIONS_KEYWORDS
+                && sectionKeyword !in ignoredItems) {
                 registerProblem(
                     sectionNamePsi,
-                    SnakemakeBundle.message("INSP.NAME.section.unrecognized.message", sectionKeyword)
+                    SnakemakeBundle.message("INSP.NAME.section.unrecognized.message", sectionKeyword),
+                    ProblemHighlightType.WEAK_WARNING,
+                    null, AddIgnoredElementQuickFix(sectionNamePsi)
                 )
             }
         }
