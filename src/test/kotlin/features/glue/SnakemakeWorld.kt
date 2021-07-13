@@ -29,16 +29,18 @@ object SnakemakeWorld {
 
     fun injectionFixture() = myInjectionFixture!!
     fun fixture()= myFixture!!
+
+    val MSG_COMPLETION_LIST_NOT_INITIALIZED = "Completion list not initialized, likely you've forgotten" +
+            " 'I invoke autocompletion popup' step" +
+            " or completion contained single variant matching item prefix so it was automatically inserted. For" +
+            " the last scenario use `I invoke autocompletion popup and see a text:` step."
+
     fun completionList(): List<String> {
-        requireNotNull(myCompletionList) {
-            "Completion list not initialized, likely you've forgotten 'I invoke autocompletion popup' step."
-        }
+        requireNotNull(myCompletionList) { MSG_COMPLETION_LIST_NOT_INITIALIZED }
         return myCompletionList!!
     }
     fun completionListPresentations(): List<LookupElementPresentation> {
-        requireNotNull(myCompletionListPresentations) {
-            "Completion list not initialized, likely you've forgotten 'I invoke autocompletion popup' step."
-        }
+        requireNotNull(myCompletionListPresentations) { MSG_COMPLETION_LIST_NOT_INITIALIZED }
         return myCompletionListPresentations!!
     }
 
