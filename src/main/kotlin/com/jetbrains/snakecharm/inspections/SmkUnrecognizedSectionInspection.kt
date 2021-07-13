@@ -14,7 +14,7 @@ import javax.swing.JComponent
 
 class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
     @JvmField
-    val ignoredItems : ArrayList<String> = arrayListOf()
+    val ignoredItems: ArrayList<String> = arrayListOf()
 
     override fun buildVisitor(
         holder: ProblemsHolder,
@@ -59,7 +59,9 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
     }
 
     override fun createOptionsPanel(): JComponent? {
-        return ListEditForm(SnakemakeBundle.message("INSP.NAME.section.unrecognized.ignored"),
-            ignoredItems).contentPanel
+        return ListEditForm(
+            SnakemakeBundle.message("INSP.NAME.section.unrecognized.ignored"),
+            ignoredItems
+        ).contentPanel
     }
 }

@@ -1,52 +1,30 @@
 package com.jetbrains.snakecharm.inspections.quickfix
 
-import com.intellij.codeInsight.template.TemplateBuilderImpl
-import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
-import com.intellij.codeInspection.ex.InspectionProfileModifiableModel
-import com.intellij.openapi.editor.Editor
+import com.intellij.codeInsight.intention.LowPriorityAction
+import com.intellij.codeInspection.LocalQuickFix
+import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.project.Project
-import com.intellij.profile.codeInspection.InspectionProfileManager
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
 
-class AddIgnoredElementQuickFix(element: PsiElement) : LocalQuickFixAndIntentionActionOnPsiElement(element) {
-    private val elementName = element.text
+class AddIgnoredElementQuickFix(section: PsiElement) : LocalQuickFix, LowPriorityAction {
+    private val sectionName = section.text
 
-    override fun getFamilyName(): String {
-        return SnakemakeBundle.message("INSP.NAME.section.unrecognized.ignored.add", elementName)
-    }
+    override fun getName() = SnakemakeBundle.message("INSP.NAME.section.unrecognized.ignored.add", sectionName)
+    override fun getFamilyName() = SnakemakeBundle.message("INSP.NAME.section.unrecognized.ignored.add", sectionName)
 
-    override fun getText(): String {
-        return SnakemakeBundle.message("INSP.NAME.section.unrecognized.ignored.add", elementName)
-    }
+    override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
+        val context = descriptor.psiElement
 
-    override fun invoke(
-        project: Project,
-        file: PsiFile,
-        editor: Editor?,
-        startElement: PsiElement,
-        endElement: PsiElement
-    ) {
-        val virtualFile = startElement.containingFile.virtualFile
-        if (virtualFile != null) {
-            val text = startElement.text
-            val inspectionProfileManager = InspectionProfileManager.getInstance(startElement.project)
-            val inspectionProfileImpl = inspectionProfileManager.currentProfile
-            val model = InspectionProfileModifiableModel(inspectionProfileImpl)
-            model.modifyProfile {
-                val inspection = it.getUnwrappedTool(
-                    SmkUnrecognizedSectionInspection::class.java.simpleName,
-                    file
-                ) as SmkUnrecognizedSectionInspection
-                if (text !in inspection.ignoredItems) {
-                    inspection.ignoredItems.add(startElement.text)
-                }
+        com.intellij.codeInspection.ex.modifyAndCommitProjectProfile(project) {
+            val inspection = it.getUnwrappedTool(
+                SmkUnrecognizedSectionInspection::class.java.simpleName,
+                context
+            ) as SmkUnrecognizedSectionInspection
+            if (sectionName !in inspection.ignoredItems) {
+                inspection.ignoredItems.add(sectionName)
             }
-            model.commit()
-            assert(editor != null)
-            TemplateBuilderImpl(startElement).run(editor!!, false)
         }
     }
 }
