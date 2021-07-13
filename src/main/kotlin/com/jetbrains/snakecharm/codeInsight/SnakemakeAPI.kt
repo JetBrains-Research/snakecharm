@@ -9,6 +9,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CONTAINERIZED
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CWL
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_ENVMODULES
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_GROUP
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_HANDOVER
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_LOG
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_MESSAGE
@@ -87,7 +88,7 @@ object SnakemakeAPI {
             SECTION_MESSAGE, SECTION_THREADS, SECTION_SINGULARITY,
             SECTION_PRIORITY, SECTION_CONDA, SECTION_GROUP,
             SECTION_SHADOW, SECTION_CACHE, SECTION_NOTEBOOK, SECTION_CONTAINER,
-            SECTION_CONTAINERIZED
+            SECTION_HANDOVER, SECTION_CONTAINERIZED
     )
 
     /**
@@ -103,7 +104,8 @@ object SnakemakeAPI {
             SECTION_CONTAINER,
             SECTION_CONTAINERIZED,
             SECTION_ENVMODULES,
-            SECTION_NAME
+            SECTION_NAME,
+            SECTION_HANDOVER
     )
     val RULE_OR_CHECKPOINT_SECTION_KEYWORDS = (RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS + setOf(SnakemakeNames.SECTION_RUN))
 
@@ -156,7 +158,7 @@ object SnakemakeAPI {
             SECTION_VERSION, SECTION_THREADS,
             SECTION_PRIORITY, SECTION_SINGULARITY, SECTION_CACHE,
             SECTION_CONTAINER, SECTION_CONTAINERIZED, SECTION_NOTEBOOK,
-            SECTION_ENVMODULES
+            SECTION_ENVMODULES, SECTION_HANDOVER
     )
 
     /**
@@ -215,7 +217,7 @@ object SnakemakeAPI {
             SECTION_BENCHMARK, SECTION_VERSION, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS, SECTION_SINGULARITY,
             SECTION_PRIORITY, SECTION_GROUP, SECTION_SHADOW, SECTION_CONDA, SECTION_SCRIPT, SECTION_WRAPPER,
             SECTION_CWL, SECTION_NOTEBOOK, SECTION_CACHE, SECTION_CONTAINER, SECTION_CONTAINERIZED, SECTION_ENVMODULES,
-            SECTION_NAME
+            SECTION_NAME, SECTION_HANDOVER
     )
 
     val IO_FLAG_2_SUPPORTED_SECTION: HashMap<String, List<String>> = hashMapOf(

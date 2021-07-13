@@ -58,3 +58,4 @@ Feature: Inspection for multiple arguments in various sections
       | notebook      |
       | container     |
       | containerized |
+      | handover      |

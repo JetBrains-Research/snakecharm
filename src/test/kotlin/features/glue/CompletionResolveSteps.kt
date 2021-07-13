@@ -20,6 +20,7 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.*
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
+import com.intellij.testFramework.fixtures.TestLookupElementPresentation
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.ui.UIUtil
 import com.jetbrains.python.psi.PyStringLiteralExpression
@@ -29,7 +30,6 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import junit.framework.TestCase
 import java.lang.Integer.max
-import java.util.*
 import kotlin.test.*
 
 /**
@@ -349,7 +349,37 @@ class CompletionResolveSteps {
 
     @Then("^completion list should contain:$")
     fun completionListShouldContain(table: DataTable) {
-        assertHasElements(SnakemakeWorld.completionList(), table.asList())
+        // table format:
+        //  | item text | tail text | type text |
+        val nCols = table.width()
+        if (nCols == 1) {
+            // lookup strings:
+            assertHasElements(SnakemakeWorld.completionList(), table.column(0).toList())
+            return
+        }
+
+        val expected = table.asLists().map { row ->
+            row.joinToString(separator = "|", prefix = "|", postfix = "|")
+        }
+
+        val buff = StringBuilder()
+        val actual = SnakemakeWorld.completionList().zip(SnakemakeWorld.completionListPresentations())
+            .map { (lookupString, p) ->
+            buff.clear()
+            buff.append('|')
+            buff.append(lookupString) //XXX: 'p.itemText' could be wrapped in extra quotes for some reason
+            if (nCols > 1) {
+                buff.append('|')
+                buff.append(p.tailText)
+            }
+            if (nCols > 2) {
+                buff.append('|')
+                buff.append(p.typeText)
+            }
+            buff.append('|')
+            buff.toString()
+        }
+        assertHasElements(actual, expected)
     }
 
     @Then("^completion list should be empty")
@@ -499,6 +529,7 @@ class CompletionResolveSteps {
         val fixture = SnakemakeWorld.fixture()
         fixture.complete(CompletionType.BASIC, invocationCount)
         SnakemakeWorld.myCompletionList = fixture.lookupElementStrings
+        SnakemakeWorld.myCompletionListPresentations = fixture.lookupElements?.map { TestLookupElementPresentation.renderReal(it) }
     }
 
     private fun getCompletionItemsPresentation(): List<LookupElementPresentation> {

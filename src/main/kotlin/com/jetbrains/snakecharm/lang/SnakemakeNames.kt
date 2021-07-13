@@ -58,6 +58,7 @@ object SnakemakeNames {
     const val SECTION_NOTEBOOK = "notebook"
     const val SECTION_ENVMODULES = "envmodules" // >= 5.9
     const val SECTION_NAME = "name" // >= 5.31
+    const val SECTION_HANDOVER = "handover" // >= 6.2
 
     const val RUN_SECTION_VARIABLE_RULE = "rule"
     const val RUN_SECTION_VARIABLE_JOBID = "jobid"
@@ -72,4 +73,6 @@ object SnakemakeNames {
     const val SNAKEMAKE_IO_METHOD_REPEAT = "repeat"
     const val SNAKEMAKE_IO_METHOD_UNPACK = "unpack"
     const val SNAKEMAKE_IO_METHOD_DYNAMIC = "dynamic"
+
+    const val SNAKEMAKE_METHOD_MULTIEXT = "multiext"
 }
