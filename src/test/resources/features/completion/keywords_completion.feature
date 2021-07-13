@@ -497,6 +497,7 @@ Feature: Completion for snakemake keyword-like things
       | workdir              |
       | singularity          |
       | container            |
+      | containerized        |
     Examples:
       | signature                   | toplevel_section | section    |
       | comment_toplevel            | rule             | input      |
@@ -522,12 +523,13 @@ Feature: Completion for snakemake keyword-like things
     When I put the caret at <signature>
     And I invoke autocompletion popup
     And completion list shouldn't contain:
-      | input      |
-      | output     |
-      | log        |
-      | container  |
-      | configfile |
-      | workdir    |
+      | input         |
+      | output        |
+      | log           |
+      | container     |
+      | containerized |
+      | configfile    |
+      | workdir       |
     Examples:
       | signature                   | toplevel_section | section    |
       | comment_toplevel            | rule             | input      |

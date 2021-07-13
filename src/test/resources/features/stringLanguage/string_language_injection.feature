@@ -186,6 +186,7 @@ Feature: Tests on snakemake string language injection
     | priority             |
     | singularity          |
     | container            |
+    | containerized        |
     | notebook             |
     |handover              |
 

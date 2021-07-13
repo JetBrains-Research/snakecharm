@@ -33,27 +33,28 @@ Feature: Inspection for unexpected keyword arguments in section
     """
     When I check highlighting errors
     Examples:
-      | rule_like  | section     |
-      | rule       | benchmark   |
-      | rule       | cache       |
-      | rule       | conda       |
-      | rule       | container   |
-      | rule       | cwl         |
-      | rule       | group       |
-      | rule       | envmodules  |
-      | rule       | singularity |
-      | rule       | threads     |
-      | rule       | name        |
-      | rule       | handover    |
-      | checkpoint | message     |
-      | checkpoint | notebook    |
-      | checkpoint | priority    |
-      | checkpoint | script      |
-      | checkpoint | shadow      |
-      | checkpoint | shell       |
-      | checkpoint | version     |
-      | checkpoint | wrapper     |
-      | checkpoint | handover    |
+      | rule_like  | section       |
+      | rule       | benchmark     |
+      | rule       | cache         |
+      | rule       | conda         |
+      | rule       | container     |
+      | rule       | containerized |
+      | rule       | cwl           |
+      | rule       | group         |
+      | rule       | envmodules    |
+      | rule       | singularity   |
+      | rule       | threads       |
+      | rule       | name          |
+      | rule       | handover      |
+      | checkpoint | message       |
+      | checkpoint | notebook      |
+      | checkpoint | priority      |
+      | checkpoint | script        |
+      | checkpoint | shadow        |
+      | checkpoint | shell         |
+      | checkpoint | version       |
+      | checkpoint | wrapper       |
+      | checkpoint | handover      |
 
   Scenario Outline: No warn on expected keyword arguments in rule\checkpoint
     Given a snakemake project

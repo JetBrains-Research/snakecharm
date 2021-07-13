@@ -30,6 +30,7 @@ object SnakemakeNames {
 
     const val WORKFLOW_ENVVARS_KEYWORD = "envvars"
     const val WORKFLOW_CONTAINER_KEYWORD = "container"
+    const val WORKFLOW_CONTAINERIZED_KEYWORD = "containerized"
 
     const val SECTION_INPUT = "input"
     const val SECTION_OUTPUT = "output"
@@ -53,6 +54,7 @@ object SnakemakeNames {
     const val SECTION_RUN = "run"
     const val SECTION_CACHE = "cache" // >= 5.12.0
     const val SECTION_CONTAINER = "container"
+    const val SECTION_CONTAINERIZED = "containerized" // => 6.0.0
     const val SECTION_NOTEBOOK = "notebook"
     const val SECTION_ENVMODULES = "envmodules" // >= 5.9
     const val SECTION_NAME = "name" // >= 5.31
