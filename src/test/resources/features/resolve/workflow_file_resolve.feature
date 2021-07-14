@@ -215,3 +215,20 @@ Feature: Resolve workflow file names to their corresponding files
       | workflow   | file_type |
       | configfile | yaml      |
       | configfile | yml       |
+
+  Scenario Outline: Reference doesn't resolve to configfile with wrong path
+    Given a snakemake project
+    Given a file "Dir1/boo.<file_type>" with text
+    """
+    TEXT
+    """
+    Given I open a file "Dir2/foo.smk" with text
+    """
+    configfile: "../Dir1/boo.<file_type>"
+    """
+    When I put the caret at boo
+    Then reference should not resolve
+    Examples:
+      | file_type |
+      | yaml      |
+      | yml       |

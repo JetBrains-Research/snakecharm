@@ -268,3 +268,21 @@ Feature: Complete file names in workflow sections
       | section    | file_type |
       | configfile | yaml      |
       | configfile | yml       |
+
+  Scenario Outline: Completion list in configfile doesn't contain path from current folder
+    Given a snakemake project
+    Given a file "Dir1/boo.<file_type>" with text
+    """
+    """
+    Given I open a file "Dir2/foo.smk" with text
+    """
+    configfile: ".."
+    """
+    When I put the caret after ..
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | ../Dir1/boo.<file_type> |
+    Examples:
+      | file_type |
+      | yaml      |
+      | yml       |
