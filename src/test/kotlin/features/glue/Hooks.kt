@@ -1,8 +1,10 @@
 package features.glue
 
+import com.intellij.codeInspection.LocalInspectionEP
 import com.intellij.codeInspection.ex.InspectionProfileImpl
 import com.intellij.openapi.util.Disposer
 import com.intellij.testFramework.TestApplicationManager
+import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
 import io.cucumber.java.After
 import io.cucumber.java.Before
 import java.lang.reflect.Modifier
@@ -25,6 +27,10 @@ class Hooks {
     fun cleanup() {
         //SeveritiesProvider.EP_NAME.getPoint(null).unregisterExtension(FindUsagesSteps.SEVERITIES_PROVIDER)
         InspectionProfileImpl.INIT_INSPECTIONS = false
+
+        (LocalInspectionEP.LOCAL_INSPECTION.extensionList
+            .first { it.shortName == "SmkUnrecognizedSectionInspection" }
+            .instance as SmkUnrecognizedSectionInspection).ignoredItems.clear()
 
         SnakemakeWorld.myFixture?.tearDown()
         SnakemakeWorld.myTestRootDisposable?.let { Disposer.dispose(it) }

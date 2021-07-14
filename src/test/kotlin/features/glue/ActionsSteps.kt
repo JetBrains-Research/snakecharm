@@ -3,6 +3,8 @@ package features.glue
 import com.google.common.collect.ImmutableMap
 import com.intellij.codeInsight.documentation.DocumentationManager
 import com.intellij.codeInsight.highlighting.BraceMatchingUtil
+import com.intellij.codeInsight.intention.IntentionAction
+import com.intellij.codeInspection.LocalInspectionEP
 import com.intellij.ide.util.gotoByName.GotoSymbolModel2
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.application.ApplicationManager
@@ -22,6 +24,7 @@ import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.FakeSnakemakeInjector
 import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler
+import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
 import features.glue.SnakemakeWorld.findPsiElementUnderCaret
 import features.glue.SnakemakeWorld.fixture
 import features.glue.SnakemakeWorld.myFixture
@@ -148,7 +151,7 @@ class ActionsSteps {
 
         updatedInspectionProblemsCounter(highlightingLevel)
         ApplicationManager.getApplication().invokeAndWait {
-            performAction(project, Runnable {
+            performAction(project, {
                 fixture.editor.document.replaceString(startPos, startPos + text.length, newText)
             })
         }
@@ -290,6 +293,21 @@ class ActionsSteps {
 
     @Then("^I invoke quick fix ([^\\]]+) and see text:")
     fun iInvokeQuickFixAndSeeText(quickFixFamilyName: String, text: String) {
+        val quickFix = findQuickFix(quickFixFamilyName)
+
+        ApplicationManager.getApplication().invokeAndWait {
+            fixture().launchAction(quickFix)
+        }
+        fixture().checkResult(text.replace("\r", ""))
+    }
+
+    @Then("^I see available quick fix: ([^\\]]+)")
+    fun iSeeAvailableQuickFixt(quickFixFamilyName: String) {
+        findQuickFix(quickFixFamilyName)
+        // already not-null, if <null> find quick fix will provoid user-friendly message
+    }
+
+    private fun findQuickFix(quickFixFamilyName: String): IntentionAction {
         require(SnakemakeWorld.myInspectionChecked) {
             "First call step: I check highlighting ..."
         }
@@ -300,11 +318,18 @@ class ActionsSteps {
                     allQuickFixes.joinToString(separator = "\n") { it.familyName }
                 }\n]"
             )
+        return quickFix
+    }
 
-        ApplicationManager.getApplication().invokeAndWait {
-            fixture().launchAction(quickFix)
+    @Given("^I emulate quick fix apply: ignore unresolved item '(.*)'")
+    fun applyFixAddIgnoredElementManually(sectionName: String) {
+        val list = (LocalInspectionEP.LOCAL_INSPECTION.extensionList
+            .first { it.shortName == "SmkUnrecognizedSectionInspection" }
+            .instance as SmkUnrecognizedSectionInspection).ignoredItems
+        if (sectionName in list){
+            fail("Section \"${sectionName}\" is already here, but it shouldn't be")
         }
-        fixture().checkResult(text.replace("\r", ""))
+        list.add(sectionName)
     }
 
     @Then("^go to symbol should contain:$")
@@ -415,7 +440,7 @@ class ActionsSteps {
         // See ids in: IdeActions
         ApplicationManager.getApplication().invokeAndWait({
             ApplicationManager.getApplication().runWriteAction {
-                SnakemakeWorld.myFixture?.performEditorAction(actionId)
+                myFixture?.performEditorAction(actionId)
             }
         }, ModalityState.NON_MODAL)
     }
@@ -478,6 +503,13 @@ class ActionsSteps {
 
             Assert.assertEquals(StringUtil.convertLineSeparators(text.trim()), mapped.trim())
         }
+    }
+
+    @Then("^I check ignored element <([^>]+)>")
+    fun checkIgnoredElementInInspectionList(el : String){
+        Assert.assertTrue(el in (LocalInspectionEP.LOCAL_INSPECTION.extensionList
+            .first { it.shortName == "SmkUnrecognizedSectionInspection" }
+            .instance as SmkUnrecognizedSectionInspection).ignoredItems)
     }
 
     companion object {
