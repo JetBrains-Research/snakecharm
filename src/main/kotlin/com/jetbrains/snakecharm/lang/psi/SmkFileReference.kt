@@ -16,8 +16,6 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 /**
  * @param [searchRelativelyToCurrentFolder] If is true - the file sought relative to the current folder
  * else relative to the project root.
- * @param [makePathRelativelyCurrentFolder] If  is true - the path built relative to the current folder
- * else relative to the project root.
  */
 open class SmkFileReference(
         element: SmkArgsSection,
@@ -25,7 +23,6 @@ open class SmkFileReference(
         private val stringLiteralExpression: PyStringLiteralExpression,
         private val path: String,
         private val searchRelativelyToCurrentFolder: Boolean = true,
-        private val makePathRelativelyCurrentFolder: Boolean = true
 ) : PsiReferenceBase<SmkArgsSection>(element, textRange), PsiReferenceEx {
     // Reference caching can be implemented with the 'ResolveCache' class if needed
 
@@ -53,10 +50,7 @@ open class SmkFileReference(
         val parentDirVFile = getParendDirForCompletion()?.virtualFile ?: return emptyArray()
 
         val psiManager = PsiManager.getInstance(project)
-        val folders = when {
-            searchRelativelyToCurrentFolder -> arrayOf(parentDirVFile)
-            else -> ProjectRootManager.getInstance(project).contentRoots
-        }
+        val folders = ProjectRootManager.getInstance(project).contentRoots
 
         return folders.flatMap { root ->
             VfsUtil.collectChildrenRecursively(root)
@@ -68,7 +62,7 @@ open class SmkFileReference(
                 .map {
                     val vFile = it.virtualFile
                     val baseFile = when {
-                        makePathRelativelyCurrentFolder -> parentDirVFile
+                        searchRelativelyToCurrentFolder -> parentDirVFile
                         else -> root
                     }
                     LookupElementBuilder
@@ -109,14 +103,14 @@ open class SmkFileReference(
 
     private fun findVirtualFile(): VirtualFile? {
         // Try to find using relative path
-        val relativeFile = if (!makePathRelativelyCurrentFolder) {
+        val relativeFile = if (searchRelativelyToCurrentFolder) {
+            element.containingFile.originalFile.virtualFile?.parent
+                ?.findFileByRelativePath(path)
+        } else {
             //search in all content roots
             ProjectRootManager.getInstance(element.project).contentRoots.firstNotNullOfOrNull { root ->
                 root.findFileByRelativePath(path)
             }
-        } else {
-            element.containingFile.originalFile.virtualFile?.parent
-                ?.findFileByRelativePath(path)
         }
         if (relativeFile != null) {
             return relativeFile
@@ -178,7 +172,8 @@ class SmkIncludeReference(
 }
 
 /**
- * Can be in any directory
+ * The path must built from working directory
+ * We use contentRoots as working directory
  * version 6.5.1
  */
 class SmkConfigfileReference(
@@ -191,8 +186,7 @@ class SmkConfigfileReference(
             textRange,
             stringLiteralExpression,
             path,
-            searchRelativelyToCurrentFolder = false,
-            makePathRelativelyCurrentFolder = false
+            searchRelativelyToCurrentFolder = false
     ) {
     override fun getVariants() =  collectFileSystemItemLike {
         isYamlFile(it)
@@ -200,7 +194,7 @@ class SmkConfigfileReference(
 }
 
 /**
- * Must be in subdirectory of makefile parent
+ * The path must built from directory with current snakefile
  * version 6.5.1
  */
 class SmkCondaEnvReference(
@@ -208,13 +202,7 @@ class SmkCondaEnvReference(
         textRange: TextRange,
         stringLiteralExpression: PyStringLiteralExpression,
         path: String
-) : SmkFileReference(
-            element,
-            textRange,
-            stringLiteralExpression,
-            path,
-            searchRelativelyToCurrentFolder = false
-    ) {
+) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() =  collectFileSystemItemLike {
         isYamlFile(it)
     }
@@ -222,7 +210,7 @@ class SmkCondaEnvReference(
 private fun isYamlFile(it: PsiFileSystemItem) = it.name.endsWith(".yaml") || it.name.endsWith(".yml")
 
 /**
- * Must be in subdirectory of makefile parent
+ * The path must built from directory with current snakefile
  * version 6.5.1
  */
 class SmkNotebookReference(
@@ -230,13 +218,7 @@ class SmkNotebookReference(
         textRange: TextRange,
         stringLiteralExpression: PyStringLiteralExpression,
         path: String
-) : SmkFileReference(
-            element,
-            textRange,
-            stringLiteralExpression,
-            path,
-            searchRelativelyToCurrentFolder = false
-    ) {
+) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() =  collectFileSystemItemLike {
         val name = it.name.lowercase()
         name.endsWith(".py.ipynb") or name.endsWith(".r.ipynb")
@@ -244,7 +226,7 @@ class SmkNotebookReference(
 }
 
 /**
- * Must be in subdirectory of makefile parent
+ * The path must built from directory with current snakefile
  * version 6.5.1
  */
 class SmkReportReference(
@@ -259,7 +241,7 @@ class SmkReportReference(
 }
 
 /**
- * Must be in subdirectory of makefile parent
+ * The path must built from directory with current snakefile
  * version 6.5.1
  */
 class SmkWorkDirReference(
