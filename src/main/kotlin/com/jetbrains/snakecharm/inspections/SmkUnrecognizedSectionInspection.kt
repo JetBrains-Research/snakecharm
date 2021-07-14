@@ -31,7 +31,7 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
                     sectionNamePsi,
                     SnakemakeBundle.message("INSP.NAME.section.unrecognized.message", sectionKeyword),
                     ProblemHighlightType.WEAK_WARNING,
-                    null, AddIgnoredElementQuickFix(sectionNamePsi)
+                    null, AddIgnoredElementQuickFix(sectionNamePsi.text)
                 )
             }
         }
@@ -46,7 +46,7 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
                     sectionNamePsi,
                     SnakemakeBundle.message("INSP.NAME.section.unrecognized.message", sectionKeyword),
                     ProblemHighlightType.WEAK_WARNING,
-                    null, AddIgnoredElementQuickFix(sectionNamePsi)
+                    null, AddIgnoredElementQuickFix(sectionNamePsi.text)
                 )
             }
         }
@@ -58,10 +58,7 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
         // }
     }
 
-    override fun createOptionsPanel(): JComponent? {
-        return ListEditForm(
-            SnakemakeBundle.message("INSP.NAME.section.unrecognized.ignored"),
-            ignoredItems
-        ).contentPanel
-    }
+    override fun createOptionsPanel(): JComponent? =
+        ListEditForm(SnakemakeBundle.message("INSP.NAME.section.unrecognized.ignored"), ignoredItems).contentPanel
 }
+
