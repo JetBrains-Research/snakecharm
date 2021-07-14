@@ -96,6 +96,7 @@ Feature: Annotate additional syntax
       | rule       | run                  | ""         | PY.PREDEFINED_DEFINITION |
       | rule       | wrapper              | ""         | PY.DECORATOR             |
       | rule       | name                 | ""         | PY.DECORATOR             |
+      | rule       | handover             | ""         | PY.DECORATOR             |
       | checkpoint | output               | "file.txt" | PY.DECORATOR             |
       | checkpoint | run                  | ""         | PY.PREDEFINED_DEFINITION |
 

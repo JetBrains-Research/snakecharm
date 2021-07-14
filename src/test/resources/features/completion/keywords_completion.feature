@@ -215,8 +215,8 @@ Feature: Completion for snakemake keyword-like things
       | checkpoint | lo   | log        |
       | rule       | be   | benchmark  |
       | checkpoint | be   | benchmark  |
-      | rule       | ve   | version    |
-      | checkpoint | ve   | version    |
+      | rule       | vers | version    |
+      | checkpoint | vers | version    |
       | rule       | cac  | cache      |
       | checkpoint | cac  | cache      |
       | rule       | mes  | message    |
@@ -237,6 +237,8 @@ Feature: Completion for snakemake keyword-like things
       | checkpoint | wr   | wrapper    |
       | rule       | na   | name       |
       | checkpoint | na   | name       |
+      | rule       | han  | handover   |
+      | checkpoint | han  | handover   |
 
   Scenario Outline: Complete at rule/checkpoint level
     Given a snakemake project
@@ -495,6 +497,7 @@ Feature: Completion for snakemake keyword-like things
       | workdir              |
       | singularity          |
       | container            |
+      | containerized        |
     Examples:
       | signature                   | toplevel_section | section    |
       | comment_toplevel            | rule             | input      |
@@ -520,12 +523,13 @@ Feature: Completion for snakemake keyword-like things
     When I put the caret at <signature>
     And I invoke autocompletion popup
     And completion list shouldn't contain:
-      | input      |
-      | output     |
-      | log        |
-      | container  |
-      | configfile |
-      | workdir    |
+      | input         |
+      | output        |
+      | log           |
+      | container     |
+      | containerized |
+      | configfile    |
+      | workdir       |
     Examples:
       | signature                   | toplevel_section | section    |
       | comment_toplevel            | rule             | input      |

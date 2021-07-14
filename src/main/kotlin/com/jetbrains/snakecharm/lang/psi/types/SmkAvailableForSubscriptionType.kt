@@ -14,7 +14,8 @@ import com.jetbrains.python.psi.types.PyType
 // like: "{input[param1]}". So this interface is needed to group
 // together types that are accessible from subscription expression
 interface SmkAvailableForSubscriptionType : PyType {
-    fun getPositionArgsNumber(location: PsiElement): Int
+    fun getPositionArgsPreviews(location: PsiElement): List<String?>
+    fun getPositionArgsNumber(location: PsiElement): Int = getPositionArgsPreviews(location).size
 
     fun getCompletionVariantsAndPriority(
             completionPrefix: String?,

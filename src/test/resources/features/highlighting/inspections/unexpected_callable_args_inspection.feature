@@ -17,21 +17,22 @@ Feature: Inspection for unexpected callable arguments in rulelike sections
     """
     When I check highlighting errors
     Examples:
-      | rule_like  | section   |
-      | rule       | benchmark |
-      | rule       | cache     |
-      | rule       | output    |
-      | rule       | container |
-      | rule       | cwl       |
-      | rule       | log       |
-      | checkpoint | version   |
-      | checkpoint | message   |
-      | checkpoint | notebook  |
-      | checkpoint | priority  |
-      | checkpoint | script    |
-      | checkpoint | shadow    |
-      | checkpoint | shell     |
-      | checkpoint | wrapper   |
+      | rule_like  | section       |
+      | rule       | benchmark     |
+      | rule       | cache         |
+      | rule       | output        |
+      | rule       | container     |
+      | rule       | containerized |
+      | rule       | cwl           |
+      | rule       | log           |
+      | checkpoint | version       |
+      | checkpoint | message       |
+      | checkpoint | notebook      |
+      | checkpoint | priority      |
+      | checkpoint | script        |
+      | checkpoint | shadow        |
+      | checkpoint | shell         |
+      | checkpoint | wrapper       |
 
   Scenario Outline: No warn on expected callable arguments
     Given a snakemake project
