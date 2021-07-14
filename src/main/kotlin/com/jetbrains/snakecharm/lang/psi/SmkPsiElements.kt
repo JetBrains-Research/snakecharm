@@ -12,6 +12,7 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECT
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_EXPANDING_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointStub
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleStub
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleStub
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkSubworkflowStub
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLExpression
@@ -25,6 +26,8 @@ interface SmkRule: SmkRuleOrCheckpoint, StubBasedPsiElement<SmkRuleStub>
 interface SmkCheckPoint: SmkRuleOrCheckpoint, StubBasedPsiElement<SmkCheckpointStub>
 
 interface SmkSubworkflow: SmkRuleLike<SmkSubworkflowArgsSection>, StubBasedPsiElement<SmkSubworkflowStub>
+
+interface SmkModule : SmkRuleLike<SmkModuleArgsSection>, StubBasedPsiElement<SmkModuleStub>
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer
     /**
@@ -41,6 +44,10 @@ interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // P
 }
 
 interface SmkSubworkflowArgsSection: SmkArgsSection {
+    override fun getParentRuleOrCheckPoint(): SmkRuleOrCheckpoint? = null
+}
+
+interface SmkModuleArgsSection : SmkArgsSection {
     override fun getParentRuleOrCheckPoint(): SmkRuleOrCheckpoint? = null
 }
 

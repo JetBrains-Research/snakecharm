@@ -27,6 +27,10 @@ interface SmkElementVisitor {
         pyElementVisitor.visitPyElement(subworkflow)
     }
 
+    fun visitSmkModule(module: SmkModule){
+        pyElementVisitor.visitPyElement(module)
+    }
+
     fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
         pyElementVisitor.visitPyStatement(st)
     }

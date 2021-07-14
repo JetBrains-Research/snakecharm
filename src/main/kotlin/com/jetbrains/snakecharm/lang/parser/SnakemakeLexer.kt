@@ -66,6 +66,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 .add(SnakemakeNames.RULE_KEYWORD)
                 .add(SnakemakeNames.CHECKPOINT_KEYWORD)
                 .add(SnakemakeNames.SUBWORKFLOW_KEYWORD)
+                .add(SnakemakeNames.MODULE_KEYWORD)
                 .build()!!
 
         val PYTHON_BLOCK_KEYWORDS = ImmutableSet.Builder<String>()
@@ -92,6 +93,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 .put(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD, SmkTokenTypes.WORKFLOW_ONERROR_KEYWORD)
                 .put(SnakemakeNames.WORKFLOW_ONSTART_KEYWORD, SmkTokenTypes.WORKFLOW_ONSTART_KEYWORD)
                 .put(SnakemakeNames.SUBWORKFLOW_KEYWORD, SmkTokenTypes.SUBWORKFLOW_KEYWORD)
+                .put(SnakemakeNames.MODULE_KEYWORD, SmkTokenTypes.MODULE_KEYWORD)
                 .build()!!
 
         val KEYWORDS_2_TEXT = KEYWORDS.map { it.value to it.key }.toMap()

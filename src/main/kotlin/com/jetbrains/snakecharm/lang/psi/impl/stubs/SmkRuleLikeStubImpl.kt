@@ -7,12 +7,12 @@ import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.jetbrains.python.psi.PyElement
 import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
+import com.jetbrains.snakecharm.lang.psi.SmkModule
 import com.jetbrains.snakecharm.lang.psi.SmkRule
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflow
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.RULE_DECLARATION_STATEMENT
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.SUBWORKFLOW_DECLARATION_STATEMENT
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.*
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointStub
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleStub
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleStub
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkSubworkflowStub
 
@@ -38,3 +38,8 @@ class SmkSubworkflowStubImpl(
         name: String?,
         parent: StubElement<*>?
 ): SmkRuleLikeStubImpl<SmkSubworkflowStub, SmkSubworkflow>(name, parent, SUBWORKFLOW_DECLARATION_STATEMENT), SmkSubworkflowStub
+
+class SmkModuleStubImpl(
+        name: String?,
+        parent: StubElement<*>?
+) : SmkRuleLikeStubImpl<SmkModuleStub, SmkModule>(name, parent, MODULE_DECLARATION_STATEMENT), SmkModuleStub
