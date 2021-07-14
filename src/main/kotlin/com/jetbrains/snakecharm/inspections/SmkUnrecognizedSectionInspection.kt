@@ -31,7 +31,7 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
                     sectionNamePsi,
                     SnakemakeBundle.message("INSP.NAME.section.unrecognized.message", sectionKeyword),
                     ProblemHighlightType.WEAK_WARNING,
-                    null, AddIgnoredElementQuickFix(sectionNamePsi.text)
+                    null, AddIgnoredElementQuickFix(sectionKeyword)
                 )
             }
         }
@@ -46,7 +46,7 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
                     sectionNamePsi,
                     SnakemakeBundle.message("INSP.NAME.section.unrecognized.message", sectionKeyword),
                     ProblemHighlightType.WEAK_WARNING,
-                    null, AddIgnoredElementQuickFix(sectionNamePsi.text)
+                    null, AddIgnoredElementQuickFix(sectionKeyword)
                 )
             }
         }
