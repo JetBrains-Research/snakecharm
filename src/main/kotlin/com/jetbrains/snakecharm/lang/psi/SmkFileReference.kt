@@ -18,23 +18,23 @@ import com.jetbrains.python.psi.types.TypeEvalContext
  * else relative to the project root.
  */
 open class SmkFileReference(
-        element: SmkArgsSection,
-        private val textRange: TextRange,
-        private val stringLiteralExpression: PyStringLiteralExpression,
-        private val path: String,
-        private val searchRelativelyToCurrentFolder: Boolean = true,
+    element: SmkArgsSection,
+    private val textRange: TextRange,
+    private val stringLiteralExpression: PyStringLiteralExpression,
+    private val path: String,
+    private val searchRelativelyToCurrentFolder: Boolean = true,
 ) : PsiReferenceBase<SmkArgsSection>(element, textRange), PsiReferenceEx {
     // Reference caching can be implemented with the 'ResolveCache' class if needed
 
     override fun handleElementRename(newElementName: String): PsiElement {
         val replacedElem = element.findElementAt(textRange.startOffset) ?: return element
 
-        val stringLiteral =  PsiTreeUtil.getParentOfType(replacedElem, PyStringLiteralExpression::class.java)!!
+        val stringLiteral = PsiTreeUtil.getParentOfType(replacedElem, PyStringLiteralExpression::class.java)!!
         val relativePathToSelf = "(.+)/".toRegex().find(stringLiteral.stringValue)?.value ?: ""
 
         val elementGenerator = PyElementGenerator.getInstance(element.project)
         val newStringLiteral =
-                elementGenerator.createStringLiteral(stringLiteral, relativePathToSelf + newElementName)
+            elementGenerator.createStringLiteral(stringLiteral, relativePathToSelf + newElementName)
 
         stringLiteral.replace(newStringLiteral)
 
@@ -43,8 +43,9 @@ open class SmkFileReference(
 
     // XXX: I thing better is a completion contributor with support of user-entered prefixes
     protected fun collectFileSystemItemLike(
-            collectFiles: Boolean = true,
-            predicate: (file: PsiFileSystemItem) -> Boolean = { true }): Array<Any> {
+        collectFiles: Boolean = true,
+        predicate: (file: PsiFileSystemItem) -> Boolean = { true }
+    ): Array<Any> {
         val project = element.project
 
         val parentDirVFile = getParendDirForCompletion()?.virtualFile ?: return emptyArray()
@@ -124,7 +125,7 @@ open class SmkFileReference(
 
     override fun resolve(): PsiElement? = findPathToResolve()
 
-    private fun findPathToResolve(): PsiElement?  {
+    private fun findPathToResolve(): PsiElement? {
         if (!couldBeParsed()) {
             return null
         }
@@ -144,14 +145,14 @@ open class SmkFileReference(
      * when autocompletion is invoked
      */
     private fun getParendDirForCompletion() =
-            PsiTreeUtil.getParentOfType(element, PsiFile::class.java)?.originalFile?.containingDirectory
+        PsiTreeUtil.getParentOfType(element, PsiFile::class.java)?.originalFile?.containingDirectory
 
     override fun getUnresolvedHighlightSeverity(typeEvalContext: TypeEvalContext?): HighlightSeverity =
-            if (couldBeParsed()) {
-                HighlightSeverity.ERROR
-            } else {
-                HighlightSeverity.WEAK_WARNING
-            }
+        if (couldBeParsed()) {
+            HighlightSeverity.ERROR
+        } else {
+            HighlightSeverity.WEAK_WARNING
+        }
 
     override fun getUnresolvedDescription(): String? = null
 }
@@ -161,12 +162,12 @@ open class SmkFileReference(
  * version 6.5.1
  */
 class SmkIncludeReference(
-        element: SmkArgsSection,
-        textRange: TextRange,
-        stringLiteralExpression: PyStringLiteralExpression,
-        path: String
+    element: SmkArgsSection,
+    textRange: TextRange,
+    stringLiteralExpression: PyStringLiteralExpression,
+    path: String
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
-    override fun getVariants() =  collectFileSystemItemLike {
+    override fun getVariants() = collectFileSystemItemLike {
         it is SmkFile && it.name != element.containingFile.name
     }
 }
@@ -177,18 +178,18 @@ class SmkIncludeReference(
  * version 6.5.1
  */
 class SmkConfigfileReference(
-        element: SmkArgsSection,
-        textRange: TextRange,
-        stringLiteralExpression: PyStringLiteralExpression,
-        path: String
+    element: SmkArgsSection,
+    textRange: TextRange,
+    stringLiteralExpression: PyStringLiteralExpression,
+    path: String
 ) : SmkFileReference(
-            element,
-            textRange,
-            stringLiteralExpression,
-            path,
-            searchRelativelyToCurrentFolder = false
-    ) {
-    override fun getVariants() =  collectFileSystemItemLike {
+    element,
+    textRange,
+    stringLiteralExpression,
+    path,
+    searchRelativelyToCurrentFolder = false
+) {
+    override fun getVariants() = collectFileSystemItemLike {
         isYamlFile(it)
     }
 }
@@ -198,15 +199,16 @@ class SmkConfigfileReference(
  * version 6.5.1
  */
 class SmkCondaEnvReference(
-        element: SmkArgsSection,
-        textRange: TextRange,
-        stringLiteralExpression: PyStringLiteralExpression,
-        path: String
+    element: SmkArgsSection,
+    textRange: TextRange,
+    stringLiteralExpression: PyStringLiteralExpression,
+    path: String
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
-    override fun getVariants() =  collectFileSystemItemLike {
+    override fun getVariants() = collectFileSystemItemLike {
         isYamlFile(it)
     }
 }
+
 private fun isYamlFile(it: PsiFileSystemItem) = it.name.endsWith(".yaml") || it.name.endsWith(".yml")
 
 /**
@@ -214,12 +216,12 @@ private fun isYamlFile(it: PsiFileSystemItem) = it.name.endsWith(".yaml") || it.
  * version 6.5.1
  */
 class SmkNotebookReference(
-        element: SmkArgsSection,
-        textRange: TextRange,
-        stringLiteralExpression: PyStringLiteralExpression,
-        path: String
+    element: SmkArgsSection,
+    textRange: TextRange,
+    stringLiteralExpression: PyStringLiteralExpression,
+    path: String
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
-    override fun getVariants() =  collectFileSystemItemLike {
+    override fun getVariants() = collectFileSystemItemLike {
         val name = it.name.lowercase()
         name.endsWith(".py.ipynb") or name.endsWith(".r.ipynb")
     }
@@ -230,10 +232,10 @@ class SmkNotebookReference(
  * version 6.5.1
  */
 class SmkReportReference(
-        element: SmkArgsSection,
-        textRange: TextRange,
-        stringLiteralExpression: PyStringLiteralExpression,
-        path: String
+    element: SmkArgsSection,
+    textRange: TextRange,
+    stringLiteralExpression: PyStringLiteralExpression,
+    path: String
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike {
         it.name.endsWith(".html")
@@ -245,10 +247,10 @@ class SmkReportReference(
  * version 6.5.1
  */
 class SmkWorkDirReference(
-        element: SmkArgsSection,
-        textRange: TextRange,
-        stringLiteralExpression: PyStringLiteralExpression,
-        path: String
+    element: SmkArgsSection,
+    textRange: TextRange,
+    stringLiteralExpression: PyStringLiteralExpression,
+    path: String
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike(collectFiles = false)
 }
