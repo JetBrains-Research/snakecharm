@@ -17,7 +17,7 @@ class SmkSLParser : PsiParser {
                 builder.advanceLexer()
                 stringMarker.done(SmkSLTokenTypes.STRING_CONTENT)
             } else {
-                parseLanguage(builder)
+                parseInjection(builder)
             }
         }
 
@@ -25,19 +25,19 @@ class SmkSLParser : PsiParser {
         return builder.treeBuilt
     }
 
-    private fun parseLanguage(builder: PsiBuilder) {
-        val languageMarker = builder.mark()
-
+    private fun parseInjection(builder: PsiBuilder) {
         builder.checkMatches(SmkSLTokenTypes.LBRACE,
-                SnakemakeBundle.message("SMKSL.PARSE.expected.lbrace"))
+            SnakemakeBundle.message("SMKSL.PARSE.expected.lbrace"))
 
-        val doParseRegExp = parseIdentifierExpr(builder)
-        // Parsing regex
+        // Left part:
+        val doParseRegExp = parseInjectionLeftPartExpression(builder)
+
+        // Right part (optional): Parsing regex
         if (doParseRegExp) {
             builder.checkMatches(SmkSLTokenTypes.COMMA,
-                    SnakemakeBundle.message("SMKSL.PARSE.expected.comma"))
+                SnakemakeBundle.message("SMKSL.PARSE.expected.comma"))
             builder.checkMatches(SmkSLTokenTypes.REGEXP,
-                    SnakemakeBundle.message("SMKSL.PARSE.expected.regexp"))
+                SnakemakeBundle.message("SMKSL.PARSE.expected.regexp"))
 
             // RegExp will be parsed automatically, because its token
             // type extends ILazyParseableElementType
@@ -49,13 +49,11 @@ class SmkSLParser : PsiParser {
         } else {
             builder.error(SnakemakeBundle.message("SMKSL.PARSE.expected.rbrace"))
         }
-
-        languageMarker.done(SmkSLElementTypes.LANGUAGE)
     }
 
     // Returns true if parsing ended on token 'COMMA', and
     // regexp has to be parsed
-    private fun parseIdentifierExpr(builder: PsiBuilder): Boolean {
+    private fun parseInjectionLeftPartExpression(builder: PsiBuilder): Boolean {
         fun PsiBuilder.Marker.drop(identifierExpected: Boolean) {
             if (identifierExpected) {
                 builder.error(SnakemakeBundle.message("SMKSL.PARSE.expected.identifier.name"))
@@ -65,7 +63,7 @@ class SmkSLParser : PsiParser {
 
         var exprMarker = builder.mark()
         var identifierExpected = true
-        while(true) {
+        while (true) {
             val tt = builder.tokenType
             when {
                 tt === SmkSLTokenTypes.IDENTIFIER -> {
@@ -103,11 +101,11 @@ class SmkSLParser : PsiParser {
 
                     val keyMarker = builder.mark()
                     builder.checkMatches(SmkSLTokenTypes.ACCESS_KEY,
-                            SnakemakeBundle.message("SMKSL.PARSE.expected.key"))
+                        SnakemakeBundle.message("SMKSL.PARSE.expected.key"))
                     keyMarker.done(SmkSLElementTypes.KEY_EXPRESSION)
 
                     builder.checkMatches(SmkSLTokenTypes.RBRACKET,
-                            SnakemakeBundle.message("SMKSL.PARSE.expected.rbracket"))
+                        SnakemakeBundle.message("SMKSL.PARSE.expected.rbracket"))
                     exprMarker.done(SmkSLElementTypes.SUBSCRIPTION_EXPRESSION)
 
                     exprMarker = exprMarker.precede()

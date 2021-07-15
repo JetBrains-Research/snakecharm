@@ -1,10 +1,9 @@
 package com.jetbrains.snakecharm.stringLanguage.lang
 
 import com.jetbrains.python.psi.PyElementVisitor
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLLanguageElement
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionExpression
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionKeyReferenceExpression
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionExpressionImpl
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionIndexKeyExpressionImpl
 
 interface SmkSLElementVisitor {
     /**
@@ -12,19 +11,15 @@ interface SmkSLElementVisitor {
      */
     val pyElementVisitor: PyElementVisitor
 
-    fun visitSmkSLLanguageElement(element: SmkSLLanguageElement) {
-        pyElementVisitor.visitPyElement(element)
-    }
-
     fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpressionImpl) {
         pyElementVisitor.visitPyElement(expr)
     }
 
-    fun visitSmkSLSubscriptionKeyExpression(expr: SmkSLSubscriptionKeyReferenceExpression) {
+    fun visitSmkSLSubscriptionExpressionKey(expr: SmkSLSubscriptionIndexKeyExpressionImpl) {
         pyElementVisitor.visitPyElement(expr)
     }
 
-    fun visitSmkSLSubscriptionExpression(expr: SmkSLSubscriptionExpression) {
+    fun visitSmkSLSubscriptionExpression(expr: SmkSLSubscriptionExpressionImpl) {
         pyElementVisitor.visitPyElement(expr)
     }
 }

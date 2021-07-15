@@ -1,8 +1,7 @@
 FILE
-  SmkSLLanguageElement(LANGUAGE)
-    PsiElement(LBRACE)('{')
-    PsiErrorElement:Expected identifier name
-      <empty list>
-    PsiElement(COMMA)(',')
-    PsiErrorElement:Expected regular expression
-      <empty list>
+  PsiElement(LBRACE)('{')
+  PsiErrorElement:Expected identifier name
+    <empty list>
+  PsiElement(COMMA)(',')
+  PsiErrorElement:Expected regular expression
+    <empty list>

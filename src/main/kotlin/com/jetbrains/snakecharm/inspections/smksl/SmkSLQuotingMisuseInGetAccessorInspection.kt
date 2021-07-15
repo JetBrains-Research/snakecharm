@@ -10,20 +10,21 @@ import com.intellij.psi.PsiFile
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLExpression
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionKeyReferenceExpression
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionIndexKeyExpressionImpl
 
 class SmkSLQuotingMisuseInGetAccessorInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession
-        ) = object : SmkSLInspectionVisitor(holder, session) {
+        session: LocalInspectionToolSession,
+    ) = object : SmkSLInspectionVisitor(holder, session) {
 
-        override fun visitSmkSLSubscriptionKeyExpression(expr: SmkSLSubscriptionKeyReferenceExpression) {
+        override fun visitSmkSLSubscriptionExpressionKey(expr: SmkSLSubscriptionIndexKeyExpressionImpl) {
             val keyStr = expr.text
             if (keyStr.startsWith('"') || keyStr.startsWith('\'')
                 || keyStr.startsWith("\\'") || keyStr.startsWith("\\\"")
-                || keyStr.endsWith('"') || keyStr.endsWith('\'')) {
+                || keyStr.endsWith('"') || keyStr.endsWith('\'')
+            ) {
                 registerProblem(
                     expr,
                     SnakemakeBundle.message("INSP.NAME.quoting.misuse.in.get.message"),
@@ -32,6 +33,7 @@ class SmkSLQuotingMisuseInGetAccessorInspection : SnakemakeInspection() {
         }
     }
 }
+
 class UnquoteQuickFix(expr: SmkSLExpression) : LocalQuickFixOnPsiElement(expr) {
     override fun getFamilyName() = SnakemakeBundle.message("INSP.NAME.quoting.misuse.in.get.fix")
 
@@ -43,9 +45,9 @@ class UnquoteQuickFix(expr: SmkSLExpression) : LocalQuickFixOnPsiElement(expr) {
         val endText = endElement.text
         val endOffsetOffset = endElement.textOffset + endElement.textLength - 1
         if (endText.endsWith("\\'") || endText.endsWith("\\\"")) {
-            doc!!.deleteString(endOffsetOffset - 1, endOffsetOffset +1 )
+            doc!!.deleteString(endOffsetOffset - 1, endOffsetOffset + 1)
         } else if (endText.endsWith('"') || endText.endsWith('\'')) {
-            doc!!.deleteString(endOffsetOffset, endOffsetOffset +1)
+            doc!!.deleteString(endOffsetOffset, endOffsetOffset + 1)
         }
 
 

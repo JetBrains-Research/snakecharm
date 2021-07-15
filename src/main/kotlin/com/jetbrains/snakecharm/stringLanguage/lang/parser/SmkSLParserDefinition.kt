@@ -17,15 +17,14 @@ class SmkSLParserDefinition : PythonParserDefinition() {
     }
 
     override fun createElement(node: ASTNode): PsiElement =
-            when (node.elementType) {
-                SmkSLElementTypes.LANGUAGE -> SmkSLLanguageElement(node)
-                SmkSLElementTypes.REFERENCE_EXPRESSION -> SmkSLReferenceExpressionImpl(node)
-                SmkSLElementTypes.SUBSCRIPTION_EXPRESSION -> SmkSLSubscriptionExpression(node)
-                SmkSLElementTypes.KEY_EXPRESSION -> SmkSLSubscriptionKeyReferenceExpression(node)
-                else -> SmkSLElementImpl(node)
-            }
+        when (node.elementType) {
+            SmkSLElementTypes.REFERENCE_EXPRESSION -> SmkSLReferenceExpressionImpl(node) // e.g. config in '{config}', {config[foo]}, {a.config.b}
+            SmkSLElementTypes.SUBSCRIPTION_EXPRESSION -> SmkSLSubscriptionExpressionImpl(node)
+            SmkSLElementTypes.KEY_EXPRESSION -> SmkSLSubscriptionIndexKeyExpressionImpl(node)
+            else -> SmkSLElementImpl(node)
+        }
 
-    override fun getStringLiteralElements()= TokenSet.EMPTY!!
+    override fun getStringLiteralElements() = TokenSet.EMPTY!!
 
     override fun getCommentTokens() = TokenSet.EMPTY!!
 
