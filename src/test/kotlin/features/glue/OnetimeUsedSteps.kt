@@ -3,15 +3,16 @@ package features.glue
 import com.intellij.openapi.application.runReadAction
 import com.jetbrains.python.psi.PyRecursiveElementVisitor
 import com.jetbrains.python.psi.PyReferenceExpression
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionKeyReferenceExpression
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionIndexKeyExpressionImpl
 import io.cucumber.java.en.When
+import kotlin.test.assertTrue
 
 class OnetimeUsedSteps {
     @When("^validate issue 380$")
     fun validateIssue380() {
         runReadAction {
             val psiElement = SnakemakeWorld.fixture().elementAtCaret
-            require(psiElement is SmkSLSubscriptionKeyReferenceExpression) {
+            require(psiElement is SmkSLSubscriptionIndexKeyExpressionImpl) {
                 "Actual class: ${psiElement.javaClass.simpleName}"
             }
             require(psiElement.text.equals("proportion")) {
@@ -26,9 +27,7 @@ class OnetimeUsedSteps {
             }
             psiElement.accept(visitor)
             // Assert no SOE, i.e. stack not deep:
-            assert(counter < 5) {
-                "Actual counter: $counter"
-            }
+            assertTrue(counter < 5, "Actual counter: $counter")
         }
     }
 }

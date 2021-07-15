@@ -12,6 +12,9 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
 
+/**
+ * See also: [com.jetbrains.snakecharm.lang.highlighter.SnakemakeVisitorFilter]
+ */
 class SmkIgnorePyInspectionExtension : PyInspectionExtension() {
     override fun ignoreUnresolvedMember(type: PyType, name: String, context: TypeEvalContext): Boolean {
         if (type is SmkAvailableForSubscriptionType) {
@@ -49,9 +52,9 @@ class SmkIgnorePyInspectionExtension : PyInspectionExtension() {
     override fun ignoreUnused(local: PsiElement?, evalContext: TypeEvalContext): Boolean {
         // If inspection is suppressed, SOE: in Parser #380 not happen
         // temporary turn off suppressing
-//        if (local is SmkRuleOrCheckpointArgsSection) {
-//            return true
-//        }
+        if (local is SmkRuleOrCheckpointArgsSection) {
+            return true
+        }
         return false
     }
 }

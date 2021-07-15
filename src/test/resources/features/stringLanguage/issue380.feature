@@ -1,5 +1,5 @@
 Feature: SOE, issue 380
-  Scenario: Foo
+  Scenario: SOE not happens
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
