@@ -1,31 +1,29 @@
 FILE
   SmkSLElementImpl(STRING_CONTENT)
     PsiElement(STRING_CONTENT)('"')
-  SmkSLLanguageElement(LANGUAGE)
-    PsiElement(LBRACE)('{')
-    SmkSLReferenceExpressionImpl: Prefix1
-      PsiElement(Py:IDENTIFIER)('Prefix1')
-    PsiErrorElement:Unexpected character
-      PsiElement(BAD_CHARACTER)(' ')
-    PsiErrorElement:Unexpected character
-      PsiElement(BAD_CHARACTER)('Suffix1')
-    PsiElement(RBRACE)('}')
+  PsiElement(LBRACE)('{')
+  SmkSLReferenceExpressionImpl: Prefix1
+    PsiElement(Py:IDENTIFIER)('Prefix1')
+  PsiErrorElement:Unexpected character
+    PsiElement(BAD_CHARACTER)(' ')
+  PsiErrorElement:Unexpected character
+    PsiElement(BAD_CHARACTER)('Suffix1')
+  PsiElement(RBRACE)('}')
   SmkSLElementImpl(STRING_CONTENT)
     PsiElement(STRING_CONTENT)('" "')
-  SmkSLLanguageElement(LANGUAGE)
-    PsiElement(LBRACE)('{')
-    SmkSLReferenceExpressionImpl: fooo
-      SmkSLReferenceExpressionImpl: Prefix2
-        PsiElement(Py:IDENTIFIER)('Prefix2')
-      PsiElement(DOT)('.')
-      PsiElement(Py:IDENTIFIER)('fooo')
-    PsiErrorElement:Unexpected character
-      PsiElement(BAD_CHARACTER)(' ')
-    PsiErrorElement:Unexpected character
-      PsiElement(BAD_CHARACTER)('Suffix2')
-    SmkSLReferenceExpressionImpl: boo
-      PsiElement(DOT)('.')
-      PsiElement(Py:IDENTIFIER)('boo')
-    PsiElement(RBRACE)('}')
+  PsiElement(LBRACE)('{')
+  SmkSLReferenceExpressionImpl: fooo
+    SmkSLReferenceExpressionImpl: Prefix2
+      PsiElement(Py:IDENTIFIER)('Prefix2')
+    PsiElement(DOT)('.')
+    PsiElement(Py:IDENTIFIER)('fooo')
+  PsiErrorElement:Unexpected character
+    PsiElement(BAD_CHARACTER)(' ')
+  PsiErrorElement:Unexpected character
+    PsiElement(BAD_CHARACTER)('Suffix2')
+  SmkSLReferenceExpressionImpl: boo
+    PsiElement(DOT)('.')
+    PsiElement(Py:IDENTIFIER)('boo')
+  PsiElement(RBRACE)('}')
   SmkSLElementImpl(STRING_CONTENT)
     PsiElement(STRING_CONTENT)('"')

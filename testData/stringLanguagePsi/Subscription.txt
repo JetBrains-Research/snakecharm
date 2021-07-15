@@ -1,27 +1,22 @@
 FILE
-  SmkSLLanguageElement(LANGUAGE)
-    PsiElement(LBRACE)('{')
-    SmkSLReferenceExpressionImpl: too
-      SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
-        SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
-          SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
-            SmkSLReferenceExpressionImpl: doo
-              SmkSLReferenceExpressionImpl: boo
-                SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
-                  SmkSLReferenceExpressionImpl: foo
-                    PsiElement(Py:IDENTIFIER)('foo')
-                  PsiElement(LBRACKET)('[')
-                  SmkSLSubscriptionKeyExpression: [0]
-                    PsiElement(ACCESS_KEY)('0')
-                  PsiElement(RBRACKET)(']')
-                PsiElement(DOT)('.')
-                PsiElement(Py:IDENTIFIER)('boo')
+  PsiElement(LBRACE)('{')
+  SmkSLReferenceExpressionImpl: too
+    SmkSLSubscriptionExpressionImpl(SUBSCRIPTION_EXPRESSION)
+      SmkSLSubscriptionExpressionImpl(SUBSCRIPTION_EXPRESSION)
+        SmkSLSubscriptionExpressionImpl(SUBSCRIPTION_EXPRESSION)
+          SmkSLReferenceExpressionImpl: doo
+            SmkSLReferenceExpressionImpl: boo
+              SmkSLSubscriptionExpressionImpl(SUBSCRIPTION_EXPRESSION)
+                SmkSLReferenceExpressionImpl: foo
+                  PsiElement(Py:IDENTIFIER)('foo')
+                PsiElement(LBRACKET)('[')
+                SmkSLSubscriptionKeyExpression: [0]
+                  PsiElement(ACCESS_KEY)('0')
+                PsiElement(RBRACKET)(']')
               PsiElement(DOT)('.')
-              PsiElement(Py:IDENTIFIER)('doo')
-            PsiElement(LBRACKET)('[')
-            SmkSLSubscriptionKeyExpression: [0]
-              PsiElement(ACCESS_KEY)('0')
-            PsiElement(RBRACKET)(']')
+              PsiElement(Py:IDENTIFIER)('boo')
+            PsiElement(DOT)('.')
+            PsiElement(Py:IDENTIFIER)('doo')
           PsiElement(LBRACKET)('[')
           SmkSLSubscriptionKeyExpression: [0]
             PsiElement(ACCESS_KEY)('0')
@@ -30,6 +25,10 @@ FILE
         SmkSLSubscriptionKeyExpression: [0]
           PsiElement(ACCESS_KEY)('0')
         PsiElement(RBRACKET)(']')
-      PsiElement(DOT)('.')
-      PsiElement(Py:IDENTIFIER)('too')
-    PsiElement(RBRACE)('}')
+      PsiElement(LBRACKET)('[')
+      SmkSLSubscriptionKeyExpression: [0]
+        PsiElement(ACCESS_KEY)('0')
+      PsiElement(RBRACKET)(']')
+    PsiElement(DOT)('.')
+    PsiElement(Py:IDENTIFIER)('too')
+  PsiElement(RBRACE)('}')

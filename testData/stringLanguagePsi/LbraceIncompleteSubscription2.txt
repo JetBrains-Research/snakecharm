@@ -1,11 +1,10 @@
 FILE
-  SmkSLLanguageElement(LANGUAGE)
-    PsiElement(LBRACE)('{')
-    SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
-      SmkSLReferenceExpressionImpl: foo
-        PsiElement(Py:IDENTIFIER)('foo')
-      PsiElement(LBRACKET)('[')
-      SmkSLSubscriptionKeyExpression: [0]
-        PsiElement(ACCESS_KEY)('0')
-      PsiErrorElement:Expected ']'
-        <empty list>
+  PsiElement(LBRACE)('{')
+  SmkSLSubscriptionExpressionImpl(SUBSCRIPTION_EXPRESSION)
+    SmkSLReferenceExpressionImpl: foo
+      PsiElement(Py:IDENTIFIER)('foo')
+    PsiElement(LBRACKET)('[')
+    SmkSLSubscriptionKeyExpression: [0]
+      PsiElement(ACCESS_KEY)('0')
+    PsiErrorElement:Expected ']'
+      <empty list>

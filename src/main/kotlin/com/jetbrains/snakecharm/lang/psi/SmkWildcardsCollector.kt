@@ -7,7 +7,6 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_BANNED_FOR_WI
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLFile
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLLanguageElement
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
 /**
@@ -21,9 +20,9 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
  *  @param visitAllSections If true visit all sections (including run) ignoring [visitDefiningSections] and [visitExpandingSections] flags
  */
 class SmkWildcardsCollector(
-        private val visitDefiningSections: Boolean,
-        private val visitExpandingSections: Boolean,
-        private val visitAllSections: Boolean = false
+    private val visitDefiningSections: Boolean,
+    private val visitExpandingSections: Boolean,
+    private val visitAllSections: Boolean = false,
 ) : SmkElementVisitor, PyRecursiveElementVisitor() {
     private val wildcardsElements = mutableListOf<WildcardDescriptor>()
     private var atLeastOneInjectionVisited = false
@@ -36,7 +35,7 @@ class SmkWildcardsCollector(
      * for them so user has not only zero wildcards, but now possible wildcards declarations
      */
     fun getWildcards(): List<WildcardDescriptor>? =
-            if (atLeastOneInjectionVisited) wildcardsElements else null
+        if (atLeastOneInjectionVisited) wildcardsElements else null
 
     fun getWildcardsNames() = getWildcards()?.asSequence()?.map { it.text }?.distinct()?.toList()
 
@@ -59,9 +58,9 @@ class SmkWildcardsCollector(
             currentSectionIdx = WILDCARDS_DEFINING_SECTIONS_KEYWORDS.indexOf(st.sectionKeyword).toByte()
 
             if (
-                    visitAllSections ||
-                    (visitDefiningSections && st.isWildcardsDefiningSection()) ||
-                    (visitExpandingSections && st.isWildcardsExpandingSection())
+                visitAllSections ||
+                (visitDefiningSections && st.isWildcardsDefiningSection()) ||
+                (visitExpandingSections && st.isWildcardsExpandingSection())
             ) {
                 super.visitSmkRuleOrCheckpointArgsSection(st)
                 return
@@ -80,10 +79,10 @@ class SmkWildcardsCollector(
     override fun visitPyStringLiteralExpression(stringLiteral: PyStringLiteralExpression) {
         val languageManager = InjectedLanguageManager.getInstance(stringLiteral.project)
         val injectedFiles =
-                languageManager.getInjectedPsiFiles(stringLiteral)
-                        ?.map { it.first }
-                        ?.filterIsInstance<SmkSLFile>()
-                        ?: return
+            languageManager.getInjectedPsiFiles(stringLiteral)
+                ?.map { it.first }
+                ?.filterIsInstance<SmkSLFile>()
+                ?: return
 
         atLeastOneInjectionVisited = atLeastOneInjectionVisited || injectedFiles.isNotEmpty()
         injectedFiles.forEach { collectWildcardsNames(it) }
@@ -91,22 +90,20 @@ class SmkWildcardsCollector(
 
     private fun collectWildcardsNames(file: SmkSLFile) {
 
-        val injections = PsiTreeUtil.getChildrenOfType(file, SmkSLLanguageElement::class.java)
-        injections?.forEach { injection ->
-            val st = PsiTreeUtil.getChildOfType(injection, SmkSLReferenceExpressionImpl::class.java)
-            if (st != null) {
-                wildcardsElements.add(WildcardDescriptor(
-                        st, st.text,
-                        if (currentSectionIdx == (-1).toByte()) WildcardDescriptor.UNDEFINED_SECTION_RATE else currentSectionIdx
-                ))
-            }
+        val injections = PsiTreeUtil.getChildrenOfType(file, SmkSLReferenceExpressionImpl::class.java)
+        injections?.forEach { st ->
+            wildcardsElements.add(WildcardDescriptor(
+                st, st.text,
+                if (currentSectionIdx == (-1).toByte()) WildcardDescriptor.UNDEFINED_SECTION_RATE else currentSectionIdx
+            ))
         }
     }
 }
+
 data class WildcardDescriptor(
-        val psi: SmkSLReferenceExpressionImpl,
-        val text: String,
-        val definingSectionRate: Byte
+    val psi: SmkSLReferenceExpressionImpl,
+    val text: String,
+    val definingSectionRate: Byte,
 ) {
     companion object {
         const val UNDEFINED_SECTION_RATE: Byte = Byte.MAX_VALUE

@@ -11,9 +11,9 @@ import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.impl.PyReferenceExpressionImpl
 import com.jetbrains.python.psi.impl.references.PyQualifiedReference
 import com.jetbrains.python.psi.resolve.PyResolveContext
+import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_BANNED_FOR_WILDCARDS
-import com.jetbrains.snakecharm.lang.psi.BaseSmkSLReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.stringLanguage.lang.SmkSLElementVisitor
@@ -22,9 +22,15 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLInitialR
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
 class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(node),
-        BaseSmkSLReferenceExpression {
+    SmkSLReferenceExpression {
 
     override fun getNameIdentifier() = nameElement?.psi
+    override fun getType(context: TypeEvalContext, key: TypeEvalContext.Key): PyType? {
+        // Use host file for resolve & type inference
+        val hostTypeEvalContext =
+            TypeEvalContext.codeAnalysis(project, injectionHost()?.containingFile) // or *.codeCompletion()
+        return super.getType(hostTypeEvalContext, key)
+    }
 
     override fun getName() = referencedName
 
@@ -41,8 +47,8 @@ class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(no
             val injectionHost = injectionHost()
             val callExpression = PsiTreeUtil.getParentOfType(injectionHost, PyCallExpression::class.java)
             if (!isQualified &&
-                    (callExpression == null || callExpression.callSimpleName() !in FUNCTIONS_BANNED_FOR_WILDCARDS) &&
-                    PsiTreeUtil.getParentOfType(injectionHost, PyLambdaExpression::class.java) == null
+                (callExpression == null || callExpression.callSimpleName() !in FUNCTIONS_BANNED_FOR_WILDCARDS) &&
+                PsiTreeUtil.getParentOfType(injectionHost, PyLambdaExpression::class.java) == null
             ) {
                 val type = context.typeEvalContext.getType(parentRuleOrCheckPoint.wildcardsElement)
                 if (type is SmkWildcardsType) {
@@ -60,7 +66,7 @@ class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(no
     }
 
     override fun getQualifier(): PyExpression? =
-            children.firstOrNull { it is PyExpression } as PyExpression?
+        children.firstOrNull { it is PyExpression } as PyExpression?
 
     override fun toString(): String {
         return "SmkSLReferenceExpressionImpl: " + this.referencedName
@@ -69,7 +75,7 @@ class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(no
     fun isWildcard() = reference is SmkSLWildcardReference
 }
 
-class SmkEmptyReference<T: PsiElement>(element: T): PsiPolyVariantReferenceBase<T>(element),
+class SmkEmptyReference<T : PsiElement>(element: T) : PsiPolyVariantReferenceBase<T>(element),
     PsiReferenceEx {
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> = ResolveResult.EMPTY_ARRAY!!
     override fun getUnresolvedHighlightSeverity(p0: TypeEvalContext?): HighlightSeverity? = null

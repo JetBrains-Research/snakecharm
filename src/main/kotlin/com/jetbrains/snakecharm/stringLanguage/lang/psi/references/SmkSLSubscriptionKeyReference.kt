@@ -6,7 +6,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.util.ArrayUtil
- import com.intellij.util.ProcessingContext
+import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PsiReferenceEx
 import com.jetbrains.python.psi.resolve.PyResolveContext
@@ -15,28 +15,29 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.completion.SmkDictionaryTypesCompletionProvider
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionKeyReferenceExpression
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionIndexKeyExpressionImpl
 
 class SmkSLSubscriptionKeyReference(
-        private val element: SmkSLSubscriptionKeyReferenceExpression,
-        val type: SmkAvailableForSubscriptionType?
-) : PsiPolyVariantReferenceBase<SmkSLSubscriptionKeyReferenceExpression>(element), PsiReferenceEx, SmkSLBaseReference {
+    private val element: SmkSLSubscriptionIndexKeyExpressionImpl,
+    val type: SmkAvailableForSubscriptionType?,
+) : PsiPolyVariantReferenceBase<SmkSLSubscriptionIndexKeyExpressionImpl>(element), PsiReferenceEx, SmkSLBaseReference {
     companion object {
         fun indexArgTypeText(type: SmkAvailableForSubscriptionType) =
             SnakemakeBundle.message("TYPES.rule.section.arg.index.type.text", type.name!!)
 
         fun unresolvedErrorMsg(element: PsiElement) =
-                SnakemakeBundle.message("INSP.NAME.unresolved.subscription.ref", element.text)
+            SnakemakeBundle.message("INSP.NAME.unresolved.subscription.ref", element.text)
 
         val INSPECTION_SEVERITY = HighlightSeverity.WARNING!!
     }
+
     override fun getUnresolvedDescription(): String = unresolvedErrorMsg(element)
 
     override fun getUnresolvedHighlightSeverity(context: TypeEvalContext?): HighlightSeverity? =
-            when (type) {
-                null -> null
-                else -> INSPECTION_SEVERITY
-            }
+        when (type) {
+            null -> null
+            else -> INSPECTION_SEVERITY
+        }
 
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         type ?: return ResolveResult.EMPTY_ARRAY
@@ -46,7 +47,7 @@ class SmkSLSubscriptionKeyReference(
 
         val resolveResults = arrayListOf<RatedResolveResult>()
         type.resolveMember(
-                canonicalText, element, accessDirection, resolveContext
+            canonicalText, element, accessDirection, resolveContext
         )?.let {
             resolveResults.addAll(it)
         }
@@ -54,7 +55,7 @@ class SmkSLSubscriptionKeyReference(
         if (type.getPositionArgsNumber(element) > 0) {
             canonicalText.toIntOrNull()?.let { idx ->
                 resolveResults.addAll(type.resolveMemberByIndex(
-                        idx, element, accessDirection, resolveContext
+                    idx, element, accessDirection, resolveContext
                 ))
             }
         }
@@ -73,8 +74,9 @@ class SmkSLSubscriptionKeyReference(
         variants.addAll(SmkDictionaryTypesCompletionProvider.collectLookupItemsForPositionArgs(type, element))
         return variants.toTypedArray()
     }
+
     override fun calculateDefaultRangeInElement() = TextRange.create(0, element.textLength)
 
     override fun handleElementRename(newElementName: String) =
-            element.setName(newElementName)
+        element.setName(newElementName)
 }

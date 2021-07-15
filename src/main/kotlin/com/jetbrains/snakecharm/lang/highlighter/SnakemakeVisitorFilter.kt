@@ -8,6 +8,9 @@ import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PythonVisitorFilter
 import com.jetbrains.python.validation.ReturnAnnotator
 
+/**
+ * See also: [com.jetbrains.snakecharm.inspections.SmkIgnorePyInspectionExtension]
+ */
 class SnakemakeVisitorFilter : PythonVisitorFilter {
     private val unsupportedClasses = listOf(
         /** Instead use [com.jetbrains.snakecharm.lang.validation.SmkReturnAnnotator] **/

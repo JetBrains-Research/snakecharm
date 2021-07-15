@@ -8,13 +8,13 @@ import com.jetbrains.python.psi.impl.PyReferenceExpressionImpl
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
-import com.jetbrains.snakecharm.lang.psi.BaseSmkSLReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
 import com.jetbrains.snakecharm.stringLanguage.lang.SmkSLElementVisitor
 import com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLTokenTypes
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLSubscriptionKeyReference
 
-class SmkSLSubscriptionKeyReferenceExpression(node: ASTNode) : PyReferenceExpressionImpl(node), BaseSmkSLReferenceExpression {
+class SmkSLSubscriptionIndexKeyExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(node),
+    SmkSLReferenceExpression {
     override fun getName() = referencedName
 
     override fun getNameElement() = node.findChildByType(SmkSLTokenTypes.ACCESS_KEY)
@@ -35,7 +35,7 @@ class SmkSLSubscriptionKeyReferenceExpression(node: ASTNode) : PyReferenceExpres
     }
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
-        is SmkSLElementVisitor -> pyVisitor.visitSmkSLSubscriptionKeyExpression(this)
+        is SmkSLElementVisitor -> pyVisitor.visitSmkSLSubscriptionExpressionKey(this)
         else -> super.acceptPyVisitor(pyVisitor)
     }
 
@@ -43,7 +43,7 @@ class SmkSLSubscriptionKeyReferenceExpression(node: ASTNode) : PyReferenceExpres
     override fun getReference(context: PyResolveContext) = getReference()
 
     override fun getQualifier() =
-            PsiTreeUtil.getParentOfType(this, SmkSLSubscriptionExpression::class.java)?.getOperand()
+        PsiTreeUtil.getParentOfType(this, SmkSLSubscriptionExpressionImpl::class.java)?.getOperand()
 
 
     override fun toString(): String {

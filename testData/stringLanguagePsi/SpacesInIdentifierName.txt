@@ -1,17 +1,16 @@
 FILE
-  SmkSLLanguageElement(LANGUAGE)
-    PsiElement(LBRACE)('{')
-    PsiErrorElement:Unexpected character
-      PsiElement(BAD_CHARACTER)('   ')
-    SmkSLReferenceExpressionImpl: foo
-      PsiElement(Py:IDENTIFIER)('foo')
-    PsiElement(COMMA)(',')
-    SmkSLElementImpl(REGEXP)
-      RegExpPatternImpl: <\d+>
-        RegExpBranchImpl: <\d+>
-          RegExpClosureImpl: <\d+>
-            RegExpSimpleClassImpl: <\d>
-              PsiElement(CHAR_CLASS)('\d')
-            RegExpQuantifierImpl: <+>
-              PsiElement(PLUS)('+')
-    PsiElement(RBRACE)('}')
+  PsiElement(LBRACE)('{')
+  PsiErrorElement:Unexpected character
+    PsiElement(BAD_CHARACTER)('   ')
+  SmkSLReferenceExpressionImpl: foo
+    PsiElement(Py:IDENTIFIER)('foo')
+  PsiElement(COMMA)(',')
+  SmkSLElementImpl(REGEXP)
+    RegExpPatternImpl: <\d+>
+      RegExpBranchImpl: <\d+>
+        RegExpClosureImpl: <\d+>
+          RegExpSimpleClassImpl: <\d>
+            PsiElement(CHAR_CLASS)('\d')
+          RegExpQuantifierImpl: <+>
+            PsiElement(PLUS)('+')
+  PsiElement(RBRACE)('}')
