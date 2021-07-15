@@ -47,9 +47,11 @@ class SmkIgnorePyInspectionExtension : PyInspectionExtension() {
     // ignoreInitNewSignatures
 
     override fun ignoreUnused(local: PsiElement?, evalContext: TypeEvalContext): Boolean {
-        if (local is SmkRuleOrCheckpointArgsSection) {
-            return true
-        }
+        // If inspection is suppressed, SOE: in Parser #380 not happen
+        // temporary turn off suppressing
+//        if (local is SmkRuleOrCheckpointArgsSection) {
+//            return true
+//        }
         return false
     }
 }

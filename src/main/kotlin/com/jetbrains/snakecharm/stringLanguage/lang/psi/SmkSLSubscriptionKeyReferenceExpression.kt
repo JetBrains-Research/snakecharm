@@ -13,7 +13,7 @@ import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
 import com.jetbrains.snakecharm.stringLanguage.lang.SmkSLElementVisitor
 import com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLTokenTypes
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLSubscriptionKeyReference
-
+// TODO: PySubscriptionExpression
 class SmkSLSubscriptionKeyReferenceExpression(node: ASTNode) : PyReferenceExpressionImpl(node), BaseSmkSLReferenceExpression {
     override fun getName() = referencedName
 
