@@ -12,12 +12,12 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
 
-class SmkIgnorePyInspectionExtension: PyInspectionExtension() {
+class SmkIgnorePyInspectionExtension : PyInspectionExtension() {
     override fun ignoreUnresolvedMember(type: PyType, name: String, context: TypeEvalContext): Boolean {
         if (type is SmkAvailableForSubscriptionType) {
             return name == "get" || name == "__getitem__"
         }
-        return  false
+        return false
     }
 
     override fun ignoreShadowed(element: PsiElement) = element is SmkRuleOrCheckpointArgsSection
@@ -25,7 +25,7 @@ class SmkIgnorePyInspectionExtension: PyInspectionExtension() {
     override fun ignoreUnresolvedReference(
         node: PyElement,
         reference: PsiReference,
-        context: TypeEvalContext
+        context: TypeEvalContext,
     ): Boolean {
         if (SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(node)) {
             if (node is PyQualifiedExpression) {
@@ -37,6 +37,7 @@ class SmkIgnorePyInspectionExtension: PyInspectionExtension() {
         }
         return false
     }
+
     // ignoreMissingDocstring
     // ignoreMethodParameters
     // getFunctionParametersFromUsage
@@ -44,4 +45,11 @@ class SmkIgnorePyInspectionExtension: PyInspectionExtension() {
     // ignoreUnresolvedReference
     // ignoreProtectedSymbol
     // ignoreInitNewSignatures
+
+    override fun ignoreUnused(local: PsiElement?, evalContext: TypeEvalContext): Boolean {
+        if (local is SmkRuleOrCheckpointArgsSection) {
+            return true
+        }
+        return false
+    }
 }
