@@ -74,3 +74,21 @@ Feature: Inspection for unexpected keyword arguments in section
       | checkpoint | log                  |
       | checkpoint | resources            |
       | checkpoint | wildcard_constraints |
+
+  Scenario Outline: Unexpected keyword arguments in workflow
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <section_name>: a="foo.bar"
+    """
+    And SmkSectionUnexpectedKeywordArgsInspection inspection is enabled
+    Then I expect inspection error on <a="foo.bar"> with message
+    """
+    Section '<section_name>' does not support keyword arguments
+    """
+    When I check highlighting errors
+    Examples:
+      | section_name  |
+      | containerized |
+      | singularity   |
+      | container     |

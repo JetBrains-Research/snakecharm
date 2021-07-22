@@ -9,6 +9,7 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTIONS_WHERE_KEYWORD_
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
 
 class SmkSectionUnexpectedKeywordArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -22,6 +23,12 @@ class SmkSectionUnexpectedKeywordArgsInspection : SnakemakeInspection() {
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
+            if (st.sectionKeyword in SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED) {
+                checkArgumentList(st.argumentList, st)
+            }
+        }
+
+        override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
             if (st.sectionKeyword in SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED) {
                 checkArgumentList(st.argumentList, st)
             }
