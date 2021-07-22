@@ -19,38 +19,54 @@ import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.*
  * @date 2018-12-31
  */
 class SmkStatementParsing(
-        context: SmkParserContext
+    context: SmkParserContext
 ) : StatementParsing(context) {
 
     private val ruleSectionParsingData = SectionParsingData(
-            declaration = RULE_DECLARATION_STATEMENT,
-            name = "rule",
-            parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
-            sectionKeyword= SmkTokenTypes.RULE_KEYWORD
+        declaration = RULE_DECLARATION_STATEMENT,
+        name = "rule",
+        parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
+        sectionKeyword = SmkTokenTypes.RULE_KEYWORD
     )
 
     private val checkpointSectionParsingData = SectionParsingData(
-            declaration = CHECKPOINT_DECLARATION_STATEMENT,
-            name = "checkpoint",
-            parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
-            sectionKeyword= SmkTokenTypes.CHECKPOINT_KEYWORD
+        declaration = CHECKPOINT_DECLARATION_STATEMENT,
+        name = "checkpoint",
+        parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
+        sectionKeyword = SmkTokenTypes.CHECKPOINT_KEYWORD
     )
 
     private val subworkflowSectionParsingData = SectionParsingData(
-            declaration = SUBWORKFLOW_DECLARATION_STATEMENT,
-            name = "subworkflow",
-            parameterListStatement = SmkElementTypes.SUBWORKFLOW_ARGS_SECTION_STATEMENT,
-            sectionKeyword= SmkTokenTypes.SUBWORKFLOW_KEYWORD
+        declaration = SUBWORKFLOW_DECLARATION_STATEMENT,
+        name = "subworkflow",
+        parameterListStatement = SmkElementTypes.SUBWORKFLOW_ARGS_SECTION_STATEMENT,
+        sectionKeyword = SmkTokenTypes.SUBWORKFLOW_KEYWORD
+    )
+
+    private val moduleSectionParsingData = SectionParsingData(
+        declaration = MODULE_DECLARATION_STATEMENT,
+        name = "module",
+        parameterListStatement = SmkElementTypes.MODULE_ARGS_SECTION_STATEMENT,
+        sectionKeyword = SmkTokenTypes.MODULE_KEYWORD
+    )
+
+    private val useSectionParsingData = SectionParsingData(
+        declaration = USE_DECLARATION_STATEMENT,
+        name = "use",
+        parameterListStatement = SmkElementTypes.USE_ARGS_SECTION_STATEMENT,
+        sectionKeyword = SmkTokenTypes.USE_KEYWORD
     )
 
     override fun getReferenceType() = SmkElementTypes.SMK_PY_REFERENCE_EXPRESSION
 
     private fun getSectionParsingData(tokenType: IElementType) =
-            when {
-                tokenType === SmkTokenTypes.SUBWORKFLOW_KEYWORD -> subworkflowSectionParsingData
-                tokenType === SmkTokenTypes.CHECKPOINT_KEYWORD -> checkpointSectionParsingData
-                else -> ruleSectionParsingData
-            }
+        when {
+            tokenType === SmkTokenTypes.SUBWORKFLOW_KEYWORD -> subworkflowSectionParsingData
+            tokenType === SmkTokenTypes.CHECKPOINT_KEYWORD -> checkpointSectionParsingData
+            tokenType === SmkTokenTypes.MODULE_KEYWORD -> moduleSectionParsingData
+            tokenType === SmkTokenTypes.USE_KEYWORD -> useSectionParsingData
+            else -> ruleSectionParsingData
+        }
 
     override fun getParsingContext() = myContext as SmkParserContext
 
@@ -89,9 +105,9 @@ class SmkStatementParsing(
                 nextToken()
 
                 val res = parsingContext.expressionParser.parseArgumentList(
-                        ",", PyTokenTypes.COMMA,
-                        SnakemakeBundle.message("PARSE.expected.identifier"),
-                        this::parseIdentifier
+                    ",", PyTokenTypes.COMMA,
+                    SnakemakeBundle.message("PARSE.expected.identifier"),
+                    this::parseIdentifier
                 )
 
                 if (!res) {
@@ -108,9 +124,9 @@ class SmkStatementParsing(
                 nextToken()
 
                 val res = parsingContext.expressionParser.parseArgumentList(
-                        ">", PyTokenTypes.GT,
-                        SnakemakeBundle.message("PARSE.expected.identifier"),
-                        this::parseIdentifier
+                    ">", PyTokenTypes.GT,
+                    SnakemakeBundle.message("PARSE.expected.identifier"),
+                    this::parseIdentifier
                 )
 
                 if (!res) {
@@ -146,9 +162,24 @@ class SmkStatementParsing(
         val ruleLikeMarker = myBuilder.mark()
         nextToken()
 
-        // rule name
-        //val ruleNameMarker: PsiBuilder.Marker = myBuilder.mark()
-        if (atToken(PyTokenTypes.IDENTIFIER)) {
+        // Parse second word in 'use rule'
+        if (section.sectionKeyword == SmkTokenTypes.USE_KEYWORD) {
+            if (myBuilder.tokenText != SnakemakeNames.RULE_KEYWORD) {
+                myBuilder.error("Unexpected token '${myBuilder.tokenText}' after 'use' keyword")
+            } else {
+                myBuilder.remapCurrentToken(SmkTokenTypes.RULE_KEYWORD)
+                nextToken()
+            }
+            // Parse rest words in 'use' definition
+            if (!parseUseDeclaration()) {
+                myBuilder.mark().done(PyElementTypes.STATEMENT_LIST) // Child must not be null
+                ruleLikeMarker.done(section.declaration)
+                checkMatches(PyTokenTypes.STATEMENT_BREAK, PyPsiBundle.message("PARSE.expected.statement.break"))
+                return
+            }
+        } else if (atToken(PyTokenTypes.IDENTIFIER)) {
+            // rule name
+            //val ruleNameMarker: PsiBuilder.Marker = myBuilder.mark()
             nextToken()
         }
 
@@ -260,7 +291,7 @@ class SmkStatementParsing(
                 myContext.popScope()
             }
             else -> {
-                // Snakemeake often adds new sections => let's by default allow all here +
+                // Snakemake often adds new sections => let's by default allow all here +
                 //  show inspection error for keyword not in `section.parameters` instead of parsing errors..
                 result = parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
                 ruleParam.done(section.parameterListStatement)
@@ -289,13 +320,63 @@ class SmkStatementParsing(
         referenceMarker.drop()
         return false
     }
+
+    /**
+     * Parsing 'use' statement. Starts after first identifier and ends before the colon
+     */
+    private fun parseUseDeclaration(): Boolean {
+        val listOfRules = myBuilder.tokenType == PyTokenTypes.MULT
+        if (!listOfRules && myBuilder.tokenType != PyTokenTypes.IDENTIFIER) { // No rule name, no '*'
+            myBuilder.error(PyPsiBundle.message("PARSE.expected.symbols.first.quotation", "*", "rule name"))
+        } else if (!listOfRules) { // Have rule name, so mark it as reference
+            parseIdentifier()
+        } else { // Have '*'
+            nextToken()
+        }
+
+        if (myBuilder.tokenType != PyTokenTypes.AS_KEYWORD) {
+            checkMatches(PyTokenTypes.FROM_KEYWORD, PyPsiBundle.message("PARSE.0.expected", "from"))
+            if (!parseIdentifier()) {
+                myBuilder.error(PyPsiBundle.message("PARSE.expected.identifier"))
+            }
+        }
+        checkMatches(PyTokenTypes.AS_KEYWORD, PyPsiBundle.message("PARSE.0.expected", "as"))
+
+        // New rule name can be: text_*, *_text, text_*_text, text or *
+        val hasFirstIdentifier = myBuilder.tokenType == PyTokenTypes.IDENTIFIER
+        val name = myBuilder.mark()
+        if (hasFirstIdentifier) {
+            nextToken()
+        }
+        if (myBuilder.tokenType == PyTokenTypes.MULT) {
+            nextToken()
+            if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER) {
+                nextToken()
+            }
+            name.done(SmkElementTypes.USE_NAME_IDENTIFIER)
+        } else {
+            name.drop()
+            if (!hasFirstIdentifier) {
+                checkMatches(PyTokenTypes.IDENTIFIER, PyPsiBundle.message("PARSE.expected.identifier"))
+            }
+        }
+
+        if (myBuilder.tokenType == PyTokenTypes.WITH_KEYWORD) {
+            if (listOfRules) {
+                myBuilder.error(SnakemakeBundle.message("PARSE.use.with.not.allowed"))
+            }
+            nextToken()
+            return true
+        }
+        return false
+    }
 }
 
 fun IElementType?.isPythonString() = this in PyTokenTypes.STRING_NODES || this == PyTokenTypes.FSTRING_START
 
 private data class SectionParsingData(
-        val declaration: IElementType,
-        val name: String,
-        val parameterListStatement: PyElementType,
-        val sectionKeyword: PyElementType
+    val declaration: IElementType,
+    val name: String,
+    val parameterListStatement: PyElementType,
+    val sectionKeyword: PyElementType
 )

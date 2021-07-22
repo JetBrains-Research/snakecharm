@@ -63,38 +63,43 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
     companion object {
         val RULE_LIKE_KEYWORDS = ImmutableSet.Builder<String>()
-                .add(SnakemakeNames.RULE_KEYWORD)
-                .add(SnakemakeNames.CHECKPOINT_KEYWORD)
-                .add(SnakemakeNames.SUBWORKFLOW_KEYWORD)
-                .add(SnakemakeNames.MODULE_KEYWORD)
-                .build()!!
+            .add(SnakemakeNames.RULE_KEYWORD)
+            .add(SnakemakeNames.CHECKPOINT_KEYWORD)
+            .add(SnakemakeNames.SUBWORKFLOW_KEYWORD)
+            .add(SnakemakeNames.MODULE_KEYWORD)
+            .add(SnakemakeNames.USE_KEYWORD)
+            .build()!!
 
         val PYTHON_BLOCK_KEYWORDS = ImmutableSet.Builder<String>()
-                .add(SnakemakeNames.WORKFLOW_ONSTART_KEYWORD)
-                .add(SnakemakeNames.WORKFLOW_ONSUCCESS_KEYWORD)
-                .add(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD)
-                .build()!!
+            .add(SnakemakeNames.WORKFLOW_ONSTART_KEYWORD)
+            .add(SnakemakeNames.WORKFLOW_ONSUCCESS_KEYWORD)
+            .add(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD)
+            .build()!!
 
         val KEYWORDS = ImmutableMap.Builder<String, PyElementType>()
-                .put(SnakemakeNames.RULE_KEYWORD, SmkTokenTypes.RULE_KEYWORD)
-                .put(SnakemakeNames.CHECKPOINT_KEYWORD, SmkTokenTypes.CHECKPOINT_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD, SmkTokenTypes.WORKFLOW_CONFIGFILE_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_REPORT_KEYWORD, SmkTokenTypes.WORKFLOW_REPORT_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD, SmkTokenTypes.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_SINGULARITY_KEYWORD, SmkTokenTypes.WORKFLOW_SINGULARITY_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD, SmkTokenTypes.WORKFLOW_INCLUDE_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD, SmkTokenTypes.WORKFLOW_WORKDIR_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_ENVVARS_KEYWORD, SmkTokenTypes.WORKFLOW_ENVVARS_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD, SmkTokenTypes.WORKFLOW_CONTAINER_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_CONTAINERIZED_KEYWORD, SmkTokenTypes.WORKFLOW_CONTAINERIZED_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_LOCALRULES_KEYWORD, SmkTokenTypes.WORKFLOW_LOCALRULES_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_RULEORDER_KEYWORD, SmkTokenTypes.WORKFLOW_RULEORDER_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_ONSUCCESS_KEYWORD, SmkTokenTypes.WORKFLOW_ONSUCCESS_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD, SmkTokenTypes.WORKFLOW_ONERROR_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_ONSTART_KEYWORD, SmkTokenTypes.WORKFLOW_ONSTART_KEYWORD)
-                .put(SnakemakeNames.SUBWORKFLOW_KEYWORD, SmkTokenTypes.SUBWORKFLOW_KEYWORD)
-                .put(SnakemakeNames.MODULE_KEYWORD, SmkTokenTypes.MODULE_KEYWORD)
-                .build()!!
+            .put(SnakemakeNames.RULE_KEYWORD, SmkTokenTypes.RULE_KEYWORD)
+            .put(SnakemakeNames.CHECKPOINT_KEYWORD, SmkTokenTypes.CHECKPOINT_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD, SmkTokenTypes.WORKFLOW_CONFIGFILE_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_REPORT_KEYWORD, SmkTokenTypes.WORKFLOW_REPORT_KEYWORD)
+            .put(
+                SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD,
+                SmkTokenTypes.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD
+            )
+            .put(SnakemakeNames.WORKFLOW_SINGULARITY_KEYWORD, SmkTokenTypes.WORKFLOW_SINGULARITY_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD, SmkTokenTypes.WORKFLOW_INCLUDE_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD, SmkTokenTypes.WORKFLOW_WORKDIR_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_ENVVARS_KEYWORD, SmkTokenTypes.WORKFLOW_ENVVARS_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD, SmkTokenTypes.WORKFLOW_CONTAINER_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_CONTAINERIZED_KEYWORD, SmkTokenTypes.WORKFLOW_CONTAINERIZED_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_LOCALRULES_KEYWORD, SmkTokenTypes.WORKFLOW_LOCALRULES_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_RULEORDER_KEYWORD, SmkTokenTypes.WORKFLOW_RULEORDER_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_ONSUCCESS_KEYWORD, SmkTokenTypes.WORKFLOW_ONSUCCESS_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD, SmkTokenTypes.WORKFLOW_ONERROR_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_ONSTART_KEYWORD, SmkTokenTypes.WORKFLOW_ONSTART_KEYWORD)
+            .put(SnakemakeNames.SUBWORKFLOW_KEYWORD, SmkTokenTypes.SUBWORKFLOW_KEYWORD)
+            .put(SnakemakeNames.MODULE_KEYWORD, SmkTokenTypes.MODULE_KEYWORD)
+            .put(SnakemakeNames.USE_KEYWORD, SmkTokenTypes.USE_KEYWORD)
+            .build()!!
 
         val KEYWORDS_2_TEXT = KEYWORDS.map { it.value to it.key }.toMap()
     }

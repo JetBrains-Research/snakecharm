@@ -1,11 +1,13 @@
-package com.jetbrains.snakecharm.lang.psi
+package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes
+import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
+import com.jetbrains.snakecharm.lang.psi.SmkModule
+import com.jetbrains.snakecharm.lang.psi.SmkModuleArgsSection
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
-import com.jetbrains.snakecharm.lang.psi.impl.SmkRuleLikeImpl
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleStub
 
 class SmkModuleImpl : SmkRuleLikeImpl<SmkModuleStub, SmkModule, SmkModuleArgsSection>, SmkModule {

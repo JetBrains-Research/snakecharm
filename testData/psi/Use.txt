@@ -1,0 +1,133 @@
+SnakemakeFile: Use.smk
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: a
+      PsiElement(Py:IDENTIFIER)('a')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: my_module
+      PsiElement(Py:IDENTIFIER)('my_module')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('b')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: f
+      PsiElement(Py:IDENTIFIER)('f')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: other_module
+      PsiElement(Py:IDENTIFIER)('other_module')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('f_z')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:WITH_KEYWORD)('with')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkUseArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: data.csv
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"data.csv"')
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: f_z
+      PsiElement(Py:IDENTIFIER)('f_z')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('x_z')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:WITH_KEYWORD)('with')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkUseArgsSection
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: dir/file.svg
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"dir/file.svg"')
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:MULT)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: last_module1
+      PsiElement(Py:IDENTIFIER)('last_module1')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNameIdentifier
+      PsiElement(Py:MULT)('*')
+      PsiElement(Py:IDENTIFIER)('_other')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:MULT)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: last_module2
+      PsiElement(Py:IDENTIFIER)('last_module2')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNameIdentifier
+      PsiElement(Py:IDENTIFIER)('other_')
+      PsiElement(Py:MULT)('*')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:MULT)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: last_module3
+      PsiElement(Py:IDENTIFIER)('last_module3')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNameIdentifier
+      PsiElement(Py:IDENTIFIER)('other_')
+      PsiElement(Py:MULT)('*')
+      PsiElement(Py:IDENTIFIER)('_other')
+    PyStatementList
+      <empty list>

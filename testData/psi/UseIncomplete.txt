@@ -1,0 +1,126 @@
+SnakemakeFile: UseIncomplete.smk
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiErrorElement:Unexpected token '' after 'use' keyword
+      <empty list>
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiErrorElement:'*' or rule name expected
+      <empty list>
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: a
+      PsiElement(Py:IDENTIFIER)('a')
+    PsiErrorElement:'from' expected
+      <empty list>
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: b
+      PsiElement(Py:IDENTIFIER)('b')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiErrorElement:Identifier expected
+      <empty list>
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: c
+      PsiElement(Py:IDENTIFIER)('c')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: module
+      PsiElement(Py:IDENTIFIER)('module')
+    PsiErrorElement:'as' expected
+      <empty list>
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: d
+      PsiElement(Py:IDENTIFIER)('d')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: module
+      PsiElement(Py:IDENTIFIER)('module')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:AS_KEYWORD)('as')
+    PsiErrorElement:Identifier expected
+      <empty list>
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: f
+      PsiElement(Py:IDENTIFIER)('f')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: module
+      PsiElement(Py:IDENTIFIER)('module')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('module_name2')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:WITH_KEYWORD)('with')
+    PsiErrorElement:Use name identifier or ':' expected
+      <empty list>
+    PyStatementList
+      PsiErrorElement:Indent expected...
+        <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: zz
+      PsiElement(Py:IDENTIFIER)('zz')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('zzz')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:WITH_KEYWORD)('with')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkUseArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: sth
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"sth"')

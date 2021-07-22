@@ -2,11 +2,15 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.psi.util.elementType
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.MODULE_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
-import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_SECTIONS_KEYWORDS
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes
+import com.jetbrains.snakecharm.lang.psi.*
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 
 class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -15,22 +19,33 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
         session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
-            val sectionNamePsi = st.nameIdentifier
-            val sectionKeyword = st.sectionKeyword
-
-            if (sectionNamePsi != null && sectionKeyword != null && sectionKeyword !in SUBWORKFLOW_SECTIONS_KEYWORDS) {
-                registerProblem(
-                    sectionNamePsi,
-                    SnakemakeBundle.message("INSP.NAME.section.unrecognized.message", sectionKeyword)
-                )
-            }
+            isSectionRecognized(st, SUBWORKFLOW_SECTIONS_KEYWORDS)
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            val sectionNamePsi = st.nameIdentifier
-            val sectionKeyword = st.sectionKeyword
+            if (st.originalElement.elementType == SmkElementTypes.USE_ARGS_SECTION_STATEMENT) {
+                isSectionRecognized(st, USE_SECTIONS_KEYWORDS)
+            } else {
+                isSectionRecognized(st, RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS)
+            }
+        }
 
-            if (sectionNamePsi != null && sectionKeyword != null && sectionKeyword !in RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS) {
+        override fun visitSmkModuleArgsSection(st: SmkModuleArgsSection) {
+            isSectionRecognized(st, MODULE_SECTIONS_KEYWORDS)
+        }
+
+        /**
+         * Checks whether [argsSection] name identifier and section keyword are not null and
+         * whether the section keyword is a member of the [setOfValidNames]. If no, it shows a weak warning.
+         */
+        private fun isSectionRecognized(
+            argsSection: SmkArgsSection,
+            setOfValidNames: Set<String>
+        ) {
+            val sectionNamePsi = argsSection.nameIdentifier
+            val sectionKeyword = argsSection.sectionKeyword
+
+            if (sectionNamePsi != null && sectionKeyword != null && sectionKeyword !in setOfValidNames) {
                 registerProblem(
                     sectionNamePsi,
                     SnakemakeBundle.message("INSP.NAME.section.unrecognized.message", sectionKeyword)

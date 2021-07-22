@@ -41,7 +41,7 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
         val moduleNameAndPsi = arrayListOf<Pair<String, SmkModule>>()
 
         acceptChildren(object : PyElementVisitor(), SmkElementVisitor {
-            override val pyElementVisitor : PyElementVisitor = this
+            override val pyElementVisitor: PyElementVisitor = this
 
             override fun visitSmkModule(module: SmkModule) {
                 if (module.name != null) {
@@ -50,6 +50,21 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
             }
         })
         return moduleNameAndPsi
+    }
+
+    fun collectUses(): List<Pair<String, SmkUse>> {
+        val useNameAndPsi = arrayListOf<Pair<String, SmkUse>>()
+
+        acceptChildren(object : PyElementVisitor(), SmkElementVisitor {
+            override val pyElementVisitor: PyElementVisitor = this
+
+            override fun visitSmkUse(use: SmkUse) {
+                if (use.name != null) {
+                    useNameAndPsi.add(use.name!! to use)
+                }
+            }
+        })
+        return useNameAndPsi
     }
 
     fun collectCheckPoints(): List<Pair<String, SmkCheckPoint>> {

@@ -1,0 +1,52 @@
+SnakemakeFile: Module.smk
+  SmkModule
+    PsiElement(Py:MODULE_KEYWORD)('module')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkModuleArgsSection
+        PsiElement(Py:IDENTIFIER)('snakefile')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: myfile
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"myfile"')
+      PsiWhiteSpace('\n    ')
+      SmkModuleArgsSection
+        PsiElement(Py:IDENTIFIER)('config')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PySubscriptionExpression
+            PyReferenceExpression: config
+              PsiElement(Py:IDENTIFIER)('config')
+            PsiElement(Py:LBRACKET)('[')
+            PyStringLiteralExpression: something
+              PsiElement(Py:SINGLE_QUOTED_STRING)('"something"')
+            PsiElement(Py:RBRACKET)(']')
+      PsiWhiteSpace('\n    ')
+      SmkModuleArgsSection
+        PsiElement(Py:IDENTIFIER)('meta')
+        PsiErrorElement:':' expected
+          <empty list>
+        PyArgumentList
+          PyPrefixExpression
+            PsiElement(Py:MINUS)('-')
+            PyReferenceExpression: wrapper
+              PsiElement(Py:IDENTIFIER)('wrapper')
+          PsiErrorElement:',' expected
+            PsiElement(Py:COLON)(':')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"some/wrapper/here"')
+          PsiErrorElement:Expression expected
+            <empty list>
+      PsiWhiteSpace('\n    ')
+      SmkModuleArgsSection
+        PsiElement(Py:IDENTIFIER)('skip_validation')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyBoolLiteralExpression
+            PsiElement(Py:TRUE_KEYWORD)('True')

@@ -17,13 +17,16 @@ import com.intellij.util.ProcessingContext
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.completion.PythonLookupElement
 import com.jetbrains.python.psi.*
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.MODULE_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_LIKE
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
 import com.jetbrains.snakecharm.lang.psi.*
+import com.jetbrains.snakecharm.lang.psi.impl.SmkUseArgsSectionImpl
 
 /**
  * @author Roman.Chernyatchik
@@ -51,6 +54,18 @@ class SmkKeywordCompletionContributor : CompletionContributor() {
             CompletionType.BASIC,
             SubworkflowSectionKeywordsProvider.CAPTURE,
             SubworkflowSectionKeywordsProvider
+        )
+
+        extend(
+            CompletionType.BASIC,
+            ModuleSectionKeywordsProvider.CAPTURE,
+            ModuleSectionKeywordsProvider
+        )
+
+        extend(
+            CompletionType.BASIC,
+            UseSectionKeywordsProvider.CAPTURE,
+            UseSectionKeywordsProvider
         )
     }
 }
@@ -150,7 +165,10 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
         .inside(SmkRuleOrCheckpoint::class.java)!!
         .andNot(
             psiElement().insideOneOf(
-                PyArgumentList::class.java, SmkRunSection::class.java, PsiComment::class.java
+                PyArgumentList::class.java,
+                SmkRunSection::class.java,
+                PsiComment::class.java,
+                SmkUseArgsSectionImpl::class.java
             )
         )
 
@@ -189,6 +207,60 @@ object SubworkflowSectionKeywordsProvider : CompletionProvider<CompletionParamet
         result: CompletionResultSet
     ) {
         SUBWORKFLOW_SECTIONS_KEYWORDS.forEach { s ->
+            result.addElement(
+                SmkCompletionUtil.createPrioritizedLookupElement(
+                    TailTypeDecorator.withTail(
+                        PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
+                        ColonAndWhiteSpaceTail
+                    ),
+                    priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
+                )
+            )
+        }
+    }
+}
+
+object ModuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
+    val CAPTURE = psiElement()
+        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+        .inside(psiElement().inside(SmkModule::class.java))
+        .andNot(
+            psiElement().insideOneOf(PyArgumentList::class.java, PsiComment::class.java)
+        )
+
+    override fun addCompletions(
+        parameters: CompletionParameters,
+        context: ProcessingContext,
+        result: CompletionResultSet
+    ) {
+        MODULE_SECTIONS_KEYWORDS.forEach { s ->
+            result.addElement(
+                SmkCompletionUtil.createPrioritizedLookupElement(
+                    TailTypeDecorator.withTail(
+                        PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
+                        ColonAndWhiteSpaceTail
+                    ),
+                    priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
+                )
+            )
+        }
+    }
+}
+
+object UseSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
+    val CAPTURE = psiElement()
+        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+        .inside(psiElement().inside(SmkUse::class.java))
+        .andNot(
+            psiElement().insideOneOf(PyArgumentList::class.java, PsiComment::class.java)
+        )
+
+    override fun addCompletions(
+        parameters: CompletionParameters,
+        context: ProcessingContext,
+        result: CompletionResultSet
+    ) {
+        USE_SECTIONS_KEYWORDS.forEach { s ->
             result.addElement(
                 SmkCompletionUtil.createPrioritizedLookupElement(
                     TailTypeDecorator.withTail(

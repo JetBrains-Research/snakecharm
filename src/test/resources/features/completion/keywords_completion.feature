@@ -48,9 +48,11 @@ Feature: Completion for snakemake keyword-like things
     <item> "foo"
     """
     Examples:
-    | item         |
-    | rule         |
-    | checkpoint   |
+      | item       |
+      | rule       |
+      | checkpoint |
+      | module     |
+      | use        |
 
   Scenario Outline: Replace at toplevel
       Given a snakemake project
@@ -240,18 +242,18 @@ Feature: Completion for snakemake keyword-like things
       | rule       | han  | handover   |
       | checkpoint | han  | handover   |
 
-  Scenario Outline: Complete at rule/checkpoint level
+  Scenario Outline: Complete at rule/checkpoint/module level
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
       <rule_like> NAME:
-        <str>
+        <str>#here
       """
-    When I put the caret after <str>
+    When I put the caret at #here
     Then I invoke autocompletion popup, select "<result>" lookup item and see a text:
       """
       <rule_like> NAME:
-        <result>: 
+        <result>: #here
       """
     Examples:
       | rule_like  | str | result               |
@@ -269,6 +271,46 @@ Feature: Completion for snakemake keyword-like things
       | checkpoint | co  | conda                |
       | rule       | sh  | shell                |
       | checkpoint | sh  | shell                |
+      | module     | s   | snakefile            |
+      | module     | c   | config               |
+      | module     | m   | meta_wrapper         |
+      | module     | s   | skip_validation      |
+
+  Scenario Outline: Complete at use level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      use rule NAME1 from MODULE as NAME2 with:
+        <str>#here
+      """
+    When I put the caret at #here
+    Then I invoke autocompletion popup, select "<result>" lookup item and see a text:
+      """
+      use rule NAME1 from MODULE as NAME2 with:
+        <result>: #here
+      """
+    Examples:
+      | str | result  |
+      | in  | input   |
+      | ou  | output  |
+      | l   | log     |
+      | th  | threads |
+
+  Scenario: No rule execution sections in use section
+    Given a snakemake project
+    Given I open a file "foo.py" with text
+    """
+    use rule NAME1 from MODULE as NAME2 with:
+      #here
+    """
+    When I put the caret at #here
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | run      |
+      | shell    |
+      | notebook |
+      | script   |
+      | cwl      |
 
   Scenario Outline: Complete and replace at rule/checkpoint level
     Given a snakemake project
@@ -393,18 +435,21 @@ Feature: Completion for snakemake keyword-like things
       | localrules |
       | onstart    |
     Examples:
-      | rule_like   | text                | ptn   |
-      | rule        | input: foo          | foo   |
-      | rule        | input: foo, #here   | #here |
-      | rule        | input: foo.boo      | boo   |
-      | rule        | run: foo            | foo   |
-      | checkpoint  | input: foo          | foo   |
-      | checkpoint  | input: foo, #here   | #here |
-      | checkpoint  | input: foo.boo      | boo   |
-      | checkpoint  | run: foo            | foo   |
-      | subworkflow | workdir: foo        | foo   |
-      | subworkflow | workdir: foo, #here | #here |
-      | subworkflow | workdir: foo.boo    | boo   |
+      | rule_like   | text                 | ptn   |
+      | rule        | input: foo           | foo   |
+      | rule        | input: foo, #here    | #here |
+      | rule        | input: foo.boo       | boo   |
+      | rule        | run: foo             | foo   |
+      | checkpoint  | input: foo           | foo   |
+      | checkpoint  | input: foo, #here    | #here |
+      | checkpoint  | input: foo.boo       | boo   |
+      | checkpoint  | run: foo             | foo   |
+      | subworkflow | workdir: foo         | foo   |
+      | subworkflow | workdir: foo, #here  | #here |
+      | subworkflow | workdir: foo.boo     | boo   |
+      | module      | nakefile: foo        | foo   |
+      | module      | nakefile: foo, #here | #here |
+      | module      | nakefile: foo.boo    | boo   |
 
   Scenario Outline: Do not show toplevel keywords in workflow sections
     Given a snakemake project

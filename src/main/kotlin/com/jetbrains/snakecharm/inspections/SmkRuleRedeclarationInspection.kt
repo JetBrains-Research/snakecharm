@@ -5,6 +5,8 @@ import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemHighlightType.GENERIC_ERROR
 import com.intellij.codeInspection.ProblemHighlightType.WEAK_WARNING
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyStatement
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -16,9 +18,9 @@ import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 
 class SmkRuleRedeclarationInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         private val localRules by lazy {
             holder.file.let { psiFile ->
@@ -61,11 +63,38 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
                 ruleLike, nameToCheck, SmkCheckpointNameIndex.KEY, SmkCheckPoint::class.java
             ) { localCheckpoints }
 
-            val resolveResults = ruleResolveResults + cpResolveResults
+            val usesResolveResults: Collection<PsiElement> = AbstractSmkRuleOrCheckpointType.findUseSectionsByName(
+                containingFile, nameToCheck
+            )
 
+            val resolveResults = ruleResolveResults + cpResolveResults + usesResolveResults
+
+            makeADecision(ruleLike, resolveResults, containingFile)
+        }
+
+        override fun visitSmkUse(use: SmkUse) {
+            val containingFile = use.containingFile
+            val nameToCheck = use.name ?: return
+
+            val rules = AbstractSmkRuleOrCheckpointType.findAvailableRuleLikeElementByName(
+                use, nameToCheck, SmkRuleNameIndex.KEY, SmkRule::class.java
+            ) { localRules }
+            val uses = AbstractSmkRuleOrCheckpointType.findUseSectionsByName(
+                containingFile, nameToCheck
+            )
+
+            makeADecision(use, rules + uses, containingFile)
+        }
+
+        private fun makeADecision(
+            ruleLike: SmkSection,
+            resolveResults: Collection<PsiElement>,
+            containingFile: PsiFile
+        ) {
             if (resolveResults.isEmpty()) {
                 return
             }
+
             if (resolveResults.size == 1 && resolveResults.single() == ruleLike) {
                 return
             }
@@ -98,7 +127,7 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
         }
 
         private fun registerProblem(
-            ruleLike: SmkRuleLike<SmkRuleOrCheckpointArgsSection>,
+            ruleLike: SmkSection,
             msg: String,
             severity: ProblemHighlightType
         ) {
@@ -114,5 +143,6 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
             )
         }
     }
+
     override fun getDisplayName(): String = SnakemakeBundle.message("INSP.NAME.rule.redeclaration")
 }
