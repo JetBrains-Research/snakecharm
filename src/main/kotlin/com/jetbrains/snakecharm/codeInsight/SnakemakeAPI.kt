@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.codeInsight
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_CONFIG_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_META_WRAPPER_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_REPLACE_PREFIX_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_SKIP_VALIDATION_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_SNAKEFILE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_BENCHMARK
@@ -130,7 +131,8 @@ object SnakemakeAPI {
         MODULE_SNAKEFILE_KEYWORD,
         MODULE_CONFIG_KEYWORD,
         MODULE_SKIP_VALIDATION_KEYWORD,
-        MODULE_META_WRAPPER_KEYWORD
+        MODULE_META_WRAPPER_KEYWORD,
+        MODULE_REPLACE_PREFIX_KEYWORD
     )
 
     /**

@@ -275,6 +275,7 @@ Feature: Completion for snakemake keyword-like things
       | module     | c   | config               |
       | module     | m   | meta_wrapper         |
       | module     | s   | skip_validation      |
+      | module     | r   | replace_prefix       |
 
   Scenario Outline: Complete at use level
     Given a snakemake project

@@ -6,7 +6,6 @@ import com.intellij.codeInspection.ProblemHighlightType.GENERIC_ERROR
 import com.intellij.codeInspection.ProblemHighlightType.WEAK_WARNING
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyStatement
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -14,6 +13,7 @@ import com.jetbrains.snakecharm.inspections.quickfix.RenameElementWithoutUsagesQ
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 
 class SmkRuleRedeclarationInspection : SnakemakeInspection() {
@@ -42,6 +42,16 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
                 }
             }
         }
+        private val localUses by lazy {
+            holder.file.let { psiFile ->
+                when (psiFile) {
+                    is SmkFile -> {
+                        psiFile.collectUses().map { it.second }
+                    }
+                    else -> emptyList()
+                }
+            }
+        }
 
         override fun visitSmkRule(rule: SmkRule) {
             visitSMKRuleLike(rule)
@@ -49,6 +59,10 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
 
         override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
             visitSMKRuleLike(checkPoint)
+        }
+
+        override fun visitSmkUse(use: SmkUse) {
+            visitSMKRuleLike(use)
         }
 
         private fun visitSMKRuleLike(ruleLike: SmkRuleLike<SmkRuleOrCheckpointArgsSection>) {
@@ -63,34 +77,13 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
                 ruleLike, nameToCheck, SmkCheckpointNameIndex.KEY, SmkCheckPoint::class.java
             ) { localCheckpoints }
 
-            val usesResolveResults: Collection<PsiElement> = AbstractSmkRuleOrCheckpointType.findUseSectionsByName(
-                containingFile, nameToCheck
-            )
+            val usesResolveResults: Collection<PsiElement> =
+                AbstractSmkRuleOrCheckpointType.findAvailableRuleLikeElementByName(
+                    ruleLike, nameToCheck, SmkUseNameIndex.KEY, SmkUse::class.java
+                ) { localUses }
 
             val resolveResults = ruleResolveResults + cpResolveResults + usesResolveResults
 
-            makeADecision(ruleLike, resolveResults, containingFile)
-        }
-
-        override fun visitSmkUse(use: SmkUse) {
-            val containingFile = use.containingFile
-            val nameToCheck = use.name ?: return
-
-            val rules = AbstractSmkRuleOrCheckpointType.findAvailableRuleLikeElementByName(
-                use, nameToCheck, SmkRuleNameIndex.KEY, SmkRule::class.java
-            ) { localRules }
-            val uses = AbstractSmkRuleOrCheckpointType.findUseSectionsByName(
-                containingFile, nameToCheck
-            )
-
-            makeADecision(use, rules + uses, containingFile)
-        }
-
-        private fun makeADecision(
-            ruleLike: SmkSection,
-            resolveResults: Collection<PsiElement>,
-            containingFile: PsiFile
-        ) {
             if (resolveResults.isEmpty()) {
                 return
             }

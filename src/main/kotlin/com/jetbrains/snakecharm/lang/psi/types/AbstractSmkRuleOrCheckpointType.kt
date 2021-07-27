@@ -8,7 +8,6 @@ import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
@@ -22,7 +21,6 @@ import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
-import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import gnu.trove.THashSet
@@ -147,22 +145,6 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
                 results.addAll(StubIndex.getElements(indexKey, key, project, scope, clazz))
             }
             return results
-        }
-
-        /**
-         * Finds all 'use' sections with name [nameToCheck] in [containingFile] and returns them.
-         * Note, that it is checked only sections, which are producing a single rule (not list of rules).
-         * If there no such rules, returns an empty collection.
-         */
-        fun findUseSectionsByName(
-            containingFile: PsiFile,
-            nameToCheck: String
-        ): Collection<PsiElement> {
-            return if (containingFile is SmkFile) {
-                containingFile.collectUses().filter { it.first == nameToCheck }.map { it.second }
-            } else {
-                emptyList()
-            }
         }
 
         private fun searchScope(module: Module): GlobalSearchScope {

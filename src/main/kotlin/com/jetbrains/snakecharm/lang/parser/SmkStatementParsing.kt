@@ -310,11 +310,11 @@ class SmkStatementParsing(
 //    }
 
 
-    private fun parseIdentifier(): Boolean {
+    private fun parseIdentifier(type: IElementType = SmkElementTypes.REFERENCE_EXPRESSION): Boolean {
         val referenceMarker = myBuilder.mark()
         if (Parsing.isIdentifier(myBuilder)) {
             Parsing.advanceIdentifierLike(myBuilder)
-            referenceMarker.done(SmkElementTypes.REFERENCE_EXPRESSION)
+            referenceMarker.done(type)
             return true
         }
         referenceMarker.drop()
@@ -325,6 +325,7 @@ class SmkStatementParsing(
      * Parsing 'use' statement. Starts after first identifier and ends before the colon
      */
     private fun parseUseDeclaration(): Boolean {
+        var hasImport = false // Does this section contains 'module' keyword
         val listOfRules = myBuilder.tokenType == PyTokenTypes.MULT
         if (!listOfRules && myBuilder.tokenType != PyTokenTypes.IDENTIFIER) { // No rule name, no '*'
             myBuilder.error(PyPsiBundle.message("PARSE.expected.symbols.first.quotation", "*", "rule name"))
@@ -336,28 +337,36 @@ class SmkStatementParsing(
 
         if (myBuilder.tokenType != PyTokenTypes.AS_KEYWORD) {
             checkMatches(PyTokenTypes.FROM_KEYWORD, PyPsiBundle.message("PARSE.0.expected", "from"))
-            if (!parseIdentifier()) {
+
+            // Creates reference to module definition
+            if (!parseIdentifier(PyElementTypes.REFERENCE_EXPRESSION)) {
                 myBuilder.error(PyPsiBundle.message("PARSE.expected.identifier"))
             }
-        }
-        checkMatches(PyTokenTypes.AS_KEYWORD, PyPsiBundle.message("PARSE.0.expected", "as"))
 
-        // New rule name can be: text_*, *_text, text_*_text, text or *
-        val hasFirstIdentifier = myBuilder.tokenType == PyTokenTypes.IDENTIFIER
-        val name = myBuilder.mark()
-        if (hasFirstIdentifier) {
-            nextToken()
+            hasImport = true
         }
-        if (myBuilder.tokenType == PyTokenTypes.MULT) {
-            nextToken()
-            if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER) {
+        // If there are no 'module' keyword, we expect 'as' keyword
+        // If there are 'module' keyword, there may not be 'as' keyword
+        if (!hasImport || myBuilder.tokenType == PyTokenTypes.AS_KEYWORD) {
+            checkMatches(PyTokenTypes.AS_KEYWORD, PyPsiBundle.message("PARSE.0.expected", "as"))
+
+            // New rule name can be: text_*, *_text, text_*_text, text or *
+            val hasFirstIdentifier = myBuilder.tokenType == PyTokenTypes.IDENTIFIER
+            val name = myBuilder.mark()
+            if (hasFirstIdentifier) {
                 nextToken()
             }
-            name.done(SmkElementTypes.USE_NAME_IDENTIFIER)
-        } else {
-            name.drop()
-            if (!hasFirstIdentifier) {
-                checkMatches(PyTokenTypes.IDENTIFIER, PyPsiBundle.message("PARSE.expected.identifier"))
+            if (myBuilder.tokenType == PyTokenTypes.MULT) {
+                nextToken()
+                if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER) {
+                    nextToken()
+                }
+                name.done(SmkElementTypes.USE_NAME_IDENTIFIER)
+            } else {
+                name.drop()
+                if (!hasFirstIdentifier) {
+                    checkMatches(PyTokenTypes.IDENTIFIER, PyPsiBundle.message("PARSE.expected.identifier"))
+                }
             }
         }
 

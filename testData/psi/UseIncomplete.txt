@@ -46,29 +46,12 @@ SnakemakeFile: UseIncomplete.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkReferenceExpression: c
-      PsiElement(Py:IDENTIFIER)('c')
-    PsiWhiteSpace(' ')
-    PsiElement(Py:FROM_KEYWORD)('from')
-    PsiWhiteSpace(' ')
-    SmkReferenceExpression: module
-      PsiElement(Py:IDENTIFIER)('module')
-    PsiErrorElement:'as' expected
-      <empty list>
-    PyStatementList
-      <empty list>
-  PsiWhiteSpace('\n')
-  SmkUse
-    PsiElement(Py:USE_KEYWORD)('use')
-    PsiWhiteSpace(' ')
-    PsiElement(Py:RULE_KEYWORD)('rule')
-    PsiWhiteSpace(' ')
     SmkReferenceExpression: d
       PsiElement(Py:IDENTIFIER)('d')
     PsiWhiteSpace(' ')
     PsiElement(Py:FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    SmkReferenceExpression: module
+    PyReferenceExpression: module
       PsiElement(Py:IDENTIFIER)('module')
     PsiWhiteSpace(' ')
     PsiElement(Py:AS_KEYWORD)('as')
@@ -87,7 +70,7 @@ SnakemakeFile: UseIncomplete.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    SmkReferenceExpression: module
+    PyReferenceExpression: module
       PsiElement(Py:IDENTIFIER)('module')
     PsiWhiteSpace(' ')
     PsiElement(Py:AS_KEYWORD)('as')

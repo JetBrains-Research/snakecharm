@@ -9,7 +9,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    SmkReferenceExpression: my_module
+    PyReferenceExpression: my_module
       PsiElement(Py:IDENTIFIER)('my_module')
     PsiWhiteSpace(' ')
     PsiElement(Py:AS_KEYWORD)('as')
@@ -28,7 +28,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    SmkReferenceExpression: other_module
+    PyReferenceExpression: other_module
       PsiElement(Py:IDENTIFIER)('other_module')
     PsiWhiteSpace(' ')
     PsiElement(Py:AS_KEYWORD)('as')
@@ -80,7 +80,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    SmkReferenceExpression: last_module1
+    PyReferenceExpression: last_module1
       PsiElement(Py:IDENTIFIER)('last_module1')
     PsiWhiteSpace(' ')
     PsiElement(Py:AS_KEYWORD)('as')
@@ -100,7 +100,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    SmkReferenceExpression: last_module2
+    PyReferenceExpression: last_module2
       PsiElement(Py:IDENTIFIER)('last_module2')
     PsiWhiteSpace(' ')
     PsiElement(Py:AS_KEYWORD)('as')
@@ -120,7 +120,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    SmkReferenceExpression: last_module3
+    PyReferenceExpression: last_module3
       PsiElement(Py:IDENTIFIER)('last_module3')
     PsiWhiteSpace(' ')
     PsiElement(Py:AS_KEYWORD)('as')
@@ -129,5 +129,19 @@ SnakemakeFile: Use.smk
       PsiElement(Py:IDENTIFIER)('other_')
       PsiElement(Py:MULT)('*')
       PsiElement(Py:IDENTIFIER)('_other')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:MULT)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    PyReferenceExpression: last_module4
+      PsiElement(Py:IDENTIFIER)('last_module4')
     PyStatementList
       <empty list>

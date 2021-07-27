@@ -347,6 +347,17 @@
     />
 
     <localInspection
+            language="Snakemake" shortName="SmkModuleRedeclarationInspection"
+            enabledByDefault="true"
+            level="WEAK WARNING"
+            suppressId="SmkModuleRedeclaration"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.module.redeclaration"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkModuleRedeclarationInspection"
+    />
+
+    <localInspection
             language="Snakemake" shortName="SmkRuleOrCheckpointNameYetUndefinedInspection"
             enabledByDefault="true"
             level="ERROR"

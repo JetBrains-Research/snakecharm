@@ -8,3 +8,4 @@ use rule f_z as x_z with:
 use rule * from last_module1 as *_other
 use rule * from last_module2 as other_*
 use rule * from last_module3 as other_*_other
+use rule * from last_module4

@@ -33,6 +33,7 @@ object SnakemakeNames {
     const val MODULE_CONFIG_KEYWORD = "config"
     const val MODULE_SKIP_VALIDATION_KEYWORD = "skip_validation"
     const val MODULE_META_WRAPPER_KEYWORD = "meta_wrapper"
+    const val MODULE_REPLACE_PREFIX_KEYWORD = "replace_prefix"
 
     const val USE_KEYWORD = "use"
 
