@@ -20,6 +20,20 @@ Feature: Annotate syntax errors
       """
       When I check highlighting errors
 
+  Scenario: Annotate keyword argument duplication in workflow
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      wildcard_constraints:
+          foo = ".*",
+          foo = "other.*"
+      """
+    Then I expect inspection error on <foo> in <foo = "other.*"> with message
+      """
+      Keyword argument already provided: foo = \".*\".
+      """
+    When I check highlighting errors
+
   Scenario Outline: Annotate positional argument after keyword argument
     Given a snakemake project
     Given I open a file "foo.smk" with text

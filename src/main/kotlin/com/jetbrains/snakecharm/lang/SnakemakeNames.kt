@@ -8,29 +8,25 @@ object SnakemakeNames {
     const val RULE_KEYWORD = "rule"
     const val CHECKPOINT_KEYWORD = "checkpoint"
 
+    const val WORKFLOW_ONSUCCESS_KEYWORD = "onsuccess"
+    const val WORKFLOW_ONERROR_KEYWORD = "onerror"
+    const val WORKFLOW_ONSTART_KEYWORD = "onstart"
+    const val WORKFLOW_LOCALRULES_KEYWORD = "localrules"
+    const val WORKFLOW_RULEORDER_KEYWORD = "ruleorder"
     const val WORKFLOW_CONFIGFILE_KEYWORD = "configfile"
     const val WORKFLOW_REPORT_KEYWORD = "report"
     const val WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD = "wildcard_constraints"
     const val WORKFLOW_SINGULARITY_KEYWORD = "singularity"
     const val WORKFLOW_INCLUDE_KEYWORD = "include"
     const val WORKFLOW_WORKDIR_KEYWORD = "workdir"
-
-    const val WORKFLOW_LOCALRULES_KEYWORD = "localrules"
-
-    const val WORKFLOW_RULEORDER_KEYWORD = "ruleorder"
-
-    const val WORKFLOW_ONSUCCESS_KEYWORD = "onsuccess"
-    const val WORKFLOW_ONERROR_KEYWORD = "onerror"
-    const val WORKFLOW_ONSTART_KEYWORD = "onstart"
-
-    const val SUBWORKFLOW_KEYWORD = "subworkflow"
-    const val SUBWORKFLOW_WORKDIR_KEYWORD  = WORKFLOW_WORKDIR_KEYWORD
-    const val SUBWORKFLOW_CONFIGFILE_KEYWORD  = WORKFLOW_CONFIGFILE_KEYWORD
-    const val SUBWORKFLOW_SNAKEFILE_KEYWORD = "snakefile"
-
     const val WORKFLOW_ENVVARS_KEYWORD = "envvars"
     const val WORKFLOW_CONTAINER_KEYWORD = "container"
-    const val WORKFLOW_CONTAINERIZED_KEYWORD = "containerized"
+    const val WORKFLOW_CONTAINERIZED_KEYWORD = "containerized"  // => 6.0.0
+
+    const val SUBWORKFLOW_KEYWORD = "subworkflow"
+    const val SUBWORKFLOW_WORKDIR_KEYWORD = WORKFLOW_WORKDIR_KEYWORD
+    const val SUBWORKFLOW_CONFIGFILE_KEYWORD = WORKFLOW_CONFIGFILE_KEYWORD
+    const val SUBWORKFLOW_SNAKEFILE_KEYWORD = "snakefile"
 
     const val SECTION_INPUT = "input"
     const val SECTION_OUTPUT = "output"
@@ -39,9 +35,9 @@ object SnakemakeNames {
     const val SECTION_VERSION = "version"
     const val SECTION_MESSAGE = "message"
     const val SECTION_THREADS = "threads"
-    const val SECTION_SINGULARITY = "singularity"
+    const val SECTION_SINGULARITY = WORKFLOW_SINGULARITY_KEYWORD
     const val SECTION_PRIORITY = "priority"
-    const val SECTION_WILDCARD_CONSTRAINTS = "wildcard_constraints"
+    const val SECTION_WILDCARD_CONSTRAINTS = WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD
     const val SECTION_GROUP = "group"
     const val SECTION_CONDA = "conda" // >= 4.8
     const val SECTION_RESOURCES = "resources"
@@ -53,8 +49,8 @@ object SnakemakeNames {
     const val SECTION_SHADOW = "shadow"
     const val SECTION_RUN = "run"
     const val SECTION_CACHE = "cache" // >= 5.12.0
-    const val SECTION_CONTAINER = "container"
-    const val SECTION_CONTAINERIZED = "containerized" // => 6.0.0
+    const val SECTION_CONTAINER = WORKFLOW_CONTAINER_KEYWORD
+    const val SECTION_CONTAINERIZED = WORKFLOW_CONTAINERIZED_KEYWORD
     const val SECTION_NOTEBOOK = "notebook"
     const val SECTION_ENVMODULES = "envmodules" // >= 5.9
     const val SECTION_NAME = "name" // >= 5.31
