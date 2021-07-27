@@ -1,0 +1,84 @@
+SnakemakeFile: WorkflowUnknownSections.smk
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('unknownSection1')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyStringLiteralExpression: Unknown_section1
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"Unknown_section1"')
+  PsiWhiteSpace('\n\n')
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('unknownSection2')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n  ')
+      PyStringLiteralExpression: Unknown_section2
+        PsiElement(Py:SINGLE_QUOTED_STRING)('"Unknown_section2"')
+  PsiWhiteSpace('\n\n')
+  PyAssignmentStatement
+    PyTargetExpression: variable1
+      PsiElement(Py:IDENTIFIER)('variable1')
+    PyAnnotation
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyReferenceExpression: int
+        PsiElement(Py:IDENTIFIER)('int')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:EQ)('=')
+    PsiWhiteSpace(' ')
+    PyNumericLiteralExpression
+      PsiElement(Py:INTEGER_LITERAL)('5')
+  PsiWhiteSpace('\n\n')
+  PyAssignmentStatement
+    PyTargetExpression: variable2
+      PsiElement(Py:IDENTIFIER)('variable2')
+    PyAnnotation
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyReferenceExpression: string
+        PsiElement(Py:IDENTIFIER)('string')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:EQ)('=')
+    PsiWhiteSpace(' ')
+    PyStringLiteralExpression: variable2
+      PsiElement(Py:SINGLE_QUOTED_STRING)('"variable2"')
+  PsiWhiteSpace('\n\n')
+  PyTypeDeclarationStatement
+    PyTargetExpression: variable3
+      PsiElement(Py:IDENTIFIER)('variable3')
+    PyAnnotation
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace(' ')
+      PyReferenceExpression: int
+        PsiElement(Py:IDENTIFIER)('int')
+  PsiWhiteSpace('\n\n')
+  PyFunction('foo')
+    PsiElement(Py:DEF_KEYWORD)('def')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('foo')
+    PyParameterList
+      PsiElement(Py:LPAR)('(')
+      PyNamedParameter('a')
+        PsiElement(Py:IDENTIFIER)('a')
+        PyAnnotation
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyReferenceExpression: int
+            PsiElement(Py:IDENTIFIER)('int')
+      PsiElement(Py:RPAR)(')')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace('\n    ')
+    PyStatementList
+      PyReturnStatement
+        PsiElement(Py:RETURN_KEYWORD)('return')
+        PsiWhiteSpace(' ')
+        PyReferenceExpression: a
+          PsiElement(Py:IDENTIFIER)('a')
+  PsiWhiteSpace('\n\n')
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('incorrectVariable')
+    PyArgumentList
+      PsiElement(Py:COLON)(':')
+      PsiWhiteSpace('\n    ')
+      PyReferenceExpression: int
+        PsiElement(Py:IDENTIFIER)('int')

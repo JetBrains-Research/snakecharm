@@ -10,8 +10,10 @@ import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_OR_CHECKPOINT
+import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer.Companion.TOPLEVEL_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.*
+import java.util.*
 
 
 /**
@@ -19,38 +21,38 @@ import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.*
  * @date 2018-12-31
  */
 class SmkStatementParsing(
-        context: SmkParserContext
+    context: SmkParserContext
 ) : StatementParsing(context) {
 
     private val ruleSectionParsingData = SectionParsingData(
-            declaration = RULE_DECLARATION_STATEMENT,
-            name = "rule",
-            parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
-            sectionKeyword= SmkTokenTypes.RULE_KEYWORD
+        declaration = RULE_DECLARATION_STATEMENT,
+        name = "rule",
+        parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
+        sectionKeyword = SmkTokenTypes.RULE_KEYWORD
     )
 
     private val checkpointSectionParsingData = SectionParsingData(
-            declaration = CHECKPOINT_DECLARATION_STATEMENT,
-            name = "checkpoint",
-            parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
-            sectionKeyword= SmkTokenTypes.CHECKPOINT_KEYWORD
+        declaration = CHECKPOINT_DECLARATION_STATEMENT,
+        name = "checkpoint",
+        parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
+        sectionKeyword = SmkTokenTypes.CHECKPOINT_KEYWORD
     )
 
     private val subworkflowSectionParsingData = SectionParsingData(
-            declaration = SUBWORKFLOW_DECLARATION_STATEMENT,
-            name = "subworkflow",
-            parameterListStatement = SmkElementTypes.SUBWORKFLOW_ARGS_SECTION_STATEMENT,
-            sectionKeyword= SmkTokenTypes.SUBWORKFLOW_KEYWORD
+        declaration = SUBWORKFLOW_DECLARATION_STATEMENT,
+        name = "subworkflow",
+        parameterListStatement = SmkElementTypes.SUBWORKFLOW_ARGS_SECTION_STATEMENT,
+        sectionKeyword = SmkTokenTypes.SUBWORKFLOW_KEYWORD
     )
 
     override fun getReferenceType() = SmkElementTypes.SMK_PY_REFERENCE_EXPRESSION
 
     private fun getSectionParsingData(tokenType: IElementType) =
-            when {
-                tokenType === SmkTokenTypes.SUBWORKFLOW_KEYWORD -> subworkflowSectionParsingData
-                tokenType === SmkTokenTypes.CHECKPOINT_KEYWORD -> checkpointSectionParsingData
-                else -> ruleSectionParsingData
-            }
+        when {
+            tokenType === SmkTokenTypes.SUBWORKFLOW_KEYWORD -> subworkflowSectionParsingData
+            tokenType === SmkTokenTypes.CHECKPOINT_KEYWORD -> checkpointSectionParsingData
+            else -> ruleSectionParsingData
+        }
 
     override fun getParsingContext() = myContext as SmkParserContext
 
@@ -63,11 +65,16 @@ class SmkStatementParsing(
             val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText!!]
             if (actualToken != null) {
                 myBuilder.remapCurrentToken(actualToken)
+            } else if (isToplevelDecoratorKeyword()) {
+                myBuilder.remapCurrentToken(SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)
             }
         }
+
         val tt = myBuilder.tokenType
 
-        if (tt !in SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
+        if (tt !in SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS &&
+            tt != SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD
+        ) {
             // XXX: maybe also allow: `some_new_section: ` case, i.e. indentifier with following ':' in order
             // to support any section here
             super.parseStatement()
@@ -75,7 +82,7 @@ class SmkStatementParsing(
         }
         when {
             tt in SmkTokenTypes.RULE_LIKE -> parseRuleLikeDeclaration(getSectionParsingData(tt!!))
-            tt in SmkTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS -> {
+            tt === SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
                 val result = parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
@@ -89,9 +96,9 @@ class SmkStatementParsing(
                 nextToken()
 
                 val res = parsingContext.expressionParser.parseArgumentList(
-                        ",", PyTokenTypes.COMMA,
-                        SnakemakeBundle.message("PARSE.expected.identifier"),
-                        this::parseIdentifier
+                    ",", PyTokenTypes.COMMA,
+                    SnakemakeBundle.message("PARSE.expected.identifier"),
+                    this::parseIdentifier
                 )
 
                 if (!res) {
@@ -103,14 +110,14 @@ class SmkStatementParsing(
                     nextToken()
                 }
             }
-            tt === SmkTokenTypes.WORKFLOW_RULEORDER_KEYWORD  -> {
+            tt === SmkTokenTypes.WORKFLOW_RULEORDER_KEYWORD -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
 
                 val res = parsingContext.expressionParser.parseArgumentList(
-                        ">", PyTokenTypes.GT,
-                        SnakemakeBundle.message("PARSE.expected.identifier"),
-                        this::parseIdentifier
+                    ">", PyTokenTypes.GT,
+                    SnakemakeBundle.message("PARSE.expected.identifier"),
+                    this::parseIdentifier
                 )
 
                 if (!res) {
@@ -154,7 +161,13 @@ class SmkStatementParsing(
 
         // XXX at the moment we continue parsing rule even if colon missed, probably better
         // XXX to drop rule and scroll up to next STATEMENT_BREAK/RULE/CHECKPOINT/other toplevel keyword or eof()
-        checkMatches(PyTokenTypes.COLON, "${section.name.capitalize()} name identifier or ':' expected") // bundle
+        checkMatches(PyTokenTypes.COLON,
+            "${
+                section.name.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                }
+            } name identifier or ':' expected"
+        ) // bundle
 
         val ruleStatements = myBuilder.mark()
 
@@ -241,7 +254,11 @@ class SmkStatementParsing(
         val ruleParam = myBuilder.mark()
 
         if (myBuilder.tokenType != PyTokenTypes.IDENTIFIER) {
-            myBuilder.error("${section.name.capitalize()} parameter identifier is expected") // bundle
+            myBuilder.error("${
+                section.name.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                }
+            } parameter identifier is expected") // bundle
             nextToken()
             ruleParam.drop()
             return false
@@ -273,7 +290,7 @@ class SmkStatementParsing(
         return result
     }
 
-    // TODO: cleanup
+// TODO: cleanup
 //    override fun getFunctionParser(): FunctionParsing {
 //        return super.getFunctionParser()
 //    }
@@ -289,13 +306,35 @@ class SmkStatementParsing(
         referenceMarker.drop()
         return false
     }
+
+    private fun isToplevelDecoratorKeyword(): Boolean {
+        return if (myBuilder.tokenText!! in TOPLEVEL_KEYWORDS) {
+            true
+        } else {
+            val workflowParam = myBuilder.mark()
+            var result = checkNextToken(PyTokenTypes.COLON)
+            nextToken()
+            result = result &&
+                    (myBuilder.tokenType.isPythonString() || myBuilder.tokenType == PyTokenTypes.STATEMENT_BREAK)
+            workflowParam.rollbackTo()
+            result
+        }
+    }
+
+    private fun checkNextToken(tt: PyElementType): Boolean {
+        nextToken()
+        if (myBuilder.tokenType == tt) {
+            return true
+        }
+        return false
+    }
 }
 
 fun IElementType?.isPythonString() = this in PyTokenTypes.STRING_NODES || this == PyTokenTypes.FSTRING_START
 
 private data class SectionParsingData(
-        val declaration: IElementType,
-        val name: String,
-        val parameterListStatement: PyElementType,
-        val sectionKeyword: PyElementType
+    val declaration: IElementType,
+    val name: String,
+    val parameterListStatement: PyElementType,
+    val sectionKeyword: PyElementType
 )

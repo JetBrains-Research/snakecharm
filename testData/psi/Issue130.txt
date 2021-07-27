@@ -126,7 +126,7 @@ SnakemakeFile: Issue130.smk
           PsiElement(Py:PASS_KEYWORD)('pass')
   PsiWhiteSpace('\n\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_WORKDIR_KEYWORD)('workdir')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('workdir')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')

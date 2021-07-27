@@ -9,7 +9,7 @@ SnakemakeFile: KeywordLikeIdentifiersAsKeywords.smk
       PsiWhiteSpace('\n    ')
       PyStatementList
         SmkWorkflowArgsSection
-          PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+          PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('configfile')
           PyArgumentList
             PsiElement(Py:COLON)(':')
             PsiWhiteSpace(' ')
@@ -25,7 +25,7 @@ SnakemakeFile: KeywordLikeIdentifiersAsKeywords.smk
       PsiWhiteSpace('\n    ')
       PyStatementList
         SmkWorkflowArgsSection
-          PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+          PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('configfile')
           PyArgumentList
             PsiElement(Py:COLON)(':')
             PsiWhiteSpace(' ')
@@ -38,7 +38,7 @@ SnakemakeFile: KeywordLikeIdentifiersAsKeywords.smk
       PsiWhiteSpace('\n    ')
       PyStatementList
         SmkWorkflowArgsSection
-          PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+          PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('configfile')
           PyArgumentList
             PsiElement(Py:COLON)(':')
             PsiWhiteSpace(' ')
@@ -52,7 +52,7 @@ SnakemakeFile: KeywordLikeIdentifiersAsKeywords.smk
       PsiWhiteSpace('\n    ')
       PyStatementList
         SmkWorkflowArgsSection
-          PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+          PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('configfile')
           PyArgumentList
             PsiElement(Py:COLON)(':')
             PsiWhiteSpace(' ')
@@ -65,7 +65,7 @@ SnakemakeFile: KeywordLikeIdentifiersAsKeywords.smk
       PsiWhiteSpace('\n    ')
       PyStatementList
         SmkWorkflowArgsSection
-          PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+          PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('configfile')
           PyArgumentList
             PsiElement(Py:COLON)(':')
             PsiWhiteSpace(' ')

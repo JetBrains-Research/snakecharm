@@ -9,7 +9,6 @@ import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.patterns.PsiElementPattern
 import com.intellij.patterns.StandardPatterns
-import com.intellij.profile.codeInspection.InspectionProfileManager
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
@@ -20,7 +19,6 @@ import com.jetbrains.python.codeInsight.completion.PythonLookupElement
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_LIKE
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE
@@ -92,17 +90,18 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
             return
         }
 
-        val tokenType2Name = SnakemakeLexer.KEYWORDS
-            .map { (k, v) -> v to k }
-            .toMap()
-
+        val tokenType2Name = SnakemakeLexer.KEYWORDS_2_TEXT
+        val colonAndWhiteSpaceTailKeys = WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE.types.map { tt ->
+            tokenType2Name[tt]!!
+        } + SnakemakeLexer.TOPLEVEL_KEYWORDS
+        val spaceTailKeys = RULE_LIKE.types.map { tt ->
+            tokenType2Name[tt]!!
+        }
         listOf(
-            WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE to ColonAndWhiteSpaceTail,
-            RULE_LIKE to TailType.SPACE
+            colonAndWhiteSpaceTailKeys to ColonAndWhiteSpaceTail,
+            spaceTailKeys to TailType.SPACE
         ).forEach { (tokenSet, tail) ->
-            tokenSet.types.forEach { tt ->
-                val s = tokenType2Name[tt]!!
-
+            tokenSet.forEach { s ->
                 result.addElement(
                     SmkCompletionUtil.createPrioritizedLookupElement(
                         TailTypeDecorator.withTail(

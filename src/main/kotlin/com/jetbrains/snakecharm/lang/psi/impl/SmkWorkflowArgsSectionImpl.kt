@@ -16,10 +16,10 @@ import com.jetbrains.snakecharm.lang.psi.*
 class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkflowArgsSection {
     companion object {
         val WORKFLOWS_WITH_FILE_REFERENCES = setOf(
-                SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD,
-                SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD,
-                SnakemakeNames.WORKFLOW_REPORT_KEYWORD,
-                SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD
+            SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD,
+            SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD,
+            SnakemakeNames.WORKFLOW_REPORT_KEYWORD,
+            SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD
         )
     }
 
@@ -28,8 +28,8 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
         else -> super.acceptPyVisitor(pyVisitor)
     }
 
-    override fun getSectionKeywordNode()= node
-            .findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
+    override fun getSectionKeywordNode() = node
+        .findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)
 
     override fun getPresentation() = getPresentation(this)
     override fun getIcon(flags: Int) = getIcon(this, flags)
@@ -42,17 +42,17 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
         return when (keywordName) {
             SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD -> {
                 SmkConfigfileReference(
-                        this, textRange, strExpr, path
+                    this, textRange, strExpr, path
                 )
             }
             SnakemakeNames.WORKFLOW_REPORT_KEYWORD -> SmkReportReference(
-                    this, textRange, strExpr, path
+                this, textRange, strExpr, path
             )
             SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD -> SmkWorkDirReference(
-                    this, textRange, strExpr, path
+                this, textRange, strExpr, path
             )
             else -> SmkIncludeReference(
-                    this, textRange, strExpr, path
+                this, textRange, strExpr, path
             )
         }
     }
@@ -63,7 +63,7 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
         }
 
         val stringLiteralArgs =
-                argumentList?.arguments?.filterIsInstance<PyStringLiteralExpression>() ?: return emptyArray()
+            argumentList?.arguments?.filterIsInstance<PyStringLiteralExpression>() ?: return emptyArray()
 
         return stringLiteralArgs.map { createReference(it) }.toTypedArray()
     }
@@ -71,5 +71,5 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
     private val keywordName: String?
         get() = getKeywordNode()?.text
 
-    private fun getKeywordNode() = node.findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
+    private fun getKeywordNode() = node.findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)
 }
