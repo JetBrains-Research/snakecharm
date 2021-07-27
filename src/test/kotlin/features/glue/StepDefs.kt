@@ -18,6 +18,7 @@ import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
+import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
 import io.cucumber.java.en.Given
 import javax.swing.SwingUtilities
 import kotlin.test.fail

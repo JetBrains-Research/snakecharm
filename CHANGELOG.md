@@ -11,11 +11,15 @@ Released on ...
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Fixed
+- Default path "config/config.yaml" now supported (see [#363](https://github.com/JetBrains-Research/snakecharm/issues/363))
 - Access by index to input/output sections with 'multiext' function (see [#278](https://github.com/JetBrains-Research/snakecharm/issues/278))
+- Inspection: Do not show warning that rule section is unused variable if rule is defined in method (see [#385](https://github.com/JetBrains-Research/snakecharm/issues/385))
+- SOE: From UnusedLocal inspection for SnakemakeSL expression  (see [#380](https://github.com/JetBrains-Research/snakecharm/issues/380))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN))
 
 ### Added
 - Support for 'module' and 'use' keywords (see [#355](https://github.com/JetBrains-Research/snakecharm/issues/355))
+- Ability for memorising new section name (see [#372](https://github.com/JetBrains-Research/snakecharm/issues/372))
 - Support for 'handover' section (see [#362](https://github.com/JetBrains-Research/snakecharm/issues/362))
 - Support for 'containerized' section (see [#361](https://github.com/JetBrains-Research/snakecharm/issues/361))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN))

@@ -1,10 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.ASTNode
-import com.intellij.lang.injection.InjectedLanguageManager
-import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.StubBasedPsiElement
-import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
 import com.jetbrains.python.psi.*
@@ -69,20 +66,4 @@ interface SmkWorkflowRuleorderSection : PyStatement, SmkArgsSection, SmkToplevel
 
 interface SmkReferenceExpression : PyReferenceExpression {
     override fun getNameElement(): ASTNode? = node.findChildByType(PyTokenTypes.IDENTIFIER)
-}
-
-interface BaseSmkSLReferenceExpression : PyReferenceExpression, SmkSLExpression, PsiNameIdentifierOwner {
-    fun injectionHost() = InjectedLanguageManager.getInstance(project).getInjectionHost(this)
-
-    fun containingRuleOrCheckpointSection(): SmkRuleOrCheckpointArgsSection? {
-        return PsiTreeUtil.getParentOfType(injectionHost(), SmkRuleOrCheckpointArgsSection::class.java)
-    }
-
-    fun containingSection(): SmkSection? {
-        return PsiTreeUtil.getParentOfType(injectionHost(), SmkSection::class.java)
-    }
-
-    override fun getNameIdentifier() = nameElement?.psi
-    override fun setName(name: String) = SmkResolveUtil.renameNameNode(name, nameElement, this)
-
 }

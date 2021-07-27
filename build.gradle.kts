@@ -1,6 +1,5 @@
 
 import io.gitlab.arturbosch.detekt.Detekt
-import org.jetbrains.changelog.closure
 import org.jetbrains.changelog.date
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -12,15 +11,15 @@ plugins {
     id("java")
 
     // Kotlin support
-    kotlin("jvm") version "1.5.10"
-    kotlin("plugin.serialization") version "1.5.10"
+    kotlin("jvm") version "1.5.21"
+    kotlin("plugin.serialization") version "1.5.21"
 
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
-    id("org.jetbrains.intellij") version "1.0"
+    id("org.jetbrains.intellij") version "1.1.4"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
-    id("org.jetbrains.changelog") version "1.1.2"
+    id("org.jetbrains.changelog") version "1.2.1"
     // detekt linter - read more: https://detekt.github.io/detekt/gradle.html
     id("io.gitlab.arturbosch.detekt") version "1.17.1"
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
@@ -46,7 +45,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     testImplementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.0.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.2.2")
 }
 
 // Configure gradle-intellij-plugin plugin.
@@ -79,12 +78,12 @@ intellij {
 // Read more: https://github.com/JetBrains/gradle-changelog-plugin
 // Configuration: https://github.com/JetBrains/gradle-changelog-plugin#configuration
 changelog {
-    version = project.version.toString()
-    groups = listOf("Added", "Changed", "Deprecated", "Removed", "Fixed", "Security")
-    header = closure { "[$version] - ${date()}" }
-    itemPrefix = "-"
-    keepUnreleasedSection = true
-    unreleasedTerm = "[Unreleased]"
+    version.set(project.version.toString())
+    groups.set(listOf("Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"))
+    header.set(provider { "[${version.get()}] - ${date()}" })
+    itemPrefix.set("-")
+    keepUnreleasedSection.set(true)
+    unreleasedTerm.set("[Unreleased]")
 }
 
 // Configure detekt plugin.
@@ -101,6 +100,7 @@ detekt {
 }
 
 tasks {
+    // TODO [1.8] ?
     // Set the compatibility versions to 11
     withType<JavaCompile> {
         sourceCompatibility = "11"

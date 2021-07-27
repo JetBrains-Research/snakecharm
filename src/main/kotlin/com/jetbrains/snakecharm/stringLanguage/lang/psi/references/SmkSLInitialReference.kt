@@ -25,21 +25,21 @@ import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionVariantsProcessor
 import com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
-import com.jetbrains.snakecharm.lang.psi.BaseSmkSLReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
 import com.jetbrains.snakecharm.lang.psi.SmkSection
 import com.jetbrains.snakecharm.lang.psi.impl.refs.SmkPyReferenceImpl
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 import java.util.*
 
 
 class SmkSLInitialReference(
-        expr: BaseSmkSLReferenceExpression,
-        private val parentDeclaration: SmkRuleOrCheckpoint?,
-        context: PyResolveContext?
+    expr: SmkSLReferenceExpression,
+    private val parentDeclaration: SmkRuleOrCheckpoint?,
+    context: PyResolveContext?,
 ) : PyQualifiedReference(expr, context), SmkSLBaseReference {
 
-    override fun getElement() = myElement as BaseSmkSLReferenceExpression
+    override fun getElement() = myElement as SmkSLReferenceExpression
 
     override fun resolveInner(): MutableList<RatedResolveResult> {
         require(!element.isQualified) // this reference is supposed to be not qualified
@@ -101,25 +101,25 @@ class SmkSLInitialReference(
             val scopeControlFlowAnchor = host.containingFile  // not clear what should be here
             val resultList = getResultsFromProcessor(referencedName, processor, scopeControlFlowAnchor, topLevel)
             resultList.asSequence()
-                    .filter { isSupportedElementType(it.element) }
-                    .forEach { ret.add(it) }
+                .filter { isSupportedElementType(it.element) }
+                .forEach { ret.add(it) }
         }
 
         // custom providers
         resolveByReferenceResolveProviders()
-                .asSequence()
-                .filter { isSupportedElementType(it.element) }
-                .forEach { ret.add(it) }
+            .asSequence()
+            .filter { isSupportedElementType(it.element) }
+            .forEach { ret.add(it) }
 
         return ret
     }
 
     private fun getHostElement(e: PsiElement) =
-            InjectedLanguageManager.getInstance(e.project).getInjectionHost(e)
+        InjectedLanguageManager.getInstance(e.project).getInjectionHost(e)
 
     private fun isSupportedElementType(element: PsiElement?) =
-            !(element is PyFunction || element is PyClass) &&
-                    !SmkPyReferenceImpl.shouldBeRemovedFromDefaultScopeCrawlUpResults(element, false, parentDeclaration)
+        !(element is PyFunction || element is PyClass) &&
+                !SmkPyReferenceImpl.shouldBeRemovedFromDefaultScopeCrawlUpResults(element, false, parentDeclaration)
 
 
     private fun resolveByReferenceResolveProviders(): List<RatedResolveResult> {
@@ -127,13 +127,13 @@ class SmkSLInitialReference(
         val context = myContext.typeEvalContext
 
         return PyReferenceResolveProvider.EP_NAME.extensionList.asSequence()
-                .filterNot { it is PyOverridingReferenceResolveProvider }
-                .flatMap { it.resolveName(expression, context).asSequence() }
-                .toList()
+            .filterNot { it is PyOverridingReferenceResolveProvider }
+            .flatMap { it.resolveName(expression, context).asSequence() }
+            .toList()
     }
 
     override fun copyWithResolveContext(context: PyResolveContext?) =
-            SmkSLInitialReference(element, parentDeclaration, context)
+        SmkSLInitialReference(element, parentDeclaration, context)
 
     override fun getVariants(): Array<LookupElement> {
         // val originalElement = CompletionUtil.getOriginalElement(myElement)
@@ -144,9 +144,9 @@ class SmkSLInitialReference(
         val accessibleSections = collectAccessibleSectionsFromDeclaration().toList()
         accessibleSections.forEach {
             variants.add(SmkCompletionUtil.createPrioritizedLookupElement(
-                    it.name!!, it,
-                    typeText = SnakemakeBundle.message("TYPES.rule.section.type.text"),
-                    priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
+                it.name!!, it,
+                typeText = SnakemakeBundle.message("TYPES.rule.section.type.text"),
+                priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
             ))
         }
 
@@ -237,13 +237,14 @@ class SmkSLInitialReference(
         }
 
         return parentDeclaration.statementList.statements
-                .asSequence()
-                .filterIsInstance<SmkSection>()
-                .filter { it.sectionKeyword in SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS }
+            .asSequence()
+            .filterIsInstance<SmkSection>()
+            .filter { it.sectionKeyword in SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS }
     }
 
-    override fun getUnresolvedHighlightSeverity(context: TypeEvalContext?): HighlightSeverity? = HighlightSeverity.WEAK_WARNING
+    override fun getUnresolvedHighlightSeverity(context: TypeEvalContext?): HighlightSeverity? =
+        HighlightSeverity.WEAK_WARNING
 
     override fun handleElementRename(newElementName: String) =
-            element.setName(newElementName)
+        element.setName(newElementName)
 }

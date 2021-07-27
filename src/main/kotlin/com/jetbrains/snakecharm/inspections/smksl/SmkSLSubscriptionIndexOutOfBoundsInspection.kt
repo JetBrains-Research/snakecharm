@@ -6,17 +6,17 @@ import com.intellij.psi.PsiElement
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionKeyReferenceExpression
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionIndexKeyExpressionImpl
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLSubscriptionKeyReference
 
 class SmkSLSubscriptionIndexOutOfBoundsInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
     ) = object : SmkSLInspectionVisitor(holder, session) {
 
-        override fun visitSmkSLSubscriptionKeyExpression(expr: SmkSLSubscriptionKeyReferenceExpression) {
+        override fun visitSmkSLSubscriptionExpressionKey(expr: SmkSLSubscriptionIndexKeyExpressionImpl) {
             val ref = expr.reference
             if (ref is SmkSLSubscriptionKeyReference) {
                 val refText = ref.canonicalText
@@ -34,9 +34,9 @@ class SmkSLSubscriptionIndexOutOfBoundsInspection : SnakemakeInspection() {
 
     companion object {
         fun checkOutOfBounds(
-                type: SmkAvailableForSubscriptionType,
-                expr: PsiElement,
-                idx: Int
+            type: SmkAvailableForSubscriptionType,
+            expr: PsiElement,
+            idx: Int,
         ): String? {
             val argsNumber = type.getPositionArgsNumber(expr)
 
@@ -46,7 +46,7 @@ class SmkSLSubscriptionIndexOutOfBoundsInspection : SnakemakeInspection() {
                         SnakemakeBundle.message("INSP.NAME.section.arg.idx.aiobe.zero.message")
                     } else {
                         SnakemakeBundle.message(
-                                "INSP.NAME.section.arg.idx.aiobe.message", argsNumber - 1
+                            "INSP.NAME.section.arg.idx.aiobe.message", argsNumber - 1
                         )
                     }
                 }

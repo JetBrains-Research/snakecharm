@@ -1,30 +1,29 @@
 FILE
-  SmkSLLanguageElement(LANGUAGE)
-    PsiElement(LBRACE)('{')
-    SmkSLReferenceExpressionImpl: f
-      PsiElement(Py:IDENTIFIER)('f')
-    PsiErrorElement:Unexpected character
-      PsiElement(BAD_CHARACTER)('?')
-    SmkSLReferenceExpressionImpl: o
-      PsiElement(Py:IDENTIFIER)('o')
-    PsiErrorElement:Unexpected character
-      PsiElement(BAD_CHARACTER)('&')
-    PsiErrorElement:Unexpected character
-      PsiElement(BAD_CHARACTER)('*')
-    SmkSLSubscriptionExpression(SUBSCRIPTION_EXPRESSION)
-      SmkSLReferenceExpressionImpl: to
-        SmkSLReferenceExpressionImpl: doo
-          SmkSLReferenceExpressionImpl: boo
-            SmkSLReferenceExpressionImpl: o
-              PsiElement(Py:IDENTIFIER)('o')
-            PsiElement(DOT)('.')
-            PsiElement(Py:IDENTIFIER)('boo')
+  PsiElement(LBRACE)('{')
+  SmkSLReferenceExpressionImpl: f
+    PsiElement(Py:IDENTIFIER)('f')
+  PsiErrorElement:Unexpected character
+    PsiElement(BAD_CHARACTER)('?')
+  SmkSLReferenceExpressionImpl: o
+    PsiElement(Py:IDENTIFIER)('o')
+  PsiErrorElement:Unexpected character
+    PsiElement(BAD_CHARACTER)('&')
+  PsiErrorElement:Unexpected character
+    PsiElement(BAD_CHARACTER)('*')
+  SmkSLSubscriptionExpressionImpl(SUBSCRIPTION_EXPRESSION)
+    SmkSLReferenceExpressionImpl: to
+      SmkSLReferenceExpressionImpl: doo
+        SmkSLReferenceExpressionImpl: boo
+          SmkSLReferenceExpressionImpl: o
+            PsiElement(Py:IDENTIFIER)('o')
           PsiElement(DOT)('.')
-          PsiElement(Py:IDENTIFIER)('doo')
+          PsiElement(Py:IDENTIFIER)('boo')
         PsiElement(DOT)('.')
-        PsiElement(Py:IDENTIFIER)('to')
-      PsiElement(LBRACKET)('[')
-      SmkSLSubscriptionKeyExpression: [o[100]
-        PsiElement(ACCESS_KEY)('o[100')
-      PsiElement(RBRACKET)(']')
-    PsiElement(RBRACE)('}')
+        PsiElement(Py:IDENTIFIER)('doo')
+      PsiElement(DOT)('.')
+      PsiElement(Py:IDENTIFIER)('to')
+    PsiElement(LBRACKET)('[')
+    SmkSLSubscriptionKeyExpression: [o[100]
+      PsiElement(ACCESS_KEY)('o[100')
+    PsiElement(RBRACKET)(']')
+  PsiElement(RBRACE)('}')
