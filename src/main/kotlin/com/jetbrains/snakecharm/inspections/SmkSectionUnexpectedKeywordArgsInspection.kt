@@ -14,9 +14,9 @@ import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
 
 class SmkSectionUnexpectedKeywordArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
@@ -24,30 +24,36 @@ class SmkSectionUnexpectedKeywordArgsInspection : SnakemakeInspection() {
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            if (st.sectionKeyword in SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED) {
-                checkArgumentList(st.argumentList, st)
-            }
+            checkArgumentList(st, SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED)
         }
 
         override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
-            if (st.sectionKeyword in WORKFLOWS_WHERE_KEYWORD_ARGS_PROHIBITED) {
+            checkArgumentList(st, WORKFLOWS_WHERE_KEYWORD_ARGS_PROHIBITED)
+        }
+
+        private fun checkArgumentList(
+            st: SmkArgsSection,
+            sectionKeywords: Set<String>,
+        ) {
+            val keyword = st.sectionKeyword
+            if (keyword != null && keyword in sectionKeywords) {
                 checkArgumentList(st.argumentList, st)
             }
         }
 
         private fun checkArgumentList(
-                argumentList: PyArgumentList?,
-                section: SmkArgsSection
+            argumentList: PyArgumentList?,
+            section: SmkArgsSection,
         ) {
             val args = argumentList?.arguments ?: emptyArray()
             args.forEach { arg ->
                 if (arg is PyKeywordArgument) {
                     registerProblem(
-                            arg,
-                            SnakemakeBundle.message(
-                                    "INSP.NAME.section.unexpected.keyword.args.message",
-                                    section.sectionKeyword!!
-                            )
+                        arg,
+                        SnakemakeBundle.message(
+                            "INSP.NAME.section.unexpected.keyword.args.message",
+                            section.sectionKeyword!!
+                        )
                     )
                 }
             }
