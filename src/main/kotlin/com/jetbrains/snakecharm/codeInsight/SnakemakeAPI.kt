@@ -37,6 +37,9 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_REPORT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_TEMP
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_TOUCH
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_UNPACK
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINERIZED_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_SINGULARITY_KEYWORD
 
 /**
  * Also see [ImplicitPySymbolsProvider] class
@@ -89,6 +92,11 @@ object SnakemakeAPI {
             SECTION_PRIORITY, SECTION_CONDA, SECTION_GROUP,
             SECTION_SHADOW, SECTION_CACHE, SECTION_NOTEBOOK, SECTION_CONTAINER,
             SECTION_HANDOVER, SECTION_CONTAINERIZED
+    )
+
+    val SINGLE_ARGUMENT_WORKFLOWS_KEYWORDS = setOf(
+        WORKFLOW_CONTAINERIZED_KEYWORD, WORKFLOW_CONTAINER_KEYWORD,
+        WORKFLOW_SINGULARITY_KEYWORD
     )
 
     /**
@@ -218,6 +226,11 @@ object SnakemakeAPI {
             SECTION_PRIORITY, SECTION_GROUP, SECTION_SHADOW, SECTION_CONDA, SECTION_SCRIPT, SECTION_WRAPPER,
             SECTION_CWL, SECTION_NOTEBOOK, SECTION_CACHE, SECTION_CONTAINER, SECTION_CONTAINERIZED, SECTION_ENVMODULES,
             SECTION_NAME, SECTION_HANDOVER
+    )
+
+    val WORKFLOWS_WHERE_KEYWORD_ARGS_PROHIBITED = setOf(
+        WORKFLOW_CONTAINERIZED_KEYWORD, WORKFLOW_CONTAINER_KEYWORD,
+        WORKFLOW_SINGULARITY_KEYWORD
     )
 
     val IO_FLAG_2_SUPPORTED_SECTION: HashMap<String, List<String>> = hashMapOf(
