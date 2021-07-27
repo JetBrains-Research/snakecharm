@@ -8,7 +8,7 @@ SnakemakeFile: UseInvalid.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    SmkReferenceExpression: module
+    PyReferenceExpression: module
       PsiElement(Py:IDENTIFIER)('module')
     PsiWhiteSpace(' ')
     PsiElement(Py:AS_KEYWORD)('as')
@@ -65,7 +65,7 @@ SnakemakeFile: UseInvalid.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    SmkReferenceExpression: module
+    PyReferenceExpression: module
       PsiElement(Py:IDENTIFIER)('module')
     PsiWhiteSpace(' ')
     PsiElement(Py:AS_KEYWORD)('as')

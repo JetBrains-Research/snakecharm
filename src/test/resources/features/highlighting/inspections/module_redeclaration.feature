@@ -13,7 +13,7 @@ Feature: SmkModuleRedeclarationInspection inspection
         snakefile: "boo.smk"
     """
     And SmkModuleRedeclarationInspection inspection is enabled
-    Then I expect inspection weak warning with message "Only last module with the same name will be executed" on
+    Then I expect inspection weak warning with message "Only last module with the same name will be used" on
     """
     module NAME:
         snakefile: "snake.smk"
