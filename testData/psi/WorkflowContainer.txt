@@ -1,6 +1,6 @@
 SnakemakeFile: WorkflowContainer.smk
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_CONTAINER_KEYWORD)('container')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('container')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace('  ')

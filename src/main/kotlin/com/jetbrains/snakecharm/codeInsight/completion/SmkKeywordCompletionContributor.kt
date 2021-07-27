@@ -115,18 +115,19 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
             return
         }
 
-        val tokenType2Name = SnakemakeLexer.KEYWORDS
-            .map { (k, v) -> v to k }
-            .toMap()
+        val tokenType2Name = SnakemakeLexer.KEYWORDS_2_TEXT
+        val colonAndWhiteSpaceTailKeys = WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE.types.map { tt ->
+            tokenType2Name[tt]!!
+        } + SnakemakeLexer.TOPLEVEL_KEYWORDS
+        val spaceTailKeys = RULE_LIKE.types.map { tt ->
+            tokenType2Name[tt]!!
+        }
         listOf(
-            WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE to ColonAndWhiteSpaceTail,
-            RULE_LIKE to TailType.SPACE
+            colonAndWhiteSpaceTailKeys to ColonAndWhiteSpaceTail,
+            spaceTailKeys to TailType.SPACE,
         ).forEach { (tokenSet, tail) ->
-            tokenSet.types.forEach { tt ->
-                val s = tokenType2Name[tt]!!
-
-                val modifiedTail = if (tt == USE_KEYWORD) RuleKeywordTail else tail
-
+            tokenSet.forEach { s ->
+                val modifiedTail = if (s == SnakemakeNames.USE_KEYWORD) RuleKeywordTail else tail
                 result.addElement(
                     SmkCompletionUtil.createPrioritizedLookupElement(
                         TailTypeDecorator.withTail(

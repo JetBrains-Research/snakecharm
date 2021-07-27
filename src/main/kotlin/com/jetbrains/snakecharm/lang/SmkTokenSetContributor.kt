@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.lang
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.PythonDialectsTokenSetContributorBase
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes.SMK_PY_REFERENCE_EXPRESSION
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
@@ -50,6 +51,9 @@ class SmkTokenSetContributor : PythonDialectsTokenSetContributorBase() {
     override fun getFunctionDeclarationTokens() = TokenSet.EMPTY!!
 
     override fun getUnbalancedBracesRecoveryTokens(): TokenSet {
-        return WORKFLOW_TOPLEVEL_DECORATORS
+        return TokenSet.orSet(
+            WORKFLOW_TOPLEVEL_DECORATORS,
+            TokenSet.create(WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)
+        )
     }
 }

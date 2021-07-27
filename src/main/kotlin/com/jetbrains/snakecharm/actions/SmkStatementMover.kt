@@ -17,6 +17,7 @@ import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer.Companion.KEYWORDS
+import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer.Companion.TOPLEVEL_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.*
 
 open class SmkStatementMover : PyStatementMover() {
@@ -161,7 +162,8 @@ open class SmkStatementMover : PyStatementMover() {
         }
 
         if ((((elementToMove is SmkRuleOrCheckpointArgsSection &&
-                    elementToMove.sectionKeyword !in KEYWORDS) ||
+                    elementToMove.sectionKeyword !in KEYWORDS &&
+                    elementToMove.sectionKeyword!! !in TOPLEVEL_KEYWORDS) ||
                     (elementToMove is SmkRunSection)) &&
                     ((!down && statements.first() == elementToMove)
                             || (down && statements.last() == elementToMove))) ||

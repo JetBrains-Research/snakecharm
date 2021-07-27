@@ -57,17 +57,16 @@ SnakemakeFile: UnexpectedSectionKeyword.smk
           PyStringLiteralExpression: 
             PsiElement(Py:SINGLE_QUOTED_STRING)('''')
   PsiWhiteSpace('\n\n')
-  PyTypeDeclarationStatement
-    PyTargetExpression: booo
-      PsiElement(Py:IDENTIFIER)('booo')
-    PyAnnotation
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('booo')
+    PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
       PyStringLiteralExpression: 
         PsiElement(Py:SINGLE_QUOTED_STRING)('''')
   PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('configfile')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
