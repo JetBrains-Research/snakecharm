@@ -40,10 +40,6 @@ object SnakemakeNames {
     const val SMK_AS_KEYWORD = "as"
     const val SMK_WITH_KEYWORD = "with"
 
-    const val WORKFLOW_ENVVARS_KEYWORD = "envvars"
-    const val WORKFLOW_CONTAINER_KEYWORD = "container"
-    const val WORKFLOW_CONTAINERIZED_KEYWORD = "containerized"
-
     const val SECTION_INPUT = "input"
     const val SECTION_OUTPUT = "output"
     const val SECTION_LOG = "log"
