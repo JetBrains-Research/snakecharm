@@ -1,17 +1,16 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.*
-import com.intellij.lang.ASTNode
-import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiElement
-import com.intellij.psi.TokenType
+import com.intellij.psi.*
 import com.intellij.psi.util.elementType
-import com.jetbrains.python.PyElementTypes
+import com.intellij.refactoring.suggested.startOffset
 import com.jetbrains.python.PyTokenTypes
-import com.jetbrains.python.psi.PyArgumentList
+import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+
+const val TAB = "    "
 
 class SmkMultilineFunctionCallInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -20,57 +19,80 @@ class SmkMultilineFunctionCallInspection : SnakemakeInspection() {
         session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            val args = st.children.firstOrNull { it is PyArgumentList } ?: return
+            val args = st.argumentList ?: return
 
-            if (multilineSectionDefinition(args as PyArgumentList)) {
+            if (st.multilineSectionDefinition()) {
                 return
             }
 
-            val problemCalls = arrayListOf<PsiElement>()
-            args.children.filter { it.elementType == PyElementTypes.CALL_EXPRESSION }.forEach {
-                multilineFunctionCall(it.node, problemCalls)
+            val invalidWhitespaces = mutableListOf<PsiElement>()
+            args.arguments.forEach { psi ->
+                if (psi is PyCallExpression) {
+                    collectNewlinesInMultilineCall(psi, invalidWhitespaces)
+                }
             }
 
-            problemCalls.forEach {
+            invalidWhitespaces.forEach {
                 registerProblem(
                     it,
                     SnakemakeBundle.message("INSP.NAME.multiline.func.call"),
-                    RemoveSectionQuickFix
+                    ShiftToNextLine(st, invalidWhitespaces)
                 )
             }
         }
     }
 
     /**
-     * Checks if [arguments] starts from new line
-     */
-    private fun multilineSectionDefinition(arguments: PyArgumentList): Boolean {
-        val colons = arguments.node.findChildByType(PyTokenTypes.COLON) ?: return false
-        val whitespace = colons.treeNext ?: return false
-        return whitespace.elementType == TokenType.WHITE_SPACE && whitespace.text.contains("\n")
-    }
-
-    /**
-     * Checks whether there are any whitespaces in [callNode] argument list,
+     * Checks whether there are any whitespaces in [expression] argument list,
      * if so, checks if it contains new line character,
      * if so, adds whitespace nodes to [incorrectElements]
      */
-    private fun multilineFunctionCall(callNode: ASTNode, incorrectElements: ArrayList<PsiElement>) {
-        var element = callNode.findChildByType(PyElementTypes.ARGUMENT_LIST)?.firstChildNode
+    private fun collectNewlinesInMultilineCall(
+        expression: PyCallExpression,
+        incorrectElements: MutableList<PsiElement>
+    ) {
+        var element = expression.argumentList?.firstChild
         while (element != null) {
             if (element.elementType == TokenType.WHITE_SPACE && element.text.contains("\n")) {
-                incorrectElements.add(element.psi)
+                incorrectElements.add(element)
                 break
             }
-            element = element.treeNext
+            element = element.nextSibling
         }
     }
 
-    private object RemoveSectionQuickFix : LocalQuickFix {
+    private class ShiftToNextLine(expr: PsiElement, val incorrectElements: MutableList<PsiElement>) :
+        LocalQuickFixOnPsiElement(expr) {
+
         override fun getFamilyName() = SnakemakeBundle.message("INSP.NAME.multiline.func.call.fix")
 
-        override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
-            WriteCommandAction.runWriteCommandAction(project) { descriptor.psiElement.delete() }
+        override fun getText() = familyName
+
+        override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
+            val doc = PsiDocumentManager.getInstance(project).getDocument(file)
+            if (startElement.prevSibling !is PsiWhiteSpace || doc == null) {
+                return
+            }
+            val argumentList = (startElement as SmkRuleOrCheckpointArgsSection).argumentList ?: return
+            val indent = startElement.prevSibling.text
+            // Moves every argument list element to new line
+            argumentList.arguments.forEach { expression ->
+                doc.insertString(expression.startOffset, "$indent$TAB")
+                PsiDocumentManager.getInstance(project).commitDocument(doc)
+            }
+            // Deletes every incorrect whitespace
+            // If there are END_OF_LINE_COMMENT, new whitespace will be inserted automatically
+            // Otherwise, we need to insert it manually
+            incorrectElements.forEach { space ->
+                val hasComment = space.prevSibling.elementType == PyTokenTypes.END_OF_LINE_COMMENT
+                val offset = space.startOffset
+                space.delete()
+                PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(doc)
+                if (!hasComment) {
+                    doc.insertString(offset, "$indent$TAB$TAB")
+                    PsiDocumentManager.getInstance(project).commitDocument(doc)
+                }
+            }
         }
     }
 }

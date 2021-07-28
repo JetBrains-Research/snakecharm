@@ -11,6 +11,10 @@ Feature: Inspection for multiline function calls in sections, which were declare
               "text2","text3"),
             foo3("text4","text2",
                       "text3")
+    <rule_like> rule_148_c:
+        input: #ffff
+            foo1("text1",
+                 "text2", "text3")
     """
     And SmkMultilineFunctionCallInspection inspection is enabled
     Then I expect no inspection errors
@@ -32,11 +36,11 @@ Feature: Inspection for multiline function calls in sections, which were declare
     And SmkMultilineFunctionCallInspection inspection is enabled
     Then I expect inspection error on pattern <\n                > with message
     """
-    Invalid function call. Rewrite it using a single line
+    Invalid function call. Rewrite section as multiline or rewrite function using a single line
     """
     Then I expect inspection error on pattern <\n                        > with message
     """
-    Invalid function call. Rewrite it using a single line
+    Invalid function call. Rewrite section as multiline or rewrite function using a single line
     """
     When I check highlighting errors
     Examples:
@@ -49,19 +53,29 @@ Feature: Inspection for multiline function calls in sections, which were declare
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-        input: foo("abc","abcde"), foo2("text1",
-                    "text2","text3")
+        input:foo("abc","abcde"),foo2("text1", #comments here
+                    "text2","text3"),foo3("text4","text2",
+                            "text3")
     """
     And SmkMultilineFunctionCallInspection inspection is enabled
     Then I expect inspection error on pattern <\n                > with message
     """
-    Invalid function call. Rewrite it using a single line
+    Invalid function call. Rewrite section as multiline or rewrite function using a single line
+    """
+    Then I expect inspection error on pattern <\n                        > with message
+    """
+    Invalid function call. Rewrite section as multiline or rewrite function using a single line
     """
     When I check highlighting errors
-    Then I invoke quick fix Remove whitespace and see text:
+    Then I invoke quick fix Rewrite section as multiline and see text:
     """
     <rule_like> NAME:
-        input: foo("abc","abcde"), foo2("text1","text2","text3")
+        input:
+            foo("abc","abcde"),
+            foo2("text1", #comments here
+                "text2","text3"),
+            foo3("text4","text2",
+                "text3")
     """
     Examples:
       | rule_like  |
