@@ -6,10 +6,12 @@ import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WORKFLOWS_WHERE_KEYWORD_ARGS_PROHIBITED
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkModuleArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
 
 class SmkSectionUnexpectedKeywordArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -23,7 +25,19 @@ class SmkSectionUnexpectedKeywordArgsInspection : SnakemakeInspection() {
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            if (st.sectionKeyword in SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED) {
+            checkArgumentList(st, SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED)
+        }
+
+        override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
+            checkArgumentList(st, WORKFLOWS_WHERE_KEYWORD_ARGS_PROHIBITED)
+        }
+
+        private fun checkArgumentList(
+            st: SmkArgsSection,
+            sectionKeywords: Set<String>,
+        ) {
+            val keyword = st.sectionKeyword
+            if (keyword != null && keyword in sectionKeywords) {
                 checkArgumentList(st.argumentList, st)
             }
         }

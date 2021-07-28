@@ -63,3 +63,25 @@ Feature: Inspection for multiple arguments in various sections
       | container     |
       | containerized |
       | handover      |
+
+  Scenario Outline: Multiple arguments in workflow section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <section_name>: "a", "b", "c"
+    """
+    And SmkSectionMultipleArgsInspection inspection is enabled
+    Then I expect inspection error on <"b"> with message
+    """
+    Only one argument is allowed for '<section_name>' section.
+    """
+    And I expect inspection error on <"c"> with message
+    """
+    Only one argument is allowed for '<section_name>' section.
+    """
+      When I check highlighting errors
+    Examples:
+      | section_name  |
+      | containerized |
+      | singularity   |
+      | container     |
