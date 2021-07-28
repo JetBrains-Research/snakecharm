@@ -12,6 +12,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
@@ -78,7 +79,7 @@ class SmkRuleOrCheckpointNameReference(
     ): List<RatedResolveResult> {
         if (element.parent.elementType == SmkStubElementTypes.USE_DECLARATION_STATEMENT) {
             var moduleRef = element.nextSibling
-            while (moduleRef != null && moduleRef.elementType != PyElementTypes.REFERENCE_EXPRESSION) {
+            while (moduleRef != null && moduleRef.elementType != SmkElementTypes.REFERENCE_EXPRESSION) {
                 moduleRef = moduleRef.nextSibling
             }
             if (moduleRef != null) {
