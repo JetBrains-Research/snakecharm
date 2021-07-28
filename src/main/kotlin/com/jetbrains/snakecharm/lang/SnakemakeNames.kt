@@ -36,6 +36,9 @@ object SnakemakeNames {
     const val MODULE_REPLACE_PREFIX_KEYWORD = "replace_prefix"
 
     const val USE_KEYWORD = "use"
+    const val SMK_FROM_KEYWORD = "from"
+    const val SMK_AS_KEYWORD = "as"
+    const val SMK_WITH_KEYWORD = "with"
 
     const val WORKFLOW_ENVVARS_KEYWORD = "envvars"
     const val WORKFLOW_CONTAINER_KEYWORD = "container"

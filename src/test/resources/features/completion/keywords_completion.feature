@@ -52,7 +52,6 @@ Feature: Completion for snakemake keyword-like things
       | rule       |
       | checkpoint |
       | module     |
-      | use        |
 
   Scenario Outline: Replace at toplevel
       Given a snakemake project
@@ -276,6 +275,22 @@ Feature: Completion for snakemake keyword-like things
       | module     | m   | meta_wrapper         |
       | module     | s   | skip_validation      |
       | module     | r   | replace_prefix       |
+
+  Scenario Outline: Use keyword completion
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <given># Use completion
+    """
+    When I put the caret after <given>
+    Then I invoke autocompletion popup, select "<choice>" lookup item and see a text:
+    """
+    use rule # Use completion
+    """
+    Examples:
+      | given  | choice |
+      | u      | use    |
+      | use ru | rule   |
 
   Scenario Outline: Complete at use level
     Given a snakemake project

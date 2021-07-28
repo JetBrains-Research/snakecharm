@@ -188,3 +188,48 @@ Feature: Annotate additional syntax
       | onstart              |
       | onsuccess            |
       | onerror              |
+
+  Scenario: 'use' section highlighting
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    use rule A as B with:
+        input: "data"
+    """
+    Then I expect inspection info on <use> with message
+    """
+    PY.KEYWORD
+    """
+    Then I expect inspection info on <rule> with message
+    """
+    PY.KEYWORD
+    """
+    Then I expect inspection info on <B> with message
+    """
+    PY.FUNC_DEFINITION
+    """
+    Then I expect inspection info on <input> with message
+    """
+    PY.DECORATOR
+    """
+    When I check highlighting infos
+
+  Scenario: 'use' section highlighting, part 2
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    use rule * from module as other_*
+    """
+    Then I expect inspection info on <use> with message
+    """
+    PY.KEYWORD
+    """
+    Then I expect inspection info on <rule> with message
+    """
+    PY.KEYWORD
+    """
+    Then I expect inspection info on <other_*> with message
+    """
+    PY.FUNC_DEFINITION
+    """
+    When I check highlighting infos

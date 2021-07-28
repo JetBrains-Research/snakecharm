@@ -9,7 +9,6 @@ import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.patterns.PsiElementPattern
 import com.intellij.patterns.StandardPatterns
-import com.intellij.profile.codeInspection.InspectionProfileManager
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
@@ -21,9 +20,12 @@ import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.MODULE_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_DECLARATION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_LIKE
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.USE_KEYWORD
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
 import com.jetbrains.snakecharm.lang.psi.*
@@ -71,6 +73,13 @@ class SmkKeywordCompletionContributor : CompletionContributor() {
     }
 }
 
+object RuleKeywordTail : TailType() {
+    override fun processTail(editor: Editor, tailOffset: Int): Int {
+        editor.document.insertString(tailOffset, " ${SnakemakeNames.RULE_KEYWORD} ")
+        return moveCaret(editor, tailOffset, 2 + SnakemakeNames.RULE_KEYWORD.length)
+    }
+}
+
 object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
         .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
@@ -109,7 +118,6 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
         val tokenType2Name = SnakemakeLexer.KEYWORDS
             .map { (k, v) -> v to k }
             .toMap()
-
         listOf(
             WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE to ColonAndWhiteSpaceTail,
             RULE_LIKE to TailType.SPACE
@@ -117,10 +125,12 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
             tokenSet.types.forEach { tt ->
                 val s = tokenType2Name[tt]!!
 
+                val modifiedTail = if (tt == USE_KEYWORD) RuleKeywordTail else tail
+
                 result.addElement(
                     SmkCompletionUtil.createPrioritizedLookupElement(
                         TailTypeDecorator.withTail(
-                            PythonLookupElement(s, true, null), tail
+                            PythonLookupElement(s, true, null), modifiedTail
                         ),
                         SmkCompletionUtil.KEYWORDS_PRIORITY
                     )
@@ -261,6 +271,18 @@ object UseSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
         context: ProcessingContext,
         result: CompletionResultSet
     ) {
+        USE_DECLARATION_KEYWORDS.forEach { s ->
+            result.addElement(
+                SmkCompletionUtil.createPrioritizedLookupElement(
+                    TailTypeDecorator.withTail(
+                        PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
+                        TailType.SPACE
+                    ),
+                    priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
+                )
+            )
+        }
+
         USE_SECTIONS_KEYWORDS.forEach { s ->
             result.addElement(
                 SmkCompletionUtil.createPrioritizedLookupElement(
