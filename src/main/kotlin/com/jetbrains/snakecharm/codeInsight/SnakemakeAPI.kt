@@ -138,13 +138,7 @@ object SnakemakeAPI {
     /**
      * For uses parsing
      */
-    val USE_SECTIONS_KEYWORDS = RULE_OR_CHECKPOINT_SECTION_KEYWORDS - setOf(
-        SECTION_SHELL,
-        SECTION_NOTEBOOK,
-        SECTION_SCRIPT,
-        SECTION_CWL,
-        SECTION_RUN
-    )
+    val USE_SECTIONS_KEYWORDS = RULE_OR_CHECKPOINT_SECTION_KEYWORDS - EXECUTION_SECTIONS_KEYWORDS - SECTION_RUN
 
     /**
      * For type inference:

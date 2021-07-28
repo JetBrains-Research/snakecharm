@@ -4,7 +4,6 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.psi.util.elementType
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.psi.AccessDirection
-import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.impl.references.PyReferenceImpl
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
@@ -50,9 +49,23 @@ class SmkRuleOrCheckpointNameReference(
         results.addAll(SmkRulesType(null, smkFile).resolveMember(name, element, ctx, myContext))
         results.addAll(SmkCheckpointType(null, smkFile).resolveMember(name, element, ctx, myContext))
         results.addAll(SmkUsesType(null, smkFile).resolveMember(name, element, ctx, myContext))
+        results.addAll(collectModulesAndResolveThem(smkFile, name))
         results.addAll(collectModuleFromUseSection(element))
 
         return results
+    }
+
+    /**
+     * Collects all modules sections names from local file which name is [name]
+     */
+    private fun collectModulesAndResolveThem(smkFile: SmkFile, name: String): List<RatedResolveResult> {
+        val modules = smkFile.collectModules().map { it.second }.filter { elem -> elem.name == name }
+        if (modules.isEmpty()) {
+            return emptyList()
+        }
+        return modules.map { element ->
+            RatedResolveResult(SmkResolveUtil.RATE_NORMAL, element)
+        }
     }
 
     /**
@@ -69,12 +82,7 @@ class SmkRuleOrCheckpointNameReference(
                 moduleRef = moduleRef.nextSibling
             }
             if (moduleRef != null) {
-                return listOf(
-                    RatedResolveResult(
-                        SmkResolveUtil.RATE_NORMAL,
-                        PyReferenceImpl(moduleRef as PyReferenceExpression, myContext).resolve()
-                    )
-                )
+                return SmkRuleOrCheckpointNameReference(moduleRef as SmkReferenceExpression, myContext).resolveInner()
             }
         }
 

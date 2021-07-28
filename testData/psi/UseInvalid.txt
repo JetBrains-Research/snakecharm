@@ -6,16 +6,16 @@ SnakemakeFile: UseInvalid.smk
     PsiErrorElement:'*' or rule name expected
       <empty list>
     PsiWhiteSpace(' ')
-    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    PyReferenceExpression: module
+    SmkReferenceExpression: module
       PsiElement(Py:IDENTIFIER)('module')
     PsiWhiteSpace(' ')
-    PsiElement(Py:AS_KEYWORD)('as')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('f')
     PsiWhiteSpace(' ')
-    PsiElement(Py:WITH_KEYWORD)('with')
+    PsiElement(Py:SMK_WITH_KEYWORD)('with')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
@@ -35,15 +35,15 @@ SnakemakeFile: UseInvalid.smk
     SmkReferenceExpression: rule
       PsiElement(Py:IDENTIFIER)('rule')
     PsiWhiteSpace(' ')
-    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
     PsiErrorElement:Identifier expected
       <empty list>
     PsiWhiteSpace(' ')
-    PsiElement(Py:AS_KEYWORD)('as')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('f')
     PsiWhiteSpace(' ')
-    PsiElement(Py:WITH_KEYWORD)('with')
+    PsiElement(Py:SMK_WITH_KEYWORD)('with')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
@@ -63,16 +63,45 @@ SnakemakeFile: UseInvalid.smk
     SmkReferenceExpression: rule
       PsiElement(Py:IDENTIFIER)('rule')
     PsiWhiteSpace(' ')
-    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    PyReferenceExpression: module
+    SmkReferenceExpression: module
       PsiElement(Py:IDENTIFIER)('module')
     PsiWhiteSpace(' ')
-    PsiElement(Py:AS_KEYWORD)('as')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiErrorElement:Identifier expected
       <empty list>
     PsiWhiteSpace(' ')
-    PsiElement(Py:WITH_KEYWORD)('with')
+    PsiElement(Py:SMK_WITH_KEYWORD)('with')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkUseArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: text
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: rule
+      PsiElement(Py:IDENTIFIER)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: module
+      PsiElement(Py:IDENTIFIER)('module')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('f')
+    PsiErrorElement:'with' expected
+      <empty list>
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')

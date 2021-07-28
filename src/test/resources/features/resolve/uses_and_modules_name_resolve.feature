@@ -1,4 +1,4 @@
-Feature: Resolve use name to its declaration
+Feature: Resolve use and module name to its declaration
   Scenario: Refer to rule section
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -42,4 +42,21 @@ Feature: Resolve use name to its declaration
         "data_file.txt"
     """
     When I put the caret at NAME
+    Then reference should resolve to "MODULE:" in "foo.smk"
+
+  Scenario: Module name refere to module declaration
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    module MODULE:
+      snakefile:
+        "../path/to/otherworkflow/Snakefile"
+      configfile:
+        "path/to/custom_configfile.yaml"
+
+    use rule NAME from MODULE as other with:
+      input:
+        "data_file.txt"
+    """
+    When I put the caret at MODULE as
     Then reference should resolve to "MODULE:" in "foo.smk"

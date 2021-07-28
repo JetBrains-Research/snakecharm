@@ -163,9 +163,9 @@ class SmkStatementParsing(
         nextToken()
 
         // Parse second word in 'use rule'
-        if (section.sectionKeyword == SmkTokenTypes.USE_KEYWORD) {
+        if (section == useSectionParsingData) {
             if (myBuilder.tokenText != SnakemakeNames.RULE_KEYWORD) {
-                myBuilder.error("Unexpected token '${myBuilder.tokenText}' after 'use' keyword")
+                myBuilder.error(SnakemakeBundle.message("PARSE.use.rule.keyword.expected"))
             } else {
                 myBuilder.remapCurrentToken(SmkTokenTypes.RULE_KEYWORD)
                 nextToken()
@@ -310,15 +310,24 @@ class SmkStatementParsing(
 //    }
 
 
-    private fun parseIdentifier(type: IElementType = SmkElementTypes.REFERENCE_EXPRESSION): Boolean {
+    private fun parseIdentifier(): Boolean {
         val referenceMarker = myBuilder.mark()
         if (Parsing.isIdentifier(myBuilder)) {
             Parsing.advanceIdentifierLike(myBuilder)
-            referenceMarker.done(type)
+            referenceMarker.done(SmkElementTypes.REFERENCE_EXPRESSION)
             return true
         }
         referenceMarker.drop()
         return false
+    }
+
+    private fun checkMatchesAndRemapToken(required: PyElementType, remapTo: PyElementType, nameForUser: String) {
+        if (myBuilder.tokenType == required) {
+            myBuilder.remapCurrentToken(remapTo)
+        } else {
+            myBuilder.error(PyPsiBundle.message("PARSE.0.expected", nameForUser))
+        }
+        nextToken()
     }
 
     /**
@@ -336,10 +345,10 @@ class SmkStatementParsing(
         }
 
         if (myBuilder.tokenType != PyTokenTypes.AS_KEYWORD) {
-            checkMatches(PyTokenTypes.FROM_KEYWORD, PyPsiBundle.message("PARSE.0.expected", "from"))
+            checkMatchesAndRemapToken(PyTokenTypes.FROM_KEYWORD, SmkTokenTypes.SMK_FROM_KEYWORD, "from")
 
             // Creates reference to module definition
-            if (!parseIdentifier(PyElementTypes.REFERENCE_EXPRESSION)) {
+            if (!parseIdentifier()) {
                 myBuilder.error(PyPsiBundle.message("PARSE.expected.identifier"))
             }
 
@@ -348,36 +357,69 @@ class SmkStatementParsing(
         // If there are no 'module' keyword, we expect 'as' keyword
         // If there are 'module' keyword, there may not be 'as' keyword
         if (!hasImport || myBuilder.tokenType == PyTokenTypes.AS_KEYWORD) {
-            checkMatches(PyTokenTypes.AS_KEYWORD, PyPsiBundle.message("PARSE.0.expected", "as"))
+            checkMatchesAndRemapToken(PyTokenTypes.AS_KEYWORD, SmkTokenTypes.SMK_AS_KEYWORD, "as")
 
-            // New rule name can be: text_*, *_text, text_*_text, text or *
-            val hasFirstIdentifier = myBuilder.tokenType == PyTokenTypes.IDENTIFIER
+            // New rule name can be: text, *, *_text_* and so on
+            var lasTokenIsIdentifier =
+                myBuilder.tokenType != PyTokenTypes.IDENTIFIER // Default value need to ve reversed
+            var simpleName = true // Does new rule name consist of one identifier
+            var hasIdentifier = false // Do we have new rule name
             val name = myBuilder.mark()
-            if (hasFirstIdentifier) {
-                nextToken()
-            }
-            if (myBuilder.tokenType == PyTokenTypes.MULT) {
-                nextToken()
-                if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER) {
-                    nextToken()
+            while (true) {
+                when (myBuilder.tokenType) {
+                    PyTokenTypes.IDENTIFIER -> {
+                        if (lasTokenIsIdentifier) {
+                            break // Because it's separated by whitespace so it isn't name anymore
+                        }
+                        lasTokenIsIdentifier = true
+                        hasIdentifier = true
+                        nextToken()
+                    }
+                    PyTokenTypes.MULT -> {
+                        if (!lasTokenIsIdentifier) {
+                            myBuilder.error(SnakemakeBundle.message("PARSE.use.double.mult.sign"))
+                        }
+                        lasTokenIsIdentifier = false
+                        hasIdentifier = true
+                        simpleName = false
+                        nextToken()
+                    }
+                    PyTokenTypes.EXP -> {
+                        myBuilder.error(SnakemakeBundle.message("PARSE.use.double.mult.sign"))
+                        lasTokenIsIdentifier = false
+                        simpleName = false
+                        nextToken()
+                    }
+                    else -> break
                 }
-                name.done(SmkElementTypes.USE_NAME_IDENTIFIER)
-            } else {
+            }
+            if (!hasIdentifier) { // No identifiers and/or '*' symbols
                 name.drop()
-                if (!hasFirstIdentifier) {
-                    checkMatches(PyTokenTypes.IDENTIFIER, PyPsiBundle.message("PARSE.expected.identifier"))
+                myBuilder.error(PyPsiBundle.message("PARSE.expected.identifier"))
+            } else {
+                if (!simpleName) { // New rule name contains at least one '*' symbol
+                    name.done(SmkElementTypes.USE_NAME_IDENTIFIER)
+                } else { // New rule name consists of one identifier
+                    name.drop()
                 }
             }
         }
 
-        if (myBuilder.tokenType == PyTokenTypes.WITH_KEYWORD) {
-            if (listOfRules) {
-                myBuilder.error(SnakemakeBundle.message("PARSE.use.with.not.allowed"))
+        return when (myBuilder.tokenType) {
+            PyTokenTypes.WITH_KEYWORD -> {
+                myBuilder.remapCurrentToken(SmkTokenTypes.SMK_WITH_KEYWORD)
+                if (listOfRules) {
+                    myBuilder.error(SnakemakeBundle.message("PARSE.use.with.not.allowed"))
+                }
+                nextToken()
+                true
             }
-            nextToken()
-            return true
+            PyTokenTypes.COLON -> {
+                myBuilder.error(PyPsiBundle.message("PARSE.0.expected", "with"))
+                true
+            }
+            else -> false
         }
-        return false
     }
 }
 

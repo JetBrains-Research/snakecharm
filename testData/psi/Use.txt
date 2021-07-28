@@ -7,12 +7,12 @@ SnakemakeFile: Use.smk
     SmkReferenceExpression: a
       PsiElement(Py:IDENTIFIER)('a')
     PsiWhiteSpace(' ')
-    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    PyReferenceExpression: my_module
+    SmkReferenceExpression: my_module
       PsiElement(Py:IDENTIFIER)('my_module')
     PsiWhiteSpace(' ')
-    PsiElement(Py:AS_KEYWORD)('as')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('b')
     PyStatementList
@@ -26,16 +26,16 @@ SnakemakeFile: Use.smk
     SmkReferenceExpression: f
       PsiElement(Py:IDENTIFIER)('f')
     PsiWhiteSpace(' ')
-    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    PyReferenceExpression: other_module
+    SmkReferenceExpression: other_module
       PsiElement(Py:IDENTIFIER)('other_module')
     PsiWhiteSpace(' ')
-    PsiElement(Py:AS_KEYWORD)('as')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('f_z')
     PsiWhiteSpace(' ')
-    PsiElement(Py:WITH_KEYWORD)('with')
+    PsiElement(Py:SMK_WITH_KEYWORD)('with')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
@@ -55,11 +55,11 @@ SnakemakeFile: Use.smk
     SmkReferenceExpression: f_z
       PsiElement(Py:IDENTIFIER)('f_z')
     PsiWhiteSpace(' ')
-    PsiElement(Py:AS_KEYWORD)('as')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('x_z')
     PsiWhiteSpace(' ')
-    PsiElement(Py:WITH_KEYWORD)('with')
+    PsiElement(Py:SMK_WITH_KEYWORD)('with')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
@@ -78,12 +78,12 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:MULT)('*')
     PsiWhiteSpace(' ')
-    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    PyReferenceExpression: last_module1
+    SmkReferenceExpression: last_module1
       PsiElement(Py:IDENTIFIER)('last_module1')
     PsiWhiteSpace(' ')
-    PsiElement(Py:AS_KEYWORD)('as')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
     SmkUseNameIdentifier
       PsiElement(Py:MULT)('*')
@@ -98,12 +98,12 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:MULT)('*')
     PsiWhiteSpace(' ')
-    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    PyReferenceExpression: last_module2
+    SmkReferenceExpression: last_module2
       PsiElement(Py:IDENTIFIER)('last_module2')
     PsiWhiteSpace(' ')
-    PsiElement(Py:AS_KEYWORD)('as')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
     SmkUseNameIdentifier
       PsiElement(Py:IDENTIFIER)('other_')
@@ -118,12 +118,12 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:MULT)('*')
     PsiWhiteSpace(' ')
-    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    PyReferenceExpression: last_module3
+    SmkReferenceExpression: last_module3
       PsiElement(Py:IDENTIFIER)('last_module3')
     PsiWhiteSpace(' ')
-    PsiElement(Py:AS_KEYWORD)('as')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
     SmkUseNameIdentifier
       PsiElement(Py:IDENTIFIER)('other_')
@@ -139,9 +139,9 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:MULT)('*')
     PsiWhiteSpace(' ')
-    PsiElement(Py:FROM_KEYWORD)('from')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    PyReferenceExpression: last_module4
+    SmkReferenceExpression: last_module4
       PsiElement(Py:IDENTIFIER)('last_module4')
     PyStatementList
       <empty list>

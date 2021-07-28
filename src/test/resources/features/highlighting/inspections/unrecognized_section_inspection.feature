@@ -70,6 +70,7 @@ Feature: Inspection if section isn't recognized by SnakeCharm
           notebook: ""
           script: ""
           cwl: ""
+          wrapper: ""
       """
       And SmkUnrecognizedSectionInspection inspection is enabled
       Then I expect inspection weak warning on <run> with message
@@ -91,5 +92,9 @@ Feature: Inspection if section isn't recognized by SnakeCharm
       Then I expect inspection weak warning on <cwl> with message
       """
       Section 'cwl' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
+      """
+      Then I expect inspection weak warning on <wrapper> with message
+      """
+      Section 'wrapper' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
       """
       When I check highlighting weak warnings
