@@ -1,12 +1,14 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.*
+import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.project.Project
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLFile
 
 class SmkUnusedLogSectionInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -30,25 +32,29 @@ class SmkUnusedLogSectionInspection : SnakemakeInspection() {
             rule.getSections().forEach { section ->
                 val name = section.sectionKeyword ?: return
 
-                when (name) {
-                    SnakemakeNames.SECTION_LOG -> {
-                        hasLog = true
-                        logSection = section
-                    }
-                    SnakemakeNames.SECTION_SHELL -> logUsed = logUsed or hasShellSectionLogReference(section)
-                    SnakemakeNames.SECTION_RUN -> logUsed = logUsed or hasRunSectionLogReference(section)
-                }
+                val collector = SmkSLSectionReferencesCollector("log")
+                section.accept(collector)
+                val sections = collector.getSections()
+                val z = 22 + sections.size
+//                when (name) {
+//                    SnakemakeNames.SECTION_LOG -> {
+//                        hasLog = true
+//                        logSection = section
+//                    }
+//                    SnakemakeNames.SECTION_SHELL -> logUsed = logUsed or hasShellSectionLogReference(section)
+//                    SnakemakeNames.SECTION_RUN -> logUsed = logUsed or hasRunSectionWildcard(section)
+//                }
             }
 
-            if (hasLog && !logUsed) {
-                registerProblem(
-                    logSection ?: return,
-                    SnakemakeBundle.message("INSP.NAME.unused.section"),
-                    ProblemHighlightType.LIKE_UNUSED_SYMBOL,
-                    null,
-                    RemoveSectionQuickFix
-                )
-            }
+//            if (hasLog && !logUsed) {
+//                registerProblem(
+//                    logSection ?: return,
+//                    SnakemakeBundle.message("INSP.NAME.unused.section"),
+//                    ProblemHighlightType.LIKE_UNUSED_SYMBOL,
+//                    null,
+//                    RemoveSectionQuickFix
+//                )
+//            }
         }
 
         private fun hasShellSectionLogReference(shellSection: SmkSection): Boolean {
@@ -63,7 +69,7 @@ class SmkUnusedLogSectionInspection : SnakemakeInspection() {
             return false
         }
 
-        private fun hasRunSectionLogReference(runSection: SmkSection): Boolean {
+        private fun hasRunSectionWildcard(runSection: SmkSection): Boolean {
             val argsSection = runSection.children.firstOrNull { it is PyStatementList } ?: return false
             val statements = (argsSection as PyStatementList).statements // Run section statements
             statements.forEach { statement -> // Checks each statement in order to find 'shell' expression
