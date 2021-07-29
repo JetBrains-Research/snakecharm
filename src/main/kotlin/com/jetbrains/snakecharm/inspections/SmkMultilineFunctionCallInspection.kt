@@ -1,6 +1,8 @@
 package com.jetbrains.snakecharm.inspections
 
-import com.intellij.codeInspection.*
+import com.intellij.codeInspection.LocalInspectionToolSession
+import com.intellij.codeInspection.LocalQuickFixOnPsiElement
+import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.*
 import com.intellij.psi.util.elementType
@@ -68,11 +70,12 @@ class SmkMultilineFunctionCallInspection : SnakemakeInspection() {
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val doc = PsiDocumentManager.getInstance(project).getDocument(file)
-            if (startElement.prevSibling !is PsiWhiteSpace || doc == null) {
+            val indentCandidate = startElement.prevSibling
+            if (indentCandidate !is PsiWhiteSpace || doc == null) {
                 return
             }
             val argumentList = (startElement as SmkRuleOrCheckpointArgsSection).argumentList ?: return
-            val indent = startElement.prevSibling.text.replace("\n", "")
+            val indent = indentCandidate.text.replace("\n", "")
             // Moves every argument list element to new line
             argumentList.arguments.forEach { expression ->
                 doc.insertString(expression.startOffset, "\n$indent$indent")
