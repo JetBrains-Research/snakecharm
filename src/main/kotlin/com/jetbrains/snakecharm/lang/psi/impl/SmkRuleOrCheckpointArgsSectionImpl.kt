@@ -66,7 +66,7 @@ open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode) : SmkArgsSectionImp
             while (true) {
                 node = when (node.elementType) {
                     TokenType.WHITE_SPACE -> {
-                        if (node.text.contains("\n")) {
+                        if (node.text.contains('\n')) {
                             return true
                         }
                         node.treeNext

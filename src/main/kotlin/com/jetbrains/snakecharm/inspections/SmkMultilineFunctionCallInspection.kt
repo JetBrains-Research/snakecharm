@@ -10,8 +10,6 @@ import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
-const val TAB = "    "
-
 class SmkMultilineFunctionCallInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
@@ -53,7 +51,7 @@ class SmkMultilineFunctionCallInspection : SnakemakeInspection() {
     ) {
         var element = expression.argumentList?.firstChild
         while (element != null) {
-            if (element.elementType == TokenType.WHITE_SPACE && element.text.contains("\n")) {
+            if (element.elementType == TokenType.WHITE_SPACE && element.text.contains('\n')) {
                 incorrectElements.add(element)
                 break
             }
@@ -74,10 +72,10 @@ class SmkMultilineFunctionCallInspection : SnakemakeInspection() {
                 return
             }
             val argumentList = (startElement as SmkRuleOrCheckpointArgsSection).argumentList ?: return
-            val indent = startElement.prevSibling.text
+            val indent = startElement.prevSibling.text.replace("\n", "")
             // Moves every argument list element to new line
             argumentList.arguments.forEach { expression ->
-                doc.insertString(expression.startOffset, "$indent$TAB")
+                doc.insertString(expression.startOffset, "\n$indent$indent")
                 PsiDocumentManager.getInstance(project).commitDocument(doc)
             }
             // Deletes every incorrect whitespace
@@ -89,7 +87,7 @@ class SmkMultilineFunctionCallInspection : SnakemakeInspection() {
                 space.delete()
                 PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(doc)
                 if (!hasComment) {
-                    doc.insertString(offset, "$indent$TAB$TAB")
+                    doc.insertString(offset, "\n$indent$indent$indent")
                     PsiDocumentManager.getInstance(project).commitDocument(doc)
                 }
             }
