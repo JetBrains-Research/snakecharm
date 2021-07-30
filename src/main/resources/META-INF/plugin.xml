@@ -544,6 +544,17 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkMisuseUsageIOFlagMethodsInspection"
     />
 
+    <localInspection
+            language="Snakemake" shortName="SmkMultilineFunctionCallInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkMultilineFunctionCall"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.multiline.func.call"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkMultilineFunctionCallInspection"
+      />
+
     <findUsagesHandlerFactory
             implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"
             id="Python" order="last, before default"

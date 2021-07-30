@@ -33,6 +33,11 @@ interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // P
     fun isWildcardsDefiningSection() = sectionKeyword in WILDCARDS_DEFINING_SECTIONS_KEYWORDS
 
     override fun getParentRuleOrCheckPoint(): SmkRuleOrCheckpoint = super.getParentRuleOrCheckPoint()!!
+
+    /**
+     * Checks if section argument list starts from new line
+     */
+    fun multilineSectionDefinition(): Boolean
 }
 
 interface SmkSubworkflowArgsSection : SmkArgsSection {
