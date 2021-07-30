@@ -16,7 +16,8 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionExpressionImpl
 
 class SmkSLSectionReferencesCollector(
-    private val searchingType: String
+    private val searchingType: String,
+    private val isRuleOrCheckpointAppropriate: (SmkRuleOrCheckpoint) -> Boolean = { true }
 ) : SmkElementVisitor, PyRecursiveElementVisitor() {
     private val sections = mutableListOf<PsiElement>()
 
@@ -24,6 +25,18 @@ class SmkSLSectionReferencesCollector(
 
     override val pyElementVisitor: PyElementVisitor
         get() = this
+
+    override fun visitSmkRule(rule: SmkRule) {
+        if (isRuleOrCheckpointAppropriate(rule)) {
+            super.visitSmkRule(rule)
+        }
+    }
+
+    override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
+        if (isRuleOrCheckpointAppropriate(checkPoint)) {
+            super.visitSmkCheckPoint(checkPoint)
+        }
+    }
 
     override fun visitPyStringLiteralExpression(node: PyStringLiteralExpression) {
         val languageManager = InjectedLanguageManager.getInstance(node.project)
@@ -33,10 +46,10 @@ class SmkSLSectionReferencesCollector(
                 ?.filterIsInstance<SmkSLFile>()
                 ?: return
 
-        injectedFiles.forEach { collectReferences(it) }
+        injectedFiles.forEach(::collectResolvedReferences)
     }
 
-    private fun collectReferences(file: SmkSLFile) {
+    private fun collectResolvedReferences(file: SmkSLFile) {
         val references = PsiTreeUtil.getChildrenOfType(file, SmkSLReferenceExpressionImpl::class.java)
         references?.forEach { st ->
             checkSLReference(st)
@@ -51,6 +64,9 @@ class SmkSLSectionReferencesCollector(
     }
 
     private fun checkSLReference(ref: SmkSLReferenceExpressionImpl) {
+        if (ref.isWildcard()) {
+            return
+        }
         var element = ref.reference.resolve()
         if (element.elementType == PyElementTypes.KEYWORD_ARGUMENT_EXPRESSION) {
             element = (element as PyKeywordArgument).parentOfType<SmkRuleOrCheckpointArgsSection>()
@@ -59,7 +75,7 @@ class SmkSLSectionReferencesCollector(
             (element.elementType == SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT
                     && (element as SmkRuleOrCheckpointArgsSection).name == searchingType)
         ) {
-            sections.add(ref)
+            sections.add(element)
         }
     }
 }
