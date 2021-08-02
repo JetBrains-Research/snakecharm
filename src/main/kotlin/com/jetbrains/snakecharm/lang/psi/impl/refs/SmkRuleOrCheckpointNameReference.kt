@@ -49,7 +49,7 @@ class SmkRuleOrCheckpointNameReference(
 
         results.addAll(SmkRulesType(null, smkFile).resolveMember(name, element, ctx, myContext))
         results.addAll(SmkCheckpointType(null, smkFile).resolveMember(name, element, ctx, myContext))
-        results.addAll(SmkUsesType(null, smkFile).resolveMember(name, element, ctx, myContext))
+        //results.addAll(SmkUsesType(null, smkFile).resolveMember(name, element, ctx, myContext))
         results.addAll(collectModulesAndResolveThem(smkFile, name))
         results.addAll(collectModuleFromUseSection(element))
 
@@ -83,7 +83,12 @@ class SmkRuleOrCheckpointNameReference(
                 moduleRef = moduleRef.nextSibling
             }
             if (moduleRef != null) {
-                return SmkRuleOrCheckpointNameReference(moduleRef as SmkReferenceExpression, myContext).resolveInner()
+                return listOf(
+                    RatedResolveResult(
+                        SmkResolveUtil.RATE_NORMAL,
+                        (moduleRef as SmkReferenceExpression).reference.resolve()
+                    )
+                )
             }
         }
 

@@ -204,9 +204,17 @@ Feature: Annotate additional syntax
     """
     PY.KEYWORD
     """
+    Then I expect inspection info on <as> with message
+    """
+    PY.KEYWORD
+    """
     Then I expect inspection info on <B> with message
     """
     PY.FUNC_DEFINITION
+    """
+    Then I expect inspection info on <with> with message
+    """
+    PY.KEYWORD
     """
     Then I expect inspection info on <input> with message
     """
@@ -225,6 +233,14 @@ Feature: Annotate additional syntax
     PY.KEYWORD
     """
     Then I expect inspection info on <rule> with message
+    """
+    PY.KEYWORD
+    """
+    Then I expect inspection info on <from> with message
+    """
+    PY.KEYWORD
+    """
+    Then I expect inspection info on <as> with message
     """
     PY.KEYWORD
     """

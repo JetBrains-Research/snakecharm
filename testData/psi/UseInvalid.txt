@@ -3,7 +3,7 @@ SnakemakeFile: UseInvalid.smk
     PsiElement(Py:USE_KEYWORD)('use')
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
-    PsiErrorElement:'*' or rule name expected
+    PsiErrorElement:Expecting '*', rule name, or rule listing (comma separated) after 'use rule' statement
       <empty list>
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_FROM_KEYWORD)('from')
@@ -26,17 +26,18 @@ SnakemakeFile: UseInvalid.smk
           PsiWhiteSpace(' ')
           PyStringLiteralExpression: text
             PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
-  PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n\n')
   SmkUse
     PsiElement(Py:USE_KEYWORD)('use')
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkReferenceExpression: rule
-      PsiElement(Py:IDENTIFIER)('rule')
+    SmkImportedRulesNames
+      SmkReferenceExpression: rule
+        PsiElement(Py:IDENTIFIER)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_FROM_KEYWORD)('from')
-    PsiErrorElement:Identifier expected
+    PsiErrorElement:Expecting module name after 'from' keyword in 'use rule' statement.
       <empty list>
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
@@ -54,22 +55,78 @@ SnakemakeFile: UseInvalid.smk
           PsiWhiteSpace(' ')
           PyStringLiteralExpression: text
             PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
-  PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiErrorElement:Expecting keyword 'rule' after keyword 'use'
+      <empty list>
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      SmkReferenceExpression: a1
+        PsiElement(Py:IDENTIFIER)('a1')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('NAME')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiErrorElement:Expecting '*', rule name, or rule listing (comma separated) after 'use rule' statement
+      <empty list>
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('NAME2')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n\n')
   SmkUse
     PsiElement(Py:USE_KEYWORD)('use')
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkReferenceExpression: rule
-      PsiElement(Py:IDENTIFIER)('rule')
+    SmkImportedRulesNames
+      SmkReferenceExpression: NAME
+        PsiElement(Py:IDENTIFIER)('NAME')
+      PsiErrorElement:Unexpected token in comma separated list of rules within 'use rule' statement.
+        <empty list>
+    PsiWhiteSpace(' ')
+    PyStatementList
+      PsiErrorElement:Expecting either 'as', 'with' or end of line in 'use rule' statement.
+        <empty list>
+      SmkUseArgsSection
+        PsiElement(Py:IDENTIFIER)('frm')
+        PsiErrorElement:':' expected
+          <empty list>
+        PsiWhiteSpace(' ')
+        PyArgumentList
+          PyReferenceExpression: MODULE
+            PsiElement(Py:IDENTIFIER)('MODULE')
+          PsiWhiteSpace(' ')
+          PsiErrorElement:',' expected
+            PsiElement(Py:AS_KEYWORD)('as')
+            PsiWhiteSpace(' ')
+            PsiElement(Py:IDENTIFIER)('NAME3')
+          PsiErrorElement:Expression expected
+            <empty list>
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      PsiElement(Py:MULT)('*')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_FROM_KEYWORD)('from')
     PsiWhiteSpace(' ')
-    SmkReferenceExpression: module
-      PsiElement(Py:IDENTIFIER)('module')
-    PsiWhiteSpace(' ')
-    PsiElement(Py:SMK_AS_KEYWORD)('as')
-    PsiErrorElement:Identifier expected
+    SmkReferenceExpression: MODULE
+      PsiElement(Py:IDENTIFIER)('MODULE')
+    PsiErrorElement:Keyword 'with' in 'use rule' statement is not allowed in combination with rule pattern '*'.
       <empty list>
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_WITH_KEYWORD)('with')
@@ -81,27 +138,128 @@ SnakemakeFile: UseInvalid.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: text
-            PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
-  PsiWhiteSpace('\n')
+          PyStringLiteralExpression: datafile.doc
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"datafile.doc"')
+  PsiWhiteSpace('\n\n')
   SmkUse
     PsiElement(Py:USE_KEYWORD)('use')
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkReferenceExpression: rule
-      PsiElement(Py:IDENTIFIER)('rule')
-    PsiWhiteSpace(' ')
-    PsiElement(Py:SMK_FROM_KEYWORD)('from')
-    PsiWhiteSpace(' ')
-    SmkReferenceExpression: module
-      PsiElement(Py:IDENTIFIER)('module')
+    SmkImportedRulesNames
+      SmkReferenceExpression: NAME
+        PsiElement(Py:IDENTIFIER)('NAME')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('f')
-    PsiErrorElement:'with' expected
+    SmkUseNameIdentifier
+      PsiElement(Py:IDENTIFIER)('d')
+      PsiErrorElement:Expecting rulename modifying pattern (e.g. modulename_*) after 'as' keyword
+        <empty list>
+      PsiElement(Py:EXP)('**')
+    PyStatementList
       <empty list>
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      SmkReferenceExpression: NAME
+        PsiElement(Py:IDENTIFIER)('NAME')
+      PsiElement(Py:COMMA)(',')
+      PsiErrorElement:Wildcard '*' can't be used with rules names List
+        <empty list>
+      PsiElement(Py:MULT)('*')
+      PsiElement(Py:COMMA)(',')
+      SmkReferenceExpression: NAME2
+        PsiElement(Py:IDENTIFIER)('NAME2')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: MODULE
+      PsiElement(Py:IDENTIFIER)('MODULE')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNameIdentifier
+      PsiElement(Py:IDENTIFIER)('other_')
+      PsiElement(Py:MULT)('*')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      PsiElement(Py:MULT)('*')
+    PsiErrorElement:Expecting list of rules in 'use rule' statement to end with keyword 'from'.
+      <empty list>
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNameIdentifier
+      PsiElement(Py:IDENTIFIER)('other_')
+      PsiElement(Py:MULT)('*')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      SmkReferenceExpression: NAME
+        PsiElement(Py:IDENTIFIER)('NAME')
+      PsiElement(Py:COMMA)(',')
+      SmkReferenceExpression: NAME2
+        PsiElement(Py:IDENTIFIER)('NAME2')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: MODULE
+      PsiElement(Py:IDENTIFIER)('MODULE')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNameIdentifier
+      PsiElement(Py:IDENTIFIER)('N1')
+      PsiErrorElement:Expecting rulename modifying pattern (e.g. modulename_*) after 'as' keyword
+        <empty list>
+      PsiElement(Py:COMMA)(',')
+      PsiElement(Py:IDENTIFIER)('N2')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      SmkReferenceExpression: NAME
+        PsiElement(Py:IDENTIFIER)('NAME')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression: NAME2
+        PsiElement(Py:IDENTIFIER)('NAME2')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: MODULE
+      PsiElement(Py:IDENTIFIER)('MODULE')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('N1')
+    PsiErrorElement:Multiple rules in 'use rule' statement but name modification ('as' statement) does not contain a wildcard '*'.
+      <empty list>
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_WITH_KEYWORD)('with')
     PsiElement(Py:COLON)(':')
     PyStatementList
       PsiWhiteSpace('\n    ')
@@ -110,5 +268,86 @@ SnakemakeFile: UseInvalid.smk
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
-          PyStringLiteralExpression: text
-            PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
+          PyStringLiteralExpression: file
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"file"')
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      SmkReferenceExpression: a
+        PsiElement(Py:IDENTIFIER)('a')
+      PsiElement(Py:COMMA)(',')
+      PsiErrorElement:Expecting '*', rule name, or rule listing (comma separated) after 'use rule' statement
+        <empty list>
+      PsiElement(Py:COMMA)(',')
+      SmkReferenceExpression: b
+        PsiElement(Py:IDENTIFIER)('b')
+      PsiElement(Py:COMMA)(',')
+      SmkReferenceExpression: c
+        PsiElement(Py:IDENTIFIER)('c')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: MODULE
+      PsiElement(Py:IDENTIFIER)('MODULE')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNameIdentifier
+      PsiElement(Py:IDENTIFIER)('other_')
+      PsiElement(Py:MULT)('*')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      SmkReferenceExpression: z
+        PsiElement(Py:IDENTIFIER)('z')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: M
+      PsiElement(Py:IDENTIFIER)('M')
+    PyStatementList
+      PsiErrorElement:Expecting either 'as', 'with' or end of line in 'use rule' statement.
+        <empty list>
+      PsiWhiteSpace('\n    ')
+      SmkUseArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: myfile3
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"myfile3"')
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      SmkReferenceExpression: z
+        PsiElement(Py:IDENTIFIER)('z')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: M
+      PsiElement(Py:IDENTIFIER)('M')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      PsiErrorElement:Expecting either 'as', 'with' or end of line in 'use rule' statement.
+        <empty list>
+      SmkUseArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: myfile3
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"myfile3"')

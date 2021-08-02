@@ -16,6 +16,10 @@ class SmkUseArgsSectionImpl(node: ASTNode) : SmkArgsSectionImpl(node), SmkRuleOr
         }
     }
 
+    override fun multilineSectionDefinition(): Boolean =
+        SmkRuleOrCheckpointArgsSectionImpl.multilineSectionDefinition(this)
+
+
     override fun getType(context: TypeEvalContext, key: TypeEvalContext.Key): PyType =
         SmkRuleLikeSectionArgsType(this)
 }

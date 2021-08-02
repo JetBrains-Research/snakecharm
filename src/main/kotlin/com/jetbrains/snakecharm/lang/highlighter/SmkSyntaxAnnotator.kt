@@ -33,7 +33,11 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
         var done = false
         while (!done && next != null) {
             when (next.elementType) {
-                SmkTokenTypes.RULE_KEYWORD -> addHighlightingAnnotation(next, PyHighlighter.PY_KEYWORD)
+                SmkTokenTypes.RULE_KEYWORD, SmkTokenTypes.SMK_FROM_KEYWORD,
+                SmkTokenTypes.SMK_AS_KEYWORD, SmkTokenTypes.SMK_WITH_KEYWORD -> addHighlightingAnnotation(
+                    next,
+                    PyHighlighter.PY_KEYWORD
+                )
                 SmkElementTypes.USE_NAME_IDENTIFIER, PyTokenTypes.IDENTIFIER -> addHighlightingAnnotation(
                     next, PY_FUNC_DEFINITION
                 )
