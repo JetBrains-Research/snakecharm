@@ -36,11 +36,28 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
     And I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
-      | rule_like  | log_variation | mention                       |
-      | checkpoint | "my_log.log"  | shell: "command {log}"        |
-      | rule       | l1="foo.log"  | shell: "--log {log.l1}"       |
-      | checkpoint | l1="foo.log"  | run: shell("foo ff {log[0]}") |
-      | rule       | "log.log"     | name: "{log}"                 |
+      | rule_like  | log_variation | mention                            |
+      | checkpoint | "my_log.log"  | shell: "command {log}"             |
+      | rule       | l1="foo.log"  | shell: "--log {log.l1}"            |
+      | checkpoint | l1="foo.log"  | run: shell("foo ff {log[0]}")      |
+      | rule       | "log.log"     | name: "{log}"                      |
+
+  Scenario Outline: No warnings in 'log' section if used in wrapper
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+        log: <log_variation>
+        wrapper 0.60.1/bio/samtools/merge"
+    """
+    And SmkUnusedLogSectionInspection inspection is enabled
+    And I expect no inspection weak warnings
+    When I check highlighting weak warnings
+    Examples:
+      | rule_like  | log_variation |
+      | rule       | "log.log"     |
+      | checkpoint | "my_log.log"  |
+      | rule       | l1="foo.log"  |
 
   Scenario Outline: Unused in 'run' section 'log' section
     Given a snakemake project
