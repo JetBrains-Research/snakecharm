@@ -2,7 +2,7 @@ package com.jetbrains.snakecharm.lang.psi.impl.refs
 
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.psi.util.elementType
-import com.jetbrains.python.PyElementTypes
+import com.intellij.psi.util.parentOfType
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.impl.references.PyReferenceImpl
 import com.jetbrains.python.psi.resolve.PyResolveContext
@@ -12,11 +12,11 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
-import com.jetbrains.snakecharm.lang.psi.types.SmkUsesType
 
 class SmkRuleOrCheckpointNameReference(
     element: SmkReferenceExpression,
@@ -77,8 +77,12 @@ class SmkRuleOrCheckpointNameReference(
     private fun collectModuleFromUseSection(
         element: SmkReferenceExpression
     ): List<RatedResolveResult> {
-        if (element.parent.elementType == SmkStubElementTypes.USE_DECLARATION_STATEMENT) {
-            var moduleRef = element.nextSibling
+        if (element.parent.elementType != SmkElementTypes.USE_IMPORTED_RULES_NAMES) {
+            return emptyList()
+        }
+        val parent = element.parentOfType<SmkRuleOrCheckpoint>()
+        if (parent != null && parent.elementType == SmkStubElementTypes.USE_DECLARATION_STATEMENT) {
+            var moduleRef = element.parent.nextSibling
             while (moduleRef != null && moduleRef.elementType != SmkElementTypes.REFERENCE_EXPRESSION) {
                 moduleRef = moduleRef.nextSibling
             }

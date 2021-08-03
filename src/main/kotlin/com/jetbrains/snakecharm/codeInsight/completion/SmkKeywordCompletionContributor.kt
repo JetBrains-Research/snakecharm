@@ -272,11 +272,12 @@ object UseSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
         result: CompletionResultSet
     ) {
         USE_DECLARATION_KEYWORDS.forEach { s ->
+            val tail = if (s != SnakemakeNames.SMK_WITH_KEYWORD) TailType.SPACE else TailType.CASE_COLON
             result.addElement(
                 SmkCompletionUtil.createPrioritizedLookupElement(
                     TailTypeDecorator.withTail(
                         PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
-                        TailType.SPACE
+                        tail
                     ),
                     priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
                 )

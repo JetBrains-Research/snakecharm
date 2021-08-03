@@ -280,17 +280,20 @@ Feature: Completion for snakemake keyword-like things
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    <given># Use completion
+    <given>#
     """
     When I put the caret after <given>
     Then I invoke autocompletion popup, select "<choice>" lookup item and see a text:
     """
-    use rule # Use completion
+    <result>
     """
     Examples:
-      | given  | choice |
-      | u      | use    |
-      | use ru | rule   |
+      | given      | choice | result          |
+      | u          | use    | use rule #      |
+      | use ru     | rule   | use rule #      |
+      | use rule f | from   | use rule from # |
+      | use rule w | with   | use rule with:# |
+
 
   Scenario Outline: Complete at use level
     Given a snakemake project

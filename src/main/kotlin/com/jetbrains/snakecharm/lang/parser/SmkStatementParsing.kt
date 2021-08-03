@@ -321,7 +321,8 @@ class SmkStatementParsing(
 
     /**
      * Parses 'use' section. If any part of 'use' section declaration is missing,
-     * it will create an error message and keep parsing the section
+     * it will create an error message and keep parsing the section.
+     * Returns true if 'as' part was detected
      */
     private fun parseUseSection(names: MutableList<String>): Boolean {
         var asKeywordExists = false
@@ -346,7 +347,7 @@ class SmkStatementParsing(
                 val marker = myBuilder.mark()
                 names.add(myBuilder.tokenText!!)
                 nextToken()
-                if (myBuilder.tokenType == PyTokenTypes.COMMA) {
+                if (atToken(PyTokenTypes.COMMA)) {
                     myBuilder.error(SnakemakeBundle.message("PARSE.use.wildcard.in.names.list"))
                     nextToken()
                     parseIdentifierFromIdentifiersList(names)
@@ -389,7 +390,7 @@ class SmkStatementParsing(
                     true
                 }
                 // Actually, Snakemake allows any name for rules and modules,
-                // that doesn't have python token type NAME, which may contains such words as:
+                // that have python token type NAME, which may contains such words as:
                 // 'use', 'as', 'from'
                 // Do we need to add such support?
                 else -> {
@@ -422,6 +423,7 @@ class SmkStatementParsing(
 
     /**
      * Uses when we've finished to collect rules names and went to the next step
+     * Returns true if 'as' part was detected
      */
     private fun endOfImportedRulesDeclaration(
         definedByWildcard: Boolean,
@@ -449,19 +451,20 @@ class SmkStatementParsing(
     }
 
     /**
-     * Parses 'from' part in 'use' section declaration
+     * Parses 'from' part in 'use' section declaration.
+     * Returns true if 'as' part was detected after 'from' part
      */
     private fun fromSignatureParsing(names: List<String>): Boolean {
         myBuilder.remapCurrentToken(SmkTokenTypes.SMK_FROM_KEYWORD)
         nextToken()
 
-        if (myBuilder.tokenType != PyTokenTypes.IDENTIFIER) {
+        if (!atToken(PyTokenTypes.IDENTIFIER)) {
             myBuilder.error(SnakemakeBundle.message("PARSE.use.expecting.module.name"))
         } else {
             parseIdentifier()
         }
 
-        if (myBuilder.tokenType == PyTokenTypes.AS_KEYWORD) {
+        if (atToken(PyTokenTypes.AS_KEYWORD)) {
             asSignatureParsing(names)
             return true
         }
@@ -477,7 +480,7 @@ class SmkStatementParsing(
         nextToken()
 
         var lasTokenIsIdentifier =
-            myBuilder.tokenType != PyTokenTypes.IDENTIFIER // Default value need to ve reversed
+            !atToken(PyTokenTypes.IDENTIFIER) // Default value need to ve reversed
         var simpleName = true // Does new rule name consist of one identifier
         var hasIdentifier = false // Do we have new rule name
         val name = myBuilder.mark()
@@ -538,7 +541,7 @@ class SmkStatementParsing(
         val argsSectionsBanned = (names.size == 1 && names[0] == "*")
         var gotWithOrColon = false
 
-        if (myBuilder.tokenType == PyTokenTypes.WITH_KEYWORD) {
+        if (atToken(PyTokenTypes.WITH_KEYWORD)) {
             gotWithOrColon = true
             if (argsSectionsBanned) {
                 myBuilder.error(SnakemakeBundle.message("PARSE.use.with.not.allowed"))
@@ -547,7 +550,7 @@ class SmkStatementParsing(
             nextToken()
         }
 
-        if (myBuilder.tokenType == PyTokenTypes.COLON) {
+        if (atToken(PyTokenTypes.COLON)) {
             if (!gotWithOrColon) {
                 myBuilder.error(SnakemakeBundle.message("PARSE.use.with.missed"))
             }
@@ -567,9 +570,6 @@ class SmkStatementParsing(
             parseRuleParameter(section)
             ruleStatements.done(PyElementTypes.STATEMENT_LIST)
             return
-        }
-        while (!atToken(PyTokenTypes.STATEMENT_BREAK)) {
-            nextToken()
         }
         val ruleStatements = myBuilder.mark()
         nextToken()
