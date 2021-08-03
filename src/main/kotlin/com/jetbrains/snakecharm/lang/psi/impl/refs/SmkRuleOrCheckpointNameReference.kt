@@ -17,6 +17,7 @@ import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
+import com.jetbrains.snakecharm.lang.psi.types.SmkUsesType
 
 class SmkRuleOrCheckpointNameReference(
     element: SmkReferenceExpression,
@@ -49,7 +50,7 @@ class SmkRuleOrCheckpointNameReference(
 
         results.addAll(SmkRulesType(null, smkFile).resolveMember(name, element, ctx, myContext))
         results.addAll(SmkCheckpointType(null, smkFile).resolveMember(name, element, ctx, myContext))
-        //results.addAll(SmkUsesType(null, smkFile).resolveMember(name, element, ctx, myContext))
+        results.addAll(SmkUsesType(null, smkFile).resolveMember(name, element, ctx, myContext))
         results.addAll(collectModulesAndResolveThem(smkFile, name))
         results.addAll(collectModuleFromUseSection(element))
 
