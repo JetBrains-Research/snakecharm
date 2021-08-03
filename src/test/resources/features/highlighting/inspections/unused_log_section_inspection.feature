@@ -8,7 +8,7 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
         output: "output.txt"
         log: "my_log.log"
         threads: 4
-        shell: "command touch"
+        shell: "command touch {wildcards.log}"
     """
     And SmkUnusedLogSectionInspection inspection is enabled
     And I expect inspection weak warning on <log: "my_log.log"> with message
@@ -48,7 +48,7 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
     """
     <rule_like> NAME:
         log: <log_variation>
-        wrapper 0.60.1/bio/samtools/merge"
+        wrapper: "0.60.1/bio/samtools/merge"
     """
     And SmkUnusedLogSectionInspection inspection is enabled
     And I expect no inspection weak warnings

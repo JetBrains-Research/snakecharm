@@ -38,19 +38,21 @@ class SmkUnusedLogSectionInspection : SnakemakeInspection() {
                 return
             }
 
-            val collector = SmkSLSectionReferencesCollector(SnakemakeNames.SECTION_LOG) {
-                !sectionsByRule.contains(rule)
-            }
-            rule.containingFile.accept(collector)
-            collector.getSections()
-                .forEach {
-                    val parent = it.parentOfType<SmkRuleOrCheckpoint>()
-                    if (parent != null && !sectionsByRule.contains(parent)) {
-                        sectionsByRule.add(parent)
-                    }
+            SmkSLSectionReferencesCollector(SnakemakeNames.SECTION_LOG) {
+                !sectionsByRule.contains(it)
+            }.also {
+                rule.containingFile.accept(it)
+            }.getSections().forEach {
+                val parent = it.parentOfType<SmkRuleOrCheckpoint>()
+                if (parent != null && !sectionsByRule.contains(parent)) {
+                    sectionsByRule.add(parent)
                 }
+            }
 
-            if (rule !in sectionsByRule) {
+            val skipValidation = rule.getSectionByName(SnakemakeNames.SECTION_WRAPPER) != null
+                    || rule.getSectionByName(SnakemakeNames.SECTION_NOTEBOOK) != null
+                    || rule.getSectionByName(SnakemakeNames.SECTION_SCRIPT) != null
+            if (!skipValidation && rule !in sectionsByRule) {
                 registerProblem(
                     logSection,
                     SnakemakeBundle.message("INSP.NAME.unused.section"),
