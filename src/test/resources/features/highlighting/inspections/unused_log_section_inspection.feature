@@ -8,12 +8,13 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
         output: "output.txt"
         log: "my_log.log"
         threads: 4
+        name: "name_{log}"
         shell: "command touch {wildcards.log}"
     """
     And SmkUnusedLogSectionInspection inspection is enabled
     And I expect inspection weak warning on <log: "my_log.log"> with message
     """
-    Section 'log' is never used
+    Looks like 'log' file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
     Examples:
@@ -36,11 +37,10 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
     And I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
-      | rule_like  | log_variation | mention                            |
-      | checkpoint | "my_log.log"  | shell: "command {log}"             |
-      | rule       | l1="foo.log"  | shell: "--log {log.l1}"            |
-      | checkpoint | l1="foo.log"  | run: shell("foo ff {log[0]}")      |
-      | rule       | "log.log"     | name: "{log}"                      |
+      | rule_like  | log_variation | mention                       |
+      | checkpoint | "my_log.log"  | shell: "command {log}"        |
+      | rule       | l1="foo.log"  | shell: "--log {log.l1}"       |
+      | checkpoint | l1="foo.log"  | run: shell("foo ff {log[0]}") |
 
   Scenario Outline: No warnings in 'log' section if used in wrapper
     Given a snakemake project
@@ -69,14 +69,16 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
         log: "my_log.log"
         threads: 4
         run:
+          log = "Bye"
           print("Hello world!")
           shell("something")
+          print(log)
           foo = 5
     """
     And SmkUnusedLogSectionInspection inspection is enabled
     And I expect inspection weak warning on <log: "my_log.log"> with message
     """
-    Section 'log' is never used
+    Looks like 'log' file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
     Examples:
@@ -84,33 +86,32 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
       | checkpoint |
       | rule       |
 
-  Scenario Outline: No warnings in 'log' section. 'log' is referenced from another rule
+  Scenario Outline: There are warnings in 'log' section if 'log' is referenced from another rule
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
         input: "input.txt"
         output: "output.txt"
-        log: <log_variation>
+        log: "data/log.log"
         threads: 4
 
     <rule_like> NAME2:
         run:
           print("Hello world!")
-          shell("<shell_variation>")
+          shell("{<rules_like>.NAME.log}")
           foo = 5
     """
     And SmkUnusedLogSectionInspection inspection is enabled
-    And I expect no inspection weak warnings
+    And I expect inspection weak warning on <log: "data/log.log"> with message
+    """
+    Looks like 'log' file won't be created, because it is not referenced from 'shell' or 'run' sections
+    """
     When I check highlighting weak warnings
     Examples:
-      | rule_like  | log_variation | shell_variation           |
-      | checkpoint | "my_log.log"  | command {checkpoints.NAME.log}  |
-      | checkpoint | l1="foo.log"  | -=log {checkpoints.NAME.log.l1} |
-      | checkpoint | "foo", "boo"  | {checkpoints.NAME.log[1]}       |
-      | rule       | "my_log.log"  | command {rules.NAME.log}  |
-      | rule       | l1="foo.log"  | -=log {rules.NAME.log.l1} |
-      | rule       | "foo", "boo"  | {rules.NAME.log[1]}       |
+      | rule_like  | rules_like  |
+      | rule       | rules       |
+      | checkpoint | checkpoints |
 
   Scenario Outline: Quick fix for unused in 'shell' section 'log' reference
     Given a snakemake project
@@ -126,16 +127,83 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
     And SmkUnusedLogSectionInspection inspection is enabled
     And I expect inspection weak warning on <log: "my_log.log"> with message
     """
-    Section 'log' is never used
+    Looks like 'log' file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
-    And I invoke quick fix Remove unused 'log' section and see text:
+    And I invoke quick fix Create 'log' file in 'shell' section and see text:
     """
     <rule_like> NAME:
         input: "input.txt"
         output: "output.txt"
+        log: "my_log.log"
         threads: 4
-        shell: "command touch"
+        shell: "command touch >{log} 2>&1"
+    """
+    Examples:
+      | rule_like  |
+      | checkpoint |
+      | rule       |
+    # Impossible to check inspection for 'shell' without arguments
+    # because of 'checkHighlighting' implementation
+
+  Scenario Outline: Quick fix for unused in 'run' section 'log' reference
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+        input: "input.txt"
+        output: "output.txt"
+        log: "my_log.log"
+        threads: 4
+        run:
+            shell("something")
+    """
+    And SmkUnusedLogSectionInspection inspection is enabled
+    And I expect inspection weak warning on <log: "my_log.log"> with message
+    """
+    Looks like 'log' file won't be created, because it is not referenced from 'shell' or 'run' sections
+    """
+    When I check highlighting weak warnings
+    And I invoke quick fix Create 'log' file in 'run' section and see text:
+    """
+    <rule_like> NAME:
+        input: "input.txt"
+        output: "output.txt"
+        log: "my_log.log"
+        threads: 4
+        run:
+            shell("something")
+            shell(" >{log} 2>&1")
+    """
+    Examples:
+      | rule_like  |
+      | checkpoint |
+      | rule       |
+
+  Scenario Outline: Quick fix for unused in rule/checkpoint 'log' section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+        input: "input.txt"
+        output: "output.txt"
+        log: "my_log.log"
+        threads: 4
+    """
+    And SmkUnusedLogSectionInspection inspection is enabled
+    And I expect inspection weak warning on <log: "my_log.log"> with message
+    """
+    Looks like 'log' file won't be created, because it is not referenced from 'shell' or 'run' sections
+    """
+    When I check highlighting weak warnings
+    And I invoke quick fix Create 'shell' section which creates 'log' file and see text:
+    """
+    <rule_like> NAME:
+        input: "input.txt"
+        output: "output.txt"
+        log: "my_log.log"
+        threads: 4
+        shell: " >{log} 2>&1"
     """
     Examples:
       | rule_like  |
@@ -156,7 +224,7 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
     And SmkUnusedLogSectionInspection inspection is enabled
     And I expect inspection weak warning on <log: "my_log.log"> with message
     """
-    Section 'log' is never used
+    Looks like 'log' file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
     Examples:
