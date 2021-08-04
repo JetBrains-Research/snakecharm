@@ -355,9 +355,7 @@ class SmkStatementParsing(
                 marker.done(SmkElementTypes.USE_IMPORTED_RULES_NAMES)
                 asKeywordExists = endOfImportedRulesDeclaration(true, names)
             }
-            else -> myBuilder.apply {
-                error(SnakemakeBundle.message("PARSE.use.names.expected"))
-            }
+            else -> myBuilder.error(SnakemakeBundle.message("PARSE.use.names.expected"))
         }
 
         return asKeywordExists
@@ -392,7 +390,6 @@ class SmkStatementParsing(
                 // Actually, Snakemake allows any name for rules and modules,
                 // that have python token type NAME, which may contains such words as:
                 // 'use', 'as', 'from'
-                // Do we need to add such support?
                 else -> {
                     myBuilder.error(SnakemakeBundle.message("PARSE.use.names.expected"))
                     false
@@ -405,19 +402,15 @@ class SmkStatementParsing(
      * Uses when we need to register comma in list of imported rules names
      * or ending of the list
      */
-    private fun registerCommaOrEndOfNames(): Boolean {
-        return when (myBuilder.tokenType) {
-            PyTokenTypes.FROM_KEYWORD, PyTokenTypes.AS_KEYWORD, PyTokenTypes.WITH_KEYWORD -> {
-                return false
-            }
-            PyTokenTypes.COMMA -> {
-                nextToken()
-                return true
-            }
-            else -> {
-                myBuilder.error(SnakemakeBundle.message("PARSE.use.unexpected.names.separator"))
-                false
-            }
+    private fun registerCommaOrEndOfNames(): Boolean = when (myBuilder.tokenType) {
+        PyTokenTypes.FROM_KEYWORD, PyTokenTypes.AS_KEYWORD, PyTokenTypes.WITH_KEYWORD -> false
+        PyTokenTypes.COMMA -> {
+            nextToken()
+            true
+        }
+        else -> {
+            myBuilder.error(SnakemakeBundle.message("PARSE.use.unexpected.names.separator"))
+            false
         }
     }
 
@@ -428,26 +421,22 @@ class SmkStatementParsing(
     private fun endOfImportedRulesDeclaration(
         definedByWildcard: Boolean,
         names: List<String>
-    ): Boolean {
-        when (myBuilder.tokenType) {
-            PyTokenTypes.FROM_KEYWORD -> {
-                return fromSignatureParsing(names)
-            }
-            PyTokenTypes.AS_KEYWORD -> {
-                if (definedByWildcard) {
-                    myBuilder.error(SnakemakeBundle.message("PARSE.use.unexpected.list.ending"))
-                }
-                if (names.size > 1) {
-                    myBuilder.error(SnakemakeBundle.message("PARSE.use.few.names.from.current.module"))
-                }
-                asSignatureParsing(names)
-                return true
-            }
-            else -> {
+    ): Boolean = when (myBuilder.tokenType) {
+        PyTokenTypes.FROM_KEYWORD -> fromSignatureParsing(names)
+        PyTokenTypes.AS_KEYWORD -> {
+            if (definedByWildcard) {
                 myBuilder.error(SnakemakeBundle.message("PARSE.use.unexpected.list.ending"))
             }
+            if (names.size > 1) {
+                myBuilder.error(SnakemakeBundle.message("PARSE.use.few.names.from.current.module"))
+            }
+            asSignatureParsing(names)
+            true
         }
-        return false
+        else -> {
+            myBuilder.error(SnakemakeBundle.message("PARSE.use.unexpected.list.ending"))
+            false
+        }
     }
 
     /**
