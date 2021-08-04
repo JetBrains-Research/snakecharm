@@ -37,7 +37,7 @@ SnakemakeFile: UseInvalid.smk
         PsiElement(Py:IDENTIFIER)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_FROM_KEYWORD)('from')
-    PsiErrorElement:Expecting module name after 'from' keyword in 'use rule' statement.
+    PsiErrorElement:Expecting module name after 'from' keyword in 'use rule' statement
       <empty list>
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
@@ -92,11 +92,11 @@ SnakemakeFile: UseInvalid.smk
     SmkImportedRulesNames
       SmkReferenceExpression: NAME
         PsiElement(Py:IDENTIFIER)('NAME')
-      PsiErrorElement:Unexpected token in comma separated list of rules within 'use rule' statement.
+      PsiErrorElement:Unexpected token in comma separated list of rules within 'use rule' statement
         <empty list>
     PsiWhiteSpace(' ')
     PyStatementList
-      PsiErrorElement:Expecting either 'as', 'with' or end of line in 'use rule' statement.
+      PsiErrorElement:Expecting either 'as', 'with' or end of line in 'use rule' statement
         <empty list>
       SmkUseArgsSection
         PsiElement(Py:IDENTIFIER)('frm')
@@ -126,7 +126,7 @@ SnakemakeFile: UseInvalid.smk
     PsiWhiteSpace(' ')
     SmkReferenceExpression: MODULE
       PsiElement(Py:IDENTIFIER)('MODULE')
-    PsiErrorElement:Keyword 'with' in 'use rule' statement is not allowed in combination with rule pattern '*'.
+    PsiErrorElement:Keyword 'with' in 'use rule' statement is not allowed in combination with rule pattern '*'
       <empty list>
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_WITH_KEYWORD)('with')
@@ -196,7 +196,7 @@ SnakemakeFile: UseInvalid.smk
     PsiWhiteSpace(' ')
     SmkImportedRulesNames
       PsiElement(Py:MULT)('*')
-    PsiErrorElement:Expecting list of rules in 'use rule' statement to end with keyword 'from'.
+    PsiErrorElement:Expecting list of rules in 'use rule' statement to end with keyword 'from'
       <empty list>
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
@@ -256,7 +256,7 @@ SnakemakeFile: UseInvalid.smk
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('N1')
-    PsiErrorElement:Multiple rules in 'use rule' statement but name modification ('as' statement) does not contain a wildcard '*'.
+    PsiErrorElement:Multiple rules in 'use rule' statement but name modification ('as' statement) does not contain a wildcard '*'
       <empty list>
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_WITH_KEYWORD)('with')
@@ -316,7 +316,7 @@ SnakemakeFile: UseInvalid.smk
     SmkReferenceExpression: M
       PsiElement(Py:IDENTIFIER)('M')
     PyStatementList
-      PsiErrorElement:Expecting either 'as', 'with' or end of line in 'use rule' statement.
+      PsiErrorElement:Expecting either 'as', 'with' or end of line in 'use rule' statement
         <empty list>
       PsiWhiteSpace('\n    ')
       SmkUseArgsSection
@@ -342,7 +342,7 @@ SnakemakeFile: UseInvalid.smk
       PsiElement(Py:IDENTIFIER)('M')
     PsiWhiteSpace(' ')
     PyStatementList
-      PsiErrorElement:Expecting either 'as', 'with' or end of line in 'use rule' statement.
+      PsiErrorElement:Expecting either 'as', 'with' or end of line in 'use rule' statement
         <empty list>
       SmkUseArgsSection
         PsiElement(Py:IDENTIFIER)('input')

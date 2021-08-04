@@ -23,7 +23,7 @@ SnakemakeFile: UseIncomplete.smk
     SmkImportedRulesNames
       SmkReferenceExpression: a
         PsiElement(Py:IDENTIFIER)('a')
-      PsiErrorElement:Unexpected token in comma separated list of rules within 'use rule' statement.
+      PsiErrorElement:Unexpected token in comma separated list of rules within 'use rule' statement
         <empty list>
     PyStatementList
       <empty list>
@@ -38,7 +38,7 @@ SnakemakeFile: UseIncomplete.smk
         PsiElement(Py:IDENTIFIER)('b')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_FROM_KEYWORD)('from')
-    PsiErrorElement:Expecting module name after 'from' keyword in 'use rule' statement.
+    PsiErrorElement:Expecting module name after 'from' keyword in 'use rule' statement
       <empty list>
     PyStatementList
       <empty list>
@@ -62,7 +62,7 @@ SnakemakeFile: UseIncomplete.smk
     PsiElement(Py:IDENTIFIER)('module_name2')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_WITH_KEYWORD)('with')
-    PsiErrorElement:Expecting colon after 'with' keyword in 'use rule' statement.
+    PsiErrorElement:Expecting colon after 'with' keyword in 'use rule' statement
       <empty list>
     PyStatementList
       <empty list>
