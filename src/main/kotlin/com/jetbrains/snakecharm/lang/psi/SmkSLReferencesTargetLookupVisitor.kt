@@ -17,6 +17,8 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcard
 /**
  * Checks if rule/checkpoint section has a string injected reference (e.g. "echo {log}") that is resolved into
  * desired target element.
+ *
+ * At the moment limited to 'run' and 'rule' sections
  */
 class SmkSLReferencesTargetLookupVisitor(
     private val targetPsiElement: PsiElement
@@ -29,9 +31,11 @@ class SmkSLReferencesTargetLookupVisitor(
         get() = this
 
     override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-        if (st.sectionKeyword in setOf(SnakemakeNames.SECTION_RUN, SnakemakeNames.SECTION_SHELL)) {
-            super.visitSmkRuleOrCheckpointArgsSection(st)
+        if (st.sectionKeyword != SnakemakeNames.SECTION_SHELL) {
+            // stop traversing
+            return
         }
+        super.visitSmkRuleOrCheckpointArgsSection(st)
     }
 
     override fun visitPyStringLiteralExpression(node: PyStringLiteralExpression) {
