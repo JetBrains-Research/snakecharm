@@ -14,12 +14,16 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
-class SmkSLSectionReferencesCollector(
-    private val searchingElement: PsiElement
+/**
+ * Checks if rule/checkpoint section has a string injected reference (e.g. "echo {log}") that is resolved into
+ * desired target element.
+ */
+class SmkSLReferencesTargetLookupVisitor(
+    private val targetPsiElement: PsiElement
 ) : SmkElementVisitor, PyRecursiveElementVisitor() {
-    private var gotReference = false
 
-    fun hasReferenceToElement() = gotReference
+    var hasReferenceToTarget: Boolean = false
+        private set
 
     override val pyElementVisitor: PyElementVisitor
         get() = this
@@ -63,8 +67,8 @@ class SmkSLSectionReferencesCollector(
         if (element is PyKeywordArgument) {
             element = element.parentOfType<SmkRuleOrCheckpointArgsSection>()
         }
-        if (element == searchingElement) {
-            gotReference = true
+        if (element == targetPsiElement) {
+            hasReferenceToTarget = true
         }
     }
 }

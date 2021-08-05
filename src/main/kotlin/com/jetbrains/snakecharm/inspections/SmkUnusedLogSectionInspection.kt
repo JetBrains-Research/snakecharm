@@ -11,6 +11,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.refactoring.suggested.endOffset
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
 
@@ -36,7 +37,8 @@ class SmkUnusedLogSectionInspection : SnakemakeInspection() {
         private fun visitSMKRuleLike(rule: SmkRuleLike<SmkArgsSection>) {
             val logSection = rule.getSectionByName(SnakemakeNames.SECTION_LOG) ?: return
             val shellSection = rule.getSectionByName(SnakemakeNames.SECTION_SHELL)
-            val runSection = rule.getSections().find {
+            val ruleSections = rule.getSections()
+            val runSection = ruleSections.find {
                 it.sectionKeyword == SnakemakeNames.SECTION_RUN
             }
             val quickfix = when ((shellSection != null) to (runSection != null)) {
@@ -45,23 +47,24 @@ class SmkUnusedLogSectionInspection : SnakemakeInspection() {
                 else -> CreateShellSectionWithLogReference(rule)
             }
 
-            val collector = SmkSLSectionReferencesCollector(logSection)
-                .also {
-                    rule.accept(it)
-                }
+            val skipValidation = ruleSections.any { section ->
+                section.sectionKeyword in EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE
+            }
+            if (!skipValidation) {
+                val collector = SmkSLReferencesTargetLookupVisitor(logSection)
+                    .also {
+                        rule.accept(it)
+                    }
 
-            val skipValidation = rule.getSectionByName(SnakemakeNames.SECTION_WRAPPER) != null
-                    || rule.getSectionByName(SnakemakeNames.SECTION_NOTEBOOK) != null
-                    || rule.getSectionByName(SnakemakeNames.SECTION_SCRIPT) != null
-                    || rule.getSectionByName(SnakemakeNames.SECTION_CWL) != null
-            if (!skipValidation && !collector.hasReferenceToElement()) {
-                registerProblem(
-                    logSection,
-                    SnakemakeBundle.message("INSP.NAME.unused.section"),
-                    ProblemHighlightType.WEAK_WARNING,
-                    null,
-                    quickfix
-                )
+                if (!collector.hasReferenceToTarget) {
+                    registerProblem(
+                        logSection,
+                        SnakemakeBundle.message("INSP.NAME.unused.section"),
+                        ProblemHighlightType.WEAK_WARNING,
+                        null,
+                        quickfix
+                    )
+                }
             }
         }
     }
