@@ -183,6 +183,17 @@
     />
 
     <localInspection
+            language="Snakemake" shortName="SmkUnusedLogSectionInspection"
+            enabledByDefault="true"
+            level="WEAK WARNING"
+            suppressId="SmkUnusedLogSection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.unused.section"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkUnusedLogSectionInspection"
+    />
+
+    <localInspection
             language="Snakemake" shortName="SmkRuleSectionAfterExecutionInspection"
             enabledByDefault="true"
             level="ERROR"

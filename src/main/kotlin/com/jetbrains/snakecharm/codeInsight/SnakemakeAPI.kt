@@ -90,9 +90,16 @@ object SnakemakeAPI {
     )
     const val SNAKEMAKE_MODULE_NAME_IO_PY = "io.py"
 
+    /**
+     * Sections that gets 'snakemake' object with 'snakemake.input', 'snakemake.params' etc settings
+     */
+    val EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE = setOf(
+        SECTION_WRAPPER, SECTION_NOTEBOOK, SECTION_SCRIPT, SECTION_CWL
+    )
+
     val EXECUTION_SECTIONS_KEYWORDS = setOf(
-        SECTION_SHELL, SECTION_SCRIPT,
-        SECTION_WRAPPER, SECTION_CWL, SECTION_NOTEBOOK
+        SECTION_SHELL,
+        *EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE.toTypedArray()
     )
 
     /**
