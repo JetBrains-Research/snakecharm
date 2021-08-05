@@ -11,8 +11,7 @@ import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLFile
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionExpressionImpl
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
 class SmkSLSectionReferencesCollector(
@@ -47,11 +46,11 @@ class SmkSLSectionReferencesCollector(
         references?.forEach { st ->
             checkSLReference(st)
         }
-        val subscriptions = PsiTreeUtil.getChildrenOfType(file, SmkSLSubscriptionExpressionImpl::class.java)
-        subscriptions?.forEach { st ->
-            val child = (st.node.firstChildNode.psi as? SmkSLReferenceExpressionImpl)
-            if (child != null) {
-                checkSLReference(child)
+        val subscriptions = PsiTreeUtil.getChildrenOfType(file, SmkSLSubscriptionExpression::class.java)
+        subscriptions?.forEach { st: SmkSLSubscriptionExpression ->
+            val rootOperand = st.rootOperand
+            if (rootOperand is SmkSLReferenceExpression) {
+                checkSLReference(rootOperand)
             }
         }
     }
