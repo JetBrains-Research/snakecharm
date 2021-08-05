@@ -173,7 +173,7 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
         threads: 4
         run:
             shell("something")
-            shell(" >{log} 2>&1")
+            shell("echo TODO >{log} 2>&1")
     """
     Examples:
       | rule_like  |
@@ -203,7 +203,7 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
         output: "output.txt"
         log: "my_log.log"
         threads: 4
-        shell: " >{log} 2>&1"
+        shell: "echo TODO >{log} 2>&1"
     """
     Examples:
       | rule_like  |

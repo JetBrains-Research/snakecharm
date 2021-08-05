@@ -1,6 +1,9 @@
 package com.jetbrains.snakecharm.inspections
 
-import com.intellij.codeInspection.*
+import com.intellij.codeInspection.LocalInspectionToolSession
+import com.intellij.codeInspection.LocalQuickFixOnPsiElement
+import com.intellij.codeInspection.ProblemHighlightType
+import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
@@ -13,7 +16,7 @@ import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkUnusedLogSectionInspection : SnakemakeInspection() {
     companion object {
-        private const val FIX = " >{log} 2>&1"
+        private const val REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT = " >{log} 2>&1"
     }
 
     override fun buildVisitor(
@@ -79,12 +82,12 @@ class SmkUnusedLogSectionInspection : SnakemakeInspection() {
 
             if (stringArgument == null) {
                 val indent = shellSection.prevSibling.text.replace("\n", "")
-                doc.insertString(shellSection.lastChild.endOffset, "\n$indent$indent\"$FIX\"")
+                doc.insertString(shellSection.lastChild.endOffset, "\n$indent$indent\"$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\"")
                 PsiDocumentManager.getInstance(project).commitDocument(doc)
                 return
             }
 
-            doc.insertString(stringArgument.endOffset - 1, FIX)
+            doc.insertString(stringArgument.endOffset - 1, REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT)
             PsiDocumentManager.getInstance(project).commitDocument(doc)
         }
     }
@@ -101,7 +104,7 @@ class SmkUnusedLogSectionInspection : SnakemakeInspection() {
             val runSection = (startElement as SmkRunSection)
             val lastArg = runSection.lastChild
             val indent = lastArg.prevSibling.text
-            doc.insertString(lastArg.endOffset, "${indent}shell(\"$FIX\")")
+            doc.insertString(lastArg.endOffset, "${indent}shell(\"echo TODO$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\")")
             PsiDocumentManager.getInstance(project).commitDocument(doc)
         }
     }
@@ -118,7 +121,7 @@ class SmkUnusedLogSectionInspection : SnakemakeInspection() {
             val ruleLike = (startElement as SmkRuleOrCheckpoint)
             val lastArg = ruleLike.getSections().last()
             val indent = lastArg.prevSibling.text
-            doc.insertString(lastArg.endOffset, "${indent}shell: \"$FIX\"")
+            doc.insertString(lastArg.endOffset, "${indent}shell: \"echo TODO$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\"")
             PsiDocumentManager.getInstance(project).commitDocument(doc)
         }
     }
