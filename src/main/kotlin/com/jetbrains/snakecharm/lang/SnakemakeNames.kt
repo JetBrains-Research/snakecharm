@@ -28,6 +28,18 @@ object SnakemakeNames {
     const val SUBWORKFLOW_CONFIGFILE_KEYWORD = WORKFLOW_CONFIGFILE_KEYWORD
     const val SUBWORKFLOW_SNAKEFILE_KEYWORD = "snakefile"
 
+    const val MODULE_KEYWORD = "module"
+    const val MODULE_SNAKEFILE_KEYWORD = "snakefile"
+    const val MODULE_CONFIG_KEYWORD = "config"
+    const val MODULE_SKIP_VALIDATION_KEYWORD = "skip_validation"
+    const val MODULE_META_WRAPPER_KEYWORD = "meta_wrapper"
+    const val MODULE_REPLACE_PREFIX_KEYWORD = "replace_prefix"
+
+    const val USE_KEYWORD = "use"
+    const val SMK_FROM_KEYWORD = "from"
+    const val SMK_AS_KEYWORD = "as"
+    const val SMK_WITH_KEYWORD = "with"
+
     const val SECTION_INPUT = "input"
     const val SECTION_OUTPUT = "output"
     const val SECTION_LOG = "log"

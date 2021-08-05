@@ -1,0 +1,258 @@
+SnakemakeFile: Use.smk
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      SmkReferenceExpression: a
+        PsiElement(Py:IDENTIFIER)('a')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: my_module
+      PsiElement(Py:IDENTIFIER)('my_module')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('b')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      SmkReferenceExpression: f
+        PsiElement(Py:IDENTIFIER)('f')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: other_module
+      PsiElement(Py:IDENTIFIER)('other_module')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('f_z')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_WITH_KEYWORD)('with')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkUseArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: data.csv
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"data.csv"')
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      SmkReferenceExpression: f_z
+        PsiElement(Py:IDENTIFIER)('f_z')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('x_z')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_WITH_KEYWORD)('with')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkUseArgsSection
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: dir/file.svg
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"dir/file.svg"')
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      PsiElement(Py:MULT)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: last_module1
+      PsiElement(Py:IDENTIFIER)('last_module1')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNameIdentifier
+      PsiElement(Py:MULT)('*')
+      PsiElement(Py:IDENTIFIER)('_other')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      PsiElement(Py:MULT)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: last_module2
+      PsiElement(Py:IDENTIFIER)('last_module2')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNameIdentifier
+      PsiElement(Py:IDENTIFIER)('other_')
+      PsiElement(Py:MULT)('*')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      PsiElement(Py:MULT)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: last_module3
+      PsiElement(Py:IDENTIFIER)('last_module3')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNameIdentifier
+      PsiElement(Py:IDENTIFIER)('other_')
+      PsiElement(Py:MULT)('*')
+      PsiElement(Py:IDENTIFIER)('_other')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      PsiElement(Py:MULT)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: last_module4
+      PsiElement(Py:IDENTIFIER)('last_module4')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      SmkReferenceExpression: a
+        PsiElement(Py:IDENTIFIER)('a')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression: b
+        PsiElement(Py:IDENTIFIER)('b')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: m
+      PsiElement(Py:IDENTIFIER)('m')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      SmkReferenceExpression: a
+        PsiElement(Py:IDENTIFIER)('a')
+      PsiElement(Py:COMMA)(',')
+      SmkReferenceExpression: b
+        PsiElement(Py:IDENTIFIER)('b')
+      PsiElement(Py:COMMA)(',')
+      SmkReferenceExpression: c
+        PsiElement(Py:IDENTIFIER)('c')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: m
+      PsiElement(Py:IDENTIFIER)('m')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNameIdentifier
+      PsiElement(Py:MULT)('*')
+      PsiElement(Py:IDENTIFIER)('_other')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_WITH_KEYWORD)('with')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      SmkReferenceExpression: rule
+        PsiElement(Py:IDENTIFIER)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: module
+      PsiElement(Py:IDENTIFIER)('module')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_WITH_KEYWORD)('with')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkUseArgsSection
+        PsiElement(Py:IDENTIFIER)('input')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: text
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"text"')
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      SmkReferenceExpression: a
+        PsiElement(Py:IDENTIFIER)('a')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('b')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_WITH_KEYWORD)('with')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PyStatementList
+      SmkUseArgsSection
+        PsiElement(Py:IDENTIFIER)('output')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: dataset
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"dataset"')

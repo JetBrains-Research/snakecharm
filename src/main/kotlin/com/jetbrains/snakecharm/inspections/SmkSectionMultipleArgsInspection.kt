@@ -7,6 +7,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SINGLE_ARGUMENT_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SINGLE_ARGUMENT_WORKFLOWS_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkModuleArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
@@ -15,7 +16,7 @@ class SmkSectionMultipleArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession,
+        session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
@@ -37,9 +38,13 @@ class SmkSectionMultipleArgsInspection : SnakemakeInspection() {
             }
         }
 
+        override fun visitSmkModuleArgsSection(st: SmkModuleArgsSection) {
+            checkArgumentList(st.argumentList, "module")
+        }
+
         private fun checkArgumentList(
             argumentList: PyArgumentList?,
-            sectionName: String,
+            sectionName: String
         ) {
             val args = argumentList?.arguments ?: emptyArray()
             if (args.size > 1) {

@@ -26,11 +26,11 @@ import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import gnu.trove.THashSet
 
 
-abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
-        private val containingRule: T?,
-        private val typeName: String,
-        private val indexKey: StubIndexKey<String, T>,
-        private val clazz: Class<T>
+abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
+    private val containingRule: T?,
+    private val typeName: String,
+    private val indexKey: StubIndexKey<String, T>,
+    private val clazz: Class<T>
 ) : PyType {
 
     abstract val currentFileDeclarations: List<T>
@@ -38,9 +38,9 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
     override fun getName() = typeName
 
     override fun getCompletionVariants(
-            completionPrefix: String?,
-            location: PsiElement,
-            context: ProcessingContext?
+        completionPrefix: String?,
+        location: PsiElement,
+        context: ProcessingContext?
     ): Array<Any> = emptyArray()
 
     override fun assertValid(message: String?) {
@@ -53,17 +53,17 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
     }
 
     override fun resolveMember(
-            name: String,
-            location: PyExpression?,
-            direction: AccessDirection,
-            resolveContext: PyResolveContext
+        name: String,
+        location: PyExpression?,
+        direction: AccessDirection,
+        resolveContext: PyResolveContext
     ): List<RatedResolveResult> {
         if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location) || location == null) {
             return emptyList()
         }
 
         val results = findAvailableRuleLikeElementByName(
-                location.originalElement, name, indexKey, clazz
+            location.originalElement, name, indexKey, clazz
         ) { currentFileDeclarations }
 
         if (results.isEmpty()) {
@@ -78,7 +78,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
     override fun isBuiltin() = false
 
     companion object {
-        fun <T: SmkRuleOrCheckpoint> createRuleLikeLookupItem(name: String, elem: T): LookupElement {
+        fun <T : SmkRuleOrCheckpoint> createRuleLikeLookupItem(name: String, elem: T): LookupElement {
             val containingFileName = elem.containingFile.name
             /*
               it is important to use originalFile to access virtualFile
@@ -90,8 +90,8 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
                 containingFileName
             } else {
                 val fileContentRootDirectory = ProjectRootManager.getInstance(elem.project)
-                        .fileIndex
-                        .getContentRootForFile(virtualFile)
+                    .fileIndex
+                    .getContentRootForFile(virtualFile)
                 if (fileContentRootDirectory == null) {
                     containingFileName
                 } else {
@@ -100,22 +100,22 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
             }
 
             return PrioritizedLookupElement.withPriority(
-                    LookupElementBuilder
-                            .createWithSmartPointer(name, elem)
-                            .withTypeText(displayPath)
-                            .withIcon(elem.getIcon(0)),
-                    SmkCompletionUtil.RULES_AND_CHECKPOINTS_PRIORITY
+                LookupElementBuilder
+                    .createWithSmartPointer(name, elem)
+                    .withTypeText(displayPath)
+                    .withIcon(elem.getIcon(0)),
+                SmkCompletionUtil.RULES_AND_CHECKPOINTS_PRIORITY
             )
         }
 
-        fun <T: SmkRuleOrCheckpoint> findAvailableRuleLikeElementByName(
-                location: PsiElement,
-                name: String,
-                indexKey: StubIndexKey<String, T>,
-                clazz: Class<T>,
-                getCurrentFileDeclarationsFunction: () -> List<T>
+        fun <T : SmkRuleOrCheckpoint> findAvailableRuleLikeElementByName(
+            location: PsiElement,
+            name: String,
+            indexKey: StubIndexKey<String, T>,
+            clazz: Class<T>,
+            getCurrentFileDeclarationsFunction: () -> List<T>
         ): Collection<PsiElement> {
-            val module = location.let {  ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
+            val module = location.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
             return if (module != null) {
                 val scope = searchScope(module)
                 StubIndex.getElements(indexKey, name, module.project, scope, clazz)
@@ -127,18 +127,18 @@ abstract class AbstractSmkRuleOrCheckpointType<T: SmkRuleOrCheckpoint>(
             }
         }
 
-        fun <Psi: SmkRuleOrCheckpoint> getVariantsFromIndex(
-                indexKey: StubIndexKey<String, Psi>,
-                module: Module,
-                clazz: Class<Psi>,
-                scope: GlobalSearchScope = searchScope(module)
+        fun <Psi : SmkRuleOrCheckpoint> getVariantsFromIndex(
+            indexKey: StubIndexKey<String, Psi>,
+            module: Module,
+            clazz: Class<Psi>,
+            scope: GlobalSearchScope = searchScope(module)
         ): List<Psi> {
             val results = mutableListOf<Psi>()
             val project = module.project
             val stubIndex = StubIndex.getInstance()
             val allKeys = THashSet<String>()
             stubIndex.processAllKeys(
-                    indexKey, Processors.cancelableCollectProcessor<String>(allKeys), scope, null
+                indexKey, Processors.cancelableCollectProcessor<String>(allKeys), scope, null
             )
 
             for (key in allKeys) {

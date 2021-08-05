@@ -19,38 +19,54 @@ import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.*
  * @date 2018-12-31
  */
 class SmkStatementParsing(
-        context: SmkParserContext
+    context: SmkParserContext
 ) : StatementParsing(context) {
 
     private val ruleSectionParsingData = SectionParsingData(
-            declaration = RULE_DECLARATION_STATEMENT,
-            name = "rule",
-            parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
-            sectionKeyword= SmkTokenTypes.RULE_KEYWORD
+        declaration = RULE_DECLARATION_STATEMENT,
+        name = "rule",
+        parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
+        sectionKeyword = SmkTokenTypes.RULE_KEYWORD
     )
 
     private val checkpointSectionParsingData = SectionParsingData(
-            declaration = CHECKPOINT_DECLARATION_STATEMENT,
-            name = "checkpoint",
-            parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
-            sectionKeyword= SmkTokenTypes.CHECKPOINT_KEYWORD
+        declaration = CHECKPOINT_DECLARATION_STATEMENT,
+        name = "checkpoint",
+        parameterListStatement = SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
+        sectionKeyword = SmkTokenTypes.CHECKPOINT_KEYWORD
     )
 
     private val subworkflowSectionParsingData = SectionParsingData(
-            declaration = SUBWORKFLOW_DECLARATION_STATEMENT,
-            name = "subworkflow",
-            parameterListStatement = SmkElementTypes.SUBWORKFLOW_ARGS_SECTION_STATEMENT,
-            sectionKeyword= SmkTokenTypes.SUBWORKFLOW_KEYWORD
+        declaration = SUBWORKFLOW_DECLARATION_STATEMENT,
+        name = "subworkflow",
+        parameterListStatement = SmkElementTypes.SUBWORKFLOW_ARGS_SECTION_STATEMENT,
+        sectionKeyword = SmkTokenTypes.SUBWORKFLOW_KEYWORD
+    )
+
+    private val moduleSectionParsingData = SectionParsingData(
+        declaration = MODULE_DECLARATION_STATEMENT,
+        name = "module",
+        parameterListStatement = SmkElementTypes.MODULE_ARGS_SECTION_STATEMENT,
+        sectionKeyword = SmkTokenTypes.MODULE_KEYWORD
+    )
+
+    private val useSectionParsingData = SectionParsingData(
+        declaration = USE_DECLARATION_STATEMENT,
+        name = "use",
+        parameterListStatement = SmkElementTypes.USE_ARGS_SECTION_STATEMENT,
+        sectionKeyword = SmkTokenTypes.USE_KEYWORD
     )
 
     override fun getReferenceType() = SmkElementTypes.SMK_PY_REFERENCE_EXPRESSION
 
     private fun getSectionParsingData(tokenType: IElementType) =
-            when {
-                tokenType === SmkTokenTypes.SUBWORKFLOW_KEYWORD -> subworkflowSectionParsingData
-                tokenType === SmkTokenTypes.CHECKPOINT_KEYWORD -> checkpointSectionParsingData
-                else -> ruleSectionParsingData
-            }
+        when {
+            tokenType === SmkTokenTypes.SUBWORKFLOW_KEYWORD -> subworkflowSectionParsingData
+            tokenType === SmkTokenTypes.CHECKPOINT_KEYWORD -> checkpointSectionParsingData
+            tokenType === SmkTokenTypes.MODULE_KEYWORD -> moduleSectionParsingData
+            tokenType === SmkTokenTypes.USE_KEYWORD -> useSectionParsingData
+            else -> ruleSectionParsingData
+        }
 
     override fun getParsingContext() = myContext as SmkParserContext
 
@@ -89,9 +105,9 @@ class SmkStatementParsing(
                 nextToken()
 
                 val res = parsingContext.expressionParser.parseArgumentList(
-                        ",", PyTokenTypes.COMMA,
-                        SnakemakeBundle.message("PARSE.expected.identifier"),
-                        this::parseIdentifier
+                    ",", PyTokenTypes.COMMA,
+                    SnakemakeBundle.message("PARSE.expected.identifier"),
+                    this::parseIdentifier
                 )
 
                 if (!res) {
@@ -103,14 +119,14 @@ class SmkStatementParsing(
                     nextToken()
                 }
             }
-            tt === SmkTokenTypes.WORKFLOW_RULEORDER_KEYWORD  -> {
+            tt === SmkTokenTypes.WORKFLOW_RULEORDER_KEYWORD -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
 
                 val res = parsingContext.expressionParser.parseArgumentList(
-                        ">", PyTokenTypes.GT,
-                        SnakemakeBundle.message("PARSE.expected.identifier"),
-                        this::parseIdentifier
+                    ">", PyTokenTypes.GT,
+                    SnakemakeBundle.message("PARSE.expected.identifier"),
+                    this::parseIdentifier
                 )
 
                 if (!res) {
@@ -146,9 +162,22 @@ class SmkStatementParsing(
         val ruleLikeMarker = myBuilder.mark()
         nextToken()
 
-        // rule name
-        //val ruleNameMarker: PsiBuilder.Marker = myBuilder.mark()
-        if (atToken(PyTokenTypes.IDENTIFIER)) {
+        // Parse second word in 'use rule'
+        if (section == useSectionParsingData) {
+            if (myBuilder.tokenText != SnakemakeNames.RULE_KEYWORD) {
+                myBuilder.error(SnakemakeBundle.message("PARSE.use.rule.keyword.expected"))
+            } else {
+                myBuilder.remapCurrentToken(SmkTokenTypes.RULE_KEYWORD)
+                nextToken()
+            }
+            // Parse rest words in 'use' definition
+            val names = mutableListOf<String>()
+            parseRestUseStatement(parseUseSection(names), names, section)
+            ruleLikeMarker.done(section.declaration)
+            return
+        } else if (atToken(PyTokenTypes.IDENTIFIER)) {
+            // rule name
+            //val ruleNameMarker: PsiBuilder.Marker = myBuilder.mark()
             nextToken()
         }
 
@@ -260,7 +289,7 @@ class SmkStatementParsing(
                 myContext.popScope()
             }
             else -> {
-                // Snakemeake often adds new sections => let's by default allow all here +
+                // Snakemake often adds new sections => let's by default allow all here +
                 //  show inspection error for keyword not in `section.parameters` instead of parsing errors..
                 result = parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
                 ruleParam.done(section.parameterListStatement)
@@ -289,13 +318,287 @@ class SmkStatementParsing(
         referenceMarker.drop()
         return false
     }
+
+    /**
+     * Parses 'use' section. If any part of 'use' section declaration is missing,
+     * it will create an error message and keep parsing the section.
+     * Returns true if 'as' part was detected
+     */
+    private fun parseUseSection(names: MutableList<String>): Boolean {
+        var asKeywordExists = false
+
+        when (myBuilder.tokenType) {
+            PyTokenTypes.FROM_KEYWORD -> myBuilder.apply {
+                error(SnakemakeBundle.message("PARSE.use.names.expected"))
+                asKeywordExists = fromSignatureParsing(names)
+            }
+            PyTokenTypes.AS_KEYWORD -> myBuilder.apply {
+                asKeywordExists = true
+                error(SnakemakeBundle.message("PARSE.use.names.expected"))
+                asSignatureParsing(names)
+            }
+            PyTokenTypes.IDENTIFIER -> {
+                val marker = myBuilder.mark()
+                parseIdentifierFromIdentifiersList(names)
+                marker.done(SmkElementTypes.USE_IMPORTED_RULES_NAMES)
+                asKeywordExists = endOfImportedRulesDeclaration(false, names)
+            }
+            PyTokenTypes.MULT -> {
+                val marker = myBuilder.mark()
+                names.add(myBuilder.tokenText!!)
+                nextToken()
+                if (atToken(PyTokenTypes.COMMA)) {
+                    myBuilder.error(SnakemakeBundle.message("PARSE.use.wildcard.in.names.list"))
+                    nextToken()
+                    parseIdentifierFromIdentifiersList(names)
+                }
+                marker.done(SmkElementTypes.USE_IMPORTED_RULES_NAMES)
+                asKeywordExists = endOfImportedRulesDeclaration(true, names)
+            }
+            else -> myBuilder.error(SnakemakeBundle.message("PARSE.use.names.expected"))
+        }
+
+        return asKeywordExists
+    }
+
+    /**
+     * Uses when we need to parse list of imported rules names.
+     */
+    private fun parseIdentifierFromIdentifiersList(
+        list: MutableList<String>
+    ) {
+        var hasNext = true
+        while (hasNext) {
+            hasNext = when (myBuilder.tokenType) {
+                PyTokenTypes.IDENTIFIER -> {
+                    val referenceMarker = myBuilder.mark() // Register new name
+                    list.add(myBuilder.tokenText ?: return)
+                    Parsing.advanceIdentifierLike(myBuilder)
+                    referenceMarker.done(SmkElementTypes.REFERENCE_EXPRESSION)
+                    registerCommaOrEndOfNames()
+                }
+                PyTokenTypes.MULT -> {
+                    myBuilder.error(SnakemakeBundle.message("PARSE.use.wildcard.in.names.list"))
+                    nextToken()
+                    registerCommaOrEndOfNames()
+                }
+                PyTokenTypes.COMMA -> {
+                    myBuilder.error(SnakemakeBundle.message("PARSE.use.names.expected"))
+                    nextToken()
+                    true
+                }
+                // Actually, Snakemake allows any name for rules and modules,
+                // that have python token type NAME, which may contains such words as:
+                // 'use', 'as', 'from'
+                else -> {
+                    myBuilder.error(SnakemakeBundle.message("PARSE.use.names.expected"))
+                    false
+                }
+            }
+        }
+    }
+
+    /**
+     * Uses when we need to register comma in list of imported rules names
+     * or ending of the list
+     */
+    private fun registerCommaOrEndOfNames(): Boolean = when (myBuilder.tokenType) {
+        PyTokenTypes.FROM_KEYWORD, PyTokenTypes.AS_KEYWORD, PyTokenTypes.WITH_KEYWORD -> false
+        PyTokenTypes.COMMA -> {
+            nextToken()
+            true
+        }
+        else -> {
+            myBuilder.error(SnakemakeBundle.message("PARSE.use.unexpected.names.separator"))
+            false
+        }
+    }
+
+    /**
+     * Uses when we've finished to collect rules names and went to the next step
+     * Returns true if 'as' part was detected
+     */
+    private fun endOfImportedRulesDeclaration(
+        definedByWildcard: Boolean,
+        names: List<String>
+    ): Boolean = when (myBuilder.tokenType) {
+        PyTokenTypes.FROM_KEYWORD -> fromSignatureParsing(names)
+        PyTokenTypes.AS_KEYWORD -> {
+            if (definedByWildcard) {
+                myBuilder.error(SnakemakeBundle.message("PARSE.use.unexpected.list.ending"))
+            }
+            if (names.size > 1) {
+                myBuilder.error(SnakemakeBundle.message("PARSE.use.few.names.from.current.module"))
+            }
+            asSignatureParsing(names)
+            true
+        }
+        else -> {
+            myBuilder.error(SnakemakeBundle.message("PARSE.use.unexpected.list.ending"))
+            false
+        }
+    }
+
+    /**
+     * Parses 'from' part in 'use' section declaration.
+     * Returns true if 'as' part was detected after 'from' part
+     */
+    private fun fromSignatureParsing(names: List<String>): Boolean {
+        myBuilder.remapCurrentToken(SmkTokenTypes.SMK_FROM_KEYWORD)
+        nextToken()
+
+        if (!atToken(PyTokenTypes.IDENTIFIER)) {
+            myBuilder.error(SnakemakeBundle.message("PARSE.use.expecting.module.name"))
+        } else {
+            parseIdentifier()
+        }
+
+        if (atToken(PyTokenTypes.AS_KEYWORD)) {
+            asSignatureParsing(names)
+            return true
+        }
+
+        return false
+    }
+
+    /**
+     * Parses 'as' part in 'use' section declaration
+     */
+    private fun asSignatureParsing(names: List<String>) {
+        myBuilder.remapCurrentToken(SmkTokenTypes.SMK_AS_KEYWORD)
+        nextToken()
+
+        var lasTokenIsIdentifier =
+            !atToken(PyTokenTypes.IDENTIFIER) // Default value need to ve reversed
+        var simpleName = true // Does new rule name consist of one identifier
+        var hasIdentifier = false // Do we have new rule name
+        val name = myBuilder.mark()
+        while (true) {
+            when (myBuilder.tokenType) {
+                PyTokenTypes.IDENTIFIER -> {
+                    if (lasTokenIsIdentifier) {
+                        break // Because it's separated by whitespace so it isn't name anymore
+                    }
+                    lasTokenIsIdentifier = true
+                    hasIdentifier = true
+                    nextToken()
+                }
+                PyTokenTypes.MULT -> {
+                    if (!lasTokenIsIdentifier) {
+                        myBuilder.error(SnakemakeBundle.message("PARSE.use.double.mult.sign"))
+                    }
+                    lasTokenIsIdentifier = false
+                    hasIdentifier = true
+                    simpleName = false
+                    nextToken()
+                }
+                PyTokenTypes.EXP, PyTokenTypes.COMMA -> {
+                    myBuilder.error(SnakemakeBundle.message("PARSE.use.double.mult.sign"))
+                    lasTokenIsIdentifier = false
+                    simpleName = false
+                    nextToken()
+                }
+                else -> break
+            }
+        }
+        if (!hasIdentifier) { // No identifiers and/or '*' symbols
+            name.drop()
+            // Currently (6.5.3) it's ok for snakemake
+            // We can write 'as with:' or just 'as' and end line
+            // Both variants are allowed and original rule names will be taken
+        } else {
+            if (!simpleName) { // New rule name contains at least one '*' symbol
+                name.done(SmkElementTypes.USE_NAME_IDENTIFIER)
+            } else { // New rule name consists of one identifier
+                name.drop()
+                if (names.size > 1) {
+                    myBuilder.error(SnakemakeBundle.message("PARSE.use.requires.wildcard"))
+                }
+            }
+        }
+    }
+
+    /**
+     * Parses end of 'use' section declaration and its arguments sections
+     */
+    private fun parseRestUseStatement(
+        asKeywordExists: Boolean,
+        names: List<String>,
+        section: SectionParsingData
+    ) {
+        // Parses 'with' part
+        val argsSectionsBanned = (names.size == 1 && names[0] == "*")
+        var gotWithOrColon = false
+
+        if (atToken(PyTokenTypes.WITH_KEYWORD)) {
+            gotWithOrColon = true
+            if (argsSectionsBanned) {
+                myBuilder.error(SnakemakeBundle.message("PARSE.use.with.not.allowed"))
+            }
+            myBuilder.remapCurrentToken(SmkTokenTypes.SMK_WITH_KEYWORD)
+            nextToken()
+        }
+
+        if (atToken(PyTokenTypes.COLON)) {
+            if (!gotWithOrColon) {
+                myBuilder.error(SnakemakeBundle.message("PARSE.use.with.missed"))
+            }
+            gotWithOrColon = true
+            nextToken()
+        } else if (gotWithOrColon) {
+            myBuilder.error(SnakemakeBundle.message("PARSE.use.expecting.colon"))
+        }
+
+        // Parses arguments sections
+        if (myBuilder.tokenType.isPythonString()) {
+            parsingContext.expressionParser.parseStringLiteralExpression()
+        }
+        if (!atToken(PyTokenTypes.STATEMENT_BREAK)) {
+            val ruleStatements = myBuilder.mark()
+            verifyArgsSections(argsSectionsBanned, gotWithOrColon, asKeywordExists)
+            parseRuleParameter(section)
+            ruleStatements.done(PyElementTypes.STATEMENT_LIST)
+            return
+        }
+        val ruleStatements = myBuilder.mark()
+        nextToken()
+
+        if (!atToken(PyTokenTypes.INDENT)) {
+            ruleStatements.done(PyElementTypes.STATEMENT_LIST)
+            // No error if we got 'with:' without arguments sections
+            return
+        }
+
+        verifyArgsSections(argsSectionsBanned, gotWithOrColon, asKeywordExists)
+
+        nextToken()
+        while (!atToken(PyTokenTypes.DEDENT)) {
+            if (!parseRuleParameter(section)) {
+                break
+            }
+        }
+        ruleStatements.done(PyElementTypes.STATEMENT_LIST)
+        nextToken()
+    }
+
+    private fun verifyArgsSections(argsSectionsBanned: Boolean, gotWithOrColon: Boolean, asKeywordExists: Boolean) {
+        if (argsSectionsBanned && !gotWithOrColon) {
+            myBuilder.error(SnakemakeBundle.message("PARSE.use.args.sections.forbidden"))
+        }
+
+        if (!gotWithOrColon && !asKeywordExists) {
+            myBuilder.error(SnakemakeBundle.message("PARSE.use.as.or.with.expecting"))
+        } else if (!gotWithOrColon) {
+            myBuilder.error(SnakemakeBundle.message("PARSE.use.with.expecting"))
+        }
+    }
 }
 
 fun IElementType?.isPythonString() = this in PyTokenTypes.STRING_NODES || this == PyTokenTypes.FSTRING_START
 
 private data class SectionParsingData(
-        val declaration: IElementType,
-        val name: String,
-        val parameterListStatement: PyElementType,
-        val sectionKeyword: PyElementType
+    val declaration: IElementType,
+    val name: String,
+    val parameterListStatement: PyElementType,
+    val sectionKeyword: PyElementType
 )

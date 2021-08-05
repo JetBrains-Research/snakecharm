@@ -12,6 +12,12 @@ object SmkTokenTypes {
     val RULE_KEYWORD = PyElementType("RULE_KEYWORD") // rule
     val SUBWORKFLOW_KEYWORD = PyElementType("SUBWORKFLOW_KEYWORD")
     val CHECKPOINT_KEYWORD = PyElementType("CHECKPOINT_KEYWORD") // rule
+    val MODULE_KEYWORD = PyElementType("MODULE_KEYWORD")
+    val USE_KEYWORD = PyElementType("USE_KEYWORD")
+
+    val SMK_FROM_KEYWORD = PyElementType("SMK_FROM_KEYWORD")
+    val SMK_AS_KEYWORD = PyElementType("SMK_AS_KEYWORD")
+    val SMK_WITH_KEYWORD = PyElementType("SMK_WITH_KEYWORD")
 
     val WORKFLOW_CONFIGFILE_KEYWORD = PyElementType("WORKFLOW_CONFIGFILE_KEYWORD")
     val WORKFLOW_REPORT_KEYWORD = PyElementType("WORKFLOW_REPORT_KEYWORD")
@@ -57,7 +63,7 @@ object SmkTokenTypes {
     )
 
     val RULE_LIKE = TokenSet.orSet(
-            RULE_OR_CHECKPOINT, TokenSet.create(SUBWORKFLOW_KEYWORD)
+            RULE_OR_CHECKPOINT, TokenSet.create(SUBWORKFLOW_KEYWORD, MODULE_KEYWORD, USE_KEYWORD)
     )
 
     val WORKFLOW_TOPLEVEL_DECORATORS = TokenSet.orSet(

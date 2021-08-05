@@ -68,11 +68,11 @@ Feature: Rule SmkSectionRedeclarationInspection inspection
       | rule       |
       | checkpoint |
 
-  Scenario: Subworkflow SmkSectionRedeclarationInspection
+  Scenario Outline: Subworkflow and Module SmkSectionRedeclarationInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    subworkflow NAME:
+    <header> NAME:
       snakefile: "foo.smk"
       snakefile: "boo.smk"
     """
@@ -82,7 +82,26 @@ Feature: Rule SmkSectionRedeclarationInspection inspection
     Declaration of section 'snakefile' above overrides this declaration.
     """
     When I check highlighting weak warnings
+    Examples:
+      | header      |
+      | subworkflow |
+      | module      |
 
+  Scenario: SmkSectionRedeclarationInspection for 'use' section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    use rule a from module as b with:
+      input: "some_file"
+      input: "other_file"
+    """
+    And SmkSectionRedeclarationInspection inspection is enabled
+    Then I expect inspection weak warning on <input: "other_file"> with message
+    """
+    Declaration of section 'input' above overrides this declaration.
+    """
+    When I check highlighting weak warnings
+    
   Scenario Outline: SmkSectionRedeclarationInspection element removal fix test
     Given a snakemake project
     Given I open a file "foo.smk" with text

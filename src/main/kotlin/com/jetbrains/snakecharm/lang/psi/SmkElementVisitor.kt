@@ -27,6 +27,14 @@ interface SmkElementVisitor {
         pyElementVisitor.visitPyElement(subworkflow)
     }
 
+    fun visitSmkModule(module: SmkModule) {
+        pyElementVisitor.visitPyElement(module)
+    }
+
+    fun visitSmkUse(use: SmkUse) {
+        pyElementVisitor.visitPyElement(use)
+    }
+
     fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
         pyElementVisitor.visitPyStatement(st)
     }
@@ -36,6 +44,10 @@ interface SmkElementVisitor {
     }
 
     fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
+        pyElementVisitor.visitPyStatement(st)
+    }
+
+    fun visitSmkModuleArgsSection(st: SmkModuleArgsSection) {
         pyElementVisitor.visitPyStatement(st)
     }
 
