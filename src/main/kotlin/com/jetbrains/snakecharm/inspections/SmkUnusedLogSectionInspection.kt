@@ -36,35 +36,40 @@ class SmkUnusedLogSectionInspection : SnakemakeInspection() {
 
         private fun visitSMKRuleLike(rule: SmkRuleLike<SmkArgsSection>) {
             val logSection = rule.getSectionByName(SnakemakeNames.SECTION_LOG) ?: return
-            val shellSection = rule.getSectionByName(SnakemakeNames.SECTION_SHELL)
-            val ruleSections = rule.getSections()
-            val runSection = ruleSections.find {
-                it.sectionKeyword == SnakemakeNames.SECTION_RUN
-            }
-            val quickfix = when ((shellSection != null) to (runSection != null)) {
-                (true to true), (true to false) -> CreateLogFileInShellSection(shellSection ?: return)
-                (false to true) -> CreateLogFileInRunSection(runSection ?: return)
-                else -> CreateShellSectionWithLogReference(rule)
-            }
 
+            val ruleSections = rule.getSections()
             val skipValidation = ruleSections.any { section ->
                 section.sectionKeyword in EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE
             }
-            if (!skipValidation) {
-                val collector = SmkSLReferencesTargetLookupVisitor(logSection)
-                    .also {
-                        rule.accept(it)
-                    }
+            if (skipValidation) {
+                return
+            }
 
-                if (!collector.hasReferenceToTarget) {
-                    registerProblem(
-                        logSection,
-                        SnakemakeBundle.message("INSP.NAME.unused.section"),
-                        ProblemHighlightType.WEAK_WARNING,
-                        null,
-                        quickfix
-                    )
+            val shellSection = rule.getSectionByName(SnakemakeNames.SECTION_SHELL)
+            val quickfix = if (shellSection != null) {
+                CreateLogFileInShellSection(shellSection)
+            } else {
+                val runSection = ruleSections.firstOrNull { it is SmkRunSection } as SmkRunSection?
+                when {
+                    runSection != null -> CreateLogFileInRunSection(runSection)
+                    else -> CreateShellSectionWithLogReference(rule)
                 }
+            }
+
+
+            val collector = SmkSLReferencesTargetLookupVisitor(logSection)
+                .also {
+                    rule.accept(it)
+                }
+
+            if (!collector.hasReferenceToTarget) {
+                registerProblem(
+                    logSection,
+                    SnakemakeBundle.message("INSP.NAME.unused.section"),
+                    ProblemHighlightType.WEAK_WARNING,
+                    null,
+                    quickfix
+                )
             }
         }
     }
@@ -95,7 +100,7 @@ class SmkUnusedLogSectionInspection : SnakemakeInspection() {
         }
     }
 
-    private class CreateLogFileInRunSection(expr: PsiElement) : LocalQuickFixOnPsiElement(expr) {
+    private class CreateLogFileInRunSection(expr: SmkRunSection) : LocalQuickFixOnPsiElement(expr) {
 
         override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.add.to.run.section")
 
