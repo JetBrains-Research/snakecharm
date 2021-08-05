@@ -1,6 +1,12 @@
 package com.jetbrains.snakecharm.codeInsight
 
 import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_CONFIG_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_META_WRAPPER_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_REPLACE_PREFIX_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_SKIP_VALIDATION_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_SNAKEFILE_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.RULE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_BENCHMARK
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CACHE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CONDA
@@ -19,6 +25,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_PARAMS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_PRIORITY
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RESOURCES
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RUN
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_SCRIPT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_SHADOW
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_SHELL
@@ -27,6 +34,9 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_THREADS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_VERSION
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_WRAPPER
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_AS_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_FROM_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_WITH_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_ANCIENT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_DIRECTORY
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_DYNAMIC
@@ -128,8 +138,8 @@ object SnakemakeAPI {
         SECTION_NAME,
         SECTION_HANDOVER
     )
-    val RULE_OR_CHECKPOINT_SECTION_KEYWORDS =
-        (RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS + setOf(SnakemakeNames.SECTION_RUN))
+
+    val RULE_OR_CHECKPOINT_SECTION_KEYWORDS = (RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS + setOf(SECTION_RUN))
 
     /**
      * For subworkflows parsing
@@ -138,6 +148,29 @@ object SnakemakeAPI {
         SnakemakeNames.SUBWORKFLOW_WORKDIR_KEYWORD,
         SnakemakeNames.SUBWORKFLOW_SNAKEFILE_KEYWORD,
         SnakemakeNames.SUBWORKFLOW_CONFIGFILE_KEYWORD
+    )
+
+    /**
+     * For modules parsing
+     */
+    val MODULE_SECTIONS_KEYWORDS = setOf(
+        MODULE_SNAKEFILE_KEYWORD,
+        MODULE_CONFIG_KEYWORD,
+        MODULE_SKIP_VALIDATION_KEYWORD,
+        MODULE_META_WRAPPER_KEYWORD,
+        MODULE_REPLACE_PREFIX_KEYWORD
+    )
+
+    /**
+     * For uses parsing
+     */
+    val USE_SECTIONS_KEYWORDS = RULE_OR_CHECKPOINT_SECTION_KEYWORDS - EXECUTION_SECTIONS_KEYWORDS - SECTION_RUN
+
+    val USE_DECLARATION_KEYWORDS = setOf(
+        RULE_KEYWORD,
+        SMK_FROM_KEYWORD,
+        SMK_AS_KEYWORD,
+        SMK_WITH_KEYWORD
     )
 
     /**

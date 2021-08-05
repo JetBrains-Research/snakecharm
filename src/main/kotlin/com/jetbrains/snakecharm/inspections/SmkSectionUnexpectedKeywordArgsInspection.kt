@@ -8,6 +8,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WORKFLOWS_WHERE_KEYWORD_ARGS_PROHIBITED
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkModuleArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
@@ -16,7 +17,7 @@ class SmkSectionUnexpectedKeywordArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession,
+        session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
@@ -41,9 +42,13 @@ class SmkSectionUnexpectedKeywordArgsInspection : SnakemakeInspection() {
             }
         }
 
+        override fun visitSmkModuleArgsSection(st: SmkModuleArgsSection) {
+            checkArgumentList(st.argumentList, st)
+        }
+
         private fun checkArgumentList(
             argumentList: PyArgumentList?,
-            section: SmkArgsSection,
+            section: SmkArgsSection
         ) {
             val args = argumentList?.arguments ?: emptyArray()
             args.forEach { arg ->

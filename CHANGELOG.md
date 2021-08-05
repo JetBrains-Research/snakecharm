@@ -19,6 +19,7 @@ Released on ...
 
 ### Added
 - Weak warnings for unused 'log' sections (see [#300](https://github.com/JetBrains-Research/snakecharm/issues/300))
+- Support for 'module' and 'use' keywords (see [#355](https://github.com/JetBrains-Research/snakecharm/issues/355))
 - Inspection for improperly called functions (see [#148](https://github.com/JetBrains-Research/snakecharm/issues/148))
 - Ability for memorising new section name (see [#372](https://github.com/JetBrains-Research/snakecharm/issues/372))
 - Support for 'handover' section (see [#362](https://github.com/JetBrains-Research/snakecharm/issues/362))

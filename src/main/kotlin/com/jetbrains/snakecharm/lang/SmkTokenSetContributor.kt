@@ -13,21 +13,27 @@ import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
  */
 class SmkTokenSetContributor : PythonDialectsTokenSetContributorBase() {
     override fun getStatementTokens() = TokenSet.create(
-            SmkElementTypes.WORKFLOW_ARGS_SECTION_STATEMENT,
-            SmkElementTypes.WORKFLOW_LOCALRULES_SECTION_STATEMENT,
-            SmkElementTypes.WORKFLOW_RULEORDER_SECTION_STATEMENT,
-            SmkElementTypes.WORKFLOW_PY_BLOCK_SECTION_STATEMENT,
+        SmkElementTypes.WORKFLOW_ARGS_SECTION_STATEMENT,
+        SmkElementTypes.WORKFLOW_LOCALRULES_SECTION_STATEMENT,
+        SmkElementTypes.WORKFLOW_RULEORDER_SECTION_STATEMENT,
+        SmkElementTypes.WORKFLOW_PY_BLOCK_SECTION_STATEMENT,
 
-            SmkStubElementTypes.RULE_DECLARATION_STATEMENT,
-            SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT,
-            SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
+        SmkStubElementTypes.RULE_DECLARATION_STATEMENT,
+        SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT,
+        SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT,
 
-            SmkStubElementTypes.SUBWORKFLOW_DECLARATION_STATEMENT,
-            SmkElementTypes.SUBWORKFLOW_ARGS_SECTION_STATEMENT
+        SmkStubElementTypes.SUBWORKFLOW_DECLARATION_STATEMENT,
+        SmkElementTypes.SUBWORKFLOW_ARGS_SECTION_STATEMENT,
+
+        SmkStubElementTypes.MODULE_DECLARATION_STATEMENT,
+        SmkElementTypes.MODULE_ARGS_SECTION_STATEMENT,
+
+        SmkStubElementTypes.USE_DECLARATION_STATEMENT,
+        SmkElementTypes.USE_ARGS_SECTION_STATEMENT
     )
 
     override fun getExpressionTokens() = TokenSet.create(
-            SmkElementTypes.REFERENCE_EXPRESSION, SMK_PY_REFERENCE_EXPRESSION
+        SmkElementTypes.REFERENCE_EXPRESSION, SMK_PY_REFERENCE_EXPRESSION
     )
 
     /**
@@ -41,7 +47,7 @@ class SmkTokenSetContributor : PythonDialectsTokenSetContributorBase() {
 
     override fun getReferenceExpressionTokens() = TokenSet.create(SMK_PY_REFERENCE_EXPRESSION)
 
-    override fun getFunctionDeclarationTokens()= TokenSet.EMPTY!!
+    override fun getFunctionDeclarationTokens() = TokenSet.EMPTY!!
 
     override fun getUnbalancedBracesRecoveryTokens(): TokenSet {
         return WORKFLOW_TOPLEVEL_DECORATORS

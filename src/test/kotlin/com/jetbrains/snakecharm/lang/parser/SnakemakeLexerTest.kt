@@ -285,6 +285,49 @@ class SnakemakeLexerTest : PyLexerTestCase() {
             "Py:PASS_KEYWORD", "Py:STATEMENT_BREAK")
     }
 
+    fun testModuleSection1() {
+        doTest(
+            """
+            |module foo:
+            |   input:
+        """.trimMargin().trimStart(),
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK", "Py:INDENT", "Py:IDENTIFIER",
+            "Py:COLON", "Py:STATEMENT_BREAK")
+    }
+
+    fun testUseSection1() {
+        doTest(
+            """
+            |use rule a as b with:
+            |   input:
+        """.trimMargin().trimStart(),
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER",
+            "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER",
+            "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK", "Py:INDENT", "Py:IDENTIFIER",
+            "Py:COLON", "Py:STATEMENT_BREAK")
+    }
+
+    fun testUseSection2() {
+        doTest(
+            """
+            |use rule * from foo as foo_*
+        """.trimMargin().trimStart(),
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE", "Py:MULT",
+            "Py:SPACE", "Py:FROM_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER",
+            "Py:SPACE", "Py:IDENTIFIER", "Py:MULT", "Py:STATEMENT_BREAK")
+    }
+
+    fun testUseSection3() {
+        doTest(
+            """
+            |use rule rule from foo as other_rule
+        """.trimMargin().trimStart(),
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER",
+            "Py:SPACE", "Py:FROM_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER",
+            "Py:SPACE", "Py:IDENTIFIER", "Py:STATEMENT_BREAK")
+    }
+
     private fun doTest(text: String, vararg expectedTokens: String) {
         doLexerTest(text, SnakemakeLexer(), *expectedTokens)
     }

@@ -13,9 +13,9 @@ import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         override fun visitSmkRule(rule: SmkRule) {
             visitSMKRuleLike(rule)
@@ -41,14 +41,13 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
                         requireNotNull(executionSection.name)
 
                         registerProblem(st,
-                                SnakemakeBundle.message(
-                                        "INSP.NAME.rule.section.after.execution.message",
-                                        sectionName,
-                                        executionSection.name!!
-                                ),
-                                ProblemHighlightType.GENERIC_ERROR,
-                                null,
-                                MoveExecutionSectionToEndOfRuleQuickFix(SmartPointerManager.createPointer(executionSection))
+                            SnakemakeBundle.message(
+                                "INSP.NAME.rule.section.after.execution.message",
+                                executionSection.name!!
+                            ),
+                            ProblemHighlightType.GENERIC_ERROR,
+                            null,
+                            MoveExecutionSectionToEndOfRuleQuickFix(SmartPointerManager.createPointer(executionSection))
                         )
                     }
                 }
@@ -57,7 +56,7 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
     }
 
     private class MoveExecutionSectionToEndOfRuleQuickFix(
-            private val executionSectionPointer: SmartPsiElementPointer<SmkSection>
+        private val executionSectionPointer: SmartPsiElementPointer<SmkSection>,
     ) : LocalQuickFix {
         override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.move.execution.section.down.family")
 
