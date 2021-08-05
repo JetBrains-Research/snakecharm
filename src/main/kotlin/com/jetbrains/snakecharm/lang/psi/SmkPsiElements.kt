@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiElement
 import com.intellij.psi.StubBasedPsiElement
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
@@ -23,7 +24,12 @@ interface SmkSubworkflow : SmkRuleLike<SmkSubworkflowArgsSection>, StubBasedPsiE
 
 interface SmkModule : SmkRuleLike<SmkModuleArgsSection>, StubBasedPsiElement<SmkModuleStub>
 
-interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub>
+interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
+    /**
+     * Returns names and corresponded [PsiElement]s which are produced by this section
+     */
+    fun getProducedRulesNames(): List<Pair<String, PsiElement>>
+}
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer
     /**

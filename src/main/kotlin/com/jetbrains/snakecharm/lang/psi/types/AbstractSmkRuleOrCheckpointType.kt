@@ -12,6 +12,7 @@ import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
+import com.intellij.psi.util.elementType
 import com.intellij.util.ProcessingContext
 import com.intellij.util.Processors
 import com.jetbrains.python.psi.AccessDirection
@@ -21,8 +22,13 @@ import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
+import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
+import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.SmkUse
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex
 import gnu.trove.THashSet
 
 
@@ -67,7 +73,8 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
         ) { currentFileDeclarations }
 
         if (results.isEmpty()) {
-            return emptyList()
+            // If there are no such rule, searches for rule declared in 'use' section
+            return getUseSections(name, location)
         }
 
         return results.map { element ->
@@ -76,6 +83,30 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
     }
 
     override fun isBuiltin() = false
+
+    private fun getUseSections(name: String, location: PyExpression): List<RatedResolveResult> {
+        if (clazz == SmkCheckPoint::class.java) {
+            return emptyList()
+        }
+        val result = mutableListOf<RatedResolveResult>()
+        val module = location.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
+        when (module) {
+            null -> (location.containingFile.originalFile as SmkFile).collectUses().map { it.second }
+            else -> getVariantsFromIndex(SmkUseNameIndex.KEY, module, SmkUse::class.java)
+        }.forEach { use ->
+            use as SmkUse
+            val referTo = use.getProducedRulesNames()
+                .firstOrNull {
+                    (it.first == name &&
+                            it.second != location.originalElement) ||
+                            it.second.elementType == SmkElementTypes.USE_NAME_IDENTIFIER
+                }
+            if (referTo != null) {
+                result.add(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, referTo.second))
+            }
+        }
+        return result
+    }
 
     companion object {
         fun <T : SmkRuleOrCheckpoint> createRuleLikeLookupItem(name: String, elem: T): LookupElement {

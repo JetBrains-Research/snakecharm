@@ -387,3 +387,35 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       | # run section    |
       | input_injection  |
       | shell_injection  |
+
+  Scenario: Complete rule name, declared in use section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    use rule * from MODULE as last_rule
+
+    use rule a,b,c from MODULE as other_*
+
+    use rule NAME as NAME2 with:
+        input: "data_file.txt"
+
+    use rule zZzz from MODULE as with:
+        input: "log.log"
+
+    rule my_rule:
+        log: rules.
+    """
+    When I put the caret after rules.
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | last_rule |
+      | other_a   |
+      | other_b   |
+      | other_c   |
+      | NAME2     |
+      | zZzz      |
+    Then completion list shouldn't contain:
+      | NAME    |
+      | other_* |
+      | *       |
+      | MODULE  |

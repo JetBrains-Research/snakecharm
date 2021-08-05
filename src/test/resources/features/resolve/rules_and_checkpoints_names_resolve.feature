@@ -326,3 +326,52 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       | CHECKPOINT  | # run section        | reference              |
       | RULE        | }" # shell injection | reference in injection |
       | CHECKPOINT  | }" # shell injection | reference in injection |
+
+  Scenario Outline: Resolve rule name, declared in use section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    use rule * from MODULE as last_rule
+
+    use rule a,b,c from MODULE as other_*
+
+    use rule NAME as NAME2 with:
+        input: "data_file.txt"
+
+    use rule zZzz from MODULE as with:
+        input: "log.log"
+
+    rule my_rule:
+        log: rules.<name>.log
+    """
+    When I put the caret at <name>.log
+    Then reference should resolve to "<resolve_to>" in "foo.smk"
+    Examples:
+      | name      | resolve_to |
+      | last_rule | last_rule  |
+      | other_b   | b          |
+      | NAME2     | NAME2      |
+      | zZzz      |zZzz        |
+
+  Scenario Outline: Not resolve rule name, if module imports all rules
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    use rule * from MODULE as last_rule_*
+
+    use rule * MODULE as
+
+    use rule NAME as NAME2 with:
+        input: "data_file.txt"
+
+    rule my_rule:
+        log: rules.<name>.log
+    """
+    When I put the caret at <name>.log
+    Then reference should not resolve
+    Examples:
+      | name                |
+      | last_rule_something |
+      | last_rule_*         |
+      | NAME                |
+      | *                   |

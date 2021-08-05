@@ -59,8 +59,8 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
             override val pyElementVisitor: PyElementVisitor = this
 
             override fun visitSmkUse(use: SmkUse) {
-                if (use.name != null) {
-                    useNameAndPsi.add(use.name!! to use)
+                use.getProducedRulesNames().forEach {
+                    useNameAndPsi.add(it.first to use)
                 }
             }
         })
