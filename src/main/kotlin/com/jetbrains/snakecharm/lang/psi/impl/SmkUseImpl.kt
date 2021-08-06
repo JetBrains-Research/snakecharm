@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.util.elementType
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.python.psi.PyElementVisitor
@@ -50,7 +51,7 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
         return null
     }
 
-    override fun getProducedRulesNames(): List<Pair<String, PsiElement>> {
+    override fun getProducedRulesNames(visitedFiles: MutableSet<PsiFile>): List<Pair<String, PsiElement>> {
         val identifier = super.getNameNode()
         if (identifier != null) {
             return listOf(identifier.text to identifier.psi)
@@ -77,7 +78,7 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
             }
             val file = module.getPsiFile()
             if (file != null && file is SmkFile) {
-                originalNames.addAll(file.collectRules().map { it.first to it.second })
+                originalNames.addAll(file.advancedCollectRules(visitedFiles).map { it.first to it.second })
             } else {
                 return emptyList()
             }

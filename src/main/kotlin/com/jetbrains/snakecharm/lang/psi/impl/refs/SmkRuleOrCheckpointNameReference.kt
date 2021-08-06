@@ -112,7 +112,7 @@ class SmkRuleOrCheckpointNameReference(
                             (moduleRef).reference.resolve()
                         )
                     )
-                val result = file.collectRules().firstOrNull { it.first == element.text }
+                val result = file.advancedCollectRules(mutableSetOf()).firstOrNull { it.first == element.text }
                 if (result != null) {
                     return listOf(
                         RatedResolveResult(

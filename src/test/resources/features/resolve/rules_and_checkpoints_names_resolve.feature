@@ -357,11 +357,19 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
     Given a snakemake project
     And a file "boo.smk" with text
     """
+    include: "zoo.smk"
+
     rule something:
       input: "data_file.db"
 
     rule NAME:
       input: "file.txt"
+    """
+    And a file "zoo.smk" with text
+    """
+    rule zoo_rule: threads: 1
+
+    use rule zoo_rule as rule_from_zoo with: threads: 2
     """
     Given I open a file "foo.smk" with text
     """
@@ -379,8 +387,10 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
         log: rules.<name>.log
     """
     When I put the caret at <name>.log
-    Then reference should resolve to "<resolve_to>" in "boo.smk"
+    Then reference should resolve to "<resolve_to>" in "<file>.smk"
     Examples:
-      | name                | resolve_to |
-      | last_rule_something | something  |
-      | NAME                | NAME       |
+      | name                | resolve_to    | file |
+      | last_rule_something | something     | boo  |
+      | NAME                | NAME          | boo  |
+      | rule_from_zoo       | rule_from_zoo | zoo  |
+      | last_rule_zoo_rule  | zoo_rule      | zoo  |

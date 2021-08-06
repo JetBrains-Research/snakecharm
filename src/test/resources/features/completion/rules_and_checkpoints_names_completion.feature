@@ -392,8 +392,16 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
     Given a snakemake project
     And a file "boo.smk" with text
     """
+    include: "zoo.smk"
+
     rule rule_name:
       log: "log_file.txt"
+    """
+    And a file "zoo.smk" with text
+    """
+    rule zoo_rule: threads: 1
+
+    use rule zoo_rule as rule_from_zoo with: threads: 2
     """
     Given I open a file "foo.smk" with text
     """
@@ -418,16 +426,79 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
     When I put the caret after rules.
     And I invoke autocompletion popup
     Then completion list should contain:
-      | last_rule     |
-      | other_a       |
-      | other_b       |
-      | other_c       |
-      | NAME2         |
-      | zZzz          |
-      | not_rule_name |
+      | last_rule         |
+      | other_a           |
+      | other_b           |
+      | other_c           |
+      | NAME2             |
+      | zZzz              |
+      | not_rule_name     |
+      | not_zoo_rule      |
+      | not_rule_from_zoo |
     Then completion list shouldn't contain:
       | NAME    |
       | other_* |
       | *       |
       | not_*   |
       | MODULE  |
+
+  Scenario: No StackOverflowError with cyclic imports
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    include: "zoo.smk"
+
+    rule boo_rule:
+      log: "log_file1.txt"
+    """
+    And a file "zoo.smk" with text
+    """
+    include: "boo.smk"
+
+    rule zoo_rule:
+      log: "log_file2.txt"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module m:
+      snakefile: "boo.smk"
+
+    use rule * from m as other_*
+
+    rules.
+    """
+    When I put the caret after rules.
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | other_boo_rule |
+      | other_zoo_rule |
+
+  Scenario: No StackOverflowError with cyclic module imports
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    module m:
+      snakefile: "zoo.smk"
+
+    use rule * from m
+    """
+    And a file "zoo.smk" with text
+    """
+    module m:
+      snakefile: "boo.smk"
+
+    use rule * from m
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module m:
+      snakefile: "boo.smk"
+
+    use rule * from m as other_*
+
+    rules.
+    """
+    When I put the caret after rules.
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | m |

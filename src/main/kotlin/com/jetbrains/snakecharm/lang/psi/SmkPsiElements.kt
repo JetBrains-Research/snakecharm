@@ -9,9 +9,7 @@ import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_EXPANDING_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.stubs.*
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLExpression
 
 interface SmkToplevelSection : SmkSection {
     override fun getParentRuleOrCheckPoint(): SmkRuleOrCheckpoint? = null
@@ -32,9 +30,10 @@ interface SmkModule : SmkRuleLike<SmkModuleArgsSection>, StubBasedPsiElement<Smk
 
 interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
     /**
-     * Returns names and corresponded [PsiElement]s which are produced by this section
+     * Returns names and corresponded [PsiElement]s which are produced by this section.
+     * [visitedFiles] is set of [PsiFile]s which are already visited.
      */
-    fun getProducedRulesNames(): List<Pair<String, PsiElement>>
+    fun getProducedRulesNames(visitedFiles: MutableSet<PsiFile> = mutableSetOf()): List<Pair<String, PsiElement>>
 }
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer

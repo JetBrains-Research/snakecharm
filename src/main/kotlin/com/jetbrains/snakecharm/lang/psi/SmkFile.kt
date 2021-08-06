@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.psi.FileViewProvider
+import com.intellij.psi.PsiFile
 import com.intellij.psi.stubs.StubElement
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.impl.PyFileImpl
@@ -52,14 +53,14 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
         return moduleNameAndPsi
     }
 
-    fun collectUses(): List<Pair<String, SmkUse>> {
+    fun collectUses(visitedFiles: MutableSet<PsiFile> = mutableSetOf()): List<Pair<String, SmkUse>> {
         val useNameAndPsi = arrayListOf<Pair<String, SmkUse>>()
 
         acceptChildren(object : PyElementVisitor(), SmkElementVisitor {
             override val pyElementVisitor: PyElementVisitor = this
 
             override fun visitSmkUse(use: SmkUse) {
-                use.getProducedRulesNames().forEach {
+                use.getProducedRulesNames(visitedFiles).forEach {
                     useNameAndPsi.add(it.first to use)
                 }
             }
@@ -112,5 +113,29 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
         })
 
         return includeStatements
+    }
+
+    /**
+     * Collects local rules, rules, defined in use section and rules, imported by 'includes'
+     */
+    fun advancedCollectRules(visitedFiles: MutableSet<PsiFile>): List<Pair<String, SmkRuleOrCheckpoint>> {
+        if (!visitedFiles.add(this)) {
+            return emptyList()
+        }
+
+        val result = mutableListOf<Pair<String, SmkRuleOrCheckpoint>>()
+        result.addAll(collectRules())
+        result.addAll(collectUses(visitedFiles))
+        collectIncludes().forEach { include ->
+            include.references.forEach { reference ->
+                if (reference is SmkIncludeReference) {
+                    val file = reference.resolve() as? SmkFile
+                    if (file != null) {
+                        result.addAll(file.advancedCollectRules(visitedFiles))
+                    }
+                }
+            }
+        }
+        return result
     }
 }
