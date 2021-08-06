@@ -8,6 +8,7 @@ import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.lexer.PythonIndentingLexer
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD
 
 /**
  * @author Roman.Chernyatchik
@@ -80,7 +81,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             .add(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD)
             .build()!!
 
-        val KEYWORDS = ImmutableMap.Builder<String, PyElementType>()
+        private val SPECIAL_KEYWORDS = ImmutableMap.Builder<String, PyElementType>()
             .put(SnakemakeNames.RULE_KEYWORD, SmkTokenTypes.RULE_KEYWORD)
             .put(SnakemakeNames.CHECKPOINT_KEYWORD, SmkTokenTypes.CHECKPOINT_KEYWORD)
             .put(SnakemakeNames.WORKFLOW_LOCALRULES_KEYWORD, SmkTokenTypes.WORKFLOW_LOCALRULES_KEYWORD)
@@ -93,7 +94,6 @@ class SnakemakeLexer : PythonIndentingLexer() {
             .put(SnakemakeNames.USE_KEYWORD, SmkTokenTypes.USE_KEYWORD)
             .build()!!
 
-        val KEYWORDS_2_TEXT = KEYWORDS.map { it.value to it.key }.toMap()
 
         val TOPLEVEL_KEYWORDS = ImmutableSet.Builder<String>()
             .add(SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD)
@@ -106,6 +106,13 @@ class SnakemakeLexer : PythonIndentingLexer() {
             .add(SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD)
             .add(SnakemakeNames.WORKFLOW_CONTAINERIZED_KEYWORD)
             .build()!!
+
+        val KEYWORDS_2_TEXT =
+            (SPECIAL_KEYWORDS.map { it.value to it.key }.toMap() +
+                    TOPLEVEL_KEYWORDS.associateBy { WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD }.toMap())
+
+        val KEYWORDS_2_TOKEN_TYPE =
+            TOPLEVEL_KEYWORDS.associateWith { WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD } + SPECIAL_KEYWORDS
     }
 
     override fun advance() {
@@ -137,7 +144,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             beforeFirstArgumentInSection = false
         }
 
-        if (topLevelSectionIndent == -1 && (tokenText in KEYWORDS || tokenText in TOPLEVEL_KEYWORDS)) {
+        if (topLevelSectionIndent == -1 && (tokenText in KEYWORDS_2_TOKEN_TYPE)) {
             val possibleToplevelSectionKeyword = tokenText
             if (isToplevelKeywordSection()) {
                 // if it's the first token in the file, it's 0, as it should be
@@ -285,7 +292,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
         val possibleKeywordPosition = currentPosition
         val possibleToplevelSectionKeyword = tokenText
 
-        if (possibleToplevelSectionKeyword !in KEYWORDS && possibleToplevelSectionKeyword !in TOPLEVEL_KEYWORDS
+        if (possibleToplevelSectionKeyword !in KEYWORDS_2_TOKEN_TYPE
             || tokenStart != myCurrentNewlineOffset
         ) {
             return false

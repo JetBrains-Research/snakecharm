@@ -10,7 +10,6 @@ import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_OR_CHECKPOINT
-import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer.Companion.TOPLEVEL_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.*
 import java.util.*
@@ -77,7 +76,7 @@ class SmkStatementParsing(
         val scope = context.scope
 
         myBuilder.setDebugMode(false)
-        tryRemapCurrentToken(scope, this::isToplevelDecoratorKeyword)
+        tryRemapCurrentToken(scope, isToplevelDecoratorKeyword())
         val tt = myBuilder.tokenType
 
         if (tt !in SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
@@ -228,7 +227,7 @@ class SmkStatementParsing(
             }
             multiline && !myBuilder.eof() -> {
                 if (atToken(PyTokenTypes.IDENTIFIER)) {
-                    val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText!!]
+                    val actualToken = SnakemakeLexer.KEYWORDS_2_TOKEN_TYPE[myBuilder.tokenText!!]
                     if (actualToken != null) {
                         myBuilder.remapCurrentToken(actualToken)
                         return
@@ -328,7 +327,7 @@ class SmkStatementParsing(
 
     private inline fun tryRemapCurrentToken(scope: SmkParsingScope, checkToplevel: () -> Boolean) {
         if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER && !scope.inPythonicSection) {
-            val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText!!]
+            val actualToken = SnakemakeLexer.KEYWORDS_2_TOKEN_TYPE[myBuilder.tokenText!!]
             if (actualToken != null) {
                 myBuilder.remapCurrentToken(actualToken)
             } else if (checkToplevel()) {
@@ -337,9 +336,7 @@ class SmkStatementParsing(
         }
     }
 
-    private fun isToplevelDecoratorKeyword() = if (myBuilder.tokenText!! in TOPLEVEL_KEYWORDS) {
-        true
-    } else {
+    private fun isToplevelDecoratorKeyword(): () -> Boolean = {
         val workflowParam = myBuilder.mark()
         var result = checkNextToken(PyTokenTypes.COLON)
         nextToken()
