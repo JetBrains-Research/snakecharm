@@ -334,18 +334,16 @@ class SmkStatementParsing(
         return false
     }
 
-    private fun isToplevelDecoratorKeyword(): Boolean {
-        return if (myBuilder.tokenText!! in TOPLEVEL_KEYWORDS) {
-            true
-        } else {
-            val workflowParam = myBuilder.mark()
-            var result = checkNextToken(PyTokenTypes.COLON)
-            nextToken()
-            result = result &&
-                    (myBuilder.tokenType.isPythonString() || myBuilder.tokenType == PyTokenTypes.STATEMENT_BREAK)
-            workflowParam.rollbackTo()
-            result
-        }
+    private fun isToplevelDecoratorKeyword() = if (myBuilder.tokenText!! in TOPLEVEL_KEYWORDS) {
+        true
+    } else {
+        val workflowParam = myBuilder.mark()
+        var result = checkNextToken(PyTokenTypes.COLON)
+        nextToken()
+        result = result &&
+                (myBuilder.tokenType.isPythonString() || myBuilder.tokenType == PyTokenTypes.STATEMENT_BREAK)
+        workflowParam.rollbackTo()
+        result
     }
 
     private fun checkNextToken(tt: PyElementType): Boolean {
