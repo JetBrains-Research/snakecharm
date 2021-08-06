@@ -29,17 +29,6 @@ Feature: Resolve use and module name to its declaration
 
   Scenario: Refer to other file
     Given a snakemake project
-    And a file "foo.smk" with text
-    """
-    module M:
-      snakefile: "boo.smk"
-
-    use rule * from M as other_*
-
-    use rule other_z as NAME_other with:
-      input:
-        "data_file.txt"
-    """
     And a file "boo.smk" with text
     """
     rule z:

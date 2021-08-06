@@ -355,22 +355,7 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
 
   Scenario Outline: Resolve rule name to another .smk file
     Given a snakemake project
-    And a file "foo.smk" with text
-    """
-    module MODULE:
-      snakefile: "boo.smk"
-
-    use rule * from MODULE as last_rule_*
-
-    use rule * from MODULE as
-
-    use rule NAME as NAME2 with:
-        input: "data_file.txt"
-
-    rule my_rule:
-        log: rules.<name>.log
-    """
-    Given a file "boo.smk" with text
+    And a file "boo.smk" with text
     """
     rule something:
       input: "data_file.db"
