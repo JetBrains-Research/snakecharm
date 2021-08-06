@@ -77,15 +77,7 @@ class SmkStatementParsing(
         val scope = context.scope
 
         myBuilder.setDebugMode(false)
-        if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER && !scope.inPythonicSection) {
-            val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText!!]
-            if (actualToken != null) {
-                myBuilder.remapCurrentToken(actualToken)
-            } else if (isToplevelDecoratorKeyword()) {
-                myBuilder.remapCurrentToken(SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)
-            }
-        }
-
+        tryRemapCurrentToken(scope, this::isToplevelDecoratorKeyword)
         val tt = myBuilder.tokenType
 
         if (tt !in SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
@@ -332,6 +324,17 @@ class SmkStatementParsing(
         }
         referenceMarker.drop()
         return false
+    }
+
+    private inline fun tryRemapCurrentToken(scope: SmkParsingScope, checkToplevel: () -> Boolean) {
+        if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER && !scope.inPythonicSection) {
+            val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText!!]
+            if (actualToken != null) {
+                myBuilder.remapCurrentToken(actualToken)
+            } else if (checkToplevel()) {
+                myBuilder.remapCurrentToken(SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)
+            }
+        }
     }
 
     private fun isToplevelDecoratorKeyword() = if (myBuilder.tokenText!! in TOPLEVEL_KEYWORDS) {
