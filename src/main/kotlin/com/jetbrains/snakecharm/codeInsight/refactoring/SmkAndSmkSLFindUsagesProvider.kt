@@ -50,7 +50,7 @@ class SmkWordsScanner : DefaultWordsScanner(
     SnakemakeLexer(),
     TokenSet.orSet(
         WORKFLOW_TOPLEVEL_DECORATORS,
-        TokenSet.create(WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD, PyTokenTypes.IDENTIFIER)
+        TokenSet.create(PyTokenTypes.IDENTIFIER)
     ),
     TokenSet.create(PyTokenTypes.END_OF_LINE_COMMENT),
     PyTokenTypes.STRING_NODES

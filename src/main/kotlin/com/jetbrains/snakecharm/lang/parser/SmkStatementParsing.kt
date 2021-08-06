@@ -88,9 +88,7 @@ class SmkStatementParsing(
 
         val tt = myBuilder.tokenType
 
-        if (tt !in SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS &&
-            tt != SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD
-        ) {
+        if (tt !in SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS) {
             // XXX: maybe also allow: `some_new_section: ` case, i.e. indentifier with following ':' in order
             // to support any section here
             super.parseStatement()

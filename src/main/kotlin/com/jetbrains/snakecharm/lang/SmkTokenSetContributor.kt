@@ -51,9 +51,6 @@ class SmkTokenSetContributor : PythonDialectsTokenSetContributorBase() {
     override fun getFunctionDeclarationTokens() = TokenSet.EMPTY!!
 
     override fun getUnbalancedBracesRecoveryTokens(): TokenSet {
-        return TokenSet.orSet(
-            WORKFLOW_TOPLEVEL_DECORATORS,
-            TokenSet.create(WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)
-        )
+        return WORKFLOW_TOPLEVEL_DECORATORS
     }
 }

@@ -47,6 +47,7 @@ object SmkTokenTypes {
     )
 
     val WORKFLOW_TOPLEVEL_DECORATORS = TokenSet.orSet(
+        TokenSet.create(WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD),
         WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE,
         RULE_LIKE
     )
