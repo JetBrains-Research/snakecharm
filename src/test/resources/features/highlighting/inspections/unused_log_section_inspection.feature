@@ -1,4 +1,4 @@
-Feature: Rule SmkUnusedLogSectionInspection inspection
+Feature: Rule SmkUnusedLogFileInspection inspection
   Scenario Outline: Unused in non-run section 'log' section
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -11,10 +11,10 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
         name: "name_{log}"
         shell: "command touch {wildcards.log}"
     """
-    And SmkUnusedLogSectionInspection inspection is enabled
+    And SmkUnusedLogFileInspection inspection is enabled
     And I expect inspection weak warning on <log: "my_log.log"> with message
     """
-    Looks like 'log' file won't be created, because it is not referenced from 'shell' or 'run' sections
+    Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
     Examples:
@@ -33,7 +33,7 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
         threads: 4
         <mention>
     """
-    And SmkUnusedLogSectionInspection inspection is enabled
+    And SmkUnusedLogFileInspection inspection is enabled
     And I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
@@ -50,7 +50,7 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
         log: <log_variation>
         wrapper: "0.60.1/bio/samtools/merge"
     """
-    And SmkUnusedLogSectionInspection inspection is enabled
+    And SmkUnusedLogFileInspection inspection is enabled
     And I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
@@ -75,10 +75,10 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
           print(log)
           foo = 5
     """
-    And SmkUnusedLogSectionInspection inspection is enabled
+    And SmkUnusedLogFileInspection inspection is enabled
     And I expect inspection weak warning on <log: "my_log.log"> with message
     """
-    Looks like 'log' file won't be created, because it is not referenced from 'shell' or 'run' sections
+    Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
     Examples:
@@ -102,10 +102,10 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
           shell("{<rules_like>.NAME.log}")
           foo = 5
     """
-    And SmkUnusedLogSectionInspection inspection is enabled
+    And SmkUnusedLogFileInspection inspection is enabled
     And I expect inspection weak warning on <log: "data/log.log"> with message
     """
-    Looks like 'log' file won't be created, because it is not referenced from 'shell' or 'run' sections
+    Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
     Examples:
@@ -124,13 +124,13 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
         threads: 4
         shell: "command touch"
     """
-    And SmkUnusedLogSectionInspection inspection is enabled
+    And SmkUnusedLogFileInspection inspection is enabled
     And I expect inspection weak warning on <log: "my_log.log"> with message
     """
-    Looks like 'log' file won't be created, because it is not referenced from 'shell' or 'run' sections
+    Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
-    And I invoke quick fix Create 'log' file in 'shell' section and see text:
+    And I invoke quick fix Append " >{log} 2>&1" to shell section command and see text:
     """
     <rule_like> NAME:
         input: "input.txt"
@@ -158,13 +158,13 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
         run:
             shell("something")
     """
-    And SmkUnusedLogSectionInspection inspection is enabled
+    And SmkUnusedLogFileInspection inspection is enabled
     And I expect inspection weak warning on <log: "my_log.log"> with message
     """
-    Looks like 'log' file won't be created, because it is not referenced from 'shell' or 'run' sections
+    Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
-    And I invoke quick fix Create 'log' file in 'run' section and see text:
+    And I invoke quick fix Add 'shell(..)' call that creates crates a log file in 'run' section and see text:
     """
     <rule_like> NAME:
         input: "input.txt"
@@ -190,13 +190,13 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
         log: "my_log.log"
         threads: 4
     """
-    And SmkUnusedLogSectionInspection inspection is enabled
+    And SmkUnusedLogFileInspection inspection is enabled
     And I expect inspection weak warning on <log: "my_log.log"> with message
     """
-    Looks like 'log' file won't be created, because it is not referenced from 'shell' or 'run' sections
+    Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
-    And I invoke quick fix Create 'shell' section which creates 'log' file and see text:
+    And I invoke quick fix Add 'shell' section that creates a log file and see text:
     """
     <rule_like> NAME:
         input: "input.txt"
@@ -221,10 +221,10 @@ Feature: Rule SmkUnusedLogSectionInspection inspection
         threads: 4
         <scenario>
     """
-    And SmkUnusedLogSectionInspection inspection is enabled
+    And SmkUnusedLogFileInspection inspection is enabled
     And I expect inspection weak warning on <log: "my_log.log"> with message
     """
-    Looks like 'log' file won't be created, because it is not referenced from 'shell' or 'run' sections
+    Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
     Examples:

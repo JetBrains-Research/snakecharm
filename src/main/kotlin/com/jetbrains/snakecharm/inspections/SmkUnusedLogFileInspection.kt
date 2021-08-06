@@ -15,7 +15,7 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_THAT
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
 
-class SmkUnusedLogSectionInspection : SnakemakeInspection() {
+class SmkUnusedLogFileInspection : SnakemakeInspection() {
     companion object {
         private const val REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT = " >{log} 2>&1"
     }
@@ -65,7 +65,7 @@ class SmkUnusedLogSectionInspection : SnakemakeInspection() {
             if (!collector.hasReferenceToTarget) {
                 registerProblem(
                     logSection,
-                    SnakemakeBundle.message("INSP.NAME.unused.section"),
+                    SnakemakeBundle.message("INSP.NAME.unused.log.section"),
                     ProblemHighlightType.WEAK_WARNING,
                     null,
                     quickfix
@@ -76,7 +76,10 @@ class SmkUnusedLogSectionInspection : SnakemakeInspection() {
 
     private class CreateLogFileInShellSection(expr: PsiElement) : LocalQuickFixOnPsiElement(expr) {
 
-        override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.add.to.shell.section")
+        override fun getFamilyName() = SnakemakeBundle.message(
+            "INSP.INTN.unused.log.fix.add.to.shell.section",
+            REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT
+        )
 
         override fun getText() = familyName
 
@@ -102,7 +105,7 @@ class SmkUnusedLogSectionInspection : SnakemakeInspection() {
 
     private class CreateLogFileInRunSection(expr: SmkRunSection) : LocalQuickFixOnPsiElement(expr) {
 
-        override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.add.to.run.section")
+        override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.unused.log.fix.add.to.run.section")
 
         override fun getText() = familyName
 
@@ -119,7 +122,7 @@ class SmkUnusedLogSectionInspection : SnakemakeInspection() {
 
     private class CreateShellSectionWithLogReference(expr: PsiElement) : LocalQuickFixOnPsiElement(expr) {
 
-        override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.create.shell.section")
+        override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.unused.log.fix.create.shell.section")
 
         override fun getText() = familyName
 
