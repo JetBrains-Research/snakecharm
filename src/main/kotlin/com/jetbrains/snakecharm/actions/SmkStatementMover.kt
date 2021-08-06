@@ -12,11 +12,12 @@ import com.intellij.psi.*
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.impl.source.PostprocessReformattingAspect
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.elementType
 import com.jetbrains.python.codeInsight.editorActions.moveUpDown.PyStatementMover
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
-import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer.Companion.KEYWORDS
+import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer.Companion.KEYWORDS_2_TEXT
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer.Companion.TOPLEVEL_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.*
 
@@ -162,7 +163,7 @@ open class SmkStatementMover : PyStatementMover() {
         }
 
         if ((((elementToMove is SmkRuleOrCheckpointArgsSection &&
-                    elementToMove.sectionKeyword !in KEYWORDS &&
+                    elementToMove.elementType !in KEYWORDS_2_TEXT &&
                     elementToMove.sectionKeyword!! !in TOPLEVEL_KEYWORDS) ||
                     (elementToMove is SmkRunSection)) &&
                     ((!down && statements.first() == elementToMove)

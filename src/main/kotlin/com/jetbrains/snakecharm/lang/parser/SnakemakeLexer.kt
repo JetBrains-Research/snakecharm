@@ -16,6 +16,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 class SnakemakeLexer : PythonIndentingLexer() {
     // number of spaces between line start and the first non-whitespace token on the line
     private var myCurrentNewlineIndent = 0
+
     // end offset of the last line break before the first non-whitespace token on the line,
     // which is also start offset of the first non-whitespace token on the line
     private var myCurrentNewlineOffset = 0
@@ -33,6 +34,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
     // used to insert statement break before the first argument but only line breaks between section arguments
     private var beforeFirstArgumentInSection = false
+
     /*
      The following tokens can be considered top-level sections:
      1. text is present in the KEYWORDS map
@@ -40,6 +42,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
      3. topLevelSectionIndent is equal to -1, meaning there is no top-level section nesting the current section
     */
     private var topLevelSectionIndent = -1
+
     /*
      The following tokens can be considered rule-like sections:
      0. identifiers
@@ -48,6 +51,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
      Should always be not less than topLevelSectionIndent
     */
     private var ruleLikeSectionIndent = -1
+
     /*
      Is true for:
       - `onsuccess`/`onerror`/`onstart` top-level sections
@@ -94,8 +98,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
         val TOPLEVEL_KEYWORDS = ImmutableSet.Builder<String>()
             .add(SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD)
             .add(SnakemakeNames.WORKFLOW_REPORT_KEYWORD)
-            .add(SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD)
             .add(SnakemakeNames.WORKFLOW_SINGULARITY_KEYWORD)
+            .add(SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD)
             .add(SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD)
             .add(SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD)
             .add(SnakemakeNames.WORKFLOW_ENVVARS_KEYWORD)
