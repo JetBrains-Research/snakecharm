@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.StubBasedPsiElement
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
@@ -22,7 +23,12 @@ interface SmkCheckPoint : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkCheckpoint
 
 interface SmkSubworkflow : SmkRuleLike<SmkSubworkflowArgsSection>, StubBasedPsiElement<SmkSubworkflowStub>
 
-interface SmkModule : SmkRuleLike<SmkModuleArgsSection>, StubBasedPsiElement<SmkModuleStub>
+interface SmkModule : SmkRuleLike<SmkModuleArgsSection>, StubBasedPsiElement<SmkModuleStub> {
+    /**
+     * Returns the PsiFile, which is defined in 'snakefile' section if there is such a local file
+     */
+    fun getPsiFile(): PsiFile?
+}
 
 interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
     /**

@@ -5,10 +5,11 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.StubElement
 import com.jetbrains.snakecharm.lang.psi.SmkModule
 import com.jetbrains.snakecharm.lang.psi.impl.SmkModuleImpl
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex.Companion.KEY
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleStub
 
 class SmkModuleElementType
-    : SmkRuleLikeElementType<SmkModuleStub, SmkModule>("SMK_MODULE_DECLARATION_STATEMENT", null) {
+    : SmkRuleLikeElementType<SmkModuleStub, SmkModule>("SMK_MODULE_DECLARATION_STATEMENT", KEY) {
 
     override fun createStub(name: String?, parentStub: StubElement<*>?): SmkModuleStub =
         SmkModuleStubImpl(name, parentStub)

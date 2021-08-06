@@ -353,13 +353,39 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       | NAME2     | NAME2      |
       | zZzz      |zZzz        |
 
-  Scenario Outline: Not resolve rule name, if module imports all rules
+  Scenario Outline: Resolve rule name to another .smk file
     Given a snakemake project
-    Given I open a file "foo.smk" with text
+    And a file "foo.smk" with text
     """
+    module MODULE:
+      snakefile: "boo.smk"
+
     use rule * from MODULE as last_rule_*
 
-    use rule * MODULE as
+    use rule * from MODULE as
+
+    use rule NAME as NAME2 with:
+        input: "data_file.txt"
+
+    rule my_rule:
+        log: rules.<name>.log
+    """
+    Given a file "boo.smk" with text
+    """
+    rule something:
+      input: "data_file.db"
+
+    rule NAME:
+      input: "file.txt"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module MODULE:
+      snakefile: "boo.smk"
+
+    use rule * from MODULE as last_rule_*
+
+    use rule * from MODULE as
 
     use rule NAME as NAME2 with:
         input: "data_file.txt"
@@ -368,10 +394,8 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
         log: rules.<name>.log
     """
     When I put the caret at <name>.log
-    Then reference should not resolve
+    Then reference should resolve to "<resolve_to>" in "boo.smk"
     Examples:
-      | name                |
-      | last_rule_something |
-      | last_rule_*         |
-      | NAME                |
-      | *                   |
+      | name                | resolve_to |
+      | last_rule_something | something  |
+      | NAME                | NAME       |

@@ -31,17 +31,23 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
         }
     }
 
-    override fun getName(): String? {
-        val result = getProducedRulesNames().lastOrNull()?.first ?: return null
-        return if (result.contains('*')) null else result
-    }
-
     override fun getNameNode(): ASTNode? {
-        val names = getProducedRulesNames()
-        if (names.isNotEmpty()) {
-            return names.last().second.node
+        val identifier = super.getNameNode()
+        if (identifier != null) { // Returns new name if we know it
+            return identifier
         }
-        return (findChildByType(SmkElementTypes.USE_NAME_IDENTIFIER) as? PsiElement)?.node
+        val namePattern = findChildByType(SmkElementTypes.USE_NAME_IDENTIFIER) as? PsiElement
+        if (namePattern != null) { // Returns name patter if it exits
+            return namePattern.node
+        }
+        val originalNames = findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES) as? PsiElement
+        // Returns original names, we don't want to save one name because
+        // index with this name probably already exists
+        // so we save whole rules names if it is not just '*' wildcard
+        if (originalNames != null && originalNames.text != "*") {
+            return originalNames.node
+        }
+        return null
     }
 
     override fun getProducedRulesNames(): List<Pair<String, PsiElement>> {
@@ -54,31 +60,32 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
         if (importedNames == null) {
             return emptyList()
         }
-        val originalNames = mutableListOf<PsiElement>()
+        val originalNames = mutableListOf<Pair<String, PsiElement>>()
         var child = importedNames.firstChild
         while (child != null) {
             if (child.elementType == SmkElementTypes.REFERENCE_EXPRESSION) {
-                originalNames.add(child)
+                originalNames.add(child.text to child)
             }
             child = child.nextSibling
         }
         if (originalNames.isEmpty()) {
-            return emptyList()
-        }
-        val result = mutableListOf<Pair<String, PsiElement>>()
-        if (newName != null) {
-            originalNames.forEach {
-                if (it.text != "*") {
-                    result.add(newName.text.replace("*", it.text) to it)
-                }
+            val moduleRef =
+                (findChildByType(SmkElementTypes.REFERENCE_EXPRESSION) as? SmkReferenceExpression) ?: return emptyList()
+            val module = moduleRef.reference.resolve()
+            if (module == null || module !is SmkModule) {
+                return emptyList()
             }
+            val file = module.getPsiFile()
+            if (file != null && file is SmkFile) {
+                originalNames.addAll(file.collectRules().map { it.first to it.second })
+            } else {
+                return emptyList()
+            }
+        }
+        return if (newName != null) {
+            originalNames.map { newName.text.replace("*", it.first) to it.second }
         } else {
-            originalNames.forEach {
-                if (it.text != "*") {
-                    result.add(it.text to it)
-                }
-            }
+            originalNames.map { it.first.replace("*", it.first) to it.second }
         }
-        return result
     }
 }

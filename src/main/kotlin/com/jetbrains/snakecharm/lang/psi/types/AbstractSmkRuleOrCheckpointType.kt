@@ -95,7 +95,8 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
             else -> getVariantsFromIndex(SmkUseNameIndex.KEY, module, SmkUse::class.java)
         }.forEach { use ->
             use as SmkUse
-            val referTo = use.getProducedRulesNames()
+            val list = use.getProducedRulesNames()
+            val referTo = list
                 .firstOrNull {
                     (it.first == name &&
                             it.second != location.originalElement) ||

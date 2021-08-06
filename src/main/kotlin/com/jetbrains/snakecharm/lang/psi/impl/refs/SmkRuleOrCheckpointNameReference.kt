@@ -1,6 +1,10 @@
 package com.jetbrains.snakecharm.lang.psi.impl.refs
 
 import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.psi.PsiElement
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.parentOfType
 import com.jetbrains.python.psi.AccessDirection
@@ -11,10 +15,12 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkFile
+import com.jetbrains.snakecharm.lang.psi.SmkModule
 import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 
@@ -49,28 +55,40 @@ class SmkRuleOrCheckpointNameReference(
 
         results.addAll(SmkRulesType(null, smkFile).resolveMember(name, element, ctx, myContext))
         results.addAll(SmkCheckpointType(null, smkFile).resolveMember(name, element, ctx, myContext))
-        results.addAll(collectModulesAndResolveThem(smkFile, name))
+        results.addAll(collectModulesAndResolveThem(smkFile, element))
         results.addAll(collectModuleFromUseSection(element))
 
         return results
     }
 
     /**
-     * Collects all modules sections names from local file which name is [name]
+     * Collects all modules sections names from local file or using indexes which name is [element] name
      */
-    private fun collectModulesAndResolveThem(smkFile: SmkFile, name: String): List<RatedResolveResult> {
-        val modules = smkFile.collectModules().map { it.second }.filter { elem -> elem.name == name }
+    private fun collectModulesAndResolveThem(smkFile: SmkFile, element: PsiElement): List<RatedResolveResult> {
+        val module = element.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
+        val modules = if (module == null) {
+            smkFile.collectModules().map { it.second }.filter { elem -> elem.name == element.text }
+        } else {
+            StubIndex.getElements(
+                SmkModuleNameIndex.KEY,
+                element.text,
+                module.project,
+                GlobalSearchScope.moduleWithDependentsScope(module),
+                SmkModule::class.java
+            )
+        }
         if (modules.isEmpty()) {
             return emptyList()
         }
-        return modules.map { element ->
-            RatedResolveResult(SmkResolveUtil.RATE_NORMAL, element)
+        return modules.map { variant ->
+            RatedResolveResult(SmkResolveUtil.RATE_NORMAL, variant)
         }
     }
 
     /**
      * Resolves rule reference, which is declared in 'use' section.
-     * It refers to module, which imports such rule.
+     * It refers to rule in module if the module is local file
+     * Or to module, which imports such rule, otherwise.
      * If there no such module, returns an empty array.
      */
     private fun collectModuleFromUseSection(
@@ -86,12 +104,23 @@ class SmkRuleOrCheckpointNameReference(
                 moduleRef = moduleRef.nextSibling
             }
             if (moduleRef != null) {
-                return listOf(
-                    RatedResolveResult(
-                        SmkResolveUtil.RATE_NORMAL,
-                        (moduleRef as SmkReferenceExpression).reference.resolve()
+                val module = (moduleRef as SmkReferenceExpression).reference.resolve() as? SmkModule
+                val file = module?.getPsiFile() as? SmkFile
+                    ?: return listOf(
+                        RatedResolveResult(
+                            SmkResolveUtil.RATE_NORMAL,
+                            (moduleRef).reference.resolve()
+                        )
                     )
-                )
+                val result = file.collectRules().firstOrNull { it.first == element.text }
+                if (result != null) {
+                    return listOf(
+                        RatedResolveResult(
+                            SmkResolveUtil.RATE_NORMAL,
+                            result.second
+                        )
+                    )
+                }
             }
         }
 

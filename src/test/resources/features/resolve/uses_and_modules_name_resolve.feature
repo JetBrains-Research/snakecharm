@@ -27,6 +27,39 @@ Feature: Resolve use and module name to its declaration
     When I put the caret at NAME as
     Then reference should resolve to "NAME" in "foo.smk"
 
+  Scenario: Refer to other file
+    Given a snakemake project
+    And a file "foo.smk" with text
+    """
+    module M:
+      snakefile: "boo.smk"
+
+    use rule * from M as other_*
+
+    use rule other_z as NAME_other with:
+      input:
+        "data_file.txt"
+    """
+    And a file "boo.smk" with text
+    """
+    rule z:
+      input: "data_file.csv"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+      snakefile: "boo.smk"
+
+    use rule * from M as other_* with:
+      output: "dir/log.log"
+
+    use rule other_z as NAME_other with:
+      input:
+        "data_file.txt"
+    """
+    When I put the caret at other_z
+    Then reference should resolve to "z" in "boo.smk"
+
   Scenario Outline: Refer to other use section which declared new rules with wildcard
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -51,7 +84,7 @@ Feature: Resolve use and module name to its declaration
     """
     module MODULE:
       snakefile:
-        "../path/to/otherworkflow/Snakefile"
+        "https://usefullsmkfiles.com/file.smk "
       configfile:
         "path/to/custom_configfile.yaml"
 
@@ -60,7 +93,7 @@ Feature: Resolve use and module name to its declaration
         "data_file.txt"
     """
     When I put the caret at NAME
-    Then reference should resolve to "MODULE:" in "foo.smk"
+    Then reference should resolve to "MODULE" in "foo.smk"
     Examples:
       | name  |
       | other |

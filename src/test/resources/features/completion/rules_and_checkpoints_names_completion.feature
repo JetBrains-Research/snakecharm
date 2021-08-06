@@ -390,32 +390,64 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
 
   Scenario: Complete rule name, declared in use section
     Given a snakemake project
-    Given I open a file "foo.smk" with text
+    Given a file "foo.smk" with text
     """
+    module MODULE_2:
+      snakefile: "boo.smk"
+
     use rule * from MODULE as last_rule
 
     use rule a,b,c from MODULE as other_*
 
+    use rule * from MODULE_2 as not_*
+
     use rule NAME as NAME2 with:
-        input: "data_file.txt"
+      input: "data_file.txt"
 
     use rule zZzz from MODULE as with:
-        input: "log.log"
+      input: "log.log"
 
     rule my_rule:
-        log: rules.
+      log: rules.
+    """
+    Given a file "boo.smk" with text
+    """
+    rule rule_name:
+      log: "log_file.txt"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module MODULE_2:
+      snakefile: "boo.smk"
+
+    use rule * from MODULE as last_rule
+
+    use rule a,b,c from MODULE as other_*
+
+    use rule * from MODULE_2 as not_*
+
+    use rule NAME as NAME2 with:
+      input: "data_file.txt"
+
+    use rule zZzz from MODULE as with:
+      input: "log.log"
+
+    rule my_rule:
+      log: rules.
     """
     When I put the caret after rules.
     And I invoke autocompletion popup
     Then completion list should contain:
-      | last_rule |
-      | other_a   |
-      | other_b   |
-      | other_c   |
-      | NAME2     |
-      | zZzz      |
+      | last_rule     |
+      | other_a       |
+      | other_b       |
+      | other_c       |
+      | NAME2         |
+      | zZzz          |
+      | not_rule_name |
     Then completion list shouldn't contain:
       | NAME    |
       | other_* |
       | *       |
+      | not_*   |
       | MODULE  |
