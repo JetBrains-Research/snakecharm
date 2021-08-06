@@ -7,7 +7,6 @@ import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.findUsages.PythonFindUsagesProvider
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkFakePsiElement
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS
-import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
 import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SmkRule

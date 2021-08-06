@@ -87,7 +87,7 @@ class SmkStatementParsing(
         }
         when {
             tt in SmkTokenTypes.RULE_LIKE -> parseRuleLikeDeclaration(getSectionParsingData(tt!!))
-            tt === SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD -> {
+            tt === SmkTokenTypes.WORKFLOW_TOPLEVEL_ARGS_SECTION_STATEMENT -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
                 val result = parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
@@ -331,7 +331,7 @@ class SmkStatementParsing(
             if (actualToken != null) {
                 myBuilder.remapCurrentToken(actualToken)
             } else if (checkToplevel()) {
-                myBuilder.remapCurrentToken(SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)
+                myBuilder.remapCurrentToken(SmkTokenTypes.WORKFLOW_TOPLEVEL_ARGS_SECTION_STATEMENT)
             }
         }
     }

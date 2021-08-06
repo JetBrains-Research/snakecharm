@@ -29,7 +29,7 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
     }
 
     override fun getSectionKeywordNode() = node
-        .findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)
+        .findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_ARGS_SECTION_STATEMENT)
 
     override fun getPresentation() = getPresentation(this)
     override fun getIcon(flags: Int) = getIcon(this, flags)
@@ -71,5 +71,5 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
     private val keywordName: String?
         get() = getKeywordNode()?.text
 
-    private fun getKeywordNode() = node.findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)
+    private fun getKeywordNode() = node.findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_ARGS_SECTION_STATEMENT)
 }

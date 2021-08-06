@@ -8,7 +8,7 @@ import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.lexer.PythonIndentingLexer
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_ARGS_SECTION_STATEMENT
 
 /**
  * @author Roman.Chernyatchik
@@ -109,10 +109,10 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
         val KEYWORDS_2_TEXT =
             (SPECIAL_KEYWORDS.map { it.value to it.key }.toMap() +
-                    TOPLEVEL_KEYWORDS.associateBy { WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD }.toMap())
+                    TOPLEVEL_KEYWORDS.associateBy { WORKFLOW_TOPLEVEL_ARGS_SECTION_STATEMENT }.toMap())
 
         val KEYWORDS_2_TOKEN_TYPE =
-            TOPLEVEL_KEYWORDS.associateWith { WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD } + SPECIAL_KEYWORDS
+            TOPLEVEL_KEYWORDS.associateWith { WORKFLOW_TOPLEVEL_ARGS_SECTION_STATEMENT } + SPECIAL_KEYWORDS
     }
 
     override fun advance() {
