@@ -16,7 +16,7 @@ import com.jetbrains.python.codeInsight.editorActions.moveUpDown.PyStatementMove
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
-import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer.Companion.TOPLEVEL_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.TOPLEVEL_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.*
 
 open class SmkStatementMover : PyStatementMover() {
@@ -179,7 +179,7 @@ open class SmkStatementMover : PyStatementMover() {
             // do not move sections that cannot be toplevel:
             if (elementToMove is SmkRuleOrCheckpointArgsSection) {
                 val keyword = elementToMove.sectionKeyword
-                val sectionCouldBeToplevel = keyword != null && keyword in TOPLEVEL_KEYWORDS
+                val sectionCouldBeToplevel = keyword != null && keyword in TOPLEVEL_ARGS_SECTION_KEYWORDS
                 if (!sectionCouldBeToplevel) {
                     return false
                 }

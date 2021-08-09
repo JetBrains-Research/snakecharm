@@ -229,13 +229,13 @@ class SmkStatementParsing(
             }
             multiline && !myBuilder.eof() -> {
                 if (atToken(PyTokenTypes.IDENTIFIER)) {
-                    val actualToken = SnakemakeLexer.KEYWORDS_2_TOKEN_TYPE[myBuilder.tokenText!!]
+                    val actualToken = SnakemakeLexer.KEYWORD_LIKE_SECTION_NAME_2_TOKEN_TYPE[myBuilder.tokenText!!]
                     if (actualToken != null) {
                         myBuilder.remapCurrentToken(actualToken)
                         return
                     }
                 }
-                if (!atAnyOfTokens(*SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.types)) {
+                if (!SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.contains(myBuilder.tokenType)) {
                     nextToken() // probably check token type
                 }
             }
@@ -329,7 +329,7 @@ class SmkStatementParsing(
 
     private inline fun tryRemapCurrentToken(scope: SmkParsingScope, checkToplevelFun: () -> Boolean) {
         if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER && !scope.inPythonicSection) {
-            val actualToken = SnakemakeLexer.KEYWORDS_2_TOKEN_TYPE[myBuilder.tokenText!!]
+            val actualToken = SnakemakeLexer.KEYWORD_LIKE_SECTION_NAME_2_TOKEN_TYPE[myBuilder.tokenText!!]
             if (actualToken != null) {
                 myBuilder.remapCurrentToken(actualToken)
             } else if (checkToplevelFun()) {

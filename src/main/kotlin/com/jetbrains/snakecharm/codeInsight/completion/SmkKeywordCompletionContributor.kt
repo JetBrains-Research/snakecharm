@@ -20,12 +20,12 @@ import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.MODULE_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.TOPLEVEL_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_DECLARATION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_LIKE
-import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.USE_KEYWORD
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
 import com.jetbrains.snakecharm.lang.psi.*
@@ -115,10 +115,10 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
             return
         }
 
-        val tokenType2Name = SnakemakeLexer.KEYWORDS_2_TEXT
-        val colonAndWhiteSpaceTailKeys = WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE.types.map { tt ->
-            tokenType2Name[tt]!!
-        } + SnakemakeLexer.TOPLEVEL_KEYWORDS
+        val tokenType2Name = SnakemakeLexer.KEYWORD_LIKE_SECTION_TOKEN_TYPE_2_KEYWORD
+        val colonAndWhiteSpaceTailKeys = WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE.types.mapNotNull { tt ->
+            tokenType2Name[tt]
+        } + TOPLEVEL_ARGS_SECTION_KEYWORDS
         val spaceTailKeys = RULE_LIKE.types.map { tt ->
             tokenType2Name[tt]!!
         }

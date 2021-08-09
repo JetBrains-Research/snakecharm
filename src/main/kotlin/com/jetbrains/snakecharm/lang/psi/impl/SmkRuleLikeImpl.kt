@@ -79,7 +79,7 @@ abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT : SmkRuleLike<S>, o
 
     override fun getPresentation() = object : PyElementPresentation(this) {
         override fun getPresentableText() =
-            "${SnakemakeLexer.KEYWORDS_2_TEXT[sectionTokenType]}: ${name ?: UNNAMED_ELEMENT}"
+            "${SnakemakeLexer.KEYWORD_LIKE_SECTION_TOKEN_TYPE_2_KEYWORD[sectionTokenType]}: ${name ?: UNNAMED_ELEMENT}"
 
         override fun getLocationString() = "(${containingFile.name})"
     }
