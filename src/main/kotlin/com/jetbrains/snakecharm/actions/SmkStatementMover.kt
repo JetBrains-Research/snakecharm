@@ -16,7 +16,7 @@ import com.jetbrains.python.codeInsight.editorActions.moveUpDown.PyStatementMove
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
-import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer.Companion.KEYWORDS_2_TOKEN_TYPE
+import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer.Companion.TOPLEVEL_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.*
 
 open class SmkStatementMover : PyStatementMover() {
@@ -160,20 +160,31 @@ open class SmkStatementMover : PyStatementMover() {
             }
         }
 
-        // check if element to move is rule/checkpoint section near 'rule' block bounds
-        if (
-            ((elementToMove is SmkRuleOrCheckpointArgsSection && elementToMove.sectionKeyword!! !in KEYWORDS_2_TOKEN_TYPE)
-                    || elementToMove is SmkRunSection)
-            && ((!down && statements.first() == elementToMove) || (down && statements.last() == elementToMove))
-        ) {
-            return false
+        // if statement is a candidate for moving out of statement list:
+        val boundaryStatement = when {
+            down -> statements.last() == elementToMove
+            else -> statements.first() == elementToMove
         }
+        if (boundaryStatement) {
+            // do not remove the only one section from rule/checkpoint/subworkflow/..
+            if (statements.size == 1 && elementToMove is SmkArgsSection) {
+                return false
+            }
 
-        // do not remove the only one section from rule/checkpoint/subworkflow
-        if (statements.size == 1 && statements.single() == elementToMove
-            && (elementToMove is SmkRuleOrCheckpointArgsSection || elementToMove is SmkSubworkflowArgsSection)
-        ) {
-            return false
+            // do not move run section out of container
+            if (elementToMove is SmkRunSection) {
+                return false
+            }
+
+            // do not move sections that cannot be toplevel:
+            if (elementToMove is SmkRuleOrCheckpointArgsSection) {
+                val keyword = elementToMove.sectionKeyword
+                val sectionCouldBeToplevel = keyword != null && keyword in TOPLEVEL_KEYWORDS
+                if (!sectionCouldBeToplevel) {
+                    return false
+                }
+            }
+
         }
 
         // ok to move
