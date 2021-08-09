@@ -160,18 +160,23 @@ open class SmkStatementMover : PyStatementMover() {
             }
         }
 
-        if ((((elementToMove is SmkRuleOrCheckpointArgsSection &&
-                    elementToMove.sectionKeyword!! !in KEYWORDS_2_TOKEN_TYPE) ||
-                    (elementToMove is SmkRunSection)) &&
-                    ((!down && statements.first() == elementToMove)
-                            || (down && statements.last() == elementToMove))) ||
-            (statements.size == 1 && statements.first() == elementToMove &&
-                    (elementToMove is SmkRuleOrCheckpointArgsSection ||
-                            elementToMove is SmkSubworkflowArgsSection))
+        // check if element to move is rule/checkpoint section near 'rule' block bounds
+        if (
+            ((elementToMove is SmkRuleOrCheckpointArgsSection && elementToMove.sectionKeyword!! !in KEYWORDS_2_TOKEN_TYPE)
+                    || elementToMove is SmkRunSection)
+            && ((!down && statements.first() == elementToMove) || (down && statements.last() == elementToMove))
         ) {
             return false
         }
 
+        // do not remove the only one section from rule/checkpoint/subworkflow
+        if (statements.size == 1 && statements.single() == elementToMove
+            && (elementToMove is SmkRuleOrCheckpointArgsSection || elementToMove is SmkSubworkflowArgsSection)
+        ) {
+            return false
+        }
+
+        // ok to move
         return true
     }
 
