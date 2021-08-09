@@ -1,6 +1,6 @@
 SnakemakeFile: WorkflowParamsListArgsKeywords.smk
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('configfile')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
@@ -8,7 +8,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
         PsiElement(Py:SINGLE_QUOTED_STRING)('"config.yaml"')
   PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_REPORT_KEYWORD)('report')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('report')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
@@ -16,7 +16,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
         PsiElement(Py:SINGLE_QUOTED_STRING)('"report/workflow.rst"')
   PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_SINGULARITY_KEYWORD)('singularity')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('singularity')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
@@ -24,7 +24,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
         PsiElement(Py:SINGLE_QUOTED_STRING)('"docker://continuumio/miniconda3:4.4.10"')
   PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_INCLUDE_KEYWORD)('include')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('include')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace('\n    ')
@@ -32,7 +32,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
         PsiElement(Py:SINGLE_QUOTED_STRING)(''tex.smrules'')
   PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_WORKDIR_KEYWORD)('workdir')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('workdir')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
@@ -40,7 +40,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
         PsiElement(Py:SINGLE_QUOTED_STRING)('"path/to/workdir"')
   PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD)('wildcard_constraints')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('wildcard_constraints')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace('\n    ')
@@ -61,7 +61,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
     PsiWhiteSpace('\n    ')
     PyStatementList
       SmkWorkflowArgsSection
-        PsiElement(Py:WORKFLOW_CONFIGFILE_KEYWORD)('configfile')
+        PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('configfile')
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')
@@ -69,7 +69,7 @@ SnakemakeFile: WorkflowParamsListArgsKeywords.smk
             PsiElement(Py:SINGLE_QUOTED_STRING)('"config.yaml"')
       PsiWhiteSpace('\n    ')
       SmkWorkflowArgsSection
-        PsiElement(Py:WORKFLOW_INCLUDE_KEYWORD)('include')
+        PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('include')
         PyArgumentList
           PsiElement(Py:COLON)(':')
           PsiWhiteSpace(' ')

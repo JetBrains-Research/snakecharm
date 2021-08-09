@@ -19,15 +19,15 @@ import com.jetbrains.snakecharm.lang.psi.SmkSection
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil.getIdentifierNode
 import javax.swing.Icon
 
-abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT: SmkRuleLike<S>, out S : SmkSection>
+abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT : SmkRuleLike<S>, out S : SmkSection>
     : PyBaseElementImpl<StubT>, SmkRuleLike<S>
 
-    //TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SmkRule>
-    // SnakemakeNamedElement, SnakemakeScopeOwner
+//TODO: PyNamedElementContainer; PyStubElementType<SMKRuleStub, SmkRule>
+// SnakemakeNamedElement, SnakemakeScopeOwner
 
 {
-    constructor(node: ASTNode): super(node)
-    constructor(stub: StubT, nodeType: IStubElementType<StubT, PsiT>): super(stub, nodeType)
+    constructor(node: ASTNode) : super(node)
+    constructor(stub: StubT, nodeType: IStubElementType<StubT, PsiT>) : super(stub, nodeType)
 
     override fun getName(): String? {
         val stub = stub
@@ -46,7 +46,7 @@ abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT: SmkRuleLike<S>, ou
         return this
     }
 
-    override fun getSectionKeywordNode()= node.findChildByType(sectionTokenType)
+    override fun getSectionKeywordNode() = node.findChildByType(sectionTokenType)
 
     override fun getNameIdentifier() = getNameNode()?.psi
 
@@ -77,9 +77,9 @@ abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT: SmkRuleLike<S>, ou
         return SnakemakeIcons.FILE
     }
 
-    override fun getPresentation() = object: PyElementPresentation(this) {
+    override fun getPresentation() = object : PyElementPresentation(this) {
         override fun getPresentableText() =
-                "${SnakemakeLexer.KEYWORDS_2_TEXT[sectionTokenType]}: ${name ?: UNNAMED_ELEMENT}"
+            "${SnakemakeLexer.KEYWORD_LIKE_SECTION_TOKEN_TYPE_2_KEYWORD[sectionTokenType]}: ${name ?: UNNAMED_ELEMENT}"
 
         override fun getLocationString() = "(${containingFile.name})"
     }

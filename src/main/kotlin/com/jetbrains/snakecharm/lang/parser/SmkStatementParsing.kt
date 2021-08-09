@@ -12,6 +12,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_OR_CHECKPOINT
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.*
+import java.util.*
 
 
 /**
@@ -75,11 +76,8 @@ class SmkStatementParsing(
         val scope = context.scope
 
         myBuilder.setDebugMode(false)
-        if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER && !scope.inPythonicSection) {
-            val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText!!]
-            if (actualToken != null) {
-                myBuilder.remapCurrentToken(actualToken)
-            }
+        tryRemapCurrentToken(scope) {
+            checkIfAtToplevelDecoratorKeyword()
         }
         val tt = myBuilder.tokenType
 
@@ -91,7 +89,7 @@ class SmkStatementParsing(
         }
         when {
             tt in SmkTokenTypes.RULE_LIKE -> parseRuleLikeDeclaration(getSectionParsingData(tt!!))
-            tt in SmkTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS -> {
+            tt === SmkTokenTypes.WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
                 val result = parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
@@ -183,7 +181,13 @@ class SmkStatementParsing(
 
         // XXX at the moment we continue parsing rule even if colon missed, probably better
         // XXX to drop rule and scroll up to next STATEMENT_BREAK/RULE/CHECKPOINT/other toplevel keyword or eof()
-        checkMatches(PyTokenTypes.COLON, "${section.name.capitalize()} name identifier or ':' expected") // bundle
+        checkMatches(PyTokenTypes.COLON,
+            "${
+                section.name.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                }
+            } name identifier or ':' expected"
+        ) // bundle
 
         val ruleStatements = myBuilder.mark()
 
@@ -225,13 +229,13 @@ class SmkStatementParsing(
             }
             multiline && !myBuilder.eof() -> {
                 if (atToken(PyTokenTypes.IDENTIFIER)) {
-                    val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText!!]
+                    val actualToken = SnakemakeLexer.KEYWORD_LIKE_SECTION_NAME_2_TOKEN_TYPE[myBuilder.tokenText!!]
                     if (actualToken != null) {
                         myBuilder.remapCurrentToken(actualToken)
                         return
                     }
                 }
-                if (!atAnyOfTokens(*SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.types)) {
+                if (!SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.contains(myBuilder.tokenType)) {
                     nextToken() // probably check token type
                 }
             }
@@ -270,7 +274,11 @@ class SmkStatementParsing(
         val ruleParam = myBuilder.mark()
 
         if (myBuilder.tokenType != PyTokenTypes.IDENTIFIER) {
-            myBuilder.error("${section.name.capitalize()} parameter identifier is expected") // bundle
+            myBuilder.error("${
+                section.name.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                }
+            } parameter identifier is expected") // bundle
             nextToken()
             ruleParam.drop()
             return false
@@ -316,6 +324,36 @@ class SmkStatementParsing(
             return true
         }
         referenceMarker.drop()
+        return false
+    }
+
+    private inline fun tryRemapCurrentToken(scope: SmkParsingScope, checkToplevelFun: () -> Boolean) {
+        if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER && !scope.inPythonicSection) {
+            val actualToken = SnakemakeLexer.KEYWORD_LIKE_SECTION_NAME_2_TOKEN_TYPE[myBuilder.tokenText!!]
+            if (actualToken != null) {
+                myBuilder.remapCurrentToken(actualToken)
+            } else if (checkToplevelFun()) {
+                myBuilder.remapCurrentToken(SmkTokenTypes.WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)
+            }
+        }
+    }
+
+    private fun checkIfAtToplevelDecoratorKeyword(): Boolean {
+        val workflowParam = myBuilder.mark()
+        var result = checkNextToken(PyTokenTypes.COLON)
+        nextToken()
+
+        val tt = myBuilder.tokenType
+        result = result && (tt.isPythonString() || tt == PyTokenTypes.STATEMENT_BREAK)
+        workflowParam.rollbackTo()
+        return result
+    }
+
+    private fun checkNextToken(tt: PyElementType): Boolean {
+        nextToken()
+        if (myBuilder.tokenType == tt) {
+            return true
+        }
         return false
     }
 

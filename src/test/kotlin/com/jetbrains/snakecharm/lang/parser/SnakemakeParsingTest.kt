@@ -1,6 +1,5 @@
 package com.jetbrains.snakecharm.lang.parser
 
-import com.intellij.lang.ASTFactory
 import com.intellij.lang.LanguageASTFactory
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
@@ -27,7 +26,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
  *
  */
 class SnakemakeParsingTest : ParsingTestCase(
-        "psi", "smk", SmkParserDefinition(), PythonParserDefinition()
+    "psi", "smk", SmkParserDefinition(), PythonParserDefinition()
 ) {
     private var myLanguageLevel = LanguageLevel.getDefault()
 
@@ -41,7 +40,7 @@ class SnakemakeParsingTest : ParsingTestCase(
         registerExtensionPoint(PythonDialectsTokenSetContributor.EP_NAME, PythonDialectsTokenSetContributor::class.java)
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
         registerExtension(PythonDialectsTokenSetContributor.EP_NAME, SmkTokenSetContributor())
-        addExplicitExtension<ASTFactory>(LanguageASTFactory.INSTANCE, PythonLanguage.getInstance(), PythonASTFactory())
+        addExplicitExtension(LanguageASTFactory.INSTANCE, PythonLanguage.getInstance(), PythonASTFactory())
 
         // w/o this fails due to NPEs on PyPsiFacade access
         project.registerService(
@@ -225,6 +224,10 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testWorkflowUnknownSections() {
+        doTest()
+    }
+
     fun testSingleLineDocstring() {
         doTest()
     }
@@ -285,7 +288,7 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-     fun testIssue190() {
+    fun testIssue190() {
         doTest()
     }
 
@@ -426,8 +429,8 @@ class SnakemakeParsingTest : ParsingTestCase(
     }
 
     private fun <T : PyFunction> ensureEachFunctionHasStatementList(
-      parentFile: PsiFile,
-      functionType: Class<T>
+        parentFile: PsiFile,
+        functionType: Class<T>
     ) {
         val functions = PsiTreeUtil.findChildrenOfType(parentFile, functionType)
         for (functionToCheck in functions) {

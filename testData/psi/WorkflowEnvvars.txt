@@ -1,6 +1,6 @@
 SnakemakeFile: WorkflowEnvvars.smk
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_ENVVARS_KEYWORD)('envvars')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('envvars')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace('\n    ')
