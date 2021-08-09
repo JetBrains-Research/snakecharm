@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.stringLanguage.lang.psi
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiPolyVariantReference
 import com.jetbrains.python.psi.PyElementVisitor
-import com.jetbrains.python.psi.PySubscriptionExpression
 import com.jetbrains.python.psi.PyTargetExpression
 import com.jetbrains.python.psi.impl.PyEvaluator
 import com.jetbrains.python.psi.impl.PyPsiUtils
@@ -21,8 +20,7 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLElemen
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLElementTypes.KEY_EXPRESSION
 import java.util.function.Predicate
 
-class SmkSLSubscriptionExpressionImpl(node: ASTNode) : SmkSLElementImpl(node), PySubscriptionExpression,
-    SmkSLReferenceExpression {
+class SmkSLSubscriptionExpressionImpl(node: ASTNode) : SmkSLElementImpl(node), SmkSLSubscriptionExpression {
     //    override fun toString() = "${this::class.java.simpleName}(${node.elementType})"
 
     override fun getReference(context: PyResolveContext): PsiPolyVariantReference {
