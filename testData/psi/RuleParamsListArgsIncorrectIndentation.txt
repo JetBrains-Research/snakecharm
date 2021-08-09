@@ -160,7 +160,7 @@ SnakemakeFile: RuleParamsListArgsIncorrectIndentation.smk
   PsiErrorElement:Unexpected indent
     <empty list>
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('shell')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('shell')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')

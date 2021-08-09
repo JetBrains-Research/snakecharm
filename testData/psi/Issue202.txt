@@ -1,6 +1,6 @@
 SnakemakeFile: Issue202.smk
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('configfile')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('configfile')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
@@ -27,7 +27,7 @@ SnakemakeFile: Issue202.smk
         PsiElement(Py:SINGLE_QUOTED_STRING)('"rules/raw_qc.smk"')
   PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('include')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('include')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')

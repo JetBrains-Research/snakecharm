@@ -131,7 +131,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 <empty list>
       PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('configfile')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('configfile')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
@@ -161,7 +161,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 <empty list>
       PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('workdir')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('workdir')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
@@ -191,7 +191,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 <empty list>
       PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('singularity')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('singularity')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
@@ -221,7 +221,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 <empty list>
       PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('report')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('report')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
@@ -251,7 +251,7 @@ SnakemakeFile: UnbalancedBracesRecovery.smk
                 <empty list>
       PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('wildcard_constraints')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('wildcard_constraints')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')

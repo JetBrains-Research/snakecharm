@@ -1,6 +1,6 @@
 SnakemakeFile: WorkflowUnknownSections.smk
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('unknownSection1')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('unknownSection1')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
@@ -8,7 +8,7 @@ SnakemakeFile: WorkflowUnknownSections.smk
         PsiElement(Py:SINGLE_QUOTED_STRING)('"Unknown_section1"')
   PsiWhiteSpace('\n\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('unknownSection2')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('unknownSection2')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace('\n  ')
@@ -16,7 +16,7 @@ SnakemakeFile: WorkflowUnknownSections.smk
         PsiElement(Py:SINGLE_QUOTED_STRING)('"Unknown_section2"')
   PsiWhiteSpace('\n\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('unknownSection3')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('unknownSection3')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace('\n        ')
@@ -94,7 +94,7 @@ SnakemakeFile: WorkflowUnknownSections.smk
           PsiElement(Py:IDENTIFIER)('a')
   PsiWhiteSpace('\n\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('incorrectVariable')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('incorrectVariable')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace('\n    ')

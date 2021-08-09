@@ -58,7 +58,7 @@ SnakemakeFile: UnexpectedSectionKeyword.smk
             PsiElement(Py:SINGLE_QUOTED_STRING)('''')
   PsiWhiteSpace('\n\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('booo')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('booo')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
@@ -66,7 +66,7 @@ SnakemakeFile: UnexpectedSectionKeyword.smk
         PsiElement(Py:SINGLE_QUOTED_STRING)('''')
   PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_TOPLEVEL_DECORATOR_KEYWORD)('configfile')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('configfile')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
