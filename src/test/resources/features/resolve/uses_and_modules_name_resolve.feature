@@ -83,7 +83,7 @@ Feature: Resolve use and module name to its declaration
       | a,b,c from M as other_*   | b          |
       | other_a,other_b from M as | other_b    |
 
-  Scenario Outline: Refer to MODULE which imports a rule
+  Scenario Outline: Doesn't refer to MODULE which imports a rule
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -98,7 +98,7 @@ Feature: Resolve use and module name to its declaration
         "data_file.txt"
     """
     When I put the caret at NAME
-    Then reference should resolve to "MODULE" in "foo.smk"
+    Then reference should not resolve
     Examples:
       | name  |
       | other |

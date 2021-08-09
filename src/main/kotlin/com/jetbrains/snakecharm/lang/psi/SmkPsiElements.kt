@@ -34,6 +34,11 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
      * [visitedFiles] is set of [PsiFile]s which are already visited.
      */
     fun getProducedRulesNames(visitedFiles: MutableSet<PsiFile> = mutableSetOf()): List<Pair<String, PsiElement>>
+
+    /**
+     * Returns reference to 'module', which is mentioned in 'from' definition region is there are such region
+     */
+    fun getModuleReference(): SmkReferenceExpression?
 }
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer

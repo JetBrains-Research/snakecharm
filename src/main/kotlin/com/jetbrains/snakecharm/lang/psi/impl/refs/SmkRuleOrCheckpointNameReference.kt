@@ -5,8 +5,6 @@ import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
-import com.intellij.psi.util.elementType
-import com.intellij.psi.util.parentOfType
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.impl.references.PyReferenceImpl
 import com.jetbrains.python.psi.resolve.PyResolveContext
@@ -17,9 +15,6 @@ import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkModule
 import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
@@ -56,7 +51,6 @@ class SmkRuleOrCheckpointNameReference(
         results.addAll(SmkRulesType(null, smkFile).resolveMember(name, element, ctx, myContext))
         results.addAll(SmkCheckpointType(null, smkFile).resolveMember(name, element, ctx, myContext))
         results.addAll(collectModulesAndResolveThem(smkFile, element))
-        results.addAll(collectModuleFromUseSection(element))
 
         return results
     }
@@ -83,47 +77,5 @@ class SmkRuleOrCheckpointNameReference(
         return modules.map { variant ->
             RatedResolveResult(SmkResolveUtil.RATE_NORMAL, variant)
         }
-    }
-
-    /**
-     * Resolves rule reference, which is declared in 'use' section.
-     * It refers to rule in module if the module is local file
-     * Or to module, which imports such rule, otherwise.
-     * If there no such module, returns an empty array.
-     */
-    private fun collectModuleFromUseSection(
-        element: SmkReferenceExpression
-    ): List<RatedResolveResult> {
-        if (element.parent.elementType != SmkElementTypes.USE_IMPORTED_RULES_NAMES) {
-            return emptyList()
-        }
-        val parent = element.parentOfType<SmkRuleOrCheckpoint>()
-        if (parent != null && parent.elementType == SmkStubElementTypes.USE_DECLARATION_STATEMENT) {
-            var moduleRef = element.parent.nextSibling
-            while (moduleRef != null && moduleRef.elementType != SmkElementTypes.REFERENCE_EXPRESSION) {
-                moduleRef = moduleRef.nextSibling
-            }
-            if (moduleRef != null) {
-                val module = (moduleRef as SmkReferenceExpression).reference.resolve() as? SmkModule
-                val file = module?.getPsiFile() as? SmkFile
-                    ?: return listOf(
-                        RatedResolveResult(
-                            SmkResolveUtil.RATE_NORMAL,
-                            (moduleRef).reference.resolve()
-                        )
-                    )
-                val result = file.advancedCollectRules(mutableSetOf()).firstOrNull { it.first == element.text }
-                if (result != null) {
-                    return listOf(
-                        RatedResolveResult(
-                            SmkResolveUtil.RATE_NORMAL,
-                            result.second
-                        )
-                    )
-                }
-            }
-        }
-
-        return emptyList()
     }
 }

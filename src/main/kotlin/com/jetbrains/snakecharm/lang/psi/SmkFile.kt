@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.lang.psi
 
+import com.intellij.openapi.vfs.impl.http.HttpVirtualFile
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiFile
 import com.intellij.psi.stubs.StubElement
@@ -116,22 +117,55 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
     }
 
     /**
-     * Collects local rules, rules, defined in use section and rules, imported by 'includes'
+     * Collects local rules, rules, defined in use section, and rules, imported by 'include:'
      */
-    fun advancedCollectRules(visitedFiles: MutableSet<PsiFile>): List<Pair<String, SmkRuleOrCheckpoint>> {
+    fun advancedCollectRules(visitedFiles: MutableSet<PsiFile>) = advancedCollect(visitedFiles) { file ->
+        file.collectRules() + file.collectUses(visitedFiles)
+    }
+
+    /**
+     * Collects elements of [SmkUse] with wildcard '*' in name.
+     * It collects elements from current [SmkFile] and from files which were imported via 'include:'
+     */
+    fun advancedCollectUseSectionsWithWildcards(visitedFiles: MutableSet<PsiFile>) =
+        advancedCollect(visitedFiles) { file ->
+            val useNameAndPsi = arrayListOf<Pair<String, SmkUse>>()
+
+            file.acceptChildren(object : PyElementVisitor(), SmkElementVisitor {
+                override val pyElementVisitor: PyElementVisitor = this
+
+                override fun visitSmkUse(use: SmkUse) {
+                    val moduleFile = (use.getModuleReference()?.reference?.resolve() as? SmkModule)?.getPsiFile()
+                    val doesNotReferToLocalModule = (moduleFile == null || moduleFile.virtualFile is HttpVirtualFile)
+                    if (use.name?.contains('*') == true && doesNotReferToLocalModule) {
+                        useNameAndPsi.add((use.name ?: return) to use)
+                    }
+                }
+            })
+
+            useNameAndPsi
+        }.map { it.first to it.second as SmkUse }
+
+    /**
+     * Collects elements of type [SmkRuleOrCheckpoint] from a current [SmkFile] using [additionalCollector]
+     * and collects elements from other files which were imported via 'include:'
+     */
+    private fun advancedCollect(
+        visitedFiles: MutableSet<PsiFile>,
+        additionalCollector: (SmkFile) -> List<Pair<String, SmkRuleOrCheckpoint>>
+    ): List<Pair<String, SmkRuleOrCheckpoint>> {
         if (!visitedFiles.add(this)) {
             return emptyList()
         }
 
         val result = mutableListOf<Pair<String, SmkRuleOrCheckpoint>>()
-        result.addAll(collectRules())
-        result.addAll(collectUses(visitedFiles))
+        result.addAll(additionalCollector(this))
         collectIncludes().forEach { include ->
             include.references.forEach { reference ->
                 if (reference is SmkIncludeReference) {
                     val file = reference.resolve() as? SmkFile
                     if (file != null) {
-                        result.addAll(file.advancedCollectRules(visitedFiles))
+                        result.addAll(file.advancedCollect(visitedFiles, additionalCollector))
                     }
                 }
             }

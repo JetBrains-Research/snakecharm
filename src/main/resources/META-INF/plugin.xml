@@ -557,6 +557,16 @@
             implementationClass="com.jetbrains.snakecharm.inspections.SmkMultilineFunctionCallInspection"
       />
 
+    <localInspection
+      language="Snakemake" shortName="SmkUnresolvedReferenceInUseSectionInspection"
+      enabledByDefault="true"
+      level="WEAK WARNING"
+      suppressId="SmkUnresolvedReferenceInUseSection"
+      bundle="SnakemakeBundle"
+      groupKey="INSP.GROUP.snakemake"
+      key="INSP.NAME.unresolved.use.reference"
+      implementationClass="com.jetbrains.snakecharm.inspections.SmkUnresolvedReferenceInUseSectionInspection"/>
+
     <findUsagesHandlerFactory
             implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"
             id="Python" order="last, before default"

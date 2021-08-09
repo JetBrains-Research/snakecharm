@@ -89,4 +89,7 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
             originalNames.map { it.first.replace("*", it.first) to it.second }
         }
     }
+
+    override fun getModuleReference() =
+        node.findChildByType(SmkTokenTypes.SMK_FROM_KEYWORD)?.psi?.nextSibling?.nextSibling as? SmkReferenceExpression
 }
