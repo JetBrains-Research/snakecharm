@@ -8,65 +8,73 @@ Feature: Statement mover
     """
     <rule_like2> NAME2:
         <rule_section2>: <content2>
-    <rule_like1> NAME1:
+    <rule_like1> NAME1 <addition>:
         <rule_section1>: <content1>
     """
-    When I put the caret at <rule_like1> NAME1:
+    When I put the caret at <rule_like1> NAME1 <addition>:
     And I invoke MoveStatementUp action
     Then editor content will be
     """
-    <rule_like1> NAME1:
+    <rule_like1> NAME1 <addition>:
         <rule_section1>: <content1>
     <rule_like2> NAME2:
         <rule_section2>: <content2>
     """
-    When I put the caret at <rule_like1> NAME1:
+    When I put the caret at <rule_like1> NAME1 <addition>:
     And I invoke MoveStatementDown action
     Then editor content will be
     """
     <rule_like2> NAME2:
         <rule_section2>: <content2>
-    <rule_like1> NAME1:
+    <rule_like1> NAME1 <addition>:
         <rule_section1>: <content1>
     """
     Examples:
-      | rule_like1  | rule_like2  | rule_section1  | rule_section2  | content1       | content2      |
-      | rule        | rule        | input          | output         | "file1.txt"    | "file2.txt"   |
-      | checkpoint  | rule        | input          | output         | "file1.txt"    | "file2.txt"   |
-      | subworkflow | rule        | workdir        | output         | "file1.txt"    | "file2.txt"   |
-      | rule        | checkpoint  | input          | output         | "file1.txt"    | "file2.txt"   |
-      | checkpoint  | checkpoint  | input          | output         | "file1.txt"    | "file2.txt"   |
-      | subworkflow | checkpoint  | workdir        | output         | "file1.txt"    | "file2.txt"   |
-      | rule        | subworkflow | input          | workdir        | "file1.txt"    | "file2.txt"   |
-      | checkpoint  | subworkflow | input          | workdir        | "file1.txt"    | "file2.txt"   |
-      | subworkflow | subworkflow | workdir        | workdir        | "file1.txt"    | "file2.txt"   |
-      | rule        | rule        | input          | output         | "file1.txt"    | \n        "file2.txt" |
-      | checkpoint  | rule        | input          | output         | "file1.txt"    | \n        "file2.txt" |
-      | subworkflow | rule        | workdir        | output         | "file1.txt"    | \n        "file2.txt" |
-      | rule        | checkpoint  | input          | output         | "file1.txt"    | \n        "file2.txt" |
-      | checkpoint  | checkpoint  | input          | output         | "file1.txt"    | \n        "file2.txt" |
-      | subworkflow | checkpoint  | workdir        | output         | "file1.txt"    | \n        "file2.txt" |
-      | rule        | subworkflow | input          | workdir        | "file1.txt"    | \n        "file2.txt" |
-      | checkpoint  | subworkflow | input          | workdir        | "file1.txt"    | \n        "file2.txt" |
-      | subworkflow | subworkflow | workdir        | workdir        | "file1.txt"    | \n        "file2.txt" |
-      | rule        | rule        | input          | output         | \n        "file1.txt"  | "file2.txt"   |
-      | checkpoint  | rule        | input          | output         | \n        "file1.txt"  | "file2.txt"   |
-      | subworkflow | rule        | workdir        | output         | \n        "file1.txt"  | "file2.txt"   |
-      | rule        | checkpoint  | input          | output         | \n        "file1.txt"  | "file2.txt"   |
-      | checkpoint  | checkpoint  | input          | output         | \n        "file1.txt"  | "file2.txt"   |
-      | subworkflow | checkpoint  | workdir        | output         | \n        "file1.txt"  | "file2.txt"   |
-      | rule        | subworkflow | input          | workdir        | \n        "file1.txt"  | "file2.txt"   |
-      | checkpoint  | subworkflow | input          | workdir        | \n        "file1.txt"  | "file2.txt"   |
-      | subworkflow | subworkflow | workdir        | workdir        | \n        "file1.txt"  | "file2.txt"   |
-      | rule        | rule        | input          | output         | \n        "file1.txt"  | \n        "file2.txt" |
-      | checkpoint  | rule        | input          | output         | \n        "file1.txt"  | \n        "file2.txt" |
-      | subworkflow | rule        | workdir        | output         | \n        "file1.txt"  | \n        "file2.txt" |
-      | rule        | checkpoint  | input          | output         | \n        "file1.txt"  | \n        "file2.txt" |
-      | checkpoint  | checkpoint  | input          | output         | \n        "file1.txt"  | \n        "file2.txt" |
-      | subworkflow | checkpoint  | workdir        | output         | \n        "file1.txt"  | \n        "file2.txt" |
-      | rule        | subworkflow | input          | workdir        | \n        "file1.txt"  | \n        "file2.txt" |
-      | checkpoint  | subworkflow | input          | workdir        | \n        "file1.txt"  | \n        "file2.txt" |
-      | subworkflow | subworkflow | workdir        | workdir        | \n        "file1.txt"  | \n        "file2.txt" |
+      | rule_like1  | rule_like2  | rule_section1 | rule_section2 | content1               | content2              | addition      |
+      | rule        | rule        | input         | output        | "file1.txt"            | "file2.txt"           |               |
+      | checkpoint  | rule        | input         | output        | "file1.txt"            | "file2.txt"           |               |
+      | subworkflow | rule        | workdir       | output        | "file1.txt"            | "file2.txt"           |               |
+      | module      | rule        | snakefile     | output        | "file1.smk"            | "file2.txt"           |               |
+      | use rule    | rule        | input         | output        | "file1.txt"            | "file2.txt"           | as NAME3 with |
+      | rule        | checkpoint  | input         | output        | "file1.txt"            | "file2.txt"           |               |
+      | checkpoint  | checkpoint  | input         | output        | "file1.txt"            | "file2.txt"           |               |
+      | subworkflow | checkpoint  | workdir       | output        | "file1.txt"            | "file2.txt"           |               |
+      | rule        | subworkflow | input         | workdir       | "file1.txt"            | "file2.txt"           |               |
+      | checkpoint  | subworkflow | input         | workdir       | "file1.txt"            | "file2.txt"           |               |
+      | subworkflow | subworkflow | workdir       | workdir       | "file1.txt"            | "file2.txt"           |               |
+      | rule        | rule        | input         | output        | "file1.txt"            | \n        "file2.txt" |               |
+      | checkpoint  | rule        | input         | output        | "file1.txt"            | \n        "file2.txt" |               |
+      | subworkflow | rule        | workdir       | output        | "file1.txt"            | \n        "file2.txt" |               |
+      | module      | rule        | snakefile     | output        | "file1.smk"            | \n        "file2.txt" |               |
+      | use rule    | rule        | input         | output        | "file1.txt"            | \n        "file2.txt" | as NAME3 with |
+      | rule        | checkpoint  | input         | output        | "file1.txt"            | \n        "file2.txt" |               |
+      | checkpoint  | checkpoint  | input         | output        | "file1.txt"            | \n        "file2.txt" |               |
+      | subworkflow | checkpoint  | workdir       | output        | "file1.txt"            | \n        "file2.txt" |               |
+      | rule        | subworkflow | input         | workdir       | "file1.txt"            | \n        "file2.txt" |               |
+      | checkpoint  | subworkflow | input         | workdir       | "file1.txt"            | \n        "file2.txt" |               |
+      | subworkflow | subworkflow | workdir       | workdir       | "file1.txt"            | \n        "file2.txt" |               |
+      | rule        | rule        | input         | output        | \n        "file1.txt"  | "file2.txt"           |               |
+      | checkpoint  | rule        | input         | output        | \n        "file1.txt"  | "file2.txt"           |               |
+      | subworkflow | rule        | workdir       | output        | \n        "file1.txt"  | "file2.txt"           |               |
+      | module      | rule        | snakefile     | output        | \n        "file1.smk"  | "file2.txt"           |               |
+      | use rule    | rule        | input         | output        | \n         "file1.txt" | "file2.txt"           | as NAME3 with |
+      | rule        | checkpoint  | input         | output        | \n        "file1.txt"  | "file2.txt"           |               |
+      | checkpoint  | checkpoint  | input         | output        | \n        "file1.txt"  | "file2.txt"           |               |
+      | subworkflow | checkpoint  | workdir       | output        | \n        "file1.txt"  | "file2.txt"           |               |
+      | rule        | subworkflow | input         | workdir       | \n        "file1.txt"  | "file2.txt"           |               |
+      | checkpoint  | subworkflow | input         | workdir       | \n        "file1.txt"  | "file2.txt"           |               |
+      | subworkflow | subworkflow | workdir       | workdir       | \n        "file1.txt"  | "file2.txt"           |               |
+      | rule        | rule        | input         | output        | \n        "file1.txt"  | \n        "file2.txt" |               |
+      | checkpoint  | rule        | input         | output        | \n        "file1.txt"  | \n        "file2.txt" |               |
+      | subworkflow | rule        | workdir       | output        | \n        "file1.txt"  | \n        "file2.txt" |               |
+      | module      | rule        | snakefile     | output        | \n        "file1.smk"  | \n        "file2.txt" |               |
+      | use rule    | rule        | input         | output        | \n        "file1.txt"  | \n        "file2.txt" | as NAME3 with |
+      | rule        | checkpoint  | input         | output        | \n        "file1.txt"  | \n        "file2.txt" |               |
+      | checkpoint  | checkpoint  | input         | output        | \n        "file1.txt"  | \n        "file2.txt" |               |
+      | subworkflow | checkpoint  | workdir       | output        | \n        "file1.txt"  | \n        "file2.txt" |               |
+      | rule        | subworkflow | input         | workdir       | \n        "file1.txt"  | \n        "file2.txt" |               |
+      | checkpoint  | subworkflow | input         | workdir       | \n        "file1.txt"  | \n        "file2.txt" |               |
+      | subworkflow | subworkflow | workdir       | workdir       | \n        "file1.txt"  | \n        "file2.txt" |               |
 
   Scenario Outline: Swap rule like toplevel and python function sections
     Given a snakemake project
@@ -74,32 +82,32 @@ Feature: Statement mover
     """
     def NAME2():
         n = 1
-    <rule_like1> NAME1:
+    <rule_like1> NAME1 <addition>:
         <rule_section1>: "file1.txt"
     """
-    When I put the caret at <rule_like1> NAME1:
+    When I put the caret at <rule_like1> NAME1 <addition>:
     And I invoke MoveStatementUp action
     Then editor content will be
     """
-    <rule_like1> NAME1:
+    <rule_like1> NAME1 <addition>:
         <rule_section1>: "file1.txt"
     def NAME2():
         n = 1
     """
-    When I put the caret at <rule_like1> NAME1:
+    When I put the caret at <rule_like1> NAME1 <addition>:
     And I invoke MoveStatementDown action
     Then editor content will be
     """
     def NAME2():
         n = 1
-    <rule_like1> NAME1:
+    <rule_like1> NAME1 <addition>:
         <rule_section1>: "file1.txt"
     """
     When I put the caret at def NAME2()
     And I invoke MoveStatementDown action
     Then editor content will be
     """
-    <rule_like1> NAME1:
+    <rule_like1> NAME1 <addition>:
         <rule_section1>: "file1.txt"
     def NAME2():
         n = 1
@@ -110,56 +118,62 @@ Feature: Statement mover
     """
     def NAME2():
         n = 1
-    <rule_like1> NAME1:
+    <rule_like1> NAME1 <addition>:
         <rule_section1>: "file1.txt"
     """
     Examples:
-      | rule_like1  | rule_section1  |
-      | rule        | input          |
-      | checkpoint  | input          |
-      | subworkflow | workdir        |
+      | rule_like1  | rule_section1 | addition      |
+      | rule        | input         |               |
+      | checkpoint  | input         |               |
+      | subworkflow | workdir       |               |
+      | module      | snakefile     |               |
+      | use rule    | input         | as NAME2 with |
 
   Scenario Outline: Swap rule like section and comment
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
     # comment
-    <rule_like1> NAME1:
+    <rule_like1> NAME1 <addition>:
         <rule_section1>:
             <content>
 
     pass
     """
-    When I put the caret at <rule_like1> NAME1:
+    When I put the caret at <rule_like1> NAME1 <addition>:
     And I invoke MoveStatementUp action
     Then editor content will be
     """
-    <rule_like1> NAME1:
+    <rule_like1> NAME1 <addition>:
         <rule_section1>:
             <content>
     # comment
 
     pass
     """
-    When I put the caret at <rule_like1> NAME1:
+    When I put the caret at <rule_like1> NAME1 <addition>:
     And I invoke MoveStatementDown action
     Then editor content will be
     """
     # comment
-    <rule_like1> NAME1:
+    <rule_like1> NAME1 <addition>:
         <rule_section1>:
             <content>
 
     pass
     """
     Examples:
-      | rule_like1  | rule_section1  | content |
-      | rule        | input          | ""      |
-      | checkpoint  | input          | ""      |
-      | subworkflow | workdir        | ""      |
-      | rule        | input          | \n        ""    |
-      | checkpoint  | input          | \n        ""    |
-      | subworkflow | workdir        | \n        ""    |
+      | rule_like1  | rule_section1 | content      | addition      |
+      | rule        | input         | ""           |               |
+      | checkpoint  | input         | ""           |               |
+      | subworkflow | workdir       | ""           |               |
+      | module      | snakefile     | ""           |               |
+      | use rule    | input         | ""           | as NAME2 with |
+      | rule        | input         | \n        "" |               |
+      | checkpoint  | input         | \n        "" |               |
+      | subworkflow | workdir       | \n        "" |               |
+      | module      | snakefile     | \n        "" |               |
+      | use rule    | input         | \n        "" | as NAME2 with |
 
   Scenario Outline: Swap rule like single line subsections
     Given a snakemake project
@@ -311,7 +325,7 @@ Feature: Statement mover
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
-    <rule_like> NAME1:
+    <rule_like> NAME1 <addition>:
         input:<content>
     wildcard_constraints:<statement_content>
     """
@@ -319,7 +333,7 @@ Feature: Statement mover
     And I invoke MoveStatementUp action
     Then editor content will be
     """
-    <rule_like> NAME1:
+    <rule_like> NAME1 <addition>:
         input:<content>
         wildcard_constraints:<statement_content>
 
@@ -328,7 +342,7 @@ Feature: Statement mover
     And I invoke MoveStatementUp action
     Then editor content will be
     """
-    <rule_like> NAME1:
+    <rule_like> NAME1 <addition>:
         wildcard_constraints:<statement_content>
         input:<content>
 
@@ -338,7 +352,7 @@ Feature: Statement mover
     Then editor content will be
     """
     wildcard_constraints:<statement_content>
-    <rule_like> NAME1:
+    <rule_like> NAME1 <addition>:
         input:<content>
 
     """
@@ -347,7 +361,7 @@ Feature: Statement mover
     Then editor content will be
     """
 
-    <rule_like> NAME1:
+    <rule_like> NAME1 <addition>:
         wildcard_constraints:<statement_content>
         input:<content>
 
@@ -357,7 +371,7 @@ Feature: Statement mover
     Then editor content will be
     """
 
-    <rule_like> NAME1:
+    <rule_like> NAME1 <addition>:
         input:<content>
         wildcard_constraints:<statement_content>
 
@@ -367,17 +381,19 @@ Feature: Statement mover
     Then editor content will be
     """
 
-    <rule_like> NAME1:
+    <rule_like> NAME1 <addition>:
         input:<content>
     wildcard_constraints:<statement_content>
 
     """
     Examples:
-      | rule_like   | content         | statement_content | caret |
-      | rule        | "file.txt"      | wildcard="/d+1"   | wildcard= |
-      | checkpoint  | "file.txt"      | wildcard="/d+1"   | wildcard= |
-      | rule        | \n        "file.txt"    | wildcard="/d+1"   | wildcard= |
-      | checkpoint  | \n        "file.txt"    | wildcard="/d+1"   | wildcard= |
+      | rule_like  | content              | statement_content | caret     | addition      |
+      | rule       | "file.txt"           | wildcard="/d+1"   | wildcard= |               |
+      | checkpoint | "file.txt"           | wildcard="/d+1"   | wildcard= |               |
+      | use rule   | "file.txt"           | wildcard="/d+1"   | wildcard= | as NAME2 with |
+      | rule       | \n        "file.txt" | wildcard="/d+1"   | wildcard= |               |
+      | checkpoint | \n        "file.txt" | wildcard="/d+1"   | wildcard= |               |
+      | use rule   | \n        "file.txt" | wildcard="/d+1"   | wildcard= | as NAME2 with |
 
 
   Scenario Outline: Move wildcard_constraints in/out rule (wildcard_constraints)
@@ -464,33 +480,65 @@ Feature: Statement mover
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
-    <rule_like> NAME1:
+    <rule_like> NAME1 <addition>:
         <statement_name>: <statement_content>
     """
     When I put the caret at <caret>
     And I invoke MoveStatementUp action
     Then editor content will be
     """
-    <rule_like> NAME1:
+    <rule_like> NAME1 <addition>:
         <statement_name>: <statement_content>
     """
     When I put the caret at <caret>
     And I invoke MoveStatementDown action
     Then editor content will be
     """
-    <rule_like> NAME1:
+    <rule_like> NAME1 <addition>:
         <statement_name>: <statement_content>
     """
     Examples:
-      | rule_like   | statement_name       | statement_content         | caret                |
-      | rule        | wildcard_constraints | wildcard="/d+1"           | wildcard=            |
-      | checkpoint  | wildcard_constraints | wildcard="/d+1"           | wildcard_constraints |
-      | subworkflow | workdir              | "/dir"                    | workdir              |
-      | subworkflow | workdir              | "/dir"                    | "/dir"               |
-      | rule        | wildcard_constraints | \n        wildcard="/d+1" | wildcard=            |
-      | checkpoint  | wildcard_constraints | \n        wildcard="/d+1" | wildcard_constraints |
-      | subworkflow | workdir              | \n        "/dir"          | workdir              |
-      | subworkflow | workdir              | \n        "/dir"          | "/dir"               |
+      | rule_like   | statement_name       | statement_content         | caret                | addition      |
+      | rule        | wildcard_constraints | wildcard="/d+1"           | wildcard=            |               |
+      | checkpoint  | wildcard_constraints | wildcard="/d+1"           | wildcard_constraints |               |
+      | subworkflow | workdir              | "/dir"                    | workdir              |               |
+      | subworkflow | workdir              | "/dir"                    | "/dir"               |               |
+      | module      | snakefile            | "/dir""                   | "/dir"               |               |
+      | use rule    | wildcard_constraints | wildcard="/d+1"           | wildcard=            | as NAME2 with |
+      | rule        | wildcard_constraints | \n        wildcard="/d+1" | wildcard=            |               |
+      | checkpoint  | wildcard_constraints | \n        wildcard="/d+1" | wildcard_constraints |               |
+      | subworkflow | workdir              | \n        "/dir"          | workdir              |               |
+      | subworkflow | workdir              | \n        "/dir"          | "/dir"               |               |
+      | module      | snakefile            | \n        "/dir"          | "/dir"               |               |
+      | use rule    | wildcard_constraints | \n        wildcard="/d+1" | wildcard=            | as NAME2 with |
+
+  Scenario Outline: Move section out rule doesn't work if destination is use section and moving section is execution section
+    Given a snakemake project
+    Given I open a file "foo1.smk" with text
+    """
+    rule NAME:
+      <section>:
+        file="file.txt"
+
+    use rule NAME2 as NAME3 with:
+      threads: 5
+    """
+    When I put the caret at <section>
+    And I invoke MoveStatementDown action
+    Then editor content will be
+    """
+    rule NAME:
+      <section>:
+        file="file.txt"
+
+    use rule NAME2 as NAME3 with:
+      threads: 5
+    """
+    Examples:
+      | section |
+      | shell   |
+      | run     |
+      | wrapper |
 
   Scenario Outline: Move in/out if/else statement for rule like.
     Given a snakemake project
@@ -651,62 +699,68 @@ Feature: Statement mover
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
-    <rule_like2> NAME2:
+    <rule_like2> NAME2 <addition2>:
         input:<content2>
         output:<content2>
 
     # comment
 
-    <rule_like1> NAME1:
-        log:<content1>
+    <rule_like1> NAME1 <addition1>:
+        <section>:<content1>
         message:<content1>
     """
-    When I put the caret at log:
+    When I put the caret at <section>:
     And I invoke MoveStatementUp action
     Then editor content will be
     """
-    <rule_like2> NAME2:
+    <rule_like2> NAME2 <addition2>:
         input:<content2>
         output:<content2>
-        log:<content1>
+        <section>:<content1>
 
     # comment
 
-    <rule_like1> NAME1:
+    <rule_like1> NAME1 <addition1>:
         message:<content1>
     """
-    When I put the caret at log:
+    When I put the caret at <section>:
     And I invoke MoveStatementDown action
     Then editor content will be
     """
-    <rule_like2> NAME2:
+    <rule_like2> NAME2 <addition2>:
         input:<content2>
         output:<content2>
 
     # comment
 
-    <rule_like1> NAME1:
-        log:<content1>
+    <rule_like1> NAME1 <addition1>:
+        <section>:<content1>
         message:<content1>
     """
     Examples:
-      | rule_like1  | rule_like2  | content1       | content2      |
-      | rule       | rule       | "file1.txt"           | "file2.txt"           |
-      | checkpoint | rule       | "file1.txt"           | "file2.txt"           |
-      | rule       | checkpoint | "file1.txt"           | "file2.txt"           |
-      | checkpoint | checkpoint | "file1.txt"           | "file2.txt"           |
-      | rule       | rule       | \n        "file1.txt" | "file2.txt"           |
-      | checkpoint | rule       | \n        "file1.txt" | "file2.txt"           |
-      | rule       | checkpoint | \n        "file1.txt" | "file2.txt"           |
-      | checkpoint | checkpoint | \n        "file1.txt" | "file2.txt"           |
-      | rule       | rule       | "file1.txt"           | \n        "file2.txt" |
-      | checkpoint | rule       | "file1.txt"           | \n        "file2.txt" |
-      | rule       | checkpoint | "file1.txt"           | \n        "file2.txt" |
-      | checkpoint | checkpoint | "file1.txt"           | \n        "file2.txt" |
-      | rule       | rule       | \n        "file1.txt" | \n        "file2.txt" |
-      | checkpoint | rule       | \n        "file1.txt" | \n        "file2.txt" |
-      | rule       | checkpoint | \n        "file1.txt" | \n        "file2.txt" |
-      | checkpoint | checkpoint | \n        "file1.txt" | \n        "file2.txt" |
+      | rule_like1 | rule_like2 | content1              | content2              | section         | addition1     | addition2     |
+      | rule       | rule       | "file1.txt"           | "file2.txt"           | log             |               |               |
+      | checkpoint | rule       | "file1.txt"           | "file2.txt"           | log             |               |               |
+      | rule       | checkpoint | "file1.txt"           | "file2.txt"           | log             |               |               |
+      | checkpoint | checkpoint | "file1.txt"           | "file2.txt"           | log             |               |               |
+      | rule       | rule       | \n        "file1.txt" | "file2.txt"           | log             |               |               |
+      | checkpoint | rule       | \n        "file1.txt" | "file2.txt"           | log             |               |               |
+      | rule       | checkpoint | \n        "file1.txt" | "file2.txt"           | log             |               |               |
+      | checkpoint | checkpoint | \n        "file1.txt" | "file2.txt"           | log             |               |               |
+      | rule       | rule       | "file1.txt"           | \n        "file2.txt" | log             |               |               |
+      | checkpoint | rule       | "file1.txt"           | \n        "file2.txt" | log             |               |               |
+      | rule       | checkpoint | "file1.txt"           | \n        "file2.txt" | log             |               |               |
+      | checkpoint | checkpoint | "file1.txt"           | \n        "file2.txt" | log             |               |               |
+      | rule       | rule       | \n        "file1.txt" | \n        "file2.txt" | log             |               |               |
+      | checkpoint | rule       | \n        "file1.txt" | \n        "file2.txt" | log             |               |               |
+      | rule       | checkpoint | \n        "file1.txt" | \n        "file2.txt" | log             |               |               |
+      | checkpoint | checkpoint | \n        "file1.txt" | \n        "file2.txt" | log             |               |               |
+      | module     | module     | True                  | "file2.txt"           | skip_validation |               |               |
+      | use rule   | use rule   | "file1.txt"           | "file2.txt"           | log             | as NAME3 with | as NAME4 with |
+      | use rule   | rule       | "file1.txt"           | "file2.txt"           | log             | as NAME3 with |               |
+      | rule       | use rule   | "file1.txt"           | "file2.txt"           | log             |               | as NAME4 with |
+      | use rule   | checkpoint | "file1.txt"           | "file2.txt"           | log             | as NAME3 with |               |
+      | checkpoint | use rule   | "file1.txt"           | "file2.txt"           | log             |               | as NAME4 with |
 
   Scenario Outline: Swap rule between rule sections doesn't work with content between them
      Given a snakemake project
