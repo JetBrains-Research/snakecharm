@@ -569,14 +569,14 @@
       />
 
     <localInspection
-      language="Snakemake" shortName="SmkUnresolvedReferenceInUseSectionInspection"
+      language="Snakemake" shortName="SmkUnresolvedImportedRuleNameInspection"
       enabledByDefault="true"
       level="WEAK WARNING"
-      suppressId="SmkUnresolvedReferenceInUseSection"
+      suppressId="SmkUnresolvedImportedRuleName"
       bundle="SnakemakeBundle"
       groupKey="INSP.GROUP.snakemake"
-      key="INSP.NAME.unresolved.use.reference"
-      implementationClass="com.jetbrains.snakecharm.inspections.SmkUnresolvedReferenceInUseSectionInspection"/>
+      key="INSP.NAME.probably.unresolved.use.reference"
+      implementationClass="com.jetbrains.snakecharm.inspections.SmkUnresolvedImportedRuleNameInspection"/>
 
     <findUsagesHandlerFactory
             implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"

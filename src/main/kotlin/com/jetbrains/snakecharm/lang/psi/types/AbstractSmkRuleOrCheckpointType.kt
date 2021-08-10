@@ -106,6 +106,15 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
                 result.add(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, referTo.second))
             }
         }
+
+        // Checks rule name patterns, produced by 'use' sections
+        if (result.isEmpty()) {
+            val namePatter = (location.containingFile as? SmkFile)?.resolveByRuleNamePattern(name)
+            if (namePatter != null) {
+                result.add(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, namePatter))
+            }
+        }
+
         return result
     }
 

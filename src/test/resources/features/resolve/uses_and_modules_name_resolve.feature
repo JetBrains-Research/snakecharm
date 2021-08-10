@@ -83,27 +83,6 @@ Feature: Resolve use and module name to its declaration
       | a,b,c from M as other_*   | b          |
       | other_a,other_b from M as | other_b    |
 
-  Scenario Outline: Doesn't refer to MODULE which imports a rule
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    module MODULE:
-      snakefile:
-        "https://usefullsmkfiles.com/file.smk "
-      configfile:
-        "path/to/custom_configfile.yaml"
-
-    use rule NAME from MODULE as <name> with:
-      input:
-        "data_file.txt"
-    """
-    When I put the caret at NAME
-    Then reference should not resolve
-    Examples:
-      | name  |
-      | other |
-      |       |
-
   Scenario: Module name refere to module declaration
     Given a snakemake project
     Given I open a file "foo.smk" with text

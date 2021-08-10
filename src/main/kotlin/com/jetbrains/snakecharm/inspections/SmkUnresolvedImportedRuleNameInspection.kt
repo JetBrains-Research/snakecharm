@@ -4,11 +4,15 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.vfs.impl.http.HttpVirtualFile
+import com.intellij.psi.util.elementType
+import com.jetbrains.python.psi.PyReferenceExpression
+import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
+import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 
-class SmkUnresolvedReferenceInUseSectionInspection : SnakemakeInspection() {
+class SmkUnresolvedImportedRuleNameInspection : SnakemakeInspection() {
 
     override fun buildVisitor(
         holder: ProblemsHolder,
@@ -18,9 +22,11 @@ class SmkUnresolvedReferenceInUseSectionInspection : SnakemakeInspection() {
 
         override fun visitSmkUse(use: SmkUse) {
             val references = use.node.findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES) ?: return
-            var file = use.containingFile as SmkFile
             val moduleRef = use.getModuleReference()
             if (moduleRef != null) {
+                // If there are 'from' construction
+                // And module doesn't refer to local
+                // Highlight rule references
                 val module = moduleRef.reference.resolve() as? SmkModule
                 val importedFile = module?.getPsiFile() as? SmkFile
                 if (importedFile == null || importedFile.virtualFile is HttpVirtualFile) {
@@ -35,28 +41,29 @@ class SmkUnresolvedReferenceInUseSectionInspection : SnakemakeInspection() {
                     }
                     return
                 }
-                file = importedFile
             }
-            val uses = file.advancedCollectUseSectionsWithWildcards(mutableSetOf())
             references.psi.children.forEach { reference ->
-                if (reference is SmkReferenceExpression && reference.reference.resolve() == null) {
-                    if (uses.any { (first) ->
-                            val pattern = first.replaceFirst("*", "(?<name>\\w+)").replace("*", "\\k<name>") + '$'
-                            pattern.toRegex().matches(reference.text)
-                        }) {
-                        registerProblem(
-                            reference,
-                            SnakemakeBundle.message("INSP.NAME.probably.unresolved.use.reference"),
-                            ProblemHighlightType.WEAK_WARNING
-                        )
-                    } else {
-                        registerProblem(
-                            reference,
-                            SnakemakeBundle.message("INSP.NAME.unresolved.use.reference", reference.text),
-                            ProblemHighlightType.GENERIC_ERROR
-                        )
-                    }
+                if (reference is SmkReferenceExpression) {
+                    checkReference(reference)
                 }
+            }
+        }
+
+        override fun visitPyReferenceExpression(node: PyReferenceExpression) {
+            val childQualified = node.qualifier ?: return
+            val childType = TypeEvalContext.codeAnalysis(node.project, node.containingFile).getType(childQualified)
+            if (childType is SmkRulesType) {
+                checkReference(node)
+            }
+        }
+
+        private fun checkReference(reference: PyReferenceExpression) {
+            if (reference.reference.resolve().elementType == SmkElementTypes.USE_NAME_IDENTIFIER) {
+                registerProblem(
+                    reference,
+                    SnakemakeBundle.message("INSP.NAME.probably.unresolved.use.reference"),
+                    ProblemHighlightType.WEAK_WARNING
+                )
             }
         }
     }

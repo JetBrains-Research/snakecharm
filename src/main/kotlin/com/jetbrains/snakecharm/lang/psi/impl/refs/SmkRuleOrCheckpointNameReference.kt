@@ -18,7 +18,6 @@ import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
-import com.jetbrains.snakecharm.lang.psi.types.SmkUsesType
 
 class SmkRuleOrCheckpointNameReference(
     element: SmkReferenceExpression,

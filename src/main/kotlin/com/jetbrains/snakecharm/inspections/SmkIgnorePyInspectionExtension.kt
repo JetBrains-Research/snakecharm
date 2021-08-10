@@ -2,7 +2,6 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
-import com.intellij.psi.util.elementType
 import com.jetbrains.python.inspections.PyInspectionExtension
 import com.jetbrains.python.psi.PyElement
 import com.jetbrains.python.psi.PyQualifiedExpression
@@ -10,7 +9,6 @@ import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
 
@@ -33,10 +31,6 @@ class SmkIgnorePyInspectionExtension : PyInspectionExtension() {
         context: TypeEvalContext,
     ): Boolean {
         if (SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(node)) {
-            if (node.parent.elementType == SmkElementTypes.USE_IMPORTED_RULES_NAMES) {
-                return true
-            }
-
             if (node is PyQualifiedExpression) {
                 // Maybe referenceName is better here?
                 //val referencedName = node.referencedName

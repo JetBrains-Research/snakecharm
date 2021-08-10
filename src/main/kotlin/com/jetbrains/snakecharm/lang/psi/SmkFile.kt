@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.openapi.vfs.impl.http.HttpVirtualFile
 import com.intellij.psi.FileViewProvider
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.stubs.StubElement
 import com.jetbrains.python.psi.PyElementVisitor
@@ -117,6 +118,19 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
     }
 
     /**
+     * Returns [PsiElement] from [SmkUse] which may produce [name] or returns null if no such element
+     */
+    fun resolveByRuleNamePattern(
+        name: String
+    ): PsiElement? {
+        val uses = advancedCollectUseSectionsWithWildcards(mutableSetOf())
+        return uses.firstOrNull { (first) ->
+            val pattern = first.replaceFirst("*", "(?<name>\\w+)").replace("*", "\\k<name>") + '$'
+            pattern.toRegex().matches(name)
+        }?.second?.nameIdentifier
+    }
+
+    /**
      * Collects local rules, rules, defined in use section, and rules, imported by 'include:'
      */
     fun advancedCollectRules(visitedFiles: MutableSet<PsiFile>) = advancedCollect(visitedFiles) { file ->
@@ -127,7 +141,7 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
      * Collects elements of [SmkUse] with wildcard '*' in name.
      * It collects elements from current [SmkFile] and from files which were imported via 'include:'
      */
-    fun advancedCollectUseSectionsWithWildcards(visitedFiles: MutableSet<PsiFile>) =
+    private fun advancedCollectUseSectionsWithWildcards(visitedFiles: MutableSet<PsiFile>) =
         advancedCollect(visitedFiles) { file ->
             val useNameAndPsi = arrayListOf<Pair<String, SmkUse>>()
 

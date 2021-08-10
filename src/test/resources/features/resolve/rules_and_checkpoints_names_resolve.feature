@@ -341,17 +341,23 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
     use rule zZzz from MODULE as with:
         input: "log.log"
 
+    module MODULE2:
+        snakefile: "https://github.com/useful_smk_files/file.smk"
+
+    use rule * from MODULE2 as remote_*
+
     rule my_rule:
         log: rules.<name>.log
     """
     When I put the caret at <name>.log
     Then reference should resolve to "<resolve_to>" in "foo.smk"
     Examples:
-      | name      | resolve_to |
-      | last_rule | last_rule  |
-      | other_b   | b          |
-      | NAME2     | NAME2      |
-      | zZzz      |zZzz        |
+      | name        | resolve_to |
+      | last_rule   | last_rule  |
+      | other_b     | b          |
+      | NAME2       | NAME2      |
+      | zZzz        | zZzz       |
+      | remote_rule |remote_*    |
 
   Scenario Outline: Resolve rule name to another .smk file
     Given a snakemake project
