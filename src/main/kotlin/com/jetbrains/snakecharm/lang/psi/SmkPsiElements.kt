@@ -39,6 +39,11 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
      * Returns reference to 'module', which is mentioned in 'from' definition region is there are such region
      */
     fun getModuleReference(): SmkReferenceExpression?
+
+    /**
+     * Returns a list of [SmkReferenceExpression] which refer to overridden rules
+     */
+    fun getOverriddenRuleReferences(): List<SmkReferenceExpression>?
 }
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer

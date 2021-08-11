@@ -92,4 +92,7 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
 
     override fun getModuleReference() =
         node.findChildByType(SmkTokenTypes.SMK_FROM_KEYWORD)?.psi?.nextSibling?.nextSibling as? SmkReferenceExpression
+
+    override fun getOverriddenRuleReferences(): List<SmkReferenceExpression>? =
+        node.findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES)?.psi?.children?.filterIsInstance<SmkReferenceExpression>()
 }

@@ -1,8 +1,19 @@
 Feature: Rule SmkUnusedLogFileInspection inspection
   Scenario Outline: Unused in non-run section 'log' section
     Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    rule A:
+        shell: "{log}"
+
+    rule B:
+        threads: 4
+    """
     Given I open a file "foo.smk" with text
     """
+    module MODULE:
+        snakefile: "boo.smk"
+
     <rule_like> NAME:
         input: "input.txt"
         output: "output.txt"
@@ -10,11 +21,25 @@ Feature: Rule SmkUnusedLogFileInspection inspection
         threads: 4
         name: "name_{log}"
         shell: "command touch {wildcards.log}"
+
+    use rule A,B from MODULE as other_* with:
+        log: "other_log.log"
+
+    use rule other_B as new_other_B with:
+        log: "new_other_log.log"
     """
     And SmkUnusedLogFileInspection inspection is enabled
     And I expect inspection weak warning on <log: "my_log.log"> with message
     """
     Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
+    """
+    And I expect inspection weak warning on <log: "other_log.log"> with message
+    """
+    Looks like a log file won't be created in rule 'B', because it is not referenced from 'shell' or 'run' sections
+    """
+    And I expect inspection weak warning on <log: "new_other_log.log"> with message
+    """
+    Looks like a log file won't be created in rule 'B', because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
     Examples:
@@ -32,6 +57,15 @@ Feature: Rule SmkUnusedLogFileInspection inspection
         log: <log_variation>
         threads: 4
         <mention>
+
+    module MODULE:
+        snakefile: "https://something/file.smk"
+
+    use rule A,B from MODULE as other_* with:
+        log: "other_log.log"
+
+    use rule other_B as new_other_B with:
+        log: "new_other_log.log"
     """
     And SmkUnusedLogFileInspection inspection is enabled
     And I expect no inspection weak warnings
@@ -220,11 +254,21 @@ Feature: Rule SmkUnusedLogFileInspection inspection
         log: "my_log.log"
         threads: 4
         <scenario>
+
+    rule NAME2:
+        <scenario>
+
+    use rule NAME2 as NAME3 with:
+        log: "new_log.log"
     """
     And SmkUnusedLogFileInspection inspection is enabled
     And I expect inspection weak warning on <log: "my_log.log"> with message
     """
     Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
+    """
+    And I expect inspection weak warning on <log: "new_log.log"> with message
+    """
+    Looks like a log file won't be created in rule 'NAME2', because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
     Examples:

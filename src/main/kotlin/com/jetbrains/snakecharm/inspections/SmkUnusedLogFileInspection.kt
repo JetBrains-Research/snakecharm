@@ -26,17 +26,54 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
         session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
+        override fun visitSmkUse(use: SmkUse) {
+            val logSection = use.getSectionByName(SnakemakeNames.SECTION_LOG) ?: return
+            use.getOverriddenRuleReferences()?.forEach {
+                var resolveResult: PsiElement?
+                var reference = it
+                while (true) {
+                    resolveResult = reference.reference.resolve()
+                    when (resolveResult) {
+                        is SmkRule -> break
+                        is SmkReferenceExpression -> reference = resolveResult
+                        else -> {
+                            return@forEach
+                        }
+                    }
+                }
+                if (resolveResult != null) {
+                    resolveResult as SmkRule
+                    val ruleLogSection = resolveResult.getSectionByName(SnakemakeNames.SECTION_LOG)
+                    val message =
+                        SnakemakeBundle.message(
+                            "INSP.NAME.unused.log.section.in.special.rule",
+                            resolveResult.name ?: return@forEach
+                        )
+                    visitSMKRuleLike(resolveResult, logSection, ruleLogSection, message)
+                }
+            }
+        }
+
         override fun visitSmkRule(rule: SmkRule) {
-            visitSMKRuleLike(rule)
+            ruleOrCheckpointHandler(rule)
         }
 
         override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
-            visitSMKRuleLike(checkPoint)
+            ruleOrCheckpointHandler(checkPoint)
         }
 
-        private fun visitSMKRuleLike(rule: SmkRuleLike<SmkArgsSection>) {
-            val logSection = rule.getSectionByName(SnakemakeNames.SECTION_LOG) ?: return
+        private fun ruleOrCheckpointHandler(ruleOrCheckpoint: SmkRuleOrCheckpoint) {
+            val logSection = ruleOrCheckpoint.getSectionByName(SnakemakeNames.SECTION_LOG) ?: return
+            val message = SnakemakeBundle.message("INSP.NAME.unused.log.section")
+            visitSMKRuleLike(ruleOrCheckpoint, logSection, logSection, message)
+        }
 
+        private fun visitSMKRuleLike(
+            rule: SmkRuleLike<SmkArgsSection>,
+            originalLogSection: SmkArgsSection,
+            logSectionWhichMustBeResolveResult: SmkArgsSection?,
+            message: String
+        ) {
             val ruleSections = rule.getSections()
             val skipValidation = ruleSections.any { section ->
                 section.sectionKeyword in EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE
@@ -57,15 +94,15 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
             }
 
 
-            val collector = SmkSLReferencesTargetLookupVisitor(logSection)
+            val collector = SmkSLReferencesTargetLookupVisitor(logSectionWhichMustBeResolveResult)
                 .also {
                     rule.accept(it)
                 }
 
             if (!collector.hasReferenceToTarget) {
                 registerProblem(
-                    logSection,
-                    SnakemakeBundle.message("INSP.NAME.unused.log.section"),
+                    originalLogSection,
+                    message,
                     ProblemHighlightType.WEAK_WARNING,
                     null,
                     quickfix
@@ -93,7 +130,10 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
 
             if (stringArgument == null) {
                 val indent = shellSection.prevSibling.text.replace("\n", "")
-                doc.insertString(shellSection.lastChild.endOffset, "\n$indent$indent\"$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\"")
+                doc.insertString(
+                    shellSection.lastChild.endOffset,
+                    "\n$indent$indent\"$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\""
+                )
                 PsiDocumentManager.getInstance(project).commitDocument(doc)
                 return
             }
