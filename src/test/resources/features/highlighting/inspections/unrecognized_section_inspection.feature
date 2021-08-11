@@ -60,9 +60,9 @@ Feature: Inspection if section isn't recognized by SnakeCharm
       | subworkflow |
       | checkpoint  |
 
-    Scenario: When 'use' section contains execution subsections
-      Given a snakemake project
-      Given I open a file "foo.smk" with text
+  Scenario: When 'use' section contains execution subsections
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
       """
       use rule RULE as NEW_RULE with:
           run: ""
@@ -71,30 +71,63 @@ Feature: Inspection if section isn't recognized by SnakeCharm
           script: ""
           cwl: ""
           wrapper: ""
+          unknown_section: ""
       """
-      And SmkUnrecognizedSectionInspection inspection is enabled
-      Then I expect inspection weak warning on <run> with message
+    And SmkUnrecognizedSectionInspection inspection is enabled
+    Then I expect inspection weak warning on <run> with message
       """
-      Section 'run' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
+      Section 'run' can't be used in 'use' but can be in 'rule'
       """
-      Then I expect inspection weak warning on <shell> with message
+    Then I expect inspection weak warning on <shell> with message
       """
-      Section 'shell' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
+      Section 'shell' can't be used in 'use' but can be in 'rule'
       """
-      Then I expect inspection weak warning on <notebook> with message
+    Then I expect inspection weak warning on <notebook> with message
       """
-      Section 'notebook' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
+      Section 'notebook' can't be used in 'use' but can be in 'rule'
       """
-      Then I expect inspection weak warning on <script> with message
+    Then I expect inspection weak warning on <script> with message
       """
-      Section 'script' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
+      Section 'script' can't be used in 'use' but can be in 'rule'
       """
-      Then I expect inspection weak warning on <cwl> with message
+    Then I expect inspection weak warning on <cwl> with message
       """
-      Section 'cwl' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
+      Section 'cwl' can't be used in 'use' but can be in 'rule'
       """
-      Then I expect inspection weak warning on <wrapper> with message
+    Then I expect inspection weak warning on <wrapper> with message
       """
-      Section 'wrapper' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
+      Section 'wrapper' can't be used in 'use' but can be in 'rule'
       """
-      When I check highlighting weak warnings
+    Then I expect inspection weak warning on <unknown_section> with message
+      """
+      Section 'unknown_section' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
+      """
+    When I check highlighting weak warnings
+
+  Scenario: Wrong sections
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      rule NAME:
+          skip_validation: True
+
+      subworkflow NAME2:
+          log: "log.txt"
+
+      module m:
+          workdir: "dir"
+      """
+    And SmkUnrecognizedSectionInspection inspection is enabled
+    Then I expect inspection weak warning on <skip_validation> with message
+      """
+      Section 'skip_validation' can't be used in 'rule' or 'checkpoint' but can be in 'module'
+      """
+    Then I expect inspection weak warning on <log> with message
+      """
+      Section 'log' can't be used in 'subworkflow' but can be in 'rule'
+      """
+    Then I expect inspection weak warning on <workdir> with message
+      """
+      Section 'workdir' can't be used in 'module' but can be in 'subworkflow'
+      """
+    When I check highlighting weak warnings
