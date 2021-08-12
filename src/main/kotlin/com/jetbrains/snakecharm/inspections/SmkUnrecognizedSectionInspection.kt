@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
-import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.util.elementType
 import com.intellij.codeInspection.ui.ListEditForm
@@ -64,8 +63,7 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
                     registerProblem(
                         sectionNamePsi,
                         SnakemakeBundle.message("INSP.NAME.section.unrecognized.message", sectionKeyword),
-                        ProblemHighlightType.WEAK_WARNING,
-                        null, AddIgnoredElementQuickFix(sectionKeyword)
+                        AddIgnoredElementQuickFix(sectionKeyword)
                     )
                 }
             }
