@@ -3,9 +3,11 @@ package com.jetbrains.snakecharm.lang.psi.impl
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiReference
 import com.intellij.psi.util.elementType
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.python.psi.PyElementVisitor
+import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes
 import com.jetbrains.snakecharm.lang.psi.*
@@ -37,11 +39,11 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
         if (identifier != null) { // Returns new name if we know it
             return identifier
         }
-        val namePattern = findChildByType(SmkElementTypes.USE_NAME_IDENTIFIER) as? PsiElement
+        val namePattern = getNameIdentifierPattern()
         if (namePattern != null) { // Returns name patter if it exits
             return namePattern.node
         }
-        val originalNames = findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES) as? PsiElement
+        val originalNames = getImportedRuleNames()
         // Returns original names, we don't want to save one name because
         // index with this name probably already exists
         // so we save whole rules names if it is not just '*' wildcard
@@ -56,8 +58,8 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
         if (identifier != null) {
             return listOf(identifier.text to identifier.psi)
         }
-        val importedNames: PsiElement? = findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES)
-        val newName: PsiElement? = findChildByType(SmkElementTypes.USE_NAME_IDENTIFIER)
+        val importedNames = getImportedRuleNames()
+        val newName = getNameIdentifierPattern()
         if (importedNames == null) {
             return emptyList()
         }
@@ -70,8 +72,7 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
             child = child.nextSibling
         }
         if (originalNames.isEmpty()) {
-            val moduleRef =
-                (findChildByType(SmkElementTypes.REFERENCE_EXPRESSION) as? SmkReferenceExpression) ?: return emptyList()
+            val moduleRef = (getModuleName() as? SmkReferenceExpression) ?: return emptyList()
             val module = moduleRef.reference.resolve()
             if (module == null || module !is SmkModule) {
                 return emptyList()
@@ -90,6 +91,13 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
         }
     }
 
-    override fun getModuleReference() =
-        node.findChildByType(SmkTokenTypes.SMK_FROM_KEYWORD)?.psi?.nextSibling?.nextSibling as? SmkReferenceExpression
+    override fun getModuleName() =
+        (findChildByType(SmkTokenTypes.SMK_FROM_KEYWORD) as? PsiElement)?.nextSibling?.nextSibling
+
+    override fun getImportedRuleNames() = findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES) as? PsiElement
+
+    override fun getNameIdentifierPattern() = findChildByType(SmkElementTypes.USE_NAME_IDENTIFIER) as? PsiElement
+
+    override fun containsRuleReference(reference: PsiReference) =
+        getImportedRuleNames()?.children?.any { it == reference.element } ?: false
 }

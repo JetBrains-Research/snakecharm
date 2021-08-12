@@ -29,18 +29,32 @@ Feature: Inspection: unresolved rule name in 'use' section declaration or after 
     And SmkUnresolvedImportedRuleNameInspection inspection is enabled
     Then I expect inspection weak warning on <NAME1> with message
     """
-    Resolved rule may not contains in imported modules
+    Cannot check rule names imported from remote modules
     """
     Then I expect inspection weak warning on <other_NAME2> with message
     """
-    Resolved rule may not contains in imported modules
+    Cannot check rule names imported from remote modules
     """
     Then I expect inspection weak warning on <NAME3> with message
     """
-    Resolved rule may not contains in imported modules
+    Cannot check rule names imported from remote modules
     """
     Then I expect inspection weak warning on <rules.other_rule_name> with message
-        """
-    Resolved rule may not contains in imported modules
+    """
+    Cannot check rule names imported from remote modules
     """
     When I check highlighting weak warnings
+
+  Scenario: No errors if there are appropriate module import
+    Given a snakemake project
+    And I open a file "foo.smk" with text
+    """
+    module MODULE:
+      snakefile: "https://github.com/useful_smk_diles/file.smk"
+
+    use rule NAME1 from MODULE with:
+      threads: 5
+    """
+    And PyUnresolvedReferencesInspection inspection is enabled
+    Then I expect no inspection errors
+    When I check highlighting errors

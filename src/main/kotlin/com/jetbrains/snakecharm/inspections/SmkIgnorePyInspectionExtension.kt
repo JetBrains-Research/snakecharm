@@ -1,14 +1,18 @@
 package com.jetbrains.snakecharm.inspections
 
+import com.intellij.openapi.vfs.impl.http.HttpVirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
+import com.intellij.psi.util.parentOfType
 import com.jetbrains.python.inspections.PyInspectionExtension
 import com.jetbrains.python.psi.PyElement
 import com.jetbrains.python.psi.PyQualifiedExpression
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+import com.jetbrains.snakecharm.lang.psi.SmkModule
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkUse
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
 
@@ -31,6 +35,13 @@ class SmkIgnorePyInspectionExtension : PyInspectionExtension() {
         context: TypeEvalContext,
     ): Boolean {
         if (SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(node)) {
+            val use = node.parentOfType<SmkUse>()
+            if (use != null && use.containsRuleReference(reference)) {
+                // Ignore references imported by 'module' from remote file
+                val module = use.getModuleName()?.reference?.resolve()
+                val file = (module as? SmkModule)?.getPsiFile()?.virtualFile
+                return module != null && (file == null || file is HttpVirtualFile)
+            }
             if (node is PyQualifiedExpression) {
                 // Maybe referenceName is better here?
                 //val referencedName = node.referencedName

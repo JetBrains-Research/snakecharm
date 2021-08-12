@@ -58,14 +58,18 @@ class SmkRuleOrCheckpointNameReference(
     /**
      * Collects all modules sections names from local file or using indexes which name is [element] name
      */
-    private fun collectModulesAndResolveThem(smkFile: SmkFile, element: PsiElement): List<RatedResolveResult> {
+    private fun collectModulesAndResolveThem(
+        smkFile: SmkFile,
+        element: SmkReferenceExpression
+    ): List<RatedResolveResult> {
         val module = element.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
+        val target = element.referencedName ?: return emptyList()
         val modules = if (module == null) {
-            smkFile.collectModules().map { it.second }.filter { elem -> elem.name == element.text }
+            smkFile.collectModules().map { it.second }.filter { modulePsi -> modulePsi.name == target }
         } else {
             StubIndex.getElements(
                 SmkModuleNameIndex.KEY,
-                element.text,
+                target,
                 module.project,
                 GlobalSearchScope.moduleWithDependentsScope(module),
                 SmkModule::class.java

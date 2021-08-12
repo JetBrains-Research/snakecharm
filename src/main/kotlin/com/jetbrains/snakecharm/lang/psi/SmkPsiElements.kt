@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.lang.psi
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiReference
 import com.intellij.psi.StubBasedPsiElement
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
@@ -36,9 +37,24 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
     fun getProducedRulesNames(visitedFiles: MutableSet<PsiFile> = mutableSetOf()): List<Pair<String, PsiElement>>
 
     /**
-     * Returns reference to 'module', which is mentioned in 'from' definition region is there are such region
+     * Returns [PsiElement] contains module name which imports rules
      */
-    fun getModuleReference(): SmkReferenceExpression?
+    fun getModuleName(): PsiElement?
+
+    /**
+     * Returns a [PsiElement] which sets pattern of produced rule names
+     */
+    fun getNameIdentifierPattern(): PsiElement?
+
+    /**
+     * Returns a [PsiElement] which contains a references to overridden rules
+     */
+    fun getImportedRuleNames(): PsiElement?
+
+    /**
+     * Checks if [reference] refer to one of the overridden rules
+     */
+    fun containsRuleReference(reference: PsiReference): Boolean
 }
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer

@@ -341,41 +341,42 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
     use rule zZzz from MODULE as with:
         input: "log.log"
 
-    module MODULE2:
-        snakefile: "https://github.com/useful_smk_files/file.smk"
-
-    use rule * from MODULE2 as remote_*
-
     rule my_rule:
         log: rules.<name>.log
     """
     When I put the caret at <name>.log
     Then reference should resolve to "<resolve_to>" in "foo.smk"
     Examples:
-      | name        | resolve_to |
-      | last_rule   | last_rule  |
-      | other_b     | b          |
-      | NAME2       | NAME2      |
-      | zZzz        | zZzz       |
-      | remote_rule |remote_*    |
+      | name      | resolve_to |
+      | last_rule | last_rule  |
+      | other_b   | b          |
+      | NAME2     | NAME2      |
+      | zZzz      | zZzz       |
 
-  Scenario Outline: Resolve rule name to another .smk file
+  Scenario: Resolve rule name, declared in use section by pattern
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    module MODULE2:
+        snakefile: "https://github.com/useful_smk_files/file.smk"
+
+    use rule * from MODULE2 as remote_*
+
+    rule my_rule:
+        log: rules.remote_rule.log
+    """
+    When I put the caret at remote_rule.log
+    Then reference should resolve to "remote_*" in "foo.smk"
+
+  Scenario Outline: Resolve rule name to module
     Given a snakemake project
     And a file "boo.smk" with text
     """
-    include: "zoo.smk"
-
-    rule something:
+    <rule_like> something:
       input: "data_file.db"
 
-    rule NAME:
+    <rule_like> NAME:
       input: "file.txt"
-    """
-    And a file "zoo.smk" with text
-    """
-    rule zoo_rule: threads: 1
-
-    use rule zoo_rule as rule_from_zoo with: threads: 2
     """
     Given I open a file "foo.smk" with text
     """
@@ -393,10 +394,41 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
         log: rules.<name>.log
     """
     When I put the caret at <name>.log
-    Then reference should resolve to "<resolve_to>" in "<file>.smk"
+    Then reference should resolve to "<resolve_to>" in "boo.smk"
     Examples:
-      | name                | resolve_to    | file |
-      | last_rule_something | something     | boo  |
-      | NAME                | NAME          | boo  |
-      | rule_from_zoo       | rule_from_zoo | zoo  |
-      | last_rule_zoo_rule  | zoo_rule      | zoo  |
+      | name                | resolve_to | rule_like  |
+      | last_rule_something | something  | rule       |
+      | last_rule_something | something  | checkpoint |
+      | NAME                | NAME       | rule       |
+
+  Scenario Outline: Resolve rule name to .smk file included in module
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    include: "zoo.smk"
+    """
+    And a file "zoo.smk" with text
+    """
+    <rule_like> zoo_rule: threads: 1
+
+    use rule zoo_rule as rule_from_zoo with: threads: 2
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module MODULE:
+      snakefile: "boo.smk"
+
+    use rule * from MODULE as last_rule_*
+
+    use rule * from MODULE as
+
+    rule my_rule:
+        log: rules.<name>.log
+    """
+    When I put the caret at <name>.log
+    Then reference should resolve to "<resolve_to>" in "zoo.smk"
+    Examples:
+      | name               | resolve_to    | rule_like  |
+      | rule_from_zoo      | rule_from_zoo | rule       |
+      | rule_from_zoo      | rule_from_zoo | checkpoint |
+      | last_rule_zoo_rule | zoo_rule      | rule       |

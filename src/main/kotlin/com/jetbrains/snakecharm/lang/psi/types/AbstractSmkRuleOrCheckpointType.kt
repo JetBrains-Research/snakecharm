@@ -22,10 +22,7 @@ import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
-import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
-import com.jetbrains.snakecharm.lang.psi.SmkFile
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
-import com.jetbrains.snakecharm.lang.psi.SmkUse
+import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex
@@ -84,19 +81,19 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
 
     override fun isBuiltin() = false
 
-    private fun getUseSections(name: String, location: PyExpression): List<RatedResolveResult> {
-        if (clazz == SmkCheckPoint::class.java) {
-            return emptyList()
-        }
+    protected open fun getUseSections(name: String, location: PyExpression): List<RatedResolveResult> {
         val result = mutableListOf<RatedResolveResult>()
+        if (location.parent is SmkUse) {
+            // Current reference is module reference
+            return result
+        }
         val module = location.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
         when (module) {
             null -> (location.containingFile.originalFile as SmkFile).collectUses().map { it.second }
             else -> getVariantsFromIndex(SmkUseNameIndex.KEY, module, SmkUse::class.java)
         }.forEach { use ->
             use as SmkUse
-            val list = use.getProducedRulesNames()
-            val referTo = list
+            val referTo = use.getProducedRulesNames()
                 .firstOrNull {
                     (it.first == name &&
                             it.second != location.originalElement) ||
@@ -109,9 +106,9 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
 
         // Checks rule name patterns, produced by 'use' sections
         if (result.isEmpty()) {
-            val namePatter = (location.containingFile as? SmkFile)?.resolveByRuleNamePattern(name)
-            if (namePatter != null) {
-                result.add(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, namePatter))
+            val namePattern = (location.containingFile as? SmkFile)?.resolveByRuleNamePattern(name)
+            if (namePattern != null) {
+                result.add(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, namePattern))
             }
         }
 

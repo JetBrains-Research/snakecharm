@@ -388,31 +388,13 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       | input_injection  |
       | shell_injection  |
 
-  Scenario: Complete rule name, declared in use section
+  Scenario: Complete rule name, declared in use section in local .smk file
     Given a snakemake project
-    And a file "boo.smk" with text
-    """
-    include: "zoo.smk"
-
-    rule rule_name:
-      log: "log_file.txt"
-    """
-    And a file "zoo.smk" with text
-    """
-    rule zoo_rule: threads: 1
-
-    use rule zoo_rule as rule_from_zoo with: threads: 2
-    """
     Given I open a file "foo.smk" with text
     """
-    module MODULE_2:
-      snakefile: "boo.smk"
-
     use rule * from MODULE as last_rule
 
     use rule a,b,c from MODULE as other_*
-
-    use rule * from MODULE_2 as not_*
 
     use rule NAME as NAME2 with:
       input: "data_file.txt"
@@ -426,21 +408,83 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
     When I put the caret after rules.
     And I invoke autocompletion popup
     Then completion list should contain:
-      | last_rule         |
-      | other_a           |
-      | other_b           |
-      | other_c           |
-      | NAME2             |
-      | zZzz              |
-      | not_rule_name     |
-      | not_zoo_rule      |
-      | not_rule_from_zoo |
+      | last_rule |
+      | other_a   |
+      | other_b   |
+      | other_c   |
+      | NAME2     |
+      | zZzz      |
     Then completion list shouldn't contain:
       | NAME    |
       | other_* |
       | *       |
-      | not_*   |
       | MODULE  |
+
+  Scenario: Complete rule name, declared in module
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    rule rule_name:
+      log: "log_file.txt"
+
+    use rule rule_name as new_rule_name with:
+      threads: 3
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module MODULE_2:
+      snakefile: "boo.smk"
+
+    use rule * from MODULE_2 as not_*
+
+    rule my_rule:
+      log: rules.
+    """
+    When I put the caret after rules.
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | not_rule_name     |
+      | not_new_rule_name |
+    Then completion list shouldn't contain:
+      | *             |
+      | not_*         |
+      | MODULE_2      |
+      | rule_name     |
+      | new_rule_name |
+
+  Scenario: Complete rule name, declared in .smk file included to module
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    include: "zoo.smk"
+    """
+    And a file "zoo.smk" with text
+    """
+    rule zoo_rule: threads: 1
+
+    use rule zoo_rule as rule_from_zoo with: threads: 2
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module MODULE_2:
+      snakefile: "boo.smk"
+
+    use rule * from MODULE_2 as not_*
+
+    rule my_rule:
+      log: rules.
+    """
+    When I put the caret after rules.
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | not_zoo_rule      |
+      | not_rule_from_zoo |
+    Then completion list shouldn't contain:
+      | *             |
+      | not_*         |
+      | MODULE        |
+      | zoo_rule      |
+      | rule_from_zoo |
 
   Scenario: No StackOverflowError with cyclic imports
     Given a snakemake project

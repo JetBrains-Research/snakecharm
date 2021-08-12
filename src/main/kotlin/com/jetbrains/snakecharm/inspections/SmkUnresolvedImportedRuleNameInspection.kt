@@ -21,28 +21,27 @@ class SmkUnresolvedImportedRuleNameInspection : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
         override fun visitSmkUse(use: SmkUse) {
-            val references = use.node.findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES) ?: return
-            val moduleRef = use.getModuleReference()
+            val references = use.getImportedRuleNames() ?: return
+            val moduleRef = use.getModuleName()?.reference
             if (moduleRef != null) {
                 // If there are 'from' construction
                 // And module doesn't refer to local
                 // Highlight rule references
-                val module = moduleRef.reference.resolve() as? SmkModule
+                val module = moduleRef.resolve() as? SmkModule
                 val importedFile = module?.getPsiFile() as? SmkFile
                 if (importedFile == null || importedFile.virtualFile is HttpVirtualFile) {
-                    references.psi.children.forEach {
+                    references.children.forEach {
                         if (it is SmkReferenceExpression) {
                             registerProblem(
                                 it,
-                                SnakemakeBundle.message("INSP.NAME.probably.unresolved.use.reference"),
-                                ProblemHighlightType.WEAK_WARNING
+                                SnakemakeBundle.message("INSP.NAME.probably.unresolved.use.reference")
                             )
                         }
                     }
                     return
                 }
             }
-            references.psi.children.forEach { reference ->
+            references.children.forEach { reference ->
                 if (reference is SmkReferenceExpression) {
                     checkReference(reference)
                 }
@@ -61,8 +60,7 @@ class SmkUnresolvedImportedRuleNameInspection : SnakemakeInspection() {
             if (reference.reference.resolve().elementType == SmkElementTypes.USE_NAME_IDENTIFIER) {
                 registerProblem(
                     reference,
-                    SnakemakeBundle.message("INSP.NAME.probably.unresolved.use.reference"),
-                    ProblemHighlightType.WEAK_WARNING
+                    SnakemakeBundle.message("INSP.NAME.probably.unresolved.use.reference")
                 )
             }
         }
