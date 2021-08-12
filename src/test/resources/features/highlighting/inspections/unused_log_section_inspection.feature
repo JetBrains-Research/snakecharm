@@ -3,10 +3,10 @@ Feature: Rule SmkUnusedLogFileInspection inspection
     Given a snakemake project
     And a file "boo.smk" with text
     """
-    rule A:
+    <rule_like> A:
         shell: "{log}"
 
-    rule B:
+    <rule_like> B:
         threads: 4
     """
     Given I open a file "foo.smk" with text

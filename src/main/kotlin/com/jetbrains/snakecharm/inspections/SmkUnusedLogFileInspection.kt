@@ -2,7 +2,6 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement
-import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
@@ -28,13 +27,14 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
 
         override fun visitSmkUse(use: SmkUse) {
             val logSection = use.getSectionByName(SnakemakeNames.SECTION_LOG) ?: return
-            use.getOverriddenRuleReferences()?.forEach {
+            use.getImportedRuleNames()?.children?.forEach {
                 var resolveResult: PsiElement?
                 var reference = it
+                // Searching for origin element, it must be a rule or checkpoint
                 while (true) {
-                    resolveResult = reference.reference.resolve()
+                    resolveResult = reference.reference?.resolve()
                     when (resolveResult) {
-                        is SmkRule -> break
+                        is SmkRuleOrCheckpoint -> break
                         is SmkReferenceExpression -> reference = resolveResult
                         else -> {
                             return@forEach
@@ -42,7 +42,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
                     }
                 }
                 if (resolveResult != null) {
-                    resolveResult as SmkRule
+                    resolveResult as SmkRuleOrCheckpoint
                     val ruleLogSection = resolveResult.getSectionByName(SnakemakeNames.SECTION_LOG)
                     val message =
                         SnakemakeBundle.message(
@@ -93,7 +93,6 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
                 }
             }
 
-
             val collector = SmkSLReferencesTargetLookupVisitor(logSectionWhichMustBeResolveResult)
                 .also {
                     rule.accept(it)
@@ -103,8 +102,6 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
                 registerProblem(
                     originalLogSection,
                     message,
-                    ProblemHighlightType.WEAK_WARNING,
-                    null,
                     quickfix
                 )
             }
