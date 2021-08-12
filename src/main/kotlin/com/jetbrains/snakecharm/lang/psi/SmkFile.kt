@@ -134,7 +134,7 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
      * Collects local rules, rules, defined in use section, and rules, imported by 'include:'
      */
     fun advancedCollectRules(visitedFiles: MutableSet<PsiFile>) = advancedCollect(visitedFiles) { file ->
-        file.collectRules() + file.collectUses(visitedFiles)
+        file.collectRules() + file.collectUses(visitedFiles) + file.collectCheckPoints()
     }
 
     /**
@@ -149,7 +149,8 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
                 override val pyElementVisitor: PyElementVisitor = this
 
                 override fun visitSmkUse(use: SmkUse) {
-                    val moduleFile = (use.getModuleReference()?.reference?.resolve() as? SmkModule)?.getPsiFile()
+                    val moduleFile =
+                        (use.getModuleName()?.reference?.element?.reference?.resolve() as? SmkModule)?.getPsiFile()
                     val doesNotReferToLocalModule = (moduleFile == null || moduleFile.virtualFile is HttpVirtualFile)
                     if (use.name?.contains('*') == true && doesNotReferToLocalModule) {
                         useNameAndPsi.add((use.name ?: return) to use)
