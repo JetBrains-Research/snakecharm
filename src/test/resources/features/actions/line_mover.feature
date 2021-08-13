@@ -512,6 +512,37 @@ Feature: Statement mover
       | module      | snakefile            | \n        "/dir"          | "/dir"               |               |
       | use rule    | wildcard_constraints | \n        wildcard="/d+1" | wildcard=            | as NAME2 with |
 
+  Scenario: Move section in/out rule doesn't work for rule with one section, two rules case
+    Given a snakemake project
+    Given I open a file "foo1.smk" with text
+    """
+    rule NAME1:
+        input: "file1"
+
+    rule NAME2:
+        output: "file2"
+    """
+    When I put the caret at output
+    And I invoke MoveStatementUp action
+    Then editor content will be
+    """
+    rule NAME1:
+        input: "file1"
+
+    rule NAME2:
+        output: "file2"
+    """
+    When I put the caret at output
+    And I invoke MoveStatementDown action
+    Then editor content will be
+    """
+    rule NAME1:
+        input: "file1"
+
+    rule NAME2:
+        output: "file2"
+    """
+
   Scenario Outline: Move section out rule doesn't work if destination is use section and moving section is execution section
     Given a snakemake project
     Given I open a file "foo1.smk" with text
