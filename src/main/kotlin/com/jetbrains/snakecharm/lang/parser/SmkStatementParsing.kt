@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.lang.parser
 
 import com.intellij.psi.tree.IElementType
-import com.jetbrains.python.PyBundle
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyPsiBundle
 import com.jetbrains.python.PyTokenTypes
@@ -206,7 +205,6 @@ class SmkStatementParsing(
             parseRuleParameter(section)
         } else {
             nextToken()
-            //incompleteRule = !checkMatches(PyTokenTypes.INDENT, "Indent expected...")
             incompleteRule = !atToken(PyTokenTypes.INDENT)
             if (!incompleteRule) {
                 nextToken()
