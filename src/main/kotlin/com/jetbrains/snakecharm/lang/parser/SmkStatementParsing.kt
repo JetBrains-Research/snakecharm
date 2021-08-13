@@ -161,7 +161,7 @@ class SmkStatementParsing(
         nextToken()
 
         // Parse second word in 'use rule'
-        if (section == useSectionParsingData) {
+        if (section.declaration == USE_DECLARATION_STATEMENT) {
             if (myBuilder.tokenText != SnakemakeNames.RULE_KEYWORD) {
                 myBuilder.error(SnakemakeBundle.message("PARSE.use.rule.keyword.expected"))
             } else {
@@ -173,7 +173,10 @@ class SmkStatementParsing(
             parseRestUseStatement(parseUseSection(names), names, section)
             ruleLikeMarker.done(section.declaration)
             return
-        } else if (atToken(PyTokenTypes.IDENTIFIER)) {
+        }
+
+        // Other case: `rule` / `checkpoint` / etc.
+        if (atToken(PyTokenTypes.IDENTIFIER)) {
             // rule name
             //val ruleNameMarker: PsiBuilder.Marker = myBuilder.mark()
             nextToken()
