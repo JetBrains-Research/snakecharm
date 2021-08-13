@@ -139,6 +139,20 @@ open class SmkStatementMover : PyStatementMover() {
         val statementList = getStatementList(elementToMove) ?: return true
         val statements = statementList.children
 
+        // if statement is a candidate for moving out of statement list:
+        val boundaryStatement = when {
+            down -> statements.last() == elementToMove
+            else -> statements.first() == elementToMove
+        }
+        if (!boundaryStatement) {
+            return true
+        }
+
+        // do not remove the only one section from rule/checkpoint/subworkflow/..
+        if (statements.size == 1 && elementToMove is SmkArgsSection) {
+            return false
+        }
+
         if ((elementToMove is SmkRuleOrCheckpointArgsSection && searchForRuleLikeElement(
                 elementToMove,
                 down,
@@ -154,31 +168,18 @@ open class SmkStatementMover : PyStatementMover() {
             return true
         }
 
-        // if statement is a candidate for moving out of statement list:
-        val boundaryStatement = when {
-            down -> statements.last() == elementToMove
-            else -> statements.first() == elementToMove
+        // do not move run section out of container
+        if (elementToMove is SmkRunSection) {
+            return false
         }
-        if (boundaryStatement) {
-            // do not remove the only one section from rule/checkpoint/subworkflow/..
-            if (statements.size == 1 && elementToMove is SmkArgsSection) {
+
+        // do not move sections that cannot be toplevel:
+        if (elementToMove is SmkArgsSection) {
+            val keyword = elementToMove.sectionKeyword
+            val sectionCouldBeToplevel = keyword != null && keyword in TOPLEVEL_ARGS_SECTION_KEYWORDS
+            if (!sectionCouldBeToplevel) {
                 return false
             }
-
-            // do not move run section out of container
-            if (elementToMove is SmkRunSection) {
-                return false
-            }
-
-            // do not move sections that cannot be toplevel:
-            if (elementToMove is SmkRuleOrCheckpointArgsSection || elementToMove is SmkModuleArgsSection) {
-                val keyword = (elementToMove as SmkArgsSection).sectionKeyword
-                val sectionCouldBeToplevel = keyword != null && keyword in TOPLEVEL_ARGS_SECTION_KEYWORDS
-                if (!sectionCouldBeToplevel) {
-                    return false
-                }
-            }
-
         }
 
         // ok to move
@@ -285,6 +286,9 @@ open class SmkStatementMover : PyStatementMover() {
                                 elementToMove.sectionKeyword !in SnakemakeAPI.USE_SECTIONS_KEYWORDS)
                     ) {
                         val list = parentSibling.statementList
+                        if (list.statements.isEmpty()) {
+                            return null
+                        }
                         return if (down) {
                             ScopeRange(list, list.statements.first(), true)
                         } else {
@@ -314,7 +318,7 @@ open class SmkStatementMover : PyStatementMover() {
             val number = document.getLineNumber(element.textOffset)
             val number2 = document.getLineNumber(statementList2.parent.textOffset)
             if (number == number2) {
-                return ScopeRange(statementList2, statementList2.statements.first(), true)
+                return ScopeRange(statementList2, statementList2.statements.firstOrNull() ?: return null, true)
             }
         }
 
@@ -356,7 +360,7 @@ open class SmkStatementMover : PyStatementMover() {
         }
 
         if (stList != null) {
-            return ScopeRange(stList, stList.statements.first(), true)
+            return ScopeRange(stList, stList.statements.firstOrNull() ?: return null, true)
         }
         return null
     }
