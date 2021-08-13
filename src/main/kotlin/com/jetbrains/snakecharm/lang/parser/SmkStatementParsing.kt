@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.lang.parser
 
 import com.intellij.psi.tree.IElementType
+import com.jetbrains.python.PyBundle
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyPsiBundle
 import com.jetbrains.python.PyTokenTypes
@@ -205,12 +206,21 @@ class SmkStatementParsing(
             parseRuleParameter(section)
         } else {
             nextToken()
-            incompleteRule = !checkMatches(PyTokenTypes.INDENT, "Indent expected...")
+            //incompleteRule = !checkMatches(PyTokenTypes.INDENT, "Indent expected...")
+            incompleteRule = !atToken(PyTokenTypes.INDENT)
             if (!incompleteRule) {
+                nextToken()
                 while (!atToken(PyTokenTypes.DEDENT)) {
                     if (!parseRuleParameter(section)) {
                         break
                     }
+                }
+            } else {
+                if (section.parameterListStatement != SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT) {
+                    // Only rules, checkpoints and use rules can have an empty statement list
+                    myBuilder.error(PyPsiBundle.message("indent.expected"))
+                } else {
+                    incompleteRule = false
                 }
             }
         }
