@@ -1,11 +1,11 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
-import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.util.elementType
 import com.intellij.codeInspection.ui.ListEditForm
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.MODULE_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
@@ -13,6 +13,7 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.inspections.quickfix.AddIgnoredElementQuickFix
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RUN
 import javax.swing.JComponent
 
 class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
@@ -52,13 +53,13 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
             val sectionKeyword = argsSection.sectionKeyword
 
             if (sectionNamePsi != null && sectionKeyword != null && sectionKeyword !in setOfValidNames
-                && sectionKeyword !in ignoredItems
+                && sectionKeyword !in ignoredItems && !(argsSection.getParentRuleOrCheckPoint() is SmkUse
+                        && sectionKeyword in (EXECUTION_SECTIONS_KEYWORDS + SECTION_RUN))
             ) {
                 registerProblem(
                     sectionNamePsi,
                     SnakemakeBundle.message("INSP.NAME.section.unrecognized.message", sectionKeyword),
-                    ProblemHighlightType.WEAK_WARNING,
-                    null, AddIgnoredElementQuickFix(sectionKeyword)
+                    AddIgnoredElementQuickFix(sectionKeyword)
                 )
             }
         }

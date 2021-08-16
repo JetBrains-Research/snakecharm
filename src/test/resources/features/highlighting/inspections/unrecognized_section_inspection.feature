@@ -22,22 +22,22 @@ Feature: Inspection if section isn't recognized by SnakeCharm
       | subworkflow |
       | checkpoint  |
 
-    Scenario Outline: When quick fix is, applied check no warning
-      Given a snakemake project
-      Given I open a file "foo.smk" with text
+  Scenario Outline: When quick fix is, applied check no warning
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
       """
       <rule_like>:
           unknown_section: ""
       """
-      And SmkUnrecognizedSectionInspection inspection is enabled
-      And I emulate quick fix apply: ignore unresolved item 'unknown_section'
-      Then I expect no inspection weak warnings
-      When I check highlighting weak warnings
-      Examples:
-        | rule_like   |
-        | rule        |
-        | subworkflow |
-        | checkpoint  |
+    And SmkUnrecognizedSectionInspection inspection is enabled
+    And I emulate quick fix apply: ignore unresolved item 'unknown_section'
+    Then I expect no inspection weak warnings
+    When I check highlighting weak warnings
+    Examples:
+      | rule_like   |
+      | rule        |
+      | subworkflow |
+      | checkpoint  |
 
   Scenario Outline: When quick fix is applied, check such element in ignored list
     Given a snakemake project
@@ -60,41 +60,24 @@ Feature: Inspection if section isn't recognized by SnakeCharm
       | subworkflow |
       | checkpoint  |
 
-    Scenario: When 'use' section contains execution subsections
-      Given a snakemake project
-      Given I open a file "foo.smk" with text
+  Scenario: No weak warnings on execution sections in 'use rule'
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
       """
-      use rule RULE as NEW_RULE with:
+      rule A:
+          threads: 4
+
+      use rule A as B with:
           run: ""
           shell: ""
           notebook: ""
+          input: "file1"
           script: ""
           cwl: ""
           wrapper: ""
+          output: "file2"
       """
-      And SmkUnrecognizedSectionInspection inspection is enabled
-      Then I expect inspection weak warning on <run> with message
-      """
-      Section 'run' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
-      """
-      Then I expect inspection weak warning on <shell> with message
-      """
-      Section 'shell' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
-      """
-      Then I expect inspection weak warning on <notebook> with message
-      """
-      Section 'notebook' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
-      """
-      Then I expect inspection weak warning on <script> with message
-      """
-      Section 'script' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
-      """
-      Then I expect inspection weak warning on <cwl> with message
-      """
-      Section 'cwl' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
-      """
-      Then I expect inspection weak warning on <wrapper> with message
-      """
-      Section 'wrapper' isn't recognized by SnakeCharm plugin or there could be a typo in the section name.
-      """
-      When I check highlighting weak warnings
+    And SmkUnrecognizedSectionInspection inspection is enabled
+    And I emulate quick fix apply: ignore unresolved item 'unknown_section'
+    Then I expect no inspection weak warnings
+    When I check highlighting weak warnings

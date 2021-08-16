@@ -26,6 +26,7 @@ Released on ...
 - Ability for memorising new section name (see [#372](https://github.com/JetBrains-Research/snakecharm/issues/372))
 - Support for 'handover' section (see [#362](https://github.com/JetBrains-Research/snakecharm/issues/362))
 - Support for 'containerized' section (see [#361](https://github.com/JetBrains-Research/snakecharm/issues/361))
+- Inspection: Show ERROR for execution sections in 'use' section (see [#408](https://github.com/JetBrains-Research/snakecharm/issues/408))
 - Completion features related to 'use' section (see [#413](https://github.com/JetBrains-Research/snakecharm/issues/413))
 - Add reference for 'snakefile:' in module declaration (see [#409](https://github.com/JetBrains-Research/snakecharm/issues/409))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN))
