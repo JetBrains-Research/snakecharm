@@ -22,7 +22,9 @@ import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
-import com.jetbrains.snakecharm.lang.psi.*
+import com.jetbrains.snakecharm.lang.psi.SmkFile
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.SmkUse
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex
@@ -85,6 +87,12 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
         val result = mutableListOf<RatedResolveResult>()
         if (location.parent is SmkUse) {
             // Current reference is module reference
+            //
+            // XXX: We use `location.parent` instead of `containgRule`, because here we want to ignore only
+            //  the module reference in use section, and do not want to ignore e.g.
+            //  references inside USE_IMPORTED_RULES_NAMES, but both references would have SmkUse as containingRule,
+            //  so in case of module reference we want to check type of the first parent. Also the containingRule
+            //  is null when it is called from SmkRuleOrCheckpointNameReference so that's another reason
             return result
         }
         val module = location.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
