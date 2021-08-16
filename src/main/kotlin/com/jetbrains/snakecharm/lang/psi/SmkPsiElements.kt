@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.lang.psi
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiReference
 import com.intellij.psi.StubBasedPsiElement
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
@@ -45,11 +44,6 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
      * Returns an array of  [SmkReferenceExpression] which refer to overridden rules or checkpoints
      */
     fun getImportedRuleNames(): Array<SmkReferenceExpression>?
-
-    /**
-     * Checks if [reference] refer to one of the overridden rules
-     */
-    fun containsRuleReference(reference: PsiReference): Boolean
 }
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer

@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.lang.psi.impl
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiReference
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.python.psi.PyElementVisitor
@@ -95,7 +94,4 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
             findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES),
             SmkReferenceExpression::class.java
         )
-
-    override fun containsRuleReference(reference: PsiReference) =
-        getImportedRuleNames()?.any { it == reference.element } ?: false
 }
