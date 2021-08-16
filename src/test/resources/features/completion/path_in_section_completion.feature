@@ -17,12 +17,13 @@ Feature: Complete file name in conda section
       <section>: "xoo.<ext>"
     """
     Examples:
-      | rule_like  | section  | ext      |
-      | rule       | conda    | yaml     |
-      | checkpoint | conda    | yaml     |
-      | rule       | conda    | yml      |
-      | rule       | notebook | py.ipynb |
-      | rule       | notebook | r.ipynb  |
+      | rule_like  | section   | ext      |
+      | rule       | conda     | yaml     |
+      | checkpoint | conda     | yaml     |
+      | rule       | conda     | yml      |
+      | rule       | notebook  | py.ipynb |
+      | rule       | notebook  | r.ipynb  |
+      | module     | snakefile | smk      |
 
   Scenario Outline: Completion list when there are no appropriate files
     Given a snakemake project
