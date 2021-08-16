@@ -12,6 +12,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_OR_CHECKPOINT
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.*
+import java.util.*
 
 
 /**
@@ -75,11 +76,8 @@ class SmkStatementParsing(
         val scope = context.scope
 
         myBuilder.setDebugMode(false)
-        if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER && !scope.inPythonicSection) {
-            val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText!!]
-            if (actualToken != null) {
-                myBuilder.remapCurrentToken(actualToken)
-            }
+        tryRemapCurrentToken(scope) {
+            checkIfAtToplevelDecoratorKeyword()
         }
         val tt = myBuilder.tokenType
 
@@ -91,7 +89,7 @@ class SmkStatementParsing(
         }
         when {
             tt in SmkTokenTypes.RULE_LIKE -> parseRuleLikeDeclaration(getSectionParsingData(tt!!))
-            tt in SmkTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS -> {
+            tt === SmkTokenTypes.WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD -> {
                 val workflowParam = myBuilder.mark()
                 nextToken()
                 val result = parsingContext.expressionParser.parseRuleLikeSectionArgumentList()
@@ -163,7 +161,7 @@ class SmkStatementParsing(
         nextToken()
 
         // Parse second word in 'use rule'
-        if (section == useSectionParsingData) {
+        if (section.declaration == USE_DECLARATION_STATEMENT) {
             if (myBuilder.tokenText != SnakemakeNames.RULE_KEYWORD) {
                 myBuilder.error(SnakemakeBundle.message("PARSE.use.rule.keyword.expected"))
             } else {
@@ -175,7 +173,10 @@ class SmkStatementParsing(
             parseRestUseStatement(parseUseSection(names), names, section)
             ruleLikeMarker.done(section.declaration)
             return
-        } else if (atToken(PyTokenTypes.IDENTIFIER)) {
+        }
+
+        // Other case: `rule` / `checkpoint` / etc.
+        if (atToken(PyTokenTypes.IDENTIFIER)) {
             // rule name
             //val ruleNameMarker: PsiBuilder.Marker = myBuilder.mark()
             nextToken()
@@ -183,7 +184,13 @@ class SmkStatementParsing(
 
         // XXX at the moment we continue parsing rule even if colon missed, probably better
         // XXX to drop rule and scroll up to next STATEMENT_BREAK/RULE/CHECKPOINT/other toplevel keyword or eof()
-        checkMatches(PyTokenTypes.COLON, "${section.name.capitalize()} name identifier or ':' expected") // bundle
+        checkMatches(PyTokenTypes.COLON,
+            "${
+                section.name.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                }
+            } name identifier or ':' expected"
+        ) // bundle
 
         val ruleStatements = myBuilder.mark()
 
@@ -201,12 +208,20 @@ class SmkStatementParsing(
             parseRuleParameter(section)
         } else {
             nextToken()
-            incompleteRule = !checkMatches(PyTokenTypes.INDENT, "Indent expected...")
+            incompleteRule = !atToken(PyTokenTypes.INDENT)
             if (!incompleteRule) {
+                nextToken()
                 while (!atToken(PyTokenTypes.DEDENT)) {
                     if (!parseRuleParameter(section)) {
                         break
                     }
+                }
+            } else {
+                if (section.parameterListStatement != SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT) {
+                    // Only rules, checkpoints and use rules can have an empty statement list
+                    myBuilder.error(PyPsiBundle.message("indent.expected"))
+                } else {
+                    incompleteRule = false
                 }
             }
         }
@@ -225,13 +240,13 @@ class SmkStatementParsing(
             }
             multiline && !myBuilder.eof() -> {
                 if (atToken(PyTokenTypes.IDENTIFIER)) {
-                    val actualToken = SnakemakeLexer.KEYWORDS[myBuilder.tokenText!!]
+                    val actualToken = SnakemakeLexer.KEYWORD_LIKE_SECTION_NAME_2_TOKEN_TYPE[myBuilder.tokenText!!]
                     if (actualToken != null) {
                         myBuilder.remapCurrentToken(actualToken)
                         return
                     }
                 }
-                if (!atAnyOfTokens(*SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.types)) {
+                if (!SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS.contains(myBuilder.tokenType)) {
                     nextToken() // probably check token type
                 }
             }
@@ -270,7 +285,11 @@ class SmkStatementParsing(
         val ruleParam = myBuilder.mark()
 
         if (myBuilder.tokenType != PyTokenTypes.IDENTIFIER) {
-            myBuilder.error("${section.name.capitalize()} parameter identifier is expected") // bundle
+            myBuilder.error("${
+                section.name.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                }
+            } parameter identifier is expected") // bundle
             nextToken()
             ruleParam.drop()
             return false
@@ -316,6 +335,36 @@ class SmkStatementParsing(
             return true
         }
         referenceMarker.drop()
+        return false
+    }
+
+    private inline fun tryRemapCurrentToken(scope: SmkParsingScope, checkToplevelFun: () -> Boolean) {
+        if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER && !scope.inPythonicSection) {
+            val actualToken = SnakemakeLexer.KEYWORD_LIKE_SECTION_NAME_2_TOKEN_TYPE[myBuilder.tokenText!!]
+            if (actualToken != null) {
+                myBuilder.remapCurrentToken(actualToken)
+            } else if (checkToplevelFun()) {
+                myBuilder.remapCurrentToken(SmkTokenTypes.WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)
+            }
+        }
+    }
+
+    private fun checkIfAtToplevelDecoratorKeyword(): Boolean {
+        val workflowParam = myBuilder.mark()
+        var result = checkNextToken(PyTokenTypes.COLON)
+        nextToken()
+
+        val tt = myBuilder.tokenType
+        result = result && (tt.isPythonString() || tt == PyTokenTypes.STATEMENT_BREAK)
+        workflowParam.rollbackTo()
+        return result
+    }
+
+    private fun checkNextToken(tt: PyElementType): Boolean {
+        nextToken()
+        if (myBuilder.tokenType == tt) {
+            return true
+        }
         return false
     }
 

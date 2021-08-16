@@ -34,20 +34,29 @@ class SmkIgnorePyInspectionExtension : PyInspectionExtension() {
         reference: PsiReference,
         context: TypeEvalContext,
     ): Boolean {
-        if (SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(node)) {
-            val use = node.parentOfType<SmkUse>()
-            if (use != null && use.containsRuleReference(reference)) {
-                // Ignore references imported by 'module' from remote file
+        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(node)) {
+            return false
+        }
+
+        val refElement = reference.element
+
+        val use = node.parentOfType<SmkUse>()
+        if (use != null) {
+            // Ignore references imported by 'module' from remote file
+            //
+            // First check that reference is in `use` imported rules list
+            if (use.getImportedRuleNames()?.any { it == refElement } == true) {
                 val module = use.getModuleName()?.reference?.resolve()
                 val file = (module as? SmkModule)?.getPsiFile()?.virtualFile
                 return module != null && (file == null || file is HttpVirtualFile)
             }
-            if (node is PyQualifiedExpression) {
-                // Maybe referenceName is better here?
-                //val referencedName = node.referencedName
-                //return "config".equals(referencedName)
-                return node.textMatches(SnakemakeAPI.SMK_VARS_CONFIG)
-            }
+        }
+
+        if (node is PyQualifiedExpression) {
+            // Maybe referenceName is better here?
+            //val referencedName = node.referencedName
+            //return "config".equals(referencedName)
+            return node.textMatches(SnakemakeAPI.SMK_VARS_CONFIG)
         }
         return false
     }

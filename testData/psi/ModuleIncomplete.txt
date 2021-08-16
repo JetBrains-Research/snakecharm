@@ -4,7 +4,7 @@ SnakemakeFile: ModuleIncomplete.smk
     PsiErrorElement:Module name identifier or ':' expected
       <empty list>
     PyStatementList
-      PsiErrorElement:Indent expected...
+      PsiErrorElement:Indent expected
         <empty list>
   PsiWhiteSpace('\n')
   SmkModule
@@ -14,7 +14,7 @@ SnakemakeFile: ModuleIncomplete.smk
     PsiErrorElement:Module name identifier or ':' expected
       <empty list>
     PyStatementList
-      PsiErrorElement:Indent expected...
+      PsiErrorElement:Indent expected
         <empty list>
   PsiWhiteSpace('\n')
   SmkModule
@@ -23,7 +23,7 @@ SnakemakeFile: ModuleIncomplete.smk
     PsiElement(Py:IDENTIFIER)('v')
     PsiElement(Py:COLON)(':')
     PyStatementList
-      PsiErrorElement:Indent expected...
+      PsiErrorElement:Indent expected
         <empty list>
   PsiWhiteSpace('\n')
   SmkModule

@@ -1,0 +1,62 @@
+SnakemakeFile: EmptySections.smk
+  SmkRule
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('RULE_NAME')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PsiComment(Py:END_OF_LINE_COMMENT)('# can be empty')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n\n')
+  SmkCheckPoint
+    PsiElement(Py:CHECKPOINT_KEYWORD)('checkpoint')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('CHECKPOINT_NAME')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PsiComment(Py:END_OF_LINE_COMMENT)('# can be empty')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNames
+      SmkReferenceExpression: RULE_NAME
+        PsiElement(Py:IDENTIFIER)('RULE_NAME')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('USE_RULE_NAME')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_WITH_KEYWORD)('with')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PsiComment(Py:END_OF_LINE_COMMENT)('# can be empty')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n\n')
+  SmkSubworkflow
+    PsiElement(Py:SUBWORKFLOW_KEYWORD)('subworkflow')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('SUBWORKFLOW_NAME')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PsiComment(Py:END_OF_LINE_COMMENT)('# can't be empty')
+    PyStatementList
+      PsiErrorElement:Indent expected
+        <empty list>
+  PsiWhiteSpace('\n\n')
+  SmkModule
+    PsiElement(Py:MODULE_KEYWORD)('module')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('MODULE_NAME')
+    PsiElement(Py:COLON)(':')
+    PsiWhiteSpace(' ')
+    PsiComment(Py:END_OF_LINE_COMMENT)('# can't be empty')
+    PyStatementList
+      PsiErrorElement:Indent expected
+        <empty list>

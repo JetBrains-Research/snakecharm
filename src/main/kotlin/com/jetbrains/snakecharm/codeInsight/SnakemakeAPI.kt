@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.codeInsight
 
+import com.google.common.collect.ImmutableSet
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_CONFIG_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_META_WRAPPER_KEYWORD
@@ -47,9 +48,15 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_REPORT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_TEMP
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_TOUCH
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_UNPACK
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINERIZED_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_ENVVARS_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_REPORT_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_SINGULARITY_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD
 
 /**
  * Also see [ImplicitPySymbolsProvider] class
@@ -120,6 +127,19 @@ object SnakemakeAPI {
     val SINGLE_ARGUMENT_WORKFLOWS_KEYWORDS = setOf(
         WORKFLOW_CONTAINERIZED_KEYWORD, WORKFLOW_CONTAINER_KEYWORD,
         WORKFLOW_SINGULARITY_KEYWORD
+    )
+
+    // List of top-level sections
+    val TOPLEVEL_ARGS_SECTION_KEYWORDS = setOf(
+        WORKFLOW_CONFIGFILE_KEYWORD,
+        WORKFLOW_REPORT_KEYWORD,
+        WORKFLOW_SINGULARITY_KEYWORD,
+        WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD,
+        WORKFLOW_INCLUDE_KEYWORD,
+        WORKFLOW_WORKDIR_KEYWORD,
+        WORKFLOW_ENVVARS_KEYWORD,
+        WORKFLOW_CONTAINER_KEYWORD,
+        WORKFLOW_CONTAINERIZED_KEYWORD
     )
 
     /**

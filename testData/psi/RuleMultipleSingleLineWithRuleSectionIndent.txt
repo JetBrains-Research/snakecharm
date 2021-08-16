@@ -237,7 +237,7 @@ SnakemakeFile: RuleMultipleSingleLineWithRuleSectionIndent.smk
             PsiElement(Py:IDENTIFIER)('foo0')
   PsiWhiteSpace('\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD)('wildcard_constraints')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('wildcard_constraints')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace('\n    ')
