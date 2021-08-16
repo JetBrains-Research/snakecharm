@@ -8,6 +8,9 @@ Feature: Rule SmkUnusedLogFileInspection inspection
 
     <rule_like> B:
         threads: 4
+
+    <rule_like> C:
+        threads: 4
     """
     Given I open a file "foo.smk" with text
     """
@@ -22,7 +25,7 @@ Feature: Rule SmkUnusedLogFileInspection inspection
         name: "name_{log}"
         shell: "command touch {wildcards.log}"
 
-    use rule A,B from MODULE as other_* with:
+    use rule A,B,C from MODULE as other_* with:
         log: "other_log.log"
 
     use rule other_B as new_other_B with:
@@ -36,6 +39,10 @@ Feature: Rule SmkUnusedLogFileInspection inspection
     And I expect inspection weak warning on <log: "other_log.log"> with message
     """
     Looks like a log file won't be created in rule 'B', because it is not referenced from 'shell' or 'run' sections
+    """
+    And I expect inspection weak warning on <log: "other_log.log"> with message
+    """
+    Looks like a log file won't be created in rule 'C', because it is not referenced from 'shell' or 'run' sections
     """
     And I expect inspection weak warning on <log: "new_other_log.log"> with message
     """
