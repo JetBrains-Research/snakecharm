@@ -4,10 +4,9 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiReference
-import com.intellij.psi.util.elementType
+import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.python.psi.PyElementVisitor
-import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes
 import com.jetbrains.snakecharm.lang.psi.*
@@ -47,8 +46,8 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
         // Returns original names, we don't want to save one name because
         // index with this name probably already exists
         // so we save whole rules names if it is not just '*' wildcard
-        if (originalNames != null && originalNames.text != "*") {
-            return originalNames.node
+        if (originalNames != null && originalNames.isNotEmpty()) {
+            return originalNames.first().parent.node
         }
         return null
     }
@@ -58,18 +57,10 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
         if (identifier != null) {
             return listOf(identifier.text to identifier.psi)
         }
-        val importedNames = getImportedRuleNames()
         val newName = getNameIdentifierPattern()
-        if (importedNames == null) {
-            return emptyList()
-        }
         val originalNames = mutableListOf<Pair<String, PsiElement>>()
-        var child = importedNames.firstChild
-        while (child != null) {
-            if (child.elementType == SmkElementTypes.REFERENCE_EXPRESSION) {
-                originalNames.add(child.text to child)
-            }
-            child = child.nextSibling
+        getImportedRuleNames()?.forEach { reference ->
+            originalNames.add(reference.text to reference)
         }
         if (originalNames.isEmpty()) {
             val moduleRef = (getModuleName() as? SmkReferenceExpression) ?: return emptyList()
@@ -91,13 +82,20 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
         }
     }
 
+    /**
+     * Returns a [PsiElement] which sets pattern of produced rule names
+     */
+    private fun getNameIdentifierPattern() = findChildByType(SmkElementTypes.USE_NAME_IDENTIFIER) as? PsiElement
+
     override fun getModuleName() =
         (findChildByType(SmkTokenTypes.SMK_FROM_KEYWORD) as? PsiElement)?.nextSibling?.nextSibling
 
-    override fun getImportedRuleNames() = findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES) as? PsiElement
-
-    override fun getNameIdentifierPattern() = findChildByType(SmkElementTypes.USE_NAME_IDENTIFIER) as? PsiElement
+    override fun getImportedRuleNames(): Array<SmkReferenceExpression>? =
+        PsiTreeUtil.getChildrenOfType(
+            findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES),
+            SmkReferenceExpression::class.java
+        )
 
     override fun containsRuleReference(reference: PsiReference) =
-        getImportedRuleNames()?.children?.any { it == reference.element } ?: false
+        getImportedRuleNames()?.any { it == reference.element } ?: false
 }

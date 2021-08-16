@@ -2,7 +2,6 @@ package com.jetbrains.snakecharm.lang.psi.impl.refs
 
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.module.ModuleUtilCore
-import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.jetbrains.python.psi.AccessDirection

@@ -42,14 +42,9 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
     fun getModuleName(): PsiElement?
 
     /**
-     * Returns a [PsiElement] which sets pattern of produced rule names
+     * Returns an array of  [SmkReferenceExpression] which refer to overridden rules or checkpoints
      */
-    fun getNameIdentifierPattern(): PsiElement?
-
-    /**
-     * Returns a [PsiElement] which contains a references to overridden rules
-     */
-    fun getImportedRuleNames(): PsiElement?
+    fun getImportedRuleNames(): Array<SmkReferenceExpression>?
 
     /**
      * Checks if [reference] refer to one of the overridden rules

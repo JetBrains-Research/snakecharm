@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
-import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.vfs.impl.http.HttpVirtualFile
 import com.intellij.psi.util.elementType
@@ -30,21 +29,17 @@ class SmkUnresolvedImportedRuleNameInspection : SnakemakeInspection() {
                 val module = moduleRef.resolve() as? SmkModule
                 val importedFile = module?.getPsiFile() as? SmkFile
                 if (importedFile == null || importedFile.virtualFile is HttpVirtualFile) {
-                    references.children.forEach {
-                        if (it is SmkReferenceExpression) {
-                            registerProblem(
-                                it,
-                                SnakemakeBundle.message("INSP.NAME.probably.unresolved.use.reference")
-                            )
-                        }
+                    references.forEach {
+                        registerProblem(
+                            it,
+                            SnakemakeBundle.message("INSP.NAME.probably.unresolved.use.reference")
+                        )
                     }
                     return
                 }
             }
-            references.children.forEach { reference ->
-                if (reference is SmkReferenceExpression) {
-                    checkReference(reference)
-                }
+            references.forEach { reference ->
+                checkReference(reference)
             }
         }
 

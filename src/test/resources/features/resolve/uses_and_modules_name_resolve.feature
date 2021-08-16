@@ -126,7 +126,7 @@ Feature: Resolve use and module name to its declaration
     When I put the caret at MODULE as
     Then reference should resolve to "MODULE:" in "foo.smk"
 
-  Scenario: Module name refer to module declaration, confused scenario
+  Scenario: Module name resolving results shouldn't contain use sections for which the module name matched name pattern
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
