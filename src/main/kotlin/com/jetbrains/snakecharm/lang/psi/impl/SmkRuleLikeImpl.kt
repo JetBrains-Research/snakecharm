@@ -55,7 +55,7 @@ abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT : SmkRuleLike<S>, o
      */
     override fun getTextOffset() = getNameNode()?.startOffset ?: super.getTextOffset()
 
-    private fun getNameNode() = getIdentifierNode(node)
+    protected open fun getNameNode() = getIdentifierNode(node)
 
     override fun getSectionByName(sectionName: String): S? {
         require(sectionName != SnakemakeNames.SECTION_RUN) {

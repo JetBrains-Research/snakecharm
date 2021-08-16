@@ -12,6 +12,7 @@ import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
+import com.intellij.psi.util.elementType
 import com.intellij.util.ProcessingContext
 import com.intellij.util.Processors
 import com.jetbrains.python.psi.AccessDirection
@@ -21,8 +22,12 @@ import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
+import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.SmkUse
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex
 import gnu.trove.THashSet
 
 
@@ -67,7 +72,8 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
         ) { currentFileDeclarations }
 
         if (results.isEmpty()) {
-            return emptyList()
+            // If there are no such rule, searches for rule declared in 'use' section
+            return getUseSections(name, location)
         }
 
         return results.map { element ->
@@ -76,6 +82,46 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
     }
 
     override fun isBuiltin() = false
+
+    protected open fun getUseSections(name: String, location: PyExpression): List<RatedResolveResult> {
+        val result = mutableListOf<RatedResolveResult>()
+        if (location.parent is SmkUse) {
+            // Current reference is module reference
+            //
+            // XXX: We use `location.parent` instead of `containgRule`, because here we want to ignore only
+            //  the module reference in use section, and do not want to ignore e.g.
+            //  references inside USE_IMPORTED_RULES_NAMES, but both references would have SmkUse as containingRule,
+            //  so in case of module reference we want to check type of the first parent. Also the containingRule
+            //  is null when it is called from SmkRuleOrCheckpointNameReference so that's another reason
+            return result
+        }
+        val module = location.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
+        when (module) {
+            null -> (location.containingFile.originalFile as SmkFile).collectUses().map { it.second }
+            else -> getVariantsFromIndex(SmkUseNameIndex.KEY, module, SmkUse::class.java)
+        }.forEach { use ->
+            use as SmkUse
+            val referTo = use.getProducedRulesNames()
+                .firstOrNull {
+                    (it.first == name &&
+                            it.second != location.originalElement) ||
+                            it.second.elementType == SmkElementTypes.USE_NAME_IDENTIFIER
+                }
+            if (referTo != null) {
+                result.add(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, referTo.second))
+            }
+        }
+
+        // Checks rule name patterns, produced by 'use' sections
+        if (result.isEmpty()) {
+            val namePattern = (location.containingFile as? SmkFile)?.resolveByRuleNamePattern(name)
+            if (namePattern != null) {
+                result.add(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, namePattern))
+            }
+        }
+
+        return result
+    }
 
     companion object {
         fun <T : SmkRuleOrCheckpoint> createRuleLikeLookupItem(name: String, elem: T): LookupElement {

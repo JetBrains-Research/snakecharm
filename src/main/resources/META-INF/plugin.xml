@@ -92,6 +92,7 @@
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex"/>
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex"/>
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex"/>
+    <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex"/>
     <gotoSymbolContributor implementation="com.jetbrains.snakecharm.actions.SmkGotoSymbolContributor"/>
 
     <codeBlockProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.SmkCodeBlockProvider"/>
@@ -577,6 +578,16 @@
             key="INSP.NAME.multiline.func.call"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkMultilineFunctionCallInspection"
       />
+
+    <localInspection
+      language="Snakemake" shortName="SmkUnresolvedImportedRuleNameInspection"
+      enabledByDefault="true"
+      level="WEAK WARNING"
+      suppressId="SmkUnresolvedImportedRuleName"
+      bundle="SnakemakeBundle"
+      groupKey="INSP.GROUP.snakemake"
+      key="INSP.NAME.probably.unresolved.use.reference"
+      implementationClass="com.jetbrains.snakecharm.inspections.SmkUnresolvedImportedRuleNameInspection"/>
 
     <findUsagesHandlerFactory
             implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"

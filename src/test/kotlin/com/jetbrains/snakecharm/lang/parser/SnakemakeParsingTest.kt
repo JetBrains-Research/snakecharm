@@ -172,18 +172,6 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
-    fun testRuleIncomplete3() {
-        doTest()
-    }
-
-    fun testRuleIncomplete4() {
-        doTest()
-    }
-
-    fun testRuleIncomplete5() {
-        doTest()
-    }
-
     fun testWorkflowParamsListArgsKeywords() {
         doTest()
     }
@@ -405,6 +393,10 @@ class SnakemakeParsingTest : ParsingTestCase(
     }
 
     fun testUseInvalid() {
+        doTest()
+    }
+
+    fun testEmptySections() {
         doTest()
     }
 

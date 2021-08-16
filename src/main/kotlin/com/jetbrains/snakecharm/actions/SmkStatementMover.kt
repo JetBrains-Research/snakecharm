@@ -129,66 +129,94 @@ open class SmkStatementMover : PyStatementMover() {
                 ((destination is SmkRuleOrCheckpoint &&
                         elementToMove.sectionKeyword !in RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS) ||
                         (destination is SmkSubworkflow &&
-                                elementToMove.sectionKeyword !in SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS)))
+                                elementToMove.sectionKeyword !in SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS) ||
+                        (destination is SmkModule &&
+                                elementToMove.sectionKeyword !in SnakemakeAPI.MODULE_SECTIONS_KEYWORDS) ||
+                        (destination is SmkUse &&
+                                elementToMove.sectionKeyword !in SnakemakeAPI.USE_SECTIONS_KEYWORDS)))
 
     private fun isAvailableForMoveOut(elementToMove: PsiElement, down: Boolean): Boolean {
         val statementList = getStatementList(elementToMove) ?: return true
         val statements = statementList.children
-
-        if (elementToMove is SmkRuleOrCheckpointArgsSection) {
-            val parent =
-                PsiTreeUtil.getParentOfType(elementToMove, SmkRuleOrCheckpoint::class.java)
-            if (!down && statements.first() == elementToMove || down && statements.last() == elementToMove) {
-
-                var sibling = if (!down) parent?.prevSibling else parent?.nextSibling
-
-                while (sibling != null) {
-                    if (sibling !is PsiWhiteSpace && sibling !is PsiComment) {
-                        val parentSibling = PsiTreeUtil.getParentOfType(
-                            sibling,
-                            SmkRuleOrCheckpoint::class.java, false
-                        )
-
-                        if (parentSibling != null) {
-                            return true
-                        } else {
-                            break
-                        }
-                    }
-                    sibling = if (!down) sibling.prevSibling else sibling.nextSibling
-                }
-            }
-        }
 
         // if statement is a candidate for moving out of statement list:
         val boundaryStatement = when {
             down -> statements.last() == elementToMove
             else -> statements.first() == elementToMove
         }
-        if (boundaryStatement) {
-            // do not remove the only one section from rule/checkpoint/subworkflow/..
-            if (statements.size == 1 && elementToMove is SmkArgsSection) {
+        if (!boundaryStatement) {
+            return true
+        }
+
+        // do not remove the only one section from rule/checkpoint/subworkflow/..
+        if (statements.size == 1 && elementToMove is SmkArgsSection) {
+            return false
+        }
+
+        if ((elementToMove is SmkRuleOrCheckpointArgsSection && searchForRuleLikeElement(
+                elementToMove,
+                down,
+                statements,
+                SmkRuleOrCheckpoint::class.java
+            )) || (elementToMove is SmkModuleArgsSection && searchForRuleLikeElement(
+                elementToMove,
+                down,
+                statements,
+                SmkModule::class.java
+            ))
+        ) {
+            return true
+        }
+
+        // do not move run section out of container
+        if (elementToMove is SmkRunSection) {
+            return false
+        }
+
+        // do not move sections that cannot be toplevel:
+        if (elementToMove is SmkArgsSection) {
+            val keyword = elementToMove.sectionKeyword
+            val sectionCouldBeToplevel = keyword != null && keyword in TOPLEVEL_ARGS_SECTION_KEYWORDS
+            if (!sectionCouldBeToplevel) {
                 return false
             }
-
-            // do not move run section out of container
-            if (elementToMove is SmkRunSection) {
-                return false
-            }
-
-            // do not move sections that cannot be toplevel:
-            if (elementToMove is SmkRuleOrCheckpointArgsSection) {
-                val keyword = elementToMove.sectionKeyword
-                val sectionCouldBeToplevel = keyword != null && keyword in TOPLEVEL_ARGS_SECTION_KEYWORDS
-                if (!sectionCouldBeToplevel) {
-                    return false
-                }
-            }
-
         }
 
         // ok to move
         return true
+    }
+
+    private fun <T : SmkRuleLike<S>, S : SmkArgsSection> searchForRuleLikeElement(
+        elementToMove: PsiElement,
+        down: Boolean,
+        statements: Array<PsiElement>,
+        clazz: Class<T>
+    ): Boolean {
+        val parent =
+            PsiTreeUtil.getParentOfType(elementToMove, clazz)
+        if (!down && statements.first() == elementToMove || down && statements.last() == elementToMove) {
+
+            var sibling = if (!down) parent?.prevSibling else parent?.nextSibling
+
+            while (sibling != null) {
+                if (sibling !is PsiWhiteSpace && sibling !is PsiComment) {
+                    val parentSibling = PsiTreeUtil.getParentOfType(
+                        sibling,
+                        clazz, false
+                    ) ?: break
+
+                    // Check if not execution section
+                    if (!(parentSibling is SmkUse &&
+                                elementToMove is SmkSection &&
+                                elementToMove.sectionKeyword !in SnakemakeAPI.USE_SECTIONS_KEYWORDS)
+                    ) {
+                        return true
+                    }
+                }
+                sibling = if (!down) sibling.prevSibling else sibling.nextSibling
+            }
+        }
+        return false
     }
 
     /**
@@ -202,32 +230,19 @@ open class SmkStatementMover : PyStatementMover() {
             return null
         }
 
-        if (elementToMove is SmkRuleOrCheckpointArgsSection) {
-            val parent =
-                PsiTreeUtil.getParentOfType(elementToMove, SmkRuleOrCheckpoint::class.java)
-            if (!down && statements.first() == elementToMove || down && statements.last() == elementToMove) {
-                var sibling = if (!down) parent?.prevSibling else parent?.nextSibling
-
-                while (sibling != null) {
-                    if (sibling !is PsiWhiteSpace && sibling !is PsiComment) {
-                        val parentSibling =
-                            PsiTreeUtil.getParentOfType(sibling, SmkRuleOrCheckpoint::class.java, false)
-
-                        if (parentSibling != null) {
-                            val list = parentSibling.statementList
-                            return if (down) {
-                                ScopeRange(list, list.statements.first(), true)
-                            } else {
-                                ScopeRange(list, list.statements.last(), false)
-                            }
-
-                        } else {
-                            break
-                        }
-                    }
-                    sibling = if (!down) sibling.prevSibling else sibling.nextSibling
-                }
+        val result = when (elementToMove) {
+            is SmkRuleOrCheckpointArgsSection -> {
+                lookForDestinationInRuleLikeElement(elementToMove, down, statements, SmkRuleOrCheckpoint::class.java)
             }
+            is SmkModuleArgsSection -> {
+                lookForDestinationInRuleLikeElement(elementToMove, down, statements, SmkModule::class.java)
+            }
+            else -> {
+                null
+            }
+        }
+        if (result != null) {
+            return result
         }
 
 
@@ -249,6 +264,44 @@ open class SmkStatementMover : PyStatementMover() {
         }
     }
 
+    private fun <T : SmkRuleLike<S>, S : SmkArgsSection> lookForDestinationInRuleLikeElement(
+        elementToMove: PsiElement,
+        down: Boolean,
+        statements: Array<PyStatement>,
+        clazz: Class<T>
+    ): ScopeRange? {
+        val parent =
+            PsiTreeUtil.getParentOfType(elementToMove, clazz)
+        if (!down && statements.first() == elementToMove || down && statements.last() == elementToMove) {
+            var sibling = if (!down) parent?.prevSibling else parent?.nextSibling
+
+            while (sibling != null) {
+                if (sibling !is PsiWhiteSpace && sibling !is PsiComment) {
+                    val parentSibling =
+                        PsiTreeUtil.getParentOfType(sibling, clazz, false) ?: break
+
+                    // Check if not execution section
+                    if (!(parentSibling is SmkUse &&
+                                elementToMove is SmkSection &&
+                                elementToMove.sectionKeyword !in SnakemakeAPI.USE_SECTIONS_KEYWORDS)
+                    ) {
+                        val list = parentSibling.statementList
+                        if (list.statements.isEmpty()) {
+                            return null
+                        }
+                        return if (down) {
+                            ScopeRange(list, list.statements.first(), true)
+                        } else {
+                            ScopeRange(list, list.statements.last(), false)
+                        }
+                    }
+                }
+                sibling = if (!down) sibling.prevSibling else sibling.nextSibling
+            }
+        }
+        return null
+    }
+
     /**
      *  modified version
      */
@@ -265,7 +318,7 @@ open class SmkStatementMover : PyStatementMover() {
             val number = document.getLineNumber(element.textOffset)
             val number2 = document.getLineNumber(statementList2.parent.textOffset)
             if (number == number2) {
-                return ScopeRange(statementList2, statementList2.statements.first(), true)
+                return ScopeRange(statementList2, statementList2.statements.firstOrNull() ?: return null, true)
             }
         }
 
@@ -291,16 +344,23 @@ open class SmkStatementMover : PyStatementMover() {
                 PyStatement::class.java, PyStatementList::class.java
             )
 
+        val smkModuleDef =
+            PsiTreeUtil.getParentOfType(
+                elemAtOffset, SmkModule::class.java, true,
+                PyStatement::class.java, PyStatementList::class.java
+            )
+
         val stList: PyStatementList? = when {
             statementPart != null -> statementPart.statementList
             funDef != null -> funDef.statementList
             classDef != null -> classDef.statementList
             smkRuleOrCheckpointDef != null -> smkRuleOrCheckpointDef.statementList
+            smkModuleDef != null -> smkModuleDef.statementList
             else -> null
         }
 
         if (stList != null) {
-            return ScopeRange(stList, stList.statements.first(), true)
+            return ScopeRange(stList, stList.statements.firstOrNull() ?: return null, true)
         }
         return null
     }
