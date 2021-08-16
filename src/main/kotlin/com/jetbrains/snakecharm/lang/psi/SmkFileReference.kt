@@ -195,6 +195,43 @@ class SmkConfigfileReference(
 }
 
 /**
+ * The path must built from working directory
+ * We use contentRoots as working directory
+ * version 6.5.1
+ */
+class SmkPepfileReference(
+    element: SmkArgsSection,
+    textRange: TextRange,
+    stringLiteralExpression: PyStringLiteralExpression,
+    path: String
+) : SmkFileReference(
+    element,
+    textRange,
+    stringLiteralExpression,
+    path,
+    searchRelativelyToCurrentFolder = false
+) {
+    override fun getVariants() = collectFileSystemItemLike {
+        isYamlFile(it)
+    }
+}
+
+/**
+ * The path must built from directory with current snakefile
+ * version 6.5.1
+ */
+class SmkPepschemaReference(
+    element: SmkArgsSection,
+    textRange: TextRange,
+    stringLiteralExpression: PyStringLiteralExpression,
+    path: String
+) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
+    override fun getVariants() = collectFileSystemItemLike {
+        isYamlFile(it)
+    }
+}
+
+/**
  * The path must built from directory with current snakefile
  * version 6.5.1
  */

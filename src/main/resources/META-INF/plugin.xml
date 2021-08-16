@@ -12,6 +12,7 @@
   <!-- PyCharm / Python plugin dependency -->
   <depends>com.intellij.modules.lang</depends>
   <depends>com.intellij.modules.python</depends>
+  <depends>org.jetbrains.plugins.yaml</depends>
 
   <applicationListeners>
     <listener class="com.jetbrains.snakecharm.SnakemakePluginListener" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
@@ -105,6 +106,11 @@
     <completion.contributor
         language="Python"
         implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor"
+    />
+
+    <completion.contributor
+      language="Python"
+      implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkPepObjectCompletionContributor"
     />
     <completion.contributor
         language="Python"

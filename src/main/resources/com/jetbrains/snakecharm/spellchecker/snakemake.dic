@@ -2,6 +2,8 @@ localrules
 ruleorder
 checkpoint
 configfile
+pepfile
+pepschema
 workdir
 wildcard_constraints
 singularity

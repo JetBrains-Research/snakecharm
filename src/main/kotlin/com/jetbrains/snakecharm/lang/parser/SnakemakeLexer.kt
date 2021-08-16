@@ -16,6 +16,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 class SnakemakeLexer : PythonIndentingLexer() {
     // number of spaces between line start and the first non-whitespace token on the line
     private var myCurrentNewlineIndent = 0
+
     // end offset of the last line break before the first non-whitespace token on the line,
     // which is also start offset of the first non-whitespace token on the line
     private var myCurrentNewlineOffset = 0
@@ -33,6 +34,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
     // used to insert statement break before the first argument but only line breaks between section arguments
     private var beforeFirstArgumentInSection = false
+
     /*
      The following tokens can be considered top-level sections:
      1. text is present in the KEYWORDS map
@@ -40,6 +42,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
      3. topLevelSectionIndent is equal to -1, meaning there is no top-level section nesting the current section
     */
     private var topLevelSectionIndent = -1
+
     /*
      The following tokens can be considered rule-like sections:
      0. identifiers
@@ -48,6 +51,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
      Should always be not less than topLevelSectionIndent
     */
     private var ruleLikeSectionIndent = -1
+
     /*
      Is true for:
       - `onsuccess`/`onerror`/`onstart` top-level sections
@@ -63,36 +67,41 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
     companion object {
         val RULE_LIKE_KEYWORDS = ImmutableSet.Builder<String>()
-                .add(SnakemakeNames.RULE_KEYWORD)
-                .add(SnakemakeNames.CHECKPOINT_KEYWORD)
-                .add(SnakemakeNames.SUBWORKFLOW_KEYWORD)
-                .build()!!
+            .add(SnakemakeNames.RULE_KEYWORD)
+            .add(SnakemakeNames.CHECKPOINT_KEYWORD)
+            .add(SnakemakeNames.SUBWORKFLOW_KEYWORD)
+            .build()!!
 
         val PYTHON_BLOCK_KEYWORDS = ImmutableSet.Builder<String>()
-                .add(SnakemakeNames.WORKFLOW_ONSTART_KEYWORD)
-                .add(SnakemakeNames.WORKFLOW_ONSUCCESS_KEYWORD)
-                .add(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD)
-                .build()!!
+            .add(SnakemakeNames.WORKFLOW_ONSTART_KEYWORD)
+            .add(SnakemakeNames.WORKFLOW_ONSUCCESS_KEYWORD)
+            .add(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD)
+            .build()!!
 
         val KEYWORDS = ImmutableMap.Builder<String, PyElementType>()
-                .put(SnakemakeNames.RULE_KEYWORD, SmkTokenTypes.RULE_KEYWORD)
-                .put(SnakemakeNames.CHECKPOINT_KEYWORD, SmkTokenTypes.CHECKPOINT_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD, SmkTokenTypes.WORKFLOW_CONFIGFILE_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_REPORT_KEYWORD, SmkTokenTypes.WORKFLOW_REPORT_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD, SmkTokenTypes.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_SINGULARITY_KEYWORD, SmkTokenTypes.WORKFLOW_SINGULARITY_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD, SmkTokenTypes.WORKFLOW_INCLUDE_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD, SmkTokenTypes.WORKFLOW_WORKDIR_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_ENVVARS_KEYWORD, SmkTokenTypes.WORKFLOW_ENVVARS_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD, SmkTokenTypes.WORKFLOW_CONTAINER_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_CONTAINERIZED_KEYWORD, SmkTokenTypes.WORKFLOW_CONTAINERIZED_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_LOCALRULES_KEYWORD, SmkTokenTypes.WORKFLOW_LOCALRULES_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_RULEORDER_KEYWORD, SmkTokenTypes.WORKFLOW_RULEORDER_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_ONSUCCESS_KEYWORD, SmkTokenTypes.WORKFLOW_ONSUCCESS_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD, SmkTokenTypes.WORKFLOW_ONERROR_KEYWORD)
-                .put(SnakemakeNames.WORKFLOW_ONSTART_KEYWORD, SmkTokenTypes.WORKFLOW_ONSTART_KEYWORD)
-                .put(SnakemakeNames.SUBWORKFLOW_KEYWORD, SmkTokenTypes.SUBWORKFLOW_KEYWORD)
-                .build()!!
+            .put(SnakemakeNames.RULE_KEYWORD, SmkTokenTypes.RULE_KEYWORD)
+            .put(SnakemakeNames.CHECKPOINT_KEYWORD, SmkTokenTypes.CHECKPOINT_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD, SmkTokenTypes.WORKFLOW_CONFIGFILE_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_REPORT_KEYWORD, SmkTokenTypes.WORKFLOW_REPORT_KEYWORD)
+            .put(
+                SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD,
+                SmkTokenTypes.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD
+            )
+            .put(SnakemakeNames.WORKFLOW_SINGULARITY_KEYWORD, SmkTokenTypes.WORKFLOW_SINGULARITY_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD, SmkTokenTypes.WORKFLOW_INCLUDE_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD, SmkTokenTypes.WORKFLOW_WORKDIR_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_ENVVARS_KEYWORD, SmkTokenTypes.WORKFLOW_ENVVARS_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD, SmkTokenTypes.WORKFLOW_CONTAINER_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_CONTAINERIZED_KEYWORD, SmkTokenTypes.WORKFLOW_CONTAINERIZED_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_LOCALRULES_KEYWORD, SmkTokenTypes.WORKFLOW_LOCALRULES_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_RULEORDER_KEYWORD, SmkTokenTypes.WORKFLOW_RULEORDER_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_ONSUCCESS_KEYWORD, SmkTokenTypes.WORKFLOW_ONSUCCESS_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD, SmkTokenTypes.WORKFLOW_ONERROR_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_ONSTART_KEYWORD, SmkTokenTypes.WORKFLOW_ONSTART_KEYWORD)
+            .put(SnakemakeNames.SUBWORKFLOW_KEYWORD, SmkTokenTypes.SUBWORKFLOW_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_PEPFILE_KEYWORD, SmkTokenTypes.WORKFLOW_PEPFILE_KEYWORD)
+            .put(SnakemakeNames.WORKFLOW_PEPSCHEMA_KEYWORD, SmkTokenTypes.WORKFLOW_PEPSCHEMA_KEYWORD)
+            .build()!!
 
         val KEYWORDS_2_TEXT = KEYWORDS.map { it.value to it.key }.toMap()
     }
@@ -118,10 +127,11 @@ class SnakemakeLexer : PythonIndentingLexer() {
         // we are already inside the section, and then statement breaks should not occur,
         // so this variable is set to false
         if ((ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections) &&
-                beforeFirstArgumentInSection &&
-                tokenType !in PyTokenTypes.WHITESPACE_OR_LINEBREAK &&
-                !atToken(commentTokenType) &&
-                !atToken(PyTokenTypes.COLON)) {
+            beforeFirstArgumentInSection &&
+            tokenType !in PyTokenTypes.WHITESPACE_OR_LINEBREAK &&
+            !atToken(commentTokenType) &&
+            !atToken(PyTokenTypes.COLON)
+        ) {
             beforeFirstArgumentInSection = false
         }
 
@@ -135,16 +145,17 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 expectingRuleSectionOnSameLine = !isInToplevelSectionWithoutSubsections
             }
         } else if (topLevelSectionIndent > -1 &&
-                myCurrentNewlineIndent >= topLevelSectionIndent &&
-                ruleLikeSectionIndent == -1 &&
-                atToken(PyTokenTypes.IDENTIFIER) &&
-                !isInToplevelSectionWithoutSubsections) {
+            myCurrentNewlineIndent >= topLevelSectionIndent &&
+            ruleLikeSectionIndent == -1 &&
+            atToken(PyTokenTypes.IDENTIFIER) &&
+            !isInToplevelSectionWithoutSubsections
+        ) {
             val tryToIdentifyRuleSection =
-                    if (tokensBeforeRuleSection.isNotEmpty()) {
-                        tokensBeforeRuleSection.contains(PyTokenTypes.COLON)
-                    } else {
-                        tokenStart == myCurrentNewlineOffset
-                    }
+                if (tokensBeforeRuleSection.isNotEmpty()) {
+                    tokensBeforeRuleSection.contains(PyTokenTypes.COLON)
+                } else {
+                    tokenStart == myCurrentNewlineOffset
+                }
             if (tryToIdentifyRuleSection) {
                 val identifierPosition = currentPosition
                 val identifierText = tokenText
@@ -183,7 +194,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
             myCurrentNewlineIndent = spaces
             myCurrentNewlineOffset = tokenEnd
             if (insideSnakemakeArgumentList(myCurrentNewlineIndent)
-                    { currentIndent, sectionIndent -> currentIndent <= sectionIndent }) {
+                { currentIndent, sectionIndent -> currentIndent <= sectionIndent }
+            ) {
                 val currentLineBreakIndex = myTokenQueue.indexOfFirst {
                     it.type === PyTokenTypes.LINE_BREAK && it.start == tokenStart
                 }
@@ -237,7 +249,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             tokenType in PyTokenTypes.OPEN_BRACES -> myBraceLevel++
             tokenType in PyTokenTypes.CLOSE_BRACES -> myBraceLevel--
             myBraceLevel != 0 -> {
-                 val recoveryTokens = PythonDialectsTokenSetProvider.getInstance().unbalancedBracesRecoveryTokens
+                val recoveryTokens = PythonDialectsTokenSetProvider.getInstance().unbalancedBracesRecoveryTokens
 
                 val leftPreviousSection = myCurrentNewlineIndent <= ruleLikeSectionIndent ||
                         ruleLikeSectionIndent == -1 && myCurrentNewlineIndent <= topLevelSectionIndent
@@ -315,7 +327,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
     override fun processLineBreak(startPos: Int) {
         if ((ruleLikeSectionIndent > -1 || isInToplevelSectionWithoutSubsections)
-                && !isInPythonSection && !beforeFirstArgumentInSection) {
+            && !isInPythonSection && !beforeFirstArgumentInSection
+        ) {
             if (myBraceLevel != 0) {
                 processInsignificantLineBreak(startPos, false)
                 return
@@ -331,7 +344,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 return
             }
             myLineHasSignificantTokens = hasSignificantTokens
-            if (insideSnakemakeArgumentList(indent) { currentIndent, sectionIndent -> currentIndent > sectionIndent}) {
+            if (insideSnakemakeArgumentList(indent) { currentIndent, sectionIndent -> currentIndent > sectionIndent }) {
                 processInsignificantLineBreak(startPos, false)
                 processIndentsInsideSection(indent, startPos)
             } else {
@@ -360,7 +373,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
     private fun processIndentsInsideSection(indent: Int, startPos: Int) {
         val whiteSpaceEnd = if (baseTokenType == null) super.getBufferEnd() else baseTokenStart
-        if (insideSnakemakeArgumentList(indent) { currentIndent, sectionIndent -> currentIndent < sectionIndent}) {
+        if (insideSnakemakeArgumentList(indent) { currentIndent, sectionIndent -> currentIndent < sectionIndent }) {
             closeDanglingSuites(indent, startPos)
             myTokenQueue.add(PendingToken(PyTokenTypes.LINE_BREAK, startPos, whiteSpaceEnd))
         } else if (indent < myIndentStack.peek()) {
@@ -374,7 +387,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 if (indent > lastIndent) {
                     myTokenQueue.add(PendingToken(PyTokenTypes.INCONSISTENT_DEDENT, startPos, startPos))
                     if (lastIndent <= ruleLikeSectionIndent ||
-                            isInToplevelSectionWithoutSubsections && lastIndent <= topLevelSectionIndent) {
+                        isInToplevelSectionWithoutSubsections && lastIndent <= topLevelSectionIndent
+                    ) {
                         myIndentStack.push(indent)
                     }
                 }
@@ -420,17 +434,19 @@ class SnakemakeLexer : PythonIndentingLexer() {
         }
 
         // insert statement break on section exit
-        if (insideSnakemakeArgumentList(indent) { currentIndent, sectionIndent -> currentIndent <= sectionIndent}) {
+        if (insideSnakemakeArgumentList(indent) { currentIndent, sectionIndent -> currentIndent <= sectionIndent }) {
             restore(position)
             val firstCommentQueueIndex = myTokenQueue.indexOfFirst { it.type == commentTokenType }
             val precedingToken = myTokenQueue[firstCommentQueueIndex - 1]
             if (precedingToken.type == PyTokenTypes.LINE_BREAK) {
-                myTokenQueue.add(firstCommentQueueIndex - 1,
-                        PendingToken(
-                                PyTokenTypes.STATEMENT_BREAK,
-                                precedingToken.start,
-                                precedingToken.start
-                        ))
+                myTokenQueue.add(
+                    firstCommentQueueIndex - 1,
+                    PendingToken(
+                        PyTokenTypes.STATEMENT_BREAK,
+                        precedingToken.start,
+                        precedingToken.start
+                    )
+                )
                 if (linebreakBeforeFirstComment != -1) {
                     linebreakBeforeFirstComment++
                 }
@@ -467,8 +483,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
     }
 
     private fun insideSnakemakeArgumentList(indent: Int, comparator: (Int, Int) -> Boolean) =
-            ruleLikeSectionIndent > -1 && comparator(indent, ruleLikeSectionIndent) ||
-                    isInToplevelSectionWithoutSubsections && comparator(indent, topLevelSectionIndent)
+        ruleLikeSectionIndent > -1 && comparator(indent, ruleLikeSectionIndent) ||
+                isInToplevelSectionWithoutSubsections && comparator(indent, topLevelSectionIndent)
 
     private fun popIndentStackWhilePossible() {
         while (insertedIndentsCount > 0) {
@@ -484,10 +500,10 @@ class SnakemakeLexer : PythonIndentingLexer() {
     private fun atToken(token: IElementType) = tokenType === token
     private fun atBaseToken(token: IElementType) = baseTokenType === token
 
-    private class PendingCommentToken (
-            type: IElementType,
-            start: Int,
-            end: Int,
-            val indent: Int
+    private class PendingCommentToken(
+        type: IElementType,
+        start: Int,
+        end: Int,
+        val indent: Int
     ) : PendingToken(type, start, end)
 }

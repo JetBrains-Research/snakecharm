@@ -136,6 +136,14 @@ class ImplicitPySymbolsProvider(
         )
         progressIndicator?.checkCanceled()
 
+        //collect pep methods
+        collectClassInstanceMethods(
+            listOf(
+                "peppy.project" to "Project"
+            ), SmkCodeInsightScope.PEP_SECTION, usedFiles, sdk, elementsCache
+        )
+        progressIndicator?.checkCanceled()
+
         ///////////////////////////////////////
         // Collect hardcoded classes
 
@@ -211,11 +219,11 @@ class ImplicitPySymbolsProvider(
 
         val packages = PyPackageManager.getInstance(sdk).packages
 
-        val pkg1 = packages?.firstOrNull() { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK}
+        val pkg1 = packages?.firstOrNull() { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK }
         if (pkg1 != null) {
             return pkg1.matches(requirement1)
         }
-        val pkg2 = packages?.firstOrNull() { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK_MINIMAL}
+        val pkg2 = packages?.firstOrNull() { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK_MINIMAL }
         if (pkg2 != null) {
             return pkg2.matches(requirement2)
         }
@@ -356,7 +364,6 @@ class ImplicitPySymbolsProvider(
 
     private fun collectClassInstanceMethods(
         moduleAndClass: List<Pair<String, String>>,
-        methods: List<String>,
         scope: SmkCodeInsightScope,
         usedFiles: MutableSet<VirtualFile>,
         sdk: Sdk,
@@ -364,21 +371,16 @@ class ImplicitPySymbolsProvider(
         checkInheritedMethods: Boolean = false
     ) {
         processClasses(moduleAndClass, usedFiles, sdk) { pyClass ->
-            methods.forEach { methodName ->
-                //val ctx = TypeEvalContext.userInitiated(
-                //    pyClass.project,
-                //    pyClass.originalElement.containingFile
-                //)
-                val ctx = null
-                // val ctx = TypeEvalContext.codeInsightFallback(pyClass.project)
-                val method = pyClass.findMethodByName(
-                    methodName, checkInheritedMethods, ctx
-                )
-
+            //val ctx = TypeEvalContext.userInitiated(
+            //    pyClass.project,
+            //    pyClass.originalElement.containingFile
+            //)
+            val ctx = null
+            // val ctx = TypeEvalContext.codeInsightFallback(pyClass.project)
+            pyClass.methods.forEach { method ->
                 if (method != null) {
                     elementsCache.add(ImplicitPySymbol(method.name!!, method, scope, ImplicitPySymbolUsageType.METHOD))
                 }
-
             }
         }
     }
@@ -400,7 +402,14 @@ class ImplicitPySymbolsProvider(
             // val ctx = TypeEvalContext.codeInsightFallback(pyClass.project)
             val constructor = pyClass.findInitOrNew(false, ctx)
             if (constructor != null) {
-                elementsCache.add(ImplicitPySymbol(pyClass.name!!, constructor, scope, ImplicitPySymbolUsageType.METHOD))
+                elementsCache.add(
+                    ImplicitPySymbol(
+                        pyClass.name!!,
+                        constructor,
+                        scope,
+                        ImplicitPySymbolUsageType.METHOD
+                    )
+                )
             }
         }
     }
@@ -424,19 +433,19 @@ class ImplicitPySymbolsProvider(
         sdk: Sdk,
         processor: (PyClass) -> Unit
     ) {
-          moduleAndClass.forEach { (pyModuleFqn, className) ->
-              val pyFiles = collectPyFiles(pyModuleFqn, usedFiles, sdk)
+        moduleAndClass.forEach { (pyModuleFqn, className) ->
+            val pyFiles = collectPyFiles(pyModuleFqn, usedFiles, sdk)
 
-              pyFiles
-                  .asSequence()
-                  .filter { it.isValid }
-                  .mapNotNull { it.findTopLevelClass(className) }
-                  .filter { it.name != null }
-                  .forEach { pyClass ->
-                      processor(pyClass)
-                  }
-          }
-      }
+            pyFiles
+                .asSequence()
+                .filter { it.isValid }
+                .mapNotNull { it.findTopLevelClass(className) }
+                .filter { it.name != null }
+                .forEach { pyClass ->
+                    processor(pyClass)
+                }
+        }
+    }
 
     private fun collectTopLevelClassesInheretedFrom(
         pyModuleFqn: String,
@@ -509,11 +518,14 @@ class ImplicitPySymbolsProvider(
         val resolveContext = fromSdk(project, sdk)
         ////////////////
 
+
         val pyFiles = resolveQualifiedName(
             QualifiedName.fromDottedString(pyModuleFqn),
             resolveContext
         ).filterIsInstance<PyFile>()
-
+        pyFiles.forEach {
+            print(it)
+        }
         pyFiles.forEach { usedFiles.add(it.virtualFile) }
         return pyFiles
     }
@@ -606,7 +618,7 @@ class ImplicitPySymbolsProvider(
             usedFiles.add(workflowFile.virtualFile)
         }
         globals["workflow"] = workflowFile?.findTopLevelClass("Workflow")
-
+        var pepFile = collectPyFiles("peppy.project", usedFiles, sdk).firstOrNull()
         // Snakemake >= 6.5
         var commonFile = collectPyFiles("snakemake.common.__init__", usedFiles, sdk).firstOrNull()
         if (commonFile == null) {
@@ -622,6 +634,7 @@ class ImplicitPySymbolsProvider(
         globals[SnakemakeAPI.SMK_VARS_SCATTER] = commonFile?.findTopLevelClass("Scatter")
         globals[SnakemakeAPI.SMK_VARS_GATHER] = commonFile?.findTopLevelClass("Gather")
         globals[SnakemakeAPI.SMK_VARS_CONFIG] = null
+        globals[SnakemakeAPI.SMK_VARS_PEP] = pepFile?.findTopLevelClass("Project")
 
         val checkpointsFile = collectPyFiles("snakemake.checkpoints", usedFiles, sdk).firstOrNull()
         if (checkpointsFile != null) {
@@ -668,8 +681,8 @@ private class ImplicitPySymbolsCacheImpl(
     override val contentVersion: Int = 0
 ) : ImplicitPySymbolsCache {
 
-    private val scope2Symbols = symbols.groupBy { it.scope}
-    private val scope2SyntheticSymbols = syntheticSymbols.groupBy ({ it.first }, { it.second })
+    private val scope2Symbols = symbols.groupBy { it.scope }
+    private val scope2SyntheticSymbols = syntheticSymbols.groupBy({ it.first }, { it.second })
 
     override operator fun get(scope: SmkCodeInsightScope) = validElements(scope2Symbols[scope] ?: emptyList())
     override fun getSynthetic(scope: SmkCodeInsightScope) = scope2SyntheticSymbols[scope] ?: emptyList()

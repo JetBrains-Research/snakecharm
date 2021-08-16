@@ -11,6 +11,8 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_OR_CALLABLE_ARGS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTION_ACCESSOR_CLASSES
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_CHECKPOINTS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_CONFIG
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_PEP
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_RULES
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_ACCESSOR_CLASS
@@ -20,10 +22,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RESOURCES
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
-import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
-import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeSectionArgsType
-import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
-import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
+import com.jetbrains.snakecharm.lang.psi.types.*
 import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
@@ -40,9 +39,9 @@ class SmkTypeProvider : PyTypeProviderBase() {
     // getCallableType(callable, context)  // e.g. method calls
 
     override fun getReferenceType(
-            referenceTarget: PsiElement,
-            context: TypeEvalContext,
-            anchor: PsiElement?
+        referenceTarget: PsiElement,
+        context: TypeEvalContext,
+        anchor: PsiElement?
     ): Ref<PyType>? {
         if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(anchor)) {
             return null
@@ -66,9 +65,9 @@ class SmkTypeProvider : PyTypeProviderBase() {
     }
 
     private fun getSectionAccessorInRunSection(
-            referenceTarget: PyClass,
-            anchor: PyReferenceExpression,
-            context: TypeEvalContext
+        referenceTarget: PyClass,
+        anchor: PyReferenceExpression,
+        context: TypeEvalContext
     ): Ref<PyType>? {
 
         val fqn = referenceTarget.qualifiedName
@@ -78,7 +77,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
             refTargetSection != null -> {
                 // check if in run section & rule
                 val (_, ruleLike) = getParentSectionAndRuleLike(
-                        anchor, SmkRunSection::class.java
+                    anchor, SmkRunSection::class.java
                 ) ?: return null
 
                 ruleLike.getSectionByName(refTargetSection)?.let { SmkRuleLikeSectionArgsType(it) }
@@ -86,7 +85,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
             }
             fqn == WILDCARDS_ACCESSOR_CLASS -> {
                 val ruleLike = PsiTreeUtil.getParentOfType(
-                        anchor, SmkRuleOrCheckpoint::class.java
+                    anchor, SmkRuleOrCheckpoint::class.java
                 ) ?: return null
 
                 context.getType(ruleLike.wildcardsElement)
@@ -99,12 +98,12 @@ class SmkTypeProvider : PyTypeProviderBase() {
     private fun getLambdaParamType(referenceTarget: PyNamedParameter): Ref<PyType>? {
         // in a lambda
         val lambda = PsiTreeUtil.getParentOfType(
-                referenceTarget, PyLambdaExpression::class.java
+            referenceTarget, PyLambdaExpression::class.java
         ) ?: return null
 
         // in a section, lambda not in call
         val (parentSection, ruleLike) = getParentSectionAndRuleLike(
-                lambda, SmkRuleOrCheckpointArgsSection::class.java, PyCallExpression::class.java
+            lambda, SmkRuleOrCheckpointArgsSection::class.java, PyCallExpression::class.java
         ) ?: return null
 
         val allowedArgs = ALLOWED_LAMBDA_OR_CALLABLE_ARGS[parentSection.sectionKeyword] ?: emptyArray()
@@ -128,25 +127,25 @@ class SmkTypeProvider : PyTypeProviderBase() {
         return null
     }
 
-    private fun <T: SmkSection> getParentSectionAndRuleLike(
-            element: PsiElement,
-            sectionClass: Class<T>,
-            vararg sectionStopAt: Class<out PsiElement>
+    private fun <T : SmkSection> getParentSectionAndRuleLike(
+        element: PsiElement,
+        sectionClass: Class<T>,
+        vararg sectionStopAt: Class<out PsiElement>
     ): Pair<T, SmkRuleOrCheckpoint>? {
         val section = PsiTreeUtil.getParentOfType(
-                element, sectionClass, true, *sectionStopAt
+            element, sectionClass, true, *sectionStopAt
         ) ?: return null
 
         val ruleLike = PsiTreeUtil.getParentOfType(
-                section, SmkRuleOrCheckpoint::class.java
+            section, SmkRuleOrCheckpoint::class.java
         ) ?: return null
 
         return section to ruleLike
     }
 
     override fun getReferenceExpressionType(
-            referenceExpression: PyReferenceExpression,
-            context: TypeEvalContext
+        referenceExpression: PyReferenceExpression,
+        context: TypeEvalContext
     ): PyType? {
         val smkExpression = when {
             SnakemakeLanguageDialect.isInsideSmkFile(referenceExpression) -> referenceExpression
@@ -159,11 +158,15 @@ class SmkTypeProvider : PyTypeProviderBase() {
 
         val psiFile = smkExpression?.containingFile
         val parentDeclaration =
-                PsiTreeUtil.getParentOfType(smkExpression, SmkRuleOrCheckpoint::class.java)
+            PsiTreeUtil.getParentOfType(smkExpression, SmkRuleOrCheckpoint::class.java)
 
+        if (referenceExpression.asQualifiedName()?.matches(SMK_VARS_PEP, SMK_VARS_CONFIG) == true) {
+            return SmkPepConfigType(psiFile as SmkFile)
+        }
         if (referenceExpression.children.isNotEmpty() ||
-                psiFile == null ||
-                psiFile !is SmkFile) {
+            psiFile == null ||
+            psiFile !is SmkFile
+        ) {
             return null
         }
 
@@ -176,12 +179,12 @@ class SmkTypeProvider : PyTypeProviderBase() {
         // affect only "rules" which is resolved to appropriate place
         return when (referenceExpression.referencedName) {
             SMK_VARS_RULES -> SmkRulesType(
-                    parentDeclaration as? SmkRule,
-                    psiFile
+                parentDeclaration as? SmkRule,
+                psiFile
             )
             SMK_VARS_CHECKPOINTS -> SmkCheckpointType(
-                    parentDeclaration as? SmkCheckPoint,
-                    psiFile
+                parentDeclaration as? SmkCheckPoint,
+                psiFile
             )
 
             SMK_VARS_WILDCARDS -> parentDeclaration?.let {

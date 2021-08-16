@@ -45,6 +45,7 @@ object SnakemakeAPI {
     const val UNPACK_FUNCTION = "unpack"
 
     const val SMK_VARS_CONFIG = "config"
+    const val SMK_VARS_PEP = "pep"
     const val SMK_VARS_RULES = "rules"
     const val SMK_VARS_CHECKPOINTS = "checkpoints"
     const val SMK_VARS_SCATTER = "scatter"
