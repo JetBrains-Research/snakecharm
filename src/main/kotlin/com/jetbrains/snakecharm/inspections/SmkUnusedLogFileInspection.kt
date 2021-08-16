@@ -27,12 +27,12 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
 
         override fun visitSmkUse(use: SmkUse) {
             val logSection = use.getSectionByName(SnakemakeNames.SECTION_LOG) ?: return
-            use.getImportedRuleNames()?.children?.forEach {
+            use.getImportedRuleNames()?.forEach {
                 var resolveResult: PsiElement?
                 var reference = it
                 // Searching for origin element, it must be a rule or checkpoint
                 while (true) {
-                    resolveResult = reference.reference?.resolve()
+                    resolveResult = reference.reference.resolve()
                     when (resolveResult) {
                         is SmkRuleOrCheckpoint -> break
                         is SmkReferenceExpression -> reference = resolveResult
