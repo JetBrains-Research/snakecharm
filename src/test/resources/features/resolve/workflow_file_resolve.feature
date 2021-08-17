@@ -17,6 +17,8 @@ Feature: Resolve workflow file names to their corresponding files
       | include    | smk       |
       | configfile | yaml      |
       | report     | html      |
+      | pepfile    | yaml      |
+      | pepschema  | yml       |
 
   Scenario Outline: Reference doesn't resolve to inappropriate file
     Given a snakemake project
@@ -34,6 +36,8 @@ Feature: Resolve workflow file names to their corresponding files
       | include    | smk       |
       | configfile | yaml      |
       | report     | html      |
+      | pepfile    | yaml      |
+      | pepschema   | yml       |
 
   Scenario: Reference doesn't resolve to inappropriate Directory
     Given a snakemake project
@@ -62,6 +66,8 @@ Feature: Resolve workflow file names to their corresponding files
       | include    | smk       |
       | configfile | yaml      |
       | report     | html      |
+      | pepfile    | yaml      |
+      | pepschema   | yml       |
 
   Scenario Outline: Resolve for multiple files
     Given a snakemake project
@@ -86,6 +92,8 @@ Feature: Resolve workflow file names to their corresponding files
       | include    | smk       |
       | configfile | yaml      |
       | report     | html      |
+      | pepfile    | yaml      |
+      | pepschema   | yml       |
 
   Scenario Outline: Resolve for strings in different quotes
     Given a snakemake project
@@ -180,6 +188,8 @@ Feature: Resolve workflow file names to their corresponding files
       | include    | smk       |
       | configfile | yaml      |
       | report     | html      |
+      | pepfile    | yaml      |
+      | pepschema   | yml       |
 
   Scenario Outline: Resolve when string literal is crazily divided
     Given a snakemake project
@@ -198,8 +208,10 @@ Feature: Resolve workflow file names to their corresponding files
       | include    | smk       |
       | configfile | yaml      |
       | report     | html      |
+      | pepfile    | yaml      |
+      | pepschema   | yml       |
 
-  Scenario Outline: Resolve to a configfile in different subdirectories
+  Scenario Outline: Resolve to a configfile or pepfile in different subdirectories
     Given a snakemake project
     Given a file "Dir1/boo.<file_type>" with text
     """
@@ -214,9 +226,9 @@ Feature: Resolve workflow file names to their corresponding files
     Examples:
       | workflow   | file_type |
       | configfile | yaml      |
-      | configfile | yml       |
+      | pepfile          | yml       |
 
-  Scenario Outline: Reference doesn't resolve to configfile with wrong path
+  Scenario Outline: Reference doesn't resolve to configfile or pepfile with wrong path
     Given a snakemake project
     Given a file "Dir1/boo.<file_type>" with text
     """
@@ -224,11 +236,11 @@ Feature: Resolve workflow file names to their corresponding files
     """
     Given I open a file "Dir2/foo.smk" with text
     """
-    configfile: "../Dir1/boo.<file_type>"
+    <workflow>: "../Dir1/boo.<file_type>"
     """
     When I put the caret at boo
     Then reference should not resolve
     Examples:
-      | file_type |
-      | yaml      |
-      | yml       |
+      | workflow   | file_type |
+      | configfile | yaml      |
+      | pepfile    | yml       |
