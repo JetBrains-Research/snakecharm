@@ -53,6 +53,17 @@ class SmkWildcardsCollector(
         // Do nothing here
     }
 
+    override fun visitSmkUse(use: SmkUse) {
+        use.getImportedRuleNames()?.forEach {
+            when (val resolveResult = it.reference.resolve()) {
+                is SmkRule -> super.visitSmkRule(resolveResult)
+                is SmkCheckPoint -> super.visitSmkCheckPoint(resolveResult)
+                is SmkUse -> visitSmkUse(resolveResult)
+            }
+        }
+        super.visitSmkUse(use)
+    }
+
     override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
         try {
             currentSectionIdx = WILDCARDS_DEFINING_SECTIONS_KEYWORDS.indexOf(st.sectionKeyword).toByte()
@@ -92,10 +103,12 @@ class SmkWildcardsCollector(
 
         val injections = PsiTreeUtil.getChildrenOfType(file, SmkSLReferenceExpressionImpl::class.java)
         injections?.forEach { st ->
-            wildcardsElements.add(WildcardDescriptor(
-                st, st.text,
-                if (currentSectionIdx == (-1).toByte()) WildcardDescriptor.UNDEFINED_SECTION_RATE else currentSectionIdx
-            ))
+            wildcardsElements.add(
+                WildcardDescriptor(
+                    st, st.text,
+                    if (currentSectionIdx == (-1).toByte()) WildcardDescriptor.UNDEFINED_SECTION_RATE else currentSectionIdx
+                )
+            )
         }
     }
 }
