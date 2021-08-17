@@ -526,9 +526,6 @@ class ImplicitPySymbolsProvider(
             QualifiedName.fromDottedString(pyModuleFqn),
             resolveContext
         ).filterIsInstance<PyFile>()
-        pyFiles.forEach {
-            print(it)
-        }
         pyFiles.forEach { usedFiles.add(it.virtualFile) }
         return pyFiles
     }

@@ -8,14 +8,15 @@ import com.jetbrains.python.psi.PyReferenceExpression
 class SmkCompletionContributorUtils {
     companion object {
         fun checkTokenSequence(tokenList: List<Any>, element: PsiElement): Boolean {
-            var currentToken = element
+            var currentToken: PsiElement? = element
             return tokenList.all { token ->
-                currentToken = currentToken.prevSibling
+                currentToken = currentToken?.prevSibling
+                if (currentToken == null) return false
                 if (currentToken is PyReferenceExpression) {
-                    currentToken = currentToken.lastChild
+                    currentToken = currentToken?.lastChild
                 }
                 token is PyElementType && token == currentToken.elementType ||
-                        token is String && token == currentToken.text
+                        token is String && token == currentToken?.text
             }
         }
     }
