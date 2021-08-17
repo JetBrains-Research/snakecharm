@@ -137,7 +137,7 @@ Feature: Complete file names in workflow sections
       | pepfile    | yaml      |
       | pepschema  | yaml      |
 
-  Scenario Outline: Completion list if it isn't configfile or pepfile doesn't contain files from top-level directories
+  Scenario Outline: Completion list for section relative current file doesn't contain files from top-level directories
     Given a snakemake project
     Given a file "boo.<file_type>" with text
     """
@@ -262,7 +262,27 @@ Feature: Complete file names in workflow sections
       | pepfile    | yaml      |
       | pepschema   | yml       |
 
-  Scenario Outline: Completion list to a configfile and pepfile in different subdirectories
+  Scenario Outline: Completion list in sections relative current file in different subdirectories
+    Given a snakemake project
+    Given a file "Dir1/boo.<file_type>" with text
+    """
+    """
+    Given I open a file "Dir2/foo.smk" with text
+    """
+    <section>: ""
+    """
+    When I put the caret after <section>: "
+    Then I invoke autocompletion popup and see a text:
+    """
+    <section>: "../Dir1/boo.<file_type>"
+    """
+    Examples:
+      | section   | file_type |
+      | include   | smk       |
+      | report    | html      |
+      | pepschema | yaml      |
+
+  Scenario Outline: Completion list in section relative content root in different subdirectories
     Given a snakemake project
     Given a file "Dir1/boo.<file_type>" with text
     """
@@ -281,7 +301,7 @@ Feature: Complete file names in workflow sections
       | configfile | yaml      |
       | pepfile    | yml       |
 
-  Scenario Outline: Completion list in configfile and pepfile doesn't contain path from current folder
+  Scenario Outline: Completion list in section relative content root doesn't contain path from current folder
     Given a snakemake project
     Given a file "Dir1/boo.<file_type>" with text
     """

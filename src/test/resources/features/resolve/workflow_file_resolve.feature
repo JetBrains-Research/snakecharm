@@ -211,7 +211,7 @@ Feature: Resolve workflow file names to their corresponding files
       | pepfile    | yaml      |
       | pepschema   | yml       |
 
-  Scenario Outline: Resolve to a configfile or pepfile in different subdirectories
+  Scenario Outline: Resolve to a section relative content root in different subdirectories
     Given a snakemake project
     Given a file "Dir1/boo.<file_type>" with text
     """
@@ -226,9 +226,9 @@ Feature: Resolve workflow file names to their corresponding files
     Examples:
       | workflow   | file_type |
       | configfile | yaml      |
-      | pepfile          | yml       |
+      | pepfile    | yml       |
 
-  Scenario Outline: Reference doesn't resolve to configfile or pepfile with wrong path
+  Scenario Outline: Reference doesn't resolve to section relative content root with wrong path
     Given a snakemake project
     Given a file "Dir1/boo.<file_type>" with text
     """
@@ -244,3 +244,39 @@ Feature: Resolve workflow file names to their corresponding files
       | workflow   | file_type |
       | configfile | yaml      |
       | pepfile    | yml       |
+
+  Scenario Outline: Resolve to a section relative current file in different subdirectories
+    Given a snakemake project
+    Given a file "Dir1/boo.<file_type>" with text
+    """
+    TEXT
+    """
+    Given I open a file "Dir2/foo.smk" with text
+    """
+    <workflow>: "../Dir1/boo.<file_type>"
+    """
+    When I put the caret at boo
+    Then reference should resolve to "TEXT" in "Dir1/boo.<file_type>"
+    Examples:
+      | workflow  | file_type |
+      | include   | smk       |
+      | report    | html      |
+      | pepschema | yaml      |
+
+  Scenario Outline: Reference doesn't resolve to section relative content root with wrong path
+    Given a snakemake project
+    Given a file "Dir1/boo.<file_type>" with text
+    """
+    TEXT
+    """
+    Given I open a file "Dir2/foo.smk" with text
+    """
+    <workflow>: "Dir1/boo.<file_type>"
+    """
+    When I put the caret at boo
+    Then reference should not resolve
+    Examples:
+      | workflow  | file_type |
+      | include   | smk       |
+      | report    | html      |
+      | pepschema | yaml      |
