@@ -171,7 +171,7 @@ Feature: Rule SmkUnusedLogFileInspection inspection
     Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
-    And I invoke quick fix Append " >{log} 2>&1" to shell section command and see text:
+    And I invoke quick fix Append ' >{log} 2>&1' to shell section command into 'NAME' and see text:
     """
     <rule_like> NAME:
         input: "input.txt"
@@ -205,7 +205,7 @@ Feature: Rule SmkUnusedLogFileInspection inspection
     Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
-    And I invoke quick fix Add 'shell(..)' call that creates crates a log file in 'run' section and see text:
+    And I invoke quick fix Add 'shell(..)' call that creates crates a log file in 'run' section into 'NAME' and see text:
     """
     <rule_like> NAME:
         input: "input.txt"
@@ -237,7 +237,7 @@ Feature: Rule SmkUnusedLogFileInspection inspection
     Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
-    And I invoke quick fix Add 'shell' section that creates a log file and see text:
+    And I invoke quick fix Add 'shell' section that creates a log file into 'NAME' and see text:
     """
     <rule_like> NAME:
         input: "input.txt"
@@ -245,6 +245,94 @@ Feature: Rule SmkUnusedLogFileInspection inspection
         log: "my_log.log"
         threads: 4
         shell: "echo TODO >{log} 2>&1"
+    """
+    Examples:
+      | rule_like  |
+      | checkpoint |
+      | rule       |
+
+  Scenario Outline: Quick fix for overridden 'rule', 'checkpoint' and 'use rule'
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <rule_like> NAME1:
+
+    rule NAME2:
+        shell: "command touch"
+
+    rule NAME3:
+        run:
+            shell("something")
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+        snakefile: "boo.smk"
+
+    use rule NAME1, NAME2, NAME3 from M as other_* with:
+        input: "input.txt"
+        output: "output.txt"
+        log: "my_log.log"
+        threads: 4
+    """
+    And SmkUnusedLogFileInspection inspection is enabled
+    And I expect inspection weak warning on <log: "my_log.log"> with message
+    """
+    Looks like a log file won't be created in rule 'NAME1', because it is not referenced from 'shell' or 'run' sections
+    """
+    And I expect inspection weak warning on <log: "my_log.log"> with message
+    """
+    Looks like a log file won't be created in rule 'NAME2', because it is not referenced from 'shell' or 'run' sections
+    """
+    And I expect inspection weak warning on <log: "my_log.log"> with message
+    """
+    Looks like a log file won't be created in rule 'NAME3', because it is not referenced from 'shell' or 'run' sections
+    """
+    When I check highlighting weak warnings
+    And I invoke quick fix Add 'shell' section that creates a log file into 'NAME1' and see text:
+    """
+    module M:
+        snakefile: "boo.smk"
+
+    use rule NAME1, NAME2, NAME3 from M as other_* with:
+        input: "input.txt"
+        output: "output.txt"
+        log: "my_log.log"
+        threads: 4
+    """
+    And I invoke quick fix Append ' >{log} 2>&1' to shell section command into 'NAME2' and see text:
+    """
+    module M:
+        snakefile: "boo.smk"
+
+    use rule NAME1, NAME2, NAME3 from M as other_* with:
+        input: "input.txt"
+        output: "output.txt"
+        log: "my_log.log"
+        threads: 4
+    """
+    And I invoke quick fix Add 'shell(..)' call that creates crates a log file in 'run' section into 'NAME3' and see text:
+    """
+    module M:
+        snakefile: "boo.smk"
+
+    use rule NAME1, NAME2, NAME3 from M as other_* with:
+        input: "input.txt"
+        output: "output.txt"
+        log: "my_log.log"
+        threads: 4
+    """
+    Then the file "boo.smk" should have text
+    """
+    <rule_like> NAME1: shell: "echo TODO >{log} 2>&1"
+
+    rule NAME2:
+        shell: "command touch >{log} 2>&1"
+
+    rule NAME3:
+        run:
+            shell("something")
+            shell("echo TODO >{log} 2>&1")
     """
     Examples:
       | rule_like  |
