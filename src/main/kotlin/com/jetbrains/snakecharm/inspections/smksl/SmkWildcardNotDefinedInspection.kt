@@ -41,7 +41,7 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
             if (ruleOrCheckpoint is SmkUse) {
                 itIsSmkUse = true
                 // Collecting wildcards from overridden rules or checkpoints
-                collectReferences(ruleOrCheckpoint, useReferences)
+                ruleOrCheckpoint.getImportedRuleNames()?.forEach { collectReferences(it, useReferences) }
                 useReferences.forEach { resolveResult ->
                     if (resolveResult !in wildcardsByRule) {
                         updateInfo(resolveResult, wildcardsByRule)
@@ -130,22 +130,20 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
             wildcardsByRule[ruleOrCheckpoint] = Ref.create(wildcards)
         }
 
-        private fun collectReferences(useRule: SmkUse, list: MutableList<SmkRuleOrCheckpoint>) {
-            useRule.getImportedRuleNames()?.forEach {
-                var resolveResult = it.reference.resolve()
-                while (resolveResult is SmkReferenceExpression) {
-                    val newUseRule = resolveResult.parentOfType<SmkUse>() ?: return@forEach
-                    list.add(newUseRule)
-                    resolveResult = resolveResult.reference.resolve()
-                }
-                if (resolveResult !is SmkUse && resolveResult is SmkRuleOrCheckpoint) {
-                    list.add(resolveResult)
-                } else {
-                    val newUseRule =
-                        (resolveResult as? SmkUse) ?: resolveResult?.parentOfType() ?: return@forEach
-                    list.add(newUseRule)
-                    collectReferences(newUseRule, list)
-                }
+        private fun collectReferences(reference: SmkReferenceExpression, list: MutableList<SmkRuleOrCheckpoint>) {
+            var resolveResult = reference.reference.resolve()
+            while (resolveResult is SmkReferenceExpression) {
+                val newUseRule = resolveResult.parentOfType<SmkUse>() ?: return
+                list.add(newUseRule)
+                resolveResult = resolveResult.reference.resolve()
+            }
+            if (resolveResult !is SmkUse && resolveResult is SmkRuleOrCheckpoint) {
+                list.add(resolveResult)
+            } else {
+                val newUseRule =
+                    (resolveResult as? SmkUse) ?: resolveResult?.parentOfType() ?: return
+                list.add(newUseRule)
+                newUseRule.getImportedRuleNames()?.forEach { collectReferences(it, list) }
             }
         }
     }
