@@ -8,6 +8,7 @@ Released on ...
 
 ### Changed
 - Show argument preview for int indexes completion in `output[i]` (see [#378](https://github.com/JetBrains-Research/snakecharm/issues/378))
+- Allocation of all top-level sections into one token and support for unknown top-level sections (see [#373](https://github.com/JetBrains-Research/snakecharm/issues/373))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Fixed
@@ -15,12 +16,19 @@ Released on ...
 - Access by index to input/output sections with 'multiext' function (see [#278](https://github.com/JetBrains-Research/snakecharm/issues/278))
 - Inspection: Do not show warning that rule section is unused variable if rule is defined in method (see [#385](https://github.com/JetBrains-Research/snakecharm/issues/385))
 - SOE: From UnusedLocal inspection for SnakemakeSL expression  (see [#380](https://github.com/JetBrains-Research/snakecharm/issues/380))
+- Do not show syntax error for rule w/o body (see [#420](https://github.com/JetBrains-Research/snakecharm/issues/420))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN))
 
 ### Added
+- Weak warnings for unused 'log' sections (see [#300](https://github.com/JetBrains-Research/snakecharm/issues/300))
+- Support for 'module' and 'use' keywords (see [#355](https://github.com/JetBrains-Research/snakecharm/issues/355))
+- Inspection for improperly called functions (see [#148](https://github.com/JetBrains-Research/snakecharm/issues/148))
 - Ability for memorising new section name (see [#372](https://github.com/JetBrains-Research/snakecharm/issues/372))
 - Support for 'handover' section (see [#362](https://github.com/JetBrains-Research/snakecharm/issues/362))
 - Support for 'containerized' section (see [#361](https://github.com/JetBrains-Research/snakecharm/issues/361))
+- Inspection: Show ERROR for execution sections in 'use' section (see [#408](https://github.com/JetBrains-Research/snakecharm/issues/408))
+- Completion features related to 'use' section (see [#413](https://github.com/JetBrains-Research/snakecharm/issues/413))
+- Add reference for 'snakefile:' in module declaration (see [#409](https://github.com/JetBrains-Research/snakecharm/issues/409))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN))
 
 ## [2021.2.424]

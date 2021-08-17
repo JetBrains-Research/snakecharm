@@ -54,7 +54,7 @@ SnakemakeFile: FormattedStringAfterToplevelSection.smk
             PsiElement(Py:SINGLE_QUOTED_STRING)('"out"')
   PsiWhiteSpace('\n\n')
   SmkWorkflowArgsSection
-    PsiElement(Py:WORKFLOW_INCLUDE_KEYWORD)('include')
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('include')
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace('\n    ')

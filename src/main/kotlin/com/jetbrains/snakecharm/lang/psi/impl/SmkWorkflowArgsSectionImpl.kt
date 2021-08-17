@@ -31,7 +31,7 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
     }
 
     override fun getSectionKeywordNode() = node
-        .findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
+        .findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)
 
     override fun getPresentation() = getPresentation(this)
     override fun getIcon(flags: Int) = getIcon(this, flags)
@@ -52,13 +52,13 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
                 this, textRange, strExpr, path
             )
             SnakemakeNames.WORKFLOW_REPORT_KEYWORD -> SmkReportReference(
-                this, textRange, strExpr, path
+                    this, textRange, strExpr, path
             )
             SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD -> SmkWorkDirReference(
-                this, textRange, strExpr, path
+                    this, textRange, strExpr, path
             )
             else -> SmkIncludeReference(
-                this, textRange, strExpr, path
+                    this, textRange, strExpr, path
             )
         }
     }
@@ -77,5 +77,5 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
     private val keywordName: String?
         get() = getKeywordNode()?.text
 
-    private fun getKeywordNode() = node.findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_PARAMLISTS_DECORATOR_KEYWORDS)
+    private fun getKeywordNode() = node.findChildByType(SmkTokenTypes.WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)
 }

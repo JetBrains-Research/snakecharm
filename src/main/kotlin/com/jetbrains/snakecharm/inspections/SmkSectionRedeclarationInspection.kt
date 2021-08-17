@@ -9,9 +9,9 @@ import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkSectionRedeclarationInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
         override fun visitSmkRule(rule: SmkRule) {
             visitSMKRuleLike(rule)
@@ -23,6 +23,14 @@ class SmkSectionRedeclarationInspection : SnakemakeInspection() {
 
         override fun visitSmkSubworkflow(subworkflow: SmkSubworkflow) {
             visitSMKRuleLike(subworkflow)
+        }
+
+        override fun visitSmkModule(module: SmkModule) {
+            visitSMKRuleLike(module)
+        }
+
+        override fun visitSmkUse(use: SmkUse) {
+            visitSMKRuleLike(use)
         }
 
         private fun visitSMKRuleLike(rule: SmkRuleLike<SmkArgsSection>) {
@@ -46,12 +54,12 @@ class SmkSectionRedeclarationInspection : SnakemakeInspection() {
                     }
 
                     registerProblem(
-                            section,
-                            SnakemakeBundle.message("INSP.NAME.section.redeclaration.message", name),
-                            // No suitable severity, so is WEAK WARNING in plugin.xml
-                            ProblemHighlightType.LIKE_UNUSED_SYMBOL,
-                            null,
-                            *fixes.toTypedArray()
+                        section,
+                        SnakemakeBundle.message("INSP.NAME.section.redeclaration.message", name),
+                        // No suitable severity, so is WEAK WARNING in plugin.xml
+                        ProblemHighlightType.LIKE_UNUSED_SYMBOL,
+                        null,
+                        *fixes.toTypedArray()
                     )
                 }
                 sectionNamesSet.add(name)

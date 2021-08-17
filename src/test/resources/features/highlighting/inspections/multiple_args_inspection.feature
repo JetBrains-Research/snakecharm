@@ -1,26 +1,30 @@
 Feature: Inspection for multiple arguments in various sections
-  Scenario Outline: Multiple arguments in subworkflow section
+  Scenario Outline: Multiple arguments in module/subworkflow section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    subworkflow NAME:
+    <keyword> NAME:
         <section>: "a", "b", "c"
     """
     And SmkSectionMultipleArgsInspection inspection is enabled
     Then I expect inspection error on <"b"> with message
     """
-    Only one argument is allowed for 'subworkflow' section.
+    Only one argument is allowed for '<keyword>' section.
     """
     And I expect inspection error on <"c"> with message
     """
-    Only one argument is allowed for 'subworkflow' section.
+    Only one argument is allowed for '<keyword>' section.
     """
     When I check highlighting errors
     Examples:
-    | section    |
-    | workdir    |
-    | snakefile  |
-    | configfile |
+      | keyword     | section         |
+      | subworkflow | workdir         |
+      | subworkflow | snakefile       |
+      | subworkflow | configfile      |
+      | module      | snakefile       |
+      | module      | config          |
+      | module      | skip_validation |
+      | module      | meta_wrapper    |
 
   Scenario Outline: Multiple arguments in execution sections
     Given a snakemake project
@@ -59,3 +63,25 @@ Feature: Inspection for multiple arguments in various sections
       | container     |
       | containerized |
       | handover      |
+
+  Scenario Outline: Multiple arguments in workflow section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <section_name>: "a", "b", "c"
+    """
+    And SmkSectionMultipleArgsInspection inspection is enabled
+    Then I expect inspection error on <"b"> with message
+    """
+    Only one argument is allowed for '<section_name>' section.
+    """
+    And I expect inspection error on <"c"> with message
+    """
+    Only one argument is allowed for '<section_name>' section.
+    """
+      When I check highlighting errors
+    Examples:
+      | section_name  |
+      | containerized |
+      | singularity   |
+      | container     |

@@ -22,6 +22,42 @@ Feature: SmkRuleRedeclarationInspection inspection
     """
     When I check highlighting errors
 
+  Scenario: A single SmkRuleRedeclarationInspection with rule defined in 'use' section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    use rule RULE from MODULE as NAME with:
+        input: "data.csv"
+
+    rule ANOTHER_NAME:
+        output: touch("file.txt")
+
+    rule NAME: #overrides
+        output: touch("output.txt")
+    """
+    And SmkRuleRedeclarationInspection inspection is enabled
+    Then I expect inspection error on <NAME> in <rule NAME: #overrides> with message
+    """
+    This rule name is already used by another rule declaration.
+    """
+    When I check highlighting errors
+
+  Scenario: A single SmkRuleRedeclarationInspection with two 'use' sections, which defines same rules
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    use rule RULE from MODULE as NAME with:
+        input: "data.csv"
+
+    use rule ANOTHER_RULE from MODULE as NAME with: #overrides
+        input: "data_v2.csv"
+    """
+    And SmkRuleRedeclarationInspection inspection is enabled
+    Then I expect inspection error on <NAME> in <NAME with: #overrides> with message
+    """
+    This rule name is already used by another rule declaration.
+    """
+    When I check highlighting errors
 
   Scenario: Multiple SmkRuleRedeclarationInspections
     Given a snakemake project

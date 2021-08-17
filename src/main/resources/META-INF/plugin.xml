@@ -92,6 +92,8 @@
     <lang.psiStructureViewFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.structureView.SmkStructureViewFactory"/>
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex"/>
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex"/>
+    <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex"/>
+    <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex"/>
     <gotoSymbolContributor implementation="com.jetbrains.snakecharm.actions.SmkGotoSymbolContributor"/>
 
     <codeBlockProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.SmkCodeBlockProvider"/>
@@ -185,6 +187,28 @@
         groupKey="INSP.GROUP.snakemake"
         key="INSP.NAME.section.unrecognized"
         implementationClass="com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkExecutionSubsectionInUseSectionInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkExecutionSubsectionInUseSection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.unexpected.execution.section"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkExecutionSubsectionInUseSectionInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkUnusedLogFileInspection"
+            enabledByDefault="true"
+            level="WEAK WARNING"
+            suppressId="SmkUnusedLogFile"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.unused.log.section"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkUnusedLogFileInspection"
     />
 
     <localInspection
@@ -349,6 +373,17 @@
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.subworkflow.redeclaration"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkSubworkflowRedeclarationInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkModuleRedeclarationInspection"
+            enabledByDefault="true"
+            level="WEAK WARNING"
+            suppressId="SmkModuleRedeclaration"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.module.redeclaration"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkModuleRedeclarationInspection"
     />
 
     <localInspection
@@ -538,6 +573,27 @@
             key="INSP.NAME.misuse.usage.io.flag.methods.title"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkMisuseUsageIOFlagMethodsInspection"
     />
+
+    <localInspection
+            language="Snakemake" shortName="SmkMultilineFunctionCallInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkMultilineFunctionCall"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.multiline.func.call"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkMultilineFunctionCallInspection"
+      />
+
+    <localInspection
+      language="Snakemake" shortName="SmkUnresolvedImportedRuleNameInspection"
+      enabledByDefault="true"
+      level="WEAK WARNING"
+      suppressId="SmkUnresolvedImportedRuleName"
+      bundle="SnakemakeBundle"
+      groupKey="INSP.GROUP.snakemake"
+      key="INSP.NAME.probably.unresolved.use.reference"
+      implementationClass="com.jetbrains.snakecharm.inspections.SmkUnresolvedImportedRuleNameInspection"/>
 
     <findUsagesHandlerFactory
             implementation="com.jetbrains.snakecharm.codeInsight.refactoring.SmkFindUsagesHandlerFactory"

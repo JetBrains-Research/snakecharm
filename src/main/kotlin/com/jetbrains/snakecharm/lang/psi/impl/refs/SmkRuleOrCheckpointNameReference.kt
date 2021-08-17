@@ -1,20 +1,26 @@
 package com.jetbrains.snakecharm.lang.psi.impl.refs
 
 import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.stubs.StubIndex
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.impl.references.PyReferenceImpl
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkFile
+import com.jetbrains.snakecharm.lang.psi.SmkModule
 import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 
 class SmkRuleOrCheckpointNameReference(
-        element: SmkReferenceExpression,
-        context: PyResolveContext
+    element: SmkReferenceExpression,
+    context: PyResolveContext
 ) : PyReferenceImpl(element, context) { //.Poly<SmkReferenceExpression>(element, textRange, true), PsiReferenceEx {
     override fun getElement() = super.getElement() as SmkReferenceExpression
 
@@ -23,7 +29,7 @@ class SmkRuleOrCheckpointNameReference(
      *  Severity is handled by [SmkPyQualifiedReference]
      */
     override fun getUnresolvedDescription() = SnakemakeBundle.message(
-            "INSP.py.unresolved.ref.rule.like.ref.message", element.name ?: "<unnamed>"
+        "INSP.py.unresolved.ref.rule.like.ref.message", element.name ?: "<unnamed>"
     )
 
 
@@ -36,13 +42,43 @@ class SmkRuleOrCheckpointNameReference(
             return mutableListOf()
         }
 
+
         val name = element.text
         val results = arrayListOf<RatedResolveResult>()
         val ctx = AccessDirection.of(this.myElement)
 
         results.addAll(SmkRulesType(null, smkFile).resolveMember(name, element, ctx, myContext))
         results.addAll(SmkCheckpointType(null, smkFile).resolveMember(name, element, ctx, myContext))
+        results.addAll(collectModulesAndResolveThem(smkFile, element))
 
         return results
+    }
+
+    /**
+     * Collects all modules sections names from local file or using indexes which name is [element] name
+     */
+    private fun collectModulesAndResolveThem(
+        smkFile: SmkFile,
+        element: SmkReferenceExpression
+    ): List<RatedResolveResult> {
+        val module = element.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
+        val target = element.referencedName ?: return emptyList()
+        val modules = if (module == null) {
+            smkFile.collectModules().map { it.second }.filter { modulePsi -> modulePsi.name == target }
+        } else {
+            StubIndex.getElements(
+                SmkModuleNameIndex.KEY,
+                target,
+                module.project,
+                GlobalSearchScope.moduleWithDependentsScope(module),
+                SmkModule::class.java
+            )
+        }
+        if (modules.isEmpty()) {
+            return emptyList()
+        }
+        return modules.map { variant ->
+            RatedResolveResult(SmkResolveUtil.RATE_NORMAL, variant)
+        }
     }
 }

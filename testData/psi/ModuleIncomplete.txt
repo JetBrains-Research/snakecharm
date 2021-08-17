@@ -1,0 +1,42 @@
+SnakemakeFile: ModuleIncomplete.smk
+  SmkModule
+    PsiElement(Py:MODULE_KEYWORD)('module')
+    PsiErrorElement:Module name identifier or ':' expected
+      <empty list>
+    PyStatementList
+      PsiErrorElement:Indent expected
+        <empty list>
+  PsiWhiteSpace('\n')
+  SmkModule
+    PsiElement(Py:MODULE_KEYWORD)('module')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('z')
+    PsiErrorElement:Module name identifier or ':' expected
+      <empty list>
+    PyStatementList
+      PsiErrorElement:Indent expected
+        <empty list>
+  PsiWhiteSpace('\n')
+  SmkModule
+    PsiElement(Py:MODULE_KEYWORD)('module')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('v')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiErrorElement:Indent expected
+        <empty list>
+  PsiWhiteSpace('\n')
+  SmkModule
+    PsiElement(Py:MODULE_KEYWORD)('module')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:IDENTIFIER)('f')
+    PsiElement(Py:COLON)(':')
+    PyStatementList
+      PsiWhiteSpace('\n    ')
+      SmkModuleArgsSection
+        PsiElement(Py:IDENTIFIER)('snakefile')
+        PyArgumentList
+          PsiElement(Py:COLON)(':')
+          PsiWhiteSpace(' ')
+          PyStringLiteralExpression: myfile
+            PsiElement(Py:SINGLE_QUOTED_STRING)('"myfile"')

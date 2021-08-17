@@ -1,14 +1,18 @@
 package com.jetbrains.snakecharm.inspections
 
+import com.intellij.openapi.vfs.impl.http.HttpVirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
+import com.intellij.psi.util.parentOfType
 import com.jetbrains.python.inspections.PyInspectionExtension
 import com.jetbrains.python.psi.PyElement
 import com.jetbrains.python.psi.PyQualifiedExpression
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+import com.jetbrains.snakecharm.lang.psi.SmkModule
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkUse
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
 
@@ -30,14 +34,30 @@ class SmkIgnorePyInspectionExtension : PyInspectionExtension() {
         reference: PsiReference,
         context: TypeEvalContext,
     ): Boolean {
-        if (SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(node)) {
-            if (node is PyQualifiedExpression) {
-                // Maybe referenceName is better here?
-                //val referencedName = node.referencedName
-                //return "config".equals(referencedName)
-                return node.textMatches(SnakemakeAPI.SMK_VARS_CONFIG) ||
-                        node.textMatches(SnakemakeAPI.SMK_VARS_PEP)
+        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(node)) {
+            return false
+        }
+
+        val refElement = reference.element
+
+        val use = node.parentOfType<SmkUse>()
+        if (use != null) {
+            // Ignore references imported by 'module' from remote file
+            //
+            // First check that reference is in `use` imported rules list
+            if (use.getImportedRuleNames()?.any { it == refElement } == true) {
+                val module = use.getModuleName()?.reference?.resolve()
+                val file = (module as? SmkModule)?.getPsiFile()?.virtualFile
+                return module != null && (file == null || file is HttpVirtualFile)
             }
+        }
+
+        if (node is PyQualifiedExpression) {
+            // Maybe referenceName is better here?
+            //val referencedName = node.referencedName
+            //return "config".equals(referencedName)
+            return node.textMatches(SnakemakeAPI.SMK_VARS_CONFIG) ||
+                    node.textMatches(SnakemakeAPI.SMK_VARS_PEP)
         }
         return false
     }

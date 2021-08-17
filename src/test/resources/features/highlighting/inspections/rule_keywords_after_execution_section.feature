@@ -14,7 +14,7 @@ Feature: Rule sections after execution sections inspection.
     And SmkRuleSectionAfterExecutionInspection inspection is enabled
     Then I expect inspection error on <<sect2>: <sect2_text>> with message
     """
-    Rule section '<sect2>' isn't allowed after '<sect1>' section.
+    No rule keywords allowed after '<sect1>' in rule.
     """
     When I check highlighting errors
     Examples:
@@ -45,11 +45,11 @@ Feature: Rule sections after execution sections inspection.
     And SmkRuleSectionAfterExecutionInspection inspection is enabled
     Then I expect inspection error on <resources: a=4> with message
     """
-    Rule section 'resources' isn't allowed after 'shell' section.
+    No rule keywords allowed after 'shell' in rule.
     """
     And I expect inspection error on <version: 2.0> with message
     """
-    Rule section 'version' isn't allowed after 'shell' section.
+    No rule keywords allowed after 'shell' in rule.
     """
     When I check highlighting errors
     And I invoke quick fix Move execution section to the end of the rule and see text:

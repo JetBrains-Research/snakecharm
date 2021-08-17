@@ -10,60 +10,88 @@ import com.jetbrains.snakecharm.lang.psi.impl.*
  */
 object SmkElementTypes {
     val RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT = PyElementType(
-            "SMK_RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT"
+        "SMK_RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT"
     ) {
         SmkRuleOrCheckpointArgsSectionImpl(it)
     }
 
-    val SUBWORKFLOW_ARGS_SECTION_STATEMENT =  PyElementType(
-            "SMK_SUBWORKFLOW_ARGS_SECTION_STATEMENT"
+    val SUBWORKFLOW_ARGS_SECTION_STATEMENT = PyElementType(
+        "SMK_SUBWORKFLOW_ARGS_SECTION_STATEMENT"
     ) {
         SmkSubworkflowArgsSectionImpl(it)
     }
 
+    val MODULE_ARGS_SECTION_STATEMENT = PyElementType(
+        "SMK_MODULE_ARGS_SECTION_STATEMENT"
+    ) {
+        SmkModuleArgsSectionImpl(it)
+    }
+
+    val USE_ARGS_SECTION_STATEMENT = PyElementType(
+        "SMK_USE_ARGS_SECTION_STATEMENT"
+    ) {
+        SmkUseArgsSectionImpl(it)
+    }
+
+    val USE_NAME_IDENTIFIER = PyElementType(
+        "SMK_USE_NAME_IDENTIFIER"
+    ) {
+        SmkUseNameIdentifier(it)
+    }
+
+    val USE_IMPORTED_RULES_NAMES = PyElementType(
+        "USE_IMPORTED_RULES_NAMES"
+    ) {
+        SmkImportedRulesNames(it)
+    }
+
     val WORKFLOW_ARGS_SECTION_STATEMENT = PyElementType(
-            "SMK_WORKFLOW_ARGS_SECTION_STATEMENT"
+        "SMK_WORKFLOW_ARGS_SECTION_STATEMENT"
     ) {
         SmkWorkflowArgsSectionImpl(it)
     }
 
     val RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT = PyElementType(
-            "SMK_RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT"
+        "SMK_RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT"
     ) {
         SmkRunSectionImpl(it)
     }
 
     val WORKFLOW_PY_BLOCK_SECTION_STATEMENT = PyElementType(
-            "SMK_WORKFLOW_PY_BLOCK_SECTION_STATEMENT" 
+        "SMK_WORKFLOW_PY_BLOCK_SECTION_STATEMENT"
     ) {
         SmkWorkflowPythonBlockSectionImpl(it)
     }
 
     val WORKFLOW_LOCALRULES_SECTION_STATEMENT = PyElementType(
-            "SMK_WORKFLOW_LOCALRULES_SECTION_STATEMENT"
+        "SMK_WORKFLOW_LOCALRULES_SECTION_STATEMENT"
     ) {
         SmkWorkflowLocalrulesSectionImpl(it)
     }
 
     val WORKFLOW_RULEORDER_SECTION_STATEMENT = PyElementType(
-            "SMK_WORKFLOW_RULEORDER_SECTION_STATEMENT"
+        "SMK_WORKFLOW_RULEORDER_SECTION_STATEMENT"
     ) {
         SmkWorkflowRuleorderSectionImpl(it)
     }
 
     val REFERENCE_EXPRESSION = PyElementType(
-            "SMK_REFERENCE_EXPRESSION"
+        "SMK_REFERENCE_EXPRESSION"
     ) {
         SmkReferenceExpressionImpl(it)
     }
 
     val SMK_PY_REFERENCE_EXPRESSION = PyElementType(
-            "SMK_PY_REFERENCE_EXPRESSION"
+        "SMK_PY_REFERENCE_EXPRESSION"
     ) {
         SmkPyReferenceExpressionImpl(it)
     }
 
     val RULE_LIKE_STATEMENTS = TokenSet.create(
-        SmkStubElementTypes.RULE_DECLARATION_STATEMENT, SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT, SmkStubElementTypes.SUBWORKFLOW_DECLARATION_STATEMENT
+        SmkStubElementTypes.RULE_DECLARATION_STATEMENT,
+        SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT,
+        SmkStubElementTypes.SUBWORKFLOW_DECLARATION_STATEMENT,
+        SmkStubElementTypes.MODULE_DECLARATION_STATEMENT,
+        SmkStubElementTypes.USE_DECLARATION_STATEMENT
     )
 }

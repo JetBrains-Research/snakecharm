@@ -159,10 +159,9 @@ SnakemakeFile: RuleParamsListArgsIncorrectIndentation.smk
   PsiWhiteSpace('\n    ')
   PsiErrorElement:Unexpected indent
     <empty list>
-  PyTypeDeclarationStatement
-    PyTargetExpression: shell
-      PsiElement(Py:IDENTIFIER)('shell')
-    PyAnnotation
+  SmkWorkflowArgsSection
+    PsiElement(Py:WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)('shell')
+    PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
       PyStringLiteralExpression: text

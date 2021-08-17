@@ -17,7 +17,7 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 /**
  * Provides correct usages types for Snakemake specific elements, should be executed before Python impl.
  */
-class SmkAndSmkSLFindUsagesProvider: PythonFindUsagesProvider() {
+class SmkAndSmkSLFindUsagesProvider : PythonFindUsagesProvider() {
     override fun getWordsScanner() = SmkWordsScanner()
 
     override fun getNodeText(element: PsiElement, useFullName: Boolean) = getDescriptiveName(element)
@@ -41,13 +41,16 @@ class SmkAndSmkSLFindUsagesProvider: PythonFindUsagesProvider() {
     override fun getHelpId(psiElement: PsiElement) = null
 
     override fun canFindUsagesFor(element: PsiElement): Boolean {
-       return element is SmkSection || element is SmkFakePsiElement || element is SmkSLReferenceExpressionImpl
+        return element is SmkSection || element is SmkFakePsiElement || element is SmkSLReferenceExpressionImpl
     }
 }
 
 class SmkWordsScanner : DefaultWordsScanner(
-        SnakemakeLexer(),
-        TokenSet.orSet(WORKFLOW_TOPLEVEL_DECORATORS, TokenSet.create(PyTokenTypes.IDENTIFIER)),
-        TokenSet.create(PyTokenTypes.END_OF_LINE_COMMENT),
-        PyTokenTypes.STRING_NODES
+    SnakemakeLexer(),
+    TokenSet.orSet(
+        WORKFLOW_TOPLEVEL_DECORATORS,
+        TokenSet.create(PyTokenTypes.IDENTIFIER)
+    ),
+    TokenSet.create(PyTokenTypes.END_OF_LINE_COMMENT),
+    PyTokenTypes.STRING_NODES
 )

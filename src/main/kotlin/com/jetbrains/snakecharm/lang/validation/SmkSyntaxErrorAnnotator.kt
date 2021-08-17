@@ -11,14 +11,22 @@ import com.jetbrains.snakecharm.lang.psi.*
 
 object SmkSyntaxErrorAnnotator : SmkAnnotator() {
     override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-        if (!SnakemakeLanguageDialect.isInsideSmkFile(st)) {
+        findAndHighlightIncorrectArguments(st)
+    }
+
+    override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
+        findAndHighlightIncorrectArguments(st)
+    }
+
+    private fun findAndHighlightIncorrectArguments(argsSection: SmkArgsSection) {
+        if (!SnakemakeLanguageDialect.isInsideSmkFile(argsSection)) {
             return
         }
 
         val seenKeywords2Value = HashMap<String, String>()
         var encounteredKeywordArgument = false
 
-        st.argumentList?.arguments?.forEach { arg ->
+        argsSection.argumentList?.arguments?.forEach { arg ->
             when (arg) {
                 is PyKeywordArgument -> {
                     arg.keyword?.let { keyword ->
@@ -30,7 +38,7 @@ object SmkSyntaxErrorAnnotator : SmkAnnotator() {
                             holder.newAnnotation(
                                 ERROR,
                                 SnakemakeBundle.message("ANN.keyword.argument.already.provided", keywordValue)
-                            ).range(arg.keywordNode!!).create()
+                            ).range(arg.keywordNode ?: return@let).create()
                         }
                     }
                     encounteredKeywordArgument = true

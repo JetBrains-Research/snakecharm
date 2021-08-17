@@ -7,7 +7,9 @@ import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.PythonDialectsTokenSetProvider
 import com.jetbrains.python.lexer.PythonIndentingLexer
 import com.jetbrains.python.psi.PyElementType
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.TOPLEVEL_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD
 
 /**
  * @author Roman.Chernyatchik
@@ -70,6 +72,8 @@ class SnakemakeLexer : PythonIndentingLexer() {
             .add(SnakemakeNames.RULE_KEYWORD)
             .add(SnakemakeNames.CHECKPOINT_KEYWORD)
             .add(SnakemakeNames.SUBWORKFLOW_KEYWORD)
+            .add(SnakemakeNames.MODULE_KEYWORD)
+            .add(SnakemakeNames.USE_KEYWORD)
             .build()!!
 
         val PYTHON_BLOCK_KEYWORDS = ImmutableSet.Builder<String>()
@@ -78,32 +82,29 @@ class SnakemakeLexer : PythonIndentingLexer() {
             .add(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD)
             .build()!!
 
-        val KEYWORDS = ImmutableMap.Builder<String, PyElementType>()
+        private val SPECIAL_KEYWORDS_2_TOKEN_TYPE = ImmutableMap.Builder<String, PyElementType>()
             .put(SnakemakeNames.RULE_KEYWORD, SmkTokenTypes.RULE_KEYWORD)
             .put(SnakemakeNames.CHECKPOINT_KEYWORD, SmkTokenTypes.CHECKPOINT_KEYWORD)
-            .put(SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD, SmkTokenTypes.WORKFLOW_CONFIGFILE_KEYWORD)
-            .put(SnakemakeNames.WORKFLOW_REPORT_KEYWORD, SmkTokenTypes.WORKFLOW_REPORT_KEYWORD)
-            .put(
-                SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD,
-                SmkTokenTypes.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD
-            )
-            .put(SnakemakeNames.WORKFLOW_SINGULARITY_KEYWORD, SmkTokenTypes.WORKFLOW_SINGULARITY_KEYWORD)
-            .put(SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD, SmkTokenTypes.WORKFLOW_INCLUDE_KEYWORD)
-            .put(SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD, SmkTokenTypes.WORKFLOW_WORKDIR_KEYWORD)
-            .put(SnakemakeNames.WORKFLOW_ENVVARS_KEYWORD, SmkTokenTypes.WORKFLOW_ENVVARS_KEYWORD)
-            .put(SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD, SmkTokenTypes.WORKFLOW_CONTAINER_KEYWORD)
-            .put(SnakemakeNames.WORKFLOW_CONTAINERIZED_KEYWORD, SmkTokenTypes.WORKFLOW_CONTAINERIZED_KEYWORD)
             .put(SnakemakeNames.WORKFLOW_LOCALRULES_KEYWORD, SmkTokenTypes.WORKFLOW_LOCALRULES_KEYWORD)
             .put(SnakemakeNames.WORKFLOW_RULEORDER_KEYWORD, SmkTokenTypes.WORKFLOW_RULEORDER_KEYWORD)
             .put(SnakemakeNames.WORKFLOW_ONSUCCESS_KEYWORD, SmkTokenTypes.WORKFLOW_ONSUCCESS_KEYWORD)
             .put(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD, SmkTokenTypes.WORKFLOW_ONERROR_KEYWORD)
             .put(SnakemakeNames.WORKFLOW_ONSTART_KEYWORD, SmkTokenTypes.WORKFLOW_ONSTART_KEYWORD)
             .put(SnakemakeNames.SUBWORKFLOW_KEYWORD, SmkTokenTypes.SUBWORKFLOW_KEYWORD)
+            .put(SnakemakeNames.MODULE_KEYWORD, SmkTokenTypes.MODULE_KEYWORD)
+            .put(SnakemakeNames.USE_KEYWORD, SmkTokenTypes.USE_KEYWORD)
             .put(SnakemakeNames.WORKFLOW_PEPFILE_KEYWORD, SmkTokenTypes.WORKFLOW_PEPFILE_KEYWORD)
             .put(SnakemakeNames.WORKFLOW_PEPSCHEMA_KEYWORD, SmkTokenTypes.WORKFLOW_PEPSCHEMA_KEYWORD)
             .build()!!
 
-        val KEYWORDS_2_TEXT = KEYWORDS.map { it.value to it.key }.toMap()
+
+        val KEYWORD_LIKE_SECTION_TOKEN_TYPE_2_KEYWORD: Map<PyElementType, String?> =
+            SPECIAL_KEYWORDS_2_TOKEN_TYPE.map { it.value to it.key }.toMap() +
+                    // multiple section names are possible, no mapping:
+                    listOf(WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD to null).toMap()
+
+        val KEYWORD_LIKE_SECTION_NAME_2_TOKEN_TYPE =
+            TOPLEVEL_ARGS_SECTION_KEYWORDS.associateWith { WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD } + SPECIAL_KEYWORDS_2_TOKEN_TYPE
     }
 
     override fun advance() {
@@ -135,7 +136,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             beforeFirstArgumentInSection = false
         }
 
-        if (topLevelSectionIndent == -1 && tokenText in KEYWORDS) {
+        if (topLevelSectionIndent == -1 && (tokenText in KEYWORD_LIKE_SECTION_NAME_2_TOKEN_TYPE)) {
             val possibleToplevelSectionKeyword = tokenText
             if (isToplevelKeywordSection()) {
                 // if it's the first token in the file, it's 0, as it should be
@@ -283,7 +284,9 @@ class SnakemakeLexer : PythonIndentingLexer() {
         val possibleKeywordPosition = currentPosition
         val possibleToplevelSectionKeyword = tokenText
 
-        if (possibleToplevelSectionKeyword !in KEYWORDS || tokenStart != myCurrentNewlineOffset) {
+        if (possibleToplevelSectionKeyword !in KEYWORD_LIKE_SECTION_NAME_2_TOKEN_TYPE
+            || tokenStart != myCurrentNewlineOffset
+        ) {
             return false
         }
 
