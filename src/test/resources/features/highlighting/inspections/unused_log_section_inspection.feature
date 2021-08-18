@@ -353,7 +353,8 @@ Feature: Rule SmkUnusedLogFileInspection inspection
     """
     Then the file "boo.smk" should have text
     """
-    <rule_like> NAME1: shell: "echo TODO >{log} 2>&1"
+    <rule_like> NAME1:
+        shell: "echo TODO >{log} 2>&1"
 
     rule NAME2:
         shell: "command touch >{log} 2>&1"

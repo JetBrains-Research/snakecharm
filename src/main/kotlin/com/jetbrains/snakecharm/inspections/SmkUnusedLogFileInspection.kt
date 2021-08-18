@@ -69,7 +69,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
                 val runSection = ruleSections.firstOrNull { it is SmkRunSection } as SmkRunSection?
                 when {
                     runSection != null -> CreateLogFileInRunSection(runSection, name)
-                    else -> CreateShellSectionWithLogReference(rule, name)
+                    else -> CreateShellSectionWithLogReference(rule, name, originalLogSection.prevSibling.text)
                 }
             }
 
@@ -173,7 +173,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
         }
     }
 
-    private class CreateShellSectionWithLogReference(expr: PsiElement, val sectionName: String) :
+    private class CreateShellSectionWithLogReference(expr: PsiElement, val sectionName: String, val logIndent: String) :
         LocalQuickFixOnPsiElement(expr) {
 
         override fun getFamilyName() =
@@ -186,7 +186,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
 
             val ruleLike = (startElement as SmkRuleOrCheckpoint)
             val lastArg = ruleLike.getSections().lastOrNull()
-            val indent = lastArg?.prevSibling?.text ?: " "
+            val indent = lastArg?.prevSibling?.text ?: logIndent
             doc.insertString(
                 (lastArg ?: ruleLike).endOffset,
                 "${indent}shell: \"echo TODO$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\""
