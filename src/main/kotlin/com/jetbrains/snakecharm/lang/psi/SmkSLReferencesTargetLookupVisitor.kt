@@ -4,10 +4,7 @@ import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.parentOfType
-import com.jetbrains.python.psi.PyElementVisitor
-import com.jetbrains.python.psi.PyKeywordArgument
-import com.jetbrains.python.psi.PyRecursiveElementVisitor
-import com.jetbrains.python.psi.PyStringLiteralExpression
+import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLFile
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
@@ -21,7 +18,7 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcard
  * At the moment limited to 'run' and 'rule' sections
  */
 class SmkSLReferencesTargetLookupVisitor(
-    private val targetPsiElement: PsiElement
+    private val targetPsiElement: PsiElement?
 ) : SmkElementVisitor, PyRecursiveElementVisitor() {
 
     var hasReferenceToTarget: Boolean = false
@@ -71,7 +68,11 @@ class SmkSLReferencesTargetLookupVisitor(
         if (element is PyKeywordArgument) {
             element = element.parentOfType<SmkRuleOrCheckpointArgsSection>()
         }
-        if (element == targetPsiElement) {
+        if (targetPsiElement != null) {
+            if (element == targetPsiElement) {
+                hasReferenceToTarget = true
+            }
+        } else if ((element == null || element is PyClass) && ref.text == SnakemakeNames.SECTION_LOG) {
             hasReferenceToTarget = true
         }
     }

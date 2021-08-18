@@ -2,12 +2,12 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement
-import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.util.parentOfType
 import com.intellij.refactoring.suggested.endOffset
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -26,17 +26,33 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
         session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
 
+        override fun visitSmkUse(use: SmkUse) {
+            val logSection = use.getSectionByName(SnakemakeNames.SECTION_LOG) ?: return
+            use.getImportedRuleNames()?.forEach {
+                handleUseReference(it, logSection)
+            }
+        }
+
         override fun visitSmkRule(rule: SmkRule) {
-            visitSMKRuleLike(rule)
+            ruleOrCheckpointHandler(rule)
         }
 
         override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
-            visitSMKRuleLike(checkPoint)
+            ruleOrCheckpointHandler(checkPoint)
         }
 
-        private fun visitSMKRuleLike(rule: SmkRuleLike<SmkArgsSection>) {
-            val logSection = rule.getSectionByName(SnakemakeNames.SECTION_LOG) ?: return
+        private fun ruleOrCheckpointHandler(ruleOrCheckpoint: SmkRuleOrCheckpoint) {
+            val logSection = ruleOrCheckpoint.getSectionByName(SnakemakeNames.SECTION_LOG) ?: return
+            val message = SnakemakeBundle.message("INSP.NAME.unused.log.section")
+            visitSMKRuleLike(ruleOrCheckpoint, logSection, logSection, message)
+        }
 
+        private fun visitSMKRuleLike(
+            rule: SmkRuleLike<SmkArgsSection>,
+            originalLogSection: SmkArgsSection,
+            logSectionWhichMustBeResolveResult: SmkArgsSection?,
+            message: String
+        ) {
             val ruleSections = rule.getSections()
             val skipValidation = ruleSections.any { section ->
                 section.sectionKeyword in EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE
@@ -46,39 +62,71 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
             }
 
             val shellSection = rule.getSectionByName(SnakemakeNames.SECTION_SHELL)
+            val name = rule.name ?: return
             val quickfix = if (shellSection != null) {
-                CreateLogFileInShellSection(shellSection)
+                CreateLogFileInShellSection(shellSection, name)
             } else {
                 val runSection = ruleSections.firstOrNull { it is SmkRunSection } as SmkRunSection?
                 when {
-                    runSection != null -> CreateLogFileInRunSection(runSection)
-                    else -> CreateShellSectionWithLogReference(rule)
+                    runSection != null -> CreateLogFileInRunSection(runSection, name)
+                    else -> CreateShellSectionWithLogReference(rule, name, originalLogSection.prevSibling.text)
                 }
             }
 
-
-            val collector = SmkSLReferencesTargetLookupVisitor(logSection)
+            val collector = SmkSLReferencesTargetLookupVisitor(logSectionWhichMustBeResolveResult)
                 .also {
                     rule.accept(it)
                 }
 
             if (!collector.hasReferenceToTarget) {
                 registerProblem(
-                    logSection,
-                    SnakemakeBundle.message("INSP.NAME.unused.log.section"),
-                    ProblemHighlightType.WEAK_WARNING,
-                    null,
+                    originalLogSection,
+                    message,
                     quickfix
                 )
             }
         }
+
+        private fun handleUseReference(
+            ruleReference: SmkReferenceExpression,
+            logSection: SmkRuleOrCheckpointArgsSection
+        ) {
+            var resolveResult: PsiElement?
+            var reference = ruleReference
+            // Searching for origin element, it must be a rule or checkpoint
+            while (true) {
+                resolveResult = reference.reference.resolve()
+                when (resolveResult) {
+                    is SmkRuleOrCheckpoint -> break
+                    is SmkReferenceExpression -> reference = resolveResult
+                    else -> {
+                        // Sometimes reference of overridden rule refer not to SmkUse
+                        // But to its node, so we need to handle this cases
+                        val useParent = resolveResult?.parentOfType<SmkUse>() ?: return
+                        useParent.getImportedRuleNames()?.forEach { handleUseReference(it, logSection) }
+                        return
+                    }
+                }
+            }
+            if (resolveResult is SmkRuleOrCheckpoint) {
+                val ruleLogSection = resolveResult.getSectionByName(SnakemakeNames.SECTION_LOG)
+                val message =
+                    SnakemakeBundle.message(
+                        "INSP.NAME.unused.log.section.in.special.rule",
+                        resolveResult.name ?: return
+                    )
+                visitSMKRuleLike(resolveResult, logSection, ruleLogSection, message)
+            }
+        }
     }
 
-    private class CreateLogFileInShellSection(expr: PsiElement) : LocalQuickFixOnPsiElement(expr) {
+    private class CreateLogFileInShellSection(expr: PsiElement, val sectionName: String) :
+        LocalQuickFixOnPsiElement(expr) {
 
         override fun getFamilyName() = SnakemakeBundle.message(
             "INSP.INTN.unused.log.fix.add.to.shell.section",
-            REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT
+            REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT,
+            sectionName
         )
 
         override fun getText() = familyName
@@ -93,7 +141,10 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
 
             if (stringArgument == null) {
                 val indent = shellSection.prevSibling.text.replace("\n", "")
-                doc.insertString(shellSection.lastChild.endOffset, "\n$indent$indent\"$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\"")
+                doc.insertString(
+                    shellSection.lastChild.endOffset,
+                    "\n$indent$indent\"$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\""
+                )
                 PsiDocumentManager.getInstance(project).commitDocument(doc)
                 return
             }
@@ -103,9 +154,11 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
         }
     }
 
-    private class CreateLogFileInRunSection(expr: SmkRunSection) : LocalQuickFixOnPsiElement(expr) {
+    private class CreateLogFileInRunSection(expr: SmkRunSection, val sectionName: String) :
+        LocalQuickFixOnPsiElement(expr) {
 
-        override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.unused.log.fix.add.to.run.section")
+        override fun getFamilyName() =
+            SnakemakeBundle.message("INSP.INTN.unused.log.fix.add.to.run.section", sectionName)
 
         override fun getText() = familyName
 
@@ -120,9 +173,11 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
         }
     }
 
-    private class CreateShellSectionWithLogReference(expr: PsiElement) : LocalQuickFixOnPsiElement(expr) {
+    private class CreateShellSectionWithLogReference(expr: PsiElement, val sectionName: String, val logIndent: String) :
+        LocalQuickFixOnPsiElement(expr) {
 
-        override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.unused.log.fix.create.shell.section")
+        override fun getFamilyName() =
+            SnakemakeBundle.message("INSP.INTN.unused.log.fix.create.shell.section", sectionName)
 
         override fun getText() = familyName
 
@@ -130,9 +185,12 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
             val doc = PsiDocumentManager.getInstance(project).getDocument(file) ?: return
 
             val ruleLike = (startElement as SmkRuleOrCheckpoint)
-            val lastArg = ruleLike.getSections().last()
-            val indent = lastArg.prevSibling.text
-            doc.insertString(lastArg.endOffset, "${indent}shell: \"echo TODO$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\"")
+            val lastArg = ruleLike.getSections().lastOrNull()
+            val indent = lastArg?.prevSibling?.text ?: logIndent
+            doc.insertString(
+                (lastArg ?: ruleLike).endOffset,
+                "${indent}shell: \"echo TODO$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\""
+            )
             PsiDocumentManager.getInstance(project).commitDocument(doc)
         }
     }
