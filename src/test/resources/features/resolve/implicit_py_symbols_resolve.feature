@@ -68,8 +68,8 @@ Feature: Resolve implicitly imported python names
       | snakemake     | ru  | rules       | Rules       | __init__.py  |
       | snakemake     | ru  | rules.foo   | Rules       | __init__.py  |
       | snakemake     | inp | input       | input       | builtins.pyi |
-      | snakemake     | pe  | pep         | Project     | project.py   |
-      | snakemake     | pe  | pep.config  | Project     | project.py   |
+      | snakemake     | pe  | pep         | __init__     | project.py   |
+      | snakemake     | pe  | pep.config  | __init__     | project.py   |
 
   Scenario: Resolve at top-level: shell()
     Given a snakemake project
@@ -129,7 +129,7 @@ Feature: Resolve implicitly imported python names
       | snakemake:6.5 | rules | rules.foo  | Rules       | __init__.py |
       | snakemake     | exp   | expand()   | expand      | io.py       |
       | snakemake     | rules | rules.foo  | Rules       | __init__.py |
-      | snakemake     | pep   | pep.config | Project     | project.py  |
+      | snakemake     | pep   | pep.config | __init__     | project.py  |
 
   Scenario: Resolve inside rule parameters: shell()
     Given a snakemake project
@@ -171,7 +171,7 @@ Feature: Resolve implicitly imported python names
       | snakemake     | wil         | wildcards   | Wildcards   | io.py          | 1     |
       | snakemake     | res         | resources   | Resources   | io.py          | 1     |
       | snakemake     | lo          | log         | Log         | io.py          | 1     |
-      | snakemake     | pep         | pep.config  | Project     | project.py     | 1     |
+      | snakemake     | pep         | pep.config  | __init__     | project.py     | 1     |
 
   Scenario: Resolve results priority
     Given a snakemake project
@@ -348,9 +348,9 @@ Feature: Resolve implicitly imported python names
       | rule       | snakemake     | message | scatter     | Scatter     | __init__.py    |
       | rule       | snakemake     | message | gather      | Gather      | __init__.py    |
       | checkpoint | snakemake     | shell   | rules       | Rules       | __init__.py    |
-      | rule       | snakemake     | shell   | pep         | Project     | project.py     |
-      | rule       | snakemake     | message | pep         | Project     | project.py     |
-      | checkpoint | snakemake     | shell   | pep         | Project     | project.py     |
+      | rule       | snakemake     | shell   | pep         | __init__     | project.py     |
+      | rule       | snakemake     | message | pep         | __init__     | project.py     |
+      | checkpoint | snakemake     | shell   | pep         | __init__     | project.py     |
 
 
   Scenario Outline: No resolve in injections for defining expanding sections

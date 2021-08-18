@@ -34,8 +34,6 @@ import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
 import java.util.*
 import javax.swing.SwingUtilities
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * @author Roman.Chernyatchik
@@ -139,14 +137,6 @@ class ImplicitPySymbolsProvider(
         )
         progressIndicator?.checkCanceled()
 
-        //collect pep methods
-        collectClassInstanceMethods(
-            listOf(
-                "peppy.project" to "Project"
-            ), SmkCodeInsightScope.PEP_OBJECT, usedFiles, sdk, elementsCache
-        )
-        progressIndicator?.checkCanceled()
-
         ///////////////////////////////////////
         // Collect hardcoded classes
 
@@ -187,6 +177,12 @@ class ImplicitPySymbolsProvider(
                 else -> className.lowercase(Locale.getDefault())
             }
         }
+        progressIndicator?.checkCanceled()
+
+
+        ///////////////////////////////////////
+        // peppy module: `pep` variable
+        addPeppyGlobalVariables(usedFiles, sdk, syntheticElementsCache)
         progressIndicator?.checkCanceled()
 
         ////////////////////////////////////////
@@ -599,6 +595,7 @@ class ImplicitPySymbolsProvider(
         sdk: Sdk,
         elementsCache: MutableList<Pair<SmkCodeInsightScope, LookupElement>>
     ) {
+        // ====== snakemake module ========
         // See snakemake/workflow.py
         //
         // Workflow.__init__()
@@ -642,18 +639,6 @@ class ImplicitPySymbolsProvider(
         // TODO: do we need this ?
         globals["checkpoints"] = checkpointsFile?.findTopLevelClass("Checkpoints")
 
-        val pepFile = collectPyFiles("peppy.project", usedFiles, sdk).firstOrNull()
-        val pepObject = pepFile?.findTopLevelClass("Project")
-        globals[SnakemakeAPI.SMK_VARS_PEP] = pepObject
-        elementsCache.add(
-            SmkCodeInsightScope.PEP_OBJECT to SmkCompletionUtil.createPrioritizedLookupElement(
-                SnakemakeAPI.SMK_VARS_PEP,
-                pepObject,
-                typeText = SnakemakeBundle.message("TYPES.pep.object.type.text"),
-                priority = SmkCompletionUtil.WORKFLOW_GLOBALS_PRIORITY
-            )
-        )
-
         globals.forEach { (name, psi) ->
             elementsCache.add(
                 SmkCodeInsightScope.TOP_LEVEL to SmkCompletionUtil.createPrioritizedLookupElement(
@@ -664,6 +649,25 @@ class ImplicitPySymbolsProvider(
                 )
             )
         }
+    }
+
+    private fun addPeppyGlobalVariables(
+        usedFiles: MutableSet<VirtualFile>,
+        sdk: Sdk,
+        elementsCache: MutableList<Pair<SmkCodeInsightScope, LookupElement>>
+    ) {
+        // ====== peppy module ========
+        val pepFile = collectPyFiles("peppy.project", usedFiles, sdk).firstOrNull()
+        val pepObjectConstructor = pepFile?.findTopLevelClass("Project")?.findInitOrNew(false, null)
+
+        elementsCache.add(
+            SmkCodeInsightScope.TOP_LEVEL to SmkCompletionUtil.createPrioritizedLookupElement(
+                SnakemakeAPI.SMK_VARS_PEP,
+                pepObjectConstructor,
+                typeText = SnakemakeBundle.message("TYPES.rule.run.workflow.globals.type.text"),
+                priority = SmkCompletionUtil.WORKFLOW_GLOBALS_PRIORITY
+            )
+        )
     }
 
     companion object {

@@ -111,10 +111,6 @@
     />
 
     <completion.contributor
-      language="Python"
-      implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkPepObjectCompletionContributor"
-    />
-    <completion.contributor
         language="Python"
         implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkKeywordCompletionContributor"
     />

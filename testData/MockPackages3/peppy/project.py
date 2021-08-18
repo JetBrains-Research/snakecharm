@@ -1,18 +1,19 @@
 """
 Build a Project object.
 """
-import os
-from collections import Mapping
-from logging import getLogger
+from .const import *
+from .utils import copy, make_list
+from .exceptions import *
+from .sample import Sample
 
-import pandas as pd
 from attmap import PathExAttMap
 from ubiquerg import is_url
 
-from .const import *
-from .exceptions import *
-from .sample import Sample
-from .utils import copy, load_yaml, make_abs_via_cfg, make_list
+import os
+import yaml
+import pandas as pd
+from collections import Mapping
+from logging import getLogger
 
 _LOGGER = getLogger(PKG_NAME)
 
@@ -39,33 +40,25 @@ class Project(PathExAttMap):
         prj = Project("ngs")
         samples = prj.samples
     """
-
-    def __init__(
-        self,
-        cfg=None,
-        amendments=None,
-        sample_table_index=None,
-        subsample_table_index=None,
-        defer_samples_creation=False,
-    ):
-        _LOGGER.debug(
-            "Creating {}{}".format(
-                self.__class__.__name__, " from file {}".format(cfg) if cfg else ""
-            )
+    def __init__(self, cfg=None, amendments=None, sample_table_index=None,
+                 subsample_table_index=None, defer_samples_creation=False):
+        _LOGGER.debug("Creating {}{}".format(
+            self.__class__.__name__,
+            " from file {}".format(cfg) if cfg else "")
         )
         super(Project, self).__init__()
         if isinstance(cfg, str):
-            self[CONFIG_FILE_KEY] = cfg
-            self.parse_config_file(cfg, amendments)
+            cfg_pth = os.path.abspath(cfg)
+            self[CONFIG_FILE_KEY] = cfg_pth
+            self.parse_config_file(cfg_pth, amendments)
         else:
             self[CONFIG_FILE_KEY] = None
         self._samples = []
         self[SAMPLE_EDIT_FLAG_KEY] = False
-        self.st_index = sample_table_index or SAMPLE_NAME_ATTR
-        self.sst_index = subsample_table_index or [
-            SAMPLE_NAME_ATTR,
-            SUBSAMPLE_NAME_ATTR,
-        ]
+        self.st_index = sample_table_index \
+                        or SAMPLE_NAME_ATTR
+        self.sst_index = subsample_table_index \
+                         or [SAMPLE_NAME_ATTR, SUBSAMPLE_NAME_ATTR]
         self.name = self.infer_name()
         self.description = self.get_description()
         if not defer_samples_creation:
@@ -84,7 +77,7 @@ class Project(PathExAttMap):
         Clear all object attributes and initialize again
         """
         cfg_path = self[CONFIG_FILE_KEY] if CONFIG_FILE_KEY in self else None
-        for attr in self.keys():
+        for attr in list(self.keys()):
             del self[attr]
         self.__init__(cfg=cfg_path)
 
@@ -99,16 +92,16 @@ class Project(PathExAttMap):
         df = pd.DataFrame()
         for sample in self.samples:
             sd = sample.to_dict()
-            ser = pd.Series({k: v for (k, v) in sd.items() if not k.startswith("_")})
+            ser = pd.Series(
+                {k: v for (k, v) in list(sd.items()) if not k.startswith("_")}
+            )
             df = df.append(ser, ignore_index=True)
         index = [index] if isinstance(index, str) else index
         if not all([i in df.columns for i in index]):
             _LOGGER.debug(
                 "Could not set {} index. At least one of the "
-                "requested columns does not exist: {}".format(
-                    CFG_SAMPLE_TABLE_KEY, index
-                )
-            )
+                "requested columns does not exist: {}".
+                    format(CFG_SAMPLE_TABLE_KEY, index))
             return df
         _LOGGER.debug("Setting sample_table index to: {}".format(index))
         df.set_index(keys=index, drop=False, inplace=True)
@@ -124,37 +117,32 @@ class Project(PathExAttMap):
         """
         if CONFIG_KEY not in self:
             self[CONFIG_KEY] = PathExAttMap()
-        if not os.path.exists(cfg_path) and not is_url(cfg_path):
-            raise OSError(f"Project config file path does not exist: {cfg_path}")
-        config = load_yaml(cfg_path)
-        assert isinstance(
-            config, Mapping
-        ), "Config file parse did not yield a Mapping; got {} ({})".format(
-            config, type(config)
-        )
+        if not os.path.exists(cfg_path):
+            raise OSError("Project config file path does not exist: {}".
+                             format(cfg_path))
+        with open(cfg_path, 'r') as conf_file:
+            config = yaml.safe_load(conf_file)
+
+        assert isinstance(config, Mapping), \
+            "Config file parse did not yield a Mapping; got {} ({})".\
+            format(config, type(config))
 
         _LOGGER.debug("Raw ({}) config data: {}".format(cfg_path, config))
 
         # recursively import configs
-        if (
-            PROJ_MODS_KEY in config
-            and CFG_IMPORTS_KEY in config[PROJ_MODS_KEY]
-            and config[PROJ_MODS_KEY][CFG_IMPORTS_KEY]
-        ):
-            _make_sections_absolute(config[PROJ_MODS_KEY], [CFG_IMPORTS_KEY], cfg_path)
-            _LOGGER.info(
-                "Importing external Project configurations: {}".format(
-                    ", ".join(config[PROJ_MODS_KEY][CFG_IMPORTS_KEY])
-                )
-            )
+        if PROJ_MODS_KEY in config and CFG_IMPORTS_KEY in config[PROJ_MODS_KEY]\
+                and config[PROJ_MODS_KEY][CFG_IMPORTS_KEY]:
+            _make_sections_absolute(
+                config[PROJ_MODS_KEY], [CFG_IMPORTS_KEY], cfg_path)
+            _LOGGER.info("Importing external Project configurations: {}".format
+                         (", ".join(config[PROJ_MODS_KEY][CFG_IMPORTS_KEY])))
             for i in config[PROJ_MODS_KEY][CFG_IMPORTS_KEY]:
                 _LOGGER.debug("Processing external config: {}".format(i))
                 if os.path.exists(i):
                     self.parse_config_file(cfg_path=i)
                 else:
-                    _LOGGER.warning(
-                        "External Project configuration does not" " exist: {}".format(i)
-                    )
+                    _LOGGER.warning("External Project configuration does not"
+                                    " exist: {}".format(i))
 
         self[CONFIG_KEY].add_entries(config)
         # Parse yaml into the project.config attributes
@@ -164,18 +152,15 @@ class Project(PathExAttMap):
         if amendments:
             for amendment in amendments:
                 c = self[CONFIG_KEY]
-                if (
-                    PROJ_MODS_KEY in c
-                    and AMENDMENTS_KEY in c[PROJ_MODS_KEY]
-                    and c[PROJ_MODS_KEY][AMENDMENTS_KEY] is not None
-                ):
-                    _LOGGER.debug("Adding entries for amendment '{}'".format(amendment))
+                if PROJ_MODS_KEY in c and AMENDMENTS_KEY in c[PROJ_MODS_KEY] \
+                        and c[PROJ_MODS_KEY][AMENDMENTS_KEY] is not None:
+                    _LOGGER.debug("Adding entries for amendment '{}'".
+                                  format(amendment))
                     try:
                         amends = c[PROJ_MODS_KEY][AMENDMENTS_KEY][amendment]
                     except KeyError:
                         raise MissingAmendmentError(
-                            amendment, c[PROJ_MODS_KEY][AMENDMENTS_KEY]
-                        )
+                            amendment, c[PROJ_MODS_KEY][AMENDMENTS_KEY])
                     _LOGGER.debug("Updating with: {}".format(amends))
                     self[CONFIG_KEY].add_entries(amends)
                     _LOGGER.info("Using amendments: {}".format(amendment))
@@ -200,14 +185,12 @@ class Project(PathExAttMap):
 
     def modify_samples(self):
         if self._modifier_exists():
-            mod_diff = set(self[CONFIG_KEY][SAMPLE_MODS_KEY].keys()) - set(
-                SAMPLE_MODIFIERS
-            )
+            mod_diff = set(self[CONFIG_KEY][SAMPLE_MODS_KEY].keys()) - \
+                       set(SAMPLE_MODIFIERS)
             if len(mod_diff) > 0:
-                _LOGGER.warning(
-                    "Config '{}' section contains unrecognized "
-                    "subsections: {}".format(SAMPLE_MODS_KEY, mod_diff)
-                )
+                _LOGGER.warning("Config '{}' section contains unrecognized "
+                                "subsections: {}".
+                                format(SAMPLE_MODS_KEY, mod_diff))
         self.attr_remove()
         self.attr_constants()
         self.attr_synonyms()
@@ -229,10 +212,8 @@ class Project(PathExAttMap):
         _LOGGER.debug("Checking existence: {}".format(modifier_key))
         if CONFIG_KEY not in self or SAMPLE_MODS_KEY not in self[CONFIG_KEY]:
             return False
-        if (
-            modifier_key is not None
-            and modifier_key not in self[CONFIG_KEY][SAMPLE_MODS_KEY]
-        ):
+        if modifier_key is not None \
+                and modifier_key not in self[CONFIG_KEY][SAMPLE_MODS_KEY]:
             return False
         return True
 
@@ -240,11 +221,9 @@ class Project(PathExAttMap):
         """
         Remove declared attributes from all samples that have them defined
         """
-
         def _del_if_in(obj, attr):
             if attr in obj:
                 del obj[attr]
-
         if self._modifier_exists(REMOVE_KEY):
             to_remove = self[CONFIG_KEY][SAMPLE_MODS_KEY][REMOVE_KEY]
             _LOGGER.debug("Removing attributes: {}".format(to_remove))
@@ -259,7 +238,7 @@ class Project(PathExAttMap):
         if self._modifier_exists(CONSTANT_KEY):
             to_append = self[CONFIG_KEY][SAMPLE_MODS_KEY][CONSTANT_KEY]
             _LOGGER.debug("Applying constant attributes: {}".format(to_append))
-            for attr, val in to_append.items():
+            for attr, val in list(to_append.items()):
                 [s.update({attr: val}) for s in self.samples if attr not in s]
 
     def attr_synonyms(self):
@@ -270,7 +249,7 @@ class Project(PathExAttMap):
             synonyms = self[CONFIG_KEY][SAMPLE_MODS_KEY][DUPLICATED_KEY]
             _LOGGER.debug("Applying synonyms: {}".format(synonyms))
             for sample in self.samples:
-                for attr, new in synonyms.items():
+                for attr, new in list(synonyms.items()):
                     if attr in sample:
                         setattr(sample, new, getattr(sample, attr))
 
@@ -285,31 +264,26 @@ class Project(PathExAttMap):
             # before merging, which is requires sample_name attribute to map
             # sample_table rows to subsample_table rows,
             # perform only sample_name attr derivation
-            if (
-                SAMPLE_NAME_ATTR
-                in self[CONFIG_KEY][SAMPLE_MODS_KEY][DERIVED_KEY][DERIVED_ATTRS_KEY]
-            ):
+            if SAMPLE_NAME_ATTR in self[CONFIG_KEY][SAMPLE_MODS_KEY]\
+                    [DERIVED_KEY][DERIVED_ATTRS_KEY]:
                 self.attr_derive(attrs=[SAMPLE_NAME_ATTR])
         except KeyError:
             pass
         for sample in self.samples:
             if SAMPLE_NAME_ATTR not in sample:
-                msg_base = "{st} is missing '{sn}' column; ".format(
-                    st=CFG_SAMPLE_TABLE_KEY, sn=SAMPLE_NAME_ATTR
-                )
-                msg = msg_base + "you must specify {sn}s in {st} or derive them".format(
-                    st=CFG_SAMPLE_TABLE_KEY, sn=SAMPLE_NAME_ATTR
-                )
+                msg_base = "{st} is missing '{sn}' column; ".\
+                    format(st=CFG_SAMPLE_TABLE_KEY, sn=SAMPLE_NAME_ATTR)
+                msg = msg_base + \
+                      "you must specify {sn}s in {st} or derive them".\
+                          format(st=CFG_SAMPLE_TABLE_KEY, sn=SAMPLE_NAME_ATTR)
                 if self.st_index != SAMPLE_NAME_ATTR:
-                    setattr(sample, SAMPLE_NAME_ATTR, getattr(sample, self.st_index))
-                    _LOGGER.warning(
-                        msg_base + "using specified {} index ({}) instead. "
-                        "Setting name: {}".format(
-                            CFG_SAMPLE_TABLE_KEY,
-                            self.st_index,
-                            getattr(sample, self.st_index),
-                        )
-                    )
+                    setattr(sample, SAMPLE_NAME_ATTR,
+                            getattr(sample, self.st_index))
+                    _LOGGER.warning(msg_base +
+                                    "using specified {} index ({}) instead. "
+                                    "Setting name: {}".
+                                    format(CFG_SAMPLE_TABLE_KEY, self.st_index,
+                                           getattr(sample, self.st_index)))
                 else:
                     raise InvalidSampleTableFileException(msg)
 
@@ -319,40 +293,32 @@ class Project(PathExAttMap):
         sample annotations (from sample_table)
         """
         if SUBSAMPLE_DF_KEY not in self or self[SUBSAMPLE_DF_KEY] is None:
-            _LOGGER.debug("No {} found, skipping merge".format(CFG_SUBSAMPLE_TABLE_KEY))
+            _LOGGER.debug("No {} found, skipping merge".
+                          format(CFG_SUBSAMPLE_TABLE_KEY))
             return
         for subsample_table in self[SUBSAMPLE_DF_KEY]:
             for n in list(subsample_table[self.sample_name_colname]):
                 if n not in [s[SAMPLE_NAME_ATTR] for s in self.samples]:
-                    _LOGGER.warning(
-                        ("Couldn't find matching sample for " "subsample: {}").format(n)
-                    )
+                    _LOGGER.warning(("Couldn't find matching sample for "
+                                     "subsample: {}").format(n))
             for sample in self.samples:
                 sample_colname = self.sample_name_colname
                 if sample_colname not in subsample_table.columns:
-                    raise KeyError(
-                        "Subannotation requires column '{}'.".format(sample_colname)
-                    )
-                _LOGGER.debug(
-                    "Using '{}' as sample name column from "
-                    "subannotation table".format(sample_colname)
-                )
-                sample_indexer = (
+                    raise KeyError("Subannotation requires column '{}'."
+                                   .format(sample_colname))
+                _LOGGER.debug("Using '{}' as sample name column from "
+                              "subannotation table".format(sample_colname))
+                sample_indexer = \
                     subsample_table[sample_colname] == sample[SAMPLE_NAME_ATTR]
-                )
-                this_sample_rows = subsample_table[sample_indexer].dropna(
-                    how="all", axis=1
-                )
+                this_sample_rows = subsample_table[sample_indexer].\
+                    dropna(how="all", axis=1)
                 if len(this_sample_rows) == 0:
-                    _LOGGER.debug(
-                        "No merge rows for sample '%s', skipping",
-                        sample[SAMPLE_NAME_ATTR],
-                    )
+                    _LOGGER.debug("No merge rows for sample '%s', skipping",
+                                  sample[SAMPLE_NAME_ATTR])
                     continue
                 _LOGGER.debug("%d rows to merge", len(this_sample_rows))
-                _LOGGER.debug(
-                    "Merge rows dict: " "{}".format(this_sample_rows.to_dict())
-                )
+                _LOGGER.debug("Merge rows dict: "
+                              "{}".format(this_sample_rows.to_dict()))
 
                 merged_attrs = {key: list() for key in this_sample_rows.columns}
                 _LOGGER.debug(this_sample_rows)
@@ -364,33 +330,28 @@ class Project(PathExAttMap):
                     rowdata = row.to_dict()
 
                     def _select_new_attval(merged_attrs, attname, attval):
-                        """Select new attribute value for the merged columns
-                        dictionary"""
+                        """ Select new attribute value for the merged columns
+                        dictionary """
                         if attname in merged_attrs:
                             return merged_attrs[attname] + [attval]
                         return [str(attval).rstrip()]
 
-                    for attname, attval in rowdata.items():
+                    for attname, attval in list(rowdata.items()):
                         if attname == sample_colname or not attval:
-                            _LOGGER.debug("Skipping KV: {}={}".format(attname, attval))
+                            _LOGGER.debug("Skipping KV: {}={}".
+                                          format(attname, attval))
                             continue
-                        _LOGGER.debug(
-                            "merge: sample '{}'; '{}'='{}'".format(
-                                sample[SAMPLE_NAME_ATTR], attname, attval
-                            )
-                        )
-                        merged_attrs[attname] = _select_new_attval(
-                            merged_attrs, attname, attval
-                        )
+                        _LOGGER.debug("merge: sample '{}'; '{}'='{}'".
+                                      format(sample[SAMPLE_NAME_ATTR], attname,
+                                             attval))
+                        merged_attrs[attname] = \
+                            _select_new_attval(merged_attrs, attname, attval)
 
                 # remove sample name from the data with which to update sample
                 merged_attrs.pop(sample_colname, None)
 
-                _LOGGER.debug(
-                    "Updating Sample {}: {}".format(
-                        sample[SAMPLE_NAME_ATTR], merged_attrs
-                    )
-                )
+                _LOGGER.debug("Updating Sample {}: {}".
+                              format(sample[SAMPLE_NAME_ATTR], merged_attrs))
                 sample.update(merged_attrs)
 
     def attr_imply(self):
@@ -406,50 +367,40 @@ class Project(PathExAttMap):
         implications = self[CONFIG_KEY][SAMPLE_MODS_KEY][IMPLIED_KEY]
         if not isinstance(implications, list):
             raise InvalidConfigFileException(
-                "{}.{} has to be a list of key-value pairs".format(
-                    SAMPLE_MODS_KEY, IMPLIED_KEY
-                )
+                "{}.{} has to be a list of key-value pairs".
+                    format(SAMPLE_MODS_KEY, IMPLIED_KEY)
             )
         _LOGGER.debug("Sample attribute implications: {}".format(implications))
         for implication in implications:
             if not all([key in implication for key in IMPLIED_COND_KEYS]):
                 raise InvalidConfigFileException(
-                    "{}.{} section is invalid: {}".format(
-                        SAMPLE_MODS_KEY, IMPLIED_KEY, implication
-                    )
+                    "{}.{} section is invalid: {}".
+                        format(SAMPLE_MODS_KEY, IMPLIED_KEY, implication)
                 )
             implier_attrs = list(implication[IMPLIED_IF_KEY].keys())
             implied_attrs = list(implication[IMPLIED_THEN_KEY].keys())
             for sample in self.samples:
-                _LOGGER.debug(
-                    "Setting Sample attributes implied by '{}'".format(implier_attrs)
-                )
+                _LOGGER.debug("Setting Sample attributes implied by '{}'".
+                              format(implier_attrs))
                 for implier_attr in implier_attrs:
                     implier_val = implication[IMPLIED_IF_KEY][implier_attr]
                     if implier_attr not in sample:
-                        _LOGGER.debug(
-                            "Sample lacks implier attr ({}), "
-                            "skipping:".format(implier_attr)
-                        )
+                        _LOGGER.debug("Sample lacks implier attr ({}), "
+                                      "skipping:".format(implier_attr))
                         break
                     sample_val = sample[implier_attr]
                     if sample_val not in implier_val:
                         _LOGGER.debug(
                             "Sample attr value does not match any of implier "
-                            "requirements ({} not in {}), skipping".format(
-                                sample_val, implier_val
-                            )
-                        )
+                            "requirements ({} not in {}), skipping".
+                                format(sample_val, implier_val))
                         break
                 else:
                     # only executed if the inner loop did NOT break
                     for implied_attr in implied_attrs:
                         imp_val = implication[IMPLIED_THEN_KEY][implied_attr]
-                        _LOGGER.debug(
-                            "Setting implied attr: '{}={}'".format(
-                                implied_attr, imp_val
-                            )
-                        )
+                        _LOGGER.debug("Setting implied attr: '{}={}'".
+                                      format(implied_attr, imp_val))
                         sample.__setitem__(implied_attr, imp_val)
 
     def attr_derive(self, attrs=None):
@@ -470,22 +421,20 @@ class Project(PathExAttMap):
                 elif attr in sample._derived_cols_done:
                     _LOGGER.debug("'{}' has been derived".format(attr))
                     continue
-                _LOGGER.debug(
-                    "Deriving '{}' attribute for '{}'".format(attr, sample.sample_name)
-                )
+                _LOGGER.debug("Deriving '{}' attribute for '{}'".
+                              format(attr, sample.sample_name))
 
                 # Set {atr}_key, so the original source can also be retrieved
                 setattr(sample, ATTR_KEY_PREFIX + attr, getattr(sample, attr))
 
                 derived_attr = sample.derive_attribute(ds, attr)
                 if derived_attr:
-                    _LOGGER.debug("Setting '{}' to '{}'".format(attr, derived_attr))
+                    _LOGGER.debug(
+                        "Setting '{}' to '{}'".format(attr, derived_attr))
                     setattr(sample, attr, derived_attr)
                 else:
-                    _LOGGER.debug(
-                        "Not setting null/empty value for data source"
-                        " '{}': {}".format(attr, type(derived_attr))
-                    )
+                    _LOGGER.debug("Not setting null/empty value for data source"
+                                  " '{}': {}".format(attr, type(derived_attr)))
                 sample._derived_cols_done.append(attr)
 
     def activate_amendments(self, amendments):
@@ -506,15 +455,13 @@ class Project(PathExAttMap):
         amendments = [amendments] if isinstance(amendments, str) else amendments
         if amendments is None:
             raise TypeError(
-                "The amendment argument can not be null. To deactivate an "
-                "amendment use the deactivate_amendments method."
-            )
+                "The amendment argument can not be null. To deactivate a "
+                "amendment use the deactivate_amendments method.")
         if not self[CONFIG_FILE_KEY]:
             raise NotImplementedError(
                 "amendment activation isn't supported on a project not "
-                "created from a config file"
-            )
-        prev = [(k, v) for k, v in self.items() if not k.startswith("_")]
+                "created from a config file")
+        prev = [(k, v) for k, v in list(self.items()) if not k.startswith("_")]
         conf_file = self[CONFIG_FILE_KEY]
         self.__init__(cfg=conf_file, amendments=amendments)
         for k, v in prev:
@@ -534,14 +481,14 @@ class Project(PathExAttMap):
         :raise NotImplementedError: if this call is made on a project not
             created from a config file
         """
-        if ACTIVE_AMENDMENTS_KEY not in self or self[ACTIVE_AMENDMENTS_KEY] is None:
+        if ACTIVE_AMENDMENTS_KEY not in self \
+                or self[ACTIVE_AMENDMENTS_KEY] is None:
             _LOGGER.warning("No amendments have been activated.")
             return self
         if not self[CONFIG_FILE_KEY]:
             raise NotImplementedError(
                 "amendments deactivation isn't supported on a project that "
-                "lacks a config file."
-            )
+                "lacks a config file.")
         self._reinit()
         return self
 
@@ -570,23 +517,19 @@ class Project(PathExAttMap):
         :return str: inferred name for project.
         :raise InvalidConfigFileException: if the project lacks both a name and
             a configuration file (no basis, then, for inference)
-        :raise InvalidConfigFileException: if specified Project name is invalid
+        :rasie InvalidConfigFileException: if specified Project name is invalid
         """
         if CONFIG_KEY not in self:
             return
         if hasattr(self[CONFIG_KEY], "name"):
             if " " in self[CONFIG_KEY].name:
                 raise InvalidConfigFileException(
-                    "Specified Project name ({}) contains whitespace".format(
-                        self[CONFIG_KEY].name
-                    )
-                )
+                    "Specified Project name ({}) contains whitespace".
+                        format(self[CONFIG_KEY].name))
             return self[CONFIG_KEY].name.replace(" ", "_")
         if not self[CONFIG_FILE_KEY]:
-            raise NotImplementedError(
-                "Project name inference isn't supported "
-                "on a project that lacks a config file."
-            )
+            raise NotImplementedError("Project name inference isn't supported "
+                                      "on a project that lacks a config file.")
         config_folder = os.path.dirname(self[CONFIG_FILE_KEY])
         project_name = os.path.basename(config_folder)
         if project_name == METADATA_KEY:
@@ -613,10 +556,8 @@ class Project(PathExAttMap):
                 except Exception as e:
                     raise InvalidConfigFileException(
                         "Could not convert the specified Project description "
-                        "({}) to string. Caught exception: {}".format(
-                            desc_str, getattr(e, "message", repr(e))
-                        )
-                    )
+                        "({}) to string. Caught exception: {}".
+                            format(desc_str, getattr(e, 'message', repr(e))))
             return desc_str
 
     def __str__(self):
@@ -639,30 +580,24 @@ class Project(PathExAttMap):
             msg = "{}\n{} samples".format(msg, num_samples)
             sample_names = list(self[SAMPLE_DF_KEY][self.sample_name_colname])
             repr_names = sample_names[:MAX_PROJECT_SAMPLES_REPR]
-            context = (
-                " (showing first {})".format(MAX_PROJECT_SAMPLES_REPR)
-                if num_samples > MAX_PROJECT_SAMPLES_REPR
-                else ""
-            )
+            context = " (showing first {})".format(MAX_PROJECT_SAMPLES_REPR) \
+                if num_samples > MAX_PROJECT_SAMPLES_REPR else ""
             msg = "{}{}: {}".format(msg, context, ", ".join(repr_names))
         else:
             msg = "{} {}".format(msg, "0 samples")
         if CONFIG_KEY not in self:
             return msg
-        msg = "{}\nSections: {}".format(
-            msg, ", ".join([s for s in self[CONFIG_KEY].keys()])
-        )
-        if (
-            PROJ_MODS_KEY in self[CONFIG_KEY]
-            and AMENDMENTS_KEY in self[CONFIG_KEY][PROJ_MODS_KEY]
-        ):
-            msg = "{}\nAmendments: {}".format(
-                msg, ", ".join(self[CONFIG_KEY][PROJ_MODS_KEY][AMENDMENTS_KEY].keys())
-            )
+        msg = "{}\nSections: {}".\
+            format(msg, ", ".join([s for s in list(self[CONFIG_KEY].keys())]))
+        if PROJ_MODS_KEY in self[CONFIG_KEY] \
+                and AMENDMENTS_KEY in self[CONFIG_KEY][PROJ_MODS_KEY]:
+            msg = "{}\nAmendments: {}".\
+                format(msg, ", ".
+                       join(list(self[CONFIG_KEY][PROJ_MODS_KEY][AMENDMENTS_KEY].
+                            keys())))
         if self.amendments:
-            msg = "{}\nActivated amendments: {}".format(
-                msg, ", ".join(self[ACTIVE_AMENDMENTS_KEY])
-            )
+            msg = "{}\nActivated amendments: {}".\
+                format(msg, ", ".join(self[ACTIVE_AMENDMENTS_KEY]))
         return msg
 
     @property
@@ -672,7 +607,8 @@ class Project(PathExAttMap):
 
         :return Iterable[str]: a list of currently active amendment names
         """
-        return self[ACTIVE_AMENDMENTS_KEY] if ACTIVE_AMENDMENTS_KEY in self else None
+        return self[ACTIVE_AMENDMENTS_KEY] if ACTIVE_AMENDMENTS_KEY in self \
+            else None
 
     @property
     def list_amendments(self):
@@ -682,13 +618,10 @@ class Project(PathExAttMap):
         :return Iterable[str]: a list of available amendment names
         """
         try:
-            return self[CONFIG_KEY][PROJ_MODS_KEY][AMENDMENTS_KEY].keys()
+            return list(self[CONFIG_KEY][PROJ_MODS_KEY][AMENDMENTS_KEY].keys())
         except Exception as e:
-            _LOGGER.debug(
-                "Could not retrieve available amendments: {}".format(
-                    getattr(e, "message", repr(e))
-                )
-            )
+            _LOGGER.debug("Could not retrieve available amendments: {}".
+                          format(getattr(e, 'message', repr(e))))
             return None
 
     @property
@@ -735,7 +668,8 @@ class Project(PathExAttMap):
 
         :return str: name of the column that consist of sample identifiers
         """
-        return SAMPLE_NAME_ATTR if SAMPLE_NAME_ATTR == self.st_index else self.st_index
+        return SAMPLE_NAME_ATTR \
+            if SAMPLE_NAME_ATTR == self.st_index else self.st_index
 
     @property
     def sample_table(self):
@@ -763,22 +697,19 @@ class Project(PathExAttMap):
         :return pandas.DataFrame: a data frame with subsample attributes
         """
         sdf = self[SUBSAMPLE_DF_KEY]
-        if sdf is None:
-            return
         index = self.sst_index
         sdf = make_list(sdf, pd.DataFrame)
         for sst in sdf:
             if not all([i in sst.columns for i in index]):
-                _LOGGER.info(
-                    "Could not set {} index. At least one of the"
-                    " requested columns does not exist: {}".format(
-                        CFG_SUBSAMPLE_TABLE_KEY, index
-                    )
-                )
+                _LOGGER.info("Could not set {} index. At least one of the"
+                             " requested columns does not exist: {}"
+                             .format(CFG_SUBSAMPLE_TABLE_KEY, index))
                 return sst
             sst.set_index(keys=index, drop=False, inplace=True)
-            _LOGGER.info("Setting subsample_table index to: {}".format(index))
-            sst.index = sst.index.set_levels([i.astype(str) for i in sst.index.levels])
+            _LOGGER.info("Setting subsample_table index to: {}"
+                         .format(index))
+            sst.index = sst.index.set_levels([i.astype(str)
+                                              for i in sst.index.levels])
         return sdf if len(sdf) > 1 else sdf[0]
 
     def _read_sample_data(self):
@@ -786,7 +717,6 @@ class Project(PathExAttMap):
         Read the sample_table and subsample_table into dataframes
         and store in the object root
         """
-
         def _read_tab(pth):
             """
             Internal read table function
@@ -794,19 +724,13 @@ class Project(PathExAttMap):
             :param str pth: absolute path to the file to read
             :return pandas.DataFrame: table object
             """
-            csv_kwargs = {
-                "dtype": str,
-                "index_col": False,
-                "keep_default_na": False,
-                "na_values": [""],
-            }
-            try:
-                return pd.read_csv(pth, sep=infer_delimiter(pth), **csv_kwargs)
-            except Exception as e:
+            if not os.path.exists(pth):
                 raise SampleTableFileException(
-                    f"Could not read table: {pth}. "
-                    f"Caught exception: {getattr(e, 'message', repr(e))}"
-                )
+                    "File does not exist: {}".format(pth))
+            read_csv_kwargs = {"engine": "python", "dtype": str,
+                               "index_col": False, "keep_default_na": False,
+                               "na_values": [""]}
+            return pd.read_csv(pth, sep=infer_delimiter(pth), **read_csv_kwargs)
 
         no_metadata_msg = "No {} specified"
         if CONFIG_KEY not in self:
@@ -841,30 +765,24 @@ class Project(PathExAttMap):
         if CONFIG_VERSION_KEY in self[CONFIG_KEY]:
             v_str = self[CONFIG_KEY][CONFIG_VERSION_KEY]
             if not isinstance(v_str, str):
-                raise InvalidConfigFileException(
-                    "{} must be a string".format(CONFIG_VERSION_KEY)
-                )
+                raise InvalidConfigFileException("{} must be a string".
+                                                 format(CONFIG_VERSION_KEY))
             v_bundle = v_str.split(".")
-            assert len(v_bundle) == 3, InvalidConfigFileException(
-                "Version string is not tripartite"
-            )
+            assert len(v_bundle) == 3, \
+                InvalidConfigFileException("Version string is not tripartite")
             try:
                 v_bundle = list(map(int, v_bundle))
             except ValueError:
-                raise InvalidConfigFileException(
-                    "Version string elements are " "not coercible to integers"
-                )
+                raise InvalidConfigFileException("Version string elements are "
+                                                 "not coercible to integers")
             if v_bundle[0] < 2:
                 if SAMPLE_MODS_KEY in self[CONFIG_KEY]:
                     raise InvalidConfigFileException(
                         "Project configuration file ({p}) subscribes to {c} "
                         ">= 2.0.0, since '{m}' section is defined. Set {c} to "
-                        "2.0.0 in your config".format(
-                            p=self[CONFIG_FILE_KEY],
-                            c=CONFIG_VERSION_KEY,
-                            m=SAMPLE_MODS_KEY,
-                        )
-                    )
+                        "2.0.0 in your config".format(p=self[CONFIG_FILE_KEY],
+                                                      c=CONFIG_VERSION_KEY,
+                                                      m=SAMPLE_MODS_KEY))
                 else:
                     self._format_cfg()
                     return ["2", "0", "0"]
@@ -902,16 +820,13 @@ class Project(PathExAttMap):
                         "config file manually (add '{}.{}') to comply with PEP "
                         "2.0.0 specification: http://pep.databio.org/en/latest/"
                         "specification/#sample-modifier-imply".format(
-                            k_from, SAMPLE_MODS_KEY, IMPLIED_KEY
-                        )
-                    )
+                            k_from, SAMPLE_MODS_KEY, IMPLIED_KEY))
                 map.setdefault(SAMPLE_MODS_KEY, PathExAttMap())
                 if isinstance(k_to, list):
                     if k_to[0] in map[SAMPLE_MODS_KEY]:
                         if k_to[1] not in map[SAMPLE_MODS_KEY][k_to[0]]:
-                            map[SAMPLE_MODS_KEY][k_to[0]].setdefault(
-                                k_to[1], PathExAttMap()
-                            )
+                            map[SAMPLE_MODS_KEY][k_to[0]].\
+                                setdefault(k_to[1], PathExAttMap())
                         else:
                             return
                     else:
@@ -932,16 +847,15 @@ class Project(PathExAttMap):
             :param Mapping map: object to move sections within
             """
             if METADATA_KEY in map:
-                for mk in map[METADATA_KEY].keys():
+                for mk in list(map[METADATA_KEY].keys()):
                     if mk not in map:
                         map[mk] = map[METADATA_KEY][mk]
                         del map[METADATA_KEY][mk]
-                        _LOGGER.debug(
-                            "Section {m}.{k} moved to {k}".format(m=METADATA_KEY, k=mk)
-                        )
+                        _LOGGER.debug("Section {m}.{k} moved to {k}".
+                                      format(m=METADATA_KEY, k=mk))
                 del self[CONFIG_KEY][METADATA_KEY]
 
-        for k, v in mod_move_pairs.items():
+        for k, v in list(mod_move_pairs.items()):
             _mv_to_modifiers(self[CONFIG_KEY], k, v)
         _mv_to_root(self[CONFIG_KEY])
 
@@ -958,11 +872,13 @@ class Project(PathExAttMap):
         """
         samples = self.get_samples([sample_name])
         if len(samples) > 1:
-            _LOGGER.warning("More than one sample was detected; " "returning the first")
+            _LOGGER.warning("More than one sample was detected; "
+                            "returning the first")
         try:
             return samples[0]
         except IndexError:
-            raise ValueError("Project has no sample named {}.".format(sample_name))
+            raise ValueError("Project has no sample named {}."
+                             .format(sample_name))
 
     def get_samples(self, sample_names):
         """
@@ -972,6 +888,27 @@ class Project(PathExAttMap):
         :return list[peppy.Sample]: A list of Sample objects
         """
         return [s for s in self.samples if s[SAMPLE_NAME_ATTR] in sample_names]
+
+def _ensure_path_absolute(maybe_relpath, cfg_path):
+    """ Ensure that a possibly relative path is absolute. """
+    if not isinstance(maybe_relpath, str):
+        raise TypeError(
+            "Attempting to ensure non-text value is absolute path: {} ({})".
+                format(maybe_relpath, type(maybe_relpath)))
+    if os.path.isabs(maybe_relpath) or is_url(maybe_relpath):
+        _LOGGER.debug("Already absolute")
+        return maybe_relpath
+    # Maybe we have env vars that make the path absolute?
+    expanded = os.path.expanduser(os.path.expandvars(maybe_relpath))
+    if os.path.isabs(expanded):
+        _LOGGER.debug("Expanded: {}".format(expanded))
+        return expanded
+    # Set path to an absolute path, relative to project config.
+    config_dirpath = os.path.dirname(cfg_path)
+    _LOGGER.debug("config_dirpath: {}".format(config_dirpath))
+    abs_path = os.path.join(config_dirpath, maybe_relpath)
+    _LOGGER.debug("Expanded and/or made absolute: {}".format(abs_path))
+    return abs_path
 
 
 def infer_delimiter(filepath):
@@ -990,19 +927,17 @@ def _make_sections_absolute(object, sections, cfg_path):
         try:
             relpath = object[key]
         except KeyError:
-            _LOGGER.debug(
-                "No '{}' section in configuration file: {}".format(key, cfg_path)
-            )
+            _LOGGER.debug("No '{}' section in configuration file: {}".
+                          format(key, cfg_path))
             continue
         if relpath is None:
             continue
         _LOGGER.debug("Ensuring absolute path for '{}'".format(relpath))
         # Parsed from YAML, so small space of possible datatypes
         if isinstance(relpath, list):
-            absolute = [
-                make_abs_via_cfg(maybe_relpath, cfg_path) for maybe_relpath in relpath
-            ]
+            absolute = [_ensure_path_absolute(maybe_relpath, cfg_path)
+                        for maybe_relpath in relpath]
         else:
-            absolute = make_abs_via_cfg(relpath, cfg_path)
+            absolute = _ensure_path_absolute(relpath, cfg_path)
         _LOGGER.debug("Setting '{}' to '{}'".format(key, absolute))
         object[key] = absolute

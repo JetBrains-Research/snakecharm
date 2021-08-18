@@ -4,7 +4,10 @@ import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.QualifiedName
 import com.jetbrains.python.psi.*
+import com.jetbrains.python.psi.resolve.fromSdk
+import com.jetbrains.python.psi.resolve.resolveQualifiedName
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.PyTypeProviderBase
 import com.jetbrains.python.psi.types.TypeEvalContext
@@ -16,6 +19,7 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_PEP
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_RULES
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_ACCESSOR_CLASS
+import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
@@ -189,6 +193,23 @@ class SmkTypeProvider : PyTypeProviderBase() {
 
             SMK_VARS_WILDCARDS -> parentDeclaration?.let {
                 SmkWildcardsType(parentDeclaration)
+            }
+
+            SMK_VARS_PEP -> {
+                // Assign correct type to `pep` variable in order to get resolve/completion
+                val project = referenceExpression.project
+                val sdk = SmkSupportProjectSettings.getInstance(project).getActiveSdk()
+                if (sdk == null) {
+                    null
+                } else {
+                    val resolveContext = fromSdk(project, sdk)
+                    val pepFile = resolveQualifiedName(
+                        QualifiedName.fromDottedString("peppy.project"),
+                        resolveContext
+                    ).filterIsInstance<PyFile>().firstOrNull()
+
+                    pepFile?.findTopLevelClass("Project")?.getType(TypeEvalContext.codeCompletion(project, pepFile))
+                }
             }
             else -> null
         }
