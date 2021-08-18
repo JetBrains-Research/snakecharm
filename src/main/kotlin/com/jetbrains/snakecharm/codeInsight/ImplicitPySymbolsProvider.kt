@@ -618,7 +618,7 @@ class ImplicitPySymbolsProvider(
             usedFiles.add(workflowFile.virtualFile)
         }
         globals["workflow"] = workflowFile?.findTopLevelClass("Workflow")
-        val pepFile = collectPyFiles("peppy.project", usedFiles, sdk).firstOrNull()
+
         // Snakemake >= 6.5
         var commonFile = collectPyFiles("snakemake.common.__init__", usedFiles, sdk).firstOrNull()
         if (commonFile == null) {
@@ -634,8 +634,6 @@ class ImplicitPySymbolsProvider(
         globals[SnakemakeAPI.SMK_VARS_SCATTER] = commonFile?.findTopLevelClass("Scatter")
         globals[SnakemakeAPI.SMK_VARS_GATHER] = commonFile?.findTopLevelClass("Gather")
         globals[SnakemakeAPI.SMK_VARS_CONFIG] = null
-        val pepObject = pepFile?.findTopLevelClass("Project")
-        globals[SnakemakeAPI.SMK_VARS_PEP] = pepObject
 
         val checkpointsFile = collectPyFiles("snakemake.checkpoints", usedFiles, sdk).firstOrNull()
         if (checkpointsFile != null) {
@@ -643,6 +641,10 @@ class ImplicitPySymbolsProvider(
         }
         // TODO: do we need this ?
         globals["checkpoints"] = checkpointsFile?.findTopLevelClass("Checkpoints")
+
+        val pepFile = collectPyFiles("peppy.project", usedFiles, sdk).firstOrNull()
+        val pepObject = pepFile?.findTopLevelClass("Project")
+        globals[SnakemakeAPI.SMK_VARS_PEP] = pepObject
         elementsCache.add(
             SmkCodeInsightScope.PEP_OBJECT to SmkCompletionUtil.createPrioritizedLookupElement(
                 SnakemakeAPI.SMK_VARS_PEP,
@@ -651,6 +653,7 @@ class ImplicitPySymbolsProvider(
                 priority = SmkCompletionUtil.WORKFLOW_GLOBALS_PRIORITY
             )
         )
+
         globals.forEach { (name, psi) ->
             elementsCache.add(
                 SmkCodeInsightScope.TOP_LEVEL to SmkCompletionUtil.createPrioritizedLookupElement(
