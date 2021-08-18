@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.util.parentOfType
 import com.intellij.refactoring.suggested.endOffset
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -99,6 +100,10 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
                     is SmkRuleOrCheckpoint -> break
                     is SmkReferenceExpression -> reference = resolveResult
                     else -> {
+                        // Sometimes reference of overridden rule refer not to SmkUse
+                        // But to its node, so we need to handle this cases
+                        val useParent = resolveResult?.parentOfType<SmkUse>() ?: return
+                        useParent.getImportedRuleNames()?.forEach { handleUseReference(it, logSection) }
                         return
                     }
                 }

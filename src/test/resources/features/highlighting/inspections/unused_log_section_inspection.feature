@@ -83,6 +83,35 @@ Feature: Rule SmkUnusedLogFileInspection inspection
       | rule       | l1="foo.log"  | shell: "--log {log.l1}"       |
       | checkpoint | l1="foo.log"  | run: shell("foo ff {log[0]}") |
 
+  Scenario Outline: Warnings in 'log' section, if it is not used in rule which was overridden more than one time
+    Given a snakemake project
+    And a file "boo1.smk" with text
+    """
+    <rule_like> NAME:
+        shell: "command here"
+
+    use rule NAME as NAME2 with:
+        log: "other_log.log"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+        snakefile: "boo.smk"
+
+    use rule NAME2 from M as other_* with:
+        log: "new_other_log.log"
+    """
+    And SmkUnusedLogFileInspection inspection is enabled
+    And I expect inspection weak warning on <log: "new_other_log.log"> with message
+    """
+    Looks like a log file won't be created in rule 'NAME', because it is not referenced from 'shell' or 'run' sections
+    """
+    When I check highlighting weak warnings
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
   Scenario Outline: No warnings in 'log' section if used in wrapper
     Given a snakemake project
     Given I open a file "foo.smk" with text
