@@ -16,9 +16,8 @@ enum class SmkCodeInsightScope {
     }
 
     companion object {
-
         private fun isPep(anchor: PsiElement): Boolean =
-            anchor.text == "pep"
+            anchor.textMatches("pep")
 
         operator fun get(anchor: PsiElement) = when {
             isPep(anchor) -> PEP_OBJECT
