@@ -63,6 +63,11 @@ intellij {
     sandboxDir.set("${project.rootDir}/.sandbox${if (isPyCharm) "_pycharm" else "" }")
     ideaDependencyCachePath.set("${project.rootDir}/.idea_distrib_cache")  // Useful for Windows due to short cmdline path
 
+    //XXX: workaround: gradle plugin < 1.1.5
+    if (!file(ideaDependencyCachePath.get()).exists()) {
+        mkdir(ideaDependencyCachePath.get())
+    }
+
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
     val platformPlugins = ArrayList<String>()
     when (platformType) {
