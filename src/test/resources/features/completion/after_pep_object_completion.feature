@@ -61,7 +61,7 @@ Feature: Completion after pep object
     Given I open a file "foo.smk" with text
     """
     onstart :
-           pep."
+           pep.
     """
     When I put the caret after pep.
     And I invoke autocompletion popup
