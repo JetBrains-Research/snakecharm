@@ -27,44 +27,47 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
                 return
             }
 
-            val ruleOrCheckpointSection = expr.containingRuleOrCheckpointSection() ?: return
-            val ruleOrCheckpoint = ruleOrCheckpointSection.getParentRuleOrCheckPoint()
-            val wildcardsByRule = session.putUserDataIfAbsent(KEY, hashMapOf())
+            val ruleLikeBlock = expr.containingRuleOrCheckpointSection()?.getParentRuleOrCheckPoint() ?: return
+            val cachedWildcardsByRule = session.putUserDataIfAbsent(KEY, hashMapOf())
 
-            if (ruleOrCheckpoint !in wildcardsByRule) {
-                updateInfo(ruleOrCheckpoint, wildcardsByRule)
+            if (ruleLikeBlock !in cachedWildcardsByRule) {
+                updateInfo(ruleLikeBlock, cachedWildcardsByRule)
             }
 
-            val useReferences: MutableList<SmkRuleOrCheckpoint> = mutableListOf()
-            var appropriateWildcardInOverriddenRule = false
-            var noWildcardsInOverriddenRules = false
-            var itIsSmkUse = false
+            var inUseRuleBlock = false
+            var wildcardDefinedInAllOverriddenRules = false
+            var wildcardsCollectedInAllOverriddenRules = true
 
-            if (ruleOrCheckpoint is SmkUse) {
-                itIsSmkUse = true
+            if (ruleLikeBlock is SmkUse) {
+                inUseRuleBlock = true
+
                 // Collecting wildcards from overridden rules or checkpoints
-                ruleOrCheckpoint.getImportedRuleNames()?.forEach { collectReferences(it, useReferences) }
-                useReferences.forEach { resolveResult ->
-                    if (resolveResult !in wildcardsByRule) {
-                        updateInfo(resolveResult, wildcardsByRule)
+                val useReferences = mutableListOf<SmkRuleOrCheckpoint>()
+                ruleLikeBlock.getImportedRuleNames()?.forEach { collectReferences(it, useReferences) }
+                useReferences.forEach { targetRuleLike ->
+                    if (targetRuleLike !in cachedWildcardsByRule) {
+                        updateInfo(targetRuleLike, cachedWildcardsByRule)
                     }
-                    val wildcards = wildcardsByRule.getValue(resolveResult).get()
-                    if (wildcards != null) {
-                        appropriateWildcardInOverriddenRule = appropriateWildcardInOverriddenRule or
-                                (expr.text in wildcards)
-                    } else {
-                        noWildcardsInOverriddenRules = true
+
+                    val targetWildcards = cachedWildcardsByRule.getValue(targetRuleLike).get()
+                    when (targetWildcards) {
+                        null -> wildcardsCollectedInAllOverriddenRules = false
+                        else -> {
+                            wildcardDefinedInAllOverriddenRules = wildcardDefinedInAllOverriddenRules or
+                                    (expr.text in targetWildcards)
+                        }
                     }
                 }
             }
-            val wildcards = wildcardsByRule.getValue(ruleOrCheckpoint).get()
+
+            val wildcards = cachedWildcardsByRule.getValue(ruleLikeBlock).get()
             // If an appropriate wildcard exists
-            if ((wildcards != null && expr.text in wildcards) || appropriateWildcardInOverriddenRule) {
+            if ((wildcards != null && expr.text in wildcards) || wildcardDefinedInAllOverriddenRules) {
                 return
             }
             // If no, firstly we need to check if there are failures to wildcard collecting
             // If so, adds weak warning
-            if (wildcards == null || noWildcardsInOverriddenRules) {
+            if (wildcards == null || !wildcardsCollectedInAllOverriddenRules) {
                 // failed to parse wildcards defining sections
                 registerProblem(
                     expr,
@@ -73,9 +76,9 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
                 )
             } else {
                 // Otherwise adds an error
-                val definingSection = ruleOrCheckpoint.getWildcardDefiningSection()?.sectionKeyword
+                val definingSection = ruleLikeBlock.getWildcardDefiningSection()?.sectionKeyword
                 val message = when {
-                    itIsSmkUse -> {
+                    inUseRuleBlock -> {
                         SnakemakeBundle.message(
                             "INSP.NAME.wildcard.not.defined.in.overridden.rule",
                             expr.text
