@@ -9,7 +9,7 @@ import com.intellij.psi.util.parentOfType
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 
 class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
     companion object {
@@ -19,10 +19,10 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession
+        session: LocalInspectionToolSession,
     ) = object : SmkSLInspectionVisitor(holder, session) {
 
-        override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpressionImpl) {
+        override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpression) {
             if (!expr.isWildcard()) {
                 return
             }
@@ -100,7 +100,7 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
 
         private fun updateInfo(
             ruleOrCheckpoint: SmkRuleOrCheckpoint,
-            wildcardsByRule: HashMap<SmkRuleOrCheckpoint, Ref<List<String>>>
+            wildcardsByRule: HashMap<SmkRuleOrCheckpoint, Ref<List<String>>>,
         ) {
             val wildcardsDefiningSectionsAvailable = ruleOrCheckpoint.getSections()
                 .asSequence()

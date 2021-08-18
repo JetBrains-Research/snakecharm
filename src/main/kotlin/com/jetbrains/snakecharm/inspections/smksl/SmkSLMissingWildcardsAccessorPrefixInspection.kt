@@ -14,16 +14,16 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.stringLanguage.lang.SmkSLInjector.Companion.isInExpandCallExpression
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 
 class SmkSLMissingWildcardsAccessorPrefixInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
     ) = object : SmkSLInspectionVisitor(holder, session) {
 
-        override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpressionImpl) {
+        override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpression) {
             if (expr.isQualified) {
                 return
             }
@@ -42,7 +42,7 @@ class SmkSLMissingWildcardsAccessorPrefixInspection : SnakemakeInspection() {
             if (PsiTreeUtil.getParentOfType(host, PyLambdaExpression::class.java) != null) {
                 return
             }
-            
+
             val referencedName = expr.referencedName
             val typeEvalContext = TypeEvalContext.codeAnalysis(host.project, host.containingFile)
             val type = typeEvalContext.getType(ruleLike.wildcardsElement)
@@ -54,9 +54,9 @@ class SmkSLMissingWildcardsAccessorPrefixInspection : SnakemakeInspection() {
                         // ensure that reference isn't resolved to some other element
                         if (expr.reference.resolve() == null) {
                             registerProblem(
-                                    expr,
-                                    SnakemakeBundle.message("INSP.NAME.wildcards.prefix.missing.message"),
-                                    InsertWildcardsQuickFix(expr)
+                                expr,
+                                SnakemakeBundle.message("INSP.NAME.wildcards.prefix.missing.message"),
+                                InsertWildcardsQuickFix(expr)
                             )
                         }
                     }
@@ -66,7 +66,7 @@ class SmkSLMissingWildcardsAccessorPrefixInspection : SnakemakeInspection() {
     }
 }
 
-class InsertWildcardsQuickFix(expr: SmkSLReferenceExpressionImpl) : LocalQuickFixOnPsiElement(expr) {
+class InsertWildcardsQuickFix(expr: SmkSLReferenceExpression) : LocalQuickFixOnPsiElement(expr) {
     override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.add.wildcards.prefix")
 
     override fun getText() = familyName
