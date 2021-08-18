@@ -154,7 +154,7 @@ Feature: Inspection: Unresolved element
      """
     When I check highlighting warnings
 
-  Scenario Outline: Know objects not marked as unresolved
+  Scenario Outline: Implicit variables not marked as unresolved
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
