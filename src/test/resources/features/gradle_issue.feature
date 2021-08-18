@@ -5,6 +5,9 @@ Feature: Demo of wrong sandbox directory
   1. install `cucumber for java' IDEA plugin
   2. checkout `experimental/gradle_issue` branch, project https://github.com/JetBrains-Research/snakecharm/
   3. create new project from existing sources in IDEA, choose import from gradle option
+    - change 'cucumber for java' template defaults: add system properties to `VM optiopns`:
+        -Didea.config.path=$PROJECT_DIR$/.sandbox_pycharm/config-test -Didea.system.path=$PROJECT_DIR$/.sandbox_pycharm/system-test -Didea.plugins.path=$PROJECT_DIR$/.sandbox_pycharm/plugins-test
+        
   4. Ok sandbox example
      - Run 'tests' gradle task
      Sandbox is expected directory according to debug log:
