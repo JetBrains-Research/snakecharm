@@ -29,15 +29,17 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
 
             val ruleOrCheckpointSection = expr.containingRuleOrCheckpointSection() ?: return
             val ruleOrCheckpoint = ruleOrCheckpointSection.getParentRuleOrCheckPoint()
+            val wildcardsByRule = session.putUserDataIfAbsent(KEY, hashMapOf())
+
+            if (ruleOrCheckpoint !in wildcardsByRule) {
+                updateInfo(ruleOrCheckpoint, wildcardsByRule)
+            }
+
             val useReferences: MutableList<SmkRuleOrCheckpoint> = mutableListOf()
             var appropriateWildcardInOverriddenRule = false
             var noWildcardsInOverriddenRules = false
             var itIsSmkUse = false
 
-            val wildcardsByRule = session.putUserDataIfAbsent(KEY, hashMapOf())
-            if (ruleOrCheckpoint !in wildcardsByRule) {
-                updateInfo(ruleOrCheckpoint, wildcardsByRule)
-            }
             if (ruleOrCheckpoint is SmkUse) {
                 itIsSmkUse = true
                 // Collecting wildcards from overridden rules or checkpoints
