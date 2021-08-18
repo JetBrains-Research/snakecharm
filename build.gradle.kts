@@ -165,6 +165,11 @@ tasks {
             javaexec {
                 main = "io.cucumber.core.cli.Main"
                 classpath =  project.sourceSets.test.get().runtimeClasspath
+                systemProperties(
+                    "idea.config.path" to "${intellij.sandboxDir.get()}/config-test",
+                    "idea.system.path" to "${intellij.sandboxDir.get()}/system-test",
+                    "idea.plugins.path" to "${intellij.sandboxDir.get()}/plugins-test"
+                )
                 args = listOf(
                     "--plugin", "pretty", "--glue", "features.glue", "--tags", "not @ignore", "src/test/resources"
                 )
