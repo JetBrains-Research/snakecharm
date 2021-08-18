@@ -72,6 +72,10 @@ intellij {
     }
     platformPlugins.addAll(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
     plugins.set(platformPlugins)
+
+    logger.warn("Is PyCharm: ${isPyCharm}")
+    logger.warn("Plugin sandbox: ${sandboxDir.get()}, property: ${sandboxDir}")
+    logger.warn("Plugin ideaDependencyCachePath: ${ideaDependencyCachePath.get()}, property: ${ideaDependencyCachePath}")
 }
 
 // Configure gradle-changelog-plugin plugin.
@@ -167,6 +171,22 @@ tasks {
         }
     }
 
+    register("cucumber_gradle_demo") {
+        // Cucumber tests are executed using `AllCucumberFeaturesTest` JUnit runner
+        // this task is an alternative if `AllCucumberFeaturesTest` stop working for
+        // some reason, normally we don't need this
+        dependsOn("assemble", "compileTestKotlin")
+        doLast {
+            javaexec {
+                main = "io.cucumber.core.cli.Main"
+                classpath =  project.sourceSets.test.get().runtimeClasspath
+                args = listOf(
+                    "--plugin", "pretty", "--glue", "features.glue", "--tags", "@gradle_demo", "src/test/resources"
+                )
+            }
+        }
+    }
+
     register("buildWrappersBundle") {
         dependsOn("compileKotlin", "compileJava")
         doLast {
@@ -220,8 +240,8 @@ tasks {
             html.isEnabled = false
         }
 
-        include("**/*Test.class")
-//        include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
+//        include("**/*Test.class")
+        include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
 //        include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
     }
 }

@@ -3,6 +3,7 @@ package features.glue
 import com.intellij.codeInspection.LocalInspectionEP
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Disposer
@@ -127,7 +128,7 @@ class StepDefs {
         // XXX: Sometimes have to clean it manually:
         //  * When running as gradle task: see ~/.sandbox_pycharm/sytem-test
         //  * When running from *.feature file (IDE run conf): see smth like ~/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.pycharm/pycharmPC/2021.1/168dc60fb44a67e1fdfa63e0376b79725178c2df/pycharmPC-2021.1
-        // println("Caches: ${PathManager.getIndexRoot()}")
+         println("Caches: ${PathManager.getIndexRoot()}")
 
         // XXX: Post Startup activities should end before this if everything goes OK
         SnakemakeWorld.myInjectionFixture = InjectionTestFixture(SnakemakeWorld.fixture())
