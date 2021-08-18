@@ -41,7 +41,7 @@ class SMKPepObjectCompletionProvider : CompletionProvider<CompletionParameters>(
         val project = parameters.originalFile.project
         val cache = ImplicitPySymbolsProvider.instance(project).cache
         val processor = SmkCompletionVariantsProcessor(contextElement)
-        cache[SmkCodeInsightScope.PEP_SECTION].forEach { symbol ->
+        cache[SmkCodeInsightScope.PEP_OBJECT].forEach { symbol ->
             processor.addElement(symbol.identifier, symbol.psiDeclaration)
         }
         result.addAllElements(processor.resultList)

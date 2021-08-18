@@ -143,7 +143,7 @@ class ImplicitPySymbolsProvider(
         collectClassInstanceMethods(
             listOf(
                 "peppy.project" to "Project"
-            ), SmkCodeInsightScope.PEP_SECTION, usedFiles, sdk, elementsCache
+            ), SmkCodeInsightScope.PEP_OBJECT, usedFiles, sdk, elementsCache
         )
         progressIndicator?.checkCanceled()
 
@@ -644,7 +644,7 @@ class ImplicitPySymbolsProvider(
         // TODO: do we need this ?
         globals["checkpoints"] = checkpointsFile?.findTopLevelClass("Checkpoints")
         elementsCache.add(
-            SmkCodeInsightScope.PEP_SECTION to SmkCompletionUtil.createPrioritizedLookupElement(
+            SmkCodeInsightScope.PEP_OBJECT to SmkCompletionUtil.createPrioritizedLookupElement(
                 SnakemakeAPI.SMK_VARS_PEP,
                 pepObject,
                 typeText = SnakemakeBundle.message("TYPES.pep.object.type.text"),
