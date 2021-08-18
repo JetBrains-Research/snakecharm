@@ -33,10 +33,25 @@ Feature: Resolve after pep object
     When I put the caret after pep.
     Then reference should resolve to "<property>" in "project.py"
     Examples:
-      | property            | section |
-      | config_file         | section |
-      | samples             | run     |
-      | sample_name_colname | onstart |
+      | property    | section |
+      | config_file | section |
+      | samples     | run     |
+
+  Scenario Outline: Resolve in "onstart" section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    onstart :
+           pep.<property>"
+    """
+    When I put the caret after pep.
+    And I invoke autocompletion popup
+    Then reference should resolve to "<property>" in "project.py"
+    Examples:
+      | property      |
+      | amendments      |
+      | list_amendments |
+      | config          |
 
   Scenario Outline: Resolve in injections
     Given a snakemake project

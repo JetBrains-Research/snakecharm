@@ -36,7 +36,6 @@ Feature: Completion after pep object
       | section | property        |
       | section | amendments      |
       | run     | list_amendments |
-      | onstart | config          |
 
   Scenario Outline: Complete in injections
     Given a snakemake project
@@ -56,6 +55,20 @@ Feature: Completion after pep object
       | rule       | shell   |
       | rule       | message |
       | checkpoint | shell   |
+
+  Scenario: Complete in "onstart" section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    onstart :
+           pep."
+    """
+    When I put the caret after pep.
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | amendments      |
+      | list_amendments |
+      | config          |
 
   Scenario Outline: No completion in injections for wildcards expanding/defining sections
     Given a snakemake project
