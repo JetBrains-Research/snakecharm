@@ -5,6 +5,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.psi.PsiManager
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.util.ProcessingContext
@@ -19,7 +20,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import org.jetbrains.yaml.psi.YAMLFile
 
-class SmkPepConfigType(private val smkFile: SmkFile) : PyType {
+class SmkPepConfigType(smkFile: SmkFile) : PyType {
     override fun resolveMember(
         name: String,
         location: PyExpression?,
@@ -42,25 +43,23 @@ class SmkPepConfigType(private val smkFile: SmkFile) : PyType {
         completionPrefix: String?,
         location: PsiElement?,
         context: ProcessingContext?
-    ): Array<LookupElement> {
-        return sectionArgs.map {
-            LookupElementBuilder
-                .create(it.text)
-        }.toTypedArray()
-
-    }
+    ): Array<LookupElement> = sectionArgs.map {
+        LookupElementBuilder
+            .create(it.text)
+    }.toTypedArray()
 
     private val sectionArgs = getYamlKeys(getYamlFile(smkFile))
 
-    override fun getName(): String? {
-        return "pep.config"
-    }
+    override fun getName(): String = "pep.config"
 
-    override fun isBuiltin(): Boolean {
-        return false
-    }
+    override fun isBuiltin(): Boolean = false
 
     override fun assertValid(message: String?) {
+        sectionArgs.forEach {
+            if (!it.isValid) {
+                throw PsiInvalidElementAccessException(it, message)
+            }
+        }
     }
 
     companion object {
