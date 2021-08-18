@@ -153,3 +153,18 @@ Feature: Inspection: Unresolved element
      Unresolved reference '{2}/boo.yaml'
      """
     When I check highlighting warnings
+
+  Scenario Outline: Know objects not marked as unresolved
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <object>
+    """
+    And PyUnresolvedReferencesInspection inspection is enabled
+    Then I expect no inspection errors
+    When I check highlighting errors
+    Examples:
+      | object |
+      | pep    |
+      | config |
+

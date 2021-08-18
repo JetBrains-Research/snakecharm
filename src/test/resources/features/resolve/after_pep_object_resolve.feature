@@ -1,14 +1,16 @@
-Feature: Completion after pep object
+Feature: Resolve after pep object
 
-  Scenario: Complete at toplevel
+  Scenario Outline: Resolve at toplevel
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    pep.
+    pep.<property>
     """
     When I put the caret after pep.
-    And I invoke autocompletion popup
-    Then completion list should contain:
+    Then reference should resolve to "<property>" in "project.py"
+
+    Examples:
+      | property                   |
       | __init__                   |
       | create_samples             |
       | _reinit                    |
@@ -44,84 +46,50 @@ Feature: Completion after pep object
       | get_sample                 |
       | get_samples                |
 
-  Scenario: Complete inside rule
+  Scenario Outline: Resolve inside rule
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
     rule Name:
       section:
-        pep.
+        pep.<property>
     """
     When I put the caret after pep.
-    And I invoke autocompletion popup
-    Then completion list should contain:
+    Then reference should resolve to "<property>" in "project.py"
+    Examples:
+      | property       |
       | __init__       |
       | create_samples |
       | _reinit        |
 
-  Scenario Outline: Complete in injections
+  Scenario Outline: Resolve in injections
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-           <section>: "{pep.}"
+           <section>: "{pep.<property>}"
     """
     When I put the caret after pep.
-    And I invoke autocompletion popup
-    Then completion list should contain:
-      | __init__   |
-      | config     |
-      | get_sample |
+    Then reference should resolve to "<property>" in "project.py"
     Examples:
-      | rule_like  | section |
-      | rule       | shell   |
-      | rule       | message |
-      | checkpoint | shell   |
+      | rule_like  | section | property   |
+      | rule       | shell   | __init__   |
+      | rule       | message | config     |
+      | checkpoint | shell   | get_sample |
 
-  Scenario Outline: No completion in injections for wildcards expanding/defining sections
+  Scenario Outline: No resolve in injections for wildcards expanding/defining sections
     Given a snakemake project
     Given I open a file "foo.smk" with text
         """
         <rule_like> NAME:
-           <section>: "{pep.}"
+           <section>: "{pep.<property>}"
         """
     When I put the caret after pep.
-    And I invoke autocompletion popup
-    Then completion list shouldn't contain:
-      | __init__       |
-      | create_samples |
-      | _reinit        |
-
+    Then reference should not resolve
     Examples:
-      | rule_like  | section |
-      | rule       | input   |
-      | rule       | output  |
-      | rule       | log     |
-      | checkpoint | input   |
+      | rule_like  | section | property                |
+      | rule       | input   | __init__                |
+      | rule       | output  | config                  |
+      | rule       | log     | get_sample              |
+      | checkpoint | input   | _get_table_from_samples |
 
-  Scenario: Complete in not-empty context
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-     """
-     pep.c
-     """
-    When I put the caret after pep.c
-    And I invoke autocompletion popup
-    Then completion list should contain:
-      | config |
-
-  Scenario Outline: Parenthesis inserted after method completion
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-      """
-      pep.
-      """
-    When I put the caret after pep.
-    Then I invoke autocompletion popup, select "<item>" lookup item and see a text:
-      """
-      pep.<inserted_text>
-      """
-    Examples:
-      | item        | inserted_text |
-      | config      | config        |
-      | get_samples | get_samples() |

@@ -635,6 +635,7 @@ class ImplicitPySymbolsProvider(
         globals[SnakemakeAPI.SMK_VARS_GATHER] = commonFile?.findTopLevelClass("Gather")
         globals[SnakemakeAPI.SMK_VARS_CONFIG] = null
         val pepObject = pepFile?.findTopLevelClass("Project")
+        globals[SnakemakeAPI.SMK_VARS_PEP] = pepObject
 
         val checkpointsFile = collectPyFiles("snakemake.checkpoints", usedFiles, sdk).firstOrNull()
         if (checkpointsFile != null) {
