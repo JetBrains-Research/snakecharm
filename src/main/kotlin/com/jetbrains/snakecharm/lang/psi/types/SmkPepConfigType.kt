@@ -8,6 +8,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.psi.PsiManager
 import com.intellij.psi.impl.source.tree.LeafPsiElement
+import com.intellij.psi.util.elementType
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PyExpression
@@ -20,6 +21,9 @@ import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import kotlinx.serialization.modules.EmptySerializersModule
 import org.jetbrains.yaml.psi.YAMLFile
+import org.jetbrains.yaml.psi.YAMLScalarText
+import org.jetbrains.yaml.psi.impl.YAMLMappingImpl
+import org.jetbrains.yaml.psi.impl.YAMLPlainTextImpl
 
 class SmkPepConfigType(smkFile: SmkFile) : PyType {
     override fun resolveMember(
@@ -33,9 +37,9 @@ class SmkPepConfigType(smkFile: SmkFile) : PyType {
         }
         val resolveResult = ResolveResultList()
         sectionArgs
-            .filter { it.text == name }
+            .filter { it.second == name }
             .forEach {
-                resolveResult.poke(it, SmkResolveUtil.RATE_NORMAL)
+                resolveResult.poke(it.first, SmkResolveUtil.RATE_NORMAL)
             }
         return resolveResult
     }
@@ -46,7 +50,7 @@ class SmkPepConfigType(smkFile: SmkFile) : PyType {
         context: ProcessingContext?
     ): Array<LookupElement> = sectionArgs.map {
         LookupElementBuilder
-            .create(it.text)
+            .create(it.second)
     }.toTypedArray()
 
     private val sectionArgs = getYamlKeys(getYamlFile(smkFile))
@@ -57,20 +61,28 @@ class SmkPepConfigType(smkFile: SmkFile) : PyType {
 
     override fun assertValid(message: String?) {
         sectionArgs.forEach {
-            if (!it.isValid) {
-                throw PsiInvalidElementAccessException(it, message)
+            if (!it.first.isValid) {
+                throw PsiInvalidElementAccessException(it.first, message)
             }
         }
     }
 
     companion object {
-        private fun getYamlKeys(yamlFile: PsiFile?): List<PsiElement> {
+        private fun getYamlKeys(yamlFile: PsiFile?): List<Pair<PsiElement, String>> {
             if (yamlFile == null) return emptyList()
             val ymlFile = yamlFile as YAMLFile
-            val completionList = mutableListOf<PsiElement>()
+            val completionList = mutableListOf<Pair<PsiElement, String>>()
             ymlFile.documents.forEach { document ->
-                document.topLevelValue?.children?.forEach { child ->
-                    completionList.add(child.firstChild)
+                document.topLevelValue?.children?.asSequence()?.filter { child ->
+                    // We can't refer to foo: boo: key
+                    child.lastChild !is YAMLMappingImpl
+                }?.forEach { child ->
+                    completionList.add(
+                        // In Yaml file can be key like {foo.boo: }, we can refer to this section
+                        // like pep.config.foo, but not pep.config.foo.boo
+                        child.firstChild to
+                                child.firstChild.text.substringBefore('.')
+                    )
                 }
             }
             return completionList

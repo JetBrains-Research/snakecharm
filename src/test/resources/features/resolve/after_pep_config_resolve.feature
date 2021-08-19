@@ -19,6 +19,41 @@ Feature: Resolve after pep.config
       | custom_key1 |
       | custom_key2 |
 
+  Scenario Outline: Not resolve to mapping keys
+    Given a snakemake project
+    Given I open a file "config.yaml" with text
+    """
+    custom_key1:
+     custom_key2:
+      value
+    """
+    Given I open a file "foo.smk" with text
+    """
+    pepfile: "config.yaml"
+    pep.config.<key>
+    """
+    When I put the caret after pep.config.
+    Then reference should not resolve
+    Examples:
+      | key         |
+      | custom_key1 |
+      | custom_key2 |
+
+  Scenario: Resolve to key before dot
+    Given a snakemake project
+    Given I open a file "config.yaml" with text
+    """
+    custom_key1.custom_key2: value
+    custom_key3: value
+    """
+    Given I open a file "foo.smk" with text
+    """
+    pepfile: "config.yaml"
+    pep.config.custom_key1
+    """
+    When I put the caret after pep.config.
+    Then reference should resolve to "custom_key1" in "config.yaml"
+
   Scenario Outline: Resolve inside rule
     Given a snakemake project
     Given I open a file "config.yaml" with text

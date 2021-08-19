@@ -19,6 +19,47 @@ Feature: Completion after pep.config
       | custom_key2 |
 
 
+  Scenario: Not complete mapping keys
+    Given a snakemake project
+    Given I open a file "config.yaml" with text
+    """
+    custom_key1:
+     custom_key2:
+      value
+    """
+    Given I open a file "foo.smk" with text
+    """
+    pepfile: "config.yaml"
+    pep.config.
+    """
+    When I put the caret after pep.config.
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | custom_key1             |
+      | custom_key2             |
+      | custom_key1:custom_key2 |
+
+  Scenario: Complete key before dot
+    Given a snakemake project
+    Given I open a file "config.yaml" with text
+    """
+    custom_key1.custom_key2: value
+    custom_key3: value
+    """
+      Given I open a file "foo.smk" with text
+    """
+    pepfile: "config.yaml"
+    pep.config.
+    """
+    When I put the caret after pep.config.
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | custom_key1 |
+      | custom_key3 |
+    And completion list shouldn't contain:
+      | custom_key1.custom_key2 |
+
+
   Scenario Outline: Complete inside rule
     Given a snakemake project
     Given I open a file "config.yaml" with text
