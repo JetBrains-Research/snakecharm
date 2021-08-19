@@ -18,6 +18,7 @@ import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
+import kotlinx.serialization.modules.EmptySerializersModule
 import org.jetbrains.yaml.psi.YAMLFile
 
 class SmkPepConfigType(smkFile: SmkFile) : PyType {
@@ -63,24 +64,26 @@ class SmkPepConfigType(smkFile: SmkFile) : PyType {
     }
 
     companion object {
-        private fun getYamlKeys(yamlFile: PsiFile): List<PsiElement> {
+        private fun getYamlKeys(yamlFile: PsiFile?): List<PsiElement> {
+            if (yamlFile == null) return emptyList()
             val ymlFile = yamlFile as YAMLFile
             val completionList = mutableListOf<PsiElement>()
             ymlFile.documents.forEach { document ->
-                document.topLevelValue!!.children.forEach { child ->
+                document.topLevelValue?.children?.forEach { child ->
                     completionList.add(child.firstChild)
                 }
             }
             return completionList
         }
 
-        private fun getYamlFile(smkFile: SmkFile): PsiFile {
-            val psiElement = smkFile.findPepfile()!!.getSectionKeywordNode() as LeafPsiElement
+        private fun getYamlFile(smkFile: SmkFile): PsiFile? {
+            val pepFileSection = smkFile.findPepfile() ?: return null
+            val psiElement = pepFileSection.getSectionKeywordNode() as LeafPsiElement
             val virtualFile =
                 ProjectRootManager.getInstance(psiElement.project).contentRoots.firstNotNullOfOrNull { root ->
                     root.findFileByRelativePath(psiElement.nextSibling.lastChild.text.trim('"'))
-                }
-            return PsiManager.getInstance(psiElement.project).findFile(virtualFile!!)!!
+                } ?: return null
+            return PsiManager.getInstance(psiElement.project).findFile(virtualFile)
         }
     }
 }
