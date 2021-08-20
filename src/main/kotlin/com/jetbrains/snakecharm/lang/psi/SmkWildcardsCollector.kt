@@ -24,7 +24,7 @@ class SmkWildcardsCollector(
     private val visitDefiningSections: Boolean,
     private val visitExpandingSections: Boolean,
     private val visitAllSections: Boolean = false,
-    private val advanceVisitUseSection: Boolean = false
+    private val advanceVisitUseSection: Boolean = true
 ) : SmkElementVisitor, PyRecursiveElementVisitor() {
     private val wildcardsElements = mutableListOf<WildcardDescriptor>()
     private var atLeastOneInjectionVisited = false

@@ -115,7 +115,8 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
                     // defining sections and ensure that defining sections could be parsed
                     val collector = SmkWildcardsCollector(
                         visitDefiningSections = true,
-                        visitExpandingSections = false
+                        visitExpandingSections = false,
+                        advanceVisitUseSection = false
                     )
                     ruleOrCheckpoint.accept(collector)
                     collector.getWildcardsNames()

@@ -68,7 +68,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
 
   Scenario Outline: Missing wildcards in several overridden rules
     Given a snakemake project
-    And a file "boo1.smk" with text
+    And a file "boo.smk" with text
     """
     <rule_like> NAME1:
         input: "{sample1}.in"
@@ -79,7 +79,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     <rule_like> NAME2:
         input: "{sample2}.in"
         output: "{sample2}.out"
-        benchmark: "{sample}2.out"
+        benchmark: "{sample2}.out"
         shell: "touch {output}"
     """
     Given I open a file "foo.smk" with text

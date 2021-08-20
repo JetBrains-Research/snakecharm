@@ -38,8 +38,7 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
                     // defining sections and ensure that defining sections could be parsed
                     val collector = SmkWildcardsCollector(
                         visitDefiningSections = true,
-                        visitExpandingSections = false,
-                        advanceVisitUseSection = true
+                        visitExpandingSections = false
                     )
                     ruleOrCheckpoint.accept(collector)
                     wildcardsRef = Ref.create(collector.getWildcardsNames())
