@@ -4,7 +4,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
-      <rule_like> NAME:
+      <rule_like> NAME <addition>:
         log:
           log1 = "{a}.log1",
           log2 = "{a}/{b}.log2",
@@ -32,6 +32,74 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     And I expect inspection error on <"{b}.{c}"> with message
       """
       Missing wildcards: 'a'.
+      """
+    When I check highlighting errors
+    Examples:
+      | rule_like  | addition      |
+      | rule       |               |
+      | checkpoint |               |
+      | use rule   | as NAME2 with |
+
+  Scenario Outline: Missing wildcards in overridden rule
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        input: "{sample}.in"
+        output: "{sample}.out"
+        benchmark: "{sample}.out"
+        shell: "touch {output}"
+
+      use rule NAME as NAME2 with:
+        output:
+          "{sample1}.out1"
+        input: "{sample}.in"
+      """
+    And SmkNotSameWildcardsSetInspection inspection is enabled
+    Then I expect inspection error on <"{sample1}.out1"> with message
+      """
+      Missing wildcards: 'sample'.
+      """
+    When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Missing wildcards in several overridden rules
+    Given a snakemake project
+    And a file "boo1.smk" with text
+    """
+    <rule_like> NAME1:
+        input: "{sample1}.in"
+        output: "{sample1}.out"
+        benchmark: "{sample1}.out"
+        shell: "touch {output}"
+
+    <rule_like> NAME2:
+        input: "{sample2}.in"
+        output: "{sample2}.out"
+        benchmark: "{sample}2.out"
+        shell: "touch {output}"
+    """
+    Given I open a file "foo.smk" with text
+      """
+      module M:
+        snakefile: "boo.smk"
+
+      use rule NAME1,NAME2 from M as other_* with:
+        output:
+          "{sample1}.out1"
+        log: "{sample2}"
+      """
+    And SmkNotSameWildcardsSetInspection inspection is enabled
+    Then I expect inspection error on <"{sample1}.out1"> with message
+      """
+      Missing wildcards: 'sample2'.
+      """
+    Then I expect inspection error on <log: "{sample2}"> with message
+      """
+      Missing wildcards: 'sample1'.
       """
     When I check highlighting errors
     Examples:

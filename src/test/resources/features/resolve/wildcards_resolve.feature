@@ -7,8 +7,13 @@ Feature: Resolve wildcards in SnakemakeSL
     <rule_like> NAME:
         input: "{foo}"
         output: "{foo} here"
+
+    use rule NAME as NAME2 with:
+        log: "{foo}"
     """
     When I put the caret after input: "{fo
+    Then reference in injection should resolve to "foo" in context "foo} here" in file "foo.smk"
+    When I put the caret after log: "{fo
     Then reference in injection should resolve to "foo" in context "foo} here" in file "foo.smk"
     Examples:
       | rule_like  |
@@ -24,9 +29,64 @@ Feature: Resolve wildcards in SnakemakeSL
         output: "{foo}"
         wildcard_constraints:
           foo=""
+
+    use rule NAME as NAME2 with:
+        log: "{foo}"
     """
     When I put the caret after input: "{fo
     Then reference in injection should resolve to "foo=""" in "foo.smk"
+    When I put the caret after log: "{fo
+    Then reference in injection should resolve to "foo=""" in "foo.smk"
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Resolve to wildcard constraints in rule in case of overridden rules
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <rule_like> A:
+        wildcard_constraints:
+           foo4=""
+
+    <rule_like> B:
+        wildcard_constraints:
+           foo3=""
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+        snakefile: "boo.smk"
+
+    <rule_like> NAME:
+        wildcard_constraints:
+          foo5=""
+
+    use rule NAME as NAME2 with:
+        wildcard_constraints:
+          foo2=""
+
+    use rule NAME2 as NAME3 with:
+        log: "{foo2}"
+
+    use rule A,B from M as new_* with:
+        input: "{foo3}"
+
+    use rule new_A as new_new_b with:
+        output: "{foo4}"
+
+    use rule NAME2 as bbbb with:
+        benchmark: "{foo5}"
+    """
+    When I put the caret after log: "{fo
+    Then reference in injection should resolve to "foo2=""" in "foo.smk"
+    When I put the caret after input: "{fo
+    Then reference in injection should resolve to "foo3=""" in "boo.smk"
+    When I put the caret after output: "{fo
+    Then reference in injection should resolve to "foo4=""" in "boo.smk"
+    When I put the caret after benchmark: "{fo
+    Then reference in injection should resolve to "foo5=""" in "foo.smk"
     Examples:
       | rule_like  |
       | rule       |
@@ -96,8 +156,13 @@ Feature: Resolve wildcards in SnakemakeSL
         output: "{foo}"
         wildcard_constraints:
           foo=""
+
+    use rule NAME as NAME2 with:
+      log: "{foo}"
     """
     When I put the caret after output: "{fo
+    Then reference in injection should resolve to "foo="\d+"" in "foo.smk"
+    When I put the caret after log: "{fo
     Then reference in injection should resolve to "foo="\d+"" in "foo.smk"
     Examples:
       | rule_like  |
@@ -135,6 +200,32 @@ Feature: Resolve wildcards in SnakemakeSL
          shell: "{wildcards.prefix}"
      """
     When I put the caret after wildcards.pref
+    Then there should be no reference
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Do not resolve into use rule which is not overridden
+    Given a snakemake project
+    And a file "boo1.smk" with text
+    """
+    <rule_like> A:
+      output: "{foo}"
+
+    <rule_like> B:
+    """
+    Given I open a file "foo.smk" with text
+     """
+     module M:
+        snakefile: "boo.smk"
+
+     use rule A, B from M as other_*
+
+     use rule other_B as new_other_B:
+        input: "{foo}"
+     """
+    When I put the caret after input: "{fo
     Then there should be no reference
     Examples:
       | rule_like  |

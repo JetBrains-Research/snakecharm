@@ -156,7 +156,7 @@ Feature: Inspection: SmkWildcardNotDefinedInspection
     module M:
       snakefile: "boo.smk"
 
-    use rule NAME,NAME1 from M as new_*
+    use rule NAME,NAME1 from M as new_* with:
 
     use rule new_NAME1 as name_one with:
       input: "{sample}"
@@ -168,9 +168,11 @@ Feature: Inspection: SmkWildcardNotDefinedInspection
     """
     When I check highlighting errors
     Examples:
-      | section    | text   |
-      | rule       | {file} |
-      | checkpoint | {file} |
+      | section    | text   | section |
+      | rule       | {file} | log     |
+      | rule       | {file} | output  |
+      | checkpoint | {file} | log     |
+      | checkpoint | {file} | output  |
 
   Scenario Outline: Cannot parse wildcard defining section in overridden rule or checkpoint
     Given a snakemake project

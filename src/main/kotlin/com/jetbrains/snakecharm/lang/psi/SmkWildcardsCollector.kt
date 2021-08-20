@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.parentOfType
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_BANNED_FOR_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
@@ -23,6 +24,7 @@ class SmkWildcardsCollector(
     private val visitDefiningSections: Boolean,
     private val visitExpandingSections: Boolean,
     private val visitAllSections: Boolean = false,
+    private val advanceVisitUseSection: Boolean = false
 ) : SmkElementVisitor, PyRecursiveElementVisitor() {
     private val wildcardsElements = mutableListOf<WildcardDescriptor>()
     private var atLeastOneInjectionVisited = false
@@ -54,11 +56,19 @@ class SmkWildcardsCollector(
     }
 
     override fun visitSmkUse(use: SmkUse) {
-        use.getImportedRuleNames()?.forEach {
-            when (val resolveResult = it.reference.resolve()) {
-                is SmkRule -> super.visitSmkRule(resolveResult)
-                is SmkCheckPoint -> super.visitSmkCheckPoint(resolveResult)
-                is SmkUse -> visitSmkUse(resolveResult)
+        if (advanceVisitUseSection) {
+            use.getImportedRuleNames()?.forEach { smkReferenceExpression ->
+                var resolveResult = smkReferenceExpression.reference.resolve()
+                while (resolveResult is SmkReferenceExpression) {
+                    resolveResult.parentOfType<SmkUse>()?.also { super.visitSmkUse(it) }
+                    resolveResult = resolveResult.reference.resolve()
+                }
+                when (resolveResult) {
+                    is SmkRule -> super.visitSmkRule(resolveResult)
+                    is SmkCheckPoint -> super.visitSmkCheckPoint(resolveResult)
+                    is SmkUse -> visitSmkUse(resolveResult)
+                    else -> resolveResult?.parentOfType<SmkUse>()?.also { super.visitSmkUse(it) }
+                }
             }
         }
         super.visitSmkUse(use)

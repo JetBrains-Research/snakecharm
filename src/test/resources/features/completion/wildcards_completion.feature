@@ -19,8 +19,12 @@ Feature: Completion for wildcards
       cwl: "{non-wildcard2}"
       script: "{non-wildcard3}"
       shell: "{non-wildcard4}"
+
+
+    use rule NAME as NAME2 with:
+      input: "use{}"
     """
-    When I put the caret after input: "{
+    When I put the caret after input: "<addition>{
     And I invoke autocompletion popup
     Then completion list should contain:
       # wildcards defining:
@@ -40,9 +44,11 @@ Feature: Completion for wildcards
       | non-wildcard8 |
       | non-wildcard9 |
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | addition |
+      | rule       |          |
+      | rule       | use      |
+      | checkpoint |          |
+      | checkpoint | use      |
 
   Scenario Outline: Wildcards are collected from all appropriate injections
     Given a snakemake project
@@ -54,8 +60,11 @@ Feature: Completion for wildcards
           "{wildcard6}" '{wildcard7}' f"{{wildcard8}}"
           kwd="{wildcard6}"
       input: "{}"
+
+    use rule NAME as NAME2 with:
+      input: "use{}"
     """
-    When I put the caret after input: "{
+    When I put the caret after input: "<addition>{
     And I invoke autocompletion popup
     Then completion list should contain:
       | wildcard1 |
@@ -69,9 +78,11 @@ Feature: Completion for wildcards
       | wildcard2 |
 
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | addition |
+      | rule       |          |
+      | rule       | use      |
+      | checkpoint |          |
+      | checkpoint | use      |
 
   Scenario Outline: Wildcards are collected only from a parent rule
     Given a snakemake project
@@ -102,6 +113,9 @@ Feature: Completion for wildcards
     <rule_like> NAME:
       output: "{wildcard}"
       input: "{}"
+
+    use rule NAME as NAME2 with:
+      log: "{}"
     """
     When I put the caret after input: "{
     Then I invoke autocompletion popup, select "wildcard" lookup item and see a text:
@@ -109,6 +123,19 @@ Feature: Completion for wildcards
     <rule_like> NAME:
       output: "{wildcard}"
       input: "{wildcard}"
+
+    use rule NAME as NAME2 with:
+      log: "{}"
+    """
+    When I put the caret after log: "{
+    Then I invoke autocompletion popup, select "wildcard" lookup item and see a text:
+    """
+    <rule_like> NAME:
+      output: "{wildcard}"
+      input: "{wildcard}"
+
+    use rule NAME as NAME2 with:
+      log: "{wildcard}"
     """
     Examples:
       | rule_like  |

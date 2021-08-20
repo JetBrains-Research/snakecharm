@@ -4,9 +4,11 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PyExpression
+import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyStructuralType
@@ -31,19 +33,19 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
             return@lazy null
         }
         val collector = SmkWildcardsCollector(
-                visitDefiningSections = true,
-                // do not affect completion / resolve if output section cannot be parsed
-                visitExpandingSections = true
+            visitDefiningSections = true,
+            // do not affect completion / resolve if output section cannot be parsed
+            visitExpandingSections = true
         )
         ruleOrCheckpoint.accept(collector)
 
         collector.getWildcards()
-                ?.asSequence()
-                ?.sortedBy { it.definingSectionRate }
-                ?.distinctBy { it.text }
-                ?.toList()
+            ?.asSequence()
+            ?.sortedBy { it.definingSectionRate }
+            ?.distinctBy { it.text }
+            ?.toList()
     }
-    
+
     override fun getName() = typeName
 
     override fun assertValid(message: String?) {
@@ -53,19 +55,18 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
     }
 
     override fun resolveMember(
-            name: String,
-            location: PyExpression?,
-            direction: AccessDirection,
-            resolveContext: PyResolveContext
+        name: String,
+        location: PyExpression?,
+        direction: AccessDirection,
+        resolveContext: PyResolveContext
     ): List<RatedResolveResult> {
         if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location)) {
             return emptyList()
         }
 
         val resolveResult =
-                resolveToFileWildcardConstraintsKwarg(name) ?:
-                resolveToRuleWildcardConstraintsKwarg(name) ?:
-                resolveToFirstDeclaration(name)
+            resolveToFileWildcardConstraintsKwarg(name) ?: resolveToRuleWildcardConstraintsKwarg(name)
+            ?: resolveToFirstDeclaration(name)
 
         // if not empty result
         if (resolveResult != null) {
@@ -76,7 +77,7 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
     }
 
     override fun resolveMemberByIndex(
-            idx: Int, location: PyExpression?, direction: AccessDirection, resolveContext: PyResolveContext
+        idx: Int, location: PyExpression?, direction: AccessDirection, resolveContext: PyResolveContext
     ): List<RatedResolveResult> = emptyList() // not supported
 
     /**
@@ -84,35 +85,80 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
      */
     override fun getPositionArgsPreviews(location: PsiElement): List<String?> = emptyList()
 
-    private fun resolveToRuleWildcardConstraintsKwarg(name: String) =
-            getRuleWildcardConstraintsSection()?.argumentList?.getKeywordArgument(name)
+    private fun resolveToRuleWildcardConstraintsKwarg(name: String): PyKeywordArgument? {
+        return if (ruleOrCheckpoint !is SmkUse) {
+            getRuleWildcardConstraintsSection(ruleOrCheckpoint)?.argumentList?.getKeywordArgument(name)
+        } else {
+            getUseWildcardsConstraintsSection(ruleOrCheckpoint, name)
+        }
+    }
 
     private fun resolveToFirstDeclaration(name: String) =
-            wildcardsDeclarations?.firstOrNull { it.text == name }?.psi
+        wildcardsDeclarations?.firstOrNull { it.text == name }?.psi
 
     private fun resolveToFileWildcardConstraintsKwarg(name: String) = getFileWildcardConstraintsSections()
-                .asSequence()
-                .mapNotNull { section -> section.argumentList?.getKeywordArgument(name) }
-                .firstOrNull()
+        .asSequence()
+        .mapNotNull { section -> section.argumentList?.getKeywordArgument(name) }
+        .firstOrNull()
 
     private fun getFileWildcardConstraintsSections() =
-            PsiTreeUtil.findChildrenOfType(
-                    ruleOrCheckpoint.containingFile,
-                    SmkWorkflowArgsSection::class.java
-            ).filter { 
-                it.sectionKeyword == SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS 
-            }
+        PsiTreeUtil.findChildrenOfType(
+            ruleOrCheckpoint.containingFile,
+            SmkWorkflowArgsSection::class.java
+        ).filter {
+            it.sectionKeyword == SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS
+        }
 
-    private fun getRuleWildcardConstraintsSection() =
-            ruleOrCheckpoint.getSections()
-                    .asSequence()
-                    .filterIsInstance<SmkRuleOrCheckpointArgsSection>()
-                    .find { it.sectionKeyword == SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS }
+    private fun getRuleWildcardConstraintsSection(ruleLikeElement: SmkRuleOrCheckpoint) =
+        ruleLikeElement.getSections()
+            .asSequence()
+            .filterIsInstance<SmkRuleOrCheckpointArgsSection>()
+            .find { it.sectionKeyword == SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS }
+
+    private fun getUseWildcardsConstraintsSection(use: SmkUse, name: String) =
+        use.getImportedRuleNames()
+            ?.asSequence()
+            ?.mapNotNull { getWildcardsConstraintsSectionFromSectionReference(it, name) }
+            ?.firstOrNull()
+
+    private fun getWildcardsConstraintsSectionFromSectionReference(
+        reference: SmkReferenceExpression,
+        name: String
+    ): PyKeywordArgument? {
+        var resolveResult = reference.reference.resolve()
+        while (resolveResult is SmkReferenceExpression) {
+            val referenceContainer = resolveResult.parentOfType<SmkUse>()
+            if (referenceContainer != null) {
+                val argsSection =
+                    getRuleWildcardConstraintsSection(referenceContainer)?.argumentList?.getKeywordArgument(name)
+                if (argsSection != null) {
+                    return argsSection
+                }
+            }
+            resolveResult = resolveResult.reference.resolve()
+        }
+
+        if (resolveResult !is SmkRuleOrCheckpoint) {
+            resolveResult = resolveResult?.parentOfType<SmkRuleOrCheckpoint>() ?: return null
+        }
+
+        if (resolveResult is SmkUse) {
+            val argsSection = resolveResult.getImportedRuleNames()?.lastOrNull()
+                ?.let { getWildcardsConstraintsSectionFromSectionReference(it, name) }
+            if (argsSection != null) {
+                return argsSection
+            }
+        }
+
+        return getRuleWildcardConstraintsSection(resolveResult as SmkRuleOrCheckpoint)?.argumentList?.getKeywordArgument(
+            name
+        )
+    }
 
     override fun getCompletionVariants(
-            completionPrefix: String?,
-            location: PsiElement,
-            context: ProcessingContext?
+        completionPrefix: String?,
+        location: PsiElement,
+        context: ProcessingContext?
     ): Array<out Any> {
         if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location) || wildcardsDeclarations == null) {
             return emptyArray()
@@ -120,20 +166,20 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
 
         return wildcardsDeclarations!!.map {
             SmkCompletionUtil.createPrioritizedLookupElement(
-                    it.text, it.psi,
-                    typeText = SnakemakeBundle.message("TYPES.rule.wildcard.type.text")
+                it.text, it.psi,
+                typeText = SnakemakeBundle.message("TYPES.rule.wildcard.type.text")
             )
         }.toTypedArray()
     }
 
-    val wildcards: Set<String>?  by lazy {
+    val wildcards: Set<String>? by lazy {
         wildcardsDeclarations?.map { it.text }?.toHashSet()
     }
 
     override fun getAttributeNames(): Set<String> = wildcards ?: emptySet()
 
     override fun getCompletionVariantsAndPriority(
-            completionPrefix: String?, location: PsiElement, context: ProcessingContext?
+        completionPrefix: String?, location: PsiElement, context: ProcessingContext?
     ) = emptyList<LookupElementBuilder>() to 0.0
 
     override fun isBuiltin() = false
