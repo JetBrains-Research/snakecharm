@@ -90,14 +90,14 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
       use rule NAME1,NAME2 from M as other_* with:
         output:
           "{sample1}.out1"
-        log: "{sample2}"
+        log: "{sample2}.out2"
       """
     And SmkNotSameWildcardsSetInspection inspection is enabled
     Then I expect inspection error on <"{sample1}.out1"> with message
       """
       Missing wildcards: 'sample2'.
       """
-    Then I expect inspection error on <log: "{sample2}"> with message
+    Then I expect inspection error on <"{sample2}.out2"> with message
       """
       Missing wildcards: 'sample1'.
       """
