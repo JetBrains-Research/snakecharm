@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiReference
+import com.intellij.util.ArrayUtil
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.python.psi.impl.PyElementImpl
@@ -52,16 +53,18 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
                 this, textRange, strExpr, path
             )
             SnakemakeNames.WORKFLOW_REPORT_KEYWORD -> SmkReportReference(
-                    this, textRange, strExpr, path
+                this, textRange, strExpr, path
             )
             SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD -> SmkWorkDirReference(
-                    this, textRange, strExpr, path
+                this, textRange, strExpr, path
             )
             else -> SmkIncludeReference(
-                    this, textRange, strExpr, path
+                this, textRange, strExpr, path
             )
         }
     }
+
+    override fun getReference(): PsiReference? = ArrayUtil.getFirstElement(this.references)
 
     override fun getReferences(): Array<PsiReference> {
         if (keywordName !in WORKFLOWS_WITH_FILE_REFERENCES) {
