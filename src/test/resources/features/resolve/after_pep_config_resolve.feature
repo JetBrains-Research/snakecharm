@@ -5,7 +5,9 @@ Feature: Resolve after pep.config
     Given I open a file "config.yaml" with text
     """
     custom_key1: value
-    custom_key2: value
+    custom_key2:
+      custom_key3:
+        value
     """
     Given I open a file "foo.smk" with text
     """
@@ -19,40 +21,97 @@ Feature: Resolve after pep.config
       | custom_key1 |
       | custom_key2 |
 
-  Scenario Outline: Not resolve to mapping keys
+  Scenario: Resolve to _get_cfg_v if pep_version missing
     Given a snakemake project
     Given I open a file "config.yaml" with text
     """
-    custom_key1:
+    custom_key1: value
+    """
+    Given I open a file "foo.smk" with text
+    """
+    pepfile: "config.yaml"
+    pep.config.pep_version
+    """
+    When I put the caret after pep.config.
+    Then reference should resolve to "custom_key1" in "config.yaml"
+
+  Scenario Outline: Resolve to text keys
+    Given a snakemake project
+    Given I open a file "config.yaml" with text
+    """
+    <text_key>: value
+    """
+    Given I open a file "foo.smk" with text
+    """
+    pepfile: "config.yaml"
+    pep.config.<text_key>
+    """
+    When I put the caret after pep.config.
+    Then reference should resolve to "<text_key>" in "config.yaml"
+    Examples:
+      | text_key        |
+      | pep_version     |
+      | sample_table    |
+      | subsample_table |
+
+  Scenario Outline: Not resolve to text keys as mapping
+    Given a snakemake project
+    Given I open a file "config.yaml" with text
+    """
+    <text_key>:
+      key:
+        value
+    """
+    Given I open a file "foo.smk" with text
+    """
+    pepfile: "config.yaml"
+    pep.config.<text_key>
+    """
+    When I put the caret after pep.config.
+    Then reference should not resolve
+    Examples:
+      | text_key        |
+      | pep_version     |
+      | sample_table    |
+      | subsample_table |
+
+  Scenario Outline: Resolve to mapping keys
+    Given a snakemake project
+    Given I open a file "config.yaml" with text
+    """
+    <mapping_key>:
      custom_key2:
       value
     """
     Given I open a file "foo.smk" with text
     """
     pepfile: "config.yaml"
-    pep.config.<key>
+    pep.config.<mapping_key>
     """
     When I put the caret after pep.config.
-    Then reference should not resolve
+    Then reference should resolve to "<mapping_key>" in "config.yaml"
     Examples:
-      | key         |
-      | custom_key1 |
-      | custom_key2 |
+      | mapping_key       |
+      | sample_modifiers  |
+      | project_modifiers |
 
-  Scenario: Resolve to key before dot
+  Scenario Outline: Not resolve to mapping keys as text
     Given a snakemake project
     Given I open a file "config.yaml" with text
     """
-    custom_key1.custom_key2: value
-    custom_key3: value
+    <mapping_key>: value
     """
     Given I open a file "foo.smk" with text
     """
     pepfile: "config.yaml"
-    pep.config.custom_key1
+    pep.config.<mapping_key>
     """
     When I put the caret after pep.config.
-    Then reference should resolve to "custom_key1" in "config.yaml"
+    Then reference should not resolve
+    Examples:
+      | mapping_key       |
+      | sample_modifiers  |
+      | project_modifiers |
 
   Scenario Outline: Resolve inside rule
     Given a snakemake project
