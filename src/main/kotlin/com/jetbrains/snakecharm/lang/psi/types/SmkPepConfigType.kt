@@ -16,6 +16,7 @@ import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
@@ -46,8 +47,7 @@ class SmkPepConfigType(smkFile: SmkFile) : PyType {
         location: PsiElement?,
         context: ProcessingContext?
     ): Array<LookupElement> = sectionArgs.map {
-        LookupElementBuilder
-            .create(it.second)
+        SmkCompletionUtil.createPrioritizedLookupElement(it.second, it.first)
     }.toTypedArray()
 
     private val sectionArgs = getYamlKeys(getYamlFile(smkFile))
