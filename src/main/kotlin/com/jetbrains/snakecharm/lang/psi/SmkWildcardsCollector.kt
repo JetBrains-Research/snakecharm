@@ -7,6 +7,7 @@ import com.intellij.psi.util.parentOfType
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_BANNED_FOR_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLFile
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
@@ -32,6 +33,7 @@ class SmkWildcardsCollector(
     private var atLeastOneInjectionVisited = false
     private var atLeastOneSectionIgnored = false
     private var currentSectionIdx: Byte = -1
+    private var currentSectionName: String? = null
 
     /**
      * @return List of all wildcard element usages and its names or null if no string literals were found
@@ -49,6 +51,7 @@ class SmkWildcardsCollector(
 
     override fun visitSmkRunSection(st: SmkRunSection) {
         if (visitAllSections) {
+            currentSectionName = SnakemakeNames.SECTION_RUN
             super.visitSmkRunSection(st)
         }
     }
@@ -68,6 +71,7 @@ class SmkWildcardsCollector(
                 (visitExpandingSections && st.isWildcardsExpandingSection())
             ) {
                 if (st.sectionKeyword !in visitedSections) {
+                    currentSectionName = st.sectionKeyword
                     visitedSections.add(st.sectionKeyword ?: return)
                     super.visitSmkRuleOrCheckpointArgsSection(st)
                 } else {
@@ -105,7 +109,8 @@ class SmkWildcardsCollector(
             wildcardsElements.add(
                 WildcardDescriptor(
                     st, st.text,
-                    if (currentSectionIdx == (-1).toByte()) WildcardDescriptor.UNDEFINED_SECTION_RATE else currentSectionIdx
+                    if (currentSectionIdx == (-1).toByte()) WildcardDescriptor.UNDEFINED_SECTION_RATE else currentSectionIdx,
+                    currentSectionName
                 )
             )
         }
@@ -116,6 +121,7 @@ data class WildcardDescriptor(
     val psi: SmkSLReferenceExpressionImpl,
     val text: String,
     val definingSectionRate: Byte,
+    val sectionName: String?
 ) {
     companion object {
         const val UNDEFINED_SECTION_RATE: Byte = Byte.MAX_VALUE
