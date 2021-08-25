@@ -40,23 +40,36 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
       | checkpoint |               |
       | use rule   | as NAME2 with |
 
-  Scenario Outline: Missing wildcards in overridden rule
+    Scenario Outline: No missing wildcards, if defining section was overridden
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        output: "{sample}"
+
+      use rule NAME as new_NAME with:
+        output: "{sample1}"
+      """
+      And SmkNotSameWildcardsSetInspection inspection is enabled
+      Then I expect no inspection errors
+      When I check highlighting errors
+      Examples:
+        | rule_like  |
+        | rule       |
+        | checkpoint |
+
+  Scenario Outline: Missing wildcards, defining in non overridden section
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
       <rule_like> NAME:
-        input: "{sample}.in"
-        output: "{sample}.out"
-        benchmark: "{sample}.out"
-        shell: "touch {output}"
+        output: "{sample}"
 
-      use rule NAME as NAME2 with:
-        output:
-          "{sample1}.out1"
-        input: "{sample}.in"
+      use rule NAME as new_NAME with:
+        log: "{sample1}"
       """
     And SmkNotSameWildcardsSetInspection inspection is enabled
-    Then I expect inspection error on <"{sample1}.out1"> with message
+    Then I expect inspection error on <"{sample1}"> with message
       """
       Missing wildcards: 'sample'.
       """
@@ -66,20 +79,18 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
       | rule       |
       | checkpoint |
 
-  Scenario Outline: Missing wildcards in several overridden rules
+  Scenario Outline: No missing wildcards, because declaration section was overriden
     Given a snakemake project
     And a file "boo.smk" with text
     """
     <rule_like> NAME1:
         input: "{sample1}.in"
         output: "{sample1}.out"
-        benchmark: "{sample1}.out"
         shell: "touch {output}"
 
     <rule_like> NAME2:
         input: "{sample2}.in"
         output: "{sample2}.out"
-        benchmark: "{sample2}.out"
         shell: "touch {output}"
     """
     Given I open a file "foo.smk" with text
@@ -89,23 +100,56 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
 
       use rule NAME1,NAME2 from M as other_* with:
         output:
-          "{sample1}.out1"
-        log: "{sample2}.out2"
+          "{sample}.out1"
+        log: "{sample}.out2"
       """
     And SmkNotSameWildcardsSetInspection inspection is enabled
-    Then I expect inspection error on <"{sample1}.out1"> with message
-      """
-      Missing wildcards: 'sample2'.
-      """
-    Then I expect inspection error on <"{sample2}.out2"> with message
-      """
-      Missing wildcards: 'sample1'.
-      """
+    Then I expect no inspection errors
     When I check highlighting errors
     Examples:
       | rule_like  |
       | rule       |
       | checkpoint |
+
+  Scenario Outline: Missing wildcards in overridden rule or rules
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <rule_like> NAME1:
+        input: "{sample1}.in"
+        output: "{sample1}.{sample2}.out"
+        benchmark: "{sample1}.out"
+        shell: "touch {output}"
+
+    <rule_like> NAME2:
+        input: "{sample2}.in"
+        output: "{sample1}.{sample2}.out"
+        benchmark: "{sample2}.out"
+        shell: "touch {output}"
+    """
+    Given I open a file "foo.smk" with text
+      """
+      module M:
+        snakefile: "boo.smk"
+
+      <rule_like> NAME3:
+        output: "{sample1}.{sample2}"
+
+      use rule <inheritance_info> as other_* with:
+        log: "{sample1}.out2"
+      """
+    And SmkNotSameWildcardsSetInspection inspection is enabled
+    And I expect inspection error on <"{sample1}.out2"> with message
+      """
+      Missing wildcards: 'sample2'.
+      """
+    When I check highlighting errors
+    Examples:
+      | rule_like  | inheritance_info   |
+      | rule       | NAME3              |
+      | rule       | NAME1,NAME2 from M |
+      | checkpoint | NAME3              |
+      | checkpoint          | NAME1,NAME2 from M |
 
   Scenario Outline: Missing wildcards when log section is generator
     Given a snakemake project

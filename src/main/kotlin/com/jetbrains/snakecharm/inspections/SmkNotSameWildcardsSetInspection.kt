@@ -3,11 +3,11 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.openapi.util.Ref
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
+
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
@@ -26,35 +26,26 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
         }
 
         fun processRuleOrCheckpointLike(ruleOrCheckpoint: SmkRuleOrCheckpoint) {
-            var wildcardsRef: Ref<List<String>?>? = null
+            val collector = AdvanceWildcardsCollector(
+                visitDefiningSections = true,
+                visitExpandingSections = false,
+                ruleLike = ruleOrCheckpoint,
+                collectDescriptors = true,
+                cachedWildcardsByRule = null
+            )
 
+            val wildcards = collector.getDefinedWildcardDescriptors().map { it.text }.toSet()
             ruleOrCheckpoint.getSections().forEach { section ->
                 if (section !is SmkRuleOrCheckpointArgsSection || !section.isWildcardsDefiningSection()) {
                     return@forEach
                 }
-
-                if (wildcardsRef == null) {
-                    // Cannot do via types, we'd like to have wildcards only from
-                    // defining sections and ensure that defining sections could be parsed
-                    val collector = SmkWildcardsCollector(
-                        visitDefiningSections = true,
-                        visitExpandingSections = false
-                    )
-                    ruleOrCheckpoint.accept(collector)
-                    wildcardsRef = Ref.create(collector.getWildcardsNames())
-                }
-
-                val wildcards = wildcardsRef!!.get()
-                if (wildcards != null) {
-                    // show warnings only if wildcards defined
-                    processSection(section, wildcards)
-                }
+                processSection(section, wildcards)
             }
         }
 
         private fun processSection(
             section: SmkRuleOrCheckpointArgsSection,
-            wildcards: List<String>
+            wildcards: Set<String>
         ) {
             val sectionArgs = section.argumentList?.arguments ?: return
             sectionArgs.forEach { arg ->
