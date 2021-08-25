@@ -1,3 +1,59 @@
+# Configure Project from Sources
+    
+**Prerequisites:**
+  
+* To run tests install IDEA plugins: `Cucumber for Java`, `Gherkin`.
+* Also, I recommended installing `Cucumber+` plugin to get better cucumber features editing/highlighting experience.
+* Restart IDEA
+
+**Configure project from sources:**
+
+1. Checkout the project
+2. In IntelliJ IDEA, select `File | New | Project From Existing Sources...`. Choose import from gradle option.
+
+**Build plugin from sources:**
+* Run `./gradlew buildPlugin`
+* Plugin bundle is located in ` build/distributions/snakecharm-*.zip`
+
+
+**Configure Tests:**
+        
+1. Configure tests to use `$PROJECT_DIR$/.sandbox_pycharm` as sandbox directory when running tests  from the IDEA context menu. 
+   Change template settings for cucumber test:
+   1. Open `Run | Edit Configurations... | Edit configuration templates...| Cucumber Java`
+   2. Append to `VM optiopns`: 
+       ```
+      -Didea.config.path=$PROJECT_DIR$/.sandbox_pycharm/config-test -Didea.system.path=$PROJECT_DIR$/.sandbox_pycharm/system-test -Didea.plugins.path=$PROJECT_DIR$/.sandbox_pycharm/plugins-test
+      ```
+
+2. Checkout `snakemake` project sources and configure as test data:
+    ```shell
+    cd ~
+    git clone https://github.com/snakemake/snakemake.git
+
+    cd ./testData/MockPackages3
+    ln -s ~/snakemake/snakemake snakemake
+    ```
+
+Tests are written in [Gherkin](https://cucumber.io/docs/gherkin). You could run tests:
+* Using gradle `test` task
+* From IDEA context menu via `Cucumber Java` run configuration
+  * Before running first test launch `buildTestWrappersBundle` task  
+
+If you get `Unimplemented substep definition` in all `*.feature` files, ensure:
+  * Not installed or disabled: `Substeps IntelliJ Plugin` 
+  * Plugins installed: `Cucumber Java`, `Gherkin`
+
+ 
+**Release plugin:**
+* Fix version in `build.gradle`
+* Fix since/until build versions in `build.gradle`
+* Fix change notes in `CHANGES` file
+* Use 'publishPlugin' task
+                        
+
+------
+
 # Useful Resources for IntelliJ Plugin Development:
 
 * Using Kotlin + Gradle

@@ -44,10 +44,19 @@ Features available in `Snakefile` and `*.smk`, `*.rule`, `*.rules` files:
 <!-- Plugin description end -->
 
 # Installation
-
+    
+**Via JetBrains Plugins Market Place (recommended):**
 > **NB**: If you've already configured custom file type for `Snakefile` or `*.smk` files please **delete** it (**or change** file masks to smth else). Otherwise, your custom file type will replace SnakeCharm support in snakemake files.
 
 In PyCharm (or other `IntelliJ Platfrom` based IDE with `Python Community Edition` plugin installed) open `Preferences|Plugins|Marketplace|SnakeCharm` and press `Install` button.
+     
+**From ZIP plugin bundle (alternative way):**
+
+* Open IDEA/PyCharm Preferences
+* Choose `Plugins` section
+* Press gear icon and choose `Install Plugin from Disk...`
+* Use `*.zip` bundle download from Plugin Manager or built from sources 
+
 
 # Setup Snakemake support
 
@@ -73,39 +82,5 @@ Contact me at roman.chernyatchik@jetbrains.com or post issues in [Issue Tracker]
 
 # Development
 
-Pull requests are welcome. It is my side project, so I appreciate your help implementing plugin desired features.
-
-**Build plugin from sources:**
-* Run `./gradlew buildPlugin`
-* Plugin bundle is located in ` build/distributions/snakecharm-*.zip`
-
-**Install plugin from ZIP bundle:**
-* Open IDEA/PyCharm Preferences
-* Choose `Plugins` section
-* Press gear icon and choose `Install Plugin from Disk...`
-* Use `*.zip` bundle download from Plugin Manager or built from sources 
-
-**Tests:**
-
-First configure repo with 'snakemake' folder from snakemake sources as test data:
-```shell
-cd ~
-git clone https://github.com/snakemake/snakemake.git
-
-cd ./testData/MockPackages
-ln -s ~/snakemake/snakemake snakemake
-```
-
-Tests are written in [Gherkin](https://cucumber.io/docs/gherkin):
-
-If you get "Unimplemented substep definition" in all `*.feature` files, ensure:
-  * Not installed or disabled: `Substeps IntelliJ Plugin` 
-  * Plugins installed: `Cucumber Java`, `Gherkin`
-
-Also it is recommended to install `Cucumber+` plugin to get better cucumber features editing/highlighting experience.
-  
-**Release plugin:**
-* Fix version in `build.gradle`
-* Fix since/until build versions in `build.gradle`
-* Fix change notes in `CHANGES` file
-* Use 'publishPlugin' task
+Pull requests are welcome. It is my side project, so I appreciate your help with implementation of desired features.
+See [DEVELPER.md](DEVELOPER.md)
