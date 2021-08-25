@@ -38,13 +38,12 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
             val wildcardsCollectedInAllOverriddenRules = advancedCollector.wildcardsCollectedInAllOverriddenRules()
             val inUseRuleBlock = ruleLikeBlock is SmkUse
 
-            //val wildcards = cachedWildcardsByRule.getValue(ruleLikeBlock).get()
             // If an appropriate wildcard exists
             if (expr.text in wildcards) {
                 return
             }
-            // If no, firstly we need to check if there are failures to wildcard collecting
-            // If so, adds weak warning
+            // If no, firstly we need to check if there are failures in wildcard collecting
+            // If so, adds a weak warning
             if (!wildcardsCollectedInAllOverriddenRules) {
                 // failed to parse wildcards defining sections
                 registerProblem(
@@ -53,7 +52,7 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
                     ProblemHighlightType.WEAK_WARNING
                 )
             } else {
-                // Otherwise adds an error
+                // Otherwise, adds an error
                 val definingSection = ruleLikeBlock.getWildcardDefiningSection()?.sectionKeyword
                 val message = when {
                     inUseRuleBlock -> {

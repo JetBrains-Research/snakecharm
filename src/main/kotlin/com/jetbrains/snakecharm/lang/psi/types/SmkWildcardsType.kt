@@ -32,18 +32,6 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
         if (!ruleOrCheckpoint.isValid) {
             return@lazy null
         }
-//        val collector = SmkWildcardsCollector(
-//            visitDefiningSections = true,
-//            // do not affect completion / resolve if output section cannot be parsed
-//            visitExpandingSections = true
-//        )
-//        ruleOrCheckpoint.accept(collector)
-//
-//        collector.getWildcards()
-//            ?.asSequence()
-//            ?.sortedBy { it.definingSectionRate }
-//            ?.distinctBy { it.text }
-//            ?.toList()
         val collector = AdvanceWildcardsCollector(
             visitDefiningSections = true,
             visitExpandingSections = true,

@@ -20,6 +20,7 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
  *  @param visitDefiningSections Visit or not downstream sections which introduces new wildcards
  *  @param visitExpandingSections Visit or not downstream sections which allows wildcards usage w/o 'wildcards.' prefix
  *  @param visitAllSections If true visit all sections (including run) ignoring [visitDefiningSections] and [visitExpandingSections] flags
+ *  @param visitedSections Overridden sections, which were already visited ('use rule' case)
  */
 class SmkWildcardsCollector(
     private val visitDefiningSections: Boolean,
@@ -56,33 +57,6 @@ class SmkWildcardsCollector(
         // #249 do not collect wildcards in lambdas
         // Do nothing here
     }
-
-//    override fun visitSmkUse(use: SmkUse) {
-////        if (!advanceVisitUseSection) {
-////            super.visitSmkUse(use)
-////            return
-////        }
-////
-////        val wildcardDefiningSections =
-////            use.getSections().filter { it is SmkRuleOrCheckpointArgsSection && it.isWildcardsDefiningSection() }
-////                .map { it.sectionKeyword }
-////        if (wildcardDefiningSections.size != WILDCARDS_DEFINING_SECTIONS_KEYWORDS.size) {
-////            use.getImportedRuleNames()?.forEach { smkReferenceExpression ->
-////                var resolveResult = smkReferenceExpression.reference.resolve()
-////                while (resolveResult is SmkReferenceExpression) {
-////                    resolveResult.parentOfType<SmkUse>()?.also { super.visitSmkUse(it) }
-////                    resolveResult = resolveResult.reference.resolve()
-////                }
-////                when (resolveResult) {
-////                    is SmkRule -> super.visitSmkRule(resolveResult)
-////                    is SmkCheckPoint -> super.visitSmkCheckPoint(resolveResult)
-////                    is SmkUse -> visitSmkUse(resolveResult)
-////                    else -> resolveResult?.parentOfType<SmkUse>()?.also { super.visitSmkUse(it) }
-////                }
-////            }
-////        }
-//        super.visitSmkUse(use)
-//    }
 
     override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
         try {
@@ -175,7 +149,7 @@ class AdvanceWildcardsCollector(
         if (collectedWildcards.isEmpty()) {
             checkWildcardsAndUpdateThem(ruleLike, collectedWildcards, visitedWildcardDefinitionSections)
             if (ruleLike is SmkUse) {
-                getWildcardsIntersection(ruleLike, collectedWildcards,visitedWildcardDefinitionSections)
+                getWildcardsIntersection(ruleLike, collectedWildcards, visitedWildcardDefinitionSections)
             }
         }
 
@@ -186,35 +160,6 @@ class AdvanceWildcardsCollector(
         ruleOrCheckpoint: SmkRuleOrCheckpoint,
         visitedSections: MutableSet<String>
     ) {
-//
-//        val wildcards = when {
-//            // if no suitable sections let's think that no wildcards
-//            !wildcardsDefiningSectionsAvailable -> emptyList()
-//            else -> {
-//                // Cannot do via types, we'd like to have wildcards only from
-//                // defining sections and ensure that defining sections could be parsed
-//                val collector = SmkWildcardsCollector(
-//                    visitDefiningSections = visitDefiningSections,
-//                    visitExpandingSections = visitExpandingSections,
-//                    advanceVisitUseSection = false,
-//                    visitedWildcardDefinitionSections = visitedWildcardDefinitionSections
-//                )
-//                ruleOrCheckpoint.accept(collector)
-//                collector.getWildcardsNames()
-////
-////                        val type = TypeEvalContext.codeAnalysis(expr.project, expr.containingFile)
-////                                .getType(ruleOrCheckpoint.wildcardsElement)
-////
-////                        var definedWildcards: List<WildcardDescriptor>? = null
-////                        if (type is SmkWildcardsType) {
-////                            definedWildcards = type.wildcardsDeclarations
-////                                    ?.filter { it.definingSectionRate != UNDEFINED_SECTION }
-////                                    ?.ifEmpty { null }
-////                        }
-////                        definedWildcards
-//            }
-//        }
-
         val wildcardsDefiningSectionsAvailable = ruleOrCheckpoint.getSections()
             .asSequence()
             .filterIsInstance(SmkRuleOrCheckpointArgsSection::class.java)
@@ -222,6 +167,7 @@ class AdvanceWildcardsCollector(
         val collector = SmkWildcardsCollector(
             visitDefiningSections = visitDefiningSections,
             visitExpandingSections = visitExpandingSections,
+            visitAllSections = visitAllSections,
             visitedSections = visitedSections
         )
         ruleOrCheckpoint.accept(collector)
