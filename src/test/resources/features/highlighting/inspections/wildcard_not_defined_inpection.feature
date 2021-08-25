@@ -149,7 +149,7 @@ Feature: Inspection: SmkWildcardNotDefinedInspection
       output: "{sample}"
 
     <section> NAME1:
-      output: "<text>"
+      output: "{file}"
     """
     Given I open a file "foo.smk" with text
     """
@@ -168,11 +168,64 @@ Feature: Inspection: SmkWildcardNotDefinedInspection
     """
     When I check highlighting errors
     Examples:
-      | section    | text   | section |
-      | rule       | {file} | log     |
-      | rule       | {file} | output  |
-      | checkpoint | {file} | log     |
-      | checkpoint | {file} | output  |
+      | section    |
+      | rule       |
+      | rule       |
+      | checkpoint |
+      | checkpoint |
+
+  Scenario Outline: Undefined wildcard if it is was defined in sections, which is overridden
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <section> A:
+      <definition>: "{sample}"
+
+    use rule A as B with:
+      <definition>: "{log_wildcard}"
+      input: "{sample}"
+    """
+    And SmkWildcardNotDefinedInspection inspection is enabled
+    Then I expect inspection error on <sample> in <input: "{sample}"> with message
+    """
+    Wildcard 'sample' isn't defined in any appropriate section of overridden rules
+    """
+    When I check highlighting errors
+    Examples:
+      | section    | definition |
+      | rule       | log        |
+      | rule       | output     |
+      | checkpoint | log        |
+      | checkpoint | output     |
+
+  Scenario Outline: Undefined wildcard if not all parent rules contains wildcard which is checked
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <rule_like> NAME1:
+        output: "{sample1}.out"
+
+    <rule_like> NAME2:
+        output: "{sample2}.out"
+    """
+    Given I open a file "foo.smk" with text
+      """
+      module M:
+        snakefile: "boo.smk"
+
+      use rule NAME1,NAME2 from M as other_* with:
+        input: "{sample1}.out2"
+      """
+    And SmkWildcardNotDefinedInspection inspection is enabled
+    Then I expect inspection error on <sample1> with message
+    """
+    Wildcard 'sample1' isn't defined in any appropriate section of overridden rules
+    """
+    When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
   Scenario Outline: Cannot parse wildcard defining section in overridden rule or checkpoint
     Given a snakemake project

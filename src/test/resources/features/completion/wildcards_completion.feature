@@ -24,7 +24,7 @@ Feature: Completion for wildcards
     use rule NAME as NAME2 with:
       input: "use{}"
     """
-    When I put the caret after input: "<addition>{
+    When I put the caret after <signature>
     And I invoke autocompletion popup
     Then completion list should contain:
       # wildcards defining:
@@ -44,11 +44,11 @@ Feature: Completion for wildcards
       | non-wildcard8 |
       | non-wildcard9 |
     Examples:
-      | rule_like  | addition |
-      | rule       |          |
-      | rule       | use      |
-      | checkpoint |          |
-      | checkpoint | use      |
+      | rule_like  | signature    |
+      | rule       | input: "{    |
+      | rule       | input: "use{ |
+      | checkpoint | input: "{    |
+      | checkpoint | input: "use{ |
 
   Scenario Outline: Wildcards are collected from all appropriate injections
     Given a snakemake project
@@ -64,7 +64,7 @@ Feature: Completion for wildcards
     use rule NAME as NAME2 with:
       input: "use{}"
     """
-    When I put the caret after input: "<addition>{
+    When I put the caret after <signature>
     And I invoke autocompletion popup
     Then completion list should contain:
       | wildcard1 |
@@ -78,11 +78,11 @@ Feature: Completion for wildcards
       | wildcard2 |
 
     Examples:
-      | rule_like  | addition |
-      | rule       |          |
-      | rule       | use      |
-      | checkpoint |          |
-      | checkpoint | use      |
+      | rule_like  | signature    |
+      | rule       | input: "{    |
+      | rule       | input: "use{ |
+      | checkpoint | input: "{    |
+      | checkpoint | input: "use{ |
 
   Scenario Outline: Wildcards are collected only from a parent rule
     Given a snakemake project

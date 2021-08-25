@@ -9,11 +9,11 @@ Feature: Resolve wildcards in SnakemakeSL
         output: "{foo} here"
 
     use rule NAME as NAME2 with:
-        log: "{foo}"
+        input: "use{foo}"
     """
     When I put the caret after input: "{fo
     Then reference in injection should resolve to "foo" in context "foo} here" in file "foo.smk"
-    When I put the caret after log: "{fo
+    When I put the caret after input: "use{fo
     Then reference in injection should resolve to "foo" in context "foo} here" in file "foo.smk"
     Examples:
       | rule_like  |

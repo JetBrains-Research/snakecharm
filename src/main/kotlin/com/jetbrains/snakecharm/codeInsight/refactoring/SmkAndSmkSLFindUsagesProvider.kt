@@ -23,7 +23,7 @@ class SmkAndSmkSLFindUsagesProvider : PythonFindUsagesProvider() {
         is SmkRuleOrCheckpointArgsSection -> "rule section"
         is SmkRule -> "rule"
         is SmkCheckPoint -> "checkpoint"
-        is SmkUse -> "use"
+        is SmkUse -> "use rule"
         is SmkSection -> "section"
         is SmkFakePsiElement -> "element"
         is SmkSLReferenceExpressionImpl -> {
