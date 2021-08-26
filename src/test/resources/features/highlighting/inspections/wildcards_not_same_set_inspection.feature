@@ -65,15 +65,38 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
       <rule_like> NAME:
         output: "{sample}"
 
-      use rule NAME as new_NAME with:
-        log: "{sample1}"
+      use rule NAME as new_NAME with: log: "{sample1}"
       """
     And SmkNotSameWildcardsSetInspection inspection is enabled
+    Then I expect inspection error on <use rule NAME as new_NAME with: log: "{sample1}"> with message
+      """
+      Missing wildcards: 'sample1' in inherited 'output' section.
+      """
     Then I expect inspection error on <"{sample1}"> with message
       """
       Missing wildcards: 'sample'.
       """
     When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: No error if cannot detect any wildcards defined in non overridden section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        output: foo()
+
+      use rule NAME as new_NAME with: log: "{sample1}"
+      """
+    And SmkNotSameWildcardsSetInspection inspection is enabled
+    Then I expect inspection weak warning on <use rule NAME as new_NAME with: log: "{sample1}"> with message
+      """
+      Cannot check missing wildcards in inherited 'output' section.
+      """
+    When I check highlighting weak warnings
     Examples:
       | rule_like  |
       | rule       |
@@ -118,13 +141,13 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     <rule_like> NAME1:
         input: "{sample1}.in"
         output: "{sample1}.{sample2}.out"
-        benchmark: "{sample1}.out"
+        benchmark: "{sample1}.{sample2}.out"
         shell: "touch {output}"
 
     <rule_like> NAME2:
         input: "{sample2}.in"
         output: "{sample1}.{sample2}.out"
-        benchmark: "{sample2}.out"
+        benchmark: "{sample1}.{sample2}.out"
         shell: "touch {output}"
     """
     Given I open a file "foo.smk" with text
@@ -149,7 +172,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
       | rule       | NAME3              |
       | rule       | NAME1,NAME2 from M |
       | checkpoint | NAME3              |
-      | checkpoint          | NAME1,NAME2 from M |
+      | checkpoint | NAME1,NAME2 from M |
 
   Scenario Outline: Missing wildcards when log section is generator
     Given a snakemake project

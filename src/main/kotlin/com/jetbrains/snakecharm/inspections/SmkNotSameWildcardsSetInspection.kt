@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.psi.util.parentOfType
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.*
 
@@ -35,20 +36,23 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
             )
 
             val wildcards = collector.getDefinedWildcardDescriptors().map { it.text }.toSet()
-            ruleOrCheckpoint.getSections().forEach { section ->
-                if (section !is SmkRuleOrCheckpointArgsSection || !section.isWildcardsDefiningSection()) {
-                    return@forEach
-                }
-                processSection(section, wildcards)
+            val visitedSections = mutableSetOf<String>()
+            handleSections(null, ruleOrCheckpoint, visitedSections, wildcards)
+            if (ruleOrCheckpoint is SmkUse) {
+                ruleOrCheckpoint.getImportedRuleNames()
+                    ?.forEach { handleUseParent(ruleOrCheckpoint, it, visitedSections, wildcards) }
             }
         }
 
         private fun processSection(
             section: SmkRuleOrCheckpointArgsSection,
-            wildcards: Set<String>
+            wildcards: Set<String>,
+            originalUseParent: SmkUse?
         ) {
+            val sectionName = section.sectionKeyword ?: return
             val sectionArgs = section.argumentList?.arguments ?: return
             sectionArgs.forEach { arg ->
+                val errorTarget = originalUseParent ?: arg
                 // collect wildcards in section arguments:
                 val collector = SmkWildcardsCollector(
                     visitDefiningSections = false,
@@ -61,26 +65,81 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
                     // if wildcards defined for args section
                     val missingWildcards = wildcards.filter { it !in argWildcards }
                     if (missingWildcards.isNotEmpty()) {
-                        registerProblem(
-                            arg,
+                        val message = if (originalUseParent != null) {
+                            SnakemakeBundle.message(
+                                "INSP.NAME.not.same.wildcards.set.in.parent.rule",
+                                missingWildcards.sorted().joinToString() { "'$it'" },
+                                sectionName
+                            )
+                        } else {
                             SnakemakeBundle.message(
                                 "INSP.NAME.not.same.wildcards.set",
                                 missingWildcards.sorted().joinToString() { "'$it'" }
                             )
+                        }
+                        registerProblem(
+                            errorTarget,
+                            message
                         )
                     }
                 } else {
                     if (wildcards.isNotEmpty()) {
                         // no injections, cannot check
-                        registerProblem(
-                            arg,
+                        val message = if (originalUseParent != null) {
+                            SnakemakeBundle.message(
+                                "INSP.NAME.not.same.wildcards.set.cannot.check.in.parent.rule",
+                                sectionName
+                            )
+                        } else {
                             SnakemakeBundle.message(
                                 "INSP.NAME.not.same.wildcards.set.cannot.check"
-                            ),
+                            )
+                        }
+                        registerProblem(
+                            errorTarget,
+                            message,
                             ProblemHighlightType.WEAK_WARNING
                         )
                     }
                 }
+            }
+        }
+
+        private fun handleUseParent(
+            originalUseParent: SmkUse,
+            parentRef: SmkReferenceExpression,
+            visitedSections: MutableSet<String>,
+            wildcards: Set<String>
+        ) {
+            var resolveResult = parentRef.reference.resolve()
+            while (resolveResult is SmkReferenceExpression) {
+                val parentUseSection = resolveResult.parentOfType<SmkUse>() ?: return
+                handleSections(originalUseParent, parentUseSection, visitedSections, wildcards)
+                resolveResult = resolveResult.reference.resolve()
+            }
+            if (resolveResult !is SmkUse && resolveResult is SmkRuleOrCheckpoint) {
+                handleSections(originalUseParent, resolveResult, visitedSections, wildcards)
+                return
+            }
+            val useParent =
+                if (resolveResult is SmkUse) resolveResult else resolveResult?.parentOfType() ?: return
+            handleSections(originalUseParent, useParent, visitedSections, wildcards)
+            useParent.getImportedRuleNames()
+                ?.forEach { handleUseParent(originalUseParent, it, visitedSections, wildcards) }
+        }
+
+        private fun handleSections(
+            originalUseParent: SmkUse?,
+            ruleLike: SmkRuleOrCheckpoint,
+            visitedSections: MutableSet<String>,
+            wildcards: Set<String>
+        ) {
+            ruleLike.getSections().forEach { section ->
+                if (section.sectionKeyword in visitedSections || section !is SmkRuleOrCheckpointArgsSection || !section.isWildcardsDefiningSection()) {
+                    return@forEach
+                }
+                visitedSections.add(section.sectionKeyword ?: return@forEach)
+                processSection(section, wildcards, originalUseParent)
             }
         }
     }
