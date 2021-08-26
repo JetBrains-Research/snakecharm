@@ -69,7 +69,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
                 val runSection = ruleSections.firstOrNull { it is SmkRunSection } as SmkRunSection?
                 when {
                     runSection != null -> CreateLogFileInRunSection(runSection, name)
-                    else -> CreateShellSectionWithLogReference(rule, name, originalLogSection.prevSibling.text)
+                    else -> CreateShellSectionWithLogReference(rule, name, originalLogSection.prevSibling?.text ?: " ")
                 }
             }
 
