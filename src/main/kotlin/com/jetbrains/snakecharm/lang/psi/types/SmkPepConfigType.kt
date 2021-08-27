@@ -8,22 +8,43 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.psi.PsiManager
 import com.intellij.psi.impl.source.tree.LeafPsiElement
+import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.impl.ResolveResultList
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
+import com.jetbrains.python.psi.types.PyStructuralType
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkFile
+import com.jetbrains.snakecharm.lang.psi.SmkPepConfigCollector
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionIndexKeyExpressionImpl
 import org.jetbrains.yaml.psi.YAMLFile
 import org.jetbrains.yaml.psi.impl.YAMLMappingImpl
 
-class SmkPepConfigType(smkFile: SmkFile) : PyType {
+class SmkPepConfigType(val smkFile: SmkFile) : PyStructuralType(emptySet(), false), SmkAvailableForSubscriptionType {
+    override fun getPositionArgsPreviews(location: PsiElement): List<String?> {
+        return emptyList()
+    }
+
+    override fun getCompletionVariantsAndPriority(
+        completionPrefix: String?,
+        location: PsiElement,
+        context: ProcessingContext?
+    ): Pair<List<LookupElementBuilder>, Double> = TODO()
+
+    override fun resolveMemberByIndex(
+        idx: Int,
+        location: PyExpression?,
+        direction: AccessDirection,
+        resolveContext: PyResolveContext
+    ): List<RatedResolveResult> = TODO()
+
     override fun resolveMember(
         name: String,
         location: PyExpression?,
@@ -34,10 +55,10 @@ class SmkPepConfigType(smkFile: SmkFile) : PyType {
             return emptyList()
         }
         val resolveResult = ResolveResultList()
-        sectionArgs
-            .filter { it.second == name }
+        SmkPepConfigCollector.getYamlParseResult(smkFile).second
+            .filter { it.text == name }
             .forEach {
-                resolveResult.poke(it.first, SmkResolveUtil.RATE_NORMAL)
+                resolveResult.poke(it, SmkResolveUtil.RATE_NORMAL)
             }
         return resolveResult
     }
@@ -46,67 +67,47 @@ class SmkPepConfigType(smkFile: SmkFile) : PyType {
         completionPrefix: String?,
         location: PsiElement?,
         context: ProcessingContext?
-    ): Array<LookupElement> = sectionArgs.map {
+    ): Array<LookupElement> = getVariants(location is SmkSLSubscriptionIndexKeyExpressionImpl).map {
         SmkCompletionUtil.createPrioritizedLookupElement(it.second, it.first)
     }.toTypedArray()
 
-    private val sectionArgs = getYamlKeys(getYamlFile(smkFile))
 
     override fun getName(): String = "pep.config"
 
     override fun isBuiltin(): Boolean = false
 
     override fun assertValid(message: String?) {
-        sectionArgs.forEach {
-            if (!it.first.isValid) {
-                throw PsiInvalidElementAccessException(it.first, message)
+        SmkPepConfigCollector.getYamlParseResult(smkFile).second.forEach {
+            if (!it.isValid) {
+                throw PsiInvalidElementAccessException(it, message)
             }
         }
     }
 
+    private fun getVariants(isSubscriptionForm: Boolean): List<Pair<PsiElement, String>> {
+        var containPepVersion = false
+        val resultList = mutableListOf<Pair<PsiElement, String>>()
+        val yamlParseResult = SmkPepConfigCollector.getYamlParseResult(smkFile)
+        yamlParseResult.second.forEach { key ->
+            val keyName = key.text
+            if (keyName == SnakemakeAPI.PEPPY_CONFIG_PEP_VERSION) containPepVersion = true
+            if (isSubscriptionForm ||
+                keyName in SnakemakeAPI.PEPPY_CONFIG_TEXT_KEYS ||
+                keyName in SnakemakeAPI.PEPPY_CONFIG_MAPPING_KEYS ||
+                KEY_NAME_PATTERN.matches(keyName)
+            ) resultList.add(key to keyName)
+        }
+        if (!containPepVersion && yamlParseResult.first != null) {
+            resultList.add(
+                yamlParseResult.first!! to
+                        SnakemakeAPI.PEPPY_CONFIG_PEP_VERSION
+            )
+        }
+        return resultList
+        //SmkSLSubscriptionKeyExpression
+    }
+
     companion object {
-        private fun getYamlKeys(yamlFile: PsiFile?): List<Pair<PsiElement, String>> {
-            if (yamlFile == null) return emptyList()
-            val ymlFile = yamlFile as YAMLFile
-            val completionList = mutableListOf<Pair<PsiElement, String>>()
-            var containPepVersion = false
-            ymlFile.documents.forEach { document ->
-                document.topLevelValue?.children?.forEach { child ->
-                    val keyName = child.firstChild.text
-                    val keyType = child.lastChild
-                    if (keyName == SnakemakeAPI.PEPPY_CONFIG_PEP_VERSION) containPepVersion = true
-                    if (keyName in SnakemakeAPI.PEPPY_CONFIG_TEXT_KEYS && keyType !is YAMLMappingImpl ||
-                        keyName in SnakemakeAPI.PEPPY_CONFIG_MAPPING_KEYS && keyType is YAMLMappingImpl ||
-                        keyName !in SnakemakeAPI.PEPPY_CONFIG_TEXT_KEYS &&
-                        keyName !in SnakemakeAPI.PEPPY_CONFIG_MAPPING_KEYS &&
-                        KEY_NAME_PATTERN.matches(keyName)
-                    ) {
-                        completionList.add(
-                            child.firstChild to
-                                    keyName
-                        )
-                    }
-                }
-            }
-            if (!containPepVersion) {
-                completionList.add(
-                    yamlFile to
-                            SnakemakeAPI.PEPPY_CONFIG_PEP_VERSION
-                )
-            }
-            return completionList
-        }
-
-        private fun getYamlFile(smkFile: SmkFile): PsiFile? {
-            val pepFileSection = smkFile.findPepfile() ?: return null
-            val psiElement = pepFileSection.getSectionKeywordNode() as LeafPsiElement
-            val virtualFile =
-                ProjectRootManager.getInstance(psiElement.project).contentRoots.firstNotNullOfOrNull { root ->
-                    root.findFileByRelativePath(psiElement.nextSibling.lastChild.text.trim('"'))
-                } ?: return null
-            return PsiManager.getInstance(psiElement.project).findFile(virtualFile)
-        }
-
         private val KEY_NAME_PATTERN = """[\w&&[^\d]]+[\w]*""".toRegex()
     }
 }

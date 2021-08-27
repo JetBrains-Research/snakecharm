@@ -1,6 +1,6 @@
 Feature: Completion after pep.config
 
-  Scenario: Complete at toplevel
+  Scenario Outline: Complete at toplevel
     Given a snakemake project
     Given I open a file "config.yaml" with text
     """
@@ -12,13 +12,17 @@ Feature: Completion after pep.config
     Given I open a file "foo.smk" with text
     """
     pepfile: "config.yaml"
-    pep.config.
+    <complete_type>
     """
-    When I put the caret after pep.config.
+    When I put the caret after <caret_place>
     And I invoke autocompletion popup
     Then completion list should contain:
       | custom_key1 |
       | custom_key2 |
+    Examples:
+      | complete_type  | caret_place  |
+      | pep.config.    | pep.config.  |
+      | pep.config[''] | pep.config[' |
 
   Scenario: Not complete no variable keys
     Given a snakemake project
@@ -43,7 +47,28 @@ Feature: Completion after pep.config
       | custom_key1             |
       | custom_key3             |
 
-  Scenario: Complete pep_version
+  Scenario: Complete no variable keys in subscription form
+    Given a snakemake project
+    Given I open a file "config.yaml" with text
+    """
+    custom_key1.custom_key2: value
+    custom_key3:custom_key4:
+        custom_key5:
+          value
+    custom_key6: value
+    """
+    Given I open a file "foo.smk" with text
+    """
+    pepfile: "config.yaml"
+    pep.config['']
+    """
+    When I put the caret after pep.config['
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | custom_key1.custom_key2 |
+      | custom_key3:custom_key4 |
+
+  Scenario Outline: Complete pep_version
     Given a snakemake project
     Given I open a file "config.yaml" with text
     """
@@ -53,15 +78,19 @@ Feature: Completion after pep.config
     Given I open a file "foo.smk" with text
     """
     pepfile: "config.yaml"
-    pep.config.
+    <complete_type>
     """
-    When I put the caret after pep.config.
+    When I put the caret after <caret_place>
     And I invoke autocompletion popup
     Then completion list should contain:
       | pep_version |
       | custom_key  |
+    Examples:
+      | complete_type  | caret_place  |
+      | pep.config.    | pep.config.  |
+      | pep.config[''] | pep.config[' |
 
-  Scenario: Complete pep_version should be even if the section is missing
+  Scenario Outline: Complete pep_version should be even if the section is missing
     Given a snakemake project
     Given I open a file "config.yaml" with text
     """
@@ -70,13 +99,17 @@ Feature: Completion after pep.config
     Given I open a file "foo.smk" with text
     """
     pepfile: "config.yaml"
-    pep.config.
+    <complete_type>
     """
-    When I put the caret after pep.config.
+    When I put the caret after <caret_place>
     And I invoke autocompletion popup
     Then completion list should contain:
       | pep_version |
       | custom_key  |
+    Examples:
+      | complete_type  | caret_place  |
+      | pep.config.    | pep.config.  |
+      | pep.config[''] | pep.config[' |
 
   Scenario Outline: Complete text keys
     Given a snakemake project
@@ -87,17 +120,19 @@ Feature: Completion after pep.config
     Given I open a file "foo.smk" with text
     """
     pepfile: "config.yaml"
-    pep.config.
+    <complete_type>
     """
-    When I put the caret after pep.config.
+    When I put the caret after <caret_place>
     And I invoke autocompletion popup
     Then completion list should contain:
       | <text_key>  |
       | pep_version |
     Examples:
-      | text_key        |
-      | sample_table    |
-      | subsample_table |
+      | complete_type  | caret_place  | text_key        |
+      | pep.config.    | pep.config.  | sample_table    |
+      | pep.config.    | pep.config.  | subsample_table |
+      | pep.config[''] | pep.config[' | sample_table |
+      | pep.config[''] | pep.config[' | subsample_table |
 
   Scenario Outline: Not complete text keys as mapping
     Given a snakemake project
@@ -112,18 +147,21 @@ Feature: Completion after pep.config
     Given I open a file "foo.smk" with text
     """
     pepfile: "config.yaml"
-    pep.config.
+    <complete_type>
     """
-    When I put the caret after pep.config.
+    When I put the caret after <caret_place>
     And I invoke autocompletion popup
     Then completion list shouldn't contain:
       | <text_key> |
       | custom_key |
     Examples:
-      | text_key        |
-      | pep_version     |
-      | sample_table    |
-      | subsample_table |
+      | complete_type  | caret_place  | text_key        |
+      | pep.config.    | pep.config.  | pep_version     |
+      | pep.config.    | pep.config.  | sample_table    |
+      | pep.config.    | pep.config.  | subsample_table |
+      | pep.config[''] | pep.config[' | pep_version     |
+      | pep.config[''] | pep.config[' | sample_table    |
+      | pep.config[''] | pep.config[' | subsample_table |
 
   Scenario Outline: Complete mapping keys
     Given a snakemake project
@@ -136,18 +174,19 @@ Feature: Completion after pep.config
     Given I open a file "foo.smk" with text
     """
     pepfile: "config.yaml"
-    pep.config.
+    <complete_type>
     """
-    When I put the caret after pep.config.
+    When I put the caret after <caret_place>
     And I invoke autocompletion popup
     Then completion list should contain:
       | <mapping_key> |
       | pep_version   |
     Examples:
-      | mapping_key       |
-      | sample_modifiers  |
-      | project_modifiers |
-      | custom_key        |
+      | complete_type  | caret_place  | mapping_key       |
+      | pep.config.    | pep.config.  | sample_modifiers  |
+      | pep.config.    | pep.config.  | project_modifiers |
+      | pep.config[''] | pep.config[' | sample_modifiers  |
+      | pep.config[''] | pep.config[' | project_modifiers |
 
   Scenario Outline: Not complete mapping keys as text
     Given a snakemake project
@@ -160,16 +199,18 @@ Feature: Completion after pep.config
     Given I open a file "foo.smk" with text
     """
     pepfile: "config.yaml"
-    pep.config.
+    <complete_type>
     """
-    When I put the caret after pep.config.
+    When I put the caret after <caret_place>
     And I invoke autocompletion popup
     Then completion list shouldn't contain:
       | <mapping_key> |
     Examples:
-      | mapping_key       |
-      | sample_modifiers  |
-      | project_modifiers |
+      | complete_type  | caret_place  | mapping_key       |
+      | pep.config.    | pep.config.  | sample_modifiers  |
+      | pep.config.    | pep.config.  | project_modifiers |
+      | pep.config[''] | pep.config[' | sample_modifiers  |
+      | pep.config[''] | pep.config[' | project_modifiers |
 
 
   Scenario Outline: Complete inside rule
@@ -177,94 +218,117 @@ Feature: Completion after pep.config
     Given I open a file "config.yaml" with text
     """
     custom_key1: value
-    custom_key2: value
+    custom_key2:
+      key:
+        value
     """
     Given I open a file "foo.smk" with text
     """
     pepfile: "config.yaml"
     rule Name:
       <section>:
-        pep.config.
+        <complete_type>
     """
-    When I put the caret after pep.config.
+    When I put the caret after <caret_place>
     And I invoke autocompletion popup
     Then completion list should contain:
       | custom_key1 |
       | custom_key2 |
+      | pep_version |
     Examples:
-      | section |
-      | section |
-      | run     |
+      | complete_type  | caret_place  | section |
+      | pep.config.    | pep.config.  | section |
+      | pep.config.    | pep.config.  | run     |
+      | pep.config[''] | pep.config[' | section |
+      | pep.config[''] | pep.config[' | run     |
 
   Scenario Outline: Complete in injections
     Given a snakemake project
     Given I open a file "config.yaml" with text
     """
     custom_key1: value
-    custom_key2: value
+    custom_key2:
+      key:
+        value
     """
     Given I open a file "foo.smk" with text
     """
     pepfile: "config.yaml"
     <rule_like> NAME:
-           <section>: "{pep.config.}"
+           <section>: "{<complete_type>}"
     """
-    When I put the caret after pep.config.
+    When I put the caret after <caret_place>
     And I invoke autocompletion popup
     Then completion list should contain:
       | custom_key1 |
       | custom_key2 |
+      | pep_version |
     Examples:
-      | rule_like  | section |
-      | rule       | shell   |
-      | rule       | message |
-      | checkpoint | shell   |
+      | complete_type  | caret_place  | rule_like  | section |
+      | pep.config.    | pep.config.  | rule       | shell   |
+      | pep.config.    | pep.config.  | rule       | message |
+      | pep.config.    | pep.config.  | checkpoint | shell   |
+      | pep.config[''] | pep.config[' | rule       | shell   |
+      | pep.config[''] | pep.config[' | rule       | message |
+      | pep.config[''] | pep.config[' | checkpoint | shell   |
 
-  Scenario: Complete in "onstart" section
+  Scenario Outline: Complete in "onstart" section
     Given a snakemake project
     Given I open a file "config.yaml" with text
     """
     custom_key1: value
-    custom_key2: value
+    custom_key2:
+      key:
+        value
     """
     Given I open a file "foo.smk" with text
     """
     pepfile: "config.yaml"
     onstart :
-           pep.config.
+       <complete_type>
     """
-    When I put the caret after pep.config.
+    When I put the caret after <caret_place>
     And I invoke autocompletion popup
     Then completion list should contain:
       | custom_key1 |
       | custom_key2 |
+    Examples:
+      | complete_type  | caret_place  |
+      | pep.config.    | pep.config.  |
+      | pep.config[''] | pep.config[' |
 
   Scenario Outline: No completion in injections for wildcards expanding/defining sections
     Given a snakemake project
     Given I open a file "config.yaml" with text
     """
     custom_key1: value
-    custom_key2: value
+    custom_key2:
+      key:
+        value
     """
     Given I open a file "foo.smk" with text
     """
     pepfile: "config.yaml"
         <rule_like> NAME:
-           <section>: "{pep.config.}"
+           <section>: "{<complete_type>}"
     """
-    When I put the caret after pep.config.
+    When I put the caret after <caret_place>
     And I invoke autocompletion popup
     Then completion list shouldn't contain:
       | custom_key1 |
       | custom_key2 |
     Examples:
-      | rule_like  | section |
-      | rule       | input   |
-      | rule       | output  |
-      | rule       | log     |
-      | checkpoint | input   |
+      | complete_type  | caret_place  | rule_like  | section |
+      | pep.config.    | pep.config.  | rule       | input   |
+      | pep.config.    | pep.config.  | rule       | output  |
+      | pep.config.    | pep.config.  | rule       | log     |
+      | pep.config.    | pep.config.  | checkpoint | input   |
+      | pep.config[''] | pep.config[' | rule       | input   |
+      | pep.config[''] | pep.config[' | rule       | output  |
+      | pep.config[''] | pep.config[' | rule       | log     |
+      | pep.config[''] | pep.config[' | checkpoint | input   |
 
-  Scenario: Complete in not-empty context
+  Scenario Outline: Complete in not-empty context
     Given a snakemake project
     Given I open a file "config.yaml" with text
     """
@@ -274,10 +338,14 @@ Feature: Completion after pep.config
     Given I open a file "foo.smk" with text
     """
     pepfile: "config.yaml"
-    pep.config.c
+    <complete_type>
     """
-    When I put the caret after pep.config.c
+    When I put the caret after <caret_place>
     And I invoke autocompletion popup
     Then completion list should contain:
       | custom_key1 |
       | custom_key2 |
+    Examples:
+      | complete_type   | caret_place   |
+      | pep.config.c    | pep.config.c  |
+      | pep.config['c'] | pep.config['c |
