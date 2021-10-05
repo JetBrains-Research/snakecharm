@@ -86,13 +86,11 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
      */
     override fun getPositionArgsPreviews(location: PsiElement): List<String?> = emptyList()
 
-    private fun resolveToRuleWildcardConstraintsKwarg(name: String): PyKeywordArgument? {
-        return if (ruleOrCheckpoint !is SmkUse) {
-            getRuleWildcardConstraintsSection(ruleOrCheckpoint)?.argumentList?.getKeywordArgument(name)
-        } else {
-            getUseWildcardsConstraintsSection(ruleOrCheckpoint, name)
+    private fun resolveToRuleWildcardConstraintsKwarg(name: String): PyKeywordArgument? =
+        when (ruleOrCheckpoint) {
+            is SmkUse -> getUseWildcardsConstraintsSection(ruleOrCheckpoint, name)
+            else -> getRuleWildcardConstraintsSection(ruleOrCheckpoint)?.argumentList?.getKeywordArgument(name)
         }
-    }
 
     private fun resolveToFirstDeclaration(name: String) =
         wildcardsDeclarations?.firstOrNull { it.text == name }?.psi

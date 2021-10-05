@@ -1,7 +1,7 @@
 package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
-import com.intellij.codeInspection.ProblemHighlightType
+import com.intellij.codeInspection.ProblemHighlightType.WEAK_WARNING
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.util.parentOfType
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -77,10 +77,7 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
                                 missingWildcards.sorted().joinToString() { "'$it'" }
                             )
                         }
-                        registerProblem(
-                            errorTarget,
-                            message
-                        )
+                        registerProblem(errorTarget, message)
                     }
                 } else {
                     if (wildcards.isNotEmpty()) {
@@ -95,11 +92,7 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
                                 "INSP.NAME.not.same.wildcards.set.cannot.check"
                             )
                         }
-                        registerProblem(
-                            errorTarget,
-                            message,
-                            ProblemHighlightType.WEAK_WARNING
-                        )
+                        registerProblem(errorTarget, message, WEAK_WARNING)
                     }
                 }
             }
