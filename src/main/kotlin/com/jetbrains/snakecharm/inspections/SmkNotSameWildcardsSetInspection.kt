@@ -52,7 +52,7 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
             val sectionName = section.sectionKeyword ?: return
             val sectionArgs = section.argumentList?.arguments ?: return
             sectionArgs.forEach { arg ->
-                val errorTarget = originalUseParent ?: arg
+                val errorTarget = originalUseParent?.nameIdentifier ?: arg
                 // collect wildcards in section arguments:
                 val collector = SmkWildcardsCollector(
                     visitDefiningSections = false,

@@ -64,19 +64,24 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
       """
       <rule_like> NAME:
         output: "{sample}"
+        benchmark: "{donor}"
 
       use rule NAME as new_NAME with: log: "{sample1}"
       """
     And SmkNotSameWildcardsSetInspection inspection is enabled
-    Then I expect inspection error on <use rule NAME as new_NAME with: log: "{sample1}"> with message
+    Then I expect inspection error on <new_NAME> with message
       """
-      Missing wildcards: 'sample1' in inherited 'output' section.
+      Missing wildcards: 'donor', 'sample1' in inherited 'output' section.
+      """
+     Then I expect inspection error on <new_NAME> with message
+      """
+      Missing wildcards: 'sample', 'sample1' in inherited 'benchmark' section.
       """
     Then I expect inspection error on <"{sample1}"> with message
       """
-      Missing wildcards: 'sample'.
+      Missing wildcards: 'donor', 'sample'.
       """
-    When I check highlighting errors
+    When I check highlighting errors ignoring extra highlighting
     Examples:
       | rule_like  |
       | rule       |
