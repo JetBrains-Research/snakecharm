@@ -35,6 +35,11 @@ interface SmkSection: PyStatement, PsiNameIdentifierOwner {
     //override fun getIcon(flags: Int) = PlatformIcons.PROPERTY_ICON!! // XXX see #145:
 
     fun getParentRuleOrCheckPoint(): SmkRuleOrCheckpoint? = PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpoint::class.java)!!
+
+    /**
+     * Returns text of the previous PSI element
+     */
+    fun getPreviousOffset() = prevSibling?.text
 }
 
 @Suppress("UNUSED_PARAMETER")
