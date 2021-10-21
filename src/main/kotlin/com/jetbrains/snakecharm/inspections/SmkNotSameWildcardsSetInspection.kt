@@ -3,17 +3,24 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType.WEAK_WARNING
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.Ref
 import com.intellij.psi.util.parentOfType
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
+    companion object {
+        val KEY = Key<HashMap<SmkRuleOrCheckpoint, Ref<List<WildcardDescriptor>>>>("SmkNotSameWildcardsSetInspection_Wildcards")
+    }
 
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, session) {
+        private val visitedRules = mutableSetOf<String>()
+
         override fun visitSmkRule(rule: SmkRule) {
             processRuleOrCheckpointLike(rule)
         }
@@ -27,18 +34,19 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
         }
 
         fun processRuleOrCheckpointLike(ruleOrCheckpoint: SmkRuleOrCheckpoint) {
-            val collector = AdvanceWildcardsCollector(
+            val cachedWildcardsByRule = session.putUserDataIfAbsent(KEY, hashMapOf())
+            val collector = AdvancedWildcardsCollector(
                 visitDefiningSections = true,
                 visitExpandingSections = false,
                 ruleLike = ruleOrCheckpoint,
-                collectDescriptors = true,
-                cachedWildcardsByRule = null
+                cachedWildcardsByRule = cachedWildcardsByRule
             )
 
-            val wildcards = collector.getDefinedWildcardDescriptors().map { it.text }.toSet()
+            val wildcards = collector.getDefinedWildcards().map { it.text }.toSet()
             val visitedSections = mutableSetOf<String>()
             handleSections(null, ruleOrCheckpoint, visitedSections, wildcards)
             if (ruleOrCheckpoint is SmkUse) {
+                visitedRules.add(ruleOrCheckpoint.name ?: return)
                 ruleOrCheckpoint.getImportedRuleNames()
                     ?.forEach { handleUseParent(ruleOrCheckpoint, it, visitedSections, wildcards) }
             }
@@ -68,13 +76,13 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
                         val message = if (originalUseParent != null) {
                             SnakemakeBundle.message(
                                 "INSP.NAME.not.same.wildcards.set.in.parent.rule",
-                                missingWildcards.sorted().joinToString() { "'$it'" },
+                                missingWildcards.sorted().joinToString { "'$it'" },
                                 sectionName
                             )
                         } else {
                             SnakemakeBundle.message(
                                 "INSP.NAME.not.same.wildcards.set",
-                                missingWildcards.sorted().joinToString() { "'$it'" }
+                                missingWildcards.sorted().joinToString { "'$it'" }
                             )
                         }
                         registerProblem(errorTarget, message)
@@ -116,6 +124,11 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
             }
             val useParent =
                 if (resolveResult is SmkUse) resolveResult else resolveResult?.parentOfType() ?: return
+            val useName = useParent.name ?: return
+            if(visitedRules.contains(useName)) {
+                return
+            }
+            visitedRules.add(useName)
             handleSections(originalUseParent, useParent, visitedSections, wildcards)
             useParent.getImportedRuleNames()
                 ?.forEach { handleUseParent(originalUseParent, it, visitedSections, wildcards) }

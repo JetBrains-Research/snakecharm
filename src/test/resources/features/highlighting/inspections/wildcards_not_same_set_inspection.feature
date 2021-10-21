@@ -91,13 +91,13 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
-      <rule_like> NAME:
+      <rule_like> A:
         output: foo()
 
-      use rule NAME as new_NAME with: log: "{sample1}"
+      use rule A as new_A with: log: "{sample1}"
       """
     And SmkNotSameWildcardsSetInspection inspection is enabled
-    Then I expect inspection weak warning on <use rule NAME as new_NAME with: log: "{sample1}"> with message
+    Then I expect inspection weak warning on <new_A> with message
       """
       Cannot check missing wildcards in inherited 'output' section.
       """

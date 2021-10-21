@@ -12,7 +12,7 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 
 class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
     companion object {
-        val KEY = Key<HashMap<SmkRuleOrCheckpoint, Ref<List<String>>>>("SmkWildcardNotDefinedInspection_Wildcards")
+        val KEY = Key<HashMap<SmkRuleOrCheckpoint, Ref<List<WildcardDescriptor>>>>("SmkWildcardNotDefinedInspection_Wildcards")
     }
 
     override fun buildVisitor(
@@ -28,13 +28,13 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
 
             val ruleLikeBlock = expr.containingRuleOrCheckpointSection()?.getParentRuleOrCheckPoint() ?: return
             val cachedWildcardsByRule = session.putUserDataIfAbsent(KEY, hashMapOf())
-            val advancedCollector = AdvanceWildcardsCollector(
+            val advancedCollector = AdvancedWildcardsCollector(
                 visitDefiningSections = true,
                 visitExpandingSections = false,
                 ruleLike = ruleLikeBlock,
                 cachedWildcardsByRule = cachedWildcardsByRule
             )
-            val wildcards = advancedCollector.getDefinedWildcards()
+            val wildcards = advancedCollector.getDefinedWildcards().map { it.text }
             val wildcardsCollectedInAllOverriddenRules = advancedCollector.wildcardsCollectedInAllOverriddenRules()
             val inUseRuleBlock = ruleLikeBlock is SmkUse
 

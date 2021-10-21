@@ -91,6 +91,28 @@ Feature: Resolve use and module name to its declaration
       | other_rule_from_zoo | rule_from_zoo | rule       |
 
 
+  Scenario Outline: Do not resolve reference of imported rule to local rule with the same name
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+      snakefile: "boo.smk"
+
+    <rule_like> <name>:
+      log: "{sample}"
+      benchmark: "{sample1}"
+
+    use rule <name> from M with:
+      input:
+        "data_file.txt"
+    """
+    When I put the caret at <name> from
+    Then reference should not resolve
+    Examples:
+      | name   | rule_like  |
+      | rule_a | rule       |
+      | rule_a | checkpoint |
+
   Scenario Outline: Refer to other use section which declared new rules with wildcard
     Given a snakemake project
     Given I open a file "foo.smk" with text

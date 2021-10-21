@@ -13,6 +13,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.psi.util.elementType
+import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.intellij.util.Processors
 import com.jetbrains.python.psi.AccessDirection
@@ -22,9 +23,7 @@ import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
-import com.jetbrains.snakecharm.lang.psi.SmkFile
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
-import com.jetbrains.snakecharm.lang.psi.SmkUse
+import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex
@@ -76,7 +75,15 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
             return getUseSections(name, location)
         }
 
-        return results.map { element ->
+        return results.filter { resolveResult ->
+            // We don't want so suggest local resolve result for the reference of rule, which was imported
+            val moduleRef = location.parentOfType<SmkUse>()?.getModuleName() as? SmkReferenceExpression
+            val module = moduleRef?.reference?.resolve() as? SmkModule
+            moduleRef == null // There are no 'from *name*' combination, so it wasn't imported
+                    || (module == null && location.containingFile != resolveResult.containingFile)  // module with such name haven't been defined,
+                    // but we can be sure, that target rule is from another file
+                    || ( module != null && module.getPsiFile() == resolveResult.containingFile) // If module is defined
+        }.map { element ->
             RatedResolveResult(SmkResolveUtil.RATE_NORMAL, element)
         }
     }
@@ -96,6 +103,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
             return result
         }
         val module = location.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
+        val parent = location.parentOfType<SmkRuleOrCheckpoint>()
         when (module) {
             null -> (location.containingFile.originalFile as SmkFile).collectUses().map { it.second }
             else -> getVariantsFromIndex(SmkUseNameIndex.KEY, module, SmkUse::class.java)
@@ -104,7 +112,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
             val referTo = use.getProducedRulesNames()
                 .firstOrNull {
                     (it.first == name &&
-                            it.second != location.originalElement) ||
+                            it.second.parentOfType<SmkRuleOrCheckpoint>() != parent) ||
                             it.second.elementType == SmkElementTypes.USE_NAME_IDENTIFIER
                 }
             if (referTo != null) {
@@ -116,7 +124,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
         if (result.isEmpty()) {
             val namePattern = (location.containingFile as? SmkFile)?.resolveByRuleNamePattern(name)
             if (namePattern != null) {
-                result.add(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, namePattern))
+                result.add(RatedResolveResult(RatedResolveResult.RATE_LOW, namePattern))
             }
         }
 

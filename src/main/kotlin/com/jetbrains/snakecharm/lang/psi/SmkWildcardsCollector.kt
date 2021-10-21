@@ -10,6 +10,7 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECT
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLFile
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
 /**
@@ -21,17 +22,16 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
  *  @param visitDefiningSections Visit or not downstream sections which introduces new wildcards
  *  @param visitExpandingSections Visit or not downstream sections which allows wildcards usage w/o 'wildcards.' prefix
  *  @param visitAllSections If true visit all sections (including run) ignoring [visitDefiningSections] and [visitExpandingSections] flags
- *  @param visitedSections Overridden sections, which were already visited ('use rule' case)
+ *  @param collectWildcardLikeReferences If true also collects [SmkSLReferenceExpression]s that are not wildcards
  */
 class SmkWildcardsCollector(
     private val visitDefiningSections: Boolean,
     private val visitExpandingSections: Boolean,
     private val visitAllSections: Boolean = false,
-    private val visitedSections: MutableSet<String> = mutableSetOf()
+    private val collectWildcardLikeReferences: Boolean = false
 ) : SmkElementVisitor, PyRecursiveElementVisitor() {
     private val wildcardsElements = mutableListOf<WildcardDescriptor>()
     private var atLeastOneInjectionVisited = false
-    private var atLeastOneSectionIgnored = false
     private var currentSectionIdx: Byte = -1
     private var currentSectionName: String? = null
 
@@ -42,7 +42,7 @@ class SmkWildcardsCollector(
      * for them so user has not only zero wildcards, but now possible wildcards declarations
      */
     fun getWildcards(): List<WildcardDescriptor>? =
-        if (atLeastOneInjectionVisited || atLeastOneSectionIgnored) wildcardsElements else null
+        if (atLeastOneInjectionVisited) wildcardsElements else null
 
     fun getWildcardsNames() = getWildcards()?.asSequence()?.map { it.text }?.distinct()?.toList()
 
@@ -70,13 +70,8 @@ class SmkWildcardsCollector(
                 (visitDefiningSections && st.isWildcardsDefiningSection()) ||
                 (visitExpandingSections && st.isWildcardsExpandingSection())
             ) {
-                if (st.sectionKeyword !in visitedSections) {
-                    currentSectionName = st.sectionKeyword
-                    visitedSections.add(st.sectionKeyword ?: return)
-                    super.visitSmkRuleOrCheckpointArgsSection(st)
-                } else {
-                    atLeastOneSectionIgnored = true
-                }
+                currentSectionName = st.sectionKeyword
+                super.visitSmkRuleOrCheckpointArgsSection(st)
                 return
             }
         } finally {
@@ -106,150 +101,197 @@ class SmkWildcardsCollector(
 
         val injections = PsiTreeUtil.getChildrenOfType(file, SmkSLReferenceExpressionImpl::class.java)
         injections?.forEach { st ->
-            wildcardsElements.add(
-                WildcardDescriptor(
-                    st, st.text,
-                    if (currentSectionIdx == (-1).toByte()) WildcardDescriptor.UNDEFINED_SECTION_RATE else currentSectionIdx,
-                    currentSectionName
+            // We need to check whether is injection is wildcard because 'output' in:
+            // 'shell: "{output}"' is SmkSLReferenceExpressionImpl but not a wildcard
+            // We should try to resolve the reference because 'shell: "{wildcards.s}"'
+            // Is not a wildcard, but it refers to it
+            // On the same time we have to collect other references in some resolve/completion cases
+            // (see wildcards_resolve.feature 'Resolve first part of qualified like wildcard references into itself')
+            val potentialWildcardLike = if (collectWildcardLikeReferences || st.isWildcard()) st else {
+                (st.reference.resolve() as? SmkSLReferenceExpression)?.let { resolveResult ->
+                    if (resolveResult.isWildcard()) {
+                        resolveResult
+                    } else {
+                        null
+                    }
+                }
+            }
+            if (potentialWildcardLike != null) {
+                wildcardsElements.add(
+                    WildcardDescriptor(
+                        potentialWildcardLike, potentialWildcardLike.text,
+                        if (currentSectionIdx == (-1).toByte()) WildcardDescriptor.UNDEFINED_SECTION_RATE else currentSectionIdx,
+                        currentSectionName, st.isWildcard()
+                    )
                 )
-            )
+            }
         }
     }
 }
 
 data class WildcardDescriptor(
-    val psi: SmkSLReferenceExpressionImpl,
+    val psi: SmkSLReferenceExpression,
     val text: String,
     val definingSectionRate: Byte,
-    val sectionName: String?
+    val sectionName: String?,
+    val realWildcard: Boolean = false
 ) {
     companion object {
         const val UNDEFINED_SECTION_RATE: Byte = Byte.MAX_VALUE
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as WildcardDescriptor
+
+        if (text != other.text) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return text.hashCode()
+    }
 }
 
-class AdvanceWildcardsCollector(
+/**
+ * Manages collecting of wildcards from [ruleLike]. It is uses [cachedWildcardsByRule] to save and reads wildcards.
+ *
+ *  @param visitDefiningSections Visits or not downstream sections which introduces new wildcards
+ *  @param visitExpandingSections Visits or not downstream sections which allows wildcards usage w/o 'wildcards.' prefix
+ *  @param visitAllSections If true visits all sections (including run) ignoring [visitDefiningSections] and [visitExpandingSections] flags
+ *  @param getIntersection If true takes intersection of sets of inherited wildcards. Otherwise, takes union of them
+ *  @param collectWildcardLikeReferences If true also collects [SmkSLReferenceExpression]s that are not wildcards
+ */
+class AdvancedWildcardsCollector(
     private val visitDefiningSections: Boolean,
     private val visitExpandingSections: Boolean,
     private val visitAllSections: Boolean = false,
-    private val collectDescriptors: Boolean = false,
+    private val getIntersection: Boolean = true,
     private val ruleLike: SmkRuleOrCheckpoint,
-    private val cachedWildcardsByRule: HashMap<SmkRuleOrCheckpoint, Ref<List<String>>>?
+    private val cachedWildcardsByRule: HashMap<SmkRuleOrCheckpoint, Ref<List<WildcardDescriptor>>>?,
+    private val collectWildcardLikeReferences: Boolean = false
 ) {
     private val visitedWildcardDefinitionSections = mutableSetOf<String>()
-    private val wildcardsElementsDescriptors = mutableSetOf<WildcardDescriptor>()
-    private val collectedWildcards = mutableSetOf<String>()
+    private val wildcardsElementsDescriptors = mutableListOf<WildcardDescriptor>()
     private var wildcardsCollectedInAllOverriddenRules = true
+    private val visitedRules = mutableSetOf<SmkRuleOrCheckpoint>()
 
     fun wildcardsCollectedInAllOverriddenRules() = wildcardsCollectedInAllOverriddenRules
 
-    fun getDefinedWildcardDescriptors(): Set<WildcardDescriptor> {
-        if (collectedWildcards.isEmpty()) {
-            getDefinedWildcards()
+    fun getDefinedWildcards(): List<WildcardDescriptor> {
+        // Collects wildcards, defined in current rule-like section
+        checkWildcardsAndUpdateThem(ruleLike, wildcardsElementsDescriptors, visitedWildcardDefinitionSections)
+        if (ruleLike is SmkUse) {
+            // Advanced collectIon of wildcards that were inherited
+            getWildcardsIntersection(ruleLike, wildcardsElementsDescriptors, visitedWildcardDefinitionSections)
         }
 
         return wildcardsElementsDescriptors
     }
 
-    fun getDefinedWildcards(): Set<String> {
-        if (collectedWildcards.isEmpty()) {
-            checkWildcardsAndUpdateThem(ruleLike, collectedWildcards, visitedWildcardDefinitionSections)
-            if (ruleLike is SmkUse) {
-                getWildcardsIntersection(ruleLike, collectedWildcards, visitedWildcardDefinitionSections)
-            }
-        }
-
-        return collectedWildcards
-    }
-
-    private fun updateInfo(
-        ruleOrCheckpoint: SmkRuleOrCheckpoint,
-        visitedSections: MutableSet<String>
-    ) {
-        val wildcardsDefiningSectionsAvailable = ruleOrCheckpoint.getSections()
-            .asSequence()
-            .filterIsInstance(SmkRuleOrCheckpointArgsSection::class.java)
-            .filter { it.isWildcardsDefiningSection() }.firstOrNull() != null
-        val collector = SmkWildcardsCollector(
-            visitDefiningSections = visitDefiningSections,
-            visitExpandingSections = visitExpandingSections,
-            visitAllSections = visitAllSections,
-            visitedSections = visitedSections
-        )
-        ruleOrCheckpoint.accept(collector)
-        if (collectDescriptors) {
-            collector.getWildcards()?.apply {
-                wildcardsElementsDescriptors.addAll(this)
-            }
-        }
-        if (cachedWildcardsByRule == null) {
-            return
-        }
-        val wildcards = when {
-            // Case 1: searching for defining section, but there is no defining section
-            visitDefiningSections && !visitExpandingSections && !wildcardsDefiningSectionsAvailable -> emptyList()
-            // Case 2: there is at least one defining section
-            // It is null, if no wildcards in such sections
-            else -> collector.getWildcardsNames()
-        }
-        cachedWildcardsByRule[ruleOrCheckpoint] = Ref.create(wildcards)
-    }
-
     private fun collectWildcards(
         ruleLike: SmkReferenceExpression,
-        set: MutableSet<String>,
+        listOfDescriptors: MutableList<WildcardDescriptor>,
         visitedSections: MutableSet<String>
     ) {
+        // Trying to resolve the reference
         var resolveResult = ruleLike.reference.resolve()
         while (resolveResult is SmkReferenceExpression) {
+            // Collects wildcards in each step of the resolving
             val newUseRule = resolveResult.parentOfType<SmkUse>() ?: return
-            checkWildcardsAndUpdateThem(newUseRule, set, visitedSections)
+            checkWildcardsAndUpdateThem(newUseRule, listOfDescriptors, visitedSections)
             resolveResult = resolveResult.reference.resolve()
         }
-        if (resolveResult !is SmkUse && resolveResult is SmkRuleOrCheckpoint) {
-            checkWildcardsAndUpdateThem(resolveResult, set, visitedSections)
-        } else {
-            val newUseRule =
-                (resolveResult as? SmkUse) ?: resolveResult?.parentOfType() ?: return
-            checkWildcardsAndUpdateThem(newUseRule, set, visitedSections)
-            getWildcardsIntersection(newUseRule, set, visitedSections)
+        if (resolveResult in visitedRules) {
+            return
         }
+        // Collects wildcards from current section if it just a rule or checkpoint
+        if (resolveResult !is SmkUse && resolveResult is SmkRuleOrCheckpoint) {
+            checkWildcardsAndUpdateThem(resolveResult, listOfDescriptors, visitedSections)
+            return
+        }
+        // Otherwise, it also produces wildcards collecting of inherited rules
+        val newUseRule =
+            (resolveResult as? SmkUse) ?: resolveResult?.parentOfType() ?: return
+        checkWildcardsAndUpdateThem(newUseRule, listOfDescriptors, visitedSections)
+        getWildcardsIntersection(newUseRule, listOfDescriptors, visitedSections)
     }
 
     private fun getWildcardsIntersection(
         use: SmkUse,
-        list: MutableSet<String>,
+        listOfDescriptors: MutableList<WildcardDescriptor>,
         visitedSections: MutableSet<String>
     ) {
+        // Get lists of inherited wildcards
         val wildcardsLists = use.getImportedRuleNames()
             ?.map {
-                val listOfWildcards = mutableSetOf<String>()
+                val listOfWildcards = mutableListOf<WildcardDescriptor>()
                 collectWildcards(it, listOfWildcards, visitedSections.toMutableSet())
                 listOfWildcards
             }
-        var intersectiion = wildcardsLists?.firstOrNull()?.toSet() ?: return
-        for (listOfWildcards in wildcardsLists) {
-            intersectiion = intersectiion intersect listOfWildcards
+        var newDescriptors = wildcardsLists?.firstOrNull()?.toSet() ?: return
+        if (getIntersection) {
+            // Gets intersection in case of inspections
+            for (listOfWildcards in wildcardsLists) {
+                newDescriptors = newDescriptors intersect listOfWildcards.toSet()
+            }
+        } else {
+            // Gets union in case of resolve and completion
+            for (listOfWildcards in wildcardsLists) {
+                newDescriptors = newDescriptors union listOfWildcards
+            }
         }
-        list.addAll(intersectiion)
+        listOfDescriptors.addAll(newDescriptors)
     }
 
     private fun checkWildcardsAndUpdateThem(
         ruleLike: SmkRuleOrCheckpoint,
-        list: MutableSet<String>,
+        listOfDescriptors: MutableList<WildcardDescriptor>,
         visitedSections: MutableSet<String>
     ) {
-        if (collectDescriptors || (cachedWildcardsByRule != null && ruleLike !in cachedWildcardsByRule)) {
-            updateInfo(ruleLike, visitedSections)
-        }
-        if (cachedWildcardsByRule == null) {
-            return
-        }
-        val wildcards = cachedWildcardsByRule.getValue(ruleLike).get()
-        if (wildcards != null) {
-            list.addAll(wildcards)
+        // Collects wildcards from current ruleLike section
+        visitedRules.add(ruleLike)
+        // Reads wildcards from the cache if possible
+        val descriptors = if (cachedWildcardsByRule != null && ruleLike in cachedWildcardsByRule) {
+            cachedWildcardsByRule.getValue(ruleLike).get()
         } else {
+            // Otherwise, uses WildcardsCollector to gather wildcards
+            val wildcardsDefiningSectionsAvailable = ruleLike.getSections()
+                .asSequence()
+                .filterIsInstance(SmkRuleOrCheckpointArgsSection::class.java)
+                .filter { it.isWildcardsDefiningSection() }.firstOrNull() != null
+            val collector = SmkWildcardsCollector(
+                visitDefiningSections = visitDefiningSections,
+                visitExpandingSections = visitExpandingSections,
+                visitAllSections = visitAllSections,
+                collectWildcardLikeReferences = collectWildcardLikeReferences
+            )
+            ruleLike.accept(collector)
+            if (visitDefiningSections && !visitExpandingSections && !wildcardsDefiningSectionsAvailable) {
+                emptyList()
+            } else {
+                collector.getWildcards().also {
+                    if (cachedWildcardsByRule != null) {
+                        // Updates cache if possible
+                        cachedWildcardsByRule[ruleLike] = Ref.create(it)
+                    }
+                }
+            }
+        }
+        // Collects only those wildcards which were found in sections, that haven't been visited yet
+        descriptors?.filter { it.sectionName !in visitedSections }
+            ?.forEach { descriptor ->
+                listOfDescriptors.add(descriptor)
+                descriptor.sectionName?.also { visitedSections.add(it) }
+            }
+
+        if (descriptors == null) {
+            // Highlights, that it was impossible to check some sections
             wildcardsCollectedInAllOverriddenRules = false
+            return
         }
     }
 }

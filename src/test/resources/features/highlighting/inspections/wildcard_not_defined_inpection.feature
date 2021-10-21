@@ -179,16 +179,16 @@ Feature: Inspection: SmkWildcardNotDefinedInspection
     Given I open a file "foo.smk" with text
     """
     <section> A:
-      <definition>: "{sample}"
+      <definition>: "{sample}_{sample2}"
 
     use rule A as B with:
       <definition>: "{log_wildcard}"
-      input: "{sample}"
+      input: "{sample2}"
     """
     And SmkWildcardNotDefinedInspection inspection is enabled
-    Then I expect inspection error on <sample> in <input: "{sample}"> with message
+    Then I expect inspection error on <sample2> in <input: "{sample2}"> with message
     """
-    Wildcard 'sample' isn't defined in any appropriate section of overridden rules
+    Wildcard 'sample2' isn't defined in any appropriate section of overridden rules
     """
     When I check highlighting errors
     Examples:
@@ -237,7 +237,7 @@ Feature: Inspection: SmkWildcardNotDefinedInspection
     Given I open a file "foo.smk" with text
     """
     module M:
-      output: "boo.smk"
+      snakefile: "boo.smk"
 
     use rule NAME from M as NAME2 with:
       input: "{sample}"

@@ -20,6 +20,34 @@ Feature: Resolve wildcards in SnakemakeSL
       | rule       |
       | checkpoint |
 
+  Scenario Outline: Resolve to definitions of all inherited wildcards
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <rule_like> A:
+        output: "{foo1} here"
+
+    <rule_like> B:
+        output: "{foo2} here"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+        snakefile: "boo.smk"
+
+    use rule A, B from M as C with:
+        input: "use{foo1}_{foo2}"
+
+    """
+    When I put the caret after input: "use{foo
+    Then reference in injection should resolve to "foo1" in context "foo1} here" in file "boo.smk"
+    When I put the caret after input: "use{foo1}_{foo
+    Then reference in injection should resolve to "foo2" in context "foo2} here" in file "boo.smk"
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
   Scenario Outline: Resolve to wildcard constraints in rule
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -108,6 +136,25 @@ Feature: Resolve wildcards in SnakemakeSL
       | rule       | .foo     | shell: "{wildcards.fo |
       | rule       | [foo]    | shell: "{wildcards[fo |
       | checkpoint | .foo     | shell: "{wildcards.fo |
+
+  Scenario Outline: Resolve to definition from wildcards. in case of rule inheritance
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+        output: "{foo} here"
+        message: "message: {wildcards.foo}"
+
+    use rule NAME as NAME with:
+        message: "{wildcards<accessor>}"
+    """
+    When I put the caret after <signature>
+    Then reference in injection should resolve to "foo" in context "foo} here" in file "foo.smk"
+    Examples:
+      | rule_like  | accessor | signature             |
+      | rule       | .foo     | message: "{wildcards.fo |
+      | rule       | [foo]    | message: "{wildcards[fo |
+      | checkpoint | .foo     | message: "{wildcards.fo |
 
   Scenario Outline: Resolve to second definition from wildcards.
     Given a snakemake project

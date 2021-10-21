@@ -25,6 +25,8 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
 
     private val typeName = "Rule ${ruleOrCheckpoint.name?.let { "'$it' " } ?: ""}wildcards"
 
+    private val visitedRules = mutableSetOf<String>()
+
     /**
      * Null if failed to parse wildcards declarations
      */
@@ -32,15 +34,16 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
         if (!ruleOrCheckpoint.isValid) {
             return@lazy null
         }
-        val collector = AdvanceWildcardsCollector(
+        val collector = AdvancedWildcardsCollector(
             visitDefiningSections = true,
             visitExpandingSections = true,
-            collectDescriptors = true,
+            getIntersection = false,
             ruleLike = ruleOrCheckpoint,
-            cachedWildcardsByRule = null
+            cachedWildcardsByRule = null,
+            collectWildcardLikeReferences = true
         )
 
-        collector.getDefinedWildcardDescriptors()
+        collector.getDefinedWildcards()
             .asSequence()
             .sortedBy { it.definingSectionRate }
             .distinctBy { it.text }
@@ -141,7 +144,13 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
             resolveResult = resolveResult?.parentOfType<SmkRuleOrCheckpoint>() ?: return null
         }
 
+
         if (resolveResult is SmkUse) {
+            val useName = resolveResult.name ?: return null
+            if(visitedRules.contains(useName)) {
+                return null
+            }
+            visitedRules.add(useName)
             val argsSection = resolveResult.getImportedRuleNames()?.lastOrNull()
                 ?.let { getWildcardsConstraintsSectionFromSectionReference(it, name) }
             if (argsSection != null) {

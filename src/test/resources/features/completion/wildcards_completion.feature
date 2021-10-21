@@ -142,6 +142,35 @@ Feature: Completion for wildcards
       | rule       |
       | checkpoint |
 
+  Scenario Outline: Completion for all inherited wildcards
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <rule_like> A:
+        output: "{foo1} here"
+
+    <rule_like> B:
+        output: "{foo2} here"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+        snakefile: "boo.smk"
+
+    use rule A, B from M as C with:
+        input: "use{}"
+
+    """
+    When I put the caret after use{
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | foo1 |
+      | foo2 |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
   Scenario Outline: Completion list after wildcards keyword
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -161,6 +190,29 @@ Feature: Completion for wildcards
       | rule       | .        | wildcards. |
       | rule       | []       | wildcards[ |
       | checkpoint | .        | wildcards. |
+
+  Scenario Outline: Completion list after wildcards keyword in case of rule inheritance
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+        output: "{foo} here"
+        log: "{foo2}"
+        message: "message: {wildcards.foo}"
+
+    use rule NAME as NAME with:
+        message: "{wildcards<accessor>}"
+    """
+    When I put the caret after <signature>
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | foo  |
+      | foo2 |
+    Examples:
+      | rule_like  | accessor | signature    |
+      | rule       | .        | "{wildcards. |
+      | rule       | []       | "{wildcards[   |
+      | checkpoint | .        | "{wildcards.   |
 
   Scenario Outline: Insertion handler after wildcards.
     Given a snakemake project
