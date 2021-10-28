@@ -1,8 +1,6 @@
 package com.jetbrains.snakecharm.lang.highlighter
 
 import com.jetbrains.python.PyTokenTypes
-import com.jetbrains.python.highlighting.PyHighlighter
-import com.jetbrains.python.highlighting.PyHighlighter.PY_FUNC_DEFINITION
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
@@ -36,10 +34,10 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
                 SmkTokenTypes.RULE_KEYWORD, SmkTokenTypes.SMK_FROM_KEYWORD,
                 SmkTokenTypes.SMK_AS_KEYWORD, SmkTokenTypes.SMK_WITH_KEYWORD -> addHighlightingAnnotation(
                     next,
-                    PyHighlighter.PY_KEYWORD
+                    SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD
                 )
                 SmkElementTypes.USE_NAME_IDENTIFIER, PyTokenTypes.IDENTIFIER -> addHighlightingAnnotation(
-                    next, PY_FUNC_DEFINITION
+                    next, SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION
                 )
                 PyTokenTypes.COLON -> done = true
             }
@@ -61,7 +59,7 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
 
     override fun visitSmkRunSection(st: SmkRunSection) {
         st.getSectionKeywordNode()?.let {
-            addHighlightingAnnotation(it, PyHighlighter.PY_PREDEFINED_DEFINITION)
+            addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterFactory.SMK_PREDEFINED_DEFINITION)
         }
     }
 
@@ -85,19 +83,19 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
         highlightWorkflowSection(ruleLike)
 
         ruleLike.nameIdentifier?.let { nameElement ->
-            addHighlightingAnnotation(nameElement, PY_FUNC_DEFINITION)
+            addHighlightingAnnotation(nameElement, SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION)
         }
     }
 
     private fun highlightWorkflowSection(st: SmkSection) {
         st.getSectionKeywordNode()?.let {
-            addHighlightingAnnotation(it, PyHighlighter.PY_KEYWORD)
+            addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD)
         }
     }
 
     private fun highlightRuleLikeSection(st: SmkSection) {
         st.getSectionKeywordNode()?.let {
-            addHighlightingAnnotation(it, PyHighlighter.PY_DECORATOR)
+            addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterFactory.SMK_DECORATOR)
         }
     }
 }

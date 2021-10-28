@@ -6,7 +6,7 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.lang.validation.SmkAnnotator
-import com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLWildcardsAnnotator.HIGHLIGHTING_WILDCARDS_KEY
+import com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLSyntaxHighlighter.Companion.HIGHLIGHTING_WILDCARDS_KEY
 
 object SmkWildcardsAnnotator : SmkAnnotator() {
     override fun visitPyReferenceExpression(expr: PyReferenceExpression) {
