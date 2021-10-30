@@ -256,8 +256,6 @@ SnakemakeFile: UseInvalid.smk
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('N1')
-    PsiErrorElement:Multiple rules in 'use rule' statement but name modification ('as' statement) does not contain a wildcard '*'
-      <empty list>
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_WITH_KEYWORD)('with')
     PsiElement(Py:COLON)(':')
