@@ -97,7 +97,7 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
             SmkReferenceExpression::class.java
         )
 
-    override fun usePatternToDefineOverriddenRules(): Boolean {
+    override fun hasPatternInDefinitionOfInheritedRules(): Boolean {
         val importedRulesPart = findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES) as? PsiElement ?: return false
         return (PsiTreeUtil.collectElements(importedRulesPart) { el -> el.elementType == PyTokenTypes.MULT }).isNotEmpty()
     }

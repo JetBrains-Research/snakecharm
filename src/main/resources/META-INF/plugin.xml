@@ -305,11 +305,11 @@
     <localInspection
             language="Snakemake" shortName="SmkSeveralRulesAreOverriddenAsOneInspection"
             enabledByDefault="true"
-            level="WEAK WARNING"
+            level="ERROR"
             suppressId="SmkSeveralRulesAreOverriddenAsOne"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.only.last.rule.will.be.overridden"
+            key="INSP.NAME.only.last.rule.will.be.overridden.list.case"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkSeveralRulesAreOverriddenAsOneInspection"
     />
 
