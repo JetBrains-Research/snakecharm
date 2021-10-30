@@ -130,6 +130,8 @@ class SmkWildcardsCollector(
 }
 
 data class WildcardDescriptor(
+    // TODO: consider using SmartPsiElementPointer instances instead of storing PSI elements directly or
+    //    at least check psi.isValid() before usage
     val psi: SmkSLReferenceExpression,
     val text: String,
     val definingSectionRate: Byte,
