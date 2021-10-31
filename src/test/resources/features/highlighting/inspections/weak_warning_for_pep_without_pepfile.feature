@@ -1,3 +1,5 @@
+# Feature not implemented
+@ignore
 Feature: Weak warning for pep.config without config file
   Scenario: Weak warning if no config for pep.config
     Given a snakemake project

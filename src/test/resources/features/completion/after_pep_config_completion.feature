@@ -1,5 +1,6 @@
+# Feature not implemented
+@ignore
 Feature: Completion after pep.config
-
   Scenario Outline: Complete at toplevel
     Given a snakemake project
     Given I open a file "config.yaml" with text

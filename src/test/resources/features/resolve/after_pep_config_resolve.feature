@@ -1,3 +1,5 @@
+# Feature not implemented
+@ignore
 Feature: Resolve after pep.config
 
   Scenario Outline: Resolve at toplevel

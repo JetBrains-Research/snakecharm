@@ -163,10 +163,10 @@ class SmkTypeProvider : PyTypeProviderBase() {
         val psiFile = smkExpression?.containingFile
         val parentDeclaration =
             PsiTreeUtil.getParentOfType(smkExpression, SmkRuleOrCheckpoint::class.java)
-
-        if (referenceExpression.asQualifiedName()?.matches(SMK_VARS_PEP, SMK_VARS_CONFIG) == true) {
-            return SmkPepConfigType(psiFile as SmkFile)
-        }
+// TODO
+//        if (referenceExpression.asQualifiedName()?.matches(SMK_VARS_PEP, SMK_VARS_CONFIG) == true) {
+//            return SmkPepConfigType(psiFile as SmkFile)
+//        }
         if (referenceExpression.children.isNotEmpty() ||
             psiFile == null ||
             psiFile !is SmkFile
