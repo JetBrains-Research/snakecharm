@@ -201,7 +201,7 @@ tasks {
         dependsOn("compileKotlin", "compileJava")
         doLast {
             javaexec {
-                main = "com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler"
+                mainClass.set("com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler")
                 classpath =  project.sourceSets.main.get().runtimeClasspath + files(intellij.ideaDependency.get().jarFiles)
                 enableAssertions = true
                 args = listOf(
