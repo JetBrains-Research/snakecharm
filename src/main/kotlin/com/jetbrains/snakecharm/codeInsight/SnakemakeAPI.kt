@@ -53,6 +53,8 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINERIZED_KEYWO
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_ENVVARS_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_PEPFILE_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_PEPSCHEMA_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_REPORT_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_SINGULARITY_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD
@@ -140,7 +142,9 @@ object SnakemakeAPI {
         WORKFLOW_WORKDIR_KEYWORD,
         WORKFLOW_ENVVARS_KEYWORD,
         WORKFLOW_CONTAINER_KEYWORD,
-        WORKFLOW_CONTAINERIZED_KEYWORD
+        WORKFLOW_CONTAINERIZED_KEYWORD,
+        WORKFLOW_PEPSCHEMA_KEYWORD,
+        WORKFLOW_PEPFILE_KEYWORD
     )
 
     /**
