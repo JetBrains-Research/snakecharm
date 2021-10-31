@@ -2,13 +2,8 @@ package com.jetbrains.snakecharm.lang.psi.types
 
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiInvalidElementAccessException
-import com.intellij.psi.PsiManager
-import com.intellij.psi.impl.source.tree.LeafPsiElement
-import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PyExpression
@@ -16,7 +11,6 @@ import com.jetbrains.python.psi.impl.ResolveResultList
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyStructuralType
-import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
@@ -24,8 +18,6 @@ import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkPepConfigCollector
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionIndexKeyExpressionImpl
-import org.jetbrains.yaml.psi.YAMLFile
-import org.jetbrains.yaml.psi.impl.YAMLMappingImpl
 
 class SmkPepConfigType(val smkFile: SmkFile) : PyStructuralType(emptySet(), false), SmkAvailableForSubscriptionType {
     override fun getPositionArgsPreviews(location: PsiElement): List<String?> {
