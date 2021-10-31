@@ -26,9 +26,6 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
 
-apply(plugin = "kotlin")
-apply(plugin = "java")
-
 group = properties("pluginGroup")
 version = "${properties("pluginVersion")}.${properties("pluginBuildCounter")}${properties("pluginPreReleaseSuffix")}"
 
@@ -221,8 +218,8 @@ tasks {
         dependsOn("buildTestWrappersBundle")
         reports {
             // turn off html reports... windows can't handle certain cucumber test name characters.
-            junitXml.isEnabled = true
-            html.isEnabled = false
+            junitXml.required.set(true)
+            html.required.set(false)
         }
 
         include("**/*Test.class")
