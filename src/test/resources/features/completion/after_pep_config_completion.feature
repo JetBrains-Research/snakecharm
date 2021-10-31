@@ -1,6 +1,6 @@
-# Feature not implemented
-@ignore
 Feature: Completion after pep.config
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Complete at toplevel
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -25,6 +25,8 @@ Feature: Completion after pep.config
       | pep.config.    | pep.config.  |
       | pep.config[''] | pep.config[' |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario: Not complete no variable keys
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -47,7 +49,9 @@ Feature: Completion after pep.config
       | custom_key3:custom_key4 |
       | custom_key1             |
       | custom_key3             |
-
+    
+  # TODO Feature not implemented
+  @ignore
   Scenario: Complete no variable keys in subscription form
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -69,6 +73,8 @@ Feature: Completion after pep.config
       | custom_key1.custom_key2 |
       | custom_key3:custom_key4 |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Complete pep_version
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -91,6 +97,8 @@ Feature: Completion after pep.config
       | pep.config.    | pep.config.  |
       | pep.config[''] | pep.config[' |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Complete pep_version should be even if the section is missing
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -112,6 +120,8 @@ Feature: Completion after pep.config
       | pep.config.    | pep.config.  |
       | pep.config[''] | pep.config[' |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Complete text keys
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -135,6 +145,8 @@ Feature: Completion after pep.config
       | pep.config[''] | pep.config[' | sample_table |
       | pep.config[''] | pep.config[' | subsample_table |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Not complete text keys as mapping
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -164,6 +176,8 @@ Feature: Completion after pep.config
       | pep.config[''] | pep.config[' | sample_table    |
       | pep.config[''] | pep.config[' | subsample_table |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Complete mapping keys
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -189,6 +203,8 @@ Feature: Completion after pep.config
       | pep.config[''] | pep.config[' | sample_modifiers  |
       | pep.config[''] | pep.config[' | project_modifiers |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Not complete mapping keys as text
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -214,6 +230,8 @@ Feature: Completion after pep.config
       | pep.config[''] | pep.config[' | project_modifiers |
 
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Complete inside rule
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -243,6 +261,8 @@ Feature: Completion after pep.config
       | pep.config[''] | pep.config[' | section |
       | pep.config[''] | pep.config[' | run     |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Complete in injections
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -273,6 +293,8 @@ Feature: Completion after pep.config
       | pep.config[''] | pep.config[' | rule       | message |
       | pep.config[''] | pep.config[' | checkpoint | shell   |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Complete in "onstart" section
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -298,6 +320,8 @@ Feature: Completion after pep.config
       | pep.config.    | pep.config.  |
       | pep.config[''] | pep.config[' |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: No completion in injections for wildcards expanding/defining sections
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -329,6 +353,8 @@ Feature: Completion after pep.config
       | pep.config[''] | pep.config[' | rule       | log     |
       | pep.config[''] | pep.config[' | checkpoint | input   |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Complete in not-empty context
     Given a snakemake project
     Given I open a file "config.yaml" with text

@@ -1,7 +1,7 @@
-# Feature not implemented
-@ignore
 Feature: Resolve after pep.config
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Resolve at toplevel
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -25,6 +25,8 @@ Feature: Resolve after pep.config
       | ['custom_key1'] | ['          | custom_key1 |
       | ['custom_key1'] | ['          | custom_key2 |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Resolve to yamlfile if pep_version missing
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -43,6 +45,8 @@ Feature: Resolve after pep.config
       | .pep_version    | .           |
       | ['pep_version'] | ['          |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Resolve to text keys
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -65,6 +69,8 @@ Feature: Resolve after pep.config
       | ['sample_table']    | ['          | sample_table    |
       | ['subsample_table'] | ['          | subsample_table |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Not resolve to text keys as mapping
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -89,6 +95,8 @@ Feature: Resolve after pep.config
       | ['sample_table']    | ['          | sample_table    |
       | ['subsample_table'] | ['          | subsample_table |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Resolve to mapping keys
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -111,6 +119,8 @@ Feature: Resolve after pep.config
       | ['sample_modifiers '] | ['          | sample_modifiers  |
       | ['project_modifiers'] | ['          | project_modifiers |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Not resolve to mapping keys as text
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -131,6 +141,8 @@ Feature: Resolve after pep.config
       | ['sample_modifiers '] | ['          | sample_modifiers  |
       | ['project_modifiers'] | ['          | project_modifiers |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Resolve inside rule
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -154,6 +166,8 @@ Feature: Resolve after pep.config
       | ['custom_key1 '] | ['          | custom_key1 | section |
       | ['custom_key2']  | ['          | custom_key2 | run     |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Resolve in "onstart" section
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -177,6 +191,8 @@ Feature: Resolve after pep.config
       | ['custom_key1 '] | ['          | custom_key1 |
       | ['custom_key2']  | ['          | custom_key2 |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: Resolve in injections
     Given a snakemake project
     Given I open a file "config.yaml" with text
@@ -203,6 +219,8 @@ Feature: Resolve after pep.config
       | ['custom_key1'] | ['          | rule       | message | custom_key1 |
       | ['custom_key2'] | ['          | checkpoint | shell   | custom_key2 |
 
+  # TODO Feature not implemented
+  @ignore
   Scenario Outline: No resolve in injections for wildcards expanding/defining sections
     Given a snakemake project
     Given I open a file "config.yaml" with text

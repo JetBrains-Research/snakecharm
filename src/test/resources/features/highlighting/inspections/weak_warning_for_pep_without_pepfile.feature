@@ -1,6 +1,6 @@
-# Feature not implemented
-@ignore
 Feature: Weak warning for pep.config without config file
+  # TODO Feature not implemented
+  @ignore
   Scenario: Weak warning if no config for pep.config
     Given a snakemake project
     Given I open a file "config.yaml" with text
