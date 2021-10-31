@@ -31,6 +31,7 @@ Released on ...
 - Inspection: Show ERROR for execution sections in 'use' section (see [#408](https://github.com/JetBrains-Research/snakecharm/issues/408))
 - Completion features related to 'use' section (see [#413](https://github.com/JetBrains-Research/snakecharm/issues/413))
 - Add reference for 'snakefile:' in module declaration (see [#409](https://github.com/JetBrains-Research/snakecharm/issues/409))
+- Initial PEPs support (see [#360](https://github.com/JetBrains-Research/snakecharm/issues/360))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN))
 
 ## [2021.2.424]
