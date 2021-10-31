@@ -56,11 +56,11 @@ Feature: Completion after pep object
       | rule       | message |
       | checkpoint | shell   |
 
-  Scenario: Complete in "onstart" section
+  Scenario Outline: Complete in onstart/onerror/onsuccess section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    onstart :
+    <python_section> :
            pep.
     """
     When I put the caret after pep.
@@ -69,6 +69,11 @@ Feature: Completion after pep object
       | amendments      |
       | list_amendments |
       | config          |
+    Examples:
+      | python_section |
+      | onstart        |
+      | onerror        |
+      | onsuccess      |
 
   Scenario Outline: No completion in injections for wildcards expanding/defining sections
     Given a snakemake project

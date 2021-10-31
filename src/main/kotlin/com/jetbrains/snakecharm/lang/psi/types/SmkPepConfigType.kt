@@ -69,9 +69,9 @@ class SmkPepConfigType(val smkFile: SmkFile) : PyStructuralType(emptySet(), fals
     override fun isBuiltin(): Boolean = false
 
     override fun assertValid(message: String?) {
-        SmkPepConfigCollector.getYamlParseResult(smkFile).second.forEach {
-            if (!it.isValid) {
-                throw PsiInvalidElementAccessException(it, message)
+        SmkPepConfigCollector.getYamlParseResult(smkFile).second.forEach { psiElement ->
+            if (!psiElement.isValid) {
+                throw PsiInvalidElementAccessException(psiElement, message)
             }
         }
     }
