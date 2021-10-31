@@ -23,6 +23,8 @@ Feature: Complete file names in workflow sections
       | configfile | yaml      |
       | configfile | yml       |
       | report     | html      |
+      | pepfile    | yaml      |
+      | pepschema  | yaml      |
 
   Scenario: Completion list for directories in 'workdir' section
     Given a snakemake project
@@ -58,6 +60,8 @@ Feature: Complete file names in workflow sections
       | configfile | yaml      |
       | configfile | yml       |
       | report     | html      |
+      | pepfile    | yaml      |
+      | pepschema   | yml       |
 
   Scenario: Complete in 'workdir' section
     Given a snakemake project
@@ -91,6 +95,8 @@ Feature: Complete file names in workflow sections
       | configfile | yaml      |
       | configfile | yml       |
       | report     | html      |
+      | pepfile    | yaml      |
+      | pepschema   | yml       |
 
   Scenario: Completion list in 'workdir' section when there are no appropriate directories
     Given a snakemake project
@@ -128,8 +134,10 @@ Feature: Complete file names in workflow sections
       | include    | smk       |
       | configfile | yaml      |
       | report     | html      |
+      | pepfile    | yaml      |
+      | pepschema  | yaml      |
 
-  Scenario Outline: Completion list if it isn't configfile doesn't contain files from top-level directories
+  Scenario Outline: Completion list for section relative current file doesn't contain files from top-level directories
     Given a snakemake project
     Given a file "boo.<file_type>" with text
     """
@@ -143,9 +151,10 @@ Feature: Complete file names in workflow sections
     Then completion list shouldn't contain:
       | boo.<file_type> |
     Examples:
-      | section | file_type |
-      | include | smk       |
-      | report  | html      |
+      | section  | file_type |
+      | include  | smk       |
+      | report   | html      |
+      | pepschema | yaml      |
 
   Scenario: Completion list in 'workdir' section doesn't contain top-level directories
     Given a snakemake project
@@ -175,9 +184,10 @@ Feature: Complete file names in workflow sections
     Examples:
       | section    | file_type |
       | include    | smk       |
-      | configfile | yaml      |
       | configfile | yml       |
+      | pepfile    | yaml      |
       | report     | html      |
+      | pepschema   | yaml      |
 
   Scenario: Completion in 'workdir' section for subdirectory
     Given a snakemake project
@@ -249,8 +259,30 @@ Feature: Complete file names in workflow sections
       | include    | smk       |
       | configfile | yaml      |
       | report     | html      |
+      | pepfile    | yaml      |
+      | pepschema   | yml       |
 
-  Scenario Outline: Completion list to a configfile in different subdirectories
+  Scenario Outline: Completion list in sections relative current file in different subdirectories
+    Given a snakemake project
+    Given a file "Dir1/boo.<file_type>" with text
+    """
+    """
+    Given I open a file "Dir2/foo.smk" with text
+    """
+    <section>: ""
+    """
+    When I put the caret after <section>: "
+    Then I invoke autocompletion popup and see a text:
+    """
+    <section>: "../Dir1/boo.<file_type>"
+    """
+    Examples:
+      | section   | file_type |
+      | include   | smk       |
+      | report    | html      |
+      | pepschema | yaml      |
+
+  Scenario Outline: Completion list in section relative content root in different subdirectories
     Given a snakemake project
     Given a file "Dir1/boo.<file_type>" with text
     """
@@ -267,22 +299,22 @@ Feature: Complete file names in workflow sections
     Examples:
       | section    | file_type |
       | configfile | yaml      |
-      | configfile | yml       |
+      | pepfile    | yml       |
 
-  Scenario Outline: Completion list in configfile doesn't contain path from current folder
+  Scenario Outline: Completion list in section relative content root doesn't contain path from current folder
     Given a snakemake project
     Given a file "Dir1/boo.<file_type>" with text
     """
     """
     Given I open a file "Dir2/foo.smk" with text
     """
-    configfile: ".."
+    <section>: ".."
     """
     When I put the caret after ..
     And I invoke autocompletion popup
     Then completion list shouldn't contain:
       | ../Dir1/boo.<file_type> |
     Examples:
-      | file_type |
-      | yaml      |
-      | yml       |
+      | section    | file_type |
+      | configfile | yaml      |
+      | pepfile    | yml       |

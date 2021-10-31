@@ -23,6 +23,7 @@ Feature: Completion in python part of snakemake file
       | config    |
       | rules     |
       | input     |
+      | pep       |
 
   Scenario: Complete at top-level (GTE 6.1)
     Given a snakemake:6.1 project
@@ -59,9 +60,10 @@ Feature: Completion in python part of snakemake file
     When I put the caret after a.
     And I invoke autocompletion popup
     Then completion list shouldn't contain:
-    | expand    |
-    | config    |
-    | shell     |
+      | expand |
+      | config |
+      | shell  |
+      | pep    |
 
   Scenario: Complete in rules params section
     Given a snakemake project
@@ -74,10 +76,11 @@ Feature: Completion in python part of snakemake file
     When I put the caret after input:
     And I invoke autocompletion popup
     Then completion list should contain:
-    | expand      |
-    | config      |
-    | rules       |
-    | shell       |
+      | expand |
+      | config |
+      | rules  |
+      | shell  |
+      | pep    |
 
   Scenario: Complete in rules params section (GTE 6.1)
     Given a snakemake:6.1 project
@@ -104,20 +107,21 @@ Feature: Completion in python part of snakemake file
     When I put the caret after run:
     And I invoke autocompletion popup
     Then completion list should contain:
-    | expand    |
-    | config    |
-    | rules     |
-    | shell     |
-    | input     |
-    | output    |
-    | params    |
-    | wildcards |
-    | resources |
-    | log       |
-    | threads   |
-    | version   |
-    | rule      |
-    | jobid     |
+      | expand    |
+      | config    |
+      | rules     |
+      | shell     |
+      | input     |
+      | output    |
+      | params    |
+      | wildcards |
+      | resources |
+      | log       |
+      | threads   |
+      | version   |
+      | rule      |
+      | jobid     |
+      | pep       |
 
   Scenario: Complete in run section  (GTE 6.1)
       Given a snakemake:6.1 project
@@ -198,6 +202,7 @@ Feature: Completion in python part of snakemake file
       | expand | expand()      |
       | config | config        |
       | shell  | shell()       |
+      | pep    | pep           |
 
   #noinspection SpellCheckingInspection
   Scenario: Complete in not-empty context
@@ -225,6 +230,7 @@ Feature: Completion in python part of snakemake file
       | expand |
       | config |
       | rules  |
+      | pep    |
 
     Examples:
       | ext |
@@ -244,6 +250,7 @@ Feature: Completion in python part of snakemake file
       | rules       |
       | checkpoints |
       | config      |
+      | pep         |
 
     Examples:
       | rule_like  | section |
@@ -264,6 +271,7 @@ Feature: Completion in python part of snakemake file
       | rules       |
       | checkpoints |
       | config      |
+      | pep         |
 
     Examples:
       | rule_like  | section |
