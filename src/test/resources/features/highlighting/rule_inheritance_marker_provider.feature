@@ -35,9 +35,14 @@ Feature: tests line marker provider in case of rule inheritance
 
   Scenario Outline: Rule inheritance in case of module usage
     Given a snakemake project
+    And a file "doo.smk" with text
+    """
+    <rule_like> NAME: # doo.smk
+      input: "doo_name_inp"
+    """
     And a file "boo.smk" with text
     """
-    <rule_like> NAME:
+    <rule_like> NAME: # boo.smk
       input: "name_inp"
 
     <rule_like> NAME_2:
@@ -61,8 +66,11 @@ Feature: tests line marker provider in case of rule inheritance
 
     use rule * from MODULE as IMPLICIT_DEFINITION_OF_*
     """
+    When I change current file to <doo.smk>
+    And I put the caret at NAME: # doo.smk
+    Then I expect no markers
     When I change current file to <boo.smk>
-    And I put the caret at NAME:
+    And I put the caret at NAME: # boo.smk
     Then I expect marker of overridden section with references:
       | NAME_3                   | foo.smk |
       | NAME_4                   | foo.smk |
@@ -84,7 +92,7 @@ Feature: tests line marker provider in case of rule inheritance
     Then I expect no markers
     When I put the caret at EXPLICIT_DEFINITION_OF_*
     Then I expect marker of overriding section with references:
-      | NAME | boo.smk |
+      | NAME   | boo.smk |
       | NAME_2 | boo.smk |
     When I put the caret at IMPLICIT_DEFINITION_OF_*
     Then I expect marker of overriding section with references:
@@ -156,6 +164,71 @@ Feature: tests line marker provider in case of rule inheritance
     Then I expect marker of overriding section with references:
       | NAME   | doo.smk |
       | NAME_2 | doo.smk |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Rule inheritance in case of include in the main file, issue #463
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <rule_like> NAME:
+      input: "name_inp"
+
+    <rule_like> NAME_2:
+      input: "name_2_inp"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    include: "boo.smk"
+
+    use rule NAME as NAME_3 with:
+      threads: 1
+    """
+    When I change current file to <boo.smk>
+    And I put the caret at NAME:
+    Then I expect marker of overridden section with references:
+      | NAME_3 | foo.smk |
+    When I change current file to <boo.smk>
+    And I put the caret at NAME_2:
+    Then I expect no markers
+    When I change current file to <foo.smk>
+    And I put the caret at NAME_3
+    Then I expect marker of overriding section with references:
+      | NAME | boo.smk |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Rule inheritance in case of include in the main file, issue #462
+    Given a snakemake project
+    And a file "doo.smk" with text
+    """
+    <rule_like> NAME:
+      input: "name_inp"
+    """
+    And a file "boo.smk" with text
+    """
+    module DOO:
+      snakefile: "doo.smk"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    include: "boo.smk"
+
+    use rule NAME from DOO as NAME_3 with:
+      threads: 1
+    """
+    When I change current file to <doo.smk>
+    And I put the caret at NAME:
+    Then I expect marker of overridden section with references:
+      | NAME_3 | foo.smk |
+    When I change current file to <foo.smk>
+    And I put the caret at NAME_3
+    Then I expect marker of overriding section with references:
+      | NAME | doo.smk |
     Examples:
       | rule_like  |
       | rule       |
