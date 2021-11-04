@@ -49,6 +49,12 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
      * Returns True if it uses '*' pattern in section, where inherited rules are defined
      */
     fun hasPatternInDefinitionOfInheritedRules(): Boolean
+
+    /**
+     * Returns the first leaf of element it is a USE_NAME_IDENTIFIER, otherwise returns nameIdentifier.
+     * Returns null if there are no identifier
+     */
+    fun getIdentifierLeaf(): PsiElement?
 }
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer

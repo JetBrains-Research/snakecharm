@@ -86,6 +86,7 @@
     <renamePsiElementProcessor implementation="com.jetbrains.snakecharm.stringLanguage.codeInsight.SmkSLRenameWildcardsProcessor"/>
     <!--<enterBetweenBracesDelegate language="Snakemake" implementationClass="com.jetbrains.snakecharm.codeInsight.editorActions.EnterInRuleParamsListDelegate"/>-->
     <codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeMethodLineMarkerProvider"/>
+    <codeInsight.lineMarkerProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.SnakemakeRuleInheritanceMarkerProvider"/>
     <lang.documentationProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.documentation.SmkShadowSettingsDocumentation"/>
     <lang.documentationProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.documentation.SmkWrapperDocumentation"/>
     <lang.psiStructureViewFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.structureView.SmkStructureViewFactory"/>
