@@ -4,6 +4,8 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
+import com.intellij.psi.util.elementType
+import com.intellij.psi.util.parentOfType
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.impl.references.PyReferenceImpl
 import com.jetbrains.python.psi.resolve.PyResolveContext
@@ -14,6 +16,8 @@ import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkModule
 import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
+import com.jetbrains.snakecharm.lang.psi.SmkUse
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
@@ -51,7 +55,21 @@ class SmkRuleOrCheckpointNameReference(
         results.addAll(SmkCheckpointType(null, smkFile).resolveMember(name, element, ctx, myContext))
         results.addAll(collectModulesAndResolveThem(smkFile, element))
 
-        return results
+        val moduleRef = element.parentOfType<SmkUse>()?.getModuleName() as? SmkReferenceExpression
+        val itIsModuleMameReference = element.parent is SmkUse//.elementType == SmkElementTypes.USE_IMPORTED_RULES_NAMES
+        val parentIsImportedRuleNames = element.parent.elementType == SmkElementTypes.USE_IMPORTED_RULES_NAMES
+        if (!parentIsImportedRuleNames && !itIsModuleMameReference) {
+            return results
+        }
+        return results.filter { resolveResult ->
+            // If we resolve module references, there must be only SmkModules
+            (resolveResult.element is SmkModule && itIsModuleMameReference) ||
+                    // We don't want to suggest local resolve result for the reference of rule, which was imported
+                    (moduleRef != null // Module name reference is defined and resolve result is from another file
+                            && element.containingFile != resolveResult.element?.containingFile)
+                    // OR There are no 'from *name*' combination, so it hasn't been imported
+                    || (moduleRef == null && resolveResult.element?.containingFile == element.containingFile)
+        }.toMutableList()
     }
 
     /**

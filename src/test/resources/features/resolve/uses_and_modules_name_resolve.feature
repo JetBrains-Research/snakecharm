@@ -45,19 +45,17 @@ Feature: Resolve use and module name to its declaration
     module M:
       snakefile: "boo.smk"
 
-    use rule * from M as other_*
-
-    use rule <name> as NAME_other with:
+    use rule <name> from M as NAME_other with:
       input:
         "data_file.txt"
     """
     When I put the caret at <name>
-    Then reference should resolve to "<resolve_to>" in "boo.smk"
+    Then reference should resolve to "<name>" in "boo.smk"
     Examples:
-      | name              | resolve_to  | rule_like  |
-      | other_z           | z           | rule       |
-      | other_z           | z           | checkpoint |
-      | other_updated_zoo | updated_zoo | rule       |
+      | name        | rule_like  |
+      | z           | rule       |
+      | z           | checkpoint |
+      | updated_zoo | rule       |
 
   Scenario Outline: Refer to rules, declared in other .smk file included into module
     Given a snakemake project
@@ -76,20 +74,42 @@ Feature: Resolve use and module name to its declaration
     module M:
       snakefile: "boo.smk"
 
-    use rule * from M as other_*
-
-    use rule <name> as NAME_other with:
+    use rule <name> from M as NAME_other with:
       input:
         "data_file.txt"
     """
     When I put the caret at <name>
     Then reference should resolve to "<resolve_to>" in "zoo.smk"
     Examples:
-      | name                | resolve_to    | rule_like  |
-      | other_zoo_rule      | zoo_rule      | rule       |
-      | other_zoo_rule      | zoo_rule      | checkpoint |
-      | other_rule_from_zoo | rule_from_zoo | rule       |
+      | name          | resolve_to    | rule_like  |
+      | zoo_rule      | zoo_rule      | rule       |
+      | zoo_rule      | zoo_rule      | checkpoint |
+      | rule_from_zoo | rule_from_zoo | rule       |
 
+  Scenario Outline: Refer to rule, declared in appropriate file. Same file case
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <rule_like> zoo_rule: threads: 1
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+      snakefile: "boo.smk"
+
+    use rule zoo_rule from M with:
+      threads: 2
+
+    use rule zoo_rule as zoo_rule_other with:
+      input:
+        "data_file.txt"
+    """
+    When I put the caret at zoo_rule as
+    Then reference should resolve to "zoo_rule" in context "zoo_rule from" in file "foo.smk"
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
 
   Scenario Outline: Do not resolve reference of imported rule to local rule with the same name
     Given a snakemake project

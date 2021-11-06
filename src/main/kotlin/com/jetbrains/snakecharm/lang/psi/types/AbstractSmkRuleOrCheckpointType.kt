@@ -70,22 +70,9 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
             location.originalElement, name, indexKey, clazz
         ) { currentFileDeclarations }
 
-        if (results.isEmpty()) {
-            // If there are no such rule, searches for rule declared in 'use' section
-            return getUseSections(name, location)
-        }
-
-        return results.filter { resolveResult ->
-            // We don't want so suggest local resolve result for the reference of rule, which was imported
-            val moduleRef = location.parentOfType<SmkUse>()?.getModuleName() as? SmkReferenceExpression
-            val module = moduleRef?.reference?.resolve() as? SmkModule
-            moduleRef == null // There are no 'from *name*' combination, so it wasn't imported
-                    || (module == null && location.containingFile != resolveResult.containingFile)  // module with such name haven't been defined,
-                    // but we can be sure, that target rule is from another file
-                    || ( module != null && module.getPsiFile() == resolveResult.containingFile) // If module is defined
-        }.map { element ->
-            RatedResolveResult(SmkResolveUtil.RATE_NORMAL, element)
-        }
+        return results.map { element ->
+            RatedResolveResult(RatedResolveResult.RATE_LOW, element)
+        } + getUseSections(name, location)
     }
 
     override fun isBuiltin() = false
