@@ -258,7 +258,7 @@ class AdvancedWildcardsCollector(
         visitedRules.add(ruleLike)
         // Reads wildcards from the cache if possible
         val descriptors = if (cachedWildcardsByRule != null && ruleLike in cachedWildcardsByRule) {
-            cachedWildcardsByRule.getValue(ruleLike).get()
+            cachedWildcardsByRule.getValue(ruleLike).get().filter { it.psi.isValid }
         } else {
             // Otherwise, uses WildcardsCollector to gather wildcards
             val wildcardsDefiningSectionsAvailable = ruleLike.getSections()
@@ -287,8 +287,8 @@ class AdvancedWildcardsCollector(
         descriptors?.filter { it.sectionName !in visitedSections }
             ?.forEach { descriptor ->
                 listOfDescriptors.add(descriptor)
-                descriptor.sectionName?.also { visitedSections.add(it) }
             }
+        visitedSections.addAll(ruleLike.getSections().mapNotNull { it.sectionKeyword })
 
         if (descriptors == null) {
             // Highlights, that it was impossible to check some sections

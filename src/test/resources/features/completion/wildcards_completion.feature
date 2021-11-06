@@ -106,6 +106,26 @@ Feature: Completion for wildcards
       | rule       |
       | checkpoint |
 
+  Scenario Outline: One section can't be visited more than one times even if there were no wildcards. Completion case
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> ANOTHER_NAME:
+        output: "{wildcard1}"
+
+    use rule ANOTHER_NAME as NAME with:
+      output: "{}"
+      input: "{}"
+    """
+    When I put the caret after input: "{
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | wildcard1 |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
   Scenario Outline: Complete a wildcard name
     Given a snakemake project
     Given I open a file "foo.smk" with text

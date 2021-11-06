@@ -48,6 +48,24 @@ Feature: Resolve wildcards in SnakemakeSL
       | rule       |
       | checkpoint |
 
+  Scenario Outline: One section can't be visited more than one times even if there were no wildcards. Resolve case
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> ANOTHER_NAME:
+        output: "{wildcard1}"
+
+    use rule ANOTHER_NAME as NAME with:
+        output: "{}"
+        input: "{wildcard1}"
+    """
+    When I put the caret after input: "{wildcar
+    Then there should be no reference
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
   Scenario Outline: Resolve to wildcard constraints in rule
     Given a snakemake project
     Given I open a file "foo.smk" with text
