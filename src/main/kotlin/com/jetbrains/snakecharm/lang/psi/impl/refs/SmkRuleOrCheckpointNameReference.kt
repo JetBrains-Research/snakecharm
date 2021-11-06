@@ -66,9 +66,9 @@ class SmkRuleOrCheckpointNameReference(
             (resolveResult.element is SmkModule && itIsModuleMameReference) ||
                     // We don't want to suggest local resolve result for the reference of rule, which was imported
                     (moduleRef != null // Module name reference is defined and resolve result is from another file
-                            && element.containingFile != resolveResult.element?.containingFile)
+                            && element.containingFile.originalFile != resolveResult.element?.containingFile?.originalFile)
                     // OR There are no 'from *name*' combination, so it hasn't been imported
-                    || (moduleRef == null && resolveResult.element?.containingFile == element.containingFile)
+                    || (moduleRef == null && resolveResult.element?.containingFile?.originalFile == element.containingFile.originalFile)
         }.toMutableList()
     }
 
