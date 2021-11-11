@@ -29,7 +29,7 @@ class SmkSeveralRulesAreOverriddenAsOneInspection : SnakemakeInspection() {
                 // There are pattern in name, or there are no name (which means, that 'use' section doesn't change names)
                 return
             }
-            val overridden = use.getImportedRuleNames()
+            val overridden = use.getReferencesOfImportedRuleNames()
 
             if (overridden != null && overridden.size == 1) {
                 // There are only one rule reference
