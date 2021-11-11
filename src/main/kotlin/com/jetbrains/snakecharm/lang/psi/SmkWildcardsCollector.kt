@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.lang.psi
 
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.util.Ref
+import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.parentOfType
 import com.jetbrains.python.psi.*
@@ -195,12 +196,12 @@ class AdvancedWildcardsCollector(
     }
 
     private fun collectWildcards(
-        ruleLike: SmkReferenceExpression,
+        ruleLike: PsiElement,
         listOfDescriptors: MutableList<WildcardDescriptor>,
         visitedSections: MutableSet<String>
     ) {
         // Trying to resolve the reference
-        var resolveResult = ruleLike.reference.resolve()
+        var resolveResult = if (ruleLike is SmkReferenceExpression) ruleLike.reference.resolve() else ruleLike
         while (resolveResult is SmkReferenceExpression) {
             // Collects wildcards in each step of the resolving
             val newUseRule = resolveResult.parentOfType<SmkUse>() ?: return
@@ -228,7 +229,7 @@ class AdvancedWildcardsCollector(
         visitedSections: MutableSet<String>
     ) {
         // Get lists of inherited wildcards
-        val wildcardsLists = use.getImportedRuleNames()
+        val wildcardsLists = (use.getReferencesOfImportedRuleNames()?.toList() ?: use.getImportedRules())
             ?.map {
                 val listOfWildcards = mutableListOf<WildcardDescriptor>()
                 collectWildcards(it, listOfWildcards, visitedSections.toMutableSet())
@@ -258,7 +259,7 @@ class AdvancedWildcardsCollector(
         visitedRules.add(ruleLike)
         // Reads wildcards from the cache if possible
         val descriptors = if (cachedWildcardsByRule != null && ruleLike in cachedWildcardsByRule) {
-            cachedWildcardsByRule.getValue(ruleLike).get().filter { it.psi.isValid }
+            cachedWildcardsByRule.getValue(ruleLike).get()?.filter { it.psi.isValid }
         } else {
             // Otherwise, uses WildcardsCollector to gather wildcards
             val wildcardsDefiningSectionsAvailable = ruleLike.getSections()

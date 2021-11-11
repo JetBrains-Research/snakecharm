@@ -133,7 +133,7 @@ Feature: Resolve use and module name to its declaration
       | rule_a | rule       |
       | rule_a | checkpoint |
 
-  Scenario Outline: Refer to other use section which declared new rules with wildcard
+  Scenario Outline: Refer to another use identifier which declared new rules with wildcard
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -147,9 +147,9 @@ Feature: Resolve use and module name to its declaration
     When I put the caret at other_b as NAME
     Then reference should resolve to "<resolve_to>" in "foo.smk"
     Examples:
-      | original                  | resolve_to |
-      | a,b,c from M as other_*   | b          |
-      | other_a,other_b from M as | other_b    |
+      | original                  | resolve_to      |
+      | a,b,c from M as other_*   | other_*         |
+      | other_a,other_b from M as | other_a,other_b |
 
   Scenario: Module name refer to module declaration
     Given a snakemake project

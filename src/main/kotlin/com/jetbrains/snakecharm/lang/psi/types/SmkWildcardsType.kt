@@ -64,6 +64,8 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
         direction: AccessDirection,
         resolveContext: PyResolveContext
     ): List<RatedResolveResult> {
+        visitedRules.clear()
+
         if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location)) {
             return emptyList()
         }
@@ -118,16 +120,16 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
             .find { it.sectionKeyword == SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS }
 
     private fun getUseWildcardsConstraintsSection(use: SmkUse, name: String) =
-        use.getImportedRuleNames()
+        (use.getReferencesOfImportedRuleNames()?.toList() ?: use.getImportedRules())
             ?.asSequence()
             ?.mapNotNull { getWildcardsConstraintsSectionFromSectionReference(it, name) }
             ?.firstOrNull()
 
     private fun getWildcardsConstraintsSectionFromSectionReference(
-        reference: SmkReferenceExpression,
+        reference: PsiElement,
         name: String
     ): PyKeywordArgument? {
-        var resolveResult = reference.reference.resolve()
+        var resolveResult = if (reference is SmkReferenceExpression) reference.reference.resolve() else reference
         while (resolveResult is SmkReferenceExpression) {
             val referenceContainer = resolveResult.parentOfType<SmkUse>()
             if (referenceContainer != null) {
@@ -151,10 +153,9 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
                 return null
             }
             visitedRules.add(useName)
-            val argsSection = resolveResult.getImportedRuleNames()?.lastOrNull()
-                ?.let { getWildcardsConstraintsSectionFromSectionReference(it, name) }
-            if (argsSection != null) {
-                return argsSection
+            val result = getUseWildcardsConstraintsSection(resolveResult, name)
+            if (result != null){
+                return result
             }
         }
 

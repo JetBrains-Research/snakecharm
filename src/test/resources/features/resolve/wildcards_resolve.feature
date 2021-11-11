@@ -120,7 +120,7 @@ Feature: Resolve wildcards in SnakemakeSL
         input: "{foo3}"
 
     use rule new_A as new_new_b with:
-        output: "{foo4}"
+        output: "{foo4}{foo3}"
 
     use rule NAME2 as bbbb with:
         benchmark: "{foo5}"
@@ -131,6 +131,8 @@ Feature: Resolve wildcards in SnakemakeSL
     Then reference in injection should resolve to "foo3=""" in "boo.smk"
     When I put the caret after output: "{fo
     Then reference in injection should resolve to "foo4=""" in "boo.smk"
+    When I put the caret after output: "{foo4}{foo
+    Then reference in injection should resolve to "foo3=""" in "boo.smk"
     When I put the caret after benchmark: "{fo
     Then reference in injection should resolve to "foo5=""" in "foo.smk"
     Examples:
