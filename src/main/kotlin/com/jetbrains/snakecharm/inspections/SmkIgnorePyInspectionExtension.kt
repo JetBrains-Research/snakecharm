@@ -56,7 +56,8 @@ class SmkIgnorePyInspectionExtension : PyInspectionExtension() {
             // Maybe referenceName is better here?
             //val referencedName = node.referencedName
             //return "config".equals(referencedName)
-            return node.textMatches(SnakemakeAPI.SMK_VARS_CONFIG)
+            return node.textMatches(SnakemakeAPI.SMK_VARS_CONFIG) ||
+                    node.textMatches(SnakemakeAPI.SMK_VARS_PEP)
         }
         return false
     }

@@ -49,6 +49,11 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
      * Returns list of [SmkRuleOrCheckpoint] from defined module. Returns null if there are no module reference, module section or file
      */
     fun getImportedRules(): List<SmkRuleOrCheckpoint>?
+
+    /**
+     * Returns True if it uses '*' pattern in section, where inherited rules are defined
+     */
+    fun hasPatternInDefinitionOfInheritedRules(): Boolean
 }
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer

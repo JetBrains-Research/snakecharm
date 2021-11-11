@@ -69,11 +69,12 @@ Plugin is available in IntelliJ Plugins Repository, see [SnakeCharm Plugin](http
 
 # EAP Updates
 Early builds of coming releases are available in EAP channel. To receive this updates add EAP repository:
-* Open IntelliJ IDEA / PyCharm / .. IDE setting
-* In Plugins section press 'gear' icon, select `Manage Plugin Repositories...`
+* Open  `PyCharm` / `IntelliJ IDEA` IDE settings
+* In Plugins section press ⚙️ (`gear` icon), select `Manage Plugin Repositories...`
 * Add repo `https://plugins.jetbrains.com/plugins/eap/list` using `+` button, press OK
 (Complete guide at [Custom Release Channels](https://www.jetbrains.org/intellij/sdk/docs/plugin_repository/custom_channels.html))
-* EAP builds will be visible as plugin updates
+* Switch to `Marketplace` tab, search for `snakecharm`
+* EAP builds will be visible as plugin updates if compatible with your IDE build
 
 # Support
 Contact me at roman.chernyatchik@jetbrains.com or post issues in [Issue Tracker](https://github.com/JetBrains-Research/snakecharm/issues)

@@ -379,12 +379,12 @@ class SmkStatementParsing(
         when (myBuilder.tokenType) {
             PyTokenTypes.FROM_KEYWORD -> myBuilder.apply {
                 error(SnakemakeBundle.message("PARSE.use.names.expected"))
-                asKeywordExists = fromSignatureParsing(names)
+                asKeywordExists = fromSignatureParsing()
             }
             PyTokenTypes.AS_KEYWORD -> myBuilder.apply {
                 asKeywordExists = true
                 error(SnakemakeBundle.message("PARSE.use.names.expected"))
-                asSignatureParsing(names)
+                asSignatureParsing()
             }
             PyTokenTypes.IDENTIFIER -> {
                 val marker = myBuilder.mark()
@@ -464,14 +464,14 @@ class SmkStatementParsing(
     }
 
     /**
-     * Uses when we've finished to collect rules names and went to the next step
+     * Uses when we've finished collecting rules names and went to the next step
      * Returns true if 'as' part was detected
      */
     private fun endOfImportedRulesDeclaration(
         definedByWildcard: Boolean,
         names: List<String>
     ): Boolean = when (myBuilder.tokenType) {
-        PyTokenTypes.FROM_KEYWORD -> fromSignatureParsing(names)
+        PyTokenTypes.FROM_KEYWORD -> fromSignatureParsing()
         PyTokenTypes.AS_KEYWORD -> {
             if (definedByWildcard) {
                 myBuilder.error(SnakemakeBundle.message("PARSE.use.unexpected.list.ending"))
@@ -479,7 +479,7 @@ class SmkStatementParsing(
             if (names.size > 1) {
                 myBuilder.error(SnakemakeBundle.message("PARSE.use.few.names.from.current.module"))
             }
-            asSignatureParsing(names)
+            asSignatureParsing()
             true
         }
         else -> {
@@ -492,7 +492,7 @@ class SmkStatementParsing(
      * Parses 'from' part in 'use' section declaration.
      * Returns true if 'as' part was detected after 'from' part
      */
-    private fun fromSignatureParsing(names: List<String>): Boolean {
+    private fun fromSignatureParsing(): Boolean {
         myBuilder.remapCurrentToken(SmkTokenTypes.SMK_FROM_KEYWORD)
         nextToken()
 
@@ -503,7 +503,7 @@ class SmkStatementParsing(
         }
 
         if (atToken(PyTokenTypes.AS_KEYWORD)) {
-            asSignatureParsing(names)
+            asSignatureParsing()
             return true
         }
 
@@ -513,7 +513,7 @@ class SmkStatementParsing(
     /**
      * Parses 'as' part in 'use' section declaration
      */
-    private fun asSignatureParsing(names: List<String>) {
+    private fun asSignatureParsing() {
         myBuilder.remapCurrentToken(SmkTokenTypes.SMK_AS_KEYWORD)
         nextToken()
 
@@ -560,9 +560,6 @@ class SmkStatementParsing(
                 name.done(SmkElementTypes.USE_NAME_IDENTIFIER)
             } else { // New rule name consists of one identifier
                 name.drop()
-                if (names.size > 1) {
-                    myBuilder.error(SnakemakeBundle.message("PARSE.use.requires.wildcard"))
-                }
             }
         }
     }

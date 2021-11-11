@@ -24,9 +24,9 @@ class SmkFrameworkDetector : FrameworkDetector("snakemake") {
     override fun getFileType() = SmkFileType.INSTANCE
 
     override fun detect(
-        newFiles: MutableCollection<VirtualFile>,
-        context: FrameworkDetectionContext
-    ): MutableList<DetectedFrameworkDescription> {
+        newFiles: MutableCollection<out VirtualFile>,
+        context: FrameworkDetectionContext,
+    ): MutableList<out DetectedFrameworkDescription> {
         val project = context.project!!
 
         val filesByModule = MultiMap.createSet<Module, VirtualFile>()

@@ -4,6 +4,8 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.elementType
+import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.types.TypeEvalContext
@@ -101,4 +103,9 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
 
     override fun getImportedRules(): List<SmkRuleOrCheckpoint>? =
         getPairsOfImportedRulesAndNames(mutableSetOf())?.map { it.second }
+
+    override fun hasPatternInDefinitionOfInheritedRules(): Boolean {
+        val importedRulesPart = findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES) as? PsiElement ?: return false
+        return (PsiTreeUtil.collectElements(importedRulesPart) { el -> el.elementType == PyTokenTypes.MULT }).isNotEmpty()
+    }
 }

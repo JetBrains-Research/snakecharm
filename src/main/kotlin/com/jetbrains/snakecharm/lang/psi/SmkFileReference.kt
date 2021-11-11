@@ -4,7 +4,10 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.TextRange
-import com.intellij.openapi.vfs.*
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PsiReferenceEx
@@ -189,6 +192,43 @@ class SmkConfigfileReference(
     path,
     searchRelativelyToCurrentFolder = false
 ) {
+    override fun getVariants() = collectFileSystemItemLike {
+        isYamlFile(it)
+    }
+}
+
+/**
+ * The path must built from working directory
+ * We use contentRoots as working directory
+ * version 6.5.1
+ */
+class SmkPepfileReference(
+    element: SmkArgsSection,
+    textRange: TextRange,
+    stringLiteralExpression: PyStringLiteralExpression,
+    path: String
+) : SmkFileReference(
+    element,
+    textRange,
+    stringLiteralExpression,
+    path,
+    searchRelativelyToCurrentFolder = false
+) {
+    override fun getVariants() = collectFileSystemItemLike {
+        isYamlFile(it)
+    }
+}
+
+/**
+ * The path must built from directory with current snakefile
+ * version 6.5.1
+ */
+class SmkPepschemaReference(
+    element: SmkArgsSection,
+    textRange: TextRange,
+    stringLiteralExpression: PyStringLiteralExpression,
+    path: String
+) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike {
         isYamlFile(it)
     }

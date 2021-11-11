@@ -12,17 +12,19 @@ Feature: Completion for snakemake keyword-like things
     <item>: "foo"
     """
     Examples:
-    | item                  |
-    | configfile            |
-    | singularity           |
-    | include               |
-    | workdir               |
-    | wildcard_constraints  |
-    | onsuccess             |
-    | onstart               |
-    | onerror               |
-    | localrules            |
-    | ruleorder             |
+      | item                 |
+      | configfile           |
+      | singularity          |
+      | include              |
+      | workdir              |
+      | wildcard_constraints |
+      | onsuccess            |
+      | onstart              |
+      | onerror              |
+      | localrules           |
+      | ruleorder            |
+      | pepfile              |
+      | pepschema            |
 
   Scenario: Complete report at top-level
     # We have 2 'report' in completion list, so prev scenario outline doesn't work  for 'report'

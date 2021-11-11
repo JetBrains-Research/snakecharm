@@ -19,6 +19,8 @@ object SnakemakeNames {
     const val WORKFLOW_SINGULARITY_KEYWORD = "singularity"
     const val WORKFLOW_INCLUDE_KEYWORD = "include"
     const val WORKFLOW_WORKDIR_KEYWORD = "workdir"
+    const val WORKFLOW_PEPFILE_KEYWORD = "pepfile"
+    const val WORKFLOW_PEPSCHEMA_KEYWORD = "pepschema"
     const val WORKFLOW_ENVVARS_KEYWORD = "envvars"
     const val WORKFLOW_CONTAINER_KEYWORD = "container"
     const val WORKFLOW_CONTAINERIZED_KEYWORD = "containerized"  // => 6.0.0
