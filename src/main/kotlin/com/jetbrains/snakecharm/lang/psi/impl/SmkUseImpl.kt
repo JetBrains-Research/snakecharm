@@ -41,7 +41,7 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
         if (namePattern != null) { // Returns name patter if it exits
             return namePattern.node
         }
-        val originalNames = getImportedRuleNames()
+        val originalNames = getReferencesOfImportedRuleNames()
         // Returns original names, we don't want to save one name because
         // index with this name probably already exists
         // so we save whole rules names if it is not just '*' wildcard
@@ -58,21 +58,12 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
         }
         val newName = getNameIdentifierPattern()
         val originalNames = mutableListOf<Pair<String, PsiElement>>()
-        getImportedRuleNames()?.forEach { reference ->
+        getReferencesOfImportedRuleNames()?.forEach { reference ->
             originalNames.add(reference.text to reference)
         }
         if (originalNames.isEmpty()) {
-            val moduleRef = (getModuleName() as? SmkReferenceExpression) ?: return emptyList()
-            val module = moduleRef.reference.resolve()
-            if (module == null || module !is SmkModule) {
-                return emptyList()
-            }
-            val file = module.getPsiFile()
-            if (file != null && file is SmkFile) {
-                originalNames.addAll(file.advancedCollectRules(visitedFiles).map { it.first to it.second })
-            } else {
-                return emptyList()
-            }
+            val pairs = getPairsOfImportedRulesAndNames(visitedFiles) ?: return emptyList()
+            originalNames.addAll(pairs.map { it.first to it.second })
         }
         return if (newName != null) {
             originalNames.map { newName.text.replace("*", it.first) to it.second }
@@ -86,12 +77,28 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
      */
     private fun getNameIdentifierPattern() = findChildByType(SmkElementTypes.USE_NAME_IDENTIFIER) as? PsiElement
 
+    /**
+     * Collects all imported rules and their names
+     */
+    private fun getPairsOfImportedRulesAndNames(visitedFiles: MutableSet<PsiFile>): List<Pair<String, SmkRuleOrCheckpoint>>? {
+        val module = ((getModuleName() as? SmkReferenceExpression)?.reference?.resolve() as? SmkModule) ?: return null
+        val file = module.getPsiFile()
+        return if (file != null && file is SmkFile) {
+            file.advancedCollectRules(visitedFiles).map { it.first to it.second }
+        } else {
+            null
+        }
+    }
+
     override fun getModuleName() =
         (findChildByType(SmkTokenTypes.SMK_FROM_KEYWORD) as? PsiElement)?.nextSibling?.nextSibling
 
-    override fun getImportedRuleNames(): Array<SmkReferenceExpression>? =
+    override fun getReferencesOfImportedRuleNames(): Array<SmkReferenceExpression>? =
         PsiTreeUtil.getChildrenOfType(
             findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES),
             SmkReferenceExpression::class.java
         )
+
+    override fun getImportedRules(): List<SmkRuleOrCheckpoint>? =
+        getPairsOfImportedRulesAndNames(mutableSetOf())?.map { it.second }
 }

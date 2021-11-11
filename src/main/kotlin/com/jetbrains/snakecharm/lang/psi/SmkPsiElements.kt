@@ -43,7 +43,12 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
     /**
      * Returns an array of  [SmkReferenceExpression] which refer to overridden rules or checkpoints
      */
-    fun getImportedRuleNames(): Array<SmkReferenceExpression>?
+    fun getReferencesOfImportedRuleNames(): Array<SmkReferenceExpression>?
+
+    /**
+     * Returns list of [SmkRuleOrCheckpoint] from defined module. Returns null if there are no module reference, module section or file
+     */
+    fun getImportedRules(): List<SmkRuleOrCheckpoint>?
 }
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer

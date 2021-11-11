@@ -99,11 +99,11 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
             val referTo = use.getProducedRulesNames()
                 .firstOrNull {
                     (it.first == name &&
-                            it.second.parentOfType<SmkRuleOrCheckpoint>() != parent) ||
+                            it.second.let { element -> if (element is SmkRuleOrCheckpoint) element else element.parentOfType() } != parent) ||
                             it.second.elementType == SmkElementTypes.USE_NAME_IDENTIFIER
                 }
             if (referTo != null) {
-                result.add(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, referTo.second))
+                result.add(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, use))
             }
         }
 
