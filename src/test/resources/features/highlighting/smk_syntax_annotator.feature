@@ -222,6 +222,21 @@ Feature: Annotate additional syntax
     """
     When I check highlighting infos
 
+  Scenario: Annotate keyword argument
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule NAME:
+        input:
+            "file1",
+            arg = "file2"
+    """
+    Then I expect inspection info on <arg> with message
+    """
+    SMK_KEYWORD_ARGUMENT
+    """
+    When I check highlighting infos ignoring extra highlighting
+
   Scenario: 'use' section highlighting, part 2
     Given a snakemake project
     Given I open a file "foo.smk" with text

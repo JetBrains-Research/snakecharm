@@ -97,5 +97,15 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
         st.getSectionKeywordNode()?.let {
             addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterFactory.SMK_DECORATOR)
         }
+        if (st is SmkArgsSection) {
+            st.keywordArguments?.forEach {
+                it.keywordNode?.psi?.let { name ->
+                    addHighlightingAnnotation(
+                        name,
+                        SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD_ARGUMENT
+                    )
+                }
+            }
+        }
     }
 }

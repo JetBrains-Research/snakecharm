@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.text.StringUtil
+import com.jetbrains.snakecharm.lang.highlighter.SmkColorSettingsPage
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.Given
 import junit.framework.TestCase.assertEquals
@@ -32,6 +33,13 @@ class FilesSteps {
     fun iOpenAFile(name: String, text: String) {
         createAndAddFile(name, text)
     }
+
+    @Given("^I open a color settings page text$")
+    fun iOpenAColorSettingsPAge() {
+        val page = SmkColorSettingsPage()
+        createAndAddFile("ColorSettingsPageDemo.smk", page.demoText.replace(Regex("</?(\\w+)>"), ""))
+    }
+
 
     @Then("^the file \"(.+)\" should have text$")
     fun theFileShouldHaveText(path: String, text: String) {

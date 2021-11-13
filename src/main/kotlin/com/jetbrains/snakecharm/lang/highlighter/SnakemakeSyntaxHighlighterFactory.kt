@@ -19,28 +19,39 @@ import com.jetbrains.python.psi.impl.PythonLanguageLevelPusher
  */
 class SnakemakeSyntaxHighlighterFactory : SyntaxHighlighterFactory() {
     companion object {
-        val SMK_KEYWORD = TextAttributesKey.createTextAttributesKey("SMK_KEYWORD",
+        val SMK_KEYWORD = TextAttributesKey.createTextAttributesKey(
+            "SMK_KEYWORD",
             DefaultLanguageHighlighterColors.KEYWORD
         )
-        val SMK_FUNC_DEFINITION = TextAttributesKey.createTextAttributesKey("SMK_FUNC_DEFINITION",
+        val SMK_FUNC_DEFINITION = TextAttributesKey.createTextAttributesKey(
+            "SMK_FUNC_DEFINITION",
             DefaultLanguageHighlighterColors.FUNCTION_DECLARATION
         )
-        val SMK_DECORATOR = TextAttributesKey.createTextAttributesKey("SMK_DECORATOR",
+        val SMK_DECORATOR = TextAttributesKey.createTextAttributesKey(
+            "SMK_DECORATOR",
             DefaultLanguageHighlighterColors.METADATA
         )
         val SMK_PREDEFINED_DEFINITION: TextAttributesKey =
             PyHighlighter.PY_PREDEFINED_DEFINITION // IDK why, but explicit creating via '.createText...' works improperly
-
+        val SMK_KEYWORD_ARGUMENT = TextAttributesKey.createTextAttributesKey(
+            "SMK_KEYWORD_ARGUMENT",
+            DefaultLanguageHighlighterColors.PARAMETER
+        )
         val SMK_TEXT = TextAttributesKey.createTextAttributesKey("SMK_TEXT", DefaultLanguageHighlighterColors.STRING)
+        val SMK_TRIPLE_QUOTED_STRING = TextAttributesKey.createTextAttributesKey(
+            "SMK_TRIPLE_QUOTED_STRING",
+            DefaultLanguageHighlighterColors.STRING
+        )
     }
 
     private val myMap = FactoryMap.create<LanguageLevel, PyHighlighter> { key ->
         object : PyHighlighter(key) {
             override fun getTokenHighlights(tokenType: IElementType?): Array<TextAttributesKey> {
-                if (tokenType === PyTokenTypes.SINGLE_QUOTED_UNICODE) {
-                    return arrayOf(SMK_TEXT)
+                return when (tokenType) {
+                    PyTokenTypes.SINGLE_QUOTED_UNICODE -> arrayOf(SMK_TEXT)
+                    PyTokenTypes.TRIPLE_QUOTED_UNICODE -> arrayOf(SMK_TRIPLE_QUOTED_STRING)
+                    else -> super.getTokenHighlights(tokenType)
                 }
-                return super.getTokenHighlights(tokenType)
             }
 
             override fun createHighlightingLexer(level: LanguageLevel) = SnakemakeHighlightingLexer(level)
@@ -49,7 +60,10 @@ class SnakemakeSyntaxHighlighterFactory : SyntaxHighlighterFactory() {
 
     override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?): SyntaxHighlighter {
         val level = when {
-            project != null && virtualFile != null -> PythonLanguageLevelPusher.getLanguageLevelForVirtualFile(project, virtualFile)
+            project != null && virtualFile != null -> PythonLanguageLevelPusher.getLanguageLevelForVirtualFile(
+                project,
+                virtualFile
+            )
             else -> LanguageLevel.getDefault()
         }
 

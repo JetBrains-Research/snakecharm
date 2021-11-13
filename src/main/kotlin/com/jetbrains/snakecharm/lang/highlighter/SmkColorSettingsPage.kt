@@ -1,12 +1,16 @@
 package com.jetbrains.snakecharm.lang.highlighter
 
+import com.intellij.codeHighlighting.RainbowHighlighter
+import com.intellij.lang.Language
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.options.colors.AttributesDescriptor
 import com.intellij.openapi.options.colors.ColorDescriptor
-import com.intellij.openapi.options.colors.ColorSettingsPage
+import com.intellij.openapi.options.colors.RainbowColorSettingsPage
 import com.jetbrains.python.PythonLanguage
+import com.jetbrains.python.highlighting.PyRainbowVisitor
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.SnakemakeIcons
@@ -14,21 +18,55 @@ import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLSyntaxHighlighter
 import javax.swing.Icon
 
-class SmkColorSettingsPage : ColorSettingsPage {
+class SmkColorSettingsPage : RainbowColorSettingsPage {
     override fun getAttributeDescriptors(): Array<AttributesDescriptor> = arrayOf(
-        AttributesDescriptor(SnakemakeBundle.message("smk.color.keyword"), SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD),
-        AttributesDescriptor(SnakemakeBundle.message("smk.color.definition"), SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION),
-        AttributesDescriptor(SnakemakeBundle.message("smk.color.subsection"), SnakemakeSyntaxHighlighterFactory.SMK_DECORATOR),
-        AttributesDescriptor(SnakemakeBundle.message("smk.color.run"), SnakemakeSyntaxHighlighterFactory.SMK_PREDEFINED_DEFINITION),
-
-        AttributesDescriptor(SnakemakeBundle.message("smk.color.string.text"), SnakemakeSyntaxHighlighterFactory.SMK_TEXT),
-        AttributesDescriptor(SnakemakeBundle.message("smk.color.string.SL.content"), SmkSLSyntaxHighlighter.STRING_CONTENT),
+        AttributesDescriptor(
+            SnakemakeBundle.message("smk.color.keyword"),
+            SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD
+        ),
+        AttributesDescriptor(
+            SnakemakeBundle.message("smk.color.definition"),
+            SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION
+        ),
+        AttributesDescriptor(
+            SnakemakeBundle.message("smk.color.subsection"),
+            SnakemakeSyntaxHighlighterFactory.SMK_DECORATOR
+        ),
+        AttributesDescriptor(
+            SnakemakeBundle.message("smk.color.run"),
+            SnakemakeSyntaxHighlighterFactory.SMK_PREDEFINED_DEFINITION
+        ),
+        AttributesDescriptor(
+            SnakemakeBundle.message("smk.color.keyword.arg"),
+            SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD_ARGUMENT
+        ),
+        AttributesDescriptor(
+            SnakemakeBundle.message("smk.color.string.text"),
+            SnakemakeSyntaxHighlighterFactory.SMK_TEXT
+        ),
+        AttributesDescriptor(
+            SnakemakeBundle.message("smk.color.string.tqs"),
+            SnakemakeSyntaxHighlighterFactory.SMK_TRIPLE_QUOTED_STRING
+        ),
+        AttributesDescriptor(
+            SnakemakeBundle.message("smk.color.string.SL.content"),
+            SmkSLSyntaxHighlighter.STRING_CONTENT
+        ),
         AttributesDescriptor(SnakemakeBundle.message("smk.color.string.SL.braces"), SmkSLSyntaxHighlighter.BRACES),
         AttributesDescriptor(SnakemakeBundle.message("smk.color.string.SL.comma"), SmkSLSyntaxHighlighter.COMMA),
-        AttributesDescriptor(SnakemakeBundle.message("smk.color.string.SL.format"), SmkSLSyntaxHighlighter.FORMAT_SPECIFIER),
+        AttributesDescriptor(
+            SnakemakeBundle.message("smk.color.string.SL.format"),
+            SmkSLSyntaxHighlighter.FORMAT_SPECIFIER
+        ),
         AttributesDescriptor(SnakemakeBundle.message("smk.color.string.SL.key"), SmkSLSyntaxHighlighter.ACCESS_KEY),
-        AttributesDescriptor(SnakemakeBundle.message("smk.color.string.SL.reference"), SmkSLSyntaxHighlighter.IDENTIFIER),
-        AttributesDescriptor(SnakemakeBundle.message("smk.color.string.SL.wildcard"), SmkSLSyntaxHighlighter.HIGHLIGHTING_WILDCARDS_KEY)
+        AttributesDescriptor(
+            SnakemakeBundle.message("smk.color.string.SL.reference"),
+            SmkSLSyntaxHighlighter.IDENTIFIER
+        ),
+        AttributesDescriptor(
+            SnakemakeBundle.message("smk.color.string.SL.wildcard"),
+            SmkSLSyntaxHighlighter.HIGHLIGHTING_WILDCARDS_KEY
+        )
     )
 
     override fun getColorDescriptors(): Array<ColorDescriptor> = ColorDescriptor.EMPTY_ARRAY
@@ -47,33 +85,37 @@ class SmkColorSettingsPage : ColorSettingsPage {
     }
 
     override fun getDemoText(): String =
-        """
-            <keyword>rule</keyword> <identifiers>NAME</identifiers>:
-                <sectionName>input</sectionName>: 
-                    <text>"file_1.txt"</text>
-                <sectionName>output</sectionName>: 
-                    <text>"file_2.txt"</text>
-                <sectionName>shell</sectionName>: 
-                    <text>"</text><injectedText>touch </injectedText><braces>{</braces><reference>output</reference><braces>}</braces><text>"</text>
-            
-            number = 0.451 # Python elements are configured in Python color settings
-            
-            <keyword>use</keyword> <keyword>rule</keyword> NAME <keyword>as</keyword> <identifiers>NAME_2</identifiers> <keyword>with</keyword>:
-                <sectionName>input</sectionName>: 
-                    <text>"{<wildcard>name</wildcard>}.bin"</text>
-                <sectionName>output</sectionName>: 
-                    <text>"{<wildcard>name</wildcard>}.bin"</text>
-                <sectionName>message</sectionName>:  
-                    <text>"</text><injectedText>Float number: </injectedText><braces>{</braces><reference>number</reference><formatSpecifier>:2f</formatSpecifier><braces>}</braces><text>"</text>
-                <sectionName>threads</sectionName>: 
-                    1
-            
-            <keyword>rule</keyword> <identifiers>NAME3</identifiers>:
-             <sectionName>output</sectionName>: 
-                    <text>"</text><injectedText>file_</injectedText><braces>{</braces><reference>number</reference><comma>,</comma> \d+<braces>}</braces><text>"</text>,
-                    <accessKey>arg</accessKey> = <text>"file_1.txt"</text>
-                <run>run</run>:
-                    x = 2
+        "<keyword>rule</keyword> <identifiers>NAME</identifiers>:\n" +
+                "    <TQS>\"\"\"\n" +
+                "    Syntax Highlighting Demo" +
+                RainbowHighlighter.generatePaletteExample("\n    ") +
+                "\n    \"\"\"</TQS>\n" +
+                """    
+            <sectionName>input</sectionName>: 
+                <text>"file_1.txt"</text>
+            <sectionName>output</sectionName>: 
+                <text>"file_2.txt"</text>
+            <sectionName>shell</sectionName>: 
+                <text>"</text><injectedText>touch </injectedText><braces>{</braces><reference>output</reference><braces>}</braces><text>"</text>
+        
+        <localVar>number</localVar> = 0.451 # Python elements are configured in Python color settings
+        
+        <keyword>use</keyword> <keyword>rule</keyword> NAME <keyword>as</keyword> <identifiers>NAME_2</identifiers> <keyword>with</keyword>:
+            <sectionName>input</sectionName>: 
+                <text>"{<wildcard>name</wildcard>}.bin"</text>
+            <sectionName>output</sectionName>: 
+                <text>"{<wildcard>name</wildcard>}.bin"</text>
+            <sectionName>message</sectionName>:  
+                <text>"</text><injectedText>Float number: </injectedText><braces>{</braces><reference>number</reference><formatSpecifier>:2f</formatSpecifier><braces>}</braces><text>"</text>
+            <sectionName>threads</sectionName>: 
+                1
+        
+        <keyword>rule</keyword> <identifiers>NAME3</identifiers>:
+            <sectionName>output</sectionName>: 
+                <text>"</text><injectedText>file_</injectedText><braces>{</braces><wildcard>number</wildcard><comma>,</comma> <braces>}</braces><text>"</text>,
+                <keywordArg>arg</keywordArg> = <text>"file_1.txt"</text>
+            <run>run</run>:
+                <localVar>x</localVar> = 2
         """.trimIndent()
 
     override fun getAdditionalHighlightingTagToDescriptorMap(): MutableMap<String, TextAttributesKey> =
@@ -83,6 +125,8 @@ class SmkColorSettingsPage : ColorSettingsPage {
             it["sectionName"] = SnakemakeSyntaxHighlighterFactory.SMK_DECORATOR
             it["run"] = SnakemakeSyntaxHighlighterFactory.SMK_PREDEFINED_DEFINITION
             it["text"] = SnakemakeSyntaxHighlighterFactory.SMK_TEXT
+            it["TQS"] = SnakemakeSyntaxHighlighterFactory.SMK_TRIPLE_QUOTED_STRING
+            it["keywordArg"] = SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD_ARGUMENT
 
             it["injectedText"] = SmkSLSyntaxHighlighter.STRING_CONTENT
             it["braces"] = SmkSLSyntaxHighlighter.BRACES
@@ -91,5 +135,13 @@ class SmkColorSettingsPage : ColorSettingsPage {
             it["accessKey"] = SmkSLSyntaxHighlighter.ACCESS_KEY
             it["reference"] = SmkSLSyntaxHighlighter.IDENTIFIER
             it["wildcard"] = SmkSLSyntaxHighlighter.HIGHLIGHTING_WILDCARDS_KEY
+
+            it["localVar"] = DefaultLanguageHighlighterColors.LOCAL_VARIABLE
+            it.putAll(RainbowHighlighter.createRainbowHLM())
         }
+
+    override fun isRainbowType(type: TextAttributesKey?): Boolean =
+        PyRainbowVisitor.Holder.HIGHLIGHTING_KEYS.contains(type)
+
+    override fun getLanguage(): Language = SnakemakeLanguageDialect
 }
