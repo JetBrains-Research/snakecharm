@@ -132,3 +132,17 @@ Feature: Inspection for duplicated arguments in same section
       | subworkflow | configfile | "target_1"                   | "target_2"                   |
       | checkpoint  | input      | "{sample}.txt"               | "{sample}.bin"               |
       | rule        | output     | expand("{t}1", t=["A", "B"]) | expand("{t}2", t=["A", "B"]) |
+
+  Scenario: Duplicated string arguments in top-level sections
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    some_new_section: "target_1", "target_2" , "target_2" # duplicate
+    """
+    And SmkSectionDuplicatedArgsInspection inspection is enabled
+    Then I expect inspection warning on <"target_2"> in <"target_2" # duplicate> with message
+    """
+    This argument has been already added to 'some_new_section' section.
+    """
+    When I check highlighting warnings
+
