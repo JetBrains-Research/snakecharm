@@ -21,6 +21,7 @@ Released on ...
 
 ### Added
 - Color Settings Page (see [#431](https://github.com/JetBrains-Research/snakecharm/issues/431))
+- Inspection: highlights 'use rule' section which overrides several rules as one (see [#411](https://github.com/JetBrains-Research/snakecharm/issues/411))
 - Weak warnings for unused 'log' sections in 'use rule' (see [#414](https://github.com/JetBrains-Research/snakecharm/issues/414))
 - Weak warnings for unused 'log' sections (see [#300](https://github.com/JetBrains-Research/snakecharm/issues/300))
 - Support for 'module' and 'use' keywords (see [#355](https://github.com/JetBrains-Research/snakecharm/issues/355))
@@ -31,6 +32,7 @@ Released on ...
 - Inspection: Show ERROR for execution sections in 'use' section (see [#408](https://github.com/JetBrains-Research/snakecharm/issues/408))
 - Completion features related to 'use' section (see [#413](https://github.com/JetBrains-Research/snakecharm/issues/413))
 - Add reference for 'snakefile:' in module declaration (see [#409](https://github.com/JetBrains-Research/snakecharm/issues/409))
+- Initial PEPs support (see [#360](https://github.com/JetBrains-Research/snakecharm/issues/360))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN))
 
 ## [2021.2.424]

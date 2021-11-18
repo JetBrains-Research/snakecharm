@@ -53,6 +53,8 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINERIZED_KEYWO
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_ENVVARS_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_PEPFILE_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_PEPSCHEMA_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_REPORT_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_SINGULARITY_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD
@@ -65,6 +67,7 @@ object SnakemakeAPI {
     const val UNPACK_FUNCTION = "unpack"
 
     const val SMK_VARS_CONFIG = "config"
+    const val SMK_VARS_PEP = "pep"
     const val SMK_VARS_RULES = "rules"
     const val SMK_VARS_CHECKPOINTS = "checkpoints"
     const val SMK_VARS_SCATTER = "scatter"
@@ -139,7 +142,9 @@ object SnakemakeAPI {
         WORKFLOW_WORKDIR_KEYWORD,
         WORKFLOW_ENVVARS_KEYWORD,
         WORKFLOW_CONTAINER_KEYWORD,
-        WORKFLOW_CONTAINERIZED_KEYWORD
+        WORKFLOW_CONTAINERIZED_KEYWORD,
+        WORKFLOW_PEPSCHEMA_KEYWORD,
+        WORKFLOW_PEPFILE_KEYWORD
     )
 
     /**
@@ -294,6 +299,23 @@ object SnakemakeAPI {
         SECTION_PRIORITY, SECTION_GROUP, SECTION_SHADOW, SECTION_CONDA, SECTION_SCRIPT, SECTION_WRAPPER,
         SECTION_CWL, SECTION_NOTEBOOK, SECTION_CACHE, SECTION_CONTAINER, SECTION_CONTAINERIZED, SECTION_ENVMODULES,
         SECTION_NAME, SECTION_HANDOVER
+    )
+
+    /**
+     * Peppy config keys in yaml file
+     */
+    const val PEPPY_CONFIG_PEP_VERSION = "pep_version"
+    const val PEPPY_CONFIG_SAMPLE_TABLE = "sample_table"
+    const val PEPPY_CONFIG_SUBSAMPLE_TABLE = "subsample_table"
+    const val PEPPY_CONFIG_SAMPLE_MODIFIERS = "sample_modifiers"
+    const val PEPPY_CONFIG_PROJECT_MODIFIERS = "project_modifiers"
+
+    val PEPPY_CONFIG_TEXT_KEYS = setOf(
+        PEPPY_CONFIG_PEP_VERSION, PEPPY_CONFIG_SAMPLE_TABLE, PEPPY_CONFIG_SUBSAMPLE_TABLE,
+    )
+
+    val PEPPY_CONFIG_MAPPING_KEYS = setOf(
+        PEPPY_CONFIG_SAMPLE_MODIFIERS, PEPPY_CONFIG_PROJECT_MODIFIERS
     )
 
 

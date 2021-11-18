@@ -11,23 +11,20 @@ plugins {
     id("java")
 
     // Kotlin support
-    kotlin("jvm") version "1.5.21"
-    kotlin("plugin.serialization") version "1.5.21"
+    kotlin("jvm") version "1.5.31"
+    kotlin("plugin.serialization") version "1.5.31"
 
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
-    id("org.jetbrains.intellij") version "1.1.3"
+    id("org.jetbrains.intellij") version "1.2.1"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
-    id("org.jetbrains.changelog") version "1.2.1"
+    id("org.jetbrains.changelog") version "1.3.1"
     // detekt linter - read more: https://detekt.github.io/detekt/gradle.html
-    id("io.gitlab.arturbosch.detekt") version "1.17.1"
+    id("io.gitlab.arturbosch.detekt") version "1.18.1"
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
-
-apply(plugin = "kotlin")
-apply(plugin = "java")
 
 group = properties("pluginGroup")
 version = "${properties("pluginVersion")}.${properties("pluginBuildCounter")}${properties("pluginPreReleaseSuffix")}"
@@ -38,14 +35,14 @@ repositories {
 }
 
 dependencies {
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.17.1")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.18.1")
 
-    testImplementation("io.cucumber:cucumber-java:6.8.1")
-    testImplementation("io.cucumber:cucumber-junit:6.8.1")
+    testImplementation("io.cucumber:cucumber-java:7.0.0")
+    testImplementation("io.cucumber:cucumber-junit:7.0.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     testImplementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.2.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.3.0")
 }
 
 // Configure gradle-intellij-plugin plugin.
@@ -62,11 +59,6 @@ intellij {
     val isPyCharm = platformType == "PC" || platformType == "PY" || platformType == "PD"
     sandboxDir.set("${project.rootDir}/.sandbox${if (isPyCharm) "_pycharm" else "" }")
     ideaDependencyCachePath.set("${project.rootDir}/.idea_distrib_cache")  // Useful for Windows due to short cmdline path
-
-    //XXX: workaround: gradle plugin < 1.1.5
-    if (!file(ideaDependencyCachePath.get()).exists()) {
-        mkdir(ideaDependencyCachePath.get())
-    }
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
     val platformPlugins = ArrayList<String>()
@@ -209,7 +201,7 @@ tasks {
         dependsOn("compileKotlin", "compileJava")
         doLast {
             javaexec {
-                main = "com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler"
+                mainClass.set("com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler")
                 classpath =  project.sourceSets.main.get().runtimeClasspath + files(intellij.ideaDependency.get().jarFiles)
                 enableAssertions = true
                 args = listOf(
@@ -226,8 +218,8 @@ tasks {
         dependsOn("buildTestWrappersBundle")
         reports {
             // turn off html reports... windows can't handle certain cucumber test name characters.
-            junitXml.isEnabled = true
-            html.isEnabled = false
+            junitXml.required.set(true)
+            html.required.set(false)
         }
 
         include("**/*Test.class")

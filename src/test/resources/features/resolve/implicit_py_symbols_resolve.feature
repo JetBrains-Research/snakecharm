@@ -54,7 +54,7 @@ Feature: Resolve implicitly imported python names
       | snakemake:5x  | ru  | rules.foo   | rules       | workflow.py  |
       | snakemake:6.1 | ru  | rules       | Rules       | common.py    |
       | snakemake:6.1 | ru  | rules.foo   | Rules       | common.py    |
-      | snakemake:6.5 | ru  | rules       | Rules       | __init__.py    |
+      | snakemake:6.5 | ru  | rules       | Rules       | __init__.py  |
       | snakemake:6.5 | ru  | rules.foo   | Rules       | __init__.py  |
       | snakemake     | exp | expand()    | expand      | io.py        |
       | snakemake     | tem | temp()      | temp        | io.py        |
@@ -65,9 +65,11 @@ Feature: Resolve implicitly imported python names
       | snakemake     | dyn | dynamic()   | dynamic     | io.py        |
       | snakemake     | un  | unpack()    | unpack      | io.py        |
       | snakemake     | anc | ancient()   | ancient     | io.py        |
-      | snakemake     | ru  | rules       | Rules       | __init__.py    |
-      | snakemake     | ru  | rules.foo   | Rules       | __init__.py    |
+      | snakemake     | ru  | rules       | Rules       | __init__.py  |
+      | snakemake     | ru  | rules.foo   | Rules       | __init__.py  |
       | snakemake     | inp | input       | input       | builtins.pyi |
+      | snakemake     | pe  | pep         | __init__     | project.py   |
+      | snakemake     | pe  | pep.config  | __init__     | project.py   |
 
   Scenario: Resolve at top-level: shell()
     Given a snakemake project
@@ -121,12 +123,13 @@ Feature: Resolve implicitly imported python names
     Then reference should resolve to "<symbol_name>" in "<file>"
 
     Examples:
-      | smk_vers      | ptn   | text      | symbol_name | file        |
-      | snakemake:5x  | rules | rules.foo | rules       | workflow.py |
-      | snakemake:6.1 | rules | rules.foo | Rules       | common.py   |
-      | snakemake:6.5 | rules | rules.foo | Rules       | __init__.py |
-      | snakemake     | exp   | expand()  | expand      | io.py       |
-      | snakemake     | rules | rules.foo | Rules       | __init__.py |
+      | smk_vers      | ptn   | text       | symbol_name | file        |
+      | snakemake:5x  | rules | rules.foo  | rules       | workflow.py |
+      | snakemake:6.1 | rules | rules.foo  | Rules       | common.py   |
+      | snakemake:6.5 | rules | rules.foo  | Rules       | __init__.py |
+      | snakemake     | exp   | expand()   | expand      | io.py       |
+      | snakemake     | rules | rules.foo  | Rules       | __init__.py |
+      | snakemake     | pep   | pep.config | __init__     | project.py  |
 
   Scenario: Resolve inside rule parameters: shell()
     Given a snakemake project
@@ -168,6 +171,7 @@ Feature: Resolve implicitly imported python names
       | snakemake     | wil         | wildcards   | Wildcards   | io.py          | 1     |
       | snakemake     | res         | resources   | Resources   | io.py          | 1     |
       | snakemake     | lo          | log         | Log         | io.py          | 1     |
+      | snakemake     | pep         | pep.config  | __init__     | project.py     | 1     |
 
   Scenario: Resolve results priority
     Given a snakemake project
@@ -322,28 +326,31 @@ Feature: Resolve implicitly imported python names
     When I put the caret after "{
     Then reference in injection should resolve to "<result>" in "<file>"
     Examples:
-      | smk_vers      | rule_like  | section | text        | result      | file           |
-      | snakemake:5x  | rule       | shell   | rules       | rules       | workflow.py    |
-      | snakemake:5x  | rule       | shell   | checkpoints | checkpoints | workflow.py    |
-      | snakemake:5x  | rule       | message | rules       | rules       | workflow.py    |
-      | snakemake:5x  | checkpoint | shell   | rules       | rules       | workflow.py    |
-      | snakemake:6.1 | rule       | shell   | rules       | Rules       | common.py      |
-      | snakemake:6.1 | rule       | shell   | checkpoints | Checkpoints | checkpoints.py |
-      | snakemake:6.1 | rule       | message | rules       | Rules       | common.py      |
-      | snakemake:6.1 | rule       | message | scatter     | Scatter     | common.py      |
-      | snakemake:6.1 | rule       | message | gather      | Gather      | common.py      |
-      | snakemake:6.1 | checkpoint | shell   | rules       | Rules       | common.py      |
-      | snakemake:6.5 | rule       | shell   | rules       | Rules       | __init__.py    |
-      | snakemake:6.5 | rule       | message | rules       | Rules       | __init__.py    |
-      | snakemake:6.5 | rule       | message | scatter     | Scatter     | __init__.py    |
-      | snakemake:6.5 | rule       | message | gather      | Gather      | __init__.py    |
-      | snakemake:6.5 | checkpoint | shell   | rules       | Rules       | __init__.py    |
-      | snakemake     | rule       | shell   | rules       | Rules       | __init__.py    |
-      | snakemake     | rule       | shell   | checkpoints | Checkpoints | checkpoints.py |
-      | snakemake     | rule       | message | rules       | Rules       | __init__.py    |
-      | snakemake     | rule       | message | scatter     | Scatter     | __init__.py    |
-      | snakemake     | rule       | message | gather      | Gather      | __init__.py    |
-      | snakemake     | checkpoint | shell   | rules       | Rules       | __init__.py    |
+      | rule_like  | smk_vers      | section | text        | result      | file           |
+      | rule       | snakemake:5x  | shell   | rules       | rules       | workflow.py    |
+      | rule       | snakemake:5x  | shell   | checkpoints | checkpoints | workflow.py    |
+      | rule       | snakemake:5x  | message | rules       | rules       | workflow.py    |
+      | checkpoint | snakemake:5x  | shell   | rules       | rules       | workflow.py    |
+      | rule       | snakemake:6.1 | shell   | rules       | Rules       | common.py      |
+      | rule       | snakemake:6.1 | shell   | checkpoints | Checkpoints | checkpoints.py |
+      | rule       | snakemake:6.1 | message | rules       | Rules       | common.py      |
+      | rule       | snakemake:6.1 | message | scatter     | Scatter     | common.py      |
+      | rule       | snakemake:6.1 | message | gather      | Gather      | common.py      |
+      | checkpoint | snakemake:6.1 | shell   | rules       | Rules       | common.py      |
+      | rule       | snakemake:6.5 | shell   | rules       | Rules       | __init__.py    |
+      | rule       | snakemake:6.5 | message | rules       | Rules       | __init__.py    |
+      | rule       | snakemake:6.5 | message | scatter     | Scatter     | __init__.py    |
+      | rule       | snakemake:6.5 | message | gather      | Gather      | __init__.py    |
+      | checkpoint | snakemake:6.5 | shell   | rules       | Rules       | __init__.py    |
+      | rule       | snakemake     | shell   | rules       | Rules       | __init__.py    |
+      | rule       | snakemake     | shell   | checkpoints | Checkpoints | checkpoints.py |
+      | rule       | snakemake     | message | rules       | Rules       | __init__.py    |
+      | rule       | snakemake     | message | scatter     | Scatter     | __init__.py    |
+      | rule       | snakemake     | message | gather      | Gather      | __init__.py    |
+      | checkpoint | snakemake     | shell   | rules       | Rules       | __init__.py    |
+      | rule       | snakemake     | shell   | pep         | __init__     | project.py     |
+      | rule       | snakemake     | message | pep         | __init__     | project.py     |
+      | checkpoint | snakemake     | shell   | pep         | __init__     | project.py     |
 
 
   Scenario Outline: No resolve in injections for defining expanding sections

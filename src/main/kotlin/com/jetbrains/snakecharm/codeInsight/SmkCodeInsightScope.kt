@@ -9,8 +9,8 @@ enum class SmkCodeInsightScope {
     RULELIKE_RUN_SECTION;
 
     fun includes(second: SmkCodeInsightScope) = when (this) {
-         TOP_LEVEL -> second == TOP_LEVEL
-         RULELIKE_RUN_SECTION -> second == TOP_LEVEL || second == RULELIKE_RUN_SECTION
+        TOP_LEVEL -> second == TOP_LEVEL
+        RULELIKE_RUN_SECTION -> second == TOP_LEVEL || second == RULELIKE_RUN_SECTION
     }
 
     companion object {
