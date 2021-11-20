@@ -24,7 +24,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkUse(use: SmkUse) {
             val logSection = use.getSectionByName(SnakemakeNames.SECTION_LOG) ?: return

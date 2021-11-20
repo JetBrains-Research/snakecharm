@@ -10,14 +10,14 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.nextLeaf
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLExpression
 
-class SmkFileEndsWithCommentInspection  : SnakemakeInspection() {
+class SmkFileEndsWithCommentInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+
         override fun visitComment(comment: PsiComment) {
             val nextLeaf = comment.nextLeaf(true)
             if (nextLeaf == null) {

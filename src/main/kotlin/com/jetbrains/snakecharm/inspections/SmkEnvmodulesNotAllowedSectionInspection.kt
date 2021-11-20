@@ -11,7 +11,8 @@ class SmkEnvmodulesNotAllowedSectionInspection : SnakemakeInspection() {
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
             if (st.sectionKeyword == SnakemakeNames.SECTION_ENVMODULES) {
                 val ruleOrCheckPoint = st.getParentRuleOrCheckPoint()

@@ -10,7 +10,7 @@ class SmkLocalrulesRuleorderConfusingReference : SnakemakeInspection() {
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkWorkflowLocalrulesSection(st: SmkWorkflowLocalrulesSection) {
             checkConfusingReference(st)

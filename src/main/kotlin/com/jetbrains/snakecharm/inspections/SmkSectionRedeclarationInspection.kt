@@ -11,8 +11,9 @@ class SmkSectionRedeclarationInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+
         override fun visitSmkRule(rule: SmkRule) {
             visitSMKRuleLike(rule)
         }

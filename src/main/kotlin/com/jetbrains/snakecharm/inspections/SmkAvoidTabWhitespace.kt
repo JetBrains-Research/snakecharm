@@ -10,11 +10,12 @@ class SmkAvoidTabWhitespace : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+
         override fun visitWhiteSpace(space: PsiWhiteSpace) {
             if (space.containingFile is SmkFile) {
-                val text =  space.text
+                val text = space.text
                 if (text.startsWith("\n") && '\t' in text) {
                     registerProblem(space, SnakemakeBundle.message("INSP.NAME.codestyle.avoid.whitespace.tab"))
                 }

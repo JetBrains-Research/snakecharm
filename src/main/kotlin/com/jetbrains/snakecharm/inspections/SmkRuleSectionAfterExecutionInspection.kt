@@ -1,6 +1,9 @@
 package com.jetbrains.snakecharm.inspections
 
-import com.intellij.codeInspection.*
+import com.intellij.codeInspection.LocalInspectionToolSession
+import com.intellij.codeInspection.LocalQuickFix
+import com.intellij.codeInspection.ProblemDescriptor
+import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.SmartPointerManager
@@ -16,7 +19,8 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+
         override fun visitSmkRule(rule: SmkRule) {
             visitSMKRuleLike(rule)
         }

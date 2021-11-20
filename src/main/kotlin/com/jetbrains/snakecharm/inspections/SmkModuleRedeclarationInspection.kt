@@ -11,8 +11,8 @@ class SmkModuleRedeclarationInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
         private val modulesNameAndPsi = (session.file as? SmkFile)?.collectModules() ?: emptyList()
 
         override fun visitSmkModule(module: SmkModule) {

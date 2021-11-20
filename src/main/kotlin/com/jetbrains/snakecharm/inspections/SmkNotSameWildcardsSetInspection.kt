@@ -9,10 +9,11 @@ import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+
         override fun visitSmkRule(rule: SmkRule) {
             processRuleOrCheckpointLike(rule)
         }
@@ -33,8 +34,8 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
                     // Cannot do via types, we'd like to have wildcards only from
                     // defining sections and ensure that defining sections could be parsed
                     val collector = SmkWildcardsCollector(
-                            visitDefiningSections = true,
-                            visitExpandingSections = false
+                        visitDefiningSections = true,
+                        visitExpandingSections = false
                     )
                     ruleOrCheckpoint.accept(collector)
                     wildcardsRef = Ref.create(collector.getWildcardsNames())
@@ -49,15 +50,15 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
         }
 
         private fun processSection(
-                section: SmkRuleOrCheckpointArgsSection,
-                wildcards: List<String>
+            section: SmkRuleOrCheckpointArgsSection,
+            wildcards: List<String>,
         ) {
             val sectionArgs = section.argumentList?.arguments ?: return
             sectionArgs.forEach { arg ->
                 // collect wildcards in section arguments:
                 val collector = SmkWildcardsCollector(
-                        visitDefiningSections = false,
-                        visitExpandingSections = false
+                    visitDefiningSections = false,
+                    visitExpandingSections = false
                 )
                 arg.accept(collector)
                 val argWildcards = collector.getWildcardsNames()
@@ -67,11 +68,11 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
                     val missingWildcards = wildcards.filter { it !in argWildcards }
                     if (missingWildcards.isNotEmpty()) {
                         registerProblem(
-                                arg,
-                                SnakemakeBundle.message(
-                                        "INSP.NAME.not.same.wildcards.set",
-                                        missingWildcards.sorted().joinToString() { "'$it'"}
-                                )
+                            arg,
+                            SnakemakeBundle.message(
+                                "INSP.NAME.not.same.wildcards.set",
+                                missingWildcards.sorted().joinToString() { "'$it'" }
+                            )
                         )
                     }
                 } else {
