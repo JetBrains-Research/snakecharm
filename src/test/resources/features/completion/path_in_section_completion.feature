@@ -2,28 +2,30 @@ Feature: Complete file name in conda section
 
   Scenario Outline: Completion list in path dependent section
     Given a snakemake project
-    Given a file "xoo.<ext>" with text
+    Given a file "<file>" with text
     """
     """
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-      <section>: "x"
+      <section>: ""
     """
-    When I put the caret after x
+    When I put the caret after : "
     And I invoke autocompletion popup and see a text:
     """
     <rule_like> NAME:
-      <section>: "xoo.<ext>"
+      <section>: "<file>"
     """
     Examples:
-      | rule_like  | section   | ext      |
-      | rule       | conda     | yaml     |
-      | checkpoint | conda     | yaml     |
-      | rule       | conda     | yml      |
-      | rule       | notebook  | py.ipynb |
-      | rule       | notebook  | r.ipynb  |
-      | module     | snakefile | smk      |
+      | rule_like  | section   | file                  |
+      | rule       | conda     | xoo.yaml              |
+      | checkpoint | conda     | xoo.yaml              |
+      | rule       | conda     | xoo.yml               |
+      | rule       | notebook  | xoo.py.ipynb          |
+      | rule       | notebook  | xoo.r.ipynb           |
+      | module     | snakefile | xoo.smk               |
+      | module     | snakefile | other/files/foo.smk   |
+      | module     | snakefile | other/files/Snakefile |
 
   Scenario Outline: Completion list when there are no appropriate files
     Given a snakemake project
