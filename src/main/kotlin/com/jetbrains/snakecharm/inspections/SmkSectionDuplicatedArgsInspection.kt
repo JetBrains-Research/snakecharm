@@ -12,6 +12,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
 
 class SmkSectionDuplicatedArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -25,6 +26,10 @@ class SmkSectionDuplicatedArgsInspection : SnakemakeInspection() {
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
+            checkArgumentList(st.argumentList, st)
+        }
+
+        override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
             checkArgumentList(st.argumentList, st)
         }
 
