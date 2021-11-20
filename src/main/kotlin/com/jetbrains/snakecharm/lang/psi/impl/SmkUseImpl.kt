@@ -36,19 +36,26 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
     override fun getNameNode(): ASTNode? {
         val identifier = super.getNameNode()
         if (identifier != null) { // Returns new name if we know it
+            // Example: use rule A as new_A
+            // Here we can detect name node by default
             return identifier
         }
         val namePattern = getNameIdentifierPattern()
         if (namePattern != null) { // Returns name patter if it exits
+            // Example: use rule A, B from M as new_*
+            // There are pattern instead of single node
             return namePattern.node
         }
+        // There are no pattern or name node
         val originalNames = getImportedRuleNames()
         // Returns original names, we don't want to save one name because
         // index with this name probably already exists
         // so we save whole rules names if it is not just '*' wildcard
         if (originalNames != null && originalNames.isNotEmpty()) {
+            // Example: use rule A, B from M
             return originalNames.first().parent.node
         }
+        //Example: use rule * from M
         return null
     }
 
