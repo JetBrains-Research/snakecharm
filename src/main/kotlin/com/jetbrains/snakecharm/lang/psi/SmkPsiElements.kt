@@ -41,9 +41,9 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
     fun getModuleName(): PsiElement?
 
     /**
-     * Returns an array of  [SmkReferenceExpression] which refer to overridden rules or checkpoints
+     * Returns an array of  [SmkReferenceExpression] which were defined as inherited rules
      */
-    fun getReferencesOfImportedRuleNames(): Array<SmkReferenceExpression>?
+    fun getDefinedReferencesOfImportedRuleNames(): Array<SmkReferenceExpression>?
 
     /**
      * Returns list of [SmkRuleOrCheckpoint] from defined module. Returns null if there are no module reference, module section or file

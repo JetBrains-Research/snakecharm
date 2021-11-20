@@ -4,8 +4,6 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.util.elementType
-import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.types.TypeEvalContext
@@ -49,7 +47,7 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
             return namePattern.node
         }
         // There are no pattern or name node
-        val originalNames = getReferencesOfImportedRuleNames()
+        val originalNames = getDefinedReferencesOfImportedRuleNames()
         // Returns original names, we don't want to save one name because
         // index with this name probably already exists
         // so we save whole rules names if it is not just '*' wildcard
@@ -68,7 +66,7 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
         }
         val newName = getNameIdentifierPattern()
         val originalNames = mutableListOf<Pair<String, PsiElement>>()
-        getReferencesOfImportedRuleNames()?.forEach { reference ->
+        getDefinedReferencesOfImportedRuleNames()?.forEach { reference ->
             originalNames.add(reference.text to reference)
         }
         if (originalNames.isEmpty()) {
@@ -103,17 +101,15 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
     override fun getModuleName() =
         (findChildByType(SmkTokenTypes.SMK_FROM_KEYWORD) as? PsiElement)?.nextSibling?.nextSibling
 
-    override fun getReferencesOfImportedRuleNames(): Array<SmkReferenceExpression>? = PsiTreeUtil.getChildrenOfType(
+    override fun getDefinedReferencesOfImportedRuleNames(): Array<SmkReferenceExpression>? = PsiTreeUtil.getChildrenOfType(
         findChildByType(USE_IMPORTED_RULES_NAMES),
         SmkReferenceExpression::class.java
     )
 
+    override fun getImportedRules(): List<SmkRuleOrCheckpoint>? =
+        getPairsOfImportedRulesAndNames(mutableSetOf())?.map { it.second }
+
     override fun nameIdentifierIsWildcard() = nameIdentifier?.let {
         it is SmkUseNameIdentifier && it.textContains('*')
     } ?: false
-
-    override fun hasPatternInDefinitionOfInheritedRules(): Boolean {
-        val importedRulesPart = findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES) as? PsiElement ?: return false
-        return (PsiTreeUtil.collectElements(importedRulesPart) { el -> el.elementType == PyTokenTypes.MULT }).isNotEmpty()
-    }
 }

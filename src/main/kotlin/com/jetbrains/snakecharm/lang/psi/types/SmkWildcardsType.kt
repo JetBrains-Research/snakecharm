@@ -120,7 +120,7 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
             .find { it.sectionKeyword == SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS }
 
     private fun getUseWildcardsConstraintsSection(use: SmkUse, name: String) =
-        (use.getReferencesOfImportedRuleNames()?.toList() ?: use.getImportedRules())
+        (use.getDefinedReferencesOfImportedRuleNames()?.toList() ?: use.getImportedRules())
             ?.asSequence()
             ?.mapNotNull { getWildcardsConstraintsSectionFromSectionReference(it, name) }
             ?.firstOrNull()
