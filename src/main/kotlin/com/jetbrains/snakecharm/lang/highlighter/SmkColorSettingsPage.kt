@@ -85,37 +85,30 @@ class SmkColorSettingsPage : RainbowColorSettingsPage {
     }
 
     override fun getDemoText(): String =
-        "<keyword>rule</keyword> <identifiers>NAME</identifiers>:\n" +
+        """
+        <keyword>configfile</keyword>: <text>"config/config.yaml"</text>
+        <keyword>localrules</keyword>: NAME
+        """.trimIndent() +
+        "\n<keyword>rule</keyword> <identifiers>NAME</identifiers>:\n" +
                 "    <TQS>\"\"\"\n" +
                 "    Syntax Highlighting Demo" +
                 RainbowHighlighter.generatePaletteExample("\n    ") +
                 "\n    \"\"\"</TQS>\n" +
                 """    
             <sectionName>input</sectionName>: 
-                <text>"file_1.txt"</text>
+                <text>"</text><injectedText>file_</injectedText><braces>{</braces><wildcard>number</wildcard><braces>}</braces><injectedText>.txt</injectedText><text>"</text>,
+                <keywordArg>arg</keywordArg> = <text>"file_1.txt"</text>
             <sectionName>output</sectionName>: 
-                <text>"file_2.txt"</text>
-            <sectionName>shell</sectionName>: 
-                <text>"</text><injectedText>touch </injectedText><braces>{</braces><reference>output</reference><braces>}</braces><text>"</text>
+                <text>"</text><injectedText>file_</injectedText><braces>{</braces><wildcard>number</wildcard><braces>}</braces><injectedText>.txt</injectedText><text>"</text>
+            <run>run</run>:
+                <localVar>x</localVar> = 2
+                shell(<text>"</text><injectedText>touch </injectedText><braces>{</braces><reference>output</reference><braces>}</braces><text>"</text>)
         
         <localVar>number</localVar> = 0.451 # Python elements are configured in Python color settings
         
         <keyword>use</keyword> <keyword>rule</keyword> NAME <keyword>as</keyword> <identifiers>NAME_2</identifiers> <keyword>with</keyword>:
-            <sectionName>input</sectionName>: 
-                <text>"{<wildcard>name</wildcard>}.bin"</text>
-            <sectionName>output</sectionName>: 
-                <text>"{<wildcard>name</wildcard>}.bin"</text>
             <sectionName>message</sectionName>:  
                 <text>"</text><injectedText>Float number: </injectedText><braces>{</braces><reference>number</reference><formatSpecifier>:2f</formatSpecifier><braces>}</braces><text>"</text>
-            <sectionName>threads</sectionName>: 
-                1
-        
-        <keyword>rule</keyword> <identifiers>NAME3</identifiers>:
-            <sectionName>output</sectionName>: 
-                <text>"</text><injectedText>file_</injectedText><braces>{</braces><wildcard>number</wildcard><comma>,</comma> <braces>}</braces><text>"</text>,
-                <keywordArg>arg</keywordArg> = <text>"file_1.txt"</text>
-            <run>run</run>:
-                <localVar>x</localVar> = 2
         """.trimIndent()
 
     override fun getAdditionalHighlightingTagToDescriptorMap(): MutableMap<String, TextAttributesKey> =
