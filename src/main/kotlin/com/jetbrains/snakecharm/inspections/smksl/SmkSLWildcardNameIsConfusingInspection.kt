@@ -12,10 +12,10 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcard
 
 class SmkSLWildcardNameIsConfusingInspection : SnakemakeInspection() {
     override fun buildVisitor(
-                holder: ProblemsHolder,
-                isOnTheFly: Boolean,
-                session: LocalInspectionToolSession
-        ) = object : SmkSLInspectionVisitor(holder, session) {
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession
+    ) = object : SmkSLInspectionVisitor(holder, session) {
 
         override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpressionImpl) {
             // expr.isQualified: 'wildcards' in 'wildcards.input'
@@ -28,16 +28,20 @@ class SmkSLWildcardNameIsConfusingInspection : SnakemakeInspection() {
                     expr.containingSection()?.getParentRuleOrCheckPoint() ?: return
 
                     registerProblem(
-                            expr,
-                            SnakemakeBundle.message("INSP.NAME.wildcards.confusing.name.like.section.message", wildcardName),
-                            PyRenameElementQuickFix(expr)
+                        expr,
+                        SnakemakeBundle.message(
+                            "INSP.NAME.wildcards.confusing.name.like.section.message",
+                            wildcardName
+                        ),
+                        ProblemHighlightType.WARNING,
+                        null,
+                        PyRenameElementQuickFix(expr),
                     )
                 } else if ('.' in wildcardName) {
                     // E.g. 'wildcards.name' or 'foo.boo.doo'
                     registerProblem(
-                            ref.getWildcardTrueExpression(),
-                            SnakemakeBundle.message("INSP.NAME.wildcards.confusing.name.with.dot.message", wildcardName),
-                            ProblemHighlightType.GENERIC_ERROR
+                        ref.getWildcardTrueExpression(),
+                        SnakemakeBundle.message("INSP.NAME.wildcards.confusing.name.with.dot.message", wildcardName)
                     )
                 }
             }
