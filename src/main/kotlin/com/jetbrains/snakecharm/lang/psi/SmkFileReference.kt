@@ -171,7 +171,7 @@ class SmkIncludeReference(
     path: String
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike {
-        it is SmkFile && it.name != element.containingFile.name
+        it is SmkFile && it.originalFile != element.containingFile.originalFile
     }
 }
 
