@@ -70,3 +70,15 @@ Feature: Inspection warns about confusing wildcard names.
     And SmkFileEndsWithCommentInspection inspection is enabled
     Then I expect no inspection errors
     When I check highlighting errors
+
+  Scenario: No Syntax Error in non snakemake file
+    Given a snakemake project
+    Given I open a file "file.py" with text
+        """
+        x = 3
+
+        # comment
+        """
+    And SmkFileEndsWithCommentInspection inspection is enabled
+    Then I expect no inspection errors
+    When I check highlighting errors
