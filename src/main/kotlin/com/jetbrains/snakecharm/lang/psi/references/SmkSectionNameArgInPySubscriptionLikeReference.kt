@@ -14,19 +14,20 @@ import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLSubscriptionKeyReference
 
 class SmkSectionNameArgInPySubscriptionLikeReference(
-        element: PyStringLiteralExpression,
-        val type: SmkAvailableForSubscriptionType
-): PsiPolyVariantReferenceBase<PyStringLiteralExpression>(element), PsiReferenceEx {
+    element: PyStringLiteralExpression,
+    val type: SmkAvailableForSubscriptionType,
+) : PsiPolyVariantReferenceBase<PyStringLiteralExpression>(element), PsiReferenceEx {
 
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         val resolveResults = arrayListOf<RatedResolveResult>()
 
         val canonicalText = element.stringValue
+        val typeEvalContext = TypeEvalContext.codeInsightFallback(element.project)
         type.resolveMember(
-                canonicalText,
-                element,
-                AccessDirection.READ,
-                PyResolveContext.defaultContext()
+            canonicalText,
+            element,
+            AccessDirection.READ,
+            PyResolveContext.defaultContext(typeEvalContext)
         )?.let {
             resolveResults.addAll(it)
         }
@@ -40,8 +41,8 @@ class SmkSectionNameArgInPySubscriptionLikeReference(
     }
 
     override fun getUnresolvedDescription(): String =
-            SmkSLSubscriptionKeyReference.unresolvedErrorMsg(element)
+        SmkSLSubscriptionKeyReference.unresolvedErrorMsg(element)
 
     override fun getUnresolvedHighlightSeverity(context: TypeEvalContext?): HighlightSeverity? =
-            SmkSLSubscriptionKeyReference.INSPECTION_SEVERITY
+        SmkSLSubscriptionKeyReference.INSPECTION_SEVERITY
 }

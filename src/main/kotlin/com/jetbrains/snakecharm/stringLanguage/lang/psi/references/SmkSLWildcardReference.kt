@@ -14,20 +14,22 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
 class SmkSLWildcardReference(
-        element: SmkSLReferenceExpressionImpl,
-        private val type: SmkWildcardsType
+    element: SmkSLReferenceExpressionImpl,
+    private val type: SmkWildcardsType,
 ) : PsiPolyVariantReferenceBase<SmkSLReferenceExpressionImpl>(element), SmkSLBaseReference, PsiReferenceEx {
 
     override fun handleElementRename(newElementName: String) =
-            element.setName(newElementName)
+        element.setName(newElementName)
 
     override fun multiResolve(incompleteCode: Boolean): Array<out ResolveResult> =
-            type.resolveMember(
-                    wildcardName(),
-                    element,
-                    AccessDirection.READ,
-                    PyResolveContext.defaultContext()
-            ).toTypedArray()
+        type.resolveMember(
+            wildcardName(),
+            element,
+            AccessDirection.READ,
+            PyResolveContext.defaultContext(
+                TypeEvalContext.codeInsightFallback(element.project)
+            )
+        ).toTypedArray()
 
     /**
      * not canonical text!!!! (because range will be wrong for "foo.boo.doo" wildcard name
@@ -40,10 +42,10 @@ class SmkSLWildcardReference(
      * name
      */
     fun getWildcardTrueExpression() =
-            PsiTreeUtil.getTopmostParentOfType(element, SmkSLExpression::class.java) ?: element
+        PsiTreeUtil.getTopmostParentOfType(element, SmkSLExpression::class.java) ?: element
 
     override fun getVariants(): Array<out Any> =
-            type.getCompletionVariants(canonicalText, element, ProcessingContext())
+        type.getCompletionVariants(canonicalText, element, ProcessingContext())
 
     override fun getUnresolvedHighlightSeverity(context: TypeEvalContext?): HighlightSeverity? = null
 
