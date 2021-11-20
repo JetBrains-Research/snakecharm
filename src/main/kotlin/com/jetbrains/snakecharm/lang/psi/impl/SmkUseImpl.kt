@@ -97,8 +97,8 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
             SmkReferenceExpression::class.java
         )
 
-    override fun hasPatternInDefinitionOfInheritedRules(): Boolean {
-        val importedRulesPart = findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES) as? PsiElement ?: return false
-        return (PsiTreeUtil.collectElements(importedRulesPart) { el -> el.elementType == PyTokenTypes.MULT }).isNotEmpty()
+    override fun namePatternRespectsImportedNames(): Boolean {
+        val currentNameIdentifier = nameIdentifier
+        return currentNameIdentifier == null || currentNameIdentifier.text.contains('*') || currentNameIdentifier.elementType == SmkElementTypes.USE_IMPORTED_RULES_NAMES
     }
 }

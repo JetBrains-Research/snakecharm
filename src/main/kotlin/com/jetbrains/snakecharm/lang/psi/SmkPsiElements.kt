@@ -46,9 +46,9 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
     fun getImportedRuleNames(): Array<SmkReferenceExpression>?
 
     /**
-     * Returns True if it uses '*' pattern in section, where inherited rules are defined
+     * Returns True if use name node contains '*' or if it uses original names (doesn't override them)
      */
-    fun hasPatternInDefinitionOfInheritedRules(): Boolean
+    fun namePatternRespectsImportedNames(): Boolean
 }
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer
