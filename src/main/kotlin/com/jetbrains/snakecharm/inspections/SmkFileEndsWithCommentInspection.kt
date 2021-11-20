@@ -10,6 +10,8 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.nextLeaf
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.lang.psi.SmkFile
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLExpression
 
 class SmkFileEndsWithCommentInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -19,6 +21,10 @@ class SmkFileEndsWithCommentInspection : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitComment(comment: PsiComment) {
+            if(comment.containingFile !is SmkFile) {
+                return
+            }
+
             val nextLeaf = comment.nextLeaf(true)
             if (nextLeaf == null) {
                 registerProblem(

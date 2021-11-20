@@ -11,6 +11,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.refactoring.suggested.endOffset
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkUse
+import com.jetbrains.snakecharm.lang.psi.impl.SmkImportedRulesNames
 
 class SmkSeveralRulesAreOverriddenAsOneInspection : SnakemakeInspection() {
     companion object {
@@ -25,19 +26,15 @@ class SmkSeveralRulesAreOverriddenAsOneInspection : SnakemakeInspection() {
 
         override fun visitSmkUse(use: SmkUse) {
             val name = use.nameIdentifier
-            if (name == null || name.text.contains('*')) {
-                // There are pattern in name, or there are no name (which means, that 'use' section doesn't change names)
+
+            if (name == null || use.nameIdentifierIsWildcard() || use.nameIdentifier is SmkImportedRulesNames?) {
+                // There are pattern in name, or 'use' section doesn't change names
                 return
             }
             val overridden = use.getImportedRuleNames()
 
             if (overridden != null && overridden.size == 1) {
                 // There are only one rule reference
-                return
-            }
-
-            if (!use.hasPatternInDefinitionOfInheritedRules() && overridden == null) {
-                // It doesn't have '*' symbol in imported rules part
                 return
             }
 

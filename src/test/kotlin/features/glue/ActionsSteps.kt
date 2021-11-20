@@ -25,6 +25,9 @@ import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.FakeSnakemakeInjector
 import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler
 import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
+import com.jetbrains.snakecharm.lang.highlighter.SmkColorSettingsPage
+import com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterFactory
+import com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLSyntaxHighlighter
 import features.glue.SnakemakeWorld.findPsiElementUnderCaret
 import features.glue.SnakemakeWorld.fixture
 import features.glue.SnakemakeWorld.myFixture
@@ -82,16 +85,16 @@ class ActionsSteps {
             val document = PsiDocumentManager.getInstance(fixture.project).getDocument(psiFile)!!
             val pos = document.text.indexOf(signature)
             assertTrue(
-                    pos >= 0,
-                    "Signature <$signature> wasn't found in the file ${psiFile.name}."
+                pos >= 0,
+                "Signature <$signature> wasn't found in the file ${psiFile.name}."
 
             )
             val reference = fixture.getReferenceAtCaretPosition()
             assertNotNull(reference, message = "There is no reference at the caret position")
             assertEquals(
-                    signature,
-                    reference.canonicalText,
-                    message = "Expected highlighted text wasn't equal to the actual one."
+                signature,
+                reference.canonicalText,
+                message = "Expected highlighted text wasn't equal to the actual one."
             )
         }
     }
@@ -114,6 +117,54 @@ class ActionsSteps {
         }
     }
 
+    @Then("^I expect the tag highlighting to be the same as the annotator highlighting$")
+    fun iExpectTheTagHighlightingToBeTheSameAsTheAnnotatorHighlighting() {
+        val level = "info"
+        val attributesToCheck = arrayOf(
+            // Currently, IDK how to check all used tags
+            // Snakemake:
+            SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD,
+            SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION,
+            SnakemakeSyntaxHighlighterFactory.SMK_DECORATOR,
+            SnakemakeSyntaxHighlighterFactory.SMK_PREDEFINED_DEFINITION,
+            SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD_ARGUMENT,
+            // SnakemakeSL:
+            SmkSLSyntaxHighlighter.HIGHLIGHTING_WILDCARDS_KEY
+        )
+        val page = SmkColorSettingsPage()
+        val fixture = fixture()
+        val tagPattern = Pattern.compile("<(.+)>(\\w+)</(\\1)>")
+        val itemPattern = Pattern.compile(">(\\w+)<")
+        val linesPage = page.demoText.lines()
+        var problemsCounter = 0
+        for (ind in 0 until linesPage.count()) {
+            val lineMatcher = tagPattern.matcher(linesPage[ind])
+            while (lineMatcher.find()) {
+                val itemMatcher = itemPattern.matcher(lineMatcher.group(0))
+                if (itemMatcher.find()) {
+                    val item = itemMatcher.group(1)
+                    val tag = lineMatcher.group(1)
+                    val attributesKey = page.additionalHighlightingTagToDescriptorMap[tag] ?: continue
+                    if (attributesKey in attributesToCheck) {
+                        ++problemsCounter
+                        wrapTextInHighlightingTags(
+                            level,
+                            item,
+                            fixture.editor.document.text.lines()[ind],
+                            attributesKey.externalName
+                        )
+                    }
+                }
+            }
+        }
+        if (SnakemakeWorld.myInspectionProblemsCounts == null) {
+            SnakemakeWorld.myInspectionProblemsCounts = mutableMapOf(level to problemsCounter)
+        } else {
+            val counts = SnakemakeWorld.myInspectionProblemsCounts!!
+            counts[level] = problemsCounter
+        }
+    }
+
     private fun updatedInspectionProblemsCounter(level: String) {
         if (SnakemakeWorld.myInspectionProblemsCounts == null) {
             SnakemakeWorld.myInspectionProblemsCounts = mutableMapOf(level to 1)
@@ -125,11 +176,11 @@ class ActionsSteps {
     }
 
     private fun wrapTextInHighlightingTags(
-            highlightingLevel: String,
-            text: String,
-            signature: String,
-            message: String,
-            searchInTags: Boolean = false
+        highlightingLevel: String,
+        text: String,
+        signature: String,
+        message: String,
+        searchInTags: Boolean = false
     ) {
         require(!Pattern.compile("(^|[^\\\\])\"").matcher(message).find()) {
             "Quotes (\") should be escaped (with \\) in message: $message"
@@ -151,16 +202,16 @@ class ActionsSteps {
 
         updatedInspectionProblemsCounter(highlightingLevel)
         ApplicationManager.getApplication().invokeAndWait {
-            performAction(project, {
+            performAction(project) {
                 fixture.editor.document.replaceString(startPos, startPos + text.length, newText)
-            })
+            }
         }
     }
 
     private fun findTextPositionInsideTags(
-            tag: String,
-            text: String,
-            fullText: String
+        tag: String,
+        text: String,
+        fullText: String
     ): Int {
         val textInsideTagsPattern = Pattern.compile("<$tag descr=.+?>([^<>]+)</$tag>")
         val matcher = textInsideTagsPattern.matcher(fullText)
@@ -168,15 +219,15 @@ class ActionsSteps {
     }
 
     private fun findTextPositionWithSignature(
-            text: String,
-            signature: String,
-            document: Document,
-            psiFile: PsiFile
+        text: String,
+        signature: String,
+        document: Document,
+        psiFile: PsiFile
     ): Int {
         val pos = document.text.indexOf(signature)
         assertTrue(
-                pos >= 0,
-                "Signature <$signature> wasn't found in the file ${psiFile.name}."
+            pos >= 0,
+            "Signature <$signature> wasn't found in the file ${psiFile.name}."
         )
 
         val posInSignature = signature.indexOf(text)
@@ -194,9 +245,10 @@ class ActionsSteps {
         checkHighlighting(type, true)
     }
 
-    fun checkHighlighting(level: String, ignoreExtra: Boolean) {
+    private fun checkHighlighting(level: String, ignoreExtra: Boolean) {
         val problemsCounts = SnakemakeWorld.myInspectionProblemsCounts
-        SnakemakeWorld.myInspectionProblemsCounts = null // reset counter after check in order to validate in teardown that assertion step was called
+        SnakemakeWorld.myInspectionProblemsCounts =
+            null // reset counter after check in order to validate in teardown that assertion step was called
 
         requireNotNull(problemsCounts) {
             "No expected inspections steps in test. Add 'I expect no inspection ..' step if no inspection" +
@@ -261,15 +313,15 @@ class ActionsSteps {
         val docPopupText = myGeneratedDocPopupText
         assertNotNull(docPopupText)
         assertTrue(
-                text in docPopupText,
-                "Expected <$text> to be in <$docPopupText>"
+            text in docPopupText,
+            "Expected <$text> to be in <$docPopupText>"
         )
     }
 
     @When("^I invoke rename with name \"([^\"]+)\"$")
     fun iInvokeRenameWithName(newName: String) {
         ApplicationManager.getApplication().invokeAndWait {
-                fixture().renameElementAtCaret(newName)
+            fixture().renameElementAtCaret(newName)
         }
     }
 
@@ -312,13 +364,12 @@ class ActionsSteps {
             "First call step: I check highlighting ..."
         }
         val allQuickFixes = fixture().getAllQuickFixes()
-        val quickFix = allQuickFixes.firstOrNull { it.familyName == quickFixFamilyName }
+        return allQuickFixes.firstOrNull { it.familyName == quickFixFamilyName }
             ?: fail(
                 "Cannot find quickfix '${quickFixFamilyName}', available quick fixes:[\n${
                     allQuickFixes.joinToString(separator = "\n") { it.familyName }
                 }\n]"
             )
-        return quickFix
     }
 
     @Given("^I emulate quick fix apply: ignore unresolved item '(.*)'")
@@ -326,7 +377,7 @@ class ActionsSteps {
         val list = (LocalInspectionEP.LOCAL_INSPECTION.extensionList
             .first { it.shortName == "SmkUnrecognizedSectionInspection" }
             .instance as SmkUnrecognizedSectionInspection).ignoredItems
-        if (sectionName in list){
+        if (sectionName in list) {
             fail("Section \"${sectionName}\" is already here, but it shouldn't be")
         }
         list.add(sectionName)
@@ -389,19 +440,19 @@ class ActionsSteps {
     }
 
     @Then("^I inject SmkSL at a caret")
-       fun iInjectSmkSLAtCaret() {
-           ApplicationManager.getApplication().invokeAndWait {
-               val fixture = fixture()
-               val offsetUnderCaret = SnakemakeWorld.getOffsetUnderCaret()
-               val elementAtOffset = fixture.file.findElementAt(offsetUnderCaret)
-               requireNotNull(elementAtOffset) { "No element at a caret offset: $offsetUnderCaret" }
+    fun iInjectSmkSLAtCaret() {
+        ApplicationManager.getApplication().invokeAndWait {
+            val fixture = fixture()
+            val offsetUnderCaret = SnakemakeWorld.getOffsetUnderCaret()
+            val elementAtOffset = fixture.file.findElementAt(offsetUnderCaret)
+            requireNotNull(elementAtOffset) { "No element at a caret offset: $offsetUnderCaret" }
 
-               // auto unregister when fixture is disposed
-               InjectedLanguageManager.getInstance(fixture.project).registerMultiHostInjector(
-                       FakeSnakemakeInjector(offsetUnderCaret), fixture.projectDisposable
-               )
-           }
-       }
+            // auto unregister when fixture is disposed
+            InjectedLanguageManager.getInstance(fixture.project).registerMultiHostInjector(
+                FakeSnakemakeInjector(offsetUnderCaret), fixture.projectDisposable
+            )
+        }
+    }
 
     @Given("^I invoke (EditorCodeBlockStart|EditorCodeBlockEnd) action$")
     fun iInvokeCodeBlockSelectionAction(actionId: String) {
@@ -455,8 +506,8 @@ class ActionsSteps {
     }
 
     private fun findTargetElementFor(element: PsiElement, editor: Editor) =
-            DocumentationManager.getInstance(element.project)
-                    .findTargetElement(editor, element.containingFile, element)
+        DocumentationManager.getInstance(element.project)
+            .findTargetElement(editor, element.containingFile, element)
 
     private fun generateDocumentation(generateQuickDoc: Boolean) {
         ApplicationManager.getApplication().invokeAndWait {
@@ -469,18 +520,18 @@ class ActionsSteps {
 
             myGeneratedDocPopupText = when {
                 generateQuickDoc -> documentationProvider.getQuickNavigateInfo(
-                        targetElement, element
+                    targetElement, element
                 )
                 else -> documentationProvider.generateDoc(
-                        targetElement, element
+                    targetElement, element
                 )
             }
         }
     }
 
     @When("^Parse wrapper args for \"meta.yaml\" and \"wrapper.(py|r)\" result is:$")
-    fun checkWrapperArgsParsing(ext: String, text :String) {
-        ApplicationManager.getApplication().invokeAndWait() {
+    fun checkWrapperArgsParsing(ext: String, text: String) {
+        ApplicationManager.getApplication().invokeAndWait {
             val fixture = fixture()
 
             val wrapperFileContent = fixture.findFileInTempDir("wrapper.$ext")?.let {
@@ -496,17 +547,17 @@ class ActionsSteps {
             )
 
             val args = info.args
-            val mapped = args.keys.sorted().map { key ->
+            val mapped = args.keys.sorted().joinToString(separator = "\n") { key ->
                 val values = args[key]!!
                 "$key:${values.joinToString(", ", prefix = "(", postfix = ")") { "'$it'" }}"
-            }.joinToString(separator="\n")
+            }
 
             Assert.assertEquals(StringUtil.convertLineSeparators(text.trim()), mapped.trim())
         }
     }
 
     @Then("^I check ignored element <([^>]+)>")
-    fun checkIgnoredElementInInspectionList(el : String){
+    fun checkIgnoredElementInInspectionList(el: String) {
         Assert.assertTrue(el in (LocalInspectionEP.LOCAL_INSPECTION.extensionList
             .first { it.shortName == "SmkUnrecognizedSectionInspection" }
             .instance as SmkUnrecognizedSectionInspection).ignoredItems)
@@ -516,7 +567,7 @@ class ActionsSteps {
         fun performAction(project: Project, action: Runnable) {
             ApplicationManager.getApplication().runWriteAction {
                 CommandProcessor.getInstance().executeCommand(
-                        project, action, "SnakeCharmTestCmd", null
+                    project, action, "SnakeCharmTestCmd", null
                 )
             }
         }

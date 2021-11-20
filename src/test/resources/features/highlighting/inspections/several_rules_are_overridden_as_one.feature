@@ -38,16 +38,17 @@ Feature: Several rules were overridden in use section as one rule
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    use rule <import> from M as <name>
+    use rule <import> from M <overriding>
     """
     And SmkSeveralRulesAreOverriddenAsOneInspection inspection is enabled
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
-      | import | name   |
-      | A      | NAME   |
-      | A      | NAME_* |
-      | A,B    | NAME_* |
+      | import | overriding |
+      | A      | as NAME    |
+      | A      | as NAME_*  |
+      | A, B   | as NAME_*  |
+      | A, B   |            |
 
   Scenario: Rules are imported with '*' pattern, no errors because of pattern using
     Given a snakemake project

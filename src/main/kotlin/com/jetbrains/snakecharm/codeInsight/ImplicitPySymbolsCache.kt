@@ -23,12 +23,12 @@ interface ImplicitPySymbolsCache {
     fun getSynthetic(scope: SmkCodeInsightScope) : List<LookupElement>
 
     fun filter(smkScope: SmkCodeInsightScope, name: String) = this[smkScope]
-            .asSequence()
-            .filter { symbol -> symbol.identifier == name }
-            .toList()
+        .asSequence()
+        .filter { symbol -> symbol.identifier == name }
+        .toList()
 
     fun contains(smkScope: SmkCodeInsightScope, name: String) = this[smkScope]
-            .any { symbol -> symbol.identifier == name }
+        .any { symbol -> symbol.identifier == name }
 
 
     companion object {
@@ -41,11 +41,12 @@ interface ImplicitPySymbolsCache {
 }
 
 data class ImplicitPySymbol(
-        val identifier: String,
-        val psiDeclaration: PyElement,
-        val scope: SmkCodeInsightScope,
-        val usageType: ImplicitPySymbolUsageType
+    val identifier: String,
+    val psiDeclaration: PyElement,
+    val scope: SmkCodeInsightScope,
+    val usageType: ImplicitPySymbolUsageType
 )
+
 enum class ImplicitPySymbolUsageType {
     VARIABLE,
     METHOD,
