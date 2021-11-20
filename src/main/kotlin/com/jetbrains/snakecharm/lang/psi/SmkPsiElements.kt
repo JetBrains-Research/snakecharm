@@ -46,9 +46,10 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
     fun getImportedRuleNames(): Array<SmkReferenceExpression>?
 
     /**
-     * Returns True if use name node contains '*' or if it uses original names (doesn't override them)
+     * Returns True if  "as" name is wildcard with '*', e.g:
+     * use rule A,B from M as new_*
      */
-    fun namePatternRespectsImportedNames(): Boolean
+    fun nameIdentifierIsWildcard(): Boolean
 }
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer

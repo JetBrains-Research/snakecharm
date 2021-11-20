@@ -4,14 +4,13 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.util.elementType
-import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes.USE_IMPORTED_RULES_NAMES
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseStub
 import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeSectionType
@@ -91,14 +90,12 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
     override fun getModuleName() =
         (findChildByType(SmkTokenTypes.SMK_FROM_KEYWORD) as? PsiElement)?.nextSibling?.nextSibling
 
-    override fun getImportedRuleNames(): Array<SmkReferenceExpression>? =
-        PsiTreeUtil.getChildrenOfType(
-            findChildByType(SmkElementTypes.USE_IMPORTED_RULES_NAMES),
-            SmkReferenceExpression::class.java
-        )
+    override fun getImportedRuleNames(): Array<SmkReferenceExpression>? = PsiTreeUtil.getChildrenOfType(
+        findChildByType(USE_IMPORTED_RULES_NAMES),
+        SmkReferenceExpression::class.java
+    )
 
-    override fun namePatternRespectsImportedNames(): Boolean {
-        val currentNameIdentifier = nameIdentifier
-        return currentNameIdentifier == null || currentNameIdentifier.text.contains('*') || currentNameIdentifier.elementType == SmkElementTypes.USE_IMPORTED_RULES_NAMES
-    }
+    override fun nameIdentifierIsWildcard() = nameIdentifier?.let {
+        it is SmkUseNameIdentifier && it.textContains('*')
+    } ?: false
 }
