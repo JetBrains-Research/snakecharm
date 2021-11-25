@@ -21,6 +21,11 @@ Feature: Resolve file in conda/notebook sections
       | rule       | notebook | py.ipynb |
       | rule       | notebook | r.ipynb  |
       | checkpoint | notebook | py.ipynb |
+      | rule       | script   | py       |
+      | rule       | script   | r        |
+      | rule       | script   | rmd      |
+      | rule       | script   | jl       |
+      | rule       | script   | rs       |
 
   Scenario Outline: Reference doesn't resolve to inappropriate file
     Given a snakemake project
@@ -41,6 +46,11 @@ Feature: Resolve file in conda/notebook sections
       | rule       | notebook | py.ipynb |
       | rule       | notebook | r.ipynb  |
       | checkpoint | notebook | py.ipynb |
+      | rule       | script   | py       |
+      | rule       | script   | r        |
+      | rule       | script   | rmd      |
+      | rule       | script   | jl       |
+      | rule       | script   | rs       |
 
   Scenario Outline: Resolve to a file in a sub directory
     Given a snakemake project
@@ -62,6 +72,11 @@ Feature: Resolve file in conda/notebook sections
       | rule       | notebook | py.ipynb |
       | rule       | notebook | r.ipynb  |
       | checkpoint | notebook | py.ipynb |
+      | rule       | script   | py       |
+      | rule       | script   | r        |
+      | rule       | script   | rmd      |
+      | rule       | script   | jl       |
+      | rule       | script   | rs       |
 
   Scenario Outline: Resolve for strings in different quotes
     Given a snakemake project
@@ -84,6 +99,9 @@ Feature: Resolve file in conda/notebook sections
       | '     | notebook | py.ipynb |
       | "     | notebook | py.ipynb |
       | """   | notebook | py.ipynb |
+      | '     | script   | py       |
+      | "     | script   | py       |
+      | """   | script   | py       |
 
   Scenario Outline: Resolve is off for fstrings
     Given a snakemake project
@@ -106,6 +124,9 @@ Feature: Resolve file in conda/notebook sections
       | '     | notebook | py.ipynb |
       | "     | notebook | py.ipynb |
       | """   | notebook | py.ipynb |
+      | '     | script   | py       |
+      | "     | script   | py       |
+      | """   | script   | py       |
 
   Scenario Outline: Resolve when string literal is divided
     Given a snakemake project
@@ -125,6 +146,7 @@ Feature: Resolve file in conda/notebook sections
       | rule       | conda    | yaml     |
       | checkpoint | conda    | yaml     |
       | rule       | notebook | py.ipynb |
+      | rule       | script   |py        |
 
   Scenario Outline: Resolve when string literal is crazily divided
     Given a snakemake project
@@ -180,6 +202,7 @@ Feature: Resolve file in conda/notebook sections
       | rule       | conda    | yaml     |
       | checkpoint | conda    | yaml     |
       | rule       | notebook | py.ipynb |
+      | rule       | script   |py        |
 
   Scenario Outline: Resolve if rule file in subdirectory
     Given a snakemake project
@@ -203,3 +226,5 @@ Feature: Resolve file in conda/notebook sections
       | rule       | notebook | roo.py.ipynb           | ../roo.py.ipynb           |
       | rule       | notebook | notebooks/roo.py.ipynb | ../notebooks/roo.py.ipynb |
       | rule       | notebook | rules/roo.py.ipynb     | roo.py.ipynb              |
+      | rule       | script   | scripts/roo.py         | ../scripts/roo.py         |
+      | rule       | script   | scripts/roo.r          | ../scripts/roo.r          |

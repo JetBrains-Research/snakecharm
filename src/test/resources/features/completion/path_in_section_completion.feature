@@ -26,6 +26,11 @@ Feature: Complete file name in conda section
       | module     | snakefile | xoo.smk               |
       | module     | snakefile | other/files/foo.smk   |
       | module     | snakefile | other/files/Snakefile |
+      | rule       | script    | xoo.py                |
+      | rule       | script    | xoo.r                 |
+      | rule       | script    | xoo.rmd               |
+      | rule       | script    | xoo.jl                |
+      | rule       | script    | xoo.rs                |
 
   Scenario Outline: Completion list when there are no appropriate files
     Given a snakemake project
@@ -46,6 +51,7 @@ Feature: Complete file name in conda section
       | rule       | conda    |
       | checkpoint | conda    |
       | rule       | notebook |
+      | rule       | script   |
 
   Scenario Outline: Completion for file in subdirectory
     Given a snakemake project
@@ -68,6 +74,11 @@ Feature: Complete file name in conda section
       | rule       | conda    | yaml     |
       | checkpoint | conda    | yaml     |
       | rule       | notebook | py.ipynb |
+      | rule       | script   | py       |
+      | rule       | script   | r        |
+      | rule       | script   | rmd      |
+      | rule       | script   | jl       |
+      | rule       | script   | rs       |
 
   Scenario Outline: Complete in conda section for different quotes
     Given a snakemake project
@@ -93,6 +104,9 @@ Feature: Complete file name in conda section
       | '     | notebook | py.ipynb |
       | "     | notebook | py.ipynb |
       | """   | notebook | py.ipynb |
+      | '     | script   | py       |
+      | "     | script   | py       |
+      | """   | script   | py       |
 
   Scenario Outline: Complete in conda section for fstrings in different quotes
     Given a snakemake project
@@ -118,6 +132,9 @@ Feature: Complete file name in conda section
       | '     | notebook | py.ipynb |
       | "     | notebook | py.ipynb |
       | """   | notebook | py.ipynb |
+      | '     | script   | py       |
+      | "     | script   | py       |
+      | """   | script   | py       |
 
   Scenario Outline: Completion if rule file in subdirectory
     Given a snakemake project
@@ -145,3 +162,6 @@ Feature: Complete file name in conda section
       | rule       | notebook | roo.py.ipynb           | ../roo.py.ipynb           | py.ipynb |
       | rule       | notebook | notebooks/roo.py.ipynb | ../notebooks/roo.py.ipynb | py.ipynb |
       | rule       | notebook | rules/roo.py.ipynb     | roo.py.ipynb              | py.ipynb |
+      | rule       | script   | roo.py                 | ../roo.py                 | py       |
+      | rule       | script   | scripts/roo.py         | ../scripts/roo.py         | py       |
+      | rule       | script   | rules/roo.py           | roo.py                    | py       |
