@@ -263,7 +263,7 @@ class SmkNotebookReference(
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike {
         val name = it.name.lowercase()
-        name.endsWith(".py.ipynb") or name.endsWith(".r.ipynb")
+        name.endsWith(".py.ipynb") or name.endsWith(".r.ipynb") or name.endsWith(".ipynb")
     }
 }
 

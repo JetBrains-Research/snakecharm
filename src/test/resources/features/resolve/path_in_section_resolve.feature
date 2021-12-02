@@ -20,7 +20,7 @@ Feature: Resolve file in conda/notebook sections
       | rule       | conda    | yml      |
       | rule       | notebook | py.ipynb |
       | rule       | notebook | r.ipynb  |
-      | checkpoint | notebook | py.ipynb |
+      | checkpoint | notebook | ipynb    |
       | rule       | script   | py       |
       | rule       | script   | r        |
       | rule       | script   | rmd      |
@@ -45,7 +45,7 @@ Feature: Resolve file in conda/notebook sections
       | checkpoint | conda    | yaml     |
       | rule       | notebook | py.ipynb |
       | rule       | notebook | r.ipynb  |
-      | checkpoint | notebook | py.ipynb |
+      | checkpoint | notebook | ipynb    |
       | rule       | script   | py       |
       | rule       | script   | r        |
       | rule       | script   | rmd      |
@@ -71,7 +71,7 @@ Feature: Resolve file in conda/notebook sections
       | checkpoint | conda    | yaml     |
       | rule       | notebook | py.ipynb |
       | rule       | notebook | r.ipynb  |
-      | checkpoint | notebook | py.ipynb |
+      | checkpoint | notebook | ipynb    |
       | rule       | script   | py       |
       | rule       | script   | r        |
       | rule       | script   | rmd      |
@@ -98,7 +98,7 @@ Feature: Resolve file in conda/notebook sections
       | """   | conda    | yaml     |
       | '     | notebook | py.ipynb |
       | "     | notebook | py.ipynb |
-      | """   | notebook | py.ipynb |
+      | """   | notebook | ipynb    |
       | '     | script   | py       |
       | "     | script   | py       |
       | """   | script   | py       |
@@ -123,7 +123,7 @@ Feature: Resolve file in conda/notebook sections
       | """   | conda    | yaml     |
       | '     | notebook | py.ipynb |
       | "     | notebook | py.ipynb |
-      | """   | notebook | py.ipynb |
+      | """   | notebook | ipynb    |
       | '     | script   | py       |
       | "     | script   | py       |
       | """   | script   | py       |
@@ -225,6 +225,6 @@ Feature: Resolve file in conda/notebook sections
       | checkpoint | conda    | envs/roo.yaml          | ../envs/roo.yaml          |
       | rule       | notebook | roo.py.ipynb           | ../roo.py.ipynb           |
       | rule       | notebook | notebooks/roo.py.ipynb | ../notebooks/roo.py.ipynb |
-      | rule       | notebook | rules/roo.py.ipynb     | roo.py.ipynb              |
+      | rule       | notebook | rules/roo.ipynb        | roo.ipynb                 |
       | rule       | script   | scripts/roo.py         | ../scripts/roo.py         |
       | rule       | script   | scripts/roo.r          | ../scripts/roo.r          |

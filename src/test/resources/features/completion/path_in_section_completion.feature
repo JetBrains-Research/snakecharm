@@ -23,6 +23,7 @@ Feature: Complete file name in conda section
       | rule       | conda     | xoo.yml               |
       | rule       | notebook  | xoo.py.ipynb          |
       | rule       | notebook  | xoo.r.ipynb           |
+      | rule       | notebook  | xoo.ipynb             |
       | module     | snakefile | xoo.smk               |
       | module     | snakefile | other/files/foo.smk   |
       | module     | snakefile | other/files/Snakefile |
@@ -74,6 +75,7 @@ Feature: Complete file name in conda section
       | rule       | conda    | yaml     |
       | checkpoint | conda    | yaml     |
       | rule       | notebook | py.ipynb |
+      | rule       | notebook | ipynb        |
       | rule       | script   | py       |
       | rule       | script   | r        |
       | rule       | script   | rmd      |
@@ -161,7 +163,7 @@ Feature: Complete file name in conda section
       | checkpoint | conda    | envs/roo.yaml          | ../envs/roo.yaml          | yaml     |
       | rule       | notebook | roo.py.ipynb           | ../roo.py.ipynb           | py.ipynb |
       | rule       | notebook | notebooks/roo.py.ipynb | ../notebooks/roo.py.ipynb | py.ipynb |
-      | rule       | notebook | rules/roo.py.ipynb     | roo.py.ipynb              | py.ipynb |
+      | rule       | notebook | rules/roo.ipynb        | roo.ipynb                 | ipynb    |
       | rule       | script   | roo.py                 | ../roo.py                 | py       |
       | rule       | script   | scripts/roo.py         | ../scripts/roo.py         | py       |
       | rule       | script   | rules/roo.py           | roo.py                    | py       |
