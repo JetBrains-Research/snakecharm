@@ -121,6 +121,7 @@ class SmkWrapperStorage(val project: Project) : Disposable {
         Disposer.register(this, connection)
     }
 
+    @Suppress("PROVIDED_RUNTIME_TOO_LOW")
     @Serializable
     data class WrapperInfo(
         val path: String = "", // system independent separators
