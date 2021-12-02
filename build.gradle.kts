@@ -11,13 +11,13 @@ plugins {
     id("java")
 
     // Kotlin support
-    kotlin("jvm") version "1.5.31"
-    kotlin("plugin.serialization") version "1.5.31"
+    kotlin("jvm") version "1.6.0"
+    kotlin("plugin.serialization") version "1.6.0"
 
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
-    id("org.jetbrains.intellij") version "1.2.1"
+    id("org.jetbrains.intellij") version "1.3.0"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
     id("org.jetbrains.changelog") version "1.3.1"
     // detekt linter - read more: https://detekt.github.io/detekt/gradle.html
@@ -42,7 +42,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     testImplementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.3.1")
 }
 
 // Configure gradle-intellij-plugin plugin.
@@ -173,8 +173,8 @@ tasks {
         dependsOn("compileKotlin", "compileJava")
         doLast {
             javaexec {
-                main = "com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler"
-                classpath =  project.sourceSets.main.get().runtimeClasspath + files(intellij.ideaDependency.get().jarFiles)
+                mainClass.set("com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler")
+                classpath =  project.sourceSets.main.get().runtimeClasspath + files(setupDependencies.get().idea.get().jarFiles)
                 enableAssertions = true
                 args = listOf(
                     properties("snakemakeWrappersRepoPath"),

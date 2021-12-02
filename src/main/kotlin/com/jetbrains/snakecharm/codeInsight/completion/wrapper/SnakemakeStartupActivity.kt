@@ -5,10 +5,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
-import kotlinx.serialization.ExperimentalSerializationApi
 
 class SnakemakeStartupActivity : StartupActivity.Background {
-    @ExperimentalSerializationApi
     override fun runActivity(project: Project) {
         val smkSettings = project.service<SmkSupportProjectSettings>()
         smkSettings.initOnStartup()
