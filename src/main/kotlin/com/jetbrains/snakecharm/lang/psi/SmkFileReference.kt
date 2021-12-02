@@ -158,6 +158,8 @@ open class SmkFileReference(
         }
 
     override fun getUnresolvedDescription(): String? = null
+
+    fun getReferencePath() = path
 }
 
 /**

@@ -24,6 +24,7 @@ Released on ...
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN))
 
 ### Added
+- Quick fix for unresolved '.yaml' / '.yml' files (see [#277](https://github.com/JetBrains-Research/snakecharm/issues/277))
 - Color Settings Page (see [#431](https://github.com/JetBrains-Research/snakecharm/issues/431))
 - Inspection: highlights 'use rule' section which overrides several rules as one (see [#411](https://github.com/JetBrains-Research/snakecharm/issues/411))
 - Weak warnings for unused 'log' sections in 'use rule' (see [#414](https://github.com/JetBrains-Research/snakecharm/issues/414))
