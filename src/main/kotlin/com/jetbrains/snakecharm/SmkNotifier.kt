@@ -30,6 +30,22 @@ object SmkNotifier {
         }).notify(module.project)
     }
 
+    fun notifyImpossibleToCreateFileOrDirectory(name: String, project: Project){
+        NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID).createNotification(
+            title = SnakemakeBundle.message("notifier.msg.create.env.file.title"),
+            content = SnakemakeBundle.message("notifier.msg.create.env.file.io.exception", name),
+            type = NotificationType.ERROR
+        ).notify(project)
+    }
+
+    fun notifyTargetFileIsInvalid(name: String, project: Project) {
+        NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID).createNotification(
+            title = SnakemakeBundle.message("notifier.msg.create.env.file.title"),
+            content = SnakemakeBundle.message("notifier.msg.create.env.file.invalid.file.exception", name),
+            type = NotificationType.ERROR
+        ).notify(project)
+    }
+
     fun notify(content: String, type: NotificationType = NotificationType.INFORMATION, project: Project? = null) =
         NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID)
             .createNotification(content, type).also {
