@@ -39,6 +39,7 @@ class SmkWrapperStorage(val project: Project) : Disposable {
 
     fun cleanVersion() = version.removePrefix("refs/tags/").removePrefix("refs/heads/")
 
+    @ExperimentalSerializationApi
     fun initOnStartup() {
         subscribeOnEvents()
 
@@ -62,6 +63,7 @@ class SmkWrapperStorage(val project: Project) : Disposable {
         }
     }
 
+    @ExperimentalSerializationApi
     private fun subscribeOnEvents() {
         val connection = project.messageBus.connect()
         connection.subscribe(SmkSupportProjectSettings.TOPIC, object : SmkSupportProjectSettingsListener {
@@ -132,6 +134,7 @@ class SmkWrapperStorage(val project: Project) : Disposable {
     companion object {
         fun getInstance(project: Project) = project.getService(SmkWrapperStorage::class.java)
 
+        @ExperimentalSerializationApi
         fun loadOrCollectLocalWrappers(project: Project, forced: Boolean = false) {
             // TODO: scan 'custom' wrappers repo if used and decide force reparse wrappers or used serialized *.cbor representation,
             //       stored in .idea folder
