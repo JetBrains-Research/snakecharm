@@ -7,6 +7,7 @@
 Released on ...
 
 ### Changed
+- PyCharm 2021.3 compatibility (see [#444](https://github.com/JetBrains-Research/snakecharm/issues/444)) 
 - Show argument preview for int indexes completion in `output[i]` (see [#378](https://github.com/JetBrains-Research/snakecharm/issues/378))
 - Allocation of all top-level sections into one token and support for unknown top-level sections (see [#373](https://github.com/JetBrains-Research/snakecharm/issues/373))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
