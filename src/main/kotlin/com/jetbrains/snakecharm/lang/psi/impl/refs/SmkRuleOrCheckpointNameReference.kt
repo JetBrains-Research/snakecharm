@@ -16,7 +16,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkModule
 import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.SmkUse
-import com.jetbrains.snakecharm.lang.psi.impl.SmkImportedRulesNames
+import com.jetbrains.snakecharm.lang.psi.SmkImportedRulesNames
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType

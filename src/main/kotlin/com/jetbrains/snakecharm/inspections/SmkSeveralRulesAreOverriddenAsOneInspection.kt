@@ -11,7 +11,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.refactoring.suggested.endOffset
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkUse
-import com.jetbrains.snakecharm.lang.psi.impl.SmkImportedRulesNames
+import com.jetbrains.snakecharm.lang.psi.SmkImportedRulesNames
 
 class SmkSeveralRulesAreOverriddenAsOneInspection : SnakemakeInspection() {
     companion object {
