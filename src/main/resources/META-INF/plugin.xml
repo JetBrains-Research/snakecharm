@@ -550,18 +550,6 @@
     />
 
     <localInspection
-            language="Python"
-            shortName="SmkPyUnboundLocalVariableInspection"
-            suppressId="PyUnboundLocalVariable"
-            bundle="SnakemakeBundle"
-            key="INSP.NAME.unbound"
-            groupKey="INSP.GROUP.snakemake"
-            enabledByDefault="true"
-            level="WARNING"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkPyUnboundLocalVariableInspection"
-    />
-
-    <localInspection
             language="Snakemake" shortName="SmkRedundantCommaInspection"
             enabledByDefault="true"
             level="WARNING"

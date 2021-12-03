@@ -17,7 +17,7 @@ class SmkSLQuotingMisuseInGetAccessorInspection : SnakemakeInspection() {
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
-    ) = object : SmkSLInspectionVisitor(holder, session) {
+    ) = object : SmkSLInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkSLSubscriptionExpressionKey(expr: SmkSLSubscriptionIndexKeyExpressionImpl) {
             val keyStr = expr.text

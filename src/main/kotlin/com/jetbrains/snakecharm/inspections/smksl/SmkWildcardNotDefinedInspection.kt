@@ -18,10 +18,10 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
     }
 
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
-    ) = object : SmkSLInspectionVisitor(holder, session) {
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
+    ) = object : SmkSLInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpressionImpl) {
             if (!expr.isWildcard()) {
@@ -34,9 +34,9 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
             val wildcardsByRule = session.putUserDataIfAbsent(KEY, hashMapOf())
             if (ruleOrCheckpoint !in wildcardsByRule) {
                 val wildcardsDefiningSectionsAvailable = ruleOrCheckpoint.getSections()
-                        .asSequence()
-                        .filterIsInstance(SmkRuleOrCheckpointArgsSection::class.java)
-                        .filter { it.isWildcardsDefiningSection() }.firstOrNull() != null
+                    .asSequence()
+                    .filterIsInstance(SmkRuleOrCheckpointArgsSection::class.java)
+                    .filter { it.isWildcardsDefiningSection() }.firstOrNull() != null
 
                 val wildcards = when {
                     // if no suitable sections let's think that no wildcards
@@ -45,8 +45,8 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
                         // Cannot do via types, we'd like to have wildcards only from
                         // defining sections and ensure that defining sections could be parsed
                         val collector = SmkWildcardsCollector(
-                                visitDefiningSections = true,
-                                visitExpandingSections = false
+                            visitDefiningSections = true,
+                            visitExpandingSections = false
                         )
                         ruleOrCheckpoint.accept(collector)
                         collector.getWildcardsNames()
@@ -63,15 +63,15 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
 //                        definedWildcards
                     }
                 }
-                wildcardsByRule[ruleOrCheckpoint] =  Ref.create(wildcards)
+                wildcardsByRule[ruleOrCheckpoint] = Ref.create(wildcards)
             }
             val wildcards = wildcardsByRule.getValue(ruleOrCheckpoint).get()
             if (wildcards == null) {
                 // failed to parse wildcards defining sections
                 registerProblem(
-                        expr,
-                        SnakemakeBundle.message("INSP.NAME.wildcard.not.defined.cannot.check", expr.text),
-                        ProblemHighlightType.WEAK_WARNING
+                    expr,
+                    SnakemakeBundle.message("INSP.NAME.wildcard.not.defined.cannot.check", expr.text),
+                    ProblemHighlightType.WEAK_WARNING
                 )
             } else {
                 if (expr.text !in wildcards) {
@@ -79,8 +79,8 @@ class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
                     val message = when (definingSection) {
                         null -> SnakemakeBundle.message("INSP.NAME.wildcard.not.defined", expr.text)
                         else -> SnakemakeBundle.message(
-                                "INSP.NAME.wildcard.not.defined.in.section",
-                                expr.text, definingSection
+                            "INSP.NAME.wildcard.not.defined.in.section",
+                            expr.text, definingSection
                         )
                     }
 
