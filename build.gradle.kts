@@ -202,7 +202,7 @@ tasks {
         doLast {
             javaexec {
                 mainClass.set("com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler")
-                classpath =  project.sourceSets.main.get().runtimeClasspath + files(intellij.ideaDependency.get().jarFiles)
+                classpath =  project.sourceSets.main.get().runtimeClasspath + files(setupDependencies.get().idea.get().jarFiles)
                 enableAssertions = true
                 args = listOf(
                         "${project.projectDir}/testData/wrappers_storage",
