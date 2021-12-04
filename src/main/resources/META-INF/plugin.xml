@@ -42,7 +42,7 @@
             instance="com.jetbrains.snakecharm.framework.SmkFrameworkConfigurableProvider"
             nonDefaultProject="true"
     />
-    <editorNotificationProvider implementation="com.jetbrains.snakecharm.framework.SmkDisabledBanner"/>
+    <editorNotificationProvider implementation="com.jetbrains.snakecharm.framework.SmkSupportDisabledBanner"/>
     <notificationGroup
             id="SnakeCharmPluginNotifier"
             displayType="BALLOON"

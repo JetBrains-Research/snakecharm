@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.framework
 
 import com.intellij.icons.AllIcons
-import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.options.ShowSettingsUtil
@@ -15,7 +14,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 /**
  * Shows [EditorNotificationPanel] if 'Enable Snakemake support' setting is disabled
  */
-class SmkDisabledBanner : EditorNotifications.Provider<EditorNotificationPanel>() {
+class SmkSupportDisabledBanner : EditorNotifications.Provider<EditorNotificationPanel>() {
 
     private companion object {
         val KEY = Key.create<EditorNotificationPanel>("smk.content.notification.panel")
@@ -31,20 +30,18 @@ class SmkDisabledBanner : EditorNotifications.Provider<EditorNotificationPanel>(
         project: Project
     ): EditorNotificationPanel? {
         val editor = (fileEditor as? TextEditor)?.editor ?: return null
-        if (hideNotification || editor.getUserData(DISABLE_NOTIFICATION) == true || PropertiesComponent.getInstance()
-                .isTrueValue(DISABLE_NOTIFICATION.toString())
-        ) {
+        val settings = SmkSupportProjectSettings.getInstance(project)
+        if (hideNotification || editor.getUserData(DISABLE_NOTIFICATION) == true || !settings.snakemakeSupportBannerEnabled) {
             editor.putUserData(DISABLE_NOTIFICATION, false) // IDK how to update EditorNotifications
             // after SmkFrameworkConfigurableProvider closure, so we just disable it once, and enable it then
             return null
         }
 
-        val settings = SmkSupportProjectSettings.getInstance(project)
         if (settings.snakemakeSupportEnabled) {
             return null
         }
         val panel = EditorNotificationPanel(fileEditor)
-        panel.text = SnakemakeBundle.message("BANNER.msg")
+        panel.text = SnakemakeBundle.message("banner.smk.framework.nor.configured.message")
         panel.icon(AllIcons.General.Warning)
         panel.createActionLabel(SnakemakeBundle.message("notifier.msg.framework.by.snakefile.action.configure")) {
             editor.putUserData(DISABLE_NOTIFICATION, true)
@@ -54,14 +51,14 @@ class SmkDisabledBanner : EditorNotifications.Provider<EditorNotificationPanel>(
             )
             EditorNotifications.getInstance(project).updateNotifications(file)
         }
-        panel.createActionLabel(SnakemakeBundle.message("BANNER.hide")) {
+        panel.createActionLabel(SnakemakeBundle.message("banner.smk.framework.nor.configured.hide")) {
             // Hides notification for current session
             hideNotification = true
             EditorNotifications.getInstance(project).updateNotifications(file)
         }
-        panel.createActionLabel(SnakemakeBundle.message("BANNER.dont.show.again")) {
-            // Hides notification until cache will be restored
-            PropertiesComponent.getInstance().setValue(DISABLE_NOTIFICATION.toString(), "true")
+        panel.createActionLabel(SnakemakeBundle.message("banner.smk.framework.nor.configured.dont.show.again")) {
+            // Hides notification in current project
+            SmkSupportProjectSettings.hideSmkSupportBanner(project)
             EditorNotifications.getInstance(project).updateAllNotifications()
         }
 
