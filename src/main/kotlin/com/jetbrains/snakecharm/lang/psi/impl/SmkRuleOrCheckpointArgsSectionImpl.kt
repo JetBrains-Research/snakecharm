@@ -37,6 +37,13 @@ open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode) : SmkArgsSectionImp
                     stringLiteral, stringLiteral.stringValue
                 )
             }
+            SnakemakeNames.SECTION_SCRIPT -> getSimplePathRelatedSectionReference { stringLiteral, offsetInParent ->
+                SmkScriptReference(
+                    this,
+                    SmkPsiUtil.getReferenceRange(stringLiteral).shiftRight(offsetInParent),
+                    stringLiteral, stringLiteral.stringValue
+                )
+            }
             else -> null
         }
 

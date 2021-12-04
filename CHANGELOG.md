@@ -12,6 +12,7 @@ Released on ...
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Fixed
+- Resolve and completion for 'script' section (see [#426](https://github.com/JetBrains-Research/snakecharm/issues/426))
 - Only snakemake file can't end with a comment (see [#365](https://github.com/JetBrains-Research/snakecharm/issues/365))
 - SmkSectionDuplicatedArgsInspection now checks workflow top-level sections (see [#407](https://github.com/JetBrains-Research/snakecharm/issues/407))
 - All inspections warnings now can be overridden (see [#423](https://github.com/JetBrains-Research/snakecharm/issues/423))
