@@ -232,6 +232,17 @@
     />
 
     <localInspection
+            language="Snakemake" shortName="SmkWildcardInNotOverriddenSectionInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkWildcardInNotOverriddenSection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.undeclared.wildcard.in.not.overridden.section"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkWildcardInNotOverriddenSectionInspection"
+    />
+
+    <localInspection
             language="Snakemake" shortName="SmkShadowSettingsInspection"
             enabledByDefault="true"
             level="WARNING"

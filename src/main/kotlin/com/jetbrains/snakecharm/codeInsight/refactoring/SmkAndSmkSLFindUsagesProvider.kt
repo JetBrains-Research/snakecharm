@@ -8,10 +8,7 @@ import com.jetbrains.python.findUsages.PythonFindUsagesProvider
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkFakePsiElement
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
-import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
-import com.jetbrains.snakecharm.lang.psi.SmkRule
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
-import com.jetbrains.snakecharm.lang.psi.SmkSection
+import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
 /**
@@ -26,6 +23,7 @@ class SmkAndSmkSLFindUsagesProvider : PythonFindUsagesProvider() {
         is SmkRuleOrCheckpointArgsSection -> "rule section"
         is SmkRule -> "rule"
         is SmkCheckPoint -> "checkpoint"
+        is SmkUse -> "use rule"
         is SmkSection -> "section"
         is SmkFakePsiElement -> "element"
         is SmkSLReferenceExpressionImpl -> {

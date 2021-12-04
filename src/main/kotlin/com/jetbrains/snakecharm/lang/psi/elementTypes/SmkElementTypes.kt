@@ -2,6 +2,8 @@ package com.jetbrains.snakecharm.lang.psi.elementTypes
 
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.psi.PyElementType
+import com.jetbrains.snakecharm.lang.psi.SmkImportedRulesNames
+import com.jetbrains.snakecharm.lang.psi.SmkUseNameIdentifier
 import com.jetbrains.snakecharm.lang.psi.impl.*
 
 /**

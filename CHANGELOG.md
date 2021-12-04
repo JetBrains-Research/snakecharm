@@ -26,6 +26,7 @@ Released on ...
 ### Added
 - Color Settings Page (see [#431](https://github.com/JetBrains-Research/snakecharm/issues/431))
 - Inspection: highlights 'use rule' section which overrides several rules as one (see [#411](https://github.com/JetBrains-Research/snakecharm/issues/411))
+- Collecting wildcards from overridden rules in 'use' sections (see [#418](https://github.com/JetBrains-Research/snakecharm/issues/418))
 - Weak warnings for unused 'log' sections in 'use rule' (see [#414](https://github.com/JetBrains-Research/snakecharm/issues/414))
 - Weak warnings for unused 'log' sections (see [#300](https://github.com/JetBrains-Research/snakecharm/issues/300))
 - Support for 'module' and 'use' keywords (see [#355](https://github.com/JetBrains-Research/snakecharm/issues/355))

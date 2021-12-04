@@ -6,7 +6,7 @@ import com.intellij.psi.PsiElement
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionIndexKeyExpressionImpl
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionIndexKeyExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLSubscriptionKeyReference
 
 class SmkSLSubscriptionIndexOutOfBoundsInspection : SnakemakeInspection() {
@@ -16,7 +16,7 @@ class SmkSLSubscriptionIndexOutOfBoundsInspection : SnakemakeInspection() {
         session: LocalInspectionToolSession,
     ) = object : SmkSLInspectionVisitor(holder, session) {
 
-        override fun visitSmkSLSubscriptionExpressionKey(expr: SmkSLSubscriptionIndexKeyExpressionImpl) {
+        override fun visitSmkSLSubscriptionExpressionKey(expr: SmkSLSubscriptionIndexKeyExpression) {
             val ref = expr.reference
             if (ref is SmkSLSubscriptionKeyReference) {
                 val refText = ref.canonicalText

@@ -21,9 +21,9 @@ Feature: Find Usages for wildcards
       | foo.smk | <offset3> | <length> |
       | foo.smk | <offset4> | <length> |
     Examples:
-      | rule_like  | offset1 | offset2 | offset3 |offset4 | length |
-      | rule       | 44      | 74      |    117     | 143 | 9      |
-      | checkpoint | 50      | 80      |    123     | 149 | 9      |
+      | rule_like  | offset1 | offset2 | offset3 | offset4 | length |
+      | rule       | 44      | 74      | 117     | 143     | 9      |
+      | checkpoint | 50      | 80      | 123     | 149     | 9      |
 
   Scenario Outline: Usages for wildcard names
     Given a snakemake project
@@ -35,6 +35,9 @@ Feature: Find Usages for wildcards
           shell: "{wildcards.sample}" # here
           run:
             p1 = wildcards.sample
+
+        use rule foo as foo2 with:
+          log: "{sample}"
         """
     When I put the caret at sample}" # here
     And I invoke find usages
@@ -44,7 +47,8 @@ Feature: Find Usages for wildcards
       | foo.smk | <offset2> | 16     |
       | foo.smk | <offset3> | 16     |
       | foo.smk | <offset4> | 16     |
+      | foo.smk | <offset5> |6       |
     Examples:
-      | rule_like  | offset1 | offset2 | offset3 | offset4 |
-      | rule       | 22      | 44      | 74      | 116     |
-      | checkpoint | 28      | 50      | 80      | 122     |
+      | rule_like  | offset1 | offset2 | offset3 | offset4 | offset5 |
+      | rule       | 22      | 44      | 74      | 116     | 170     |
+      | checkpoint | 28      | 50      | 80      | 122     | 176     |

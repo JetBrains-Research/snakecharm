@@ -10,17 +10,17 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTION_ACCESSOR_CLASSE
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SNAKEMAKE_MODULE_NAME_IO_PY
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLInitialReference
 
-class SmkSLUndeclaredSectionInspection: SnakemakeInspection() {
+class SmkSLUndeclaredSectionInspection : SnakemakeInspection() {
     override fun buildVisitor(
-                holder: ProblemsHolder,
-                isOnTheFly: Boolean,
-                session: LocalInspectionToolSession
-        ) = object : SmkSLInspectionVisitor(holder, session) {
-        
-        override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpressionImpl) {
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
+    ) = object : SmkSLInspectionVisitor(holder, session) {
+
+        override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpression) {
             val ref = expr.reference
             if (ref is SmkSLInitialReference) {
                 val referencedName = expr.referencedName
@@ -30,8 +30,8 @@ class SmkSLUndeclaredSectionInspection: SnakemakeInspection() {
 
                     if (checkIsSectionNameUnresolved(ref)) {
                         registerProblem(
-                                expr,
-                                SnakemakeBundle.message("INSP.NAME.undeclared.section.message", referencedName!!)
+                            expr,
+                            SnakemakeBundle.message("INSP.NAME.undeclared.section.message", referencedName!!)
                         )
                     }
                 }
@@ -56,6 +56,6 @@ class SmkSLUndeclaredSectionInspection: SnakemakeInspection() {
         }
 
         fun isSectionNameOfInterest(referencedName: String?) =
-                referencedName in SnakemakeAPI.SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS
+            referencedName in SnakemakeAPI.SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS
     }
 }

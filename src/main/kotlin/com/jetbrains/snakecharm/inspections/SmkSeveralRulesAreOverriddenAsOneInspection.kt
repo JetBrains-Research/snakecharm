@@ -11,7 +11,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.refactoring.suggested.endOffset
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkUse
-import com.jetbrains.snakecharm.lang.psi.impl.SmkImportedRulesNames
+import com.jetbrains.snakecharm.lang.psi.SmkImportedRulesNames
 
 class SmkSeveralRulesAreOverriddenAsOneInspection : SnakemakeInspection() {
     companion object {
@@ -31,7 +31,7 @@ class SmkSeveralRulesAreOverriddenAsOneInspection : SnakemakeInspection() {
                 // There are pattern in name, or 'use' section doesn't change names
                 return
             }
-            val overridden = use.getImportedRuleNames()
+            val overridden = use.getDefinedReferencesOfImportedRuleNames()
 
             if (overridden != null && overridden.size == 1) {
                 // There are only one rule reference
