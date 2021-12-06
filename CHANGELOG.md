@@ -3,11 +3,17 @@
 
 # SnakeCharm Plugin Changelog
 
-## [Unreleased]
-Released on December 6th 2021
+## [2021.3.661]
+Released on December 7th 2021
 
 ### Changed
 - PyCharm 2021.3 compatibility (see [#444](https://github.com/JetBrains-Research/snakecharm/issues/444))
+  Released on December 7th 2021
+
+## [2021.2.657]
+Released on December 6th 2021
+
+### Changed
 - Show argument preview for int indexes completion in `output[i]` (see [#378](https://github.com/JetBrains-Research/snakecharm/issues/378))
 - Allocation of all top-level sections into one token and support for unknown top-level sections (see [#373](https://github.com/JetBrains-Research/snakecharm/issues/373))
 
