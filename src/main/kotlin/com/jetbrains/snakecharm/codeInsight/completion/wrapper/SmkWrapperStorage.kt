@@ -39,6 +39,7 @@ class SmkWrapperStorage(val project: Project) : Disposable {
 
     fun cleanVersion() = version.removePrefix("refs/tags/").removePrefix("refs/heads/")
 
+    @ExperimentalSerializationApi
     fun initOnStartup() {
         subscribeOnEvents()
 
@@ -62,6 +63,7 @@ class SmkWrapperStorage(val project: Project) : Disposable {
         }
     }
 
+    @ExperimentalSerializationApi
     private fun subscribeOnEvents() {
         val connection = project.messageBus.connect()
         connection.subscribe(SmkSupportProjectSettings.TOPIC, object : SmkSupportProjectSettingsListener {
@@ -121,6 +123,7 @@ class SmkWrapperStorage(val project: Project) : Disposable {
         Disposer.register(this, connection)
     }
 
+    @Suppress("PROVIDED_RUNTIME_TOO_LOW")
     @Serializable
     data class WrapperInfo(
         val path: String = "", // system independent separators

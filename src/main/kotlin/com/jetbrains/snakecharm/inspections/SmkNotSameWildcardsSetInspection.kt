@@ -18,7 +18,7 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
         private val visitedRules = mutableSetOf<String>()
 
         override fun visitSmkRule(rule: SmkRule) {

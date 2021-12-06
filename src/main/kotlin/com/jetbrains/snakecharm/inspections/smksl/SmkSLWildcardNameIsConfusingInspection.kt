@@ -14,8 +14,8 @@ class SmkSLWildcardNameIsConfusingInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession
-    ) = object : SmkSLInspectionVisitor(holder, session) {
+        session: LocalInspectionToolSession,
+    ) = object : SmkSLInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpression) {
             // expr.isQualified: 'wildcards' in 'wildcards.input'

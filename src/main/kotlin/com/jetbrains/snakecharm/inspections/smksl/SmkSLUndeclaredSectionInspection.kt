@@ -18,7 +18,7 @@ class SmkSLUndeclaredSectionInspection : SnakemakeInspection() {
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
-    ) = object : SmkSLInspectionVisitor(holder, session) {
+    ) = object : SmkSLInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpression) {
             val ref = expr.reference

@@ -19,8 +19,8 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
         private val stringVisitor = object : MultilineStringVisitor() {
             override fun reportSmkProblem(psiElement: PsiElement, text: String) {
                 registerProblem(psiElement, text)

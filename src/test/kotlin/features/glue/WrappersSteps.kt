@@ -11,7 +11,7 @@ import java.nio.file.Paths
 
 class WrappersSteps {
     @Given("^wrapper repo path in test dir \"(.+)\"")
-       fun wrapperRepoPath(folderRelativePathToTestData: String) {
+    fun wrapperRepoPath(folderRelativePathToTestData: String) {
         // val folder = SnakemakeWorld.fixture().tempDirFixture.findOrCreateDir(pathStr)
         // folder.url
 
@@ -19,8 +19,6 @@ class WrappersSteps {
         require(path.exists() && path.isDirectory()) {
             "Should be an existing directory, but was: exist:${path.exists()}, dir:${path.isDirectory()}"
         }
-        val module = SnakemakeWorld.fixture().module
-
         val newState = SmkSupportProjectSettings.State()
         newState.snakemakeSupportEnabled = true
         newState.useBundledWrappersInfo = false
@@ -31,5 +29,5 @@ class WrappersSteps {
         }
 
         waitEDTEventsDispatching()
-       }
+    }
 }

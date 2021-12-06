@@ -3,21 +3,21 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.psi.*
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 
 class SmkSectionUnspecifiedFieldArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
-        private val stringVisitor = object : MistypedStringVisitor() {
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+        private val stringVisitor = object : MistypedStringVisitor(myTypeEvalContext) {
             override fun reportSmkProblem(psiElement: PsiElement, text: String) {
                 registerProblem(psiElement, text)
             }
@@ -41,7 +41,7 @@ class SmkSectionUnspecifiedFieldArgsInspection : SnakemakeInspection() {
 
     override fun getDisplayName(): String = SnakemakeBundle.message("INSP.NAME.section.unspecified.field.args")
 
-    abstract class MistypedStringVisitor : PyElementVisitor() {
+    abstract class MistypedStringVisitor(private val sessionTypeEvalContext: TypeEvalContext) : PyElementVisitor() {
         abstract fun reportSmkProblem(psiElement: PsiElement, text: String)
 
         override fun visitPyBinaryExpression(node: PyBinaryExpression) {
@@ -54,11 +54,11 @@ class SmkSectionUnspecifiedFieldArgsInspection : SnakemakeInspection() {
 
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {
             val childQualified = node.qualifier ?: return
-            val childType = TypeEvalContext.codeAnalysis(node.project, node.containingFile).getType(childQualified)
+            val childType = sessionTypeEvalContext.getType(childQualified)
             if (childType is SmkRulesType || childType is SmkCheckpointType) {
                 reportSmkProblem(
-                        node as PsiElement,
-                        SnakemakeBundle.message("INSP.NAME.section.unspecified.field.args.message", node.text)
+                    node as PsiElement,
+                    SnakemakeBundle.message("INSP.NAME.section.unspecified.field.args.message", node.text)
                 )
             }
         }
