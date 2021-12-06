@@ -3,8 +3,8 @@
 
 # SnakeCharm Plugin Changelog
 
-## [Unreleased]
-Released on ...
+## [2021.2.657]
+Released on December 6th 2021
 
 ### Changed
 - Show argument preview for int indexes completion in `output[i]` (see [#378](https://github.com/JetBrains-Research/snakecharm/issues/378))
