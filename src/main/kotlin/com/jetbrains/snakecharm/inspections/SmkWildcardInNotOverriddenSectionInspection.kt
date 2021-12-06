@@ -20,7 +20,7 @@ class SmkWildcardInNotOverriddenSectionInspection : SnakemakeInspection() {
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkUse(use: SmkUse) {
             val cachedWildcardsByRuleInDefSection = session.putUserDataIfAbsent(KEY_DefiningSections, hashMapOf())
