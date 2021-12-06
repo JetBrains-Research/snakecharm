@@ -9,7 +9,6 @@ Released on ...
 ### Changed
 - Show argument preview for int indexes completion in `output[i]` (see [#378](https://github.com/JetBrains-Research/snakecharm/issues/378))
 - Allocation of all top-level sections into one token and support for unknown top-level sections (see [#373](https://github.com/JetBrains-Research/snakecharm/issues/373))
-- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Fixed
 - Resolve and completion for 'script' section (see [#426](https://github.com/JetBrains-Research/snakecharm/issues/426))
@@ -22,7 +21,6 @@ Released on ...
 - Inspection: Do not show warning that rule section is unused variable if rule is defined in method (see [#385](https://github.com/JetBrains-Research/snakecharm/issues/385))
 - SOE: From UnusedLocal inspection for SnakemakeSL expression  (see [#380](https://github.com/JetBrains-Research/snakecharm/issues/380))
 - Do not show syntax error for rule w/o body (see [#420](https://github.com/JetBrains-Research/snakecharm/issues/420))
-- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN))
 
 ### Added
 - Color Settings Page (see [#431](https://github.com/JetBrains-Research/snakecharm/issues/431))
@@ -39,7 +37,6 @@ Released on ...
 - Completion features related to 'use' section (see [#413](https://github.com/JetBrains-Research/snakecharm/issues/413))
 - Add reference for 'snakefile:' in module declaration (see [#409](https://github.com/JetBrains-Research/snakecharm/issues/409))
 - Initial PEPs support (see [#360](https://github.com/JetBrains-Research/snakecharm/issues/360))
-- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN))
 
 ## [2021.2.424]
 Released on July 5th 2021
