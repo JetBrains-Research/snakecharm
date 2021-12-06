@@ -3,6 +3,18 @@
 
 # SnakeCharm Plugin Changelog
 
+## [Unreleased]
+Released on ...
+                                          
+### Changed
+- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
+
+### Fixed
+- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
+
+### Added
+- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
+
 ## [2021.3.661]
 Released on December 7th 2021
 
