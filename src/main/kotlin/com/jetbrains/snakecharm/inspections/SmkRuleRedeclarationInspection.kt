@@ -20,7 +20,8 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+
         private val localRules by lazy {
             holder.file.let { psiFile ->
                 when (psiFile) {

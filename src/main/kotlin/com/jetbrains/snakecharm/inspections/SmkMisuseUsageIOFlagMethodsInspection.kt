@@ -13,12 +13,12 @@ class SmkMisuseUsageIOFlagMethodsInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         private fun getSupportedSectionIfMisuse(
             flagCallName: String,
-            section: SmkRuleOrCheckpointArgsSection
+            section: SmkRuleOrCheckpointArgsSection,
         ): List<String> {
             val supportedSections = IO_FLAG_2_SUPPORTED_SECTION[flagCallName]
             if (supportedSections != null) {
@@ -39,7 +39,7 @@ class SmkMisuseUsageIOFlagMethodsInspection : SnakemakeInspection() {
             val argList = st.argumentList ?: return
             argList.arguments
                 .filterIsInstance<PyCallExpression>()
-                .forEach { callExpr -> 
+                .forEach { callExpr ->
                     val callee = callExpr.callee
                     if (callee is PyReferenceExpression) {
                         // We don't need qualified refs here (e.g. like `foo.boo.ancient`)
@@ -57,7 +57,7 @@ class SmkMisuseUsageIOFlagMethodsInspection : SnakemakeInspection() {
                                         "INSP.NAME.misuse.usage.io.flag.methods.warning.message",
                                         callName,
                                         st.sectionKeyword!!,
-                                        supportedSectionIfMisuse.sorted().joinToString { "'$it'"}
+                                        supportedSectionIfMisuse.sorted().joinToString { "'$it'" }
                                     )
                                 )
                             }

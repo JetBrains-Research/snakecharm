@@ -42,8 +42,8 @@ class SmkSLSubscriptionKeyReference(
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         type ?: return ResolveResult.EMPTY_ARRAY
 
-        val typeEvalContext = TypeEvalContext.codeInsightFallback(element.project)
-        val resolveContext = PyResolveContext.defaultContext(typeEvalContext)
+        val context = TypeEvalContext.codeAnalysis(element.project, element.containingFile)
+        val resolveContext = PyResolveContext.defaultContext(context)
         val accessDirection = AccessDirection.READ
 
         val resolveResults = arrayListOf<RatedResolveResult>()

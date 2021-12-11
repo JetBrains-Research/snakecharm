@@ -21,20 +21,19 @@ class SmkSLWildcardReference(
     override fun handleElementRename(newElementName: String) =
         element.setName(newElementName)
 
-    override fun multiResolve(incompleteCode: Boolean): Array<out ResolveResult> =
-        type.resolveMember(
-            wildcardName(),
-            element,
-            AccessDirection.READ,
-            PyResolveContext.defaultContext(
-                TypeEvalContext.codeInsightFallback(element.project)
-            )
+    override fun multiResolve(incompleteCode: Boolean): Array<out ResolveResult> {
+        val context = TypeEvalContext.codeAnalysis(element.project, element.containingFile)
+        val resolveContext = PyResolveContext.defaultContext(context)
+
+        return type.resolveMember(
+            wildcardName(), element, AccessDirection.READ, resolveContext
         ).toTypedArray()
+    }
 
     /**
      * not canonical text!!!! (because range will be wrong for "foo.boo.doo" wildcard name
      */
-    fun wildcardName() = getWildcardTrueExpression().text
+    fun wildcardName(): String = getWildcardTrueExpression().text
 
     /**
      * In case of wildcards with dots inside, which is allows but very confusing, we need to take the

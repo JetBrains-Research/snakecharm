@@ -2,18 +2,18 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.psi.util.elementType
 import com.intellij.codeInspection.ui.ListEditForm
+import com.intellij.psi.util.elementType
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.MODULE_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.inspections.quickfix.AddIgnoredElementQuickFix
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RUN
+import com.jetbrains.snakecharm.lang.psi.*
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import javax.swing.JComponent
 
 class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
@@ -23,8 +23,9 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
             isSectionRecognized(st, SUBWORKFLOW_SECTIONS_KEYWORDS)
         }
@@ -47,7 +48,7 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
          */
         private fun isSectionRecognized(
             argsSection: SmkArgsSection,
-            setOfValidNames: Set<String>
+            setOfValidNames: Set<String>,
         ) {
             val sectionNamePsi = argsSection.nameIdentifier
             val sectionKeyword = argsSection.sectionKeyword

@@ -16,8 +16,8 @@ class SmkMultilineFunctionCallInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
             val args = st.argumentList ?: return
 
@@ -49,7 +49,7 @@ class SmkMultilineFunctionCallInspection : SnakemakeInspection() {
      */
     private fun collectNewlinesInMultilineCall(
         expression: PyCallExpression,
-        incorrectElements: MutableList<PsiElement>
+        incorrectElements: MutableList<PsiElement>,
     ) {
         var element = expression.argumentList?.firstChild
         while (element != null) {

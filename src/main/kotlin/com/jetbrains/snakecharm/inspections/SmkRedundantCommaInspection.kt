@@ -16,8 +16,8 @@ class SmkRedundantCommaInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         private fun findRedundantComma(argList: PyArgumentList): PsiElement? {
             argList.node.getChildren(null).reversed().forEach { node ->
