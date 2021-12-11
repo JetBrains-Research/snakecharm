@@ -51,6 +51,7 @@ Feature: Inspection: SmkUnresolvedReferenceInspectionExtension
     Examples:
       | path          | section                |
       | NAME.py.ipynb | rule NAME: notebook    |
+      | NAME.py       | rule NAME: script      |
       | boo.smk       | module NAME: snakefile |
       | NAME.yaml     | configfile             |
       | NAME.yaml     | pepfile                |

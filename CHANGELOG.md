@@ -13,6 +13,7 @@ Released on ...
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Added
+- Quick fix for unresolved files (conda, configfile. etc.)(see [#277](https://github.com/JetBrains-Research/snakecharm/issues/277))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ## [2021.3.661]
@@ -42,7 +43,6 @@ Released on December 6th 2021
 - Do not show syntax error for rule w/o body (see [#420](https://github.com/JetBrains-Research/snakecharm/issues/420))
 
 ### Added
-- Quick fix for unresolved '.yaml' / '.yml' files (see [#277](https://github.com/JetBrains-Research/snakecharm/issues/277))
 - Color Settings Page (see [#431](https://github.com/JetBrains-Research/snakecharm/issues/431))
 - Inspection: highlights 'use rule' section which overrides several rules as one (see [#411](https://github.com/JetBrains-Research/snakecharm/issues/411))
 - Collecting wildcards from overridden rules in 'use' sections (see [#418](https://github.com/JetBrains-Research/snakecharm/issues/418))
