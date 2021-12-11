@@ -3,17 +3,22 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.psi.*
 import com.jetbrains.python.inspections.PyUnresolvedReferenceQuickFixProvider
-import com.jetbrains.snakecharm.inspections.quickfix.CreateEnvFile
-import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.inspections.quickfix.CreateMissedFile
+import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkFileReference
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkUnresolvedReferenceInspectionExtension : PyUnresolvedReferenceQuickFixProvider {
+
     override fun registerQuickFixes(reference: PsiReference, existing: MutableList<LocalQuickFix>) {
-        val sec = reference.element as? SmkRuleOrCheckpointArgsSection ?: return
-        if (sec.sectionKeyword == SnakemakeNames.SECTION_CONDA) {
-            val name = (sec.reference as? SmkFileReference)?.getReferencePath() ?: return
-            existing.add(CreateEnvFile(sec, name))
+        val section = reference.element as? SmkArgsSection ?: return
+        val sectionName = section.sectionKeyword ?: return
+        if (CreateMissedFile.supportedSections.containsKey(sectionName)) {
+            val fileReference = (section.reference as? SmkFileReference) ?: return
+            if (!fileReference.hasAppropriateSuffix()) {
+                return
+            }
+            val name = fileReference.path
+            existing.add(CreateMissedFile(section, name, sectionName))
         }
     }
 }
