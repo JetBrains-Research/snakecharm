@@ -1,38 +1,6 @@
 Feature: Inspection: SmkUnresolvedReferenceInspectionExtension
-  Checks, that extension + inspection work
 
-  Scenario Outline: Unresolved conda file
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-     """
-     rule NAME:
-         conda:
-             "<path>"
-     """
-    And PyUnresolvedReferencesInspection inspection is enabled
-    Then I expect inspection error on <<path>> with message
-     """
-     Unresolved reference '<path>'
-     """
-    When I check highlighting warnings
-    And I invoke quick fix Create '<path>' and see text:
-     """
-     rule NAME:
-         conda:
-             "<path>"
-     """
-    Then the file "<path>" should have text
-     """
-     channels:
-     dependencies:
-     """
-    Examples:
-      | path              |
-      | NAME.yaml         |
-      | envs/NAME.yaml    |
-      | ../envs/NAME.yaml |
-
-  Scenario Outline: other unresolved sections
+  Scenario Outline: Quick fix fot missed files
     Given a snakemake project
     Given I open a file "foo.smk" with text
      """
@@ -49,10 +17,18 @@ Feature: Inspection: SmkUnresolvedReferenceInspectionExtension
      <section>: "<path>"
      """
     Examples:
-      | path          | section                |
-      | NAME.py.ipynb | rule NAME: notebook    |
-      | NAME.py       | rule NAME: script      |
-      | boo.smk       | module NAME: snakefile |
-      | NAME.yaml     | configfile             |
-      | NAME.yaml     | pepfile                |
-      | NAME.yml      | pepschema              |
+      | path              | section                |
+      | NAME.yaml         | rule NAME: conda       |
+      | envs/NAME.yaml    | rule NAME: conda       |
+      | ../envs/NAME.yaml | rule NAME: conda       |
+      | NAME.py.ipynb     | rule NAME: notebook    |
+      | NAME.py           | rule NAME: script      |
+      | boo.smk           | module NAME: snakefile |
+      | NAME.yaml         | configfile             |
+      | NAME.yaml         | pepfile                |
+      | NAME.yml          | pepschema              |
+
+    # Impossible to check whether the file has been created because:
+    # 1) It is being creating asynchronously
+    # 2) So, we may need async refresh() (see LightTempDirTestFixtureImpl.java:137)
+    # It leads to Exception: "Do not perform a synchronous refresh under read lock ..."

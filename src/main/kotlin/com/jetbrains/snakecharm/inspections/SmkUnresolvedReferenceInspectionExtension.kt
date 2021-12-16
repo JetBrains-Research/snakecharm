@@ -18,7 +18,7 @@ class SmkUnresolvedReferenceInspectionExtension : PyUnresolvedReferenceQuickFixP
                 return
             }
             val name = fileReference.path
-            existing.add(CreateMissedFile(section, name, sectionName))
+            existing.add(CreateMissedFile(section, name, sectionName, fileReference.searchRelativelyToCurrentFolder))
         }
     }
 }

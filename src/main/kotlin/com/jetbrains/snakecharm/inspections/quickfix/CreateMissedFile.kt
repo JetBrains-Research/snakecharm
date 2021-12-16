@@ -6,6 +6,7 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.undo.*
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -26,6 +27,7 @@ class CreateMissedFile(
     element: PsiElement,
     private val fileName: String,
     private val sectionName: String,
+    private val searchRelativelyToCurrentFolder: Boolean
 ) : LocalQuickFixAndIntentionActionOnPsiElement(element) {
     companion object {
         private val condaDefaultContext = """
@@ -57,7 +59,11 @@ class CreateMissedFile(
         startElement: PsiElement,
         endElement: PsiElement
     ) {
-        val targetFilePath = Paths.get(file.virtualFile.parent.path, fileName)
+        val dir =
+            if (searchRelativelyToCurrentFolder) file.virtualFile.parent else ProjectRootManager.getInstance(project).fileIndex.getContentRootForFile(
+                file.virtualFile
+            ) ?: return
+        val targetFilePath = Paths.get(dir.path, fileName)
         var firstAffectedFile = targetFilePath
         while (firstAffectedFile.parent.notExists()) {
             firstAffectedFile = firstAffectedFile.parent ?: break
@@ -70,7 +76,7 @@ class CreateMissedFile(
             } else {
                 Files.delete(firstAffectedFile)
             }
-            VirtualFileManager.getInstance().syncRefresh()
+            VirtualFileManager.getInstance().asyncRefresh { }
         }
         val redo = Runnable {
             if (!supportedSections.containsKey(sectionName)) {
@@ -80,7 +86,7 @@ class CreateMissedFile(
                 val directoryPath = Files.createDirectories(targetFilePath.parent)
                 val directoryVirtualFile = VfsUtil.findFile(directoryPath, true) ?: return@Runnable
                 LocalFileSystem.getInstance().createChildFile(this, directoryVirtualFile, targetFilePath.name)
-                VirtualFileManager.getInstance().syncRefresh()
+                VirtualFileManager.getInstance().asyncRefresh { }
                 val context = supportedSections[sectionName]
                 if (context != null) {
                     // We don't use the result of 'createChildFile()' because it has inappropriate type (and throw UnsupportedOperationException)

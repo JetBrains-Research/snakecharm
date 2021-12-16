@@ -25,7 +25,7 @@ open class SmkFileReference(
     private val textRange: TextRange,
     private val stringLiteralExpression: PyStringLiteralExpression,
     val path: String,
-    private val searchRelativelyToCurrentFolder: Boolean = true,
+    val searchRelativelyToCurrentFolder: Boolean = true,
 ) : PsiReferenceBase<SmkArgsSection>(element, textRange), PsiReferenceEx {
     // Reference caching can be implemented with the 'ResolveCache' class if needed
 
@@ -159,7 +159,7 @@ open class SmkFileReference(
 
     override fun getUnresolvedDescription(): String? = null
 
-    open fun hasAppropriateSuffix():Boolean = false
+    open fun hasAppropriateSuffix(): Boolean = false
 }
 
 /**
@@ -176,7 +176,8 @@ class SmkIncludeReference(
         it is SmkFile && it.originalFile != element.containingFile.originalFile
     }
 
-    override fun hasAppropriateSuffix() = (path.endsWith(".smk") || path == "Snakemake") && element.containingFile.virtualFile.path != path
+    override fun hasAppropriateSuffix() =
+        (path.endsWith(".smk") || path == "Snakemake") && element.containingFile.virtualFile.path != path
 }
 
 /**
@@ -277,6 +278,8 @@ class SmkNotebookReference(
         val name = it.name.lowercase()
         name.endsWith(".ipynb")
     }
+
+    override fun hasAppropriateSuffix() = path.endsWith(".ipynb")
 }
 
 /**
@@ -291,10 +294,13 @@ class SmkScriptReference(
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike {
         val name = it.name.lowercase()
-        name.endsWith(".py") or name.endsWith(".r") or name.endsWith(".rmd") or name.endsWith(".jl") or name.endsWith(".rs")
+        hasCorrectEnding(name)
     }
 
-    override fun hasAppropriateSuffix() = path.endsWith(".ipynb")
+    override fun hasAppropriateSuffix() = hasCorrectEnding(path.lowercase())
+
+    private fun hasCorrectEnding(name: String) =
+        name.endsWith(".py") or name.endsWith(".r") or name.endsWith(".rmd") or name.endsWith(".jl") or name.endsWith(".rs")
 }
 
 /**
