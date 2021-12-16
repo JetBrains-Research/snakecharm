@@ -12,10 +12,7 @@ Feature: Inspection: SmkUnresolvedReferenceInspectionExtension
      Unresolved reference '<path>'
      """
     When I check highlighting warnings
-    And I invoke quick fix Create '<path>' and see text:
-     """
-     <section>: "<path>"
-     """
+    And I see available quick fix: Create '<path>'
     Examples:
       | path              | section                |
       | NAME.yaml         | rule NAME: conda       |
