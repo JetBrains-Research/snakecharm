@@ -203,28 +203,28 @@ class ImplicitPySymbolsProvider(
         usedFiles: MutableSet<VirtualFile>,
         sdk: Sdk
     ): Boolean {
-        val requirement1 = pyRequirement("snakemake-minimal", LT, SMK_API_VERS_6_1)
-        val requirement2 = pyRequirement("snakemake", LT, SMK_API_VERS_6_1)
+        val requirementSnakemakeMinimal = pyRequirement("snakemake-minimal", LT, SMK_API_VERS_6_1)
+        val requirementSnakemake = pyRequirement("snakemake", LT, SMK_API_VERS_6_1)
 
         if (ApplicationManager.getApplication().isUnitTestMode) {
             val workflowFile = collectPyFiles("snakemake.workflow", usedFiles, sdk).firstOrNull()?.virtualFile
             val versionFile = workflowFile?.parent?.findChild("vers.snakecharm.txt")
             if (versionFile != null) {
                 val smkVersTestMode = VfsUtil.loadText(versionFile)
-                return requirement1.versionSpecs[0].matches(smkVersTestMode)
+                return requirementSnakemakeMinimal.versionSpecs[0].matches(smkVersTestMode)
             }
             return false
         }
 
         val packages = PyPackageManager.getInstance(sdk).packages
 
-        val pkg1 = packages?.firstOrNull { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK }
-        if (pkg1 != null) {
-            return pkg1.matches(requirement2)
+        val pkgSnakemake = packages?.firstOrNull { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK }
+        if (pkgSnakemake != null) {
+            return pkgSnakemake.matches(requirementSnakemake)
         }
-        val pkg2 = packages?.firstOrNull { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK_MINIMAL }
-        if (pkg2 != null) {
-            return pkg2.matches(requirement1)
+        val pkgSnakemakeMinimal = packages?.firstOrNull { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK_MINIMAL }
+        if (pkgSnakemakeMinimal != null) {
+            return pkgSnakemakeMinimal.matches(requirementSnakemakeMinimal)
         }
         return false
     }
