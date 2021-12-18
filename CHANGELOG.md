@@ -10,6 +10,7 @@ Released on ...
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Fixed
+- `localrules` and `ruleorder` now take into account `use rule` (see [#448](https://github.com/JetBrains-Research/snakecharm/issues/448))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Added
