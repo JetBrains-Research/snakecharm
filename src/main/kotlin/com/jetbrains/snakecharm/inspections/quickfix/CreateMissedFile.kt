@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.inspections.quickfix
 
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.undo.*
@@ -18,6 +19,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 import org.apache.commons.io.FileUtils
 import java.io.IOException
 import java.nio.file.Files
+import java.nio.file.InvalidPathException
 import java.nio.file.Paths
 import kotlin.io.path.isDirectory
 import kotlin.io.path.name
@@ -59,11 +61,21 @@ class CreateMissedFile(
         startElement: PsiElement,
         endElement: PsiElement
     ) {
-        val dir =
+        val relativeDirectory =
             if (searchRelativelyToCurrentFolder) file.virtualFile.parent else ProjectRootManager.getInstance(project).fileIndex.getContentRootForFile(
                 file.virtualFile
             ) ?: return
-        val targetFilePath = Paths.get(dir.path, fileName)
+        val targetFilePath = try {
+            Paths.get(relativeDirectory.path, fileName)
+        } catch (e: InvalidPathException) {
+            SmkNotifier.notify(
+                title = SnakemakeBundle.message("notifier.msg.create.env.file.title"),
+                content = SnakemakeBundle.message("notifier.msg.create.env.file.name.invalid.file.exception", fileName),
+                type = NotificationType.ERROR,
+                project = project
+            )
+            return
+        }
         var firstAffectedFile = targetFilePath
         while (firstAffectedFile.parent.notExists()) {
             firstAffectedFile = firstAffectedFile.parent ?: break
@@ -79,9 +91,6 @@ class CreateMissedFile(
             VirtualFileManager.getInstance().asyncRefresh { }
         }
         val redo = Runnable {
-            if (!supportedSections.containsKey(sectionName)) {
-                return@Runnable
-            }
             try {
                 val directoryPath = Files.createDirectories(targetFilePath.parent)
                 val directoryVirtualFile = VfsUtil.findFile(directoryPath, true) ?: return@Runnable
@@ -89,13 +98,23 @@ class CreateMissedFile(
                 VirtualFileManager.getInstance().asyncRefresh { }
                 val context = supportedSections[sectionName]
                 if (context != null) {
-                    // We don't use the result of 'createChildFile()' because it has inappropriate type (and throw UnsupportedOperationException)
+                    // We don't use the result of 'createChildFile()' because it has inappropriate type (and throws UnsupportedOperationException)
                     targetFilePath.toFile().appendText(context)
                 }
             } catch (e: SecurityException) {
-                SmkNotifier.notifyTargetFileIsInvalid(fileName, project)
+                SmkNotifier.notify(
+                    title = SnakemakeBundle.message("notifier.msg.create.env.file.title"),
+                    content = SnakemakeBundle.message("notifier.msg.create.env.file.invalid.file.exception", fileName),
+                    type = NotificationType.ERROR,
+                    project = project
+                )
             } catch (e: IOException) {
-                SmkNotifier.notifyImpossibleToCreateFileOrDirectory(fileName, project)
+                SmkNotifier.notify(
+                    title = SnakemakeBundle.message("notifier.msg.create.env.file.title"),
+                    content = SnakemakeBundle.message("notifier.msg.create.env.file.io.exception", fileName),
+                    type = NotificationType.ERROR,
+                    project = project
+                )
             }
         }
         val action = object : UndoableAction {
@@ -110,6 +129,9 @@ class CreateMissedFile(
             }
 
             override fun getAffectedDocuments(): Array<DocumentReference> =
+            // We mark only the current file as affected to make feature convenient.
+            // Otherwise, new file opening will be regarded as a new action
+                // and 'undone' will be banned
                 arrayOf(DocumentReferenceManager.getInstance().create(file.virtualFile))
 
             override fun isGlobal() = true
