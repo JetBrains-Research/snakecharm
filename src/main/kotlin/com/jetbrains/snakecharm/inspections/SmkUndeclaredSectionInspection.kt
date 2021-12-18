@@ -9,10 +9,10 @@ import com.jetbrains.snakecharm.lang.psi.impl.refs.SmkPyReferenceImpl
 
 class SmkUndeclaredSectionInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitPyReferenceExpression(expr: PyReferenceExpression) {
             val ref = expr.reference
@@ -29,11 +29,11 @@ class SmkUndeclaredSectionInspection : SnakemakeInspection() {
             if (!SmkSLUndeclaredSectionInspection.isSectionNameOfInterest(referencedName)) {
                 return
             }
-                
+
             if (SmkSLUndeclaredSectionInspection.checkIsSectionNameUnresolved(ref)) {
                 registerProblem(
-                        expr,
-                        SnakemakeBundle.message("INSP.NAME.undeclared.section.message", referencedName!!)
+                    expr,
+                    SnakemakeBundle.message("INSP.NAME.undeclared.section.message", referencedName!!)
                 )
             }
         }

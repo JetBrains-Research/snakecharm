@@ -233,6 +233,17 @@
     />
 
     <localInspection
+            language="Snakemake" shortName="SmkWildcardInNotOverriddenSectionInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkWildcardInNotOverriddenSection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.undeclared.wildcard.in.not.overridden.section"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkWildcardInNotOverriddenSectionInspection"
+    />
+
+    <localInspection
             language="Snakemake" shortName="SmkShadowSettingsInspection"
             enabledByDefault="true"
             level="WARNING"
@@ -548,18 +559,6 @@
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.undeclared.section.title"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkUndeclaredSectionInspection"
-    />
-
-    <localInspection
-            language="Python"
-            shortName="SmkPyUnboundLocalVariableInspection"
-            suppressId="PyUnboundLocalVariable"
-            bundle="SnakemakeBundle"
-            key="INSP.NAME.unbound"
-            groupKey="INSP.GROUP.snakemake"
-            enabledByDefault="true"
-            level="WARNING"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkPyUnboundLocalVariableInspection"
     />
 
     <localInspection

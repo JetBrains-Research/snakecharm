@@ -7,6 +7,7 @@ import com.intellij.psi.StubBasedPsiElement
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
 import com.jetbrains.python.psi.*
+import com.jetbrains.python.psi.impl.PyElementImpl
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_EXPANDING_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.stubs.*
@@ -41,9 +42,14 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
     fun getModuleName(): PsiElement?
 
     /**
-     * Returns an array of  [SmkReferenceExpression] which refer to overridden rules or checkpoints
+     * Returns an array of  [SmkReferenceExpression] which were defined as inherited rules
      */
-    fun getImportedRuleNames(): Array<SmkReferenceExpression>?
+    fun getDefinedReferencesOfImportedRuleNames(): Array<SmkReferenceExpression>?
+
+    /**
+     * Returns list of [SmkRuleOrCheckpoint] from defined module. Returns null if there are no module reference, module section or file
+     */
+    fun getImportedRules(): List<SmkRuleOrCheckpoint>?
 
     /**
      * Returns True if  "as" name is wildcard with '*', e.g:
@@ -51,6 +57,9 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
      */
     fun nameIdentifierIsWildcard(): Boolean
 }
+
+class SmkUseNameIdentifier(node: ASTNode) : PyElementImpl(node)
+class SmkImportedRulesNames(node: ASTNode) : PyElementImpl(node)
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer
     /**

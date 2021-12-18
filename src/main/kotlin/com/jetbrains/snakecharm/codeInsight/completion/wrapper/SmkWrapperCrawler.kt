@@ -136,7 +136,7 @@ object SmkWrapperCrawler {
         wrapperFileExt: String,
         metaYamlContent: String
     ): SmkWrapperStorage.WrapperInfo {
-        val wrapperArgs: List<Pair<String, String>> = when (wrapperFileExt.toLowerCase()) {
+        val wrapperArgs: List<Pair<String, String>> = when (wrapperFileExt.lowercase()) {
             "py" -> parseArgsPython(wrapperFileContent)
             "r" -> parseArgsR(wrapperFileContent)
             else -> emptyList()

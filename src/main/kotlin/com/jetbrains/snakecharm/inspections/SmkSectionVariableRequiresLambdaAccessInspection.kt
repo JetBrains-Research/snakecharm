@@ -17,8 +17,8 @@ class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {
             if (node.isQualified) {
                 // Not suitable case

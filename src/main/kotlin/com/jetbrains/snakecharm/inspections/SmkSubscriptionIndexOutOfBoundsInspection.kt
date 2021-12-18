@@ -13,10 +13,10 @@ import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
 
 class SmkSubscriptionIndexOutOfBoundsInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
-    ) = object : SmkSLInspectionVisitor(holder, session) {
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
+    ) = object : SmkSLInspectionVisitor(holder, getContext(session)) {
         override fun visitPySubscriptionExpression(expr: PySubscriptionExpression) {
             val psiOperand = expr.operand
             val indexExp = expr.indexExpression ?: return

@@ -14,10 +14,11 @@ import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 
 class SmkRuleOrCheckpointNameYetUndefinedInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {
             val nodeFile = node.containingFile
             val type = TypeEvalContext.codeAnalysis(node.project, nodeFile).getType(node)
@@ -50,15 +51,16 @@ class SmkRuleOrCheckpointNameYetUndefinedInspection : SnakemakeInspection() {
             val targetOffset = targetRuleLikeElem.textOffset
 
             val nodeRuleLikeElem = PsiTreeUtil.getParentOfType(
-                    node, SmkRuleOrCheckpoint::class.java
+                node, SmkRuleOrCheckpoint::class.java
             )
 
             if (targetFile == nodeFile
-                    && (targetOffset > ruleNameOffset || targetRuleLikeElem === nodeRuleLikeElem)) {
+                && (targetOffset > ruleNameOffset || targetRuleLikeElem === nodeRuleLikeElem)
+            ) {
 
                 val message = SnakemakeBundle.message(
-                        "INSP.NAME.rule.or.checkpoint.name.yet.undefined.msg",
-                        targetRuleLikeElem.name ?: "n/a"
+                    "INSP.NAME.rule.or.checkpoint.name.yet.undefined.msg",
+                    targetRuleLikeElem.name ?: "n/a"
                 )
                 registerProblem(ruleNameReference.nameElement?.psi, message)
             }

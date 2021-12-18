@@ -21,13 +21,15 @@ class SmkSectionNameArgInPySubscriptionLikeReference(
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         val resolveResults = arrayListOf<RatedResolveResult>()
 
+        val context = TypeEvalContext.codeAnalysis(element.project, element.containingFile)
+        val resolveContext = PyResolveContext.defaultContext(context)
+
         val canonicalText = element.stringValue
-        val typeEvalContext = TypeEvalContext.codeInsightFallback(element.project)
         type.resolveMember(
             canonicalText,
             element,
             AccessDirection.READ,
-            PyResolveContext.defaultContext(typeEvalContext)
+            resolveContext
         )?.let {
             resolveResults.addAll(it)
         }

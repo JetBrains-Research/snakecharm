@@ -11,10 +11,10 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkResourcesKeywordArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
             if (st.sectionKeyword != SnakemakeNames.SECTION_RESOURCES) {
                 return
@@ -23,10 +23,10 @@ class SmkResourcesKeywordArgsInspection : SnakemakeInspection() {
             st.argumentList?.arguments?.forEach {
                 if (it !is PyKeywordArgument) {
                     registerProblem(
-                            it,
-                            SnakemakeBundle.message("INSP.NAME.resources.unnamed.args"),
-                            ProblemHighlightType.GENERIC_ERROR,
-                            null, IntroduceKeywordArgument(it)
+                        it,
+                        SnakemakeBundle.message("INSP.NAME.resources.unnamed.args"),
+                        ProblemHighlightType.GENERIC_ERROR,
+                        null, IntroduceKeywordArgument(it)
                     )
                 }
             }
