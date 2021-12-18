@@ -13,6 +13,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.psi.util.elementType
+import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.intellij.util.Processors
 import com.jetbrains.python.psi.AccessDirection
@@ -22,9 +23,7 @@ import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
-import com.jetbrains.snakecharm.lang.psi.SmkFile
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
-import com.jetbrains.snakecharm.lang.psi.SmkUse
+import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex
@@ -71,14 +70,9 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
             location.originalElement, name, indexKey, clazz
         ) { currentFileDeclarations }
 
-        if (results.isEmpty()) {
-            // If there are no such rule, searches for rule declared in 'use' section
-            return getUseSections(name, location)
-        }
-
         return results.map { element ->
-            RatedResolveResult(SmkResolveUtil.RATE_NORMAL, element)
-        }
+            RatedResolveResult(RatedResolveResult.RATE_LOW, element)
+        } + getUseSections(name, location)
     }
 
     override fun isBuiltin() = false
@@ -96,6 +90,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
             return result
         }
         val module = location.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
+        val parent = location.parentOfType<SmkRuleOrCheckpoint>()
         when (module) {
             null -> (location.containingFile.originalFile as SmkFile).collectUses().map { it.second }
             else -> getVariantsFromIndex(SmkUseNameIndex.KEY, module, SmkUse::class.java)
@@ -104,11 +99,11 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
             val referTo = use.getProducedRulesNames()
                 .firstOrNull {
                     (it.first == name &&
-                            it.second != location.originalElement) ||
+                            it.second.let { element -> if (element is SmkRuleOrCheckpoint) element else element.parentOfType() } != parent) ||
                             it.second.elementType == SmkElementTypes.USE_NAME_IDENTIFIER
                 }
             if (referTo != null) {
-                result.add(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, referTo.second))
+                result.add(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, use))
             }
         }
 
@@ -116,7 +111,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
         if (result.isEmpty()) {
             val namePattern = (location.containingFile as? SmkFile)?.resolveByRuleNamePattern(name)
             if (namePattern != null) {
-                result.add(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, namePattern))
+                result.add(RatedResolveResult(RatedResolveResult.RATE_LOW, namePattern))
             }
         }
 

@@ -6,6 +6,7 @@ import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSection
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
 interface SmkSLReferenceExpression : PyReferenceExpression, SmkSLExpression, PsiNameIdentifierOwner {
     fun containingRuleOrCheckpointSection(): SmkRuleOrCheckpointArgsSection? =
@@ -15,4 +16,6 @@ interface SmkSLReferenceExpression : PyReferenceExpression, SmkSLExpression, Psi
 
     override fun getNameIdentifier() = nameElement?.psi
     override fun setName(name: String) = SmkResolveUtil.renameNameNode(name, nameElement, this)
+
+    fun isWildcard() = reference is SmkSLWildcardReference
 }

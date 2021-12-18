@@ -5,13 +5,32 @@
 
 ## [Unreleased]
 Released on ...
+                                          
+### Changed
+- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
+
+### Fixed
+- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
+
+### Added
+- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
+
+## [2021.3.661]
+Released on December 7th 2021
+
+### Changed
+- PyCharm 2021.3 compatibility (see [#444](https://github.com/JetBrains-Research/snakecharm/issues/444))
+  Released on December 7th 2021
+
+## [2021.2.657]
+Released on December 6th 2021
 
 ### Changed
 - Show argument preview for int indexes completion in `output[i]` (see [#378](https://github.com/JetBrains-Research/snakecharm/issues/378))
 - Allocation of all top-level sections into one token and support for unknown top-level sections (see [#373](https://github.com/JetBrains-Research/snakecharm/issues/373))
-- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Fixed
+- Resolve and completion for 'script' section (see [#426](https://github.com/JetBrains-Research/snakecharm/issues/426))
 - Only snakemake file can't end with a comment (see [#365](https://github.com/JetBrains-Research/snakecharm/issues/365))
 - SmkSectionDuplicatedArgsInspection now checks workflow top-level sections (see [#407](https://github.com/JetBrains-Research/snakecharm/issues/407))
 - All inspections warnings now can be overridden (see [#423](https://github.com/JetBrains-Research/snakecharm/issues/423))
@@ -21,10 +40,11 @@ Released on ...
 - Inspection: Do not show warning that rule section is unused variable if rule is defined in method (see [#385](https://github.com/JetBrains-Research/snakecharm/issues/385))
 - SOE: From UnusedLocal inspection for SnakemakeSL expression  (see [#380](https://github.com/JetBrains-Research/snakecharm/issues/380))
 - Do not show syntax error for rule w/o body (see [#420](https://github.com/JetBrains-Research/snakecharm/issues/420))
-- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN))
 
 ### Added
+- Color Settings Page (see [#431](https://github.com/JetBrains-Research/snakecharm/issues/431))
 - Inspection: highlights 'use rule' section which overrides several rules as one (see [#411](https://github.com/JetBrains-Research/snakecharm/issues/411))
+- Collecting wildcards from overridden rules in 'use' sections (see [#418](https://github.com/JetBrains-Research/snakecharm/issues/418))
 - Weak warnings for unused 'log' sections in 'use rule' (see [#414](https://github.com/JetBrains-Research/snakecharm/issues/414))
 - Weak warnings for unused 'log' sections (see [#300](https://github.com/JetBrains-Research/snakecharm/issues/300))
 - Support for 'module' and 'use' keywords (see [#355](https://github.com/JetBrains-Research/snakecharm/issues/355))
@@ -36,7 +56,6 @@ Released on ...
 - Completion features related to 'use' section (see [#413](https://github.com/JetBrains-Research/snakecharm/issues/413))
 - Add reference for 'snakefile:' in module declaration (see [#409](https://github.com/JetBrains-Research/snakecharm/issues/409))
 - Initial PEPs support (see [#360](https://github.com/JetBrains-Research/snakecharm/issues/360))
-- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN))
 
 ## [2021.2.424]
 Released on July 5th 2021

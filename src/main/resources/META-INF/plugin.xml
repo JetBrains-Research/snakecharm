@@ -72,6 +72,7 @@
     <lang.syntaxHighlighterFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterFactory"/>
     <lang.syntaxHighlighterFactory language="SnakemakeSL"
      implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLSyntaxHighlighterFactory"/>
+    <colorSettingsPage implementation="com.jetbrains.snakecharm.lang.highlighter.SmkColorSettingsPage"/>
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkDumbAwareAnnotatorManager"/>
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkStandardAnnotatorManager"/>
     <annotator language="RegExp" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLRegExpHighlightingAnnotator"/>
@@ -228,6 +229,17 @@
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.not.same.wildcards.set.title"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkNotSameWildcardsSetInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkWildcardInNotOverriddenSectionInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkWildcardInNotOverriddenSection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.undeclared.wildcard.in.not.overridden.section"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkWildcardInNotOverriddenSectionInspection"
     />
 
     <localInspection
@@ -546,18 +558,6 @@
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.undeclared.section.title"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkUndeclaredSectionInspection"
-    />
-
-    <localInspection
-            language="Python"
-            shortName="SmkPyUnboundLocalVariableInspection"
-            suppressId="PyUnboundLocalVariable"
-            bundle="SnakemakeBundle"
-            key="INSP.NAME.unbound"
-            groupKey="INSP.GROUP.snakemake"
-            enabledByDefault="true"
-            level="WARNING"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkPyUnboundLocalVariableInspection"
     />
 
     <localInspection

@@ -1,5 +1,4 @@
 
-import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.changelog.date
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -11,13 +10,13 @@ plugins {
     id("java")
 
     // Kotlin support
-    kotlin("jvm") version "1.5.31"
-    kotlin("plugin.serialization") version "1.5.31"
+    kotlin("jvm") version "1.6.0"
+    kotlin("plugin.serialization") version "1.6.0"
 
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
-    id("org.jetbrains.intellij") version "1.2.1"
+    id("org.jetbrains.intellij") version "1.3.0"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
     id("org.jetbrains.changelog") version "1.3.1"
     // detekt linter - read more: https://detekt.github.io/detekt/gradle.html
@@ -42,7 +41,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     testImplementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.3.1")
 }
 
 // Configure gradle-intellij-plugin plugin.
@@ -97,18 +96,18 @@ detekt {
 }
 
 tasks {
-    // TODO [1.8] ?
-    // Set the compatibility versions to 11
-    withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
-    }
-    withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "11"
+    properties("javaVersion").let {
+        withType<JavaCompile> {
+            sourceCompatibility = it
+            targetCompatibility = it
+        }
+        withType<KotlinCompile> {
+            kotlinOptions.jvmTarget = it
+        }
     }
 
-    withType<Detekt> {
-        jvmTarget = "11"
+    wrapper {
+        gradleVersion = properties("gradleVersion")
     }
 
     patchPluginXml {
@@ -117,17 +116,17 @@ tasks {
         untilBuild.set(properties("pluginUntilBuild"))
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
-        pluginDescription.set(
-            File(projectDir, "README.md").readText().lines().run {
-                val start = "<!-- Plugin description -->"
-                val end = "<!-- Plugin description end -->"
+       pluginDescription.set(
+           projectDir.resolve("README.md").readText().lines().run {
+               val start = "<!-- Plugin description -->"
+               val end = "<!-- Plugin description end -->"
 
-                if (!containsAll(listOf(start, end))) {
-                    throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
-                }
-                subList(indexOf(start) + 1, indexOf(end))
-            }.joinToString("\n").run { markdownToHTML(this) }
-        )
+               if (!containsAll(listOf(start, end))) {
+                   throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
+               }
+               subList(indexOf(start) + 1, indexOf(end))
+           }.joinToString("\n").run { markdownToHTML(this) }
+       )
 
         // Get the latest available change notes from the changelog file
         changeNotes.set(provider { changelog.getLatest().toHTML() })
@@ -139,7 +138,6 @@ tasks {
     }
 
     publishPlugin {
-
         dependsOn("patchChangelog")
         token.set(properties("intellijPublishToken"))
         // plugin version is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
@@ -173,8 +171,8 @@ tasks {
         dependsOn("compileKotlin", "compileJava")
         doLast {
             javaexec {
-                main = "com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler"
-                classpath =  project.sourceSets.main.get().runtimeClasspath + files(intellij.ideaDependency.get().jarFiles)
+                mainClass.set("com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler")
+                classpath =  project.sourceSets.main.get().runtimeClasspath + files(setupDependencies.get().idea.get().jarFiles)
                 enableAssertions = true
                 args = listOf(
                     properties("snakemakeWrappersRepoPath"),
@@ -202,7 +200,7 @@ tasks {
         doLast {
             javaexec {
                 mainClass.set("com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler")
-                classpath =  project.sourceSets.main.get().runtimeClasspath + files(intellij.ideaDependency.get().jarFiles)
+                classpath =  project.sourceSets.main.get().runtimeClasspath + files(setupDependencies.get().idea.get().jarFiles)
                 enableAssertions = true
                 args = listOf(
                         "${project.projectDir}/testData/wrappers_storage",

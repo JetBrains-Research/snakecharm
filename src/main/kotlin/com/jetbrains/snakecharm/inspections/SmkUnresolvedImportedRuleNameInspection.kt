@@ -5,9 +5,10 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.vfs.impl.http.HttpVirtualFile
 import com.intellij.psi.util.elementType
 import com.jetbrains.python.psi.PyReferenceExpression
-import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.psi.*
+import com.jetbrains.snakecharm.lang.psi.SmkFile
+import com.jetbrains.snakecharm.lang.psi.SmkModule
+import com.jetbrains.snakecharm.lang.psi.SmkUse
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 
@@ -16,11 +17,11 @@ class SmkUnresolvedImportedRuleNameInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkUse(use: SmkUse) {
-            val references = use.getImportedRuleNames() ?: return
+            val references = use.getDefinedReferencesOfImportedRuleNames() ?: return
             val moduleRef = use.getModuleName()?.reference
             if (moduleRef != null) {
                 // If there are 'from' construction
@@ -45,7 +46,7 @@ class SmkUnresolvedImportedRuleNameInspection : SnakemakeInspection() {
 
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {
             val childQualified = node.qualifier ?: return
-            val childType = TypeEvalContext.codeAnalysis(node.project, node.containingFile).getType(childQualified)
+            val childType = myTypeEvalContext.getType(childQualified)
             if (childType is SmkRulesType) {
                 checkReference(node)
             }

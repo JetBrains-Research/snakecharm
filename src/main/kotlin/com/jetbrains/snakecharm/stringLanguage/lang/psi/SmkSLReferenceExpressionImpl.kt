@@ -71,8 +71,6 @@ class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(no
     override fun toString(): String {
         return "SmkSLReferenceExpressionImpl: " + this.referencedName
     }
-
-    fun isWildcard() = reference is SmkSLWildcardReference
 }
 
 class SmkEmptyReference<T : PsiElement>(element: T) : PsiPolyVariantReferenceBase<T>(element),

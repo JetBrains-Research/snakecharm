@@ -24,11 +24,11 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkUse(use: SmkUse) {
             val logSection = use.getSectionByName(SnakemakeNames.SECTION_LOG) ?: return
-            use.getImportedRuleNames()?.forEach {
+            (use.getDefinedReferencesOfImportedRuleNames()?.toList() ?: use.getImportedRules())?.forEach {
                 handleUseReference(it, logSection)
             }
         }
@@ -69,7 +69,11 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
                 val runSection = ruleSections.firstOrNull { it is SmkRunSection } as SmkRunSection?
                 when {
                     runSection != null -> CreateLogFileInRunSection(runSection, name)
-                    else -> CreateShellSectionWithLogReference(rule, name, originalLogSection.prevSibling.text)
+                    else -> CreateShellSectionWithLogReference(
+                        rule,
+                        name,
+                        originalLogSection.getPreviousOffset() ?: " "
+                    )
                 }
             }
 
@@ -88,23 +92,37 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
         }
 
         private fun handleUseReference(
-            ruleReference: SmkReferenceExpression,
+            ruleReference: PsiElement,
             logSection: SmkRuleOrCheckpointArgsSection
         ) {
             var resolveResult: PsiElement?
             var reference = ruleReference
             // Searching for origin element, it must be a rule or checkpoint
             while (true) {
-                resolveResult = reference.reference.resolve()
-                when (resolveResult) {
-                    is SmkRuleOrCheckpoint -> break
-                    is SmkReferenceExpression -> reference = resolveResult
+                resolveResult = if (reference is SmkReferenceExpression) reference.reference.resolve() else reference
+                reference = when (resolveResult) {
+                    is SmkRule, is SmkCheckPoint -> break
+                    is SmkReferenceExpression -> resolveResult
                     else -> {
                         // Sometimes reference of overridden rule refer not to SmkUse
                         // But to its node, so we need to handle this cases
-                        val useParent = resolveResult?.parentOfType<SmkUse>() ?: return
-                        useParent.getImportedRuleNames()?.forEach { handleUseReference(it, logSection) }
-                        return
+                        val useParent =
+                            if (resolveResult is SmkUse) resolveResult else resolveResult?.parentOfType() ?: return
+                        useParent.getDefinedReferencesOfImportedRuleNames()?.firstOrNull {
+                            // Tries to get an appropriate reference if there are declared explicitly
+                            val res = it.reference.resolve()
+                            if (res is SmkUse) {
+                                res.getProducedRulesNames().any { pair -> pair.first == ruleReference.text }
+                            } else {
+                                val name = it.name
+                                name != null && ruleReference.text == useParent.name?.replace("*", name)
+                            }
+                        } ?: useParent.getProducedRulesNames()
+                            // If rules were imported by pattern '*', tries to detect an appropriate one
+                            // Using list of produced names
+                            .firstOrNull { it.first == ruleReference.text && it.second != useParent.nameIdentifier }?.second
+                        // If all rules from module were overridden as one, gets the last rule
+                        ?: useParent.getImportedRules()?.lastOrNull() ?: return
                     }
                 }
             }
@@ -140,7 +158,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
             }
 
             if (stringArgument == null) {
-                val indent = shellSection.prevSibling.text.replace("\n", "")
+                val indent = shellSection.getPreviousOffset()?.replace("\n", "")
                 doc.insertString(
                     shellSection.lastChild.endOffset,
                     "\n$indent$indent\"$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\""
@@ -186,7 +204,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
 
             val ruleLike = (startElement as SmkRuleOrCheckpoint)
             val lastArg = ruleLike.getSections().lastOrNull()
-            val indent = lastArg?.prevSibling?.text ?: logIndent
+            val indent = lastArg?.getPreviousOffset() ?: logIndent
             doc.insertString(
                 (lastArg ?: ruleLike).endOffset,
                 "${indent}shell: \"echo TODO$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\""

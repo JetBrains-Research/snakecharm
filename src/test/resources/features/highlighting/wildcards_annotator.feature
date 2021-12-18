@@ -9,7 +9,7 @@ Feature: Annotate wildcards
     """
     Then I expect inspection info on <sample> with message
     """
-    PY.NUMBER
+    SMKSL_WILDCARD
     """
     When I check highlighting infos ignoring extra highlighting
     Examples:
@@ -28,7 +28,7 @@ Feature: Annotate wildcards
     """
     Then I expect inspection info on <sample> with message
     """
-    PY.NUMBER
+    SMKSL_WILDCARD
     """
     When I check highlighting infos ignoring extra highlighting
     Examples:
@@ -48,7 +48,7 @@ Feature: Annotate wildcards
     """
     Then I expect inspection info on <sample> with message
     """
-    PY.NUMBER
+    SMKSL_WILDCARD
     """
     When I check highlighting infos ignoring extra highlighting
     Examples:
@@ -67,7 +67,7 @@ Feature: Annotate wildcards
     """
     Then I expect inspection info on <sample> with message
     """
-    PY.NUMBER
+    SMKSL_WILDCARD
     """
     When I check highlighting infos ignoring extra highlighting
     Examples:
@@ -84,7 +84,7 @@ Feature: Annotate wildcards
      """
     Then I expect inspection info on <sample> with message
      """
-     PY.NUMBER
+     SMKSL_WILDCARD
      """
     When I check highlighting infos ignoring extra highlighting
     Examples:
@@ -101,7 +101,7 @@ Feature: Annotate wildcards
     """
     Then I expect inspection info on <sample> with message
     """
-    PY.NUMBER
+    SMKSL_WILDCARD
     """
     When I check highlighting infos ignoring extra highlighting
     Examples:

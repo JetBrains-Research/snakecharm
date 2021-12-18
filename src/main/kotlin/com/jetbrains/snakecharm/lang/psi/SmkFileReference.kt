@@ -263,7 +263,23 @@ class SmkNotebookReference(
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike {
         val name = it.name.lowercase()
-        name.endsWith(".py.ipynb") or name.endsWith(".r.ipynb")
+        name.endsWith(".ipynb")
+    }
+}
+
+/**
+ * The path must built from directory with current snakefile
+ * version 6.5.1
+ */
+class SmkScriptReference(
+    element: SmkArgsSection,
+    textRange: TextRange,
+    stringLiteralExpression: PyStringLiteralExpression,
+    path: String
+) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
+    override fun getVariants() = collectFileSystemItemLike {
+        val name = it.name.lowercase()
+        name.endsWith(".py") or name.endsWith(".r") or name.endsWith(".rmd") or name.endsWith(".jl") or name.endsWith(".rs")
     }
 }
 
