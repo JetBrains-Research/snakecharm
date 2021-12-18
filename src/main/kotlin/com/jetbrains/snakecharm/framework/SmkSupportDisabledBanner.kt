@@ -41,7 +41,7 @@ class SmkSupportDisabledBanner : EditorNotifications.Provider<EditorNotification
             return null
         }
         val panel = EditorNotificationPanel(fileEditor)
-        panel.text = SnakemakeBundle.message("banner.smk.framework.nor.configured.message")
+        panel.text = SnakemakeBundle.message("banner.smk.framework.not.configured.message")
         panel.icon(AllIcons.General.Warning)
         panel.createActionLabel(SnakemakeBundle.message("notifier.msg.framework.by.snakefile.action.configure")) {
             editor.putUserData(DISABLE_NOTIFICATION, true)
@@ -51,13 +51,13 @@ class SmkSupportDisabledBanner : EditorNotifications.Provider<EditorNotification
             )
             EditorNotifications.getInstance(project).updateNotifications(file)
         }
-        panel.createActionLabel(SnakemakeBundle.message("banner.smk.framework.nor.configured.hide")) {
+        panel.createActionLabel(SnakemakeBundle.message("banner.smk.framework.not.configured.hide")) {
             // Hides notification for current session
             hideNotification = true
             EditorNotifications.getInstance(project).updateNotifications(file)
         }
-        panel.createActionLabel(SnakemakeBundle.message("banner.smk.framework.nor.configured.dont.show.again")) {
-            // Hides notification in current project
+        panel.createActionLabel(SnakemakeBundle.message("banner.smk.framework.not.configured.dont.show.again")) {
+            // Hides notification for current project
             SmkSupportProjectSettings.hideSmkSupportBanner(project)
             EditorNotifications.getInstance(project).updateAllNotifications()
         }
