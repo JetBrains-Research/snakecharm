@@ -52,6 +52,11 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
             return internalState.pythonSdkName
         }
 
+    val snakemakeSupportBannerEnabled: Boolean
+        get() {
+            return internalState.snakemakeSupportBannerEnabled
+        }
+
     fun getActiveSdk() = when {
         !snakemakeSupportEnabled -> null
         else -> findPythonSdk(project, internalState.pythonSdkName)
@@ -124,6 +129,9 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
 
         @get:Attribute("sdk")
         var pythonSdkName by string("")
+
+        @get:Attribute("smk_support_banner_enabled")
+        var snakemakeSupportBannerEnabled by property(true)
     }
 
     companion object {
@@ -134,6 +142,12 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
         fun addSupport(project: Project) {
             val newState = State()
             newState.snakemakeSupportEnabled = true
+            updateStateAndFireEvent(project, newState)
+        }
+
+        fun hideSmkSupportBanner(project: Project) {
+            val newState = State()
+            newState.snakemakeSupportBannerEnabled = false
             updateStateAndFireEvent(project, newState)
         }
 
