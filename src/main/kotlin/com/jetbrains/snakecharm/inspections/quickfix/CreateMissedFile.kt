@@ -5,11 +5,10 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.undo.*
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -21,8 +20,8 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
 import java.nio.file.Paths
+import kotlin.io.path.Path
 import kotlin.io.path.isDirectory
-import kotlin.io.path.name
 import kotlin.io.path.notExists
 
 class CreateMissedFile(
@@ -32,6 +31,8 @@ class CreateMissedFile(
     private val searchRelativelyToCurrentFolder: Boolean
 ) : LocalQuickFixAndIntentionActionOnPsiElement(element) {
     companion object {
+        private val LOGGER = Logger.getInstance(CreateMissedFile::class.java)
+
         private val condaDefaultContext = """
         channels:
         dependencies:
@@ -66,8 +67,13 @@ class CreateMissedFile(
                 file.virtualFile
             ) ?: return
         val targetFilePath = try {
-            Paths.get(relativeDirectory.path, fileName)
+            if (Path(fileName).isAbsolute) {
+                Path(fileName)
+            } else {
+                Paths.get(relativeDirectory.path, fileName)
+            }
         } catch (e: InvalidPathException) {
+            LOGGER.error(e)
             SmkNotifier.notify(
                 title = SnakemakeBundle.message("notifier.msg.create.env.file.title"),
                 content = SnakemakeBundle.message("notifier.msg.create.env.file.name.invalid.file.exception", fileName),
@@ -82,33 +88,37 @@ class CreateMissedFile(
         }
 
         val undo = Runnable {
-            firstAffectedFile ?: return@Runnable
+            if (firstAffectedFile == null || firstAffectedFile.notExists()) {
+                return@Runnable
+            }
             if (firstAffectedFile.isDirectory()) {
                 FileUtils.deleteDirectory(firstAffectedFile.toFile())
             } else {
                 Files.delete(firstAffectedFile)
             }
-            VirtualFileManager.getInstance().asyncRefresh { }
+            VirtualFileManager.getInstance().syncRefresh()
         }
         val redo = Runnable {
             try {
-                val directoryPath = Files.createDirectories(targetFilePath.parent)
-                val directoryVirtualFile = VfsUtil.findFile(directoryPath, true) ?: return@Runnable
-                LocalFileSystem.getInstance().createChildFile(this, directoryVirtualFile, targetFilePath.name)
-                VirtualFileManager.getInstance().asyncRefresh { }
+                Files.createDirectories(targetFilePath.parent)
+                Files.createFile(targetFilePath)
+                VirtualFileManager.getInstance().syncRefresh()
                 val context = supportedSections[sectionName]
                 if (context != null) {
                     // We don't use the result of 'createChildFile()' because it has inappropriate type (and throws UnsupportedOperationException)
                     targetFilePath.toFile().appendText(context)
                 }
             } catch (e: SecurityException) {
+                LOGGER.error(e)
+                val message = e.message ?: return@Runnable
                 SmkNotifier.notify(
                     title = SnakemakeBundle.message("notifier.msg.create.env.file.title"),
-                    content = SnakemakeBundle.message("notifier.msg.create.env.file.invalid.file.exception", fileName),
+                    content = message,
                     type = NotificationType.ERROR,
                     project = project
                 )
             } catch (e: IOException) {
+                LOGGER.error(e)
                 SmkNotifier.notify(
                     title = SnakemakeBundle.message("notifier.msg.create.env.file.title"),
                     content = SnakemakeBundle.message("notifier.msg.create.env.file.io.exception", fileName),
