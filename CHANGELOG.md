@@ -10,10 +10,12 @@ Released on ...
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Fixed
+- Resolve for `rules` keyword if `snakemake` version less than `6.1` (see [#359](https://github.com/JetBrains-Research/snakecharm/issues/359))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Added
-- Quick fix for unresolved files (conda, configfile. etc.)(see [#277](https://github.com/JetBrains-Research/snakecharm/issues/277))
+- Quick fix for unresolved files (conda, configfile. etc.) (see [#277](https://github.com/JetBrains-Research/snakecharm/issues/277))
+- Warning: Snakemake support is disabled (see [#109](https://github.com/JetBrains-Research/snakecharm/issues/109))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ## [2021.3.661]
