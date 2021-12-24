@@ -2,11 +2,12 @@ package com.jetbrains.snakecharm.inspections.quickfix
 
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.undo.*
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -96,13 +97,11 @@ class CreateMissedFile(
             } else {
                 Files.delete(firstAffectedFile)
             }
-            VirtualFileManager.getInstance().syncRefresh()
         }
         val redo = Runnable {
             try {
                 Files.createDirectories(targetFilePath.parent)
                 Files.createFile(targetFilePath)
-                VirtualFileManager.getInstance().syncRefresh()
                 val context = supportedSections[sectionName]
                 if (context != null) {
                     // We don't use the result of 'createChildFile()' because it has inappropriate type (and throws UnsupportedOperationException)
@@ -129,13 +128,41 @@ class CreateMissedFile(
         }
         val action = object : UndoableAction {
             override fun undo() {
-                // invoke later because changing document inside undo/redo is not allowed (see ChangeFileEncodingAction)
-                ApplicationManager.getApplication().invokeLater(undo, ModalityState.NON_MODAL, project.disposed)
+                // invoke in such way because:
+                // (1) changing document inside undo/redo is not allowed (see ChangeFileEncodingAction)
+                // (2) we don't want to use UI thread
+                ProgressManager.getInstance().run(object : Task.Backgroundable(
+                    project,
+                    SnakemakeBundle.message("notifier.msg.deleting.env.file", fileName),
+                    false
+                ) {
+                    override fun run(indicator: ProgressIndicator) {
+                        undo.run()
+                    }
+
+                    override fun onSuccess() {
+                        VirtualFileManager.getInstance().syncRefresh()
+                    }
+                })
             }
 
             override fun redo() {
-                // invoke later because changing document inside undo/redo is not allowed (see ChangeFileEncodingAction)
-                ApplicationManager.getApplication().invokeLater(redo, ModalityState.NON_MODAL, project.disposed)
+                // invoke in such way because:
+                // (1) changing document inside undo/redo is not allowed (see ChangeFileEncodingAction)
+                // (2) we don't want to use UI thread
+                ProgressManager.getInstance().run(object : Task.Backgroundable(
+                    project,
+                    SnakemakeBundle.message("notifier.msg.creating.env.file", fileName),
+                    false
+                ) {
+                    override fun run(indicator: ProgressIndicator) {
+                        redo.run()
+                    }
+
+                    override fun onSuccess() {
+                        VirtualFileManager.getInstance().syncRefresh()
+                    }
+                })
             }
 
             override fun getAffectedDocuments(): Array<DocumentReference> =
