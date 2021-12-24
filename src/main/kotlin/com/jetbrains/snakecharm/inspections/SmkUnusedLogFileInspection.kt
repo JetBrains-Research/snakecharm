@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.parentOfType
 import com.intellij.refactoring.suggested.endOffset
+import com.intellij.refactoring.suggested.startOffset
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE
@@ -17,7 +18,7 @@ import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkUnusedLogFileInspection : SnakemakeInspection() {
     companion object {
-        private const val REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT = " >{log} 2>&1"
+        private const val REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT = ">{log} 2>&1"
     }
 
     override fun buildVisitor(
@@ -156,18 +157,29 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
             val stringArgument = shellSection.argumentList?.arguments?.firstOrNull {
                 it is PyStringLiteralExpression
             }
-
+            var indent = shellSection.getPreviousOffset()?.replace("\n", "")
             if (stringArgument == null) {
-                val indent = shellSection.getPreviousOffset()?.replace("\n", "")
                 doc.insertString(
                     shellSection.lastChild.endOffset,
-                    "\n$indent$indent\"$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\""
+                    "\n$indent$indent\" $REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\""
                 )
                 PsiDocumentManager.getInstance(project).commitDocument(doc)
                 return
             }
-
-            doc.insertString(stringArgument.endOffset - 1, REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT)
+            var offset = 1
+            var startIndent = ""
+            var endIndent = " "
+            if (stringArgument.text.startsWith("\"\"\"")) {
+                val newIndent = stringArgument.prevSibling.text.replace("\n", "")
+                indent = if (newIndent.length > (indent?.length ?: 0)) newIndent else indent
+                offset = 3
+                startIndent = if (stringArgument.text.startsWith("\"\"\"\n")) "\n$indent" else ""
+                endIndent = if (stringArgument.text.endsWith("\n$indent\"\"\"")) "\n$indent" else " "
+            }
+            doc.insertString(stringArgument.endOffset - offset,
+                ")$endIndent$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT$endIndent"
+            )
+            doc.insertString(stringArgument.startOffset + offset, "$startIndent(")
             PsiDocumentManager.getInstance(project).commitDocument(doc)
         }
     }
@@ -186,7 +198,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
             val runSection = (startElement as SmkRunSection)
             val lastArg = runSection.lastChild
             val indent = lastArg.prevSibling.text
-            doc.insertString(lastArg.endOffset, "${indent}shell(\"echo TODO$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\")")
+            doc.insertString(lastArg.endOffset, "${indent}shell(\"(echo TODO) $REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\")")
             PsiDocumentManager.getInstance(project).commitDocument(doc)
         }
     }
@@ -207,7 +219,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
             val indent = lastArg?.getPreviousOffset() ?: logIndent
             doc.insertString(
                 (lastArg ?: ruleLike).endOffset,
-                "${indent}shell: \"echo TODO$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\""
+                "${indent}shell: \"(echo TODO) $REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\""
             )
             PsiDocumentManager.getInstance(project).commitDocument(doc)
         }
