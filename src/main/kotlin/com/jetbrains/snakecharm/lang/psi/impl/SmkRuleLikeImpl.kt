@@ -7,6 +7,7 @@ import com.intellij.psi.stubs.NamedStub
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyNames.UNNAMED_ELEMENT
 import com.jetbrains.python.psi.PyStatementList
+import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.python.psi.impl.PyBaseElementImpl
 import com.jetbrains.python.psi.impl.PyElementPresentation
@@ -49,6 +50,8 @@ abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT : SmkRuleLike<S>, o
     override fun getSectionKeywordNode() = node.findChildByType(sectionTokenType)
 
     override fun getNameIdentifier() = getNameNode()?.psi
+
+    override fun getStringLiteralExpressions(): List<PyStringLiteralExpression> = statementList.children.filterIsInstance<PyStringLiteralExpression>()
 
     /**
      * Use name start offset here, required for navigation & find usages, e.g. when ask for usages on name identifier
