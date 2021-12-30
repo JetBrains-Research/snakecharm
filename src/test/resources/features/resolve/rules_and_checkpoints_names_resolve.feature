@@ -26,6 +26,25 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
       | rule       | checkpoint |
       | checkpoint | checkpoint |
 
+  Scenario Outline: Resolve for checkpoint after rules keyword
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    checkpoint aaaa:
+      input: "path/to/input"
+      output: "path/to/output"
+      shell: "shell command"
+
+    <target> cccc:
+      input: rules.aaaa.input
+    """
+    When I put the caret after rules.aa
+    Then reference should resolve to "aaaa" in "foo.smk"
+    Examples:
+      | target     |
+      | rule       |
+      | checkpoint |
+
   Scenario Outline: Resolve for rule/checkpoint name when inside an injection
     Given a snakemake project
     Given I open a file "foo.smk" with text

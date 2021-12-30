@@ -21,11 +21,13 @@ import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex
 import gnu.trove.THashSet
 
@@ -66,9 +68,18 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
             return emptyList()
         }
 
-        val results = findAvailableRuleLikeElementByName(
+        var results = findAvailableRuleLikeElementByName(
             location.originalElement, name, indexKey, clazz
         ) { currentFileDeclarations }
+
+        if (location.text == SnakemakeAPI.SMK_VARS_RULES) {
+            results += findAvailableRuleLikeElementByName(
+                location.originalElement,
+                name,
+                SmkCheckpointNameIndex.KEY,
+                SmkCheckPoint::class.java
+            ) { (containingRule?.containingFile as? SmkFile)?.collectCheckPoints()?.map { it.second } ?: emptyList() }
+        }
 
         return results.map { element ->
             RatedResolveResult(RatedResolveResult.RATE_LOW, element)
