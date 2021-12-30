@@ -4,7 +4,7 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
-      <rule_like> NAME:
+      <rule_like> NAME <addition>:
         log:
           log1 = "{a}.log1",
           log2 = "{a}/{b}.log2",
@@ -35,9 +35,149 @@ Feature: Inspection - SmkNotSameWildcardsSetInspection
       """
     When I check highlighting errors
     Examples:
+      | rule_like  | addition      |
+      | rule       |               |
+      | checkpoint |               |
+      | use rule   | as NAME2 with |
+
+    Scenario Outline: No missing wildcards, if defining section was overridden
+      Given a snakemake project
+      Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        output: "{sample}"
+
+      use rule NAME as new_NAME with:
+        output: "{sample1}"
+      """
+      And SmkNotSameWildcardsSetInspection inspection is enabled
+      Then I expect no inspection errors
+      When I check highlighting errors
+      Examples:
+        | rule_like  |
+        | rule       |
+        | checkpoint |
+
+  Scenario Outline: Missing wildcards, defining in non overridden section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        output: "{sample}"
+        benchmark: "{donor}"
+
+      use rule NAME as new_NAME with: log: "{sample1}"
+      """
+    And SmkNotSameWildcardsSetInspection inspection is enabled
+    Then I expect inspection error on <new_NAME> with message
+      """
+      Missing wildcards: 'donor', 'sample1' in inherited 'output' section.
+      """
+     Then I expect inspection error on <new_NAME> with message
+      """
+      Missing wildcards: 'sample', 'sample1' in inherited 'benchmark' section.
+      """
+    Then I expect inspection error on <"{sample1}"> with message
+      """
+      Missing wildcards: 'donor', 'sample'.
+      """
+    When I check highlighting errors ignoring extra highlighting
+    Examples:
       | rule_like  |
       | rule       |
       | checkpoint |
+
+  Scenario Outline: No error if cannot detect any wildcards defined in non overridden section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> A:
+        output: foo()
+
+      use rule A as new_A with: log: "{sample1}"
+      """
+    And SmkNotSameWildcardsSetInspection inspection is enabled
+    Then I expect inspection weak warning on <new_A> with message
+      """
+      Cannot check missing wildcards in inherited 'output' section.
+      """
+    When I check highlighting weak warnings
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: No missing wildcards, because declaration section was overriden
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <rule_like> NAME1:
+        input: "{sample1}.in"
+        output: "{sample1}.out"
+        shell: "touch {output}"
+
+    <rule_like> NAME2:
+        input: "{sample2}.in"
+        output: "{sample2}.out"
+        shell: "touch {output}"
+    """
+    Given I open a file "foo.smk" with text
+      """
+      module M:
+        snakefile: "boo.smk"
+
+      use rule NAME1,NAME2 from M as other_* with:
+        output:
+          "{sample}.out1"
+        log: "{sample}.out2"
+      """
+    And SmkNotSameWildcardsSetInspection inspection is enabled
+    Then I expect no inspection errors
+    When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Missing wildcards in overridden rule or rules
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <rule_like> NAME1:
+        input: "{sample1}.in"
+        output: "{sample1}.{sample2}.out"
+        benchmark: "{sample1}.{sample2}.out"
+        shell: "touch {output}"
+
+    <rule_like> NAME2:
+        input: "{sample2}.in"
+        output: "{sample1}.{sample2}.out"
+        benchmark: "{sample1}.{sample2}.out"
+        shell: "touch {output}"
+    """
+    Given I open a file "foo.smk" with text
+      """
+      module M:
+        snakefile: "boo.smk"
+
+      <rule_like> NAME3:
+        output: "{sample1}.{sample2}"
+
+      use rule <inheritance_info> as other_* with:
+        log: "{sample1}.out2"
+      """
+    And SmkNotSameWildcardsSetInspection inspection is enabled
+    And I expect inspection error on <"{sample1}.out2"> with message
+      """
+      Missing wildcards: 'sample2'.
+      """
+    When I check highlighting errors
+    Examples:
+      | rule_like  | inheritance_info   |
+      | rule       | NAME3              |
+      | rule       | NAME1,NAME2 from M |
+      | checkpoint | NAME3              |
+      | checkpoint | NAME1,NAME2 from M |
 
   Scenario Outline: Missing wildcards when log section is generator
     Given a snakemake project

@@ -187,4 +187,17 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
         }
         return result
     }
+
+    fun findPepfile(): SmkWorkflowArgsSection? {
+        var pepfile: SmkWorkflowArgsSection? = null
+        acceptChildren(object : PyElementVisitor(), SmkElementVisitor {
+            override val pyElementVisitor: PyElementVisitor = this
+            override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
+                if (st.sectionKeyword == SnakemakeNames.WORKFLOW_PEPFILE_KEYWORD) {
+                    pepfile = st
+                }
+            }
+        })
+        return pepfile
+    }
 }

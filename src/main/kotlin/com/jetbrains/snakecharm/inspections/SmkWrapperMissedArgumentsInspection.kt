@@ -14,10 +14,11 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
 class SmkWrapperMissedArgumentsInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+
         override fun visitSmkRule(rule: SmkRule) {
             visitSmkRuleOrCheckpoint(rule)
         }
@@ -30,7 +31,7 @@ class SmkWrapperMissedArgumentsInspection : SnakemakeInspection() {
             val wrapper = ruleOrCheckpoint.getSectionByName(SnakemakeNames.SECTION_WRAPPER) ?: return
 
             val wrappers = SmkWrapperStorage.getInstance(ruleOrCheckpoint.project)
-                    ?.wrappers ?: return
+                ?.wrappers ?: return
             val wrapperName = wrapper.argumentList?.text ?: return
             val wrapperInfo = wrappers.find { wrapperName.contains(it.path) } ?: return
 
@@ -65,19 +66,19 @@ class SmkWrapperMissedArgumentsInspection : SnakemakeInspection() {
         }
 
         private fun checkArgumentList(
-                argumentList: PyArgumentList,
-                section: SmkArgsSection,
-                required: List<String>
+            argumentList: PyArgumentList,
+            section: SmkArgsSection,
+            required: List<String>,
         ) {
             val usedKeywords = argumentList.arguments.filterIsInstance<PyKeywordArgument>().map { it.keyword }
             required.forEach { arg ->
                 if (arg !in usedKeywords) {
                     registerProblem(
                         section.nameIdentifier?.originalElement,
-                            SnakemakeBundle.message(
-                                "INSP.NAME.wrapper.args.missed.message",
-                                    arg,
-                                    section.name!!
+                        SnakemakeBundle.message(
+                            "INSP.NAME.wrapper.args.missed.message",
+                            arg,
+                            section.name!!
                         )
                     )
                 }

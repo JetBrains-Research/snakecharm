@@ -7,8 +7,8 @@ import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import kotlinx.serialization.ExperimentalSerializationApi
 
+@ExperimentalSerializationApi
 class SnakemakeStartupActivity : StartupActivity.Background {
-    @ExperimentalSerializationApi
     override fun runActivity(project: Project) {
         val smkSettings = project.service<SmkSupportProjectSettings>()
         smkSettings.initOnStartup()

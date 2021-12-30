@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.lang.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiReference
+import com.intellij.util.ArrayUtil
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.python.psi.impl.PyElementImpl
@@ -17,6 +18,8 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
     companion object {
         val WORKFLOWS_WITH_FILE_REFERENCES = setOf(
             SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD,
+            SnakemakeNames.WORKFLOW_PEPFILE_KEYWORD,
+            SnakemakeNames.WORKFLOW_PEPSCHEMA_KEYWORD,
             SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD,
             SnakemakeNames.WORKFLOW_REPORT_KEYWORD,
             SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD
@@ -40,11 +43,15 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
         val path = strExpr.stringValue
 
         return when (keywordName) {
-            SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD -> {
-                SmkConfigfileReference(
-                    this, textRange, strExpr, path
-                )
-            }
+            SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD -> SmkConfigfileReference(
+                this, textRange, strExpr, path
+            )
+            SnakemakeNames.WORKFLOW_PEPFILE_KEYWORD -> SmkPepfileReference(
+                this, textRange, strExpr, path
+            )
+            SnakemakeNames.WORKFLOW_PEPSCHEMA_KEYWORD -> SmkPepschemaReference(
+                this, textRange, strExpr, path
+            )
             SnakemakeNames.WORKFLOW_REPORT_KEYWORD -> SmkReportReference(
                 this, textRange, strExpr, path
             )
@@ -56,6 +63,8 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
             )
         }
     }
+
+    override fun getReference(): PsiReference? = ArrayUtil.getFirstElement(this.references)
 
     override fun getReferences(): Array<PsiReference> {
         if (keywordName !in WORKFLOWS_WITH_FILE_REFERENCES) {

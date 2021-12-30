@@ -349,7 +349,7 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
     Examples:
       | name      | resolve_to |
       | last_rule | last_rule  |
-      | other_b   | b          |
+      | other_b   | other_*    |
       | NAME2     | NAME2      |
       | zZzz      | zZzz       |
 
@@ -368,7 +368,7 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
     When I put the caret at remote_rule.log
     Then reference should resolve to "remote_*" in "foo.smk"
 
-  Scenario Outline: Resolve rule name to module
+  Scenario Outline: Resolve rule name to module (if importing rule doesn't have name node)
     Given a snakemake project
     And a file "boo.smk" with text
     """
@@ -394,14 +394,14 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
         log: rules.<name>.log
     """
     When I put the caret at <name>.log
-    Then reference should resolve to "<resolve_to>" in "boo.smk"
+    Then reference should resolve to "<resolve_to>" in "<file>"
     Examples:
-      | name                | resolve_to | rule_like  |
-      | last_rule_something | something  | rule       |
-      | last_rule_something | something  | checkpoint |
-      | NAME                | NAME       | rule       |
+      | name                | resolve_to  | rule_like  | file    |
+      | last_rule_something | last_rule_* | rule       | foo.smk |
+      | last_rule_something | last_rule_* | checkpoint | foo.smk |
+      | NAME                | NAME        | rule       | boo.smk |
 
-  Scenario Outline: Resolve rule name to .smk file included in module
+  Scenario Outline: Resolve rule name to .smk file included in module (if importing rule doesn't have name node)
     Given a snakemake project
     And a file "boo.smk" with text
     """
@@ -426,9 +426,9 @@ Feature: Resolve name after 'rules.' and 'checkpoints.' to their corresponding d
         log: rules.<name>.log
     """
     When I put the caret at <name>.log
-    Then reference should resolve to "<resolve_to>" in "zoo.smk"
+    Then reference should resolve to "<resolve_to>" in "<file>"
     Examples:
-      | name               | resolve_to    | rule_like  |
-      | rule_from_zoo      | rule_from_zoo | rule       |
-      | rule_from_zoo      | rule_from_zoo | checkpoint |
-      | last_rule_zoo_rule | zoo_rule      | rule       |
+      | name               | resolve_to    | rule_like  | file    |
+      | rule_from_zoo      | rule_from_zoo | rule       | zoo.smk |
+      | rule_from_zoo      | rule_from_zoo | checkpoint | zoo.smk |
+      | last_rule_zoo_rule | last_rule_*   | rule       | foo.smk |

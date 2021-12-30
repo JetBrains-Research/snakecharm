@@ -86,6 +86,175 @@ Feature: Inspection: SmkWildcardNotDefinedInspection
       | checkpoint | log       | input |
       | rule       | output    | group |
 
+  Scenario Outline: Defined wildcard in overridden rule or checkpoint
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <section> NAME:
+      <def>: "{sample}"
+
+    use rule NAME as NAME2 with:
+      input: "{sample}"
+
+    use rule NAME2 as NAME3 with:
+      input: "{sample}"
+    """
+    And SmkWildcardNotDefinedInspection inspection is enabled
+    Then I expect no inspection errors
+    When I check highlighting errors
+    Examples:
+      | section    | def    |
+      | rule       | output |
+      | checkpoint | output |
+
+  Scenario Outline: Defined wildcard in overridden rules or checkpoints from another module
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <section> NAME:
+      <def>: "{sample}"
+
+    <section> NAME1:
+      <def>: "{sample}"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+      snakefile: "boo.smk"
+
+    use rule * from M as other_*
+
+    use rule other_NAME as NAME3 with:
+      input: "{sample}"
+
+    use rule NAME,NAME1 from M as new_* with:
+      input: "{sample}"
+
+    use rule NAME3 as NAME4 with:
+      input: "{sample}"
+    """
+    And SmkWildcardNotDefinedInspection inspection is enabled
+    Then I expect no inspection errors
+    When I check highlighting errors
+    Examples:
+      | section    | def    |
+      | rule       | output |
+      | checkpoint | output |
+
+  Scenario Outline: Undefined wildcard in one of the overridden rules
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <section> NAME:
+      output: "{sample}"
+
+    <section> NAME1:
+      output: "{file}"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+      snakefile: "boo.smk"
+
+    use rule NAME,NAME1 from M as new_* with:
+
+    use rule new_NAME1 as name_one with:
+      input: "{sample}"
+    """
+    And SmkWildcardNotDefinedInspection inspection is enabled
+    Then I expect inspection error on <sample> with message
+    """
+    Wildcard 'sample' isn't defined in any appropriate section of overridden rules
+    """
+    When I check highlighting errors
+    Examples:
+      | section    |
+      | rule       |
+      | rule       |
+      | checkpoint |
+      | checkpoint |
+
+  Scenario Outline: Undefined wildcard if it is was defined in sections, which is overridden
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <section> A:
+      <definition>: "{sample}_{sample2}"
+
+    use rule A as B with:
+      <definition>: "{log_wildcard}"
+      input: "{sample2}"
+    """
+    And SmkWildcardNotDefinedInspection inspection is enabled
+    Then I expect inspection error on <sample2> in <input: "{sample2}"> with message
+    """
+    Wildcard 'sample2' isn't defined in any appropriate section of overridden rules
+    """
+    When I check highlighting errors
+    Examples:
+      | section    | definition |
+      | rule       | log        |
+      | rule       | output     |
+      | checkpoint | log        |
+      | checkpoint | output     |
+
+  Scenario Outline: Undefined wildcard if not all parent rules contains wildcard which is checked
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <rule_like> NAME1:
+        output: "{sample1}.out"
+
+    <rule_like> NAME2:
+        output: "{sample2}.out"
+    """
+    Given I open a file "foo.smk" with text
+      """
+      module M:
+        snakefile: "boo.smk"
+
+      use rule NAME1,NAME2 from M as other_* with:
+        input: "{sample1}.out2"
+      """
+    And SmkWildcardNotDefinedInspection inspection is enabled
+    Then I expect inspection error on <sample1> with message
+    """
+    Wildcard 'sample1' isn't defined in any appropriate section of overridden rules
+    """
+    When I check highlighting errors
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Cannot parse wildcard defining section in overridden rule or checkpoint
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <section> NAME:
+      output: <text>
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+      snakefile: "boo.smk"
+
+    use rule NAME from M as NAME2 with:
+      input: "{sample}"
+    """
+    And SmkWildcardNotDefinedInspection inspection is enabled
+    Then I expect inspection weak warning on <sample> with message
+    """
+    Cannot check whether wildcard 'sample' is defined or not.
+    """
+    When I check highlighting weak warnings
+    Examples:
+      | section    | text       |
+      | rule       | foo()      |
+      | rule       | "file.txt" |
+      | checkpoint | foo()      |
+      | checkpoint | "file.txt" |
+
   Scenario Outline: Undefined wildcard in wildcards using section
     Given a snakemake project
     Given I open a file "foo.smk" with text

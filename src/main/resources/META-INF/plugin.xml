@@ -12,6 +12,7 @@
   <!-- PyCharm / Python plugin dependency -->
   <depends>com.intellij.modules.lang</depends>
   <depends>com.intellij.modules.python</depends>
+  <depends>org.jetbrains.plugins.yaml</depends>
 
   <applicationListeners>
     <listener class="com.jetbrains.snakecharm.SnakemakePluginListener" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
@@ -41,6 +42,7 @@
             instance="com.jetbrains.snakecharm.framework.SmkFrameworkConfigurableProvider"
             nonDefaultProject="true"
     />
+    <editorNotificationProvider implementation="com.jetbrains.snakecharm.framework.SmkSupportDisabledBanner"/>
     <notificationGroup
             id="SnakeCharmPluginNotifier"
             displayType="BALLOON"
@@ -71,6 +73,7 @@
     <lang.syntaxHighlighterFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterFactory"/>
     <lang.syntaxHighlighterFactory language="SnakemakeSL"
      implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLSyntaxHighlighterFactory"/>
+    <colorSettingsPage implementation="com.jetbrains.snakecharm.lang.highlighter.SmkColorSettingsPage"/>
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkDumbAwareAnnotatorManager"/>
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkStandardAnnotatorManager"/>
     <annotator language="RegExp" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLRegExpHighlightingAnnotator"/>
@@ -109,6 +112,7 @@
         language="Python"
         implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor"
     />
+
     <completion.contributor
         language="Python"
         implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkKeywordCompletionContributor"
@@ -143,6 +147,7 @@
 
     <psi.referenceContributor implementation="com.jetbrains.snakecharm.lang.psi.references.SmkPySubscriptionReferenceContributor"/>
 
+<!--    <psi.referenceContributor implementation="com.jetbrains.snakecharm.lang.psi.references.SmkPepReferenceContributor"/>-->
     <lang.inspectionSuppressor language="Snakemake" implementationClass="com.jetbrains.snakecharm.inspections.SmkInspectionsSuppressor"/>
 
     <!--Formatting-->
@@ -226,6 +231,17 @@
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.not.same.wildcards.set.title"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkNotSameWildcardsSetInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkWildcardInNotOverriddenSectionInspection"
+            enabledByDefault="true"
+            level="ERROR"
+            suppressId="SmkWildcardInNotOverriddenSection"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.undeclared.wildcard.in.not.overridden.section"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkWildcardInNotOverriddenSectionInspection"
     />
 
     <localInspection
@@ -472,7 +488,7 @@
     <localInspection
             language="SnakemakeSL" shortName="SmkSLWildcardNameIsConfusingInspection"
             enabledByDefault="true"
-            level="WARNING"
+            level="ERROR"
             suppressId="SmkSLWildcardNameIsConfusing"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
@@ -544,18 +560,6 @@
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.undeclared.section.title"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkUndeclaredSectionInspection"
-    />
-
-    <localInspection
-            language="Python"
-            shortName="SmkPyUnboundLocalVariableInspection"
-            suppressId="PyUnboundLocalVariable"
-            bundle="SnakemakeBundle"
-            key="INSP.NAME.unbound"
-            groupKey="INSP.GROUP.snakemake"
-            enabledByDefault="true"
-            level="WARNING"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkPyUnboundLocalVariableInspection"
     />
 
     <localInspection

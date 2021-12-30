@@ -29,7 +29,12 @@ class SmkSLSubscriptionExpressionImpl(node: ASTNode) : SmkSLElementImpl(node), S
         return PyOperatorReference(this, context)
     }
 
-    override fun getReference() = getReference(PyResolveContext.defaultContext())
+    override fun getReference(): PsiPolyVariantReference {
+        val context = TypeEvalContext.codeAnalysis(project, containingFile)
+        val resolveContext = PyResolveContext.defaultContext(context)
+
+        return getReference(resolveContext)
+    }
 
     override fun getType(context: TypeEvalContext, key: TypeEvalContext.Key): PyType? {
         // Taken from [PySubscriptionExpressionImpl]

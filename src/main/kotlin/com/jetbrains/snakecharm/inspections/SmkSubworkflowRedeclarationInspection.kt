@@ -4,14 +4,15 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.lang.psi.*
+import com.jetbrains.snakecharm.lang.psi.SmkFile
+import com.jetbrains.snakecharm.lang.psi.SmkSubworkflow
 
 class SmkSubworkflowRedeclarationInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
         private val subworkflowsNameAndPsi = (session.file as? SmkFile)?.collectSubworkflows() ?: emptyList()
 
         override fun visitSmkSubworkflow(subworkflow: SmkSubworkflow) {
@@ -19,8 +20,8 @@ class SmkSubworkflowRedeclarationInspection : SnakemakeInspection() {
 
             if (subworkflow !== subworkflowsNameAndPsi.findLast { it.first == name }?.second) {
                 registerProblem(subworkflow.originalElement,
-                        SnakemakeBundle.message("INSP.NAME.subworkflow.redeclaration"),
-                        ProblemHighlightType.LIKE_UNUSED_SYMBOL)
+                    SnakemakeBundle.message("INSP.NAME.subworkflow.redeclaration"),
+                    ProblemHighlightType.LIKE_UNUSED_SYMBOL)
             }
         }
     }

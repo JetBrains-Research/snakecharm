@@ -10,16 +10,16 @@ import com.intellij.psi.PsiFile
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLExpression
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionIndexKeyExpressionImpl
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionIndexKeyExpression
 
 class SmkSLQuotingMisuseInGetAccessorInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
-    ) = object : SmkSLInspectionVisitor(holder, session) {
+    ) = object : SmkSLInspectionVisitor(holder, getContext(session)) {
 
-        override fun visitSmkSLSubscriptionExpressionKey(expr: SmkSLSubscriptionIndexKeyExpressionImpl) {
+        override fun visitSmkSLSubscriptionExpressionKey(expr: SmkSLSubscriptionIndexKeyExpression) {
             val keyStr = expr.text
             if (keyStr.startsWith('"') || keyStr.startsWith('\'')
                 || keyStr.startsWith("\\'") || keyStr.startsWith("\\\"")

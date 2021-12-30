@@ -17,7 +17,7 @@ class SnakemakeVisitorFilter : PythonVisitorFilter {
         ReturnAnnotator::class.java,
         // [HACK] See https://github.com/JetBrains-Research/snakecharm/issues/14
         PyUnreachableCodeInspection::class.java,
-        // TODO: Need API for: PyResolveUtil.allowForwardReferences(node)
+        // TODO: Need API for: e.g. EP in PyResolveUtil.allowForwardReferences(node)
         PyUnboundLocalVariableInspection::class.java,
         // See https://github.com/JetBrains-Research/snakecharm/issues/133, API required
         PyShadowingBuiltinsInspection::class.java

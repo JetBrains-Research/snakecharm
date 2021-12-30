@@ -2,8 +2,7 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
-import com.intellij.codeInspection.ProblemHighlightType.GENERIC_ERROR
-import com.intellij.codeInspection.ProblemHighlightType.WEAK_WARNING
+import com.intellij.codeInspection.ProblemHighlightType.*
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
@@ -21,7 +20,8 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+
         private val localRules by lazy {
             holder.file.let { psiFile ->
                 when (psiFile) {
@@ -102,7 +102,7 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
                         ) == null
 
                         val (msg, severity) = when {
-                            isTopLevelDeclaration -> SnakemakeBundle.message("INSP.NAME.rule.redeclaration") to GENERIC_ERROR
+                            isTopLevelDeclaration -> SnakemakeBundle.message("INSP.NAME.rule.redeclaration") to GENERIC_ERROR_OR_WARNING
                             else -> SnakemakeBundle.message("INSP.NAME.rule.redeclaration.possible") to WEAK_WARNING
                         }
                         registerProblem(ruleLike, msg, severity)

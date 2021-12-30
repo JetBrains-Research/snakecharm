@@ -12,13 +12,14 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkWorkflowArgsSection
 
 class SmkSectionDuplicatedArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
             checkArgumentList(st.argumentList, st)
@@ -28,9 +29,13 @@ class SmkSectionDuplicatedArgsInspection : SnakemakeInspection() {
             checkArgumentList(st.argumentList, st)
         }
 
+        override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
+            checkArgumentList(st.argumentList, st)
+        }
+
         private fun checkArgumentList(
-                argumentList: PyArgumentList?,
-                section: SmkArgsSection
+            argumentList: PyArgumentList?,
+            section: SmkArgsSection,
         ) {
             val args = argumentList?.arguments ?: emptyArray()
             if (args.size > 1) {
@@ -44,10 +49,10 @@ class SmkSectionDuplicatedArgsInspection : SnakemakeInspection() {
 
                         if (text in setOfDeclaredArguments) {
                             registerProblem(
-                                    arg,
-                                    SnakemakeBundle.message("INSP.NAME.section.duplicated.args.message",
-                                            section.sectionKeyword!!),
-                                    RemoveArgumentQuickFix
+                                arg,
+                                SnakemakeBundle.message("INSP.NAME.section.duplicated.args.message",
+                                    section.sectionKeyword!!),
+                                RemoveArgumentQuickFix
                             )
                         } else {
                             setOfDeclaredArguments.add(text)

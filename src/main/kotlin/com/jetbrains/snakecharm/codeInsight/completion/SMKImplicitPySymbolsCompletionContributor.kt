@@ -26,17 +26,17 @@ class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
         val IN_PY_REF = psiElement().inside(PyReferenceExpression::class.java)
 
         private val REF_CAPTURE = psiElement()
-                .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
-                .and(IN_PY_REF)
-                .with(object : PatternCondition<PsiElement>("isFirstChild") {
-                    override fun accepts(element: PsiElement, context: ProcessingContext): Boolean {
-                        // check that this element is "first" in parent PyReferenceExpression, e.g. that
-                        // we don't have some prefix with '.', e.g. element is 'exp<caret>', not 'foo.exp<caret>'
-                        
-                        val refExpression = PsiTreeUtil.getParentOfType(element, PyReferenceExpression::class.java)
-                        return !(refExpression?.isQualified ?: true)
-                    }
-                })
+            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+            .and(IN_PY_REF)
+            .with(object : PatternCondition<PsiElement>("isFirstChild") {
+                override fun accepts(element: PsiElement, context: ProcessingContext): Boolean {
+                    // check that this element is "first" in parent PyReferenceExpression, e.g. that
+                    // we don't have some prefix with '.', e.g. element is 'exp<caret>', not 'foo.exp<caret>'
+
+                    val refExpression = PsiTreeUtil.getParentOfType(element, PyReferenceExpression::class.java)
+                    return !(refExpression?.isQualified ?: true)
+                }
+            })
     }
 
     init {
@@ -46,9 +46,11 @@ class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
 
 class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionParameters>() {
 
-    override fun addCompletions(parameters: CompletionParameters,
-                                context: ProcessingContext,
-                                result: CompletionResultSet) {
+    override fun addCompletions(
+        parameters: CompletionParameters,
+        context: ProcessingContext,
+        result: CompletionResultSet
+    ) {
 
         val contextElement = parameters.position
         val contextScope = SmkCodeInsightScope[contextElement]

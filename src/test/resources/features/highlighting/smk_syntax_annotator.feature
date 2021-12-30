@@ -9,7 +9,7 @@ Feature: Annotate additional syntax
     """
     Then I expect inspection info on <<section>> with message
     """
-    PY.KEYWORD
+    SMK_KEYWORD
     """
     When I check highlighting infos
     Examples:
@@ -31,11 +31,11 @@ Feature: Annotate additional syntax
     """
     Then I expect inspection info on <<rule_like>> with message
     """
-    PY.KEYWORD
+    SMK_KEYWORD
     """
     Then I expect inspection info on <NAME> with message
     """
-    PY.FUNC_DEFINITION
+    SMK_FUNC_DEFINITION
     """
     Then I expect inspection info on <<section>> with message
     """
@@ -43,13 +43,13 @@ Feature: Annotate additional syntax
     """
     When I check highlighting infos
     Examples:
-      | rule_like   | section                  | text       | highlighting |
-      | rule        | input                    | "file.txt" | PY.DECORATOR |
-      | rule        | new_unrecognized_section | "file.txt" | PY.DECORATOR |
-      | checkpoint  | input                    | "file.txt" | PY.DECORATOR |
-      | checkpoint  | new_unrecognized_section | "file.txt" | PY.DECORATOR |
-      | subworkflow | snakefile                | "file.txt" | PY.DECORATOR |
-      | subworkflow | new_unrecognized_section | "file.txt" | PY.DECORATOR |
+      | rule_like   | section                  | text       | highlighting  |
+      | rule        | input                    | "file.txt" | SMK_DECORATOR |
+      | rule        | new_unrecognized_section | "file.txt" | SMK_DECORATOR |
+      | checkpoint  | input                    | "file.txt" | SMK_DECORATOR |
+      | checkpoint  | new_unrecognized_section | "file.txt" | SMK_DECORATOR |
+      | subworkflow | snakefile                | "file.txt" | SMK_DECORATOR |
+      | subworkflow | new_unrecognized_section | "file.txt" | SMK_DECORATOR |
 
   Scenario Outline: Annotate Rules and Checkpoints
     Given a snakemake project
@@ -60,11 +60,11 @@ Feature: Annotate additional syntax
     """
     Then I expect inspection info on <<rule_like>> with message
     """
-    PY.KEYWORD
+    SMK_KEYWORD
     """
     Then I expect inspection info on <NAME> with message
     """
-    PY.FUNC_DEFINITION
+    SMK_FUNC_DEFINITION
     """
     Then I expect inspection info on <<section>> with message
     """
@@ -73,31 +73,31 @@ Feature: Annotate additional syntax
     When I check highlighting infos
     Examples:
       | rule_like  | section              | text       | highlighting             |
-      | rule       | output               | "file.txt" | PY.DECORATOR             |
-      | rule       | input                | "file.txt" | PY.DECORATOR             |
-      | rule       | params               | "file.txt" | PY.DECORATOR             |
-      | rule       | log                  | "file.txt" | PY.DECORATOR             |
-      | rule       | resources            | foo        | PY.DECORATOR             |
-      | rule       | version              | ""         | PY.DECORATOR             |
-      | rule       | cache                | ""         | PY.DECORATOR             |
-      | rule       | message              | ""         | PY.DECORATOR             |
-      | rule       | threads              | ""         | PY.DECORATOR             |
-      | rule       | singularity          | ""         | PY.DECORATOR             |
-      | rule       | priority             | ""         | PY.DECORATOR             |
-      | rule       | benchmark            | ""         | PY.DECORATOR             |
-      | rule       | wildcard_constraints | ""         | PY.DECORATOR             |
-      | rule       | group                | ""         | PY.DECORATOR             |
-      | rule       | envmodules           | ""         | PY.DECORATOR             |
-      | rule       | shadow               | ""         | PY.DECORATOR             |
-      | rule       | conda                | ""         | PY.DECORATOR             |
-      | rule       | cwl                  | ""         | PY.DECORATOR             |
-      | rule       | script               | ""         | PY.DECORATOR             |
-      | rule       | shell                | ""         | PY.DECORATOR             |
+      | rule       | output               | "file.txt" | SMK_DECORATOR            |
+      | rule       | input                | "file.txt" | SMK_DECORATOR            |
+      | rule       | params               | "file.txt" | SMK_DECORATOR            |
+      | rule       | log                  | "file.txt" | SMK_DECORATOR            |
+      | rule       | resources            | foo        | SMK_DECORATOR            |
+      | rule       | version              | ""         | SMK_DECORATOR            |
+      | rule       | cache                | ""         | SMK_DECORATOR            |
+      | rule       | message              | ""         | SMK_DECORATOR            |
+      | rule       | threads              | ""         | SMK_DECORATOR            |
+      | rule       | singularity          | ""         | SMK_DECORATOR            |
+      | rule       | priority             | ""         | SMK_DECORATOR            |
+      | rule       | benchmark            | ""         | SMK_DECORATOR            |
+      | rule       | wildcard_constraints | ""         | SMK_DECORATOR            |
+      | rule       | group                | ""         | SMK_DECORATOR            |
+      | rule       | envmodules           | ""         | SMK_DECORATOR            |
+      | rule       | shadow               | ""         | SMK_DECORATOR            |
+      | rule       | conda                | ""         | SMK_DECORATOR            |
+      | rule       | cwl                  | ""         | SMK_DECORATOR            |
+      | rule       | script               | ""         | SMK_DECORATOR            |
+      | rule       | shell                | ""         | SMK_DECORATOR            |
       | rule       | run                  | ""         | PY.PREDEFINED_DEFINITION |
-      | rule       | wrapper              | ""         | PY.DECORATOR             |
-      | rule       | name                 | ""         | PY.DECORATOR             |
-      | rule       | handover             | ""         | PY.DECORATOR             |
-      | checkpoint | output               | "file.txt" | PY.DECORATOR             |
+      | rule       | wrapper              | ""         | SMK_DECORATOR            |
+      | rule       | name                 | ""         | SMK_DECORATOR            |
+      | rule       | handover             | ""         | SMK_DECORATOR            |
+      | checkpoint | output               | "file.txt" | SMK_DECORATOR            |
       | checkpoint | run                  | ""         | PY.PREDEFINED_DEFINITION |
 
   Scenario Outline: Annotate Subworkflows
@@ -109,11 +109,11 @@ Feature: Annotate additional syntax
     """
     Then I expect inspection info on <subworkflow> with message
     """
-    PY.KEYWORD
+    SMK_KEYWORD
     """
     Then I expect inspection info on <NAME> with message
     """
-    PY.FUNC_DEFINITION
+    SMK_FUNC_DEFINITION
     """
     Then I expect inspection info on <<section>> with message
     """
@@ -122,9 +122,9 @@ Feature: Annotate additional syntax
     When I check highlighting infos
     Examples:
       | section              | text       | highlighting             |
-      | workdir              | "file.txt" | PY.DECORATOR             |
-      | snakefile            | "file.txt" | PY.DECORATOR             |
-      | configfile           | "file.txt" | PY.DECORATOR             |
+      | workdir              | "file.txt" | SMK_DECORATOR             |
+      | snakefile            | "file.txt" | SMK_DECORATOR             |
+      | configfile           | "file.txt" | SMK_DECORATOR             |
 
   Scenario: Do not annotate keyword-like identifiers in run section
       Given a snakemake project
@@ -151,11 +151,11 @@ Feature: Annotate additional syntax
       """
       Then I expect inspection info on <rule> with message
       """
-      PY.KEYWORD
+      SMK_KEYWORD
       """
       Then I expect inspection info on <foo> with message
       """
-      PY.FUNC_DEFINITION
+      SMK_FUNC_DEFINITION
       """
       Then I expect inspection info on <run> with message
       """
@@ -198,29 +198,44 @@ Feature: Annotate additional syntax
     """
     Then I expect inspection info on <use> with message
     """
-    PY.KEYWORD
+    SMK_KEYWORD
     """
     Then I expect inspection info on <rule> with message
     """
-    PY.KEYWORD
+    SMK_KEYWORD
     """
     Then I expect inspection info on <as> with message
     """
-    PY.KEYWORD
+    SMK_KEYWORD
     """
     Then I expect inspection info on <B> with message
     """
-    PY.FUNC_DEFINITION
+    SMK_FUNC_DEFINITION
     """
     Then I expect inspection info on <with> with message
     """
-    PY.KEYWORD
+    SMK_KEYWORD
     """
     Then I expect inspection info on <input> with message
     """
-    PY.DECORATOR
+    SMK_DECORATOR
     """
     When I check highlighting infos
+
+  Scenario: Annotate keyword argument
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule NAME:
+        input:
+            "file1",
+            arg = "file2"
+    """
+    Then I expect inspection info on <arg> with message
+    """
+    SMK_KEYWORD_ARGUMENT
+    """
+    When I check highlighting infos ignoring extra highlighting
 
   Scenario: 'use' section highlighting, part 2
     Given a snakemake project
@@ -230,22 +245,22 @@ Feature: Annotate additional syntax
     """
     Then I expect inspection info on <use> with message
     """
-    PY.KEYWORD
+    SMK_KEYWORD
     """
     Then I expect inspection info on <rule> with message
     """
-    PY.KEYWORD
+    SMK_KEYWORD
     """
     Then I expect inspection info on <from> with message
     """
-    PY.KEYWORD
+    SMK_KEYWORD
     """
     Then I expect inspection info on <as> with message
     """
-    PY.KEYWORD
+    SMK_KEYWORD
     """
     Then I expect inspection info on <other_*> with message
     """
-    PY.FUNC_DEFINITION
+    SMK_FUNC_DEFINITION
     """
     When I check highlighting infos

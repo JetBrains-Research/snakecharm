@@ -16,7 +16,8 @@ object SmkNotifier {
     fun notifySnakefileDetected(module: Module) {
         NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID).createNotification(
             title = SnakemakeBundle.message("notifier.msg.framework.by.snakefile.title"),
-            content = SnakemakeBundle.message("notifier.msg.framework.by.snakefile", module.name)
+            content = SnakemakeBundle.message("notifier.msg.framework.by.snakefile", module.name),
+            type = NotificationType.INFORMATION
         ).addAction(object : NotificationAction(
             SnakemakeBundle.message("notifier.msg.framework.by.snakefile.action.configure")
         ) {

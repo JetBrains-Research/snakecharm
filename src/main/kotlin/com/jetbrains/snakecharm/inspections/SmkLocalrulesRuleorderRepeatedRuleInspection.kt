@@ -7,12 +7,12 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkWorkflowLocalrulesSection
 import com.jetbrains.snakecharm.lang.psi.SmkWorkflowRuleorderSection
 
-class SmkLocalrulesRuleorderRepeatedRuleInspection  : SnakemakeInspection() {
+class SmkLocalrulesRuleorderRepeatedRuleInspection : SnakemakeInspection() {
     override fun buildVisitor(
-            holder: ProblemsHolder,
-            isOnTheFly: Boolean,
-            session: LocalInspectionToolSession
-    ) = object : SnakemakeInspectionVisitor(holder, session) {
+        holder: ProblemsHolder,
+        isOnTheFly: Boolean,
+        session: LocalInspectionToolSession,
+    ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkWorkflowLocalrulesSection(st: SmkWorkflowLocalrulesSection) {
             checkArgumentRepetition(st.argumentList)
@@ -28,8 +28,8 @@ class SmkLocalrulesRuleorderRepeatedRuleInspection  : SnakemakeInspection() {
                 val name = expr.name ?: return
                 if (!ruleNames.add(name)) {
                     registerProblem(
-                            expr,
-                            SnakemakeBundle.message("INSP.NAME.localrules.ruleorder.repeated.rule"))
+                        expr,
+                        SnakemakeBundle.message("INSP.NAME.localrules.ruleorder.repeated.rule"))
                 }
             }
         }

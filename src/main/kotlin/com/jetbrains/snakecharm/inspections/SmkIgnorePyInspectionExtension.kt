@@ -45,7 +45,7 @@ class SmkIgnorePyInspectionExtension : PyInspectionExtension() {
             // Ignore references imported by 'module' from remote file
             //
             // First check that reference is in `use` imported rules list
-            if (use.getImportedRuleNames()?.any { it == refElement } == true) {
+            if (use.getDefinedReferencesOfImportedRuleNames()?.any { it == refElement } == true) {
                 val module = use.getModuleName()?.reference?.resolve()
                 val file = (module as? SmkModule)?.getPsiFile()?.virtualFile
                 return module != null && (file == null || file is HttpVirtualFile)
@@ -56,7 +56,8 @@ class SmkIgnorePyInspectionExtension : PyInspectionExtension() {
             // Maybe referenceName is better here?
             //val referencedName = node.referencedName
             //return "config".equals(referencedName)
-            return node.textMatches(SnakemakeAPI.SMK_VARS_CONFIG)
+            return node.textMatches(SnakemakeAPI.SMK_VARS_CONFIG) ||
+                    node.textMatches(SnakemakeAPI.SMK_VARS_PEP)
         }
         return false
     }
