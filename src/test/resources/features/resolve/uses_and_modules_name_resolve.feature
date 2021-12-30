@@ -182,3 +182,20 @@ Feature: Resolve use and module name to its declaration
     """
     When I put the caret at MODULE as
     Then reference should resolve to "MODULE:" in "foo.smk"
+
+  Scenario: Resolve to rule imported via 'include'
+    Given a snakemake project
+    Given I open a file "boo.smk" with text
+    """
+    rule A:
+      threads: 1
+    """
+    Given I open a file "foo.smk" with text
+    """
+    include: "boo.smk"
+
+    use rule A as B with:
+      threads: 2
+    """
+    When I put the caret at A
+    Then reference should resolve to "A" in "boo.smk"

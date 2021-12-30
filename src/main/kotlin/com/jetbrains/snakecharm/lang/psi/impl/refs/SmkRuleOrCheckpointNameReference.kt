@@ -60,6 +60,7 @@ class SmkRuleOrCheckpointNameReference(
         if (!parentIsImportedRuleNames && !itIsModuleMameReference) {
             return results
         }
+        val allImportedFiles = smkFile.collectIncludedFiles()
         return results.filter { resolveResult ->
             // If we resolve module references, there must be only SmkModules
             (resolveResult.element is SmkModule && itIsModuleMameReference) ||
@@ -67,7 +68,7 @@ class SmkRuleOrCheckpointNameReference(
                     (moduleRef != null // Module name reference is defined and resolve result is from another file
                             && element.containingFile.originalFile != resolveResult.element?.containingFile?.originalFile)
                     // OR There are no 'from *name*' combination, so it hasn't been imported
-                    || (moduleRef == null && resolveResult.element?.containingFile?.originalFile == element.containingFile.originalFile)
+                    || (moduleRef == null && resolveResult.element?.containingFile?.originalFile in allImportedFiles)
         }.toMutableList()
     }
 
