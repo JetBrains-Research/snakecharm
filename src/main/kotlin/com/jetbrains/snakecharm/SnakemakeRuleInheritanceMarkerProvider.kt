@@ -31,9 +31,11 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         use: SmkUse,
         result: MutableCollection<in RelatedItemLineMarkerInfo<*>>
     ) {
-        val name = use.getIdentifierLeaf() ?: return
+        val name = (if (use.nameIdentifierIsWildcard()) use.nameIdentifier?.firstChild else use.nameIdentifier) ?: return
+
         val results =
-            use.getImportedRuleNames()?.mapNotNull { it.reference.resolve() } // Inherited rules are declared in list
+            use.getDefinedReferencesOfImportedRuleNames()
+                ?.mapNotNull { it.reference.resolve() } // Inherited rules are declared in list
                 ?: ((use.getModuleName()?.reference?.resolve() as? SmkModule)?.getPsiFile() as? SmkFile)?.advancedCollectRules(
                     mutableSetOf() // Inherited rules are declared by '*' pattern
                 )?.map { it.second } ?: return
@@ -52,17 +54,14 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         result: MutableCollection<in RelatedItemLineMarkerInfo<*>>
     ) {
         val currentFile = element.containingFile
-        val identifier = (if (element is SmkUse) element.getIdentifierLeaf() else element.nameIdentifier) ?: return
-        val names = if (element is SmkUse) element.getProducedRulesNames().map { it.first } else listOf(
-            element.name ?: return
-        )
-        val e = StubIndex.getInstance().getAllKeys(KEY, element.project)
+        val identifier = (if (element is SmkUse && element.nameIdentifierIsWildcard()) element.nameIdentifier?.firstChild else element.nameIdentifier) ?: return
+        val modulesFromStub = StubIndex.getInstance().getAllKeys(KEY, element.project)
         val module = element.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) } ?: return
         val files = mutableSetOf<SmkFile>()
-        for (key in e) {
+        for (smkModule in modulesFromStub) {
             files.addAll(StubIndex.getElements(
                 KEY,
-                key,
+                smkModule,
                 module.project,
                 GlobalSearchScope.moduleWithDependentsScope(module),
                 SmkModule::class.java
@@ -76,12 +75,7 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         val overrides = mutableListOf<SmkRuleOrCheckpoint>()
         files.forEach { file ->
             file.collectUses().forEach { pair ->
-                val containsReferenceToTargetRule = pair.second.getImportedRuleNames()?.any { it.text in names }
-                    ?: pair.second.hasPatternInDefinitionOfInheritedRules()
-                val moduleReference = pair.second.getModuleName()
-                val moduleReferToCurrentFileIfExists =
-                    if (moduleReference != null) (moduleReference.reference?.resolve() as? SmkModule)?.getPsiFile() == currentFile else true
-                if (containsReferenceToTargetRule && moduleReferToCurrentFileIfExists) {
+                if(pair.second.getImportedRules()?.firstOrNull{it == element} != null){
                     overrides.add(pair.second)
                 }
             }

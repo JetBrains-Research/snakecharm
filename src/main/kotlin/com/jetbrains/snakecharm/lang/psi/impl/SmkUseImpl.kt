@@ -101,13 +101,15 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
     override fun getModuleName() =
         (findChildByType(SmkTokenTypes.SMK_FROM_KEYWORD) as? PsiElement)?.nextSibling?.nextSibling
 
-    override fun getDefinedReferencesOfImportedRuleNames(): Array<SmkReferenceExpression>? = PsiTreeUtil.getChildrenOfType(
-        findChildByType(USE_IMPORTED_RULES_NAMES),
-        SmkReferenceExpression::class.java
-    )
+    override fun getDefinedReferencesOfImportedRuleNames(): Array<SmkReferenceExpression>? =
+        PsiTreeUtil.getChildrenOfType(
+            findChildByType(USE_IMPORTED_RULES_NAMES),
+            SmkReferenceExpression::class.java
+        )
 
     override fun getImportedRules(): List<SmkRuleOrCheckpoint>? =
-        getPairsOfImportedRulesAndNames(mutableSetOf())?.map { it.second }
+        getDefinedReferencesOfImportedRuleNames()?.mapNotNull { it.reference.resolve() as? SmkRuleOrCheckpoint }
+            ?: getPairsOfImportedRulesAndNames(mutableSetOf())?.map { it.second }
 
     override fun nameIdentifierIsWildcard() = nameIdentifier?.let {
         it is SmkUseNameIdentifier && it.textContains('*')
