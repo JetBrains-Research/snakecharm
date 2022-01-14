@@ -33,10 +33,8 @@ class SnakemakeSyntaxHighlighterFactory : SyntaxHighlighterFactory() {
         )
         val SMK_PREDEFINED_DEFINITION: TextAttributesKey =
             PyHighlighter.PY_PREDEFINED_DEFINITION // IDK why, but explicit creating via '.createText...' works improperly
-        val SMK_KEYWORD_ARGUMENT = TextAttributesKey.createTextAttributesKey(
-            "SMK_KEYWORD_ARGUMENT",
-            DefaultLanguageHighlighterColors.PARAMETER
-        )
+        val SMK_KEYWORD_ARGUMENT: TextAttributesKey =
+            PyHighlighter.PY_KEYWORD_ARGUMENT // The same to SMK_PREDEFINED_DEFINITION case
         val SMK_TEXT = TextAttributesKey.createTextAttributesKey("SMK_TEXT", DefaultLanguageHighlighterColors.STRING)
         val SMK_TRIPLE_QUOTED_STRING = TextAttributesKey.createTextAttributesKey(
             "SMK_TRIPLE_QUOTED_STRING",
