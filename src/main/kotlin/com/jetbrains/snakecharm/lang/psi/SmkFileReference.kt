@@ -24,8 +24,8 @@ open class SmkFileReference(
     element: SmkArgsSection,
     private val textRange: TextRange,
     private val stringLiteralExpression: PyStringLiteralExpression,
-    private val path: String,
-    private val searchRelativelyToCurrentFolder: Boolean = true,
+    val path: String,
+    val searchRelativelyToCurrentFolder: Boolean = true,
 ) : PsiReferenceBase<SmkArgsSection>(element, textRange), PsiReferenceEx {
     // Reference caching can be implemented with the 'ResolveCache' class if needed
 
@@ -158,6 +158,8 @@ open class SmkFileReference(
         }
 
     override fun getUnresolvedDescription(): String? = null
+
+    open fun hasAppropriateSuffix(): Boolean = false
 }
 
 /**
@@ -173,6 +175,9 @@ class SmkIncludeReference(
     override fun getVariants() = collectFileSystemItemLike {
         it is SmkFile && it.originalFile != element.containingFile.originalFile
     }
+
+    override fun hasAppropriateSuffix() =
+        (path.endsWith(".smk") || path == "Snakemake") && element.containingFile.virtualFile.path != path
 }
 
 /**
@@ -193,8 +198,10 @@ class SmkConfigfileReference(
     searchRelativelyToCurrentFolder = false
 ) {
     override fun getVariants() = collectFileSystemItemLike {
-        isYamlFile(it)
+        isYamlFile(it.name)
     }
+
+    override fun hasAppropriateSuffix() = isYamlFile(path)
 }
 
 /**
@@ -215,8 +222,10 @@ class SmkPepfileReference(
     searchRelativelyToCurrentFolder = false
 ) {
     override fun getVariants() = collectFileSystemItemLike {
-        isYamlFile(it)
+        isYamlFile(it.name)
     }
+
+    override fun hasAppropriateSuffix() = isYamlFile(path)
 }
 
 /**
@@ -230,8 +239,10 @@ class SmkPepschemaReference(
     path: String
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike {
-        isYamlFile(it)
+        isYamlFile(it.name)
     }
+
+    override fun hasAppropriateSuffix() = isYamlFile(path)
 }
 
 /**
@@ -245,11 +256,13 @@ class SmkCondaEnvReference(
     path: String
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike {
-        isYamlFile(it)
+        isYamlFile(it.name)
     }
+
+    override fun hasAppropriateSuffix() = isYamlFile(path.lowercase())
 }
 
-private fun isYamlFile(it: PsiFileSystemItem) = it.name.endsWith(".yaml") || it.name.endsWith(".yml")
+private fun isYamlFile(it: String) = it.endsWith(".yaml") || it.endsWith(".yml")
 
 /**
  * The path must built from directory with current snakefile
@@ -265,6 +278,8 @@ class SmkNotebookReference(
         val name = it.name.lowercase()
         name.endsWith(".ipynb")
     }
+
+    override fun hasAppropriateSuffix() = path.endsWith(".ipynb")
 }
 
 /**
@@ -279,8 +294,13 @@ class SmkScriptReference(
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike {
         val name = it.name.lowercase()
-        name.endsWith(".py") or name.endsWith(".r") or name.endsWith(".rmd") or name.endsWith(".jl") or name.endsWith(".rs")
+        hasCorrectEnding(name)
     }
+
+    override fun hasAppropriateSuffix() = hasCorrectEnding(path.lowercase())
+
+    private fun hasCorrectEnding(name: String) =
+        name.endsWith(".py") or name.endsWith(".r") or name.endsWith(".rmd") or name.endsWith(".jl") or name.endsWith(".rs")
 }
 
 /**
@@ -296,6 +316,8 @@ class SmkReportReference(
     override fun getVariants() = collectFileSystemItemLike {
         it.name.endsWith(".html")
     }
+
+    override fun hasAppropriateSuffix() = path.endsWith(".html")
 }
 
 /**

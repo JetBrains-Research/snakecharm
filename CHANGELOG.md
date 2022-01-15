@@ -16,6 +16,7 @@ Released on ...
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Added
+- Quick fix for unresolved files (conda, configfile. etc.) (see [#277](https://github.com/JetBrains-Research/snakecharm/issues/277))
 - Warning: Snakemake support is disabled (see [#109](https://github.com/JetBrains-Research/snakecharm/issues/109))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
