@@ -1,6 +1,8 @@
 package com.jetbrains.snakecharm.inspections.quickfix
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.undo.DocumentReference
 import com.intellij.openapi.command.undo.DocumentReferenceManager
 import com.intellij.openapi.command.undo.UndoableAction
@@ -9,6 +11,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiFile
 import com.jetbrains.snakecharm.SmkNotifier
@@ -24,7 +27,7 @@ import kotlin.io.path.name
 import kotlin.io.path.notExists
 
 class CreateMissedFileUndoableAction(
-    actionInvocationTarget: PsiFile,
+    private val actionInvocationTarget: PsiFile,
     private val fileToCreatePath: Path,
     private val sectionName: String,
 ) : UndoableAction {
@@ -52,6 +55,7 @@ class CreateMissedFileUndoableAction(
     private val actionInvocationTargetVFile = actionInvocationTarget.virtualFile!!
     private val project = actionInvocationTarget.project
     private val firstCreatedFileOrDir: Path
+    private val firstCreatedFileOrDirParent: VirtualFile?
 
     init {
         // Memorize first directory that will be created & delete it on "undo" step
@@ -60,12 +64,18 @@ class CreateMissedFileUndoableAction(
             fileOrDirToCreate = fileOrDirToCreate.parent ?: break
         }
         firstCreatedFileOrDir = fileOrDirToCreate
+
+        val parent = fileOrDirToCreate.parent
+        firstCreatedFileOrDirParent = when (parent) {
+            null -> null
+            else -> VirtualFileManager.getInstance().findFileByNioPath(parent)
+        }
     }
 
     override fun undo() {
         // invoke in such way because:
         // (1) changing document inside undo/redo is not allowed (see ChangeFileEncodingAction)
-        // (2) we don't want to use UI thread
+        // (2) we don't want to use UI thread, e.g. if disk IO operation will be slow due to NFS, or etc.
         ProgressManager.getInstance().run(object : Task.Backgroundable(
             project,
             SnakemakeBundle.message("notifier.msg.deleting.env.file", fileToCreatePath.name),
@@ -76,8 +86,7 @@ class CreateMissedFileUndoableAction(
             }
 
             override fun onSuccess() {
-                // TODO: wite action!!!
-                VirtualFileManager.getInstance().syncRefresh()
+                refreshFS()
             }
         })
     }
@@ -85,7 +94,7 @@ class CreateMissedFileUndoableAction(
     override fun redo() {
         // invoke in such way because:
         // (1) changing document inside undo/redo is not allowed (see ChangeFileEncodingAction)
-        // (2) we don't want to use UI thread
+        // (2) we don't want to use UI thread, e.g. if disk IO operation will be slow due to NFS, or etc.
         ProgressManager.getInstance().run(object : Task.Backgroundable(
             project,
             SnakemakeBundle.message("notifier.msg.creating.env.file", fileToCreatePath.name),
@@ -96,10 +105,20 @@ class CreateMissedFileUndoableAction(
             }
 
             override fun onSuccess() {
-                // TODO: write action is required!
-                VirtualFileManager.getInstance().syncRefresh()
+                refreshFS()
             }
         })
+    }
+
+    private fun Task.Backgroundable.refreshFS() {
+        firstCreatedFileOrDirParent?.refresh(true, true) {
+            ApplicationManager.getApplication().invokeLater(
+                {
+                    DaemonCodeAnalyzer.getInstance(project).restart(actionInvocationTarget)
+                },
+                project.disposed
+            )
+        }
     }
 
     override fun getAffectedDocuments(): Array<DocumentReference> {
@@ -119,16 +138,19 @@ class CreateMissedFileUndoableAction(
         project: Project,
     ) {
         try {
-            Files.createDirectories(fileToCreate.parent)
-            val targetFile = Files.createFile(fileToCreate)
-            val context = sectionToDefaultFileContent[sectionName]
-            if (context != null) {
-                // We don't use the result of 'createChildFile()' because it has inappropriate
-                // type (and throws UnsupportedOperationException)
-                targetFile.appendText(context)
+            // file could be created in background by someone else or if action triggred twice
+            if (fileToCreate.notExists()) {
+                Files.createDirectories(fileToCreate.parent)
+                val targetFile = Files.createFile(fileToCreate)
+
+                val context = sectionToDefaultFileContent[sectionName]
+                if (context != null) {
+                    // We don't use the result of 'createChildFile()' because it has inappropriate
+                    // type (and throws UnsupportedOperationException)
+                    targetFile.appendText(context)
+                }
             }
         } catch (e: SecurityException) {
-            LOGGER.error(e)
             val message = e.message ?: "Error: ${e.javaClass.name}"
             SmkNotifier.notify(
                 title = SnakemakeBundle.message("notifier.msg.create.env.file.title"),
@@ -137,7 +159,7 @@ class CreateMissedFileUndoableAction(
                 project = project
             )
         } catch (e: IOException) {
-            LOGGER.error(e)
+            LOGGER.warn(e)
             SmkNotifier.notify(
                 title = SnakemakeBundle.message("notifier.msg.create.env.file.title"),
                 content = SnakemakeBundle.message(
