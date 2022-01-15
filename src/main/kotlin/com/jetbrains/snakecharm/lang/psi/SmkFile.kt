@@ -119,7 +119,7 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
 
     fun collectIncludedFiles(visitedFiles: MutableSet<PsiFile> = mutableSetOf()): Set<PsiFile>{
         val includes = collectIncludes()
-        visitedFiles.add(this.containingFile.originalFile)
+        visitedFiles.add(containingFile.originalFile)
         includes.forEach { include ->
             val file = include.references.firstOrNull()?.resolve() as? PsiFile
             if (file !in visitedFiles && file is SmkFile){
