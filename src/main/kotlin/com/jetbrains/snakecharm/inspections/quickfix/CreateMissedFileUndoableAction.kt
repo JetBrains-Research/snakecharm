@@ -2,7 +2,6 @@ package com.jetbrains.snakecharm.inspections.quickfix
 
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.undo.DocumentReference
 import com.intellij.openapi.command.undo.DocumentReferenceManager
 import com.intellij.openapi.command.undo.UndoableAction
@@ -83,6 +82,7 @@ class CreateMissedFileUndoableAction(
         ) {
             override fun run(indicator: ProgressIndicator) {
                 doUndo()
+                Thread.sleep(1000)
             }
 
             override fun onSuccess() {
@@ -102,6 +102,7 @@ class CreateMissedFileUndoableAction(
         ) {
             override fun run(indicator: ProgressIndicator) {
                 doRedo(fileToCreatePath, project)
+                Thread.sleep(1000)
             }
 
             override fun onSuccess() {
@@ -110,14 +111,10 @@ class CreateMissedFileUndoableAction(
         })
     }
 
-    private fun Task.Backgroundable.refreshFS() {
+    private fun refreshFS() {
         firstCreatedFileOrDirParent?.refresh(true, true) {
-            ApplicationManager.getApplication().invokeLater(
-                {
-                    DaemonCodeAnalyzer.getInstance(project).restart(actionInvocationTarget)
-                },
-                project.disposed
-            )
+            // Post action is called in EDT:
+            DaemonCodeAnalyzer.getInstance(project).restart(actionInvocationTarget)
         }
     }
 
