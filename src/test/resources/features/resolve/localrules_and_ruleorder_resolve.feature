@@ -13,17 +13,21 @@ Feature: Resolve for rules in localrules and ruleorder
     rule cccc:
       output: touch("_output.txt")
 
+    use rule cccc as dddd with:
+      output: touch("_output_dddd.txt")
+
     localrules: <text>
     """
     When I put the caret after <ptn>
     Then reference should resolve to "<symbol_name>" in "<file>"
 
     Examples:
-      | ptn                  | text       | symbol_name | file         |
-      | localrules: aaa      | aaaa       | aaaa        | foo.smk      |
-      | localrules: bbb      | bbbb       | bbbb        | foo.smk      |
-      | localrules: ccc      | cccc       | cccc        | foo.smk      |
-      | localrules: aaaa, bb | aaaa, bbbb | bbbb        | foo.smk      |
+      | ptn                  | text       | symbol_name | file    |
+      | localrules: aaa      | aaaa       | aaaa        | foo.smk |
+      | localrules: bbb      | bbbb       | bbbb        | foo.smk |
+      | localrules: ccc      | cccc       | cccc        | foo.smk |
+      | localrules: aaaa, bb | aaaa, bbbb | bbbb        | foo.smk |
+      | localrules: ddd      | dddd       | dddd        | foo.smk |
 
   Scenario Outline: Resolve in localrules section above all rule declarations
     Given a snakemake project
@@ -39,16 +43,20 @@ Feature: Resolve for rules in localrules and ruleorder
 
     checkpoint cccc:
       output: touch("_output.txt")
+
+    use rule cccc as dddd with:
+      output: touch("_output_dddd.txt")
     """
     When I put the caret after <ptn>
     Then reference should resolve to "<symbol_name>" in "<file>"
 
     Examples:
-      | ptn                  | text       | symbol_name | file         |
-      | localrules: aaa      | aaaa       | aaaa        | foo.smk      |
-      | localrules: bbb      | bbbb       | bbbb        | foo.smk      |
-      | localrules: ccc      | cccc       | cccc        | foo.smk      |
-      | localrules: aaaa, bb | aaaa, bbbb | bbbb        | foo.smk      |
+      | ptn                  | text       | symbol_name | file    |
+      | localrules: aaa      | aaaa       | aaaa        | foo.smk |
+      | localrules: bbb      | bbbb       | bbbb        | foo.smk |
+      | localrules: ccc      | cccc       | cccc        | foo.smk |
+      | localrules: aaaa, bb | aaaa, bbbb | bbbb        | foo.smk |
+      | localrules: ddd      | dddd       | dddd        | foo.smk |
 
   Scenario Outline: Resolve in ruleorder section
     Given a snakemake project
@@ -63,15 +71,19 @@ Feature: Resolve for rules in localrules and ruleorder
     checkpoint cccc:
       output: touch("_output.txt")
 
+    use rule cccc as dddd with:
+      output: touch("_output_dddd.txt")
+
     ruleorder: aaaa > <text>
     """
     When I put the caret after <ptn>
     Then reference should resolve to "<symbol_name>" in "<file>"
 
     Examples:
-      | ptn             | text      | symbol_name | file         |
-      | > bbb           | bbbb      | bbbb        | foo.smk      |
-      | > ccc           | cccc      | cccc        | foo.smk      |
+      | ptn   | text | symbol_name | file    |
+      | > bbb | bbbb | bbbb        | foo.smk |
+      | > ccc | cccc | cccc        | foo.smk |
+      | > ddd | dddd | dddd        | foo.smk |
 
 
   Scenario Outline: Resolve in ruleorder section above all rule declarations
@@ -88,15 +100,19 @@ Feature: Resolve for rules in localrules and ruleorder
 
     checkpoint cccc:
       output: touch("_output.txt")
+
+    use rule cccc as dddd with:
+      output: touch("_output_dddd.txt")
     """
     When I put the caret after <ptn>
     Then reference should resolve to "<symbol_name>" in "<file>"
 
     Examples:
-      | ptn             | text      | symbol_name | file         |
-      | > bbb           | bbbb      | bbbb        | foo.smk      |
-      | > ccc           | cccc      | cccc        | foo.smk      |
-      | ruleorder: aa   | aaaa      | aaaa        | foo.smk      |
+      | ptn           | text | symbol_name | file    |
+      | > bbb         | bbbb | bbbb        | foo.smk |
+      | > ccc         | cccc | cccc        | foo.smk |
+      | ruleorder: aa | aaaa | aaaa        | foo.smk |
+      | > ddd         | dddd | dddd        | foo.smk |
 
   Scenario Outline: Multiresolve in ruleorder section
     Given a snakemake project
@@ -159,6 +175,9 @@ Feature: Resolve for rules in localrules and ruleorder
     """
     rule dddd:
       input: "path/to/input"
+
+    use rule dddd as eeee with:
+      output: touch("_output_dddd.txt")
     """
     Given I open a file "foo.smk" with text
     """
@@ -179,6 +198,8 @@ Feature: Resolve for rules in localrules and ruleorder
       | ptn             | text | section    | separator | symbol_name | file    |
       | <separator> ddd | dddd | localrules | ,         | dddd        | boo.smk |
       | <separator> ddd | dddd | ruleorder  | >         | dddd        | boo.smk |
+      | <separator> eee | eeee | localrules | ,         | eeee        | boo.smk |
+      | <separator> eee | eeee | ruleorder  | >         | eeee        | boo.smk |
 
   Scenario Outline: Resolve in localrules/ruleorder section for rules from included files
     Given a snakemake project
@@ -189,6 +210,9 @@ Feature: Resolve for rules in localrules and ruleorder
 
     checkpoint eeee:
         input: "path/to/input/2"
+
+    use rule eeee as ffff with:
+      output: touch("_output_dddd.txt")
     """
     Given I open a file "foo.smk" with text
     """
@@ -213,6 +237,8 @@ Feature: Resolve for rules in localrules and ruleorder
       | <separator> ddd | dddd | dddd        | boo.smk | ruleorder  | >         |
       | <separator> eee | eeee | eeee        | boo.smk | localrules | ,         |
       | <separator> eee | eeee | eeee        | boo.smk | ruleorder  | >         |
+      | <separator> fff | ffff | ffff        | boo.smk | localrules | ,         |
+      | <separator> fff | ffff | ffff        | boo.smk | ruleorder  | >         |
 
   Scenario Outline: Resolve in localrules/ruleorder section for rules from files included in other files
     Given a snakemake project
@@ -220,6 +246,9 @@ Feature: Resolve for rules in localrules and ruleorder
     """
     rule dddd:
       input: "path/to/input"
+
+    use rule dddd as ffff with:
+      output: touch("_output_dddd.txt")
     """
     Given a file "soo.smk" with text
     """
@@ -254,6 +283,8 @@ Feature: Resolve for rules in localrules and ruleorder
       | <separator> ddd | dddd | dddd        | boo.smk | ruleorder  | >         |
       | <separator> eee | eeee | eeee        | soo.smk | localrules | ,         |
       | <separator> eee | eeee | eeee        | soo.smk | ruleorder  | >         |
+      | <separator> fff | ffff | ffff        | boo.smk | localrules | ,         |
+      | <separator> fff | ffff | ffff        | boo.smk | ruleorder  | >         |
 
 
 
