@@ -8,7 +8,10 @@ import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
-import com.jetbrains.snakecharm.lang.psi.*
+import com.jetbrains.snakecharm.lang.psi.SmkFile
+import com.jetbrains.snakecharm.lang.psi.SmkModule
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.SmkUse
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex.Companion.KEY
 
 class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
@@ -31,7 +34,10 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         use: SmkUse,
         result: MutableCollection<in RelatedItemLineMarkerInfo<*>>
     ) {
-        val name = (if (use.nameIdentifierIsWildcard()) use.nameIdentifier?.firstChild else use.nameIdentifier) ?: return
+        val name = when {
+            use.nameIdentifierIsWildcard() -> use.nameIdentifier!!.firstChild
+            else -> use.nameIdentifier
+        } ?: return
 
         val results =
             use.getDefinedReferencesOfImportedRuleNames()
