@@ -82,10 +82,12 @@ class CreateMissedFileUndoableAction(
         ) {
             override fun run(indicator: ProgressIndicator) {
                 doUndo()
+                // XXX: Sometimes VFS refresh in onSuccess() called to early and doesn't see FS changes
                 Thread.sleep(1000)
             }
 
             override fun onSuccess() {
+                // Here is AWT thread!
                 refreshFS()
             }
         })
@@ -102,10 +104,12 @@ class CreateMissedFileUndoableAction(
         ) {
             override fun run(indicator: ProgressIndicator) {
                 doRedo(fileToCreatePath, project)
+                // XXX: Sometimes VFS refresh in onSuccess() called to early and doesn't see FS changes
                 Thread.sleep(1000)
             }
 
             override fun onSuccess() {
+                // Here is AWT thread!
                 refreshFS()
             }
         })
@@ -113,7 +117,7 @@ class CreateMissedFileUndoableAction(
 
     private fun refreshFS() {
         firstCreatedFileOrDirParent?.refresh(true, true) {
-            // Post action is called in EDT:
+            // Post action is called in AWT thread:
             DaemonCodeAnalyzer.getInstance(project).restart(actionInvocationTarget)
         }
     }
