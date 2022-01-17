@@ -8,10 +8,7 @@ import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
-import com.jetbrains.snakecharm.lang.psi.SmkFile
-import com.jetbrains.snakecharm.lang.psi.SmkModule
-import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
-import com.jetbrains.snakecharm.lang.psi.SmkUse
+import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex.Companion.KEY
 
 class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
@@ -20,7 +17,6 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         element: PsiElement,
         result: MutableCollection<in RelatedItemLineMarkerInfo<*>>
     ) {
-        // TODO: maybe change to visitor usage
         if (element !is SmkRuleOrCheckpoint) {
             return
         }
@@ -34,18 +30,14 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         use: SmkUse,
         result: MutableCollection<in RelatedItemLineMarkerInfo<*>>
     ) {
-        val name = when {
-            use.nameIdentifierIsWildcard() -> use.nameIdentifier!!.firstChild
-            else -> use.nameIdentifier
-        } ?: return
-
-        val results =
-            use.getDefinedReferencesOfImportedRuleNames()
-                ?.mapNotNull { it.reference.resolve() } // Inherited rules are declared in list
-                ?: ((use.getModuleName()?.reference?.resolve() as? SmkModule)?.getPsiFile() as? SmkFile)?.advancedCollectRules(
-                    mutableSetOf() // Inherited rules are declared by '*' pattern
-                )?.map { it.second } ?: return
-
+        val name = (use.nameIdentifier as? SmkUseNameIdentifier)?.getNameBeforeWildcard() ?: return
+        val inheritedRulesDeclaredExplicitly =
+            use.getDefinedReferencesOfImportedRuleNames()?.mapNotNull { it.reference.resolve() } ?: emptyList()
+        val ruleModule = use.getModuleName()?.reference?.resolve() as? SmkModule
+        val importedFile = ruleModule?.getPsiFile() as? SmkFile
+        val inheritedRulesDeclaredViaWildcard =
+            importedFile?.advancedCollectRules(mutableSetOf())?.map { it.second } ?: emptyList()
+        val results = inheritedRulesDeclaredExplicitly.ifEmpty { inheritedRulesDeclaredViaWildcard }
         if (results.isEmpty()) {
             return
         }
@@ -60,7 +52,10 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         result: MutableCollection<in RelatedItemLineMarkerInfo<*>>
     ) {
         val currentFile = element.containingFile
-        val identifier = (if (element is SmkUse && element.nameIdentifierIsWildcard()) element.nameIdentifier?.firstChild else element.nameIdentifier) ?: return
+        val identifier = when (val identifier = element.nameIdentifier) {
+            is SmkUseNameIdentifier -> identifier.getNameBeforeWildcard()
+            else -> identifier
+        } ?: return
         val modulesFromStub = StubIndex.getInstance().getAllKeys(KEY, element.project)
         val module = element.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) } ?: return
         val files = mutableSetOf<SmkFile>()
@@ -73,16 +68,14 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
                 SmkModule::class.java
             ).mapNotNull { it.containingFile as? SmkFile })
         }
-        currentFile.also {
-            if (it is SmkFile) {
-                files.add(it)
-            }
+        if (currentFile is SmkFile) {
+            files.add(currentFile)
         }
         val overrides = mutableListOf<SmkRuleOrCheckpoint>()
         files.forEach { file ->
-            file.collectUses().forEach { pair ->
-                if(pair.second.getImportedRules()?.firstOrNull{it == element} != null){
-                    overrides.add(pair.second)
+            file.collectUses().forEach { (_, psi) ->
+                if (psi.getImportedRules()?.firstOrNull { it == element } != null) {
+                    overrides.add(psi)
                 }
             }
         }

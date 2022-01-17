@@ -34,14 +34,9 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
     }
 
     override fun getNameNode(): ASTNode? {
-        val identifier = super.getNameNode()
-        if (identifier != null) { // Returns new name if we know it
+        val namePattern = getUseNameIdentifier()
+        if (namePattern != null) { // Returns name identifier if it exits
             // Example: use rule A as new_A
-            // Here we can detect name node by default
-            return identifier
-        }
-        val namePattern = getNameIdentifierPattern()
-        if (namePattern != null) { // Returns name patter if it exits
             // Example: use rule A, B from M as new_*
             // There are pattern instead of single node
             return namePattern.node
@@ -64,7 +59,7 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
         if (identifier != null) {
             return listOf(identifier.text to identifier.psi)
         }
-        val newName = getNameIdentifierPattern()
+        val newName = getUseNameIdentifier()
         val originalNames = mutableListOf<Pair<String, PsiElement>>()
         getDefinedReferencesOfImportedRuleNames()?.forEach { reference ->
             originalNames.add(reference.text to reference)
@@ -81,9 +76,9 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
     }
 
     /**
-     * Returns a [PsiElement] which sets pattern of produced rule names
+     * Returns a [SmkUseNameIdentifier] which may sets pattern of produced rule names or may be a simple name identifier
      */
-    private fun getNameIdentifierPattern() = findChildByType(SmkElementTypes.USE_NAME_IDENTIFIER) as? PsiElement
+    private fun getUseNameIdentifier() = findChildByType(SmkElementTypes.USE_NAME_IDENTIFIER) as? SmkUseNameIdentifier
 
     /**
      * Collects all imported rules and their names
@@ -111,7 +106,5 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
         getDefinedReferencesOfImportedRuleNames()?.mapNotNull { it.reference.resolve() as? SmkRuleOrCheckpoint }
             ?: getPairsOfImportedRulesAndNames(mutableSetOf())?.map { it.second }
 
-    override fun nameIdentifierIsWildcard() = nameIdentifier?.let {
-        it is SmkUseNameIdentifier && it.textContains('*')
-    } ?: false
+    override fun nameIdentifierIsWildcard() = (nameIdentifier as? SmkUseNameIdentifier)?.isWildcard() ?: false
 }
