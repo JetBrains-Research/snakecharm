@@ -117,6 +117,18 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
         return includeStatements
     }
 
+    fun collectIncludedFiles(visitedFiles: MutableSet<PsiFile> = mutableSetOf()): Set<PsiFile>{
+        val includes = collectIncludes()
+        visitedFiles.add(containingFile.originalFile)
+        includes.forEach { include ->
+            val file = include.references.firstOrNull()?.resolve() as? PsiFile
+            if (file !in visitedFiles && file is SmkFile){
+                file.collectIncludedFiles(visitedFiles)
+            }
+        }
+        return visitedFiles
+    }
+
     /**
      * Returns [PsiElement] from [SmkUse] which may produce [name] or returns null if no such element
      */

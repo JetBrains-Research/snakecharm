@@ -85,3 +85,4 @@ Feature: Inspection for multiple arguments in various sections
       | containerized |
       | singularity   |
       | container     |
+      | workdir       |
