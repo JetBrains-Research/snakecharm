@@ -634,5 +634,7 @@
     />
     <inspectionExtension
             implementation="com.jetbrains.snakecharm.inspections.SmkIgnorePyInspectionExtension"/>
+    <unresolvedReferenceQuickFixProvider
+            implementation="com.jetbrains.snakecharm.inspections.SmkUnresolvedReferenceInspectionExtension"/>
   </extensions>
 </idea-plugin>
