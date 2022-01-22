@@ -30,9 +30,7 @@ class SmkLocalrulesRuleorderConfusingReference : SnakemakeInspection() {
                     ?.filterIsInstance(SmkReferenceExpression::class.java)
 
             if (args != null) {
-                val rules = file.collectRules().map { it.first }
-                val checkPoints = file.collectCheckPoints().map { it.first }
-                val ruleLike = rules.plus(checkPoints).toSet()
+                val ruleLike = file.advancedCollectRules(mutableSetOf()).map { it.first }.toSet()
                 args.forEach { expr ->
                     val name = expr.name
                     if (name != null && name !in ruleLike) {

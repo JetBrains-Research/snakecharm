@@ -30,9 +30,12 @@ object SmkNotifier {
         }).notify(module.project)
     }
 
-    fun notify(content: String, type: NotificationType = NotificationType.INFORMATION, project: Project? = null) =
+    fun notify(
+        title: String = "",
+        content: String,
+        type: NotificationType = NotificationType.INFORMATION,
+        project: Project? = null
+    ) =
         NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID)
-            .createNotification(content, type).also {
-                it.notify(project)
-            }
+            .createNotification(title, content, type).notify(project)
 }

@@ -12,6 +12,9 @@ Feature: Completion for rule names in localrules and ruleorder sections
     rule rule3:
       output: touch("_output.txt")
 
+    use rule rule3 as rule4 with:
+      output: touch("_output_rule4.txt")
+
     localrules: rule1,
     """
     When I put the caret after rule1,
@@ -19,6 +22,7 @@ Feature: Completion for rule names in localrules and ruleorder sections
     Then completion list should only contain:
       | rule2 |
       | rule3 |
+      | rule4 |
 
   Scenario: Complete in ruleorder section
     Given a snakemake project
@@ -33,6 +37,9 @@ Feature: Completion for rule names in localrules and ruleorder sections
     rule rule3:
       output: touch("_output.txt")
 
+    use rule rule3 as rule4 with:
+      output: touch("_output_rule4.txt")
+
     ruleorder: rule3 >
     """
     When I put the caret after rule3 >
@@ -40,6 +47,7 @@ Feature: Completion for rule names in localrules and ruleorder sections
     Then completion list should only contain:
       | rule1 |
       | rule2 |
+      | rule4 |
 
   Scenario Outline: Complete in localrules/ruleorder section from included files
     Given a snakemake project
@@ -47,6 +55,9 @@ Feature: Completion for rule names in localrules and ruleorder sections
     """
     rule rule4:
         input: "path/to/input"
+
+    use rule rule4 as rule6 with:
+      output: touch("_output_rule6.txt"
     """
     Given a file "soo.smk" with text
     """
@@ -82,6 +93,7 @@ Feature: Completion for rule names in localrules and ruleorder sections
       | rule2 |
       | rule4 |
       | rule5 |
+      | rule6 |
     Examples:
       | section    | separator |
       | localrules | ,         |
@@ -94,6 +106,9 @@ Feature: Completion for rule names in localrules and ruleorder sections
     rule boo1: input: "file.txt"
 
     rule boo2: input: "file1.txt"
+
+    use rule boo2 as boo3 with:
+      input: "file2.txt"
     """
     Given a file "soo.smk" with text
     """
@@ -118,6 +133,7 @@ Feature: Completion for rule names in localrules and ruleorder sections
       | soo  |
       | boo1 |
       | boo2 |
+      | boo3 |
     Examples:
       | section    | separator |
       | localrules | ,         |
