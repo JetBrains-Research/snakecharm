@@ -11,10 +11,16 @@ Released on ...
 
 ### Fixed
 - Quick fix for unused log file inspection (see [#452](https://github.com/JetBrains-Research/snakecharm/issues/452))
+- Resolve for rule names in `use rule` section (see [#455](https://github.com/JetBrains-Research/snakecharm/issues/455))
+- Multiple args inspection in `workdir` case (see [#140](https://github.com/JetBrains-Research/snakecharm/issues/140))
+- `localrules` and `ruleorder` now take into account `use rule` (see [#448](https://github.com/JetBrains-Research/snakecharm/issues/448))
+- Keyword arguments highlighting (see [#454](https://github.com/JetBrains-Research/snakecharm/issues/454))
 - Resolve for `rules` keyword if `snakemake` version less than `6.1` (see [#359](https://github.com/JetBrains-Research/snakecharm/issues/359))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Added
+- Inspection: warns that that all docstrings except the first one will be ignored (see [#341](https://github.com/JetBrains-Research/snakecharm/issues/341))
+- Quick fix for unresolved files (conda, configfile. etc.) (see [#277](https://github.com/JetBrains-Research/snakecharm/issues/277))
 - Warning: Snakemake support is disabled (see [#109](https://github.com/JetBrains-Research/snakecharm/issues/109))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
