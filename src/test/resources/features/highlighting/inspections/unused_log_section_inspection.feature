@@ -219,7 +219,7 @@ Feature: Rule SmkUnusedLogFileInspection inspection
         output: "output.txt"
         log: "my_log.log"
         threads: 4
-        shell: "(command touch) >{log} 2>&1 "
+        shell: "(command touch) >{log} 2>&1"
     """
     Examples:
       | rule_like  |
@@ -256,17 +256,51 @@ Feature: Rule SmkUnusedLogFileInspection inspection
         log: "my_log.log"
         threads: 4
         shell:
-          \"\"\"
-          (
+          \"\"\"(
           command touch
-          )
-          >{log} 2>&1
-          \"\"\"
+          ) >{log} 2>&1\"\"\"
     """
     Examples:
       | rule_like  |
       | checkpoint |
       | rule       |
+
+  Scenario Outline: Quick fix for unused in 'shell' section 'log' reference. F-string case
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+        input: "input.txt"
+        output: "output.txt"
+        log: "my_log.log"
+        threads: 4
+        shell:
+          <first_line> foo boo"
+          <second_line> -foo -boo"
+    """
+    And SmkUnusedLogFileInspection inspection is enabled
+    And I expect inspection weak warning on <log: "my_log.log"> with message
+    """
+    Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
+    """
+    When I check highlighting weak warnings
+    And I invoke quick fix Append '>{log} 2>&1' to shell section command into 'NAME' and see text:
+    """
+    <rule_like> NAME:
+        input: "input.txt"
+        output: "output.txt"
+        log: "my_log.log"
+        threads: 4
+        shell:
+          <first_line>( foo boo"
+          <second_line> -foo -boo) ><brackets> 2>&1"
+    """
+    Examples:
+      | rule_like  | first_line | second_line | brackets |
+      | checkpoint | "          | f"          | {{log}}  |
+      | checkpoint | f"         | "           | {log}    |
+      | rule       | "          | f"          | {{log}}  |
+      | rule       | f"         | "           | {log}    |
 
   Scenario Outline: Quick fix for unused in 'run' section 'log' reference
     Given a snakemake project
@@ -409,7 +443,7 @@ Feature: Rule SmkUnusedLogFileInspection inspection
         shell: "(echo TODO) >{log} 2>&1"
 
     rule NAME2:
-        shell: "(command touch) >{log} 2>&1 "
+        shell: "(command touch) >{log} 2>&1"
 
     rule NAME3:
         run:

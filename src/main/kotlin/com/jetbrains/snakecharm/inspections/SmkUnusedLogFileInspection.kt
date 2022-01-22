@@ -10,6 +10,8 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.util.parentOfType
 import com.intellij.refactoring.suggested.endOffset
 import com.intellij.refactoring.suggested.startOffset
+import com.jetbrains.python.psi.PyBinaryExpression
+import com.jetbrains.python.psi.PyFormattedStringElement
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE
@@ -19,6 +21,7 @@ import com.jetbrains.snakecharm.lang.psi.*
 class SmkUnusedLogFileInspection : SnakemakeInspection() {
     companion object {
         private const val REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT = ">{log} 2>&1"
+        private const val F_STRING_REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT = ">{{log}} 2>&1"
     }
 
     override fun buildVisitor(
@@ -63,8 +66,11 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
             }
 
             val shellSection = rule.getSectionByName(SnakemakeNames.SECTION_SHELL)
+            var hasStringConcatenationInShellSection = false
             val name = rule.name ?: return
             val quickfix = if (shellSection != null) {
+                hasStringConcatenationInShellSection =
+                    shellSection.argumentList?.arguments?.firstOrNull { it is PyBinaryExpression } != null
                 CreateLogFileInShellSection(shellSection, name)
             } else {
                 val runSection = ruleSections.firstOrNull { it is SmkRunSection } as SmkRunSection?
@@ -84,11 +90,10 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
                 }
 
             if (!collector.hasReferenceToTarget) {
-                registerProblem(
-                    originalLogSection,
-                    message,
-                    quickfix
-                )
+                when (hasStringConcatenationInShellSection) {
+                    true -> registerProblem(originalLogSection, message)
+                    else -> registerProblem(originalLogSection, message, quickfix)
+                }
             }
         }
 
@@ -157,7 +162,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
             val stringArgument = shellSection.argumentList?.arguments?.firstOrNull {
                 it is PyStringLiteralExpression
             }
-            var indent = shellSection.getPreviousOffset()?.replace("\n", "")
+            val indent = shellSection.getPreviousOffset()?.replace("\n", "")
             if (stringArgument == null) {
                 doc.insertString(
                     shellSection.lastChild.endOffset,
@@ -166,20 +171,23 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
                 PsiDocumentManager.getInstance(project).commitDocument(doc)
                 return
             }
-            var offset = 1
-            var startIndent = ""
-            var endIndent = " "
-            if (stringArgument.text.startsWith("\"\"\"")) {
-                val newIndent = stringArgument.prevSibling.text.replace("\n", "")
-                indent = if (newIndent.length > (indent?.length ?: 0)) newIndent else indent
-                offset = 3
-                startIndent = if (stringArgument.text.startsWith("\"\"\"\n")) "\n$indent" else ""
-                endIndent = if (stringArgument.text.endsWith("\n$indent\"\"\"")) "\n$indent" else " "
+            var fixText = REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT
+            var startOffset = 1
+            if (stringArgument.text.contains(Regex("[f]?\"\"\""))) {
+                startOffset = 3
             }
-            doc.insertString(stringArgument.endOffset - offset,
-                ")$endIndent$REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT$endIndent"
+            val endOffset = startOffset
+            if (stringArgument.text.startsWith("f")) {
+                startOffset += 1
+            }
+            if ((stringArgument as? PyStringLiteralExpression)?.stringElements?.lastOrNull() is PyFormattedStringElement) {
+                fixText = F_STRING_REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT
+            }
+            doc.insertString(
+                stringArgument.endOffset - endOffset,
+                ") $fixText"
             )
-            doc.insertString(stringArgument.startOffset + offset, "$startIndent(")
+            doc.insertString(stringArgument.startOffset + startOffset, "(")
             PsiDocumentManager.getInstance(project).commitDocument(doc)
         }
     }
@@ -198,7 +206,10 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
             val runSection = (startElement as SmkRunSection)
             val lastArg = runSection.lastChild
             val indent = lastArg.prevSibling.text
-            doc.insertString(lastArg.endOffset, "${indent}shell(\"(echo TODO) $REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\")")
+            doc.insertString(
+                lastArg.endOffset,
+                "${indent}shell(\"(echo TODO) $REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT\")"
+            )
             PsiDocumentManager.getInstance(project).commitDocument(doc)
         }
     }
