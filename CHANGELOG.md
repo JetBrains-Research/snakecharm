@@ -10,6 +10,7 @@ Released on ...
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Fixed
+- Resolve for `module` name when there are few modules with the same names (see [#464](https://github.com/JetBrains-Research/snakecharm/issues/464))
 - Complex cases in creation of gutter icons for rule inheritance (see [#462](https://github.com/JetBrains-Research/snakecharm/issues/462), [#463](https://github.com/JetBrains-Research/snakecharm/issues/463))
 - Resolve for rule names in `use rule` section (see [#455](https://github.com/JetBrains-Research/snakecharm/issues/455))
 - Multiple args inspection in `workdir` case (see [#140](https://github.com/JetBrains-Research/snakecharm/issues/140))

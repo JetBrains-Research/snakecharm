@@ -64,7 +64,7 @@ class SmkRuleOrCheckpointNameReference(
         val potentialModule = moduleRef?.reference?.resolve() as? SmkModule
         return results.filter { resolveResult ->
             // If we resolve module references, there must be only SmkModules
-            (resolveResult.element is SmkModule && itIsModuleMameReference) ||
+            (resolveResult.element is SmkModule && itIsModuleMameReference && resolveResult.element?.containingFile?.originalFile in allImportedFiles) ||
                     // We don't want to suggest local resolve result for the reference of rule, which was imported
                     (moduleRef != null // Module name reference is defined and resolve result is from another file
                             && element.containingFile.originalFile != resolveResult.element?.containingFile?.originalFile

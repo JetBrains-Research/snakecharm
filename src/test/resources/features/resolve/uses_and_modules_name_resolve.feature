@@ -1,4 +1,5 @@
 Feature: Resolve use and module name to its declaration
+
   Scenario Outline: Refer to rule section
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -199,3 +200,25 @@ Feature: Resolve use and module name to its declaration
     """
     When I put the caret at A
     Then reference should resolve to "A" in "boo.smk"
+
+  Scenario: Correct resolve for modules with the same names
+    Given a snakemake project
+    Given I open a file "boo.smk" with text
+    """
+    module A:
+      snakefile: "a.smk"
+
+    use rule * from A as boo_*
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module A:
+      snakefile: "b.smk"
+
+    use rule * from A as foo_*
+    """
+    When I put the caret at A as
+    Then reference should resolve to "A:" in "foo.smk"
+    When I change current file to <boo.smk>
+    When I put the caret at A as
+    Then reference should resolve to "A:" in "boo.smk"
