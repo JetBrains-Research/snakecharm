@@ -11,7 +11,7 @@ import com.intellij.psi.util.parentOfType
 import com.intellij.refactoring.suggested.endOffset
 import com.intellij.refactoring.suggested.startOffset
 import com.jetbrains.python.psi.PyBinaryExpression
-import com.jetbrains.python.psi.PyFormattedStringElement
+import com.jetbrains.python.psi.PyStringElement
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE
@@ -161,7 +161,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
             val shellSection = (startElement as SmkArgsSection)
             val stringArgument = shellSection.argumentList?.arguments?.firstOrNull {
                 it is PyStringLiteralExpression
-            }
+            } as? PyStringLiteralExpression
             val indent = shellSection.getPreviousOffset()?.replace("\n", "")
             if (stringArgument == null) {
                 doc.insertString(
@@ -173,14 +173,15 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
             }
             var fixText = REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT
             var startOffset = 1
-            if (stringArgument.text.contains(Regex("[f]?\"\"\""))) {
+            val stringElements = stringArgument.stringElements as List<PyStringElement>
+            if (stringElements.firstOrNull()?.isTripleQuoted == true) {
                 startOffset = 3
             }
             val endOffset = startOffset
-            if (stringArgument.text.startsWith("f")) {
+            if (stringElements.firstOrNull()?.isFormatted == true) {
                 startOffset += 1
             }
-            if ((stringArgument as? PyStringLiteralExpression)?.stringElements?.lastOrNull() is PyFormattedStringElement) {
+            if (stringElements.lastOrNull()?.isFormatted == true) {
                 fixText = F_STRING_REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT
             }
             doc.insertString(
