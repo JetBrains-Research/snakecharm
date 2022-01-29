@@ -9,7 +9,8 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex.Companion.KEY
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseInheritedRulesIndex
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseInheritedRulesIndex.Companion.INHERITED_RULES_DECLARATION_VIA_WILDCARD
 
 class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
 
@@ -51,32 +52,32 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         element: SmkRuleOrCheckpoint,
         result: MutableCollection<in RelatedItemLineMarkerInfo<*>>
     ) {
-        val currentFile = element.containingFile
         val identifier = when (val identifier = element.nameIdentifier) {
             is SmkUseNameIdentifier -> identifier.getNameBeforeWildcard()
             else -> identifier
         } ?: return
-        val modulesFromStub = StubIndex.getInstance().getAllKeys(KEY, element.project)
         val module = element.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) } ?: return
-        val files = mutableSetOf<SmkFile>()
-        for (smkModule in modulesFromStub) {
-            files.addAll(StubIndex.getElements(
-                KEY,
-                smkModule,
-                module.project,
-                GlobalSearchScope.moduleWithDependentsScope(module),
-                SmkModule::class.java
-            ).mapNotNull { it.containingFile as? SmkFile })
-        }
-        if (currentFile is SmkFile) {
-            files.add(currentFile)
-        }
+        val descendantsDefinedExplicitly = StubIndex.getElements(
+            SmkUseInheritedRulesIndex.KEY,
+            identifier.text,
+            module.project,
+            GlobalSearchScope.moduleWithDependentsScope(module),
+            SmkUse::class.java
+        )
+        val potentialDescendants = StubIndex.getElements(
+            SmkUseInheritedRulesIndex.KEY,
+            INHERITED_RULES_DECLARATION_VIA_WILDCARD,
+            module.project,
+            GlobalSearchScope.moduleWithDependentsScope(module),
+            SmkUse::class.java
+        )
         val overrides = mutableListOf<SmkRuleOrCheckpoint>()
-        files.forEach { file ->
-            file.collectUses().forEach { (_, psi) ->
-                if (psi.getImportedRules()?.firstOrNull { it == element } != null) {
-                    overrides.add(psi)
-                }
+        (descendantsDefinedExplicitly + potentialDescendants).forEach { descendant ->
+            // We don't save it in stub because it requires 'resolve'
+            // We compare resolve results even for descendantsDefinedExplicitly
+            // Because there may be rules with the same names
+            if (descendant.getImportedRules()?.contains(element) == true) {
+                overrides.add(descendant)
             }
         }
         if (overrides.isEmpty()) {

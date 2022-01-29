@@ -18,6 +18,16 @@ abstract class SmkRuleLikeStubImpl<StubT : NamedStub<PsiT>, PsiT>(
     override fun getName() = myName
 }
 
+abstract class SmkRuleDescendantStubImpl<StubT : RuleDescendantStub<PsiT>, PsiT>(
+    private val myName: String?,
+    private val inheritedRulesNames: List<String?>,
+    parent: StubElement<*>?,
+    type: IStubElementType<StubT, PsiT>
+) : StubBase<PsiT>(parent, type), RuleDescendantStub<PsiT> where PsiT : PsiNamedElement, PsiT : PyElement {
+    override fun getName() = myName
+    override fun getInheritedRulesNames() = inheritedRulesNames
+}
+
 class SmkCheckpointStubImpl(
     name: String?,
     parent: StubElement<*>?
@@ -42,5 +52,7 @@ class SmkModuleStubImpl(
 
 class SmkUseStubImpl(
     name: String?,
+    inheritedRulesNames: List<String?>,
     parent: StubElement<*>?
-) : SmkRuleLikeStubImpl<SmkUseStub, SmkUse>(name, parent, USE_DECLARATION_STATEMENT), SmkUseStub
+) : SmkRuleDescendantStubImpl<SmkUseStub, SmkUse>(name, inheritedRulesNames, parent, USE_DECLARATION_STATEMENT),
+    SmkUseStub

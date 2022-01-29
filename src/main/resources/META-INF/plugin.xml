@@ -94,6 +94,7 @@
     <lang.documentationProvider language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.documentation.SmkWrapperDocumentation"/>
     <lang.psiStructureViewFactory language="Snakemake" implementationClass="com.jetbrains.snakecharm.lang.structureView.SmkStructureViewFactory"/>
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex"/>
+    <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkUseInheritedRulesIndex"/>
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex"/>
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex"/>
     <stubIndex implementation="com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex"/>
