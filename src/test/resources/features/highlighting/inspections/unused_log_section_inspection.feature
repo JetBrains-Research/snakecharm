@@ -85,7 +85,7 @@ Feature: Rule SmkUnusedLogFileInspection inspection
 
   Scenario Outline: Warnings in 'log' section, if it is not used in rule which was overridden more than one time
     Given a snakemake project
-    And a file "boo1.smk" with text
+    And a file "boo.smk" with text
     """
     <rule_like> NAME:
         shell: "command here"

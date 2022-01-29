@@ -61,12 +61,18 @@ class SmkRuleOrCheckpointNameReference(
             return results
         }
         val allImportedFiles = smkFile.collectIncludedFiles()
+        val potentialModule = moduleRef?.reference?.resolve() as? SmkModule
         return results.filter { resolveResult ->
             // If we resolve module references, there must be only SmkModules
-            (resolveResult.element is SmkModule && itIsModuleMameReference) ||
+            (resolveResult.element is SmkModule && itIsModuleMameReference && resolveResult.element?.containingFile?.originalFile in allImportedFiles) ||
                     // We don't want to suggest local resolve result for the reference of rule, which was imported
                     (moduleRef != null // Module name reference is defined and resolve result is from another file
-                            && element.containingFile.originalFile != resolveResult.element?.containingFile?.originalFile)
+                            && element.containingFile.originalFile != resolveResult.element?.containingFile?.originalFile
+                            // Also, because of using indexes, we need to check if the resolve result file
+                            // Connected to the file, which was declared in moduleRef, via 'include' or 'module'
+                            // Later, allImportedFiles will be stored in cache
+                            && resolveResult.element?.containingFile?.originalFile in ((potentialModule?.getPsiFile() as? SmkFile)?.collectIncludedFiles()
+                        ?: listOf()))
                     // OR There are no 'from *name*' combination, so it hasn't been imported
                     || (moduleRef == null && resolveResult.element?.containingFile?.originalFile in allImportedFiles)
         }.toMutableList()

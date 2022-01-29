@@ -58,7 +58,10 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
     fun nameIdentifierIsWildcard(): Boolean
 }
 
-class SmkUseNameIdentifier(node: ASTNode) : PyElementImpl(node)
+interface SmkUseNameIdentifier : PyElement {
+    fun isWildcard() : Boolean
+    fun getNameBeforeWildcard() : PsiElement
+}
 class SmkImportedRulesNames(node: ASTNode) : PyElementImpl(node)
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer

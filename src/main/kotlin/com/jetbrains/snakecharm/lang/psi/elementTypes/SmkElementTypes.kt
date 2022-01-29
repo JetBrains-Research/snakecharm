@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.lang.psi.elementTypes
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.lang.psi.SmkImportedRulesNames
-import com.jetbrains.snakecharm.lang.psi.SmkUseNameIdentifier
 import com.jetbrains.snakecharm.lang.psi.impl.*
 
 /**
@@ -38,7 +37,7 @@ object SmkElementTypes {
     val USE_NAME_IDENTIFIER = PyElementType(
         "SMK_USE_NAME_IDENTIFIER"
     ) {
-        SmkUseNameIdentifier(it)
+        SmkUseNameIdentifierImpl(it)
     }
 
     val USE_IMPORTED_RULES_NAMES = PyElementType(
