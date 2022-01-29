@@ -13,7 +13,8 @@ SnakemakeFile: UseInvalid.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('f')
+    SmkUseNameIdentifier
+        PsiElement(Py:IDENTIFIER)('f')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_WITH_KEYWORD)('with')
     PsiElement(Py:COLON)(':')
@@ -42,7 +43,8 @@ SnakemakeFile: UseInvalid.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('f')
+    SmkUseNameIdentifier
+        PsiElement(Py:IDENTIFIER)('f')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_WITH_KEYWORD)('with')
     PsiElement(Py:COLON)(':')
@@ -67,7 +69,8 @@ SnakemakeFile: UseInvalid.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('NAME')
+    SmkUseNameIdentifier
+        PsiElement(Py:IDENTIFIER)('NAME')
     PyStatementList
       <empty list>
   PsiWhiteSpace('\n\n')
@@ -80,7 +83,8 @@ SnakemakeFile: UseInvalid.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('NAME2')
+    SmkUseNameIdentifier
+        PsiElement(Py:IDENTIFIER)('NAME2')
     PyStatementList
       <empty list>
   PsiWhiteSpace('\n\n')
@@ -255,7 +259,8 @@ SnakemakeFile: UseInvalid.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('N1')
+    SmkUseNameIdentifier
+        PsiElement(Py:IDENTIFIER)('N1')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_WITH_KEYWORD)('with')
     PsiElement(Py:COLON)(':')

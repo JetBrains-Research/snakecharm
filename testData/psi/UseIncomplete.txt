@@ -59,7 +59,8 @@ SnakemakeFile: UseIncomplete.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('module_name2')
+    SmkUseNameIdentifier
+        PsiElement(Py:IDENTIFIER)('module_name2')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_WITH_KEYWORD)('with')
     PsiErrorElement:Expecting colon after 'with' keyword in 'use rule' statement
@@ -78,7 +79,8 @@ SnakemakeFile: UseIncomplete.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('name_2')
+    SmkUseNameIdentifier
+        PsiElement(Py:IDENTIFIER)('name_2')
     PyStatementList
       PsiErrorElement:Expecting 'with:' at the end of 'use rule' declaration but before arguments sections
         <empty list>
