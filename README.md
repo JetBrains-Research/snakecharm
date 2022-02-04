@@ -3,6 +3,10 @@ License [![license](https://img.shields.io/github/license/mashape/apistatus.svg)
 Tests Linux [![tests](http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:SnakeCharmPlugin_TestsLinux)/statusIcon.svg)](http://teamcity.jetbrains.com/viewType.html?buildTypeId=SnakeCharmPlugin_TestsLinux&guest=1)
 Tests Windows [![tests](http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:SnakeCharmPlugin_TestsWindows)/statusIcon.svg)](http://teamcity.jetbrains.com/viewType.html?buildTypeId=SnakeCharmPlugin_TestsWindows&guest=1)
 
+[//]: # ([![Twitter Follow]&#40;https://img.shields.io/twitter/follow/JBPlatform?style=flat-square&logo=twitter&#41;]&#40;https://twitter.com/JBPlatform&#41;)
+![IntelliJ Platform Plugin Template][file:JBResearch_SnakeCharm_Plugin_logo.png#gh-light-mode-only]
+![IntelliJ Platform Plugin Template][file:JBResearch_SnakeCharm_Plugin_white_logo.svg#gh-dark-mode-only]
+
 # About
 <!-- Plugin description -->
 **SnakeCharm** plugin for [PyCharm](https://www.jetbrains.com/pycharm/) / [IntelliJ Platform IDEs](https://www.jetbrains.com/products.html?fromMenu#type=ide) adds IDE support for [Snakemake](https://snakemake.readthedocs.io/en/stable/) workflows language, that is widely used in Bioinformatics. The plugin is developed by JetBrains Research Team, for more details see [project home page](https://research.jetbrains.org/groups/biolabs/projects?project_id=57).
