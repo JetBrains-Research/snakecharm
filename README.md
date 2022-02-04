@@ -4,8 +4,9 @@ Tests Linux [![tests](http://teamcity.jetbrains.com/app/rest/builds/buildType:(i
 Tests Windows [![tests](http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:SnakeCharmPlugin_TestsWindows)/statusIcon.svg)](http://teamcity.jetbrains.com/viewType.html?buildTypeId=SnakeCharmPlugin_TestsWindows&guest=1)
 
 [//]: # ([![Twitter Follow]&#40;https://img.shields.io/twitter/follow/JBPlatform?style=flat-square&logo=twitter&#41;]&#40;https://twitter.com/JBPlatform&#41;)
-![IntelliJ Platform Plugin Template][file:JBResearch_SnakeCharm_Plugin_logo.png#gh-light-mode-only]
-![IntelliJ Platform Plugin Template][file:JBResearch_SnakeCharm_Plugin_white_logo.svg#gh-dark-mode-only]
+
+![SnakeCharm](/.github/readme/JBResearch_SnakeCharm_Plugin_logo.svg#gh-light-mode-only)
+![SnakeCharm](/.github/readme/JBResearch_SnakeCharm_Plugin_white_logo.svg#gh-dark-mode-only)
 
 # About
 <!-- Plugin description -->
