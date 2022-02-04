@@ -519,7 +519,6 @@ class SmkStatementParsing(
 
         var lasTokenIsIdentifier =
             !atToken(PyTokenTypes.IDENTIFIER) // Default value need to ve reversed
-        var simpleName = true // Does new rule name consist of one identifier
         var hasIdentifier = false // Do we have new rule name
         val name = myBuilder.mark()
         while (true) {
@@ -538,13 +537,11 @@ class SmkStatementParsing(
                     }
                     lasTokenIsIdentifier = false
                     hasIdentifier = true
-                    simpleName = false
                     nextToken()
                 }
                 PyTokenTypes.EXP, PyTokenTypes.COMMA -> {
                     myBuilder.error(SnakemakeBundle.message("PARSE.use.double.mult.sign"))
                     lasTokenIsIdentifier = false
-                    simpleName = false
                     nextToken()
                 }
                 else -> break
@@ -556,11 +553,8 @@ class SmkStatementParsing(
             // We can write 'as with:' or just 'as' and end line
             // Both variants are allowed and original rule names will be taken
         } else {
-            if (!simpleName) { // New rule name contains at least one '*' symbol
-                name.done(SmkElementTypes.USE_NAME_IDENTIFIER)
-            } else { // New rule name consists of one identifier
-                name.drop()
-            }
+            // Any SmkUse identifier is marked as USE_NEW_NAME_PATTERN
+            name.done(SmkElementTypes.USE_NEW_NAME_PATTERN)
         }
     }
 

@@ -11,7 +11,6 @@ import com.intellij.psi.PsiFile
 import com.intellij.refactoring.suggested.endOffset
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkUse
-import com.jetbrains.snakecharm.lang.psi.SmkImportedRulesNames
 
 class SmkSeveralRulesAreOverriddenAsOneInspection : SnakemakeInspection() {
     companion object {
@@ -25,12 +24,17 @@ class SmkSeveralRulesAreOverriddenAsOneInspection : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkUse(use: SmkUse) {
-            val name = use.nameIdentifier
-
-            if (name == null || use.nameIdentifierIsWildcard() || use.nameIdentifier is SmkImportedRulesNames?) {
-                // There are pattern in name, or 'use' section doesn't change names
+            if (use.getNewNamePattern()?.isWildcard() ?: true) {
+                // There are pattern in name
                 return
             }
+
+            if (use.getImportedNamesList() == null) {
+                //  'use' section doesn't change names
+                return
+            }
+            val namePsi = use.nameIdentifier ?: return
+
             val overridden = use.getDefinedReferencesOfImportedRuleNames()
 
             if (overridden != null && overridden.size == 1) {
@@ -42,18 +46,18 @@ class SmkSeveralRulesAreOverriddenAsOneInspection : SnakemakeInspection() {
             if (overridden != null && overridden.size > 1) {
                 // Leads to runtime exception
                 registerProblem(
-                    name,
+                    namePsi,
                     SnakemakeBundle.message("INSP.NAME.only.last.rule.will.be.overridden.list.case"),
-                    AppendPatternQuickFix(name)
+                    AppendPatternQuickFix(namePsi)
                 )
             } else {
                 // Just unexpected behaviour
                 registerProblem(
-                    name,
+                    namePsi,
                     SnakemakeBundle.message("INSP.NAME.only.last.rule.will.be.overridden.pattern.case"),
                     ProblemHighlightType.WEAK_WARNING,
                     null,
-                    AppendPatternQuickFix(name)
+                    AppendPatternQuickFix(namePsi)
                 )
             }
         }

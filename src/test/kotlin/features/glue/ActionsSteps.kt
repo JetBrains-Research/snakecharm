@@ -1,10 +1,13 @@
 package features.glue
 
 import com.google.common.collect.ImmutableMap
+import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.documentation.DocumentationManager
 import com.intellij.codeInsight.highlighting.BraceMatchingUtil
 import com.intellij.codeInsight.intention.IntentionAction
+import com.intellij.codeInsight.navigation.NavigationGutterIconRenderer
 import com.intellij.codeInspection.LocalInspectionEP
+import com.intellij.icons.AllIcons
 import com.intellij.ide.util.gotoByName.GotoSymbolModel2
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.application.ApplicationManager
@@ -27,9 +30,11 @@ import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler
 import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
 import com.jetbrains.snakecharm.lang.highlighter.SmkColorSettingsPage
 import com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterFactory
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLSyntaxHighlighter
 import features.glue.SnakemakeWorld.findPsiElementUnderCaret
 import features.glue.SnakemakeWorld.fixture
+import features.glue.SnakemakeWorld.getOffsetUnderCaret
 import features.glue.SnakemakeWorld.myFixture
 import features.glue.SnakemakeWorld.myGeneratedDocPopupText
 import io.cucumber.datatable.DataTable
@@ -39,6 +44,7 @@ import io.cucumber.java.en.When
 import org.junit.Assert
 import java.io.File.separator
 import java.util.regex.Pattern
+import javax.swing.Icon
 import kotlin.test.*
 
 
@@ -115,6 +121,69 @@ class ActionsSteps {
         messages.forEach { message ->
             wrapTextInHighlightingTags(level, text, signature, message, true)
         }
+    }
+
+    @Then("^I expect marker of overriding section with references:\$")
+    fun iExpectMarkerOfOverridingSectionWithReferences(table: DataTable) {
+//        val gutters = fixture().findAllGutters()
+//        for(gutter in gutters){
+//            println(gutter.tooltipText)
+//        }
+        checkLineMarkersWithIconOnTheElement(AllIcons.Gutter.OverridingMethod, table)
+    }
+
+    @Then("^I expect marker of overridden section with references:\$")
+    fun iExpectMarkerOfOverriddenSectionWithReferences(table: DataTable) {
+        checkLineMarkersWithIconOnTheElement(AllIcons.Gutter.OverridenMethod, table)
+    }
+
+    @Then("^I expect no markers")
+    fun iExpectNoMarkers() {
+        checkLineMarkersWithIconOnTheElement(null, DataTable.emptyDataTable(), true)
+    }
+
+    private fun checkLineMarkersWithIconOnTheElement(icon: Icon?, table: DataTable, expectNoGutters: Boolean = false) {
+        fixture().doHighlighting()
+        var currentElement: PsiElement? = null
+        val application = ApplicationManager.getApplication()
+        val targetRulesOrCheckpoints = mutableListOf<SmkRuleOrCheckpoint>()
+        application.invokeAndWait({
+            application.runReadAction {
+                // Firstly, we're reading current rule or checkpoint name
+                // And all its gutter icons
+                currentElement = fixture().file.findElementAt(getOffsetUnderCaret())
+                targetRulesOrCheckpoints.addAll(
+                    ((fixture().findGuttersAtCaret()
+                        .firstOrNull { it.icon == icon } as? LineMarkerInfo.LineMarkerGutterIconRenderer<*>)?.lineMarkerInfo?.navigationHandler as? NavigationGutterIconRenderer)?.targetElements?.map { it as SmkRuleOrCheckpoint }
+                        ?: emptyList())
+            }
+        }, ModalityState.NON_MODAL)
+        // Checks, that there are an appropriate number of markers
+        if (expectNoGutters) {
+            assertTrue(targetRulesOrCheckpoints.isEmpty(), "${currentElement?.text} should not have markers.")
+            return
+        } else {
+            assertTrue(targetRulesOrCheckpoints.isNotEmpty(), "${currentElement?.text} has no appropriate markers.")
+        }
+        // Finally, we check if all defined targets are in the marker list
+        // And if there are no targets missed in the test
+        application.invokeAndWait({
+            application.runWriteAction {
+                for (marker in table.asLists()) {
+                    val appropriateTargetRule =
+                        targetRulesOrCheckpoints.find { rule -> rule.name == marker.first() && rule.containingFile.name == marker.last() }
+                    assertNotNull(
+                        appropriateTargetRule,
+                        "Missed target in ${currentElement?.text}: ${marker.first()} in the file ${marker.last()}}"
+                    )
+                    targetRulesOrCheckpoints.remove(appropriateTargetRule)
+                }
+                assertTrue(
+                    targetRulesOrCheckpoints.isEmpty(),
+                    "Extras: ${targetRulesOrCheckpoints.joinToString { "${it.name} in file ${it.containingFile.name}" }}"
+                )
+            }
+        }, ModalityState.NON_MODAL)
     }
 
     @Then("^I expect the tag highlighting to be the same as the annotator highlighting$")

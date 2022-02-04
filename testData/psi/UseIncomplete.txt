@@ -20,7 +20,7 @@ SnakemakeFile: UseIncomplete.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       SmkReferenceExpression: a
         PsiElement(Py:IDENTIFIER)('a')
       PsiErrorElement:Unexpected token in comma separated list of rules within 'use rule' statement
@@ -33,7 +33,7 @@ SnakemakeFile: UseIncomplete.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       SmkReferenceExpression: b
         PsiElement(Py:IDENTIFIER)('b')
     PsiWhiteSpace(' ')
@@ -48,7 +48,7 @@ SnakemakeFile: UseIncomplete.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       SmkReferenceExpression: f
         PsiElement(Py:IDENTIFIER)('f')
     PsiWhiteSpace(' ')
@@ -59,7 +59,8 @@ SnakemakeFile: UseIncomplete.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('module_name2')
+    SmkUseNewNamePattern
+      PsiElement(Py:IDENTIFIER)('module_name2')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_WITH_KEYWORD)('with')
     PsiErrorElement:Expecting colon after 'with' keyword in 'use rule' statement
@@ -72,13 +73,14 @@ SnakemakeFile: UseIncomplete.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       SmkReferenceExpression: NAME
         PsiElement(Py:IDENTIFIER)('NAME')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('name_2')
+    SmkUseNewNamePattern
+      PsiElement(Py:IDENTIFIER)('name_2')
     PyStatementList
       PsiErrorElement:Expecting 'with:' at the end of 'use rule' declaration but before arguments sections
         <empty list>
@@ -96,7 +98,7 @@ SnakemakeFile: UseIncomplete.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       SmkReferenceExpression: NAME
         PsiElement(Py:IDENTIFIER)('NAME')
     PsiWhiteSpace(' ')

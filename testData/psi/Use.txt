@@ -4,7 +4,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       SmkReferenceExpression: a
         PsiElement(Py:IDENTIFIER)('a')
     PsiWhiteSpace(' ')
@@ -15,7 +15,8 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('b')
+    SmkUseNewNamePattern
+      PsiElement(Py:IDENTIFIER)('b')
     PyStatementList
       <empty list>
   PsiWhiteSpace('\n\n')
@@ -24,7 +25,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       SmkReferenceExpression: f
         PsiElement(Py:IDENTIFIER)('f')
     PsiWhiteSpace(' ')
@@ -35,7 +36,8 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('f_z')
+    SmkUseNewNamePattern
+      PsiElement(Py:IDENTIFIER)('f_z')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_WITH_KEYWORD)('with')
     PsiElement(Py:COLON)(':')
@@ -54,13 +56,14 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       SmkReferenceExpression: f_z
         PsiElement(Py:IDENTIFIER)('f_z')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('x_z')
+    SmkUseNewNamePattern
+      PsiElement(Py:IDENTIFIER)('x_z')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_WITH_KEYWORD)('with')
     PsiElement(Py:COLON)(':')
@@ -79,7 +82,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       PsiElement(Py:MULT)('*')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_FROM_KEYWORD)('from')
@@ -89,7 +92,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    SmkUseNameIdentifier
+    SmkUseNewNamePattern
       PsiElement(Py:MULT)('*')
       PsiElement(Py:IDENTIFIER)('_other')
     PyStatementList
@@ -100,7 +103,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       PsiElement(Py:MULT)('*')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_FROM_KEYWORD)('from')
@@ -110,7 +113,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    SmkUseNameIdentifier
+    SmkUseNewNamePattern
       PsiElement(Py:IDENTIFIER)('other_')
       PsiElement(Py:MULT)('*')
     PyStatementList
@@ -121,7 +124,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       PsiElement(Py:MULT)('*')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_FROM_KEYWORD)('from')
@@ -131,7 +134,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    SmkUseNameIdentifier
+    SmkUseNewNamePattern
       PsiElement(Py:IDENTIFIER)('other_')
       PsiElement(Py:MULT)('*')
       PsiElement(Py:IDENTIFIER)('_other')
@@ -143,7 +146,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       PsiElement(Py:MULT)('*')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_FROM_KEYWORD)('from')
@@ -158,7 +161,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       SmkReferenceExpression: a
         PsiElement(Py:IDENTIFIER)('a')
       PsiElement(Py:COMMA)(',')
@@ -178,7 +181,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       SmkReferenceExpression: a
         PsiElement(Py:IDENTIFIER)('a')
       PsiElement(Py:COMMA)(',')
@@ -195,7 +198,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    SmkUseNameIdentifier
+    SmkUseNewNamePattern
       PsiElement(Py:MULT)('*')
       PsiElement(Py:IDENTIFIER)('_other')
     PsiWhiteSpace(' ')
@@ -209,7 +212,7 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       SmkReferenceExpression: rule
         PsiElement(Py:IDENTIFIER)('rule')
     PsiWhiteSpace(' ')
@@ -237,13 +240,14 @@ SnakemakeFile: Use.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       SmkReferenceExpression: a
         PsiElement(Py:IDENTIFIER)('a')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('b')
+    SmkUseNewNamePattern
+      PsiElement(Py:IDENTIFIER)('b')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_WITH_KEYWORD)('with')
     PsiElement(Py:COLON)(':')

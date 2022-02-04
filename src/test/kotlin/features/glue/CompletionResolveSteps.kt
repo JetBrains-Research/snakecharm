@@ -88,6 +88,16 @@ class CompletionResolveSteps {
         }, ModalityState.NON_MODAL)
     }
 
+    @When("^I change current file to <([^>]+)>\$")
+    fun iChangeCurrentFileTo(file: String){
+        val application = ApplicationManager.getApplication()
+        application.invokeAndWait({
+            application.runWriteAction {
+                SnakemakeWorld.fixture().openFileInEditor(SnakemakeWorld.fixture().findFileInTempDir(file))
+            }
+        }, ModalityState.NON_MODAL)
+    }
+
 
     @Then("^reference should resolve to \"(.+)\" directory")
     fun referenceShouldResolveToDirectory(name: String) {

@@ -52,14 +52,27 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
     fun getImportedRules(): List<SmkRuleOrCheckpoint>?
 
     /**
+     * Returns a [SmkUseNewNamePattern] which may sets pattern of produced rule names or may be a simple name identifier
+     *
+     * Examples:
+     *   `use rule N form M as A with ..` Here 'A' is use name identifier
+     *   `use rule N form M as with ..` no use name identifier
+     *   `use rule N form M with ..` no use name identifier
+     */
+    fun getNewNamePattern(): SmkUseNewNamePattern?
+    fun getImportedNamesList(): SmkImportedRulesNamesList?
+}
+
+interface SmkUseNewNamePattern : PyElement {
+    /**
      * Returns True if  "as" name is wildcard with '*', e.g:
      * use rule A,B from M as new_*
      */
-    fun nameIdentifierIsWildcard(): Boolean
+    fun isWildcard(): Boolean
+    fun getNameBeforeWildcard(): PsiElement
 }
 
-class SmkUseNameIdentifier(node: ASTNode) : PyElementImpl(node)
-class SmkImportedRulesNames(node: ASTNode) : PyElementImpl(node)
+class SmkImportedRulesNamesList(node: ASTNode) : PyElementImpl(node)
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer
     /**

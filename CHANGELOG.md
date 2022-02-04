@@ -22,6 +22,7 @@ Released on ...
 ### Added
 - Inspection: warns that that all docstrings except the first one will be ignored (see [#341](https://github.com/JetBrains-Research/snakecharm/issues/341))
 - Quick fix for unresolved files (conda, configfile. etc.) (see [#277](https://github.com/JetBrains-Research/snakecharm/issues/277))
+- Gutter icons for rule inheritance (see [#429](https://github.com/JetBrains-Research/snakecharm/issues/429))
 - Warning: Snakemake support is disabled (see [#109](https://github.com/JetBrains-Research/snakecharm/issues/109))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 

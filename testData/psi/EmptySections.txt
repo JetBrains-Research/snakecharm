@@ -24,13 +24,14 @@ SnakemakeFile: EmptySections.smk
     PsiWhiteSpace(' ')
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
-    SmkImportedRulesNames
+    SmkImportedRulesNamesList
       SmkReferenceExpression: RULE_NAME
         PsiElement(Py:IDENTIFIER)('RULE_NAME')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_AS_KEYWORD)('as')
     PsiWhiteSpace(' ')
-    PsiElement(Py:IDENTIFIER)('USE_RULE_NAME')
+    SmkUseNewNamePattern
+      PsiElement(Py:IDENTIFIER)('USE_RULE_NAME')
     PsiWhiteSpace(' ')
     PsiElement(Py:SMK_WITH_KEYWORD)('with')
     PsiElement(Py:COLON)(':')

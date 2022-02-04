@@ -3,13 +3,12 @@ package com.jetbrains.snakecharm.inspections
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.vfs.impl.http.HttpVirtualFile
-import com.intellij.psi.util.elementType
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkModule
 import com.jetbrains.snakecharm.lang.psi.SmkUse
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
+import com.jetbrains.snakecharm.lang.psi.SmkUseNewNamePattern
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 
 class SmkUnresolvedImportedRuleNameInspection : SnakemakeInspection() {
@@ -53,7 +52,7 @@ class SmkUnresolvedImportedRuleNameInspection : SnakemakeInspection() {
         }
 
         private fun checkReference(reference: PyReferenceExpression) {
-            if (reference.reference.resolve().elementType == SmkElementTypes.USE_NAME_IDENTIFIER) {
+            if (reference.reference.resolve() is SmkUseNewNamePattern) {
                 registerProblem(
                     reference,
                     SnakemakeBundle.message("INSP.NAME.probably.unresolved.use.reference")
