@@ -10,6 +10,7 @@ Released on ...
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Fixed
+- Resolve/completion for checkpoints after `rules` keyword (see [#262](https://github.com/JetBrains-Research/snakecharm/issues/262))
 - Quick fix for unused log file inspection (see [#452](https://github.com/JetBrains-Research/snakecharm/issues/452))
 - Resolve for rule names in `use rule` section (see [#455](https://github.com/JetBrains-Research/snakecharm/issues/455))
 - Multiple args inspection in `workdir` case (see [#140](https://github.com/JetBrains-Research/snakecharm/issues/140))
