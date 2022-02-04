@@ -24,12 +24,12 @@ class SmkSeveralRulesAreOverriddenAsOneInspection : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkUse(use: SmkUse) {
-            if (use.getNewNamePattern()?.isWildcard() == true) {
-                // There are pattern in name,
+            if (use.getNewNamePattern()?.isWildcard() ?: true) {
+                // There are pattern in name
                 return
             }
 
-            if (use.getImportedNamesList() != null) {
+            if (use.getImportedNamesList() == null) {
                 //  'use' section doesn't change names
                 return
             }
