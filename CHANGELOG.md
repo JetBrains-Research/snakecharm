@@ -10,6 +10,7 @@ Released on ...
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Fixed
+- Quick fix for unused log file inspection (see [#452](https://github.com/JetBrains-Research/snakecharm/issues/452))
 - Resolve for rule names in `use rule` section (see [#455](https://github.com/JetBrains-Research/snakecharm/issues/455))
 - Multiple args inspection in `workdir` case (see [#140](https://github.com/JetBrains-Research/snakecharm/issues/140))
 - `localrules` and `ruleorder` now take into account `use rule` (see [#448](https://github.com/JetBrains-Research/snakecharm/issues/448))
