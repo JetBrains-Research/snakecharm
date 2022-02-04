@@ -56,7 +56,8 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
 
     override fun getProducedRulesNames(visitedFiles: MutableSet<PsiFile>): List<Pair<String, PsiElement>> {
         val newName = getUseNameIdentifier()
-        if (newName != null && !newName.text.contains('*')){
+
+        if (newName != null && !newName.isWildcard()) {
             return listOf(newName.text to newName.originalElement)
         }
         val originalNames = mutableListOf<Pair<String, PsiElement>>()
