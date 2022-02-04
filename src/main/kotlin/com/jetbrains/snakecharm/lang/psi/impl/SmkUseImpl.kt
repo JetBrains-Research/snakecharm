@@ -9,8 +9,8 @@ import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes
 import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes.USE_IMPORTED_RULES_NAMES
+import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes.USE_NEW_NAME_PATTERN
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseStub
 import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeSectionType
@@ -34,7 +34,7 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
     }
 
     override fun getNameNode(): ASTNode? {
-        val namePattern = getUseNameIdentifier()
+        val namePattern = getNewNamePattern()
         if (namePattern != null) { // Returns name identifier if it exits
             // Example: use rule A as new_A
             // Example: use rule A, B from M as new_*
@@ -55,7 +55,7 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
     }
 
     override fun getProducedRulesNames(visitedFiles: MutableSet<PsiFile>): List<Pair<String, PsiElement>> {
-        val newName = getUseNameIdentifier()
+        val newName = getNewNamePattern()
 
         if (newName != null && !newName.isWildcard()) {
             return listOf(newName.text to newName.originalElement)
@@ -75,21 +75,18 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
         }
     }
 
-    /**
-     * Returns a [SmkUseNameIdentifier] which may sets pattern of produced rule names or may be a simple name identifier
-     */
-    private fun getUseNameIdentifier() = findChildByType(SmkElementTypes.USE_NAME_IDENTIFIER) as? SmkUseNameIdentifier
+    override fun getNewNamePattern() = findChildByType(USE_NEW_NAME_PATTERN) as? SmkUseNewNamePattern
+    override fun getImportedNamesList() = findChildByType(USE_IMPORTED_RULES_NAMES) as? SmkImportedRulesNamesList
 
     /**
      * Collects all imported rules and their names
      */
     private fun getPairsOfImportedRulesAndNames(visitedFiles: MutableSet<PsiFile>): List<Pair<String, SmkRuleOrCheckpoint>>? {
         val module = ((getModuleName() as? SmkReferenceExpression)?.reference?.resolve() as? SmkModule) ?: return null
-        val file = module.getPsiFile()
-        return if (file != null && file is SmkFile) {
-            file.advancedCollectRules(visitedFiles).map { it.first to it.second }
-        } else {
-            null
+
+        return when (val psiFile = module.getPsiFile()) {
+            is SmkFile -> psiFile.advancedCollectRules(visitedFiles).map { it.first to it.second }
+            else -> null
         }
     }
 
@@ -105,6 +102,4 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
     override fun getImportedRules(): List<SmkRuleOrCheckpoint>? =
         getDefinedReferencesOfImportedRuleNames()?.mapNotNull { it.reference.resolve() as? SmkRuleOrCheckpoint }
             ?: getPairsOfImportedRulesAndNames(mutableSetOf())?.map { it.second }
-
-    override fun nameIdentifierIsWildcard() = (nameIdentifier as? SmkUseNameIdentifier)?.isWildcard() ?: false
 }

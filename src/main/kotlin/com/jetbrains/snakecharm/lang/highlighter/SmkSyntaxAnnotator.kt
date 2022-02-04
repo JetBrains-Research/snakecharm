@@ -36,7 +36,7 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
                     next,
                     SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD
                 )
-                SmkElementTypes.USE_NAME_IDENTIFIER, PyTokenTypes.IDENTIFIER -> addHighlightingAnnotation(
+                SmkElementTypes.USE_NEW_NAME_PATTERN, PyTokenTypes.IDENTIFIER -> addHighlightingAnnotation(
                     next, SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION
                 )
                 PyTokenTypes.COLON -> done = true

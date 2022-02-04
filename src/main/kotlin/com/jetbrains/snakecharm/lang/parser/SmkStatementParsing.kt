@@ -553,8 +553,8 @@ class SmkStatementParsing(
             // We can write 'as with:' or just 'as' and end line
             // Both variants are allowed and original rule names will be taken
         } else {
-            // Any SmkUse identifier is marked as USE_NAME_IDENTIFIER
-            name.done(SmkElementTypes.USE_NAME_IDENTIFIER)
+            // Any SmkUse identifier is marked as USE_NEW_NAME_PATTERN
+            name.done(SmkElementTypes.USE_NEW_NAME_PATTERN)
         }
     }
 

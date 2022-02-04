@@ -30,7 +30,8 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         use: SmkUse,
         result: MutableCollection<in RelatedItemLineMarkerInfo<*>>
     ) {
-        val name = (use.nameIdentifier as? SmkUseNameIdentifier)?.getNameBeforeWildcard() ?: return
+        val name = use.getNewNamePattern()?.getNameBeforeWildcard() ?: return
+
         val inheritedRulesDeclaredExplicitly =
             use.getDefinedReferencesOfImportedRuleNames()?.mapNotNull { it.reference.resolve() } ?: emptyList()
         val ruleModule = use.getModuleName()?.reference?.resolve() as? SmkModule
@@ -52,8 +53,8 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         result: MutableCollection<in RelatedItemLineMarkerInfo<*>>
     ) {
         val currentFile = element.containingFile
-        val identifier = when (val identifier = element.nameIdentifier) {
-            is SmkUseNameIdentifier -> identifier.getNameBeforeWildcard()
+        val namePsi = when (val identifier = element.nameIdentifier) {
+            is SmkUseNewNamePattern -> identifier.getNameBeforeWildcard()
             else -> identifier
         } ?: return
         val modulesFromStub = StubIndex.getInstance().getAllKeys(KEY, element.project)
@@ -85,6 +86,6 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         val builder = NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridenMethod)
             .setTargets(overrides)
             .setTooltipText(SnakemakeBundle.message("smk.line.marker.provider.overridden.rules"))
-        result.add(builder.createLineMarkerInfo(identifier))
+        result.add(builder.createLineMarkerInfo(namePsi))
     }
 }

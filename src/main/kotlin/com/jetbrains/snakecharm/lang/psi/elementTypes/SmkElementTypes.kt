@@ -2,7 +2,7 @@ package com.jetbrains.snakecharm.lang.psi.elementTypes
 
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.psi.PyElementType
-import com.jetbrains.snakecharm.lang.psi.SmkImportedRulesNames
+import com.jetbrains.snakecharm.lang.psi.SmkImportedRulesNamesList
 import com.jetbrains.snakecharm.lang.psi.impl.*
 
 /**
@@ -34,16 +34,16 @@ object SmkElementTypes {
         SmkUseArgsSectionImpl(it)
     }
 
-    val USE_NAME_IDENTIFIER = PyElementType(
-        "SMK_USE_NAME_IDENTIFIER"
+    val USE_NEW_NAME_PATTERN = PyElementType(
+        "SMK_USE_NEW_NAME_PATTERN"
     ) {
-        SmkUseNameIdentifierImpl(it)
+        SmkUseNewNamePatternImpl(it)
     }
 
     val USE_IMPORTED_RULES_NAMES = PyElementType(
         "USE_IMPORTED_RULES_NAMES"
     ) {
-        SmkImportedRulesNames(it)
+        SmkImportedRulesNamesList(it)
     }
 
     val WORKFLOW_ARGS_SECTION_STATEMENT = PyElementType(
