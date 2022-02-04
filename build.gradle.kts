@@ -143,11 +143,12 @@ tasks {
         doLast {
             javaexec {
                 mainClass.set("io.cucumber.core.cli.Main")
-                classpath =  project.sourceSets.test.get().runtimeClasspath
+                classpath = project.sourceSets.test.get().runtimeClasspath
                 systemProperties(
                     "idea.config.path" to "${intellij.sandboxDir.get()}/config-test",
                     "idea.system.path" to "${intellij.sandboxDir.get()}/system-test",
-                    "idea.plugins.path" to "${intellij.sandboxDir.get()}/plugins-test"
+                    "idea.plugins.path" to "${intellij.sandboxDir.get()}/plugins-test",
+                    "idea.force.use.core.classloader" to "true",
                 )
                 args = listOf(
                     "--plugin", "pretty", "--glue", "features.glue", "--tags", "not @ignore", "src/test/resources"
@@ -202,15 +203,18 @@ tasks {
     }
 
     test {
+        val test by getting(Test::class) {
+            setScanForTestClasses(false)
+            // Only run tests from classes that end with "Test"
+            include("**/*Test.class")
+            //include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
+        }
+
         dependsOn("buildTestWrappersBundle")
         reports {
             // turn off html reports... windows can't handle certain cucumber test name characters.
             junitXml.required.set(true)
             html.required.set(false)
         }
-
-        include("**/*Test.class")
-//        include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
-//        include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
     }
 }
