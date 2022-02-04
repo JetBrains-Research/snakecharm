@@ -23,7 +23,7 @@
    1. Open `Run | Edit Configurations... | Edit configuration templates...| Cucumber Java`
    2. Append to `VM optiopns`: 
        ```
-      -Didea.config.path=$PROJECT_DIR$/.sandbox_pycharm/config-test -Didea.system.path=$PROJECT_DIR$/.sandbox_pycharm/system-test -Didea.plugins.path=$PROJECT_DIR$/.sandbox_pycharm/plugins-test
+      -Didea.config.path=$PROJECT_DIR$/.sandbox_pycharm/config-test -Didea.system.path=$PROJECT_DIR$/.sandbox_pycharm/system-test -Didea.plugins.path=$PROJECT_DIR$/.sandbox_pycharm/plugins-test -Didea.force.use.core.classloader=true
       ```
 
 2. Checkout `snakemake` project sources and configure as test data:

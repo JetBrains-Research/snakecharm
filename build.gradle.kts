@@ -10,19 +10,15 @@ plugins {
     id("java")
 
     // Kotlin support
-    kotlin("jvm") version "1.6.0"
-    kotlin("plugin.serialization") version "1.6.0"
+    kotlin("jvm") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
 
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
-    id("org.jetbrains.intellij") version "1.3.0"
+    id("org.jetbrains.intellij") version "1.3.1"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
     id("org.jetbrains.changelog") version "1.3.1"
-    // detekt linter - read more: https://detekt.github.io/detekt/gradle.html
-    id("io.gitlab.arturbosch.detekt") version "1.18.1"
-    // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
-    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
 
 group = properties("pluginGroup")
@@ -34,14 +30,12 @@ repositories {
 }
 
 dependencies {
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.18.1")
-
-    testImplementation("io.cucumber:cucumber-java:7.0.0")
-    testImplementation("io.cucumber:cucumber-junit:7.0.0")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
-    testImplementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.3.1")
+    testImplementation("io.cucumber:cucumber-java:7.2.3")
+    testImplementation("io.cucumber:cucumber-junit:7.2.3")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.6.0")
+    testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.3.2")
 }
 
 // Configure gradle-intellij-plugin plugin.
@@ -82,19 +76,6 @@ changelog {
     unreleasedTerm.set("[Unreleased]")
 }
 
-// Configure detekt plugin.
-// Read more: https://detekt.github.io/detekt/kotlindsl.html
-detekt {
-    config = files("./detekt-config.yml")
-    buildUponDefaultConfig = true
-
-    reports {
-        html.enabled = false
-        xml.enabled = false
-        txt.enabled = false
-    }
-}
-
 tasks {
     properties("javaVersion").let {
         withType<JavaCompile> {
@@ -116,20 +97,24 @@ tasks {
         untilBuild.set(properties("pluginUntilBuild"))
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
-       pluginDescription.set(
-           projectDir.resolve("README.md").readText().lines().run {
-               val start = "<!-- Plugin description -->"
-               val end = "<!-- Plugin description end -->"
+        pluginDescription.set(
+            projectDir.resolve("README.md").readText().lines().run {
+                val start = "<!-- Plugin description -->"
+                val end = "<!-- Plugin description end -->"
 
-               if (!containsAll(listOf(start, end))) {
-                   throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
-               }
-               subList(indexOf(start) + 1, indexOf(end))
-           }.joinToString("\n").run { markdownToHTML(this) }
-       )
+                if (!containsAll(listOf(start, end))) {
+                    throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
+                }
+                subList(indexOf(start) + 1, indexOf(end))
+            }.joinToString("\n").run { markdownToHTML(this) }
+        )
 
         // Get the latest available change notes from the changelog file
-        changeNotes.set(provider { changelog.getLatest().toHTML() })
+        changeNotes.set(provider {
+            changelog.run {
+                getOrNull(properties("pluginVersion")) ?: getLatest()
+            }.toHTML()
+        })
     }
 
     runPluginVerifier {
@@ -153,12 +138,13 @@ tasks {
         dependsOn("assemble", "compileTestKotlin")
         doLast {
             javaexec {
-                main = "io.cucumber.core.cli.Main"
-                classpath =  project.sourceSets.test.get().runtimeClasspath
+                mainClass.set("io.cucumber.core.cli.Main")
+                classpath = project.sourceSets.test.get().runtimeClasspath
                 systemProperties(
                     "idea.config.path" to "${intellij.sandboxDir.get()}/config-test",
                     "idea.system.path" to "${intellij.sandboxDir.get()}/system-test",
-                    "idea.plugins.path" to "${intellij.sandboxDir.get()}/plugins-test"
+                    "idea.plugins.path" to "${intellij.sandboxDir.get()}/plugins-test",
+                    "idea.force.use.core.classloader" to "true",
                 )
                 args = listOf(
                     "--plugin", "pretty", "--glue", "features.glue", "--tags", "not @ignore", "src/test/resources"
@@ -172,7 +158,8 @@ tasks {
         doLast {
             javaexec {
                 mainClass.set("com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler")
-                classpath =  project.sourceSets.main.get().runtimeClasspath + files(setupDependencies.get().idea.get().jarFiles)
+                classpath =
+                    project.sourceSets.main.get().runtimeClasspath + files(setupDependencies.get().idea.get().jarFiles)
                 enableAssertions = true
                 args = listOf(
                     properties("snakemakeWrappersRepoPath"),
@@ -200,12 +187,13 @@ tasks {
         doLast {
             javaexec {
                 mainClass.set("com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler")
-                classpath =  project.sourceSets.main.get().runtimeClasspath + files(setupDependencies.get().idea.get().jarFiles)
+                classpath =
+                    project.sourceSets.main.get().runtimeClasspath + files(setupDependencies.get().idea.get().jarFiles)
                 enableAssertions = true
                 args = listOf(
-                        "${project.projectDir}/testData/wrappers_storage",
-                        "$test",
-                        "${project.buildDir}/bundledWrappers/smk-wrapper-storage.test.cbor"
+                    "${project.projectDir}/testData/wrappers_storage",
+                    "$test",
+                    "${project.buildDir}/bundledWrappers/smk-wrapper-storage.test.cbor"
                 )
                 maxHeapSize = "1024m" // Not much RAM is available on TC agents
             }
@@ -213,15 +201,18 @@ tasks {
     }
 
     test {
+        val test by getting(Test::class) {
+            setScanForTestClasses(false)
+            // Only run tests from classes that end with "Test"
+            include("**/*Test.class")
+            //include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
+        }
+
         dependsOn("buildTestWrappersBundle")
         reports {
             // turn off html reports... windows can't handle certain cucumber test name characters.
             junitXml.required.set(true)
             html.required.set(false)
         }
-
-        include("**/*Test.class")
-//        include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
-//        include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
     }
 }

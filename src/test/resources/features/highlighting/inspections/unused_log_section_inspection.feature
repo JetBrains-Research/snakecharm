@@ -30,6 +30,13 @@ Feature: Rule SmkUnusedLogFileInspection inspection
 
     use rule other_B as new_other_B with:
         log: "new_other_log.log"
+
+    rule C:
+        log: "C_log.log"
+        shell:
+          \"\"\"
+          touch {input}
+          \"\"\"
     """
     And SmkUnusedLogFileInspection inspection is enabled
     And I expect inspection weak warning on <log: "my_log.log"> with message
@@ -47,6 +54,10 @@ Feature: Rule SmkUnusedLogFileInspection inspection
     And I expect inspection weak warning on <log: "new_other_log.log"> with message
     """
     Looks like a log file won't be created in rule 'B', because it is not referenced from 'shell' or 'run' sections
+    """
+    And I expect inspection weak warning on <log: "C_log.log"> with message
+    """
+    Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
     Examples:
@@ -82,6 +93,7 @@ Feature: Rule SmkUnusedLogFileInspection inspection
       | checkpoint | "my_log.log"  | shell: "command {log}"        |
       | rule       | l1="foo.log"  | shell: "--log {log.l1}"       |
       | checkpoint | l1="foo.log"  | run: shell("foo ff {log[0]}") |
+      | rule       | "my_log.log"  | shell: """command {log}"""    |
 
   Scenario Outline: Warnings in 'log' section, if it is not used in rule which was overridden more than one time
     Given a snakemake project
@@ -200,14 +212,14 @@ Feature: Rule SmkUnusedLogFileInspection inspection
     Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
     """
     When I check highlighting weak warnings
-    And I invoke quick fix Append ' >{log} 2>&1' to shell section command into 'NAME' and see text:
+    And I invoke quick fix Append '>{log} 2>&1' to shell section command into 'NAME' and see text:
     """
     <rule_like> NAME:
         input: "input.txt"
         output: "output.txt"
         log: "my_log.log"
         threads: 4
-        shell: "command touch >{log} 2>&1"
+        shell: "(command touch) >{log} 2>&1"
     """
     Examples:
       | rule_like  |
@@ -215,6 +227,80 @@ Feature: Rule SmkUnusedLogFileInspection inspection
       | rule       |
     # Impossible to check inspection for 'shell' without arguments
     # because of 'checkHighlighting' implementation
+
+  Scenario Outline: Quick fix for unused in 'shell' section 'log' reference. Triple quoted string case
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+        input: "input.txt"
+        output: "output.txt"
+        log: "my_log.log"
+        threads: 4
+        shell:
+          \"\"\"
+          command touch
+          \"\"\"
+    """
+    And SmkUnusedLogFileInspection inspection is enabled
+    And I expect inspection weak warning on <log: "my_log.log"> with message
+    """
+    Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
+    """
+    When I check highlighting weak warnings
+    And I invoke quick fix Append '>{log} 2>&1' to shell section command into 'NAME' and see text:
+    """
+    <rule_like> NAME:
+        input: "input.txt"
+        output: "output.txt"
+        log: "my_log.log"
+        threads: 4
+        shell:
+          \"\"\"(
+          command touch
+          ) >{log} 2>&1\"\"\"
+    """
+    Examples:
+      | rule_like  |
+      | checkpoint |
+      | rule       |
+
+  Scenario Outline: Quick fix for unused in 'shell' section 'log' reference. F-string case
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+        input: "input.txt"
+        output: "output.txt"
+        log: "my_log.log"
+        threads: 4
+        shell:
+          <first_line> foo boo"
+          <second_line> -foo -boo"
+    """
+    And SmkUnusedLogFileInspection inspection is enabled
+    And I expect inspection weak warning on <log: "my_log.log"> with message
+    """
+    Looks like a log file won't be created, because it is not referenced from 'shell' or 'run' sections
+    """
+    When I check highlighting weak warnings
+    And I invoke quick fix Append '>{log} 2>&1' to shell section command into 'NAME' and see text:
+    """
+    <rule_like> NAME:
+        input: "input.txt"
+        output: "output.txt"
+        log: "my_log.log"
+        threads: 4
+        shell:
+          <first_line>( foo boo"
+          <second_line> -foo -boo) ><brackets> 2>&1"
+    """
+    Examples:
+      | rule_like  | first_line | second_line | brackets |
+      | checkpoint | "          | f"          | {{log}}  |
+      | checkpoint | f"         | "           | {log}    |
+      | rule       | "          | f"          | {{log}}  |
+      | rule       | f"         | "           | {log}    |
 
   Scenario Outline: Quick fix for unused in 'run' section 'log' reference
     Given a snakemake project
@@ -243,7 +329,7 @@ Feature: Rule SmkUnusedLogFileInspection inspection
         threads: 4
         run:
             shell("something")
-            shell("echo TODO >{log} 2>&1")
+            shell("(echo TODO) >{log} 2>&1")
     """
     Examples:
       | rule_like  |
@@ -273,7 +359,7 @@ Feature: Rule SmkUnusedLogFileInspection inspection
         output: "output.txt"
         log: "my_log.log"
         threads: 4
-        shell: "echo TODO >{log} 2>&1"
+        shell: "(echo TODO) >{log} 2>&1"
     """
     Examples:
       | rule_like  |
@@ -329,7 +415,7 @@ Feature: Rule SmkUnusedLogFileInspection inspection
         log: "my_log.log"
         threads: 4
     """
-    And I invoke quick fix Append ' >{log} 2>&1' to shell section command into 'NAME2' and see text:
+    And I invoke quick fix Append '>{log} 2>&1' to shell section command into 'NAME2' and see text:
     """
     module M:
         snakefile: "boo.smk"
@@ -354,15 +440,15 @@ Feature: Rule SmkUnusedLogFileInspection inspection
     Then the file "boo.smk" should have text
     """
     <rule_like> NAME1:
-        shell: "echo TODO >{log} 2>&1"
+        shell: "(echo TODO) >{log} 2>&1"
 
     rule NAME2:
-        shell: "command touch >{log} 2>&1"
+        shell: "(command touch) >{log} 2>&1"
 
     rule NAME3:
         run:
             shell("something")
-            shell("echo TODO >{log} 2>&1")
+            shell("(echo TODO) >{log} 2>&1")
     """
     Examples:
       | rule_like  |
