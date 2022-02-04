@@ -109,7 +109,10 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
             ?.parent as? PyReferenceExpression ?: return
 
         val variants = when (rulesOrCheckpointsObject.name) {
-            SnakemakeAPI.SMK_VARS_RULES -> collectVariantsForElement(parameters.position, isCheckPoint = false)
+            SnakemakeAPI.SMK_VARS_RULES -> collectVariantsForElement(
+                parameters.position,
+                isCheckPoint = false
+            ) + collectVariantsForElement(parameters.position, isCheckPoint = true)
             SnakemakeAPI.SMK_VARS_CHECKPOINTS -> collectVariantsForElement(parameters.position, isCheckPoint = true)
             else -> return
         }

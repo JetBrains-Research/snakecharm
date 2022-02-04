@@ -62,6 +62,29 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       | rule       | "{             | }"              |
       | checkpoint | "{             | }"              |
 
+  Scenario: Complete checkpoint names after rules keyword
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    checkpoint aaaa:
+      input: "path/to/input"
+      output: "path/to/output"
+      shell: "shell command"
+
+    rule bbbb:
+      input: rules.aaa
+    """
+    When I put the caret after rules.aaa
+    Then I invoke autocompletion popup and see a text:
+    """
+    checkpoint aaaa:
+      input: "path/to/input"
+      output: "path/to/output"
+      shell: "shell command"
+
+    rule bbbb:
+      input: rules.aaaa
+    """
 
   Scenario Outline: No completion for parent rule in section
     Given a snakemake project
@@ -210,7 +233,7 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
 
     Examples:
       | rule_like  | ok_example  | neg_example |
-      | rule       | rule2       | checkpoint2 |
+      | rule       | rule2       |             |
       | checkpoint | checkpoint2 | rule2       |
 
   Scenario Outline: No completion for long reference with rules/checkpoints last part
@@ -312,48 +335,40 @@ Feature: Rule and Checkpoints names completion after 'rules.' and 'checkpoints.'
       | checkpoint | "{             | }"              |
 
 
-  Scenario Outline: toplevel rules/checkpoints call
+  Scenario: toplevel checkpoints call
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    <section1> A:
+    rule A:
       input: ""
-    <section1> B:
+    rule B:
       input: ""
-    <section1> C:
+    rule C:
       input: ""
-    <section2>s.
+    checkpoints.
     """
-    When I put the caret after <section2>s.
+    When I put the caret after checkpoints.
     And I invoke autocompletion popup
     Then completion list shouldn't contain:
       | A |
       | B |
       | C |
-    Examples:
-      | section1   | section2   |
-      | rule       | checkpoint |
-      | checkpoint | rule       |
 
-  Scenario Outline: rules/checkpoints call inside rule section
+  Scenario: checkpoints call inside rule section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    <section1> A:
+    rule A:
       input: ""
 
-    <section1> NAME:
-      shell: <section2>s.
+    rule  NAME:
+      shell: checkpoints.
     """
-    When I put the caret after <section2>s.
+    When I put the caret after checkpoints.
     And I invoke autocompletion popup
     Then completion list shouldn't contain:
       | A    |
       | NAME |
-    Examples:
-      | section1   | section2   |
-      | rule       | checkpoint |
-      | checkpoint | rule       |
 
   Scenario Outline: No rule like declarations completion at top-level
     Given a snakemake project

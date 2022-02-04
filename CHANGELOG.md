@@ -10,6 +10,8 @@ Released on ...
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Fixed
+- Resolve/completion for checkpoints after `rules` keyword (see [#262](https://github.com/JetBrains-Research/snakecharm/issues/262))
+- Quick fix for unused log file inspection (see [#452](https://github.com/JetBrains-Research/snakecharm/issues/452))
 - Resolve for rule names in `use rule` section (see [#455](https://github.com/JetBrains-Research/snakecharm/issues/455))
 - Multiple args inspection in `workdir` case (see [#140](https://github.com/JetBrains-Research/snakecharm/issues/140))
 - `localrules` and `ruleorder` now take into account `use rule` (see [#448](https://github.com/JetBrains-Research/snakecharm/issues/448))
@@ -18,6 +20,7 @@ Released on ...
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Added
+- Inspection: warns that that all docstrings except the first one will be ignored (see [#341](https://github.com/JetBrains-Research/snakecharm/issues/341))
 - Quick fix for unresolved files (conda, configfile. etc.) (see [#277](https://github.com/JetBrains-Research/snakecharm/issues/277))
 - Gutter icons for rule inheritance (see [#429](https://github.com/JetBrains-Research/snakecharm/issues/429))
 - Warning: Snakemake support is disabled (see [#109](https://github.com/JetBrains-Research/snakecharm/issues/109))

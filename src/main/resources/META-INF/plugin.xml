@@ -420,6 +420,17 @@
     />
 
     <localInspection
+            language="Snakemake" shortName="SmkDocstringsWillBeIgnoredInspection"
+            enabledByDefault="true"
+            level="WEAK WARNING"
+            suppressId="SmkDocstringsWillBeIgnored"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.docstrings.will.be.ignored"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkDocstringsWillBeIgnoredInspection"
+    />
+
+    <localInspection
             language="Snakemake" shortName="SmkAvoidTabWhitespace"
             enabledByDefault="true"
             level="WEAK WARNING"
