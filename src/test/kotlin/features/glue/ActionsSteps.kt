@@ -137,12 +137,35 @@ class ActionsSteps {
         checkLineMarkersWithIconOnTheElement(AllIcons.Gutter.OverridenMethod, table)
     }
 
-    @Then("^I expect no markers")
+    @Then("^I expect marker of it redeclares rule with references:\$")
+    fun iExpectMarkerOfRedeclaresRuleWithReferences(table: DataTable) {
+        checkLineMarkersWithIconOnTheElement(AllIcons.Gutter.ImplementingMethod, table)
+    }
+
+    @Then("^I expect marker of redeclared in rule with references:\$")
+    fun iExpectMarkerOfRedeclaredInRuleWithReferences(table: DataTable) {
+        checkLineMarkersWithIconOnTheElement(AllIcons.Gutter.ImplementedMethod, table)
+    }
+
+    @Then("^I expect no markers of redeclared in\$")
+    fun iExpectNoMarkersOfRedeclaredIn() {
+        checkLineMarkersWithIconOnTheElement(AllIcons.Gutter.ImplementedMethod, DataTable.emptyDataTable(), true)
+    }
+
+    @Then("^I expect no markers of it redeclares\$")
+    fun iExpectNoMarkersOfItRedeclares() {
+        checkLineMarkersWithIconOnTheElement(AllIcons.Gutter.ImplementingMethod, DataTable.emptyDataTable(), true)
+    }
+
+    @Then("^I expect no markers\$")
     fun iExpectNoMarkers() {
         checkLineMarkersWithIconOnTheElement(null, DataTable.emptyDataTable(), true)
     }
 
-    private fun checkLineMarkersWithIconOnTheElement(icon: Icon?, table: DataTable, expectNoGutters: Boolean = false) {
+    private fun checkLineMarkersWithIconOnTheElement(
+        icon: Icon?, table: DataTable,
+        expectNoGutters: Boolean = false,
+    ) {
         fixture().doHighlighting()
         var currentElement: PsiElement? = null
         val application = ApplicationManager.getApplication()
@@ -169,19 +192,30 @@ class ActionsSteps {
         // And if there are no targets missed in the test
         application.invokeAndWait({
             application.runWriteAction {
-                for (marker in table.asLists()) {
-                    val appropriateTargetRule =
-                        targetRulesOrCheckpoints.find { rule -> rule.name == marker.first() && rule.containingFile.name == marker.last() }
-                    assertNotNull(
-                        appropriateTargetRule,
-                        "Missed target in ${currentElement?.text}: ${marker.first()} in the file ${marker.last()}}"
-                    )
-                    targetRulesOrCheckpoints.remove(appropriateTargetRule)
-                }
-                assertTrue(
-                    targetRulesOrCheckpoints.isEmpty(),
-                    "Extras: ${targetRulesOrCheckpoints.joinToString { "${it.name} in file ${it.containingFile.name}" }}"
-                )
+                val actual = targetRulesOrCheckpoints.map { rule ->
+//                    "|${rule.name}|${rule.textOffset}|${rule.containingFile.name}|"
+                    "|${rule.name}|${rule.text.lines().firstOrNull()}|${rule.containingFile.name}|"
+                }.sorted().joinToString(separator = "\n")
+
+                val expected = table.asLists().map { marker ->
+                    marker.joinToString(separator = "|", prefix = "|", postfix = "|") { it }
+                }.sorted().joinToString(separator = "\n")
+
+                Assert.assertEquals(expected, actual)
+
+//                for (marker in table.asLists()) {
+//                    val appropriateTargetRule =
+//                        targetRulesOrCheckpoints.find { rule -> rule.name == marker.first() && rule.containingFile.name == marker.last() }
+//                    assertNotNull(
+//                        appropriateTargetRule,
+//                        "Missed target in ${currentElement?.text}: ${marker.first()} in the file ${marker.last()}}"
+//                    )
+//                    targetRulesOrCheckpoints.remove(appropriateTargetRule)
+//                }
+//                assertTrue(
+//                    targetRulesOrCheckpoints.isEmpty(),
+//                    "Extras: ${targetRulesOrCheckpoints.joinToString { "${it.name}:${it.textOffset} in file ${it.containingFile.name}" }}"
+//                )
             }
         }, ModalityState.NON_MODAL)
     }
@@ -249,7 +283,7 @@ class ActionsSteps {
         text: String,
         signature: String,
         message: String,
-        searchInTags: Boolean = false
+        searchInTags: Boolean = false,
     ) {
         require(!Pattern.compile("(^|[^\\\\])\"").matcher(message).find()) {
             "Quotes (\") should be escaped (with \\) in message: $message"
@@ -280,7 +314,7 @@ class ActionsSteps {
     private fun findTextPositionInsideTags(
         tag: String,
         text: String,
-        fullText: String
+        fullText: String,
     ): Int {
         val textInsideTagsPattern = Pattern.compile("<$tag descr=.+?>([^<>]+)</$tag>")
         val matcher = textInsideTagsPattern.matcher(fullText)
@@ -291,7 +325,7 @@ class ActionsSteps {
         text: String,
         signature: String,
         document: Document,
-        psiFile: PsiFile
+        psiFile: PsiFile,
     ): Int {
         val pos = document.text.indexOf(signature)
         assertTrue(

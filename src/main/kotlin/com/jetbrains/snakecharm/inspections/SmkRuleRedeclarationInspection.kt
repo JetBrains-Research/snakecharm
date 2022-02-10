@@ -2,7 +2,8 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
-import com.intellij.codeInspection.ProblemHighlightType.*
+import com.intellij.codeInspection.ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+import com.intellij.codeInspection.ProblemHighlightType.WEAK_WARNING
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
@@ -19,7 +20,7 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,
-        session: LocalInspectionToolSession
+        session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         private val localRules by lazy {
@@ -69,20 +70,12 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
             val containingFile = ruleLike.containingFile
             val nameToCheck = ruleLike.name ?: return
 
-            val ruleResolveResults = AbstractSmkRuleOrCheckpointType.findAvailableRuleLikeElementByName(
-                ruleLike, nameToCheck, SmkRuleNameIndex.KEY, SmkRule::class.java
-            ) { localRules }
-
-            val cpResolveResults = AbstractSmkRuleOrCheckpointType.findAvailableRuleLikeElementByName(
-                ruleLike, nameToCheck, SmkCheckpointNameIndex.KEY, SmkCheckPoint::class.java
-            ) { localCheckpoints }
-
-            val usesResolveResults: Collection<PsiElement> =
-                AbstractSmkRuleOrCheckpointType.findAvailableRuleLikeElementByName(
-                    ruleLike, nameToCheck, SmkUseNameIndex.KEY, SmkUse::class.java
-                ) { localUses }
-
-            val resolveResults = ruleResolveResults + cpResolveResults + usesResolveResults
+            val resolveResults = collectRuleLikeWithSameName(
+                ruleLike, nameToCheck,
+                localRules = { localRules },
+                localCheckpoints = { localCheckpoints },
+                localUses = { localUses }
+            )
 
             if (resolveResults.isEmpty()) {
                 return
@@ -122,7 +115,7 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
         private fun registerProblem(
             ruleLike: SmkSection,
             msg: String,
-            severity: ProblemHighlightType
+            severity: ProblemHighlightType,
         ) {
             val problemElement = ruleLike.nameIdentifier ?: return
 
@@ -138,4 +131,29 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
     }
 
     override fun getDisplayName(): String = SnakemakeBundle.message("INSP.NAME.rule.redeclaration")
+
+    companion object {
+        fun collectRuleLikeWithSameName(
+            ruleLike: SmkRuleLike<SmkRuleOrCheckpointArgsSection>,
+            nameToCheck: String,
+            localRules: () -> List<SmkRule>,
+            localCheckpoints: () -> List<SmkCheckPoint>,
+            localUses: () -> List<SmkUse>,
+        ): List<PsiElement> {
+            val ruleResolveResults = AbstractSmkRuleOrCheckpointType.findAvailableRuleLikeElementByName(
+                ruleLike, nameToCheck, SmkRuleNameIndex.KEY, SmkRule::class.java, localRules
+            )
+
+            val cpResolveResults = AbstractSmkRuleOrCheckpointType.findAvailableRuleLikeElementByName(
+                ruleLike, nameToCheck, SmkCheckpointNameIndex.KEY, SmkCheckPoint::class.java, localCheckpoints
+            )
+
+            val usesResolveResults: Collection<PsiElement> =
+                AbstractSmkRuleOrCheckpointType.findAvailableRuleLikeElementByName(
+                    ruleLike, nameToCheck, SmkUseNameIndex.KEY, SmkUse::class.java, localUses
+                )
+
+            return ruleResolveResults + cpResolveResults + usesResolveResults
+        }
+    }
 }
