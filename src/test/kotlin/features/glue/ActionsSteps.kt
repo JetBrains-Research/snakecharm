@@ -129,12 +129,12 @@ class ActionsSteps {
 //        for(gutter in gutters){
 //            println(gutter.tooltipText)
 //        }
-        checkLineMarkersWithIconOnTheElement(AllIcons.Gutter.OverridingMethod, table)
+        checkLineMarkersWithIconOnTheElement(AllIcons.Gutter.OverridingMethod, table, checkText = false)
     }
 
     @Then("^I expect marker of overridden section with references:\$")
     fun iExpectMarkerOfOverriddenSectionWithReferences(table: DataTable) {
-        checkLineMarkersWithIconOnTheElement(AllIcons.Gutter.OverridenMethod, table)
+        checkLineMarkersWithIconOnTheElement(AllIcons.Gutter.OverridenMethod, table, checkText = false)
     }
 
     @Then("^I expect marker of it redeclares rule with references:\$")
@@ -165,6 +165,7 @@ class ActionsSteps {
     private fun checkLineMarkersWithIconOnTheElement(
         icon: Icon?, table: DataTable,
         expectNoGutters: Boolean = false,
+        checkText: Boolean = true,
     ) {
         fixture().doHighlighting()
         var currentElement: PsiElement? = null
@@ -193,8 +194,10 @@ class ActionsSteps {
         application.invokeAndWait({
             application.runWriteAction {
                 val actual = targetRulesOrCheckpoints.map { rule ->
-//                    "|${rule.name}|${rule.textOffset}|${rule.containingFile.name}|"
-                    "|${rule.name}|${rule.text.lines().firstOrNull()}|${rule.containingFile.name}|"
+                    when {
+                        checkText -> "|${rule.name}|${rule.text.lines().firstOrNull()}|${rule.containingFile.name}|"
+                        else -> "|${rule.name}|${rule.containingFile.name}|"
+                    }
                 }.sorted().joinToString(separator = "\n")
 
                 val expected = table.asLists().map { marker ->
@@ -202,20 +205,6 @@ class ActionsSteps {
                 }.sorted().joinToString(separator = "\n")
 
                 Assert.assertEquals(expected, actual)
-
-//                for (marker in table.asLists()) {
-//                    val appropriateTargetRule =
-//                        targetRulesOrCheckpoints.find { rule -> rule.name == marker.first() && rule.containingFile.name == marker.last() }
-//                    assertNotNull(
-//                        appropriateTargetRule,
-//                        "Missed target in ${currentElement?.text}: ${marker.first()} in the file ${marker.last()}}"
-//                    )
-//                    targetRulesOrCheckpoints.remove(appropriateTargetRule)
-//                }
-//                assertTrue(
-//                    targetRulesOrCheckpoints.isEmpty(),
-//                    "Extras: ${targetRulesOrCheckpoints.joinToString { "${it.name}:${it.textOffset} in file ${it.containingFile.name}" }}"
-//                )
             }
         }, ModalityState.NON_MODAL)
     }
