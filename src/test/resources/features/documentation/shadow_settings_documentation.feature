@@ -11,10 +11,11 @@ Feature: Documentation for 'shadow' settings
     Then I invoke quick documentation popup
     Then Documentation text should contain <documentation>
     Examples:
-    | setting | documentation                                                                                       |
-    | full    |  The setting shadow: "full" fully shadows the entire subdirectory structure of the current workdir. |
-    | shallow |  By setting shadow: "shallow", the top level files and directories are symlinked                    |
-    | minimal |  The setting shadow: "minimal" only symlinks the inputs to the rule.                                |
+      | setting      | documentation                                                                                      |
+      | full         | The setting shadow: "full" fully shadows the entire subdirectory structure of the current workdir. |
+      | shallow      | By setting shadow: "shallow", the top level files and directories are symlinked                    |
+      | minimal      | The setting shadow: "minimal" only symlinks the inputs to the rule.                                |
+      | copy-minimal | The setting shadow: "copy-minimal" copies the inputs instead of just creating symlinks.            |
 
   Scenario Outline: Documentation for setting in different quotes
     Given a snakemake project

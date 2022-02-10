@@ -14,8 +14,9 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkShadowSettingsDocumentation : AbstractDocumentationProvider() {
     override fun generateDoc(
-            element: PsiElement,
-            originalElement: PsiElement?): String? {
+        element: PsiElement,
+        originalElement: PsiElement?,
+    ): String? {
         return if (element.isStringLiteralInShadowSection()) getDocumentation(element) else null
     }
 
@@ -25,6 +26,7 @@ class SmkShadowSettingsDocumentation : AbstractDocumentationProvider() {
             "full" -> SnakemakeBundle.message("INSP.NAME.shadow.settings.full")
             "shallow" -> SnakemakeBundle.message("INSP.NAME.shadow.settings.shallow")
             "minimal" -> SnakemakeBundle.message("INSP.NAME.shadow.settings.minimal")
+            "copy-minimal" -> SnakemakeBundle.message("INSP.NAME.shadow.settings.copy.minimal")
             else -> null
         }
     }
@@ -33,18 +35,18 @@ class SmkShadowSettingsDocumentation : AbstractDocumentationProvider() {
         editor: Editor,
         file: PsiFile,
         contextElement: PsiElement?,
-        targetOffset: Int
+        targetOffset: Int,
     ) = when {
         contextElement.isStringLiteralInShadowSection() -> contextElement
         else -> null
     }
 
     private fun PsiElement?.isStringLiteralInShadowSection() =
-            SnakemakeLanguageDialect.isInsideSmkFile(this) &&
-                    this.isInShadowSection() &&
-                    PsiTreeUtil.getParentOfType(this, PyStringLiteralExpression::class.java) != null
+        SnakemakeLanguageDialect.isInsideSmkFile(this) &&
+                this.isInShadowSection() &&
+                PsiTreeUtil.getParentOfType(this, PyStringLiteralExpression::class.java) != null
 
     private fun PsiElement?.isInShadowSection() =
-            PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpointArgsSection::class.java)?.name ==
-                    SnakemakeNames.SECTION_SHADOW
+        PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpointArgsSection::class.java)?.name ==
+                SnakemakeNames.SECTION_SHADOW
 }

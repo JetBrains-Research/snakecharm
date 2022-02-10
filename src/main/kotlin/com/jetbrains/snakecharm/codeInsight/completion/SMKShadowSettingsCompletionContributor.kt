@@ -13,27 +13,28 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 class SMKShadowSettingsCompletionContributor : CompletionContributor() {
     init {
         extend(
-                CompletionType.BASIC,
-                ShadowSectionSettingsProvider.CAPTURE,
-                ShadowSectionSettingsProvider
+            CompletionType.BASIC,
+            ShadowSectionSettingsProvider.CAPTURE,
+            ShadowSectionSettingsProvider
         )
     }
 }
 
 object ShadowSectionSettingsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = PlatformPatterns.psiElement()
-            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
-            .inside(SmkRuleOrCheckpointArgsSection::class.java)
-            .inside(PyStringLiteralExpression::class.java)!!
+        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+        .inside(SmkRuleOrCheckpointArgsSection::class.java)
+        .inside(PyStringLiteralExpression::class.java)!!
 
-    val SHADOW_SETTINGS = listOf("shallow", "full", "minimal")
+    val SHADOW_SETTINGS = listOf("shallow", "full", "minimal", "copy-minimal")
 
     override fun addCompletions(
-            parameters: CompletionParameters,
-            context: ProcessingContext,
-            result: CompletionResultSet
+        parameters: CompletionParameters,
+        context: ProcessingContext,
+        result: CompletionResultSet,
     ) {
-        val parentListStatement = PsiTreeUtil.getParentOfType(parameters.position, SmkRuleOrCheckpointArgsSection::class.java)!!
+        val parentListStatement =
+            PsiTreeUtil.getParentOfType(parameters.position, SmkRuleOrCheckpointArgsSection::class.java)!!
         if (parentListStatement.name == SnakemakeNames.SECTION_SHADOW) {
             SHADOW_SETTINGS.forEach {
                 result.addElement(LookupElementBuilder.create(it).withIcon(PlatformIcons.PARAMETER_ICON))

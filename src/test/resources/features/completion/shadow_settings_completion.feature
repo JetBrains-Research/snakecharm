@@ -10,9 +10,10 @@ Feature: Completion in 'shadow' section
     When I put the caret after shadow: <quote>
     And I invoke autocompletion popup
     Then completion list should contain:
-    |full   |
-    |minimal|
-    |shallow|
+      | full         |
+      | copy-minimal |
+      | minimal      |
+      | shallow      |
     Examples:
       | quote |
       | '     |
@@ -45,3 +46,4 @@ Feature: Completion in 'shadow' section
       |full   |
       |minimal|
       |shallow|
+      |copy-minimal|

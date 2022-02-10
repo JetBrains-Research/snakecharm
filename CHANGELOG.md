@@ -19,6 +19,7 @@ Released on ...
 - Resolve for `rules` keyword if `snakemake` version less than `6.1` (see [#359](https://github.com/JetBrains-Research/snakecharm/issues/359))
 - Plugin Logo Updated  (see [#449](https://github.com/JetBrains-Research/snakecharm/issues/449)) 
 - Snakemake file type icon updated 
+- 'copy-minimal' shadow section missing in completion (see [#467](https://github.com/JetBrains-Research/snakecharm/issues/467)) 
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Added

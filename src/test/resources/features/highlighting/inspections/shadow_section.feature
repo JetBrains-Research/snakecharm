@@ -10,7 +10,7 @@ Feature: 'shadow:' section related inspections
     And SmkShadowSettingsInspection inspection is enabled
     Then I expect inspection warning on <"parameter"> with message
     """
-    Shadow must either be 'shallow', 'full', 'minimal', or True (equivalent to 'full').
+    Shadow must either be 'shallow', 'full', 'minimal', 'copy-minimal', or True (equivalent to 'full').
     """
     When I check highlighting warnings
 
