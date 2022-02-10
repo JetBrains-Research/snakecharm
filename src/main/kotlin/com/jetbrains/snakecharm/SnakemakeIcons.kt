@@ -7,6 +7,6 @@ import com.intellij.openapi.util.IconLoader
  * @date 2018-12-30
  */
 object SnakemakeIcons {
-    val FILE = IconLoader.getIcon("/icons/snakemake_16.png", SnakemakeIcons::class.java)
+    val FILE = IconLoader.getIcon("/icons/snakeCharm_fileType.svg", SnakemakeIcons::class.java)
     val FACET = FILE
 }
