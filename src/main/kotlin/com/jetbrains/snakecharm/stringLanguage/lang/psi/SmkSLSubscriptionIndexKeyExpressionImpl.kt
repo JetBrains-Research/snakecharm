@@ -46,4 +46,6 @@ class SmkSLSubscriptionIndexKeyExpressionImpl(node: ASTNode) : PyReferenceExpres
         PsiTreeUtil.getParentOfType(this, SmkSLSubscriptionExpressionImpl::class.java)?.getOperand()
 
     override fun toString() = "SmkSLSubscriptionKeyExpression: [${this.referencedName}]"
+
+    override fun hasEmptyIndex() = text == "IntellijIdeaRulezzz "
 }

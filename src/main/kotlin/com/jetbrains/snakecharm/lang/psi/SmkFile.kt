@@ -117,12 +117,12 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
         return includeStatements
     }
 
-    fun collectIncludedFiles(visitedFiles: MutableSet<PsiFile> = mutableSetOf()): Set<PsiFile>{
+    fun collectIncludedFiles(visitedFiles: MutableSet<PsiFile> = mutableSetOf()): Set<PsiFile> {
         val includes = collectIncludes()
         visitedFiles.add(containingFile.originalFile)
         includes.forEach { include ->
             val file = include.references.firstOrNull()?.resolve() as? PsiFile
-            if (file !in visitedFiles && file is SmkFile){
+            if (file !in visitedFiles && file is SmkFile) {
                 file.collectIncludedFiles(visitedFiles)
             }
         }
@@ -198,6 +198,26 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
             }
         }
         return result
+    }
+
+    fun advancedCollectConfigFiles(): List<SmkWorkflowArgsSection> = collectIncludedFiles(mutableSetOf()).map {
+        collectConfigFiles()
+    }.flatten()
+
+    fun collectConfigFiles(): List<SmkWorkflowArgsSection> {
+        val configFileStatements = mutableListOf<SmkWorkflowArgsSection>()
+
+        acceptChildren(object : PyElementVisitor(), SmkElementVisitor {
+            override val pyElementVisitor: PyElementVisitor = this
+
+            override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
+                if (st.sectionKeyword == SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD) {
+                    configFileStatements.add(st)
+                }
+            }
+        })
+
+        return configFileStatements
     }
 
     fun findPepfile(): SmkWorkflowArgsSection? {

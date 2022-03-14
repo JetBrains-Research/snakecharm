@@ -111,7 +111,9 @@ public class SmkFrameworkConfigurable implements SearchableConfigurable {
 
     @NotNull
     private SmkSupportProjectSettings.State getUIState() {
-        final SmkSupportProjectSettings.State st = new SmkSupportProjectSettings.State();
+        // It gets instance of state, instead of creating new one
+        // In order not to override settings, which were set by another settings page
+        final SmkSupportProjectSettings.State st = SmkSupportProjectSettings.Companion.getInstance(project).stateSnapshot();
         st.setSnakemakeSupportEnabled(enableSmkSupportCB.isSelected());
         settingsPanel.apply(st);
         return st;

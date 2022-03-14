@@ -2,8 +2,10 @@ package com.jetbrains.snakecharm.codeInsight.completion
 
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementDecorator
 import com.intellij.codeInsight.lookup.LookupElementPresentation
+import com.intellij.openapi.components.service
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
@@ -12,6 +14,7 @@ import com.intellij.util.ProcessingContext
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PySubscriptionExpression
 import com.jetbrains.python.psi.types.TypeEvalContext
+import com.jetbrains.snakecharm.codeInsight.completion.yamlKeys.SmkYAMLKeysStorage
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
@@ -94,6 +97,10 @@ object SmkDictionaryTypesCompletionProvider: CompletionProvider<CompletionParame
 
             collectLookupItemsForPositionArgs(type, location).forEach { result.addElement(it)}
 
+        } else if (type == null && operand is PySubscriptionExpression) {
+            val storage = operand.project.service<SmkYAMLKeysStorage>()
+            result.addAllElements(
+                storage.getCompletionVariantsForOperand(operand).map { LookupElementBuilder.create("'$it'") })
         }
 //        val resolvedElement = PyResolveUtil.fullResolveLocally(operand as PyReferenceExpression)
     }

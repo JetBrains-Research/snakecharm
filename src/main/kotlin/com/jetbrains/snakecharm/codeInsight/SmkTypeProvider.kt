@@ -195,6 +195,10 @@ class SmkTypeProvider : PyTypeProviderBase() {
                 SmkWildcardsType(parentDeclaration)
             }
 
+            SMK_VARS_CONFIG -> parentDeclaration?.let {
+                SmkConfigType(parentDeclaration)
+            }
+
             SMK_VARS_PEP -> {
                 // Assign correct type to `pep` variable in order to get resolve/completion
                 val project = referenceExpression.project

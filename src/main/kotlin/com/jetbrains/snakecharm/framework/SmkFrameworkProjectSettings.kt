@@ -12,7 +12,7 @@ import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Disposer
 import com.intellij.util.messages.Topic
-import com.intellij.util.xmlb.annotations.Attribute
+import com.intellij.util.xmlb.annotations.*
 import com.jetbrains.python.PyNames
 import com.jetbrains.snakecharm.SnakemakeIcons
 
@@ -55,6 +55,16 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
     val snakemakeSupportBannerEnabled: Boolean
         get() {
             return internalState.snakemakeSupportBannerEnabled
+        }
+
+    val configurationFiles: List<FilePathState>
+        get() {
+            return internalState.configurationFiles
+        }
+
+    val explicitlyDefinedKeyValuePairs: List<KeyValuePairState>
+        get() {
+            return internalState.explicitlyDefinedKeyValuePairs
         }
 
     fun getActiveSdk() = when {
@@ -132,6 +142,62 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
 
         @get:Attribute("smk_support_banner_enabled")
         var snakemakeSupportBannerEnabled by property(true)
+
+        @get:XCollection(propertyElementName = "configuration_file_paths")
+        var configurationFiles by list<FilePathState>()
+
+        @get:XCollection(propertyElementName = "key_value_pairs")
+        var explicitlyDefinedKeyValuePairs by list<KeyValuePairState>()
+    }
+
+    class FilePathState() : BaseState()
+    {
+
+        @get:Attribute("smk_configuration_file_path")
+        var path by string("")
+
+        @get:Attribute("smk_configuration_file_enabled")
+        var enabled: Boolean by property(true)
+
+        constructor(path: String, enabled: Boolean) : this() {
+            this.path = path
+            this.enabled = enabled
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as FilePathState
+
+            return path == other.path
+        }
+
+        override fun hashCode() = path?.hashCode() ?: 0
+    }
+
+    class KeyValuePairState() : BaseState() {
+        @get:Attribute("smk_key_value_pair_key")
+        var key by string("")
+
+        @get:Attribute("smk_key_value_pair_value")
+        var value by string("")
+
+        constructor(key: String, value: String) : this() {
+            this.key = key
+            this.value = value
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as KeyValuePairState
+
+            return key == other.key
+        }
+
+        override fun hashCode() = key?.hashCode() ?: 0
     }
 
     companion object {
@@ -209,7 +275,9 @@ interface SmkSupportProjectSettingsListener {
         oldState: SmkSupportProjectSettings.State,
         sdkRenamed: Boolean,
         sdkRemoved: Boolean
-    ) {}
-    fun enabled(newSettings: SmkSupportProjectSettings)  {}
+    ) {
+    }
+
+    fun enabled(newSettings: SmkSupportProjectSettings) {}
     fun disabled(newSettings: SmkSupportProjectSettings) {}
 }

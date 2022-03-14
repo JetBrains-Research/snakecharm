@@ -18,6 +18,7 @@ Released on ...
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Added
+- `Resolve`, `Completion` for `config` keys (see [#433](https://github.com/JetBrains-Research/snakecharm/issues/433))
 - Inspection: warns that that all docstrings except the first one will be ignored (see [#341](https://github.com/JetBrains-Research/snakecharm/issues/341))
 - Quick fix for unresolved files (conda, configfile. etc.) (see [#277](https://github.com/JetBrains-Research/snakecharm/issues/277))
 - Warning: Snakemake support is disabled (see [#109](https://github.com/JetBrains-Research/snakecharm/issues/109))

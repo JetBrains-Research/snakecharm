@@ -1,11 +1,11 @@
 package com.jetbrains.snakecharm.stringLanguage.lang.psi.references
 
 import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.openapi.components.service
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReferenceBase
 import com.intellij.psi.ResolveResult
-import com.intellij.util.ArrayUtil
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PsiReferenceEx
@@ -14,7 +14,9 @@ import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.completion.SmkDictionaryTypesCompletionProvider
+import com.jetbrains.snakecharm.codeInsight.completion.yamlKeys.SmkYAMLKeysStorage
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionIndexKeyExpressionImpl
 
 class SmkSLSubscriptionKeyReference(
@@ -40,7 +42,7 @@ class SmkSLSubscriptionKeyReference(
         }
 
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
-        type ?: return ResolveResult.EMPTY_ARRAY
+        type ?: return resolveConfigSubscription()
 
         val context = TypeEvalContext.codeAnalysis(element.project, element.containingFile)
         val resolveContext = PyResolveContext.defaultContext(context)
@@ -68,7 +70,7 @@ class SmkSLSubscriptionKeyReference(
     }
 
     override fun getVariants(): Array<Any> {
-        type ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
+        type ?: return completeConfigSubscription()
 
         val variants = arrayListOf<Any>()
         variants.addAll(type.getCompletionVariants(canonicalText, element, ProcessingContext()))
@@ -80,4 +82,27 @@ class SmkSLSubscriptionKeyReference(
 
     override fun handleElementRename(newElementName: String) =
         element.setName(newElementName)
+
+    private fun resolveConfigSubscription(): Array<ResolveResult> {
+        val operandLike = element.parent
+        if (operandLike !is SmkSLSubscriptionExpression) {
+            return ResolveResult.EMPTY_ARRAY
+        }
+
+        val storage = element.project.service<SmkYAMLKeysStorage>()
+        val result = storage.resolveToOperandChildByName(operandLike) ?: return emptyArray()
+        return arrayOf(RatedResolveResult(RatedResolveResult.RATE_HIGH, result))
+    }
+
+    private fun completeConfigSubscription(): Array<Any> {
+        val operandLike = element.parent
+        if (operandLike !is SmkSLSubscriptionExpression) {
+            return emptyArray()
+        }
+
+        val variants = arrayListOf<Any>()
+        val storage = element.project.service<SmkYAMLKeysStorage>()
+        variants.addAll(storage.getCompletionVariantsForOperand(operandLike))
+        return variants.toTypedArray()
+    }
 }

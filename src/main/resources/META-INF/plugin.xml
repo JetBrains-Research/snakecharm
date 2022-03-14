@@ -42,6 +42,14 @@
             instance="com.jetbrains.snakecharm.framework.SmkFrameworkConfigurableProvider"
             nonDefaultProject="true"
     />
+    <projectConfigurable
+            parentId="com.jetbrains.snakecharm.framework.SmkFrameworkConfigurableProvider"
+            id="com.jetbrains.snakecharm.framework.SmkConfigurationFilesConfigurableProvider"
+            bundle="SnakemakeBundle"
+            key="smk.framework.configurable.configuration.files.display.name"
+            instance="com.jetbrains.snakecharm.framework.SmkConfigurationFilesConfigurableProvider"
+            nonDefaultProject="true"
+    />
     <editorNotificationProvider implementation="com.jetbrains.snakecharm.framework.SmkSupportDisabledBanner"/>
     <notificationGroup
             id="SnakeCharmPluginNotifier"
@@ -626,7 +634,7 @@
     <postStartupActivity implementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SnakemakeStartupActivity"/>
 
     <projectService serviceImplementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage"/>
-
+    <projectService serviceImplementation="com.jetbrains.snakecharm.codeInsight.completion.yamlKeys.SmkYAMLKeysStorage"/>
     <projectService serviceImplementation="com.jetbrains.snakecharm.framework.SmkSupportProjectSettings"/>
     <projectService serviceImplementation="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider"/>
   </extensions>

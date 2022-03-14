@@ -86,6 +86,8 @@ object SmkSectionNameArgInSubscriptionReferenceProvider : PsiReferenceProvider()
                 return arrayOf(
                         SmkSectionNameArgInPySubscriptionLikeReference(psiString, type)
                 )
+            } else if (operand is PySubscriptionExpression) {
+                return arrayOf(SmkConfigSubscriptionReference(psiString, operand))
             }
 
         }

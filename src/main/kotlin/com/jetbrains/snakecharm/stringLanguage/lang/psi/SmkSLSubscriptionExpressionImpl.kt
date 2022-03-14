@@ -105,4 +105,27 @@ class SmkSLSubscriptionExpressionImpl(node: ASTNode) : SmkSLElementImpl(node), S
     }
 
     override fun getIndexExpression() = this.childToPsi<SmkSLSubscriptionIndexKeyExpressionImpl>(KEY_EXPRESSION)
+
+    override fun getSubscriptionKeys(): MutableList<String> {
+        val result = mutableListOf<String>()
+
+        children.forEach {
+            when (it) {
+                is SmkSLSubscriptionIndexKeyExpression -> {
+                    if (it.hasEmptyIndex()) {
+                        return@forEach
+                    }
+
+                    val text = when (val intOrNull = it.text.toIntOrNull()) {
+                        null -> it.text
+                        else -> "[$intOrNull]"
+                    }
+                    result.add(text)
+                }
+                is SmkSLSubscriptionExpression -> result.addAll(it.getSubscriptionKeys())
+            }
+        }
+
+        return result
+    }
 }
