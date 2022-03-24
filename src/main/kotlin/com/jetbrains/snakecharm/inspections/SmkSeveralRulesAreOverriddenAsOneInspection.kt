@@ -24,7 +24,7 @@ class SmkSeveralRulesAreOverriddenAsOneInspection : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkUse(use: SmkUse) {
-            if (use.getNewNamePattern()?.isWildcard() ?: true) {
+            if (use.getNewNamePattern()?.isWildcard() != false) {
                 // There are pattern in name
                 return
             }

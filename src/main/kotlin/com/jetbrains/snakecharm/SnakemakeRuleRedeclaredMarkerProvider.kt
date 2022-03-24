@@ -5,8 +5,10 @@ import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
 import com.intellij.icons.AllIcons
 import com.intellij.psi.PsiElement
+import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.jetbrains.python.psi.PyUtil
 import com.jetbrains.snakecharm.inspections.SmkRuleRedeclarationInspection
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_OR_CHECKPOINT
 import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkRule
@@ -17,9 +19,20 @@ class SnakemakeRuleRedeclaredMarkerProvider : RelatedItemLineMarkerProvider() {
         element: PsiElement,
         result: MutableCollection<in RelatedItemLineMarkerInfo<*>>,
     ) {
+        // TODO if leaf element -> get real element at offset?
         if (element is SmkRuleOrCheckpoint && (element is SmkRule || element is SmkCheckPoint)) {
-            collectOverloadingRulesOrCheckpoint(element, result) // TODO: use?
+            collectOverloadingRulesOrCheckpoint(element, result)
+        // TODO: use?
+        } else if (element.node.elementType in RULE_OR_CHECKPOINT) {
+            // Not clear why, sometimes we get 'rule' keyword, not SmkRule and gutter won't be shown by the
+            // above code
+            val parent = element.parent
+            if (parent is SmkRuleOrCheckpoint) {
+                collectOverloadingRulesOrCheckpoint(parent, result)
+            }
         }
+
+        element is LeafPsiElement
     }
 
     private fun collectOverloadingRulesOrCheckpoint(
@@ -34,6 +47,7 @@ class SnakemakeRuleRedeclaredMarkerProvider : RelatedItemLineMarkerProvider() {
         val nameIdentifier = ruleLike.nameIdentifier ?: return
 
         // TODO: reuse in SmkRuleRedeclarationInspection
+        // TODO: reuse in SmkRuleRedeclarationInspection
         val localRules = PyUtil.getParameterizedCachedValue(containingFile, "localRules") {
             containingFile.collectRules().map { it.second }
         }
@@ -41,16 +55,17 @@ class SnakemakeRuleRedeclaredMarkerProvider : RelatedItemLineMarkerProvider() {
             containingFile.collectCheckPoints().map { it.second }
         }
 
-        val localUses = PyUtil.getParameterizedCachedValue(containingFile, "localUses") {
-            containingFile.collectUses().map { it.second }
-        }
+//        val localUses = PyUtil.getParameterizedCachedValue(containingFile, "localUses") {
+//            containingFile.collectUses().map { it.second }
+//        }
 
 
         val resolveResults = SmkRuleRedeclarationInspection.collectRuleLikeWithSameName(
             ruleLike, nameToCheck,
             localRules = { localRules },
             localCheckpoints = { localCheckpoints },
-            localUses = { localUses }
+//            localUses = { localUses }
+            localUses = null
         )
 
         if (resolveResults.isEmpty()) {
@@ -73,6 +88,7 @@ class SnakemakeRuleRedeclaredMarkerProvider : RelatedItemLineMarkerProvider() {
                     ruleRedeclaredInItems.add(res)
                 }
             } else {
+                // Icon: AllIcons.Gutter.Unique ?
                 ruleRedeclaresElements.add(res)
             }
         }

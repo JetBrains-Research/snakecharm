@@ -23,6 +23,7 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
+        // TODO: reuse in SmkRuleRedeclarationInspection?
         private val localRules by lazy {
             holder.file.let { psiFile ->
                 when (psiFile) {
@@ -138,7 +139,7 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
             nameToCheck: String,
             localRules: () -> List<SmkRule>,
             localCheckpoints: () -> List<SmkCheckPoint>,
-            localUses: () -> List<SmkUse>,
+            localUses: (() -> List<SmkUse>)?,
         ): List<PsiElement> {
             val ruleResolveResults = AbstractSmkRuleOrCheckpointType.findAvailableRuleLikeElementByName(
                 ruleLike, nameToCheck, SmkRuleNameIndex.KEY, SmkRule::class.java, localRules
@@ -148,10 +149,12 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
                 ruleLike, nameToCheck, SmkCheckpointNameIndex.KEY, SmkCheckPoint::class.java, localCheckpoints
             )
 
-            val usesResolveResults: Collection<PsiElement> =
-                AbstractSmkRuleOrCheckpointType.findAvailableRuleLikeElementByName(
+            val usesResolveResults: Collection<PsiElement> =  when {
+                localUses != null -> AbstractSmkRuleOrCheckpointType.findAvailableRuleLikeElementByName(
                     ruleLike, nameToCheck, SmkUseNameIndex.KEY, SmkUse::class.java, localUses
                 )
+                else -> emptyList()
+            }
 
             return ruleResolveResults + cpResolveResults + usesResolveResults
         }
