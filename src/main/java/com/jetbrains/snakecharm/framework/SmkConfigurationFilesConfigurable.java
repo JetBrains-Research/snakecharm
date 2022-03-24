@@ -65,7 +65,7 @@ public class SmkConfigurationFilesConfigurable implements SearchableConfigurable
         filesChooserDescriptor.setTitle(SnakemakeBundle.message("smk.framework.configurable.panel.configuration.files.file.chooser"));
         filesChooserDescriptor.withFileFilter(file -> {
             String path = file.getCanonicalPath();
-            return path != null && path.endsWith(".yaml");
+            return path != null && (path.endsWith(".yaml") || path.endsWith(".yml"));
         });
 
         var yamlFilesPanel = ToolbarDecorator.createDecorator(yamlFilesTable)
@@ -141,7 +141,7 @@ public class SmkConfigurationFilesConfigurable implements SearchableConfigurable
     @NotNull
     private SmkSupportProjectSettings.State getUIState() {
         SmkSupportProjectSettings.State state = SmkSupportProjectSettings.Companion.getInstance(project).stateSnapshot();
-        state.setConfigurationFiles(yamlFilesPaths.stream().distinct().collect(Collectors.toList()));
+        state.setConfigurationFiles(yamlFilesPaths);
         state.setExplicitlyDefinedKeyValuePairs(keyValuePairs.stream().distinct().collect(Collectors.toList()));
         return state;
     }
@@ -154,12 +154,17 @@ public class SmkConfigurationFilesConfigurable implements SearchableConfigurable
     @Override
     public void reset() {
         final SmkSupportProjectSettings conf = SmkSupportProjectSettings.Companion.getInstance(project);
-
+        // Here we create a new instances for FilePathState and KeyValuePairState
+        // Because we want to know, when settings state was changed
+        // Otherwise, if we use provided objects
+        // Old settings state and the new one will be the same
         yamlFilesPaths.clear();
-        yamlFilesPaths.addAll(conf.getConfigurationFiles());
+        yamlFilesPaths.addAll(conf.getConfigurationFiles().stream()
+                .map(it -> new SmkSupportProjectSettings.FilePathState(Objects.requireNonNull(it.getPath()), it.getEnabled())).collect(Collectors.toList()));
         ((AbstractTableModel) yamlFilesTable.getModel()).fireTableRowsInserted(0, yamlFilesPaths.size() - 1);
         keyValuePairs.clear();
-        keyValuePairs.addAll(conf.getExplicitlyDefinedKeyValuePairs());
+        keyValuePairs.addAll(conf.getExplicitlyDefinedKeyValuePairs().stream()
+                .map(it -> new SmkSupportProjectSettings.KeyValuePairState(Objects.requireNonNull(it.getKey()), Objects.requireNonNull(it.getValue()))).collect(Collectors.toList()));
         ((AbstractTableModel) keyValuePairsTable.getModel()).fireTableRowsInserted(0, keyValuePairs.size() - 1);
     }
 }

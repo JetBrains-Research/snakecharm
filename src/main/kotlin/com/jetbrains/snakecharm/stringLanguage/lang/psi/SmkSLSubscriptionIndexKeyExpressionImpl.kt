@@ -47,5 +47,5 @@ class SmkSLSubscriptionIndexKeyExpressionImpl(node: ASTNode) : PyReferenceExpres
 
     override fun toString() = "SmkSLSubscriptionKeyExpression: [${this.referencedName}]"
 
-    override fun hasEmptyIndex() = text == "IntellijIdeaRulezzz "
+    override fun hasEmptyIndex() = text.endsWith("IntellijIdeaRulezzz ")
 }

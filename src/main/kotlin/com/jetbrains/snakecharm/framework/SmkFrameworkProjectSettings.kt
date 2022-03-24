@@ -163,17 +163,6 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
             this.path = path
             this.enabled = enabled
         }
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as FilePathState
-
-            return path == other.path
-        }
-
-        override fun hashCode() = path?.hashCode() ?: 0
     }
 
     class KeyValuePairState() : BaseState() {

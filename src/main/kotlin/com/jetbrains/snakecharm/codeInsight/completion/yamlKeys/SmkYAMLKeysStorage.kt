@@ -24,10 +24,9 @@ import org.jetbrains.yaml.psi.*
 import java.io.File
 
 // TODO: Support JSON
-// TODO: disable unresolved reference inspection for predefined key-value pairs
 class SmkYAMLKeysStorage(val project: Project) : Disposable {
 
-    private var reversedYAMLFiles = mutableListOf<SmartPsiElementPointer<YAMLFile>>()
+    private var reversedYAMLFiles = mutableListOf<Pair<SmartPsiElementPointer<YAMLFile>, Boolean>>()
     private var definedPairs = mutableMapOf<String, String>()
 
     fun initOnStartup() {
@@ -56,6 +55,8 @@ class SmkYAMLKeysStorage(val project: Project) : Disposable {
         })
     }
 
+    fun keyWasDefinedInYAMLKeyValuePairs(key: String) = definedPairs.containsKey(key)
+
     /**
      * Returns top-level [YAMLKeyValue] by its name or null
      */
@@ -68,10 +69,10 @@ class SmkYAMLKeysStorage(val project: Project) : Disposable {
      */
     fun getTopLevelKeysVariants(file: SmkFile): List<String> {
         val result = mutableListOf<String>()
-        val allYamlFiles = reversedYAMLFiles.mapNotNull { it.element } + file.advancedCollectConfigFiles()
-            .mapNotNull { (it.reference?.resolve() as? YAMLFile) }
         result.addAll(definedPairs.keys)
-        result.addAll(allYamlFiles.map { YAMLUtil.getTopLevelKeys(it).map { yamlKeyValue -> yamlKeyValue.keyText } }
+        result.addAll(getYamlFilesForSmkFile(file).map {
+            YAMLUtil.getTopLevelKeys(it).map { yamlKeyValue -> yamlKeyValue.keyText }
+        }
             .flatten())
         return result
     }
@@ -85,7 +86,7 @@ class SmkYAMLKeysStorage(val project: Project) : Disposable {
         val targetPsi = resolveToOperandOrItsChild(file, path) ?: return emptyArray()
         // We don't provide completion for YAMLSequence
         // Because it receives indexes, not keys
-        return when (val variantsProvider = (targetPsi as? YAMLKeyValue)?.value ?: targetPsi) {
+        return when (val variantsProvider = SmkYAMLUtil.getValueOrParam(targetPsi)) {
             is YAMLMapping -> variantsProvider.keyValues.mapNotNull { it.keyText }.toTypedArray()
             else -> return emptyArray()
         }
@@ -179,7 +180,7 @@ class SmkYAMLKeysStorage(val project: Project) : Disposable {
                 if (file.enabled && path != null) {
                     val yamlFile = fileSystem.findFileByIoFile(File(path))?.toPsi(project) as? YAMLFile
                     if (yamlFile != null) {
-                        reversedYAMLFiles.add(pointerManager.createSmartPsiElementPointer(yamlFile))
+                        reversedYAMLFiles.add(pointerManager.createSmartPsiElementPointer(yamlFile) to file.enabled)
                     }
                 }
             }
@@ -206,7 +207,13 @@ class SmkYAMLKeysStorage(val project: Project) : Disposable {
      * Collects '.yaml' files that produce keys for specific [file]
      */
     private fun getYamlFilesForSmkFile(file: SmkFile) =
-        reversedYAMLFiles.mapNotNull { it.element } + file.advancedCollectConfigFiles()
+        reversedYAMLFiles.mapNotNull {
+            if (it.second) {
+                it.first.element
+            } else {
+                null
+            }
+        } + file.advancedCollectConfigFiles()
             .mapNotNull { it.reference?.resolve() as? YAMLFile }
 
     private fun subscribeOnEvents() {
@@ -235,6 +242,19 @@ class SmkYAMLKeysStorage(val project: Project) : Disposable {
                 updateKeyValuePairs = true
             )
         })
+    }
+
+    /**
+     * Adds YAML file into storage if project runs in unit test mode
+     */
+    fun addFilesInTestMode(file: YAMLFile, enabled: Boolean) {
+        if (!ApplicationManager.getApplication().isUnitTestMode) {
+            throw IllegalStateException("Method 'addFilesInTestMode' is available only in unit test mode")
+        }
+
+        val pointerManager = SmartPointerManager.getInstance(project)
+
+        reversedYAMLFiles.add(pointerManager.createSmartPsiElementPointer(file) to enabled)
     }
 
     override fun dispose() {

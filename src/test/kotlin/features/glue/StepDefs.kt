@@ -11,15 +11,18 @@ import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.InjectionTestFixture
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
+import com.jetbrains.extensions.python.toPsi
 import com.jetbrains.python.PythonMockSdk
 import com.jetbrains.python.codeInsight.controlflow.ControlFlowCache
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
+import com.jetbrains.snakecharm.codeInsight.completion.yamlKeys.SmkYAMLKeysStorage
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
-import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
+import org.jetbrains.yaml.psi.YAMLFile
 import javax.swing.SwingUtilities
 import kotlin.test.fail
 
@@ -167,6 +170,42 @@ class StepDefs {
         }
         ApplicationManager.getApplication().invokeAndWait {
             SmkSupportProjectSettings.updateStateAndFireEvent(SnakemakeWorld.fixture().project, newState)
+        }
+
+        waitEDTEventsDispatching()
+    }
+
+    @Given("^add file \"(.+)\" as configuration file to settings panel and (enable|disable) file")
+    fun addConfigFile(file: String, mode: String) {
+        if (!file.endsWith(".yaml") && file.endsWith(".yml")) {
+            fail("File ends with '.yaml' or '.yml' was expected, but received: $file")
+        }
+
+        val enabled = when(mode) {
+            "enable" -> true
+            "disable" -> false
+            else -> fail("Unexpected configuration file mode: $mode")
+        }
+
+        ApplicationManager.getApplication().runReadAction {
+            val yamlFile = SnakemakeWorld.fixture().findFileInTempDir(file).toPsi(SnakemakeWorld.fixture().project) as YAMLFile
+            val storage = SnakemakeWorld.fixture().project.getService(SmkYAMLKeysStorage::class.java)
+            storage.addFilesInTestMode(yamlFile, enabled)
+        }
+    }
+
+    @Given("^add key-value pairs to settings panel")
+    fun addYAMLKeyValuePairs(table: DataTable) {
+        if (table.width() != 2) {
+            fail("Data table with two columns was expected, but received: ${table.width()}")
+        }
+        val project = SnakemakeWorld.fixture().project
+        val pairs = table.asLists().map { row -> SmkSupportProjectSettings.KeyValuePairState(row.component1(), row.component2()) }
+        val state = SmkSupportProjectSettings.getInstance(project).stateSnapshot()
+
+        state.explicitlyDefinedKeyValuePairs.addAll(pairs)
+        ApplicationManager.getApplication().invokeAndWait {
+            SmkSupportProjectSettings.updateStateAndFireEvent(project, state)
         }
 
         waitEDTEventsDispatching()

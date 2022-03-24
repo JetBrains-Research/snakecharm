@@ -93,6 +93,9 @@ Feature: This feature is tests for errors/warnings related to implicit symbols
 
   Scenario Outline: Cannot find config in section types
     Given a snakemake project
+    Given add key-value pairs to settings panel
+      | d  | value_d  |
+      | ff | value_ff |
     And I open a file "foo.smk" with text
     """
     config
@@ -107,7 +110,6 @@ Feature: This feature is tests for errors/warnings related to implicit symbols
         run:
             config['ff']
             config.get("d")
-            config.items()
     """
     And PyUnresolvedReferencesInspection inspection is enabled
       # Ensure Inspection works

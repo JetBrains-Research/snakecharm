@@ -11,7 +11,7 @@ class SmkYAMLUtil {
             for (node in path) {
                 // We're getting value here instead of getting it in 'is YAMLMapping'
                 // In order to return YAMLKeyValue and produce correct resolve
-                yamlPsiElement = (yamlPsiElement as? YAMLKeyValue)?.value ?: yamlPsiElement
+                yamlPsiElement = getValueOrParam(yamlPsiElement)
                 yamlPsiElement = when (yamlPsiElement) {
                     is YAMLMapping -> yamlPsiElement.keyValues.firstOrNull { it.key?.text == node }
                     is YAMLSequence -> {
@@ -23,6 +23,11 @@ class SmkYAMLUtil {
                 }
             }
             return yamlPsiElement
+        }
+
+        fun getValueOrParam(yamlPsiElement: YAMLPsiElement?): YAMLPsiElement? {
+            val result = (yamlPsiElement as? YAMLKeyValue)?.value ?: yamlPsiElement
+            return (result as? YAMLAlias)?.reference?.resolve()?.markedValue ?: result
         }
     }
 }

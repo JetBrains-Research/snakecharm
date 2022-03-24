@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.inspections
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.vfs.impl.http.HttpVirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
@@ -10,11 +11,15 @@ import com.jetbrains.python.psi.PyQualifiedExpression
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+import com.jetbrains.snakecharm.codeInsight.completion.yamlKeys.SmkYAMLKeysStorage
 import com.jetbrains.snakecharm.lang.psi.SmkModule
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkUse
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
+import com.jetbrains.snakecharm.lang.psi.references.SmkSectionNameArgInPySubscriptionLikeReference
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
+import com.jetbrains.snakecharm.lang.psi.types.SmkConfigType
+import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLSubscriptionKeyReference
 
 /**
  * See also: [com.jetbrains.snakecharm.lang.highlighter.SnakemakeVisitorFilter]
@@ -36,6 +41,10 @@ class SmkIgnorePyInspectionExtension : PyInspectionExtension() {
     ): Boolean {
         if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(node)) {
             return false
+        }
+
+        if(isDefinedYAMLKeyValuePair(reference)) {
+            return true
         }
 
         val refElement = reference.element
@@ -60,6 +69,15 @@ class SmkIgnorePyInspectionExtension : PyInspectionExtension() {
                     node.textMatches(SnakemakeAPI.SMK_VARS_PEP)
         }
         return false
+    }
+
+    private fun isDefinedYAMLKeyValuePair(reference: PsiReference) : Boolean{
+        val type = (reference as? SmkSectionNameArgInPySubscriptionLikeReference)?.type ?: (reference as? SmkSLSubscriptionKeyReference)?.type
+        if (type !is SmkConfigType){
+            return false
+        }
+        val storage = reference.element.project.service<SmkYAMLKeysStorage>()
+        return storage.keyWasDefinedInYAMLKeyValuePairs(reference.canonicalText)
     }
 
     // ignoreMissingDocstring
