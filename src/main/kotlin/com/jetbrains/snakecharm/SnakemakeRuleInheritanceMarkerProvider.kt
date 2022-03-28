@@ -9,7 +9,8 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex.Companion.KEY
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseInheritedRulesIndex
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseInheritedRulesIndex.Companion.INHERITED_RULES_DECLARATION_VIA_WILDCARD
 
 class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
 
@@ -33,12 +34,12 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         val name = use.getNewNamePattern()?.getNameBeforeWildcard() ?: return
 
         val inheritedRulesDeclaredExplicitly =
-            use.getDefinedReferencesOfImportedRuleNames()?.mapNotNull { it.reference.resolve() } ?: emptyList()
-        val ruleModule = use.getModuleName()?.reference?.resolve() as? SmkModule
-        val importedFile = ruleModule?.getPsiFile() as? SmkFile
-        val inheritedRulesDeclaredViaWildcard =
+            use.getImportedNamesList()?.resolveArguments() ?: emptyList()
+        val results = inheritedRulesDeclaredExplicitly.ifEmpty {
+            val ruleModule = use.getModuleName()?.reference?.resolve() as? SmkModule
+            val importedFile = ruleModule?.getPsiFile() as? SmkFile
             importedFile?.advancedCollectRules(mutableSetOf())?.map { it.second } ?: emptyList()
-        val results = inheritedRulesDeclaredExplicitly.ifEmpty { inheritedRulesDeclaredViaWildcard }
+        }
         if (results.isEmpty()) {
             return
         }
@@ -52,32 +53,32 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         element: SmkRuleOrCheckpoint,
         result: MutableCollection<in RelatedItemLineMarkerInfo<*>>
     ) {
-        val currentFile = element.containingFile
-        val namePsi = when (val identifier = element.nameIdentifier) {
+        val identifier = when (val identifier = element.nameIdentifier) {
             is SmkUseNewNamePattern -> identifier.getNameBeforeWildcard()
             else -> identifier
         } ?: return
-        val modulesFromStub = StubIndex.getInstance().getAllKeys(KEY, element.project)
         val module = element.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) } ?: return
-        val files = mutableSetOf<SmkFile>()
-        for (smkModule in modulesFromStub) {
-            files.addAll(StubIndex.getElements(
-                KEY,
-                smkModule,
-                module.project,
-                GlobalSearchScope.moduleWithDependentsScope(module),
-                SmkModule::class.java
-            ).mapNotNull { it.containingFile as? SmkFile })
-        }
-        if (currentFile is SmkFile) {
-            files.add(currentFile)
-        }
+        val descendantsDefinedExplicitly = StubIndex.getElements(
+            SmkUseInheritedRulesIndex.KEY,
+            identifier.text,
+            module.project,
+            GlobalSearchScope.moduleWithDependentsScope(module),
+            SmkUse::class.java
+        )
+        val potentialDescendants = StubIndex.getElements(
+            SmkUseInheritedRulesIndex.KEY,
+            INHERITED_RULES_DECLARATION_VIA_WILDCARD,
+            module.project,
+            GlobalSearchScope.moduleWithDependentsScope(module),
+            SmkUse::class.java
+        )
         val overrides = mutableListOf<SmkRuleOrCheckpoint>()
-        files.forEach { file ->
-            file.collectUses().forEach { (_, psi) ->
-                if (psi.getImportedRules()?.firstOrNull { it == element } != null) {
-                    overrides.add(psi)
-                }
+        (descendantsDefinedExplicitly + potentialDescendants).forEach { descendant ->
+            // We don't save it in stub because it requires 'resolve'
+            // We compare resolve results even for descendantsDefinedExplicitly
+            // Because there may be rules with the same names
+            if (descendant.getImportedRulesAndResolveThem()?.contains(element) == true) {
+                overrides.add(descendant)
             }
         }
         if (overrides.isEmpty()) {
@@ -86,6 +87,6 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         val builder = NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridenMethod)
             .setTargets(overrides)
             .setTooltipText(SnakemakeBundle.message("smk.line.marker.provider.overridden.rules"))
-        result.add(builder.createLineMarkerInfo(namePsi))
+        result.add(builder.createLineMarkerInfo(identifier))
     }
 }

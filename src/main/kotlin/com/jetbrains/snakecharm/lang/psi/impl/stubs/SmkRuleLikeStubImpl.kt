@@ -41,6 +41,10 @@ class SmkModuleStubImpl(
 ) : SmkRuleLikeStubImpl<SmkModuleStub, SmkModule>(name, parent, MODULE_DECLARATION_STATEMENT), SmkModuleStub
 
 class SmkUseStubImpl(
-    name: String?,
+    private val name: String?,
+    private val inheritedRulesNames: List<String?>,
     parent: StubElement<*>?
-) : SmkRuleLikeStubImpl<SmkUseStub, SmkUse>(name, parent, USE_DECLARATION_STATEMENT), SmkUseStub
+): NamedStub<SmkUse>, StubBase<SmkUse>(parent, USE_DECLARATION_STATEMENT), SmkUseStub {
+    override fun getName() = name
+    override fun getInheritedRulesNames() = inheritedRulesNames
+}

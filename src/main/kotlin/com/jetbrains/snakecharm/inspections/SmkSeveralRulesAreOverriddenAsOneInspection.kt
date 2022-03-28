@@ -24,7 +24,7 @@ class SmkSeveralRulesAreOverriddenAsOneInspection : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkUse(use: SmkUse) {
-            if (use.getNewNamePattern()?.isWildcard() ?: true) {
+            if (use.getNewNamePattern()?.isWildcard() != false) {
                 // There are pattern in name
                 return
             }
@@ -35,7 +35,7 @@ class SmkSeveralRulesAreOverriddenAsOneInspection : SnakemakeInspection() {
             }
             val namePsi = use.nameIdentifier ?: return
 
-            val overridden = use.getDefinedReferencesOfImportedRuleNames()
+            val overridden = use.getImportedNamesList()?.arguments()
 
             if (overridden != null && overridden.size == 1) {
                 // There are only one rule reference

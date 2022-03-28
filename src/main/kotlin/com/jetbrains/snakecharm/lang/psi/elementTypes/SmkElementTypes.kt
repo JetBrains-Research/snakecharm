@@ -43,7 +43,7 @@ object SmkElementTypes {
     val USE_IMPORTED_RULES_NAMES = PyElementType(
         "USE_IMPORTED_RULES_NAMES"
     ) {
-        SmkImportedRulesNamesList(it)
+        SmkImportedRulesNamesListImpl(it)
     }
 
     val WORKFLOW_ARGS_SECTION_STATEMENT = PyElementType(
