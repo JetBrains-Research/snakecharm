@@ -12,18 +12,16 @@ import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseStub
 class SmkUseElementType
     : SmkRuleDescendantElementType<SmkUseStub, SmkUse>("SMK_USE_DECLARATION_STATEMENT", KEY) {
 
-    lateinit var psi: SmkUse
-
     override fun createStub(name: String?, inheritedRules: List<String?>, parentStub: StubElement<*>?) =
         SmkUseStubImpl(name, inheritedRules, parentStub)
 
     override fun createStub(psi: SmkUse, parentStub: StubElement<out PsiElement>?): SmkUseStub =
         createStub(
             psi.name,
-            psi.getDefinedReferencesOfImportedRuleNames()?.map { it.text } ?: listOf(
+            psi.getImportedRulesNames()?.argumentsNames() ?: listOf(
                 INHERITED_RULES_DECLARATION_VIA_WILDCARD
             ),
-            parentStub).also { this.psi = psi }
+            parentStub)
 
     override fun createPsi(stub: SmkUseStub): SmkUse = SmkUseImpl(stub)
 

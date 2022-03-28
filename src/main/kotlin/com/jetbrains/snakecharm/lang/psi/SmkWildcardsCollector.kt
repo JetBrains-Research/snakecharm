@@ -229,7 +229,7 @@ class AdvancedWildcardsCollector(
         visitedSections: MutableSet<String>
     ) {
         // Get lists of inherited wildcards
-        val wildcardsLists = (use.getDefinedReferencesOfImportedRuleNames()?.toList() ?: use.getImportedRules())
+        val wildcardsLists = (use.getImportedRulesNames()?.arguments()?.toList() ?: use.getImportedRulesAndResolveThem())
             ?.map {
                 val listOfWildcards = mutableListOf<WildcardDescriptor>()
                 collectWildcards(it, listOfWildcards, visitedSections.toMutableSet())

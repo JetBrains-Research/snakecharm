@@ -21,7 +21,7 @@ class SmkUnresolvedImportedRuleNameInspection : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkUse(use: SmkUse) {
-            val references = use.getDefinedReferencesOfImportedRuleNames() ?: return
+            val references = use.getImportedRulesNames()?.arguments() ?: return
             val moduleRef = use.getModuleName()?.reference
             if (moduleRef != null) {
                 // If there are 'from' construction

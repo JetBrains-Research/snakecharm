@@ -4,10 +4,10 @@ import com.intellij.psi.stubs.*
 import com.jetbrains.python.psi.PyElement
 import com.jetbrains.python.psi.PyStubElementType
 import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
-import com.jetbrains.snakecharm.lang.psi.stubs.RuleDescendantStub
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseInheritedRulesIndex
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseStub
 
-abstract class SmkRuleDescendantElementType<StubT : RuleDescendantStub<*>, PsiT : PyElement>(
+abstract class SmkRuleDescendantElementType<StubT : SmkUseStub, PsiT : PyElement>(
     debugName: String,
     private val nameIndexKey: StubIndexKey<String, out SmkRuleLike<*>>?
 ) :

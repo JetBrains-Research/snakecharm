@@ -47,8 +47,8 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
             handleSections(null, ruleOrCheckpoint, visitedSections, wildcards)
             if (ruleOrCheckpoint is SmkUse) {
                 visitedRules.add(ruleOrCheckpoint.name ?: return)
-                ruleOrCheckpoint.getDefinedReferencesOfImportedRuleNames()
-                    ?.forEach { handleUseParent(ruleOrCheckpoint, it, visitedSections, wildcards) }
+                ruleOrCheckpoint.getImportedRulesNames()
+                    ?.arguments()?.forEach { handleUseParent(ruleOrCheckpoint, it, visitedSections, wildcards) }
             }
         }
 
@@ -130,8 +130,8 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
             }
             visitedRules.add(useName)
             handleSections(originalUseParent, useParent, visitedSections, wildcards)
-            useParent.getDefinedReferencesOfImportedRuleNames()
-                ?.forEach { handleUseParent(originalUseParent, it, visitedSections, wildcards) }
+            useParent.getImportedRulesNames()
+                ?.arguments()?.forEach { handleUseParent(originalUseParent, it, visitedSections, wildcards) }
         }
 
         private fun handleSections(

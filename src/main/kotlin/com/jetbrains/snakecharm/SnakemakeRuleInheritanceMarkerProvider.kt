@@ -33,12 +33,12 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
     ) {
         val name = (use.nameIdentifier as? SmkUseNameIdentifier)?.getNameBeforeWildcard() ?: return
         val inheritedRulesDeclaredExplicitly =
-            use.getDefinedReferencesOfImportedRuleNames()?.mapNotNull { it.reference.resolve() } ?: emptyList()
-        val ruleModule = use.getModuleName()?.reference?.resolve() as? SmkModule
-        val importedFile = ruleModule?.getPsiFile() as? SmkFile
-        val inheritedRulesDeclaredViaWildcard =
+            use.getImportedRulesNames()?.resolveArguments() ?: emptyList()
+        val results = inheritedRulesDeclaredExplicitly.ifEmpty {
+            val ruleModule = use.getModuleName()?.reference?.resolve() as? SmkModule
+            val importedFile = ruleModule?.getPsiFile() as? SmkFile
             importedFile?.advancedCollectRules(mutableSetOf())?.map { it.second } ?: emptyList()
-        val results = inheritedRulesDeclaredExplicitly.ifEmpty { inheritedRulesDeclaredViaWildcard }
+        }
         if (results.isEmpty()) {
             return
         }
@@ -76,7 +76,7 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
             // We don't save it in stub because it requires 'resolve'
             // We compare resolve results even for descendantsDefinedExplicitly
             // Because there may be rules with the same names
-            if (descendant.getImportedRules()?.contains(element) == true) {
+            if (descendant.getImportedRulesAndResolveThem()?.contains(element) == true) {
                 overrides.add(descendant)
             }
         }

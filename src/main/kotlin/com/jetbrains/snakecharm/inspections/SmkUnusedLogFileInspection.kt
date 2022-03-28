@@ -28,7 +28,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
 
         override fun visitSmkUse(use: SmkUse) {
             val logSection = use.getSectionByName(SnakemakeNames.SECTION_LOG) ?: return
-            (use.getDefinedReferencesOfImportedRuleNames()?.toList() ?: use.getImportedRules())?.forEach {
+            (use.getImportedRulesNames()?.arguments()?.toList() ?: use.getImportedRulesAndResolveThem())?.forEach {
                 handleUseReference(it, logSection)
             }
         }
@@ -108,7 +108,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
                         // But to its node, so we need to handle this cases
                         val useParent =
                             if (resolveResult is SmkUse) resolveResult else resolveResult?.parentOfType() ?: return
-                        useParent.getDefinedReferencesOfImportedRuleNames()?.firstOrNull {
+                        useParent.getImportedRulesNames()?.arguments()?.firstOrNull {
                             // Tries to get an appropriate reference if there are declared explicitly
                             val res = it.reference.resolve()
                             if (res is SmkUse) {
@@ -122,7 +122,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
                             // Using list of produced names
                             .firstOrNull { it.first == ruleReference.text && it.second != useParent.nameIdentifier }?.second
                         // If all rules from module were overridden as one, gets the last rule
-                        ?: useParent.getImportedRules()?.lastOrNull() ?: return
+                        ?: useParent.getImportedRulesAndResolveThem()?.lastOrNull() ?: return
                     }
                 }
             }

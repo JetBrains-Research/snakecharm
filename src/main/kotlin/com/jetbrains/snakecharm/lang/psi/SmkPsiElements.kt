@@ -42,14 +42,14 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
     fun getModuleName(): PsiElement?
 
     /**
-     * Returns an array of  [SmkReferenceExpression] which were defined as inherited rules
+     * Returns [SmkImportedRulesNames] if it is declared
      */
-    fun getDefinedReferencesOfImportedRuleNames(): Array<SmkReferenceExpression>?
+    fun getImportedRulesNames(): SmkImportedRulesNames?
 
     /**
-     * Returns list of [SmkRuleOrCheckpoint] from defined module. Returns null if there are no module reference, module section or file
+     * Returns list of resolved [SmkRuleOrCheckpoint] from defined module. Returns null if there are no module reference, module section or file
      */
-    fun getImportedRules(): List<SmkRuleOrCheckpoint>?
+    fun getImportedRulesAndResolveThem(): List<SmkRuleOrCheckpoint>?
 
     /**
      * Returns True if  "as" name is wildcard with '*', e.g:
@@ -62,7 +62,23 @@ interface SmkUseNameIdentifier : PyElement {
     fun isWildcard() : Boolean
     fun getNameBeforeWildcard() : PsiElement
 }
-class SmkImportedRulesNames(node: ASTNode) : PyElementImpl(node)
+
+interface SmkImportedRulesNames : PyElement {
+    /**
+     * Returns array of explicitly declared [SmkReferenceExpression]
+     */
+    fun arguments(): Array<SmkReferenceExpression>?
+
+    /**
+     * Returns names of explicitly declared [SmkReferenceExpression]
+     */
+    fun argumentsNames(): List<String>?
+
+    /**
+     * Resolves explicitly declared [SmkReferenceExpression]
+     */
+    fun resolveArguments(): List<SmkRuleOrCheckpoint>?
+}
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer
     /**

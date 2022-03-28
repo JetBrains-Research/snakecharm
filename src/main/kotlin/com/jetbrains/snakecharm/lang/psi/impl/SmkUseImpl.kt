@@ -3,7 +3,6 @@ package com.jetbrains.snakecharm.lang.psi.impl
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.types.TypeEvalContext
@@ -42,7 +41,7 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
             return namePattern.node
         }
         // There are no pattern or name node
-        val originalNames = getDefinedReferencesOfImportedRuleNames()
+        val originalNames = getImportedRulesNames()?.arguments()
         // Returns original names, we don't want to save one name because
         // index with this name probably already exists
         // so we save whole rules names if it is not just '*' wildcard
@@ -60,7 +59,7 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
             return listOf(newName.text to newName.originalElement)
         }
         val originalNames = mutableListOf<Pair<String, PsiElement>>()
-        getDefinedReferencesOfImportedRuleNames()?.forEach { reference ->
+        getImportedRulesNames()?.arguments()?.forEach { reference ->
             originalNames.add(reference.text to reference)
         }
         if (originalNames.isEmpty()) {
@@ -95,14 +94,10 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
     override fun getModuleName() =
         (findChildByType(SmkTokenTypes.SMK_FROM_KEYWORD) as? PsiElement)?.nextSibling?.nextSibling
 
-    override fun getDefinedReferencesOfImportedRuleNames(): Array<SmkReferenceExpression>? =
-        PsiTreeUtil.getChildrenOfType(
-            findChildByType(USE_IMPORTED_RULES_NAMES),
-            SmkReferenceExpression::class.java
-        )
+    override fun getImportedRulesNames() = findChildByType<SmkImportedRulesNames>(USE_IMPORTED_RULES_NAMES)
 
-    override fun getImportedRules(): List<SmkRuleOrCheckpoint>? =
-        getDefinedReferencesOfImportedRuleNames()?.mapNotNull { it.reference.resolve() as? SmkRuleOrCheckpoint }
+    override fun getImportedRulesAndResolveThem(): List<SmkRuleOrCheckpoint>? =
+        getImportedRulesNames()?.resolveArguments()
             ?: getPairsOfImportedRulesAndNames(mutableSetOf())?.map { it.second }
 
     override fun nameIdentifierIsWildcard() = (nameIdentifier as? SmkUseNameIdentifier)?.isWildcard() ?: false

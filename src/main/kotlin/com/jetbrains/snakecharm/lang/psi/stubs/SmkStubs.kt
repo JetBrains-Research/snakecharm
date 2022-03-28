@@ -7,4 +7,6 @@ interface SmkRuleStub : NamedStub<SmkRule>
 interface SmkCheckpointStub : NamedStub<SmkCheckPoint>
 interface SmkSubworkflowStub : NamedStub<SmkSubworkflow>
 interface SmkModuleStub : NamedStub<SmkModule>
-interface SmkUseStub : RuleDescendantStub<SmkUse>
+interface SmkUseStub : NamedStub<SmkUse> {
+    fun getInheritedRulesNames(): List<String?>
+}
