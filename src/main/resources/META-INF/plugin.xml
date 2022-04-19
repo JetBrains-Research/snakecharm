@@ -464,14 +464,14 @@
     />
 
     <localInspection
-            language="Snakemake" shortName="SmkLocalrulesRuleorderConfusingReference"
+            language="Snakemake" shortName="SmkLocalrulesRuleorderConfusingReferenceInspection"
             enabledByDefault="true"
             level="WEAK WARNING"
             suppressId="SmkLocalrulesRuleorderConfusingReference"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
             key="INSP.NAME.localrules.ruleorder.confusing.ref"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkLocalrulesRuleorderConfusingReference"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkLocalrulesRuleorderConfusingReferenceInspection"
     />
 
     <localInspection
