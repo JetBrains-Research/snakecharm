@@ -5,7 +5,7 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.*
 
-class SmkLocalrulesRuleorderConfusingReference : SnakemakeInspection() {
+class SmkLocalrulesRuleorderConfusingReferenceInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,

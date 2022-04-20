@@ -19,7 +19,7 @@ Feature: Inspection warns about confusing localrules or ruleorder names.
     checkpoint foo2:
       input: "in"
     """
-    When SmkLocalrulesRuleorderConfusingReference inspection is enabled
+    When SmkLocalrulesRuleorderConfusingReferenceInspection inspection is enabled
     Then I expect inspection weak warning on <<name>> with message
     """
     Rule '<name>' isn't defined in this file, not an error but it is confusing.
@@ -45,7 +45,7 @@ Feature: Inspection warns about confusing localrules or ruleorder names.
     <rule_like2> boo:
       input: "in"
     """
-    When SmkLocalrulesRuleorderConfusingReference inspection is enabled
+    When SmkLocalrulesRuleorderConfusingReferenceInspection inspection is enabled
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
@@ -71,7 +71,7 @@ Feature: Inspection warns about confusing localrules or ruleorder names.
     use rule boo as boo2 with:
       input: "in_2"
     """
-    When SmkLocalrulesRuleorderConfusingReference inspection is enabled
+    When SmkLocalrulesRuleorderConfusingReferenceInspection inspection is enabled
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:

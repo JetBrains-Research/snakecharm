@@ -77,6 +77,7 @@ private class SmkCompletionInLocalRulesAndRuleOrderSectionsProvider : Completion
         }
 
         addVariantsToCompletionResultSet(variants, parameters, result)
+        result.stopHere()
     }
 }
 
@@ -133,8 +134,10 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
                 parameters,
                 result
             )
+            result.stopHere()
         } else {
             addVariantsToCompletionResultSet(variants, parameters, result)
+            result.stopHere()
         }
     }
 

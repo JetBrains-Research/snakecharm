@@ -1,4 +1,6 @@
 Feature: Completion for rule names in localrules and ruleorder sections
+  Initially in completion were only rule-like variants, but other completion contributors inserts
+  something own in the list, so have to just expect rule-like elements in the list.
 
   Scenario: Complete in localrules section
     Given a snakemake project
@@ -19,7 +21,7 @@ Feature: Completion for rule names in localrules and ruleorder sections
     """
     When I put the caret after rule1,
     And I invoke autocompletion popup
-    Then completion list should only contain:
+    Then completion list should contain:
       | rule2 |
       | rule3 |
       | rule4 |
@@ -44,7 +46,7 @@ Feature: Completion for rule names in localrules and ruleorder sections
     """
     When I put the caret after rule3 >
     And I invoke autocompletion popup
-    Then completion list should only contain:
+    Then completion list should contain:
       | rule1 |
       | rule2 |
       | rule4 |
@@ -88,7 +90,7 @@ Feature: Completion for rule names in localrules and ruleorder sections
     """
     When I put the caret after rule3 <separator>
     And I invoke autocompletion popup
-    Then completion list should only contain:
+    Then completion list should contain:
       | rule1 |
       | rule2 |
       | rule4 |
@@ -128,7 +130,7 @@ Feature: Completion for rule names in localrules and ruleorder sections
     """
     When I put the caret after foo1 <separator>
     And I invoke autocompletion popup 2 times
-    Then completion list should only contain:
+    Then completion list should contain:
       | foo2 |
       | soo  |
       | boo1 |
