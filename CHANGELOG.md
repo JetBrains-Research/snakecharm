@@ -18,14 +18,12 @@ Released on April 27th 2022
 - Plugin Logo Updated  (see [#449](https://github.com/JetBrains-Research/snakecharm/issues/449)) 
 - Snakemake file type icon updated 
 - 'copy-minimal' shadow section missing in completion (see [#467](https://github.com/JetBrains-Research/snakecharm/issues/467)) 
-- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Added
 - Inspection: warns that that all docstrings except the first one will be ignored (see [#341](https://github.com/JetBrains-Research/snakecharm/issues/341))
 - Quick fix for unresolved files (conda, configfile. etc.) (see [#277](https://github.com/JetBrains-Research/snakecharm/issues/277))
 - Gutter icons for rule inheritance (see [#429](https://github.com/JetBrains-Research/snakecharm/issues/429))
 - Warning: Snakemake support is disabled (see [#109](https://github.com/JetBrains-Research/snakecharm/issues/109))
-- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ## [2021.3.661]
 Released on December 7th 2021
