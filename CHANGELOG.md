@@ -6,6 +6,9 @@
 ## [2022.1.0]
 Released on April 27th 2022
                                           
+### Changed:
+- Bundles snakemake wrappers list updated to `v1.3.2`
+
 ### Fixed
 - Make plugin compatible with PyCharm 2022.1  (see [#487](https://github.com/JetBrains-Research/snakecharm/issues/487))
 - Resolve/completion for checkpoints after `rules` keyword (see [#262](https://github.com/JetBrains-Research/snakecharm/issues/262))
