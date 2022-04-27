@@ -24,6 +24,7 @@ object SnakemakeWorld {
     @JvmField var myTestRootDisposable: TestDisposable? = null
     @JvmField var myInspectionProblemsCounts: MutableMap<String, Int>? = null
     @JvmField var myInspectionChecked: Boolean = false
+    @JvmField var myScenarioName: String = "NA"
     @JvmField var myPythonSnakemakeSdk: Sdk? = null
     @JvmField var myPythonOnlySdk: Sdk? = null
 

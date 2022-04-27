@@ -330,12 +330,14 @@ class ActionsSteps {
         }
 
         val fixture = fixture()
-        when (level) {
-            "error" -> fixture.checkHighlighting(false, false, false, ignoreExtra)
-            "warning" -> fixture.checkHighlighting(true, false, false, ignoreExtra)
-            "info" -> fixture.checkHighlighting(false, true, false, ignoreExtra)
-            "weak warning" -> fixture.checkHighlighting(false, false, true, ignoreExtra)
-            else -> fail("Unknown highlighting type: $level")
+        ApplicationManager.getApplication().invokeAndWait {
+            when (level) {
+                "error" -> fixture.checkHighlighting(false, false, false, ignoreExtra)
+                "warning" -> fixture.checkHighlighting(true, false, false, ignoreExtra)
+                "info" -> fixture.checkHighlighting(false, true, false, ignoreExtra)
+                "weak warning" -> fixture.checkHighlighting(false, false, true, ignoreExtra)
+                else -> fail("Unknown highlighting type: $level")
+            }
         }
         SnakemakeWorld.myInspectionChecked = true
     }

@@ -7,6 +7,7 @@ import com.intellij.testFramework.TestApplicationManager
 import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
 import io.cucumber.java.After
 import io.cucumber.java.Before
+import io.cucumber.java.Scenario
 import java.lang.reflect.Modifier
 import kotlin.system.exitProcess
 
@@ -20,6 +21,11 @@ class Hooks {
         // todo: most likely we should remove this call
         TestApplicationManager.getInstance()
         SnakemakeWorld.myInspectionChecked = false
+    }
+
+    @Before
+    fun beforeScenario(scenario: Scenario) {
+        SnakemakeWorld.myScenarioName = scenario.id
     }
 
     @After(order = 1)
