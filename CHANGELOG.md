@@ -7,8 +7,8 @@
 Released on May 4th 2022
                                           
 ### Changed:
+- Plugin is not compatible with PyCharm 2021.x due to 2022.1 API changes
 - Bundles snakemake wrappers list updated to `v1.3.2`
-- Plugin not compatible with PyCharm 2021.x due to 2022.1 API changes
 
 ### Fixed
 - Make plugin compatible with PyCharm 2022.1  (see [#487](https://github.com/JetBrains-Research/snakecharm/issues/487))
