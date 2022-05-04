@@ -180,6 +180,7 @@ class StepDefs {
         if (withWrappersStr != "with") {
             state.useBundledWrappersInfo = false
         }
+        waitEDTEventsDispatching()
         ApplicationManager.getApplication().invokeAndWait {
             SmkSupportProjectSettings.updateStateAndFireEvent(project, state)
         }
