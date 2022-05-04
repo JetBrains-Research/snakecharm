@@ -3,11 +3,10 @@
 
 # SnakeCharm Plugin Changelog
 
-## [2022.1.0]
-Released on April 27th 2022
+## [2021.3.0]
+Released on May 4th 27th 2022
                                           
 ### Fixed
-- Make plugin compatible with PyCharm 2022.1  (see [#487](https://github.com/JetBrains-Research/snakecharm/issues/487))
 - Resolve/completion for checkpoints after `rules` keyword (see [#262](https://github.com/JetBrains-Research/snakecharm/issues/262))
 - Quick fix for unused log file inspection (see [#452](https://github.com/JetBrains-Research/snakecharm/issues/452))
 - Resolve for rule names in `use rule` section (see [#455](https://github.com/JetBrains-Research/snakecharm/issues/455))
