@@ -167,7 +167,7 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
         // it is API for custom comps initialization
 
         pythonSdkCB = new PythonSdkChooserCombo(
-                project, null, Collections.emptyList(), null, sdk -> true
+                project, null, Collections.emptyList(), sdk -> true
         );
     }
 

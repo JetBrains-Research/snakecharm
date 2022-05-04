@@ -42,7 +42,8 @@
             instance="com.jetbrains.snakecharm.framework.SmkFrameworkConfigurableProvider"
             nonDefaultProject="true"
     />
-    <editorNotificationProvider implementation="com.jetbrains.snakecharm.framework.SmkSupportDisabledBanner"/>
+    <editorNotificationProvider implementation="com.jetbrains.snakecharm.framework.SmkSupportDisabledBannerProvider"/>
+    <applicationService serviceImplementation="com.jetbrains.snakecharm.framework.SmkSupportDisabledBannerNotification"/>
     <notificationGroup
             id="SnakeCharmPluginNotifier"
             displayType="BALLOON"
