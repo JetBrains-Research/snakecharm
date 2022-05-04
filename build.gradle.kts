@@ -16,7 +16,7 @@ plugins {
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
-    id("org.jetbrains.intellij") version "1.5.2"
+    id("org.jetbrains.intellij") version "1.5.3"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
     id("org.jetbrains.changelog") version "1.3.1"
 }
@@ -57,7 +57,11 @@ intellij {
     val platformPlugins = ArrayList<String>()
     when (platformType) {
         "PC" -> platformPlugins.add("python-ce")
-        "PY", "PD" -> platformPlugins.add("python")
+        "PY", "PD" -> {
+            platformPlugins.add("python")
+            // Workaround: https://youtrack.jetbrains.com/issue/PY-51535/PluginException-when-using-Python-Plugin-213-x-version#focus=Comments-27-5439344.0-0
+            platformPlugins.add("com.intellij.platform.images")
+        }
         else -> platformPlugins.add(properties("pythonPlugin"))
     }
     platformPlugins.addAll(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
