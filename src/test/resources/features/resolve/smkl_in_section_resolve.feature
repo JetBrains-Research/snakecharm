@@ -43,6 +43,7 @@ Feature: Resolve for sections/variables in SmkSL injections
          resources: a=""
          script: ""
          handover: True
+         default_target: True
          shell: "{<section>}"
          run:
     """
@@ -67,6 +68,7 @@ Feature: Resolve for sections/variables in SmkSL injections
       | cache                |
       | name                 |
       | handover             |
+      | default_target       |
 
   Scenario Outline: Resolve for python specific variables for sections w/o arguments
       Given a <smk_vers> project

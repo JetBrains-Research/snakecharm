@@ -176,19 +176,20 @@ Feature: Tests on snakemake string language injection
     When I put the caret after foo
     Then I expect no language injection
     Examples:
-    | section              |
-    | shadow               |
-    | wildcard_constraints |
-    | wrapper              |
-    | version              |
-    | cache                |
-    | threads              |
-    | priority             |
-    | singularity          |
-    | container            |
-    | containerized        |
-    | notebook             |
-    |handover              |
+      | section              |
+      | shadow               |
+      | wildcard_constraints |
+      | wrapper              |
+      | version              |
+      | cache                |
+      | threads              |
+      | priority             |
+      | singularity          |
+      | container            |
+      | containerized        |
+      | notebook             |
+      | handover             |
+      | default_target       |
 
   Scenario Outline: Inject in snakemake function calls
     Given a snakemake project

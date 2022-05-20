@@ -75,6 +75,7 @@ Feature: Completion for sections/variables in SmkSL injections
          name: "new_rule_name"
          script: ""
          handover: True
+         default_target: True
          shell: "{}"
          run: shell("{}")
     """
@@ -98,6 +99,7 @@ Feature: Completion for sections/variables in SmkSL injections
       | cache                |
       | name                 |
       | handover             |
+      | default_target       |
     Examples:
       | rule_like  | signature     |
       | rule       | shell: "{     |

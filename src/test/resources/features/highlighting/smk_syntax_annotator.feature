@@ -97,6 +97,7 @@ Feature: Annotate additional syntax
       | rule       | wrapper              | ""         | SMK_DECORATOR            |
       | rule       | name                 | ""         | SMK_DECORATOR            |
       | rule       | handover             | ""         | SMK_DECORATOR            |
+      | rule       | default_target       | ""         | SMK_DECORATOR            |
       | checkpoint | output               | "file.txt" | SMK_DECORATOR            |
       | checkpoint | run                  | ""         | PY.PREDEFINED_DEFINITION |
 

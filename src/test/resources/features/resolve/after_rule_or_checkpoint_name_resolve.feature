@@ -161,6 +161,7 @@ Feature: Resolve for section after rule/checkpoint name e.g. rules.NAME.input
          shell: ""
          cache: True
          handover: True
+         default_target: True
          run:
 
      rule ANOTHER_NAME:
@@ -169,20 +170,21 @@ Feature: Resolve for section after rule/checkpoint name e.g. rules.NAME.input
     When I put the caret after rules.NAME.
     Then reference should not resolve
     Examples:
-      | section     |
-      | conda       |
-      | shell       |
-      | threads     |
-      | shadow      |
-      | group       |
-      | envmodules  |
-      | singularity |
-      | cwl         |
-      | run         |
-      | script      |
-      | cache       |
-      | name        |
-      | handover    |
+      | section        |
+      | conda          |
+      | shell          |
+      | threads        |
+      | shadow         |
+      | group          |
+      | envmodules     |
+      | singularity    |
+      | cwl            |
+      | run            |
+      | script         |
+      | cache          |
+      | name           |
+      | handover       |
+      | default_target |
 
   Scenario Outline: Resolve for available sections
     Given a snakemake project

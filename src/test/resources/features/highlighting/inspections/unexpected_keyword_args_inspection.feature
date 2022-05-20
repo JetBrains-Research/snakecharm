@@ -46,6 +46,7 @@ Feature: Inspection for unexpected keyword arguments in section
       | rule       | threads         |
       | rule       | name            |
       | rule       | handover        |
+      | rule       | default_target  |
       | checkpoint | message         |
       | checkpoint | notebook        |
       | checkpoint | priority        |

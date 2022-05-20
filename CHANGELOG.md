@@ -9,6 +9,10 @@ Released on ...
 ### Fixed 
 - "Snakemake support is disabled. Not all features are available" is show in non Snakemake context  (see [#491](https://github.com/JetBrains-Research/snakecharm/issues/491))
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
+       
+### Added:
+- "default_target:" directive support  (see [#473](https://github.com/JetBrains-Research/snakecharm/issues/473)) 
+- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ## [2022.1.743]
 Released on May 4th 2022

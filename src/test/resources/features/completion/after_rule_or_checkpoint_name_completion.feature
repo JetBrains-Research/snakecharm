@@ -24,6 +24,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
          priority: 1
          resources: a=""
          envmodules: "foo"
+         default_target: True
          script: ""
          shell: ""
          name: "new_rule_name"
@@ -47,18 +48,19 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
       | priority             |
       | resources            |
     And completion list shouldn't contain:
-      | conda       |
-      | envmodules  |
-      | shell       |
-      | threads     |
-      | shadow      |
-      | group       |
-      | singularity |
-      | cwl         |
-      | run         |
-      | script      |
-      | name        |
-      | handover    |
+      | conda          |
+      | envmodules     |
+      | shell          |
+      | threads        |
+      | shadow         |
+      | group          |
+      | singularity    |
+      | cwl            |
+      | run            |
+      | script         |
+      | name           |
+      | handover       |
+      | default_target |
     Examples:
       | rule_like  | injection_left | injection_right |
       | rule       |                |                 |
@@ -124,6 +126,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
       | script               |
       | name                 |
       | handover             |
+      | default_target       |
     Examples:
       | rule_like  |
       | rule       |

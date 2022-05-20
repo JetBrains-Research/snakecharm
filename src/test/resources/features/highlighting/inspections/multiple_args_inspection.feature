@@ -44,25 +44,26 @@ Feature: Inspection for multiple arguments in various sections
     """
     When I check highlighting errors
     Examples:
-      | section       |
-      | shell         |
-      | script        |
-      | wrapper       |
-      | cwl           |
-      | conda         |
-      | singularity   |
-      | priority      |
-      | version       |
-      | cache         |
-      | group         |
-      | message       |
-      | benchmark     |
-      | threads       |
-      | shadow        |
-      | notebook      |
-      | container     |
-      | containerized |
-      | handover      |
+      | section        |
+      | shell          |
+      | script         |
+      | wrapper        |
+      | cwl            |
+      | conda          |
+      | singularity    |
+      | priority       |
+      | version        |
+      | cache          |
+      | group          |
+      | message        |
+      | benchmark      |
+      | threads        |
+      | shadow         |
+      | notebook       |
+      | container      |
+      | containerized  |
+      | handover       |
+      | default_target |
 
   Scenario Outline: Multiple arguments in workflow section
     Given a snakemake project
