@@ -8,10 +8,12 @@ import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiManager
 import com.intellij.ui.EditorNotificationPanel
 import com.intellij.ui.EditorNotificationProvider
 import com.intellij.ui.EditorNotifications
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import java.util.function.Function
 
 class SmkSupportDisabledBannerNotification {
@@ -36,6 +38,10 @@ class SmkSupportDisabledBannerProvider : EditorNotificationProvider {
         project: Project,
     ): EditorNotificationPanel? {
         val editor = (fileEditor as? TextEditor)?.editor ?: return null
+        val psiFile = PsiManager.getInstance(project).findFile(file)
+        if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(psiFile)) {
+            return null
+        }
         val settings = SmkSupportProjectSettings.getInstance(project)
         val isHidden = SmkSupportDisabledBannerNotification.getInstance().hiddenUntilRestart
         if (isHidden || editor.getUserData(DISABLE_NOTIFICATION) == true || !settings.snakemakeSupportBannerEnabled) {
