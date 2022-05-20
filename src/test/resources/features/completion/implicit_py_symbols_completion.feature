@@ -19,6 +19,7 @@ Feature: Completion in python part of snakemake file
       | dynamic   |
       | unpack    |
       | ancient   |
+      | ensure    |
       | shell     |
       | config    |
       | rules     |

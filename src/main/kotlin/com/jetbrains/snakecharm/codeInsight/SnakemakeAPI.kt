@@ -41,6 +41,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_WITH_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_ANCIENT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_DIRECTORY
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_DYNAMIC
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_ENSURE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_PIPE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_PROTECTED
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_REPEAT
@@ -339,7 +340,8 @@ object SnakemakeAPI {
         SNAKEMAKE_IO_METHOD_PIPE to listOf(SECTION_OUTPUT),
         SNAKEMAKE_IO_METHOD_REPEAT to listOf(SECTION_BENCHMARK),
         SNAKEMAKE_IO_METHOD_UNPACK to listOf(SECTION_INPUT),
-        SNAKEMAKE_IO_METHOD_DYNAMIC to listOf(SECTION_OUTPUT)
+        SNAKEMAKE_IO_METHOD_DYNAMIC to listOf(SECTION_OUTPUT),
+        SNAKEMAKE_IO_METHOD_ENSURE to listOf(SECTION_OUTPUT)
     )
 
     val SMK_API_PKG_NAME_SMK = "snakemake"

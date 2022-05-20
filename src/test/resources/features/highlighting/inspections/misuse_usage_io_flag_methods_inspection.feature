@@ -20,9 +20,10 @@ Feature: Inspection for methods from snakemake library
       | rule       | input   | protected | ('')     | 'benchmark', 'log', 'output' |
       | rule       | log     | temp      | ('')     | 'input', 'output'            |
       | rule       | input   | dynamic   | ('')     | 'output'                     |
-      | rule       | input   | touch     | ('')     | 'benchmark', 'log', 'output'  |
+      | rule       | input   | touch     | ('')     | 'benchmark', 'log', 'output' |
       | rule       | input   | repeat    | ('')     | 'benchmark'                  |
       | rule       | input   | report    | ('')     | 'output'                     |
+      | rule       | input   | ensure    | ('')     | 'output'                     |
       | rule       | output  | ancient   | ('')     | 'input'                      |
       | rule       | output  | unpack    | ('')     | 'input'                      |
       | checkpoint | input   | directory | ('')     | 'output'                     |
@@ -56,6 +57,7 @@ Feature: Inspection for methods from snakemake library
       | rule       | output    | protected('') |
       | rule       | output    | dynamic('')   |
       | rule       | output    | touch('')     |
+      | rule       | output    | ensure('')    |
       | rule       | log       | touch('')     |
       | rule       | benchmark | touch('')     |
       | rule       | output    | report('')    |

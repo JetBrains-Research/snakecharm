@@ -65,11 +65,12 @@ Feature: Resolve implicitly imported python names
       | snakemake     | dyn | dynamic()   | dynamic     | io.py        |
       | snakemake     | un  | unpack()    | unpack      | io.py        |
       | snakemake     | anc | ancient()   | ancient     | io.py        |
+      | snakemake     | ens | ensure()    | ensure      | io.py        |
       | snakemake     | ru  | rules       | Rules       | __init__.py  |
       | snakemake     | ru  | rules.foo   | Rules       | __init__.py  |
       | snakemake     | inp | input       | input       | builtins.pyi |
-      | snakemake     | pe  | pep         | __init__     | project.py   |
-      | snakemake     | pe  | pep.config  | __init__     | project.py   |
+      | snakemake     | pe  | pep         | __init__    | project.py   |
+      | snakemake     | pe  | pep.config  | __init__    | project.py   |
 
   Scenario: Resolve at top-level: shell()
     Given a snakemake project

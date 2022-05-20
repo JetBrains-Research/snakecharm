@@ -12,6 +12,7 @@ Released on ...
        
 ### Added:
 - "default_target:" directive support  (see [#473](https://github.com/JetBrains-Research/snakecharm/issues/473)) 
+- "ensure:" directive support  (see [#489](https://github.com/JetBrains-Research/snakecharm/issues/489)) 
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ## [2022.1.743]
