@@ -8,7 +8,7 @@ import com.jetbrains.snakecharm.inspections.quickfix.CreateMissedFileUndoableAct
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkFileReference
 
-class SmkUnresolvedReferenceInspectionExtension : PyUnresolvedReferenceQuickFixProvider {
+class SmkUnresolvedReferenceQuickFixProvider : PyUnresolvedReferenceQuickFixProvider {
 
     override fun registerQuickFixes(reference: PsiReference, existing: MutableList<LocalQuickFix>) {
         val section = reference.element as? SmkArgsSection ?: return
@@ -20,9 +20,9 @@ class SmkUnresolvedReferenceInspectionExtension : PyUnresolvedReferenceQuickFixP
             }
             val name = fileReference.path
             existing.add(CreateMissedFileQuickFix(section,
-                name,
-                sectionName,
-                fileReference.searchRelativelyToCurrentFolder))
+                    name,
+                    sectionName,
+                    fileReference.searchRelativelyToCurrentFolder))
         }
     }
 }
