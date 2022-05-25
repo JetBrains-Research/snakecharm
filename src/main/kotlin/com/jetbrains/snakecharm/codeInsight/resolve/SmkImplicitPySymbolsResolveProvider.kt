@@ -16,10 +16,10 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_RULE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_THREADS
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
-class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
+class SmkImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
     override fun resolveName(
-            element: PyQualifiedExpression,
-            context: TypeEvalContext
+        element: PyQualifiedExpression,
+        context: TypeEvalContext,
     ): List<RatedResolveResult> {
         if (SnakemakeLanguageDialect.isInsideSmkFile(context.origin)) {
 
@@ -78,7 +78,7 @@ class SMKImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
             contextScope: SmkCodeInsightScope,
             cache: ImplicitPySymbolsCache,
             referencedName: String?,
-            items: ArrayList<RatedResolveResult>
+            items: ArrayList<RatedResolveResult>,
         ) {
             SmkCodeInsightScope.values().forEach { symbolScope ->
                 if (contextScope.includes(symbolScope)) {

@@ -8,7 +8,7 @@ import com.jetbrains.python.psi.impl.references.PyReferenceImpl
 import com.jetbrains.python.psi.resolve.PyReferenceResolveProvider
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
-import com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider
+import com.jetbrains.snakecharm.codeInsight.resolve.SmkImplicitPySymbolsResolveProvider
 import com.jetbrains.snakecharm.lang.psi.*
 
 /**
@@ -45,7 +45,7 @@ class SmkPyReferenceImpl(
         val context = myContext.typeEvalContext
 
         return PyReferenceResolveProvider.EP_NAME.extensionList.asSequence()
-                .filter { it is SMKImplicitPySymbolsResolveProvider }
+                .filter { it is SmkImplicitPySymbolsResolveProvider }
                 .flatMap {  it.resolveName(myElement, context).asSequence() }
                 .toMutableList()
     }

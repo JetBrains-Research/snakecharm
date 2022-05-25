@@ -23,7 +23,7 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_SL_INITIAL_TYPE_ACC
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionVariantsProcessor
-import com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider
+import com.jetbrains.snakecharm.codeInsight.resolve.SmkImplicitPySymbolsResolveProvider
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
@@ -78,7 +78,7 @@ class SmkSLInitialReference(
 
             val cache = ImplicitPySymbolsProvider.instance(element.project).cache
 
-            SMKImplicitPySymbolsResolveProvider.addSyntheticSymbols(contextScope, cache, referencedName, ret)
+            SmkImplicitPySymbolsResolveProvider.addSyntheticSymbols(contextScope, cache, referencedName, ret)
 
             SmkCodeInsightScope.values().asSequence()
                 .filter { symbolScope -> contextScope.includes(symbolScope) }

@@ -637,7 +637,7 @@
   <extensions defaultExtensionNs="Pythonid">
     <dialectsTokenSetContributor implementation="com.jetbrains.snakecharm.lang.SmkTokenSetContributor"/>
     <pyReferenceResolveProvider
-        implementation="com.jetbrains.snakecharm.codeInsight.resolve.SMKImplicitPySymbolsResolveProvider"
+        implementation="com.jetbrains.snakecharm.codeInsight.resolve.SmkImplicitPySymbolsResolveProvider"
     />
     <typeProvider implementation="com.jetbrains.snakecharm.codeInsight.SmkTypeProvider"/>
     <visitorFilter
