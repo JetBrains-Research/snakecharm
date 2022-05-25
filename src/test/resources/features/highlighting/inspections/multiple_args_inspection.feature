@@ -64,6 +64,7 @@ Feature: Inspection for multiple arguments in various sections
       | containerized  |
       | handover       |
       | default_target |
+      | retries        |
 
   Scenario Outline: Multiple arguments in workflow section
     Given a snakemake project

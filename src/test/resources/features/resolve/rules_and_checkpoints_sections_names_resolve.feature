@@ -65,6 +65,7 @@ Feature: Resolve for section names in rules and checkpoints
       | rule       | threads: 1           | threads        | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
       | rule       | handover: True       | handover       | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
       | rule       | default_target: True | default_target | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
+      | rule       | retries: 1           | retries        | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
       | checkpoint | output: ""           | output         | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
       | checkpoint | threads: 1           | threads        | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |
       | checkpoint | handover: True       | handover       | foo.smk | 1     | SmkRuleOrCheckpointArgsSectionImpl |

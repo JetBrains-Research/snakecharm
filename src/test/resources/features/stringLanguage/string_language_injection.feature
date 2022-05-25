@@ -190,6 +190,7 @@ Feature: Tests on snakemake string language injection
       | notebook             |
       | handover             |
       | default_target       |
+      | retries              |
 
   Scenario Outline: Inject in snakemake function calls
     Given a snakemake project

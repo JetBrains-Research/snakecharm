@@ -39,6 +39,7 @@ Feature: Resolve for sections/variables in SmkSL injections
          log: ""
          params: a=""
          priority: 1
+         retries: 3
          name: "new_rule_name"
          resources: a=""
          script: ""
@@ -69,6 +70,7 @@ Feature: Resolve for sections/variables in SmkSL injections
       | name                 |
       | handover             |
       | default_target       |
+      | retries              |
 
   Scenario Outline: Resolve for python specific variables for sections w/o arguments
       Given a <smk_vers> project

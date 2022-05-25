@@ -155,6 +155,7 @@ Feature: Resolve for section after rule/checkpoint name e.g. rules.NAME.input
          log: ""
          params: a=""
          priority: 1
+         retries: 3
          resources: a=""
          name: "new_rule_name"
          script: ""
@@ -185,6 +186,7 @@ Feature: Resolve for section after rule/checkpoint name e.g. rules.NAME.input
       | name           |
       | handover       |
       | default_target |
+      | retries        |
 
   Scenario Outline: Resolve for available sections
     Given a snakemake project

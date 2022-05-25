@@ -244,6 +244,7 @@ Feature: Completion for snakemake keyword-like things
       | checkpoint | han  | handover       |
       | rule       | defa | default_target |
       | checkpoint | defa | default_target |
+      | rule       | retr | retries        |
 
   Scenario Outline: Complete at rule/checkpoint/module level
     Given a snakemake project

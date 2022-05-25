@@ -22,6 +22,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
          log: ""
          params: a=""
          priority: 1
+         retries: 2
          resources: a=""
          envmodules: "foo"
          default_target: True
@@ -61,6 +62,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
       | name           |
       | handover       |
       | default_target |
+      | retries        |
     Examples:
       | rule_like  | injection_left | injection_right |
       | rule       |                |                 |
@@ -127,6 +129,7 @@ Feature: Completion after rule/checkpoint name e.g. rules.NAME.input
       | name                 |
       | handover             |
       | default_target       |
+      | retries              |
     Examples:
       | rule_like  |
       | rule       |

@@ -72,6 +72,7 @@ Feature: Completion for sections/variables in SmkSL injections
          singularity: ""
          cwl: ""
          priority: 1
+         retries: 3
          name: "new_rule_name"
          script: ""
          handover: True
@@ -100,6 +101,7 @@ Feature: Completion for sections/variables in SmkSL injections
       | name                 |
       | handover             |
       | default_target       |
+      | retries              |
     Examples:
       | rule_like  | signature     |
       | rule       | shell: "{     |
