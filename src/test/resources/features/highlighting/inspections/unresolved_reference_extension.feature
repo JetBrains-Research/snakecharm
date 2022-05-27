@@ -11,7 +11,11 @@ Feature: Inspection: SmkUnresolvedReferenceInspectionExtension
      """
      Unresolved reference '<path>'
      """
-    When I check highlighting warnings
+    When I check highlighting errors
+    # Impossible to check whether the file has been created because:
+    # 1) It is being creating asynchronously
+    # 2) So, we may need async refresh() (see LightTempDirTestFixtureImpl.java:137)
+    # It leads to Exception: "Do not perform a synchronous refresh under read lock ..."
     And I see available quick fix: Create '<path>'
     Examples:
       | path              | section                |
@@ -25,7 +29,12 @@ Feature: Inspection: SmkUnresolvedReferenceInspectionExtension
       | NAME.yaml         | pepfile                |
       | NAME.yml          | pepschema              |
 
-    # Impossible to check whether the file has been created because:
-    # 1) It is being creating asynchronously
-    # 2) So, we may need async refresh() (see LightTempDirTestFixtureImpl.java:137)
-    # It leads to Exception: "Do not perform a synchronous refresh under read lock ..."
+  Scenario: Do not show error if conda env name used instead of file
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+     """
+     rule NAME: conda: "foo"
+     """
+    And PyUnresolvedReferencesInspection inspection is enabled
+    Then I expect no inspection errors
+    When I check highlighting errors

@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.*
+import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PsiReferenceEx
 import com.jetbrains.python.psi.PyElementGenerator
@@ -29,6 +30,11 @@ open class SmkFileReference(
 ) : PsiReferenceBase<SmkArgsSection>(element, textRange), PsiReferenceEx {
     // Reference caching can be implemented with the 'ResolveCache' class if needed
 
+    companion object {
+        // it is *not* final so that it can be changed in debug time. if set to false, caching is off
+        private const val USE_CACHE = true
+    }
+
     override fun handleElementRename(newElementName: String): PsiElement {
         val replacedElem = element.findElementAt(textRange.startOffset) ?: return element
 
@@ -47,7 +53,7 @@ open class SmkFileReference(
     // XXX: I thing better is a completion contributor with support of user-entered prefixes
     protected fun collectFileSystemItemLike(
         collectFiles: Boolean = true,
-        predicate: (file: PsiFileSystemItem) -> Boolean = { true }
+        predicate: (file: PsiFileSystemItem) -> Boolean = { true },
     ): Array<Any> {
         val project = element.project
 
@@ -82,7 +88,7 @@ open class SmkFileReference(
      */
     private fun relativePath(
         targetFile: VirtualFile,
-        baseFile: VirtualFile
+        baseFile: VirtualFile,
     ): String? {
 
         val relativePath = VfsUtil.getRelativePath(targetFile, baseFile)
@@ -126,9 +132,14 @@ open class SmkFileReference(
         return localFS.findFileByPath(path) ?: vfm.findFileByUrl(path)
     }
 
-    override fun resolve(): PsiElement? = findPathToResolve()
+    override fun resolve(): PsiElement? = if (USE_CACHE) {
+        val cache = ResolveCache.getInstance(element.project)
+        cache.resolveWithCaching(this, MyResolver, true, false)
+    } else {
+        findPathToResolve()
+    }
 
-    private fun findPathToResolve(): PsiElement? {
+    open fun findPathToResolve(): PsiElement? {
         if (!couldBeParsed()) {
             return null
         }
@@ -160,6 +171,29 @@ open class SmkFileReference(
     override fun getUnresolvedDescription(): String? = null
 
     open fun hasAppropriateSuffix(): Boolean = false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SmkFileReference) return false
+
+        if (textRange != other.textRange) return false
+        if (stringLiteralExpression != other.stringLiteralExpression) return false
+        if (path != other.path) return false
+        if (searchRelativelyToCurrentFolder != other.searchRelativelyToCurrentFolder) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = textRange.hashCode()
+        result = 31 * result + stringLiteralExpression.hashCode()
+        result = 31 * result + path.hashCode()
+        result = 31 * result + searchRelativelyToCurrentFolder.hashCode()
+        return result
+    }
+}
+
+private object MyResolver : ResolveCache.AbstractResolver<SmkFileReference, PsiElement?> {
+    override fun resolve(ref: SmkFileReference, incompleteCode: Boolean) = ref.findPathToResolve()
 }
 
 /**
@@ -170,7 +204,7 @@ class SmkIncludeReference(
     element: SmkArgsSection,
     textRange: TextRange,
     stringLiteralExpression: PyStringLiteralExpression,
-    path: String
+    path: String,
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike {
         it is SmkFile && it.originalFile != element.containingFile.originalFile
@@ -189,7 +223,7 @@ class SmkConfigfileReference(
     element: SmkArgsSection,
     textRange: TextRange,
     stringLiteralExpression: PyStringLiteralExpression,
-    path: String
+    path: String,
 ) : SmkFileReference(
     element,
     textRange,
@@ -213,7 +247,7 @@ class SmkPepfileReference(
     element: SmkArgsSection,
     textRange: TextRange,
     stringLiteralExpression: PyStringLiteralExpression,
-    path: String
+    path: String,
 ) : SmkFileReference(
     element,
     textRange,
@@ -236,7 +270,7 @@ class SmkPepschemaReference(
     element: SmkArgsSection,
     textRange: TextRange,
     stringLiteralExpression: PyStringLiteralExpression,
-    path: String
+    path: String,
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike {
         isYamlFile(it.name)
@@ -253,11 +287,17 @@ class SmkCondaEnvReference(
     element: SmkArgsSection,
     textRange: TextRange,
     stringLiteralExpression: PyStringLiteralExpression,
-    path: String
+    path: String,
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike {
         isYamlFile(it.name)
     }
+
+    /**
+     * W/o proper suffix is just local conda env name and cannot be verified => do not show
+     * unresolved reference error
+     */
+    override fun isSoft() = !hasAppropriateSuffix() // W/o suffix just conda env name
 
     override fun hasAppropriateSuffix() = isYamlFile(path.lowercase())
 }
@@ -272,7 +312,7 @@ class SmkNotebookReference(
     element: SmkArgsSection,
     textRange: TextRange,
     stringLiteralExpression: PyStringLiteralExpression,
-    path: String
+    path: String,
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike {
         val name = it.name.lowercase()
@@ -290,7 +330,7 @@ class SmkScriptReference(
     element: SmkArgsSection,
     textRange: TextRange,
     stringLiteralExpression: PyStringLiteralExpression,
-    path: String
+    path: String,
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike {
         val name = it.name.lowercase()
@@ -311,7 +351,7 @@ class SmkReportReference(
     element: SmkArgsSection,
     textRange: TextRange,
     stringLiteralExpression: PyStringLiteralExpression,
-    path: String
+    path: String,
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike {
         it.name.endsWith(".html")
@@ -328,7 +368,7 @@ class SmkWorkDirReference(
     element: SmkArgsSection,
     textRange: TextRange,
     stringLiteralExpression: PyStringLiteralExpression,
-    path: String
+    path: String,
 ) : SmkFileReference(element, textRange, stringLiteralExpression, path) {
     override fun getVariants() = collectFileSystemItemLike(collectFiles = false)
 }

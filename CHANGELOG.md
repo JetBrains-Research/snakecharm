@@ -8,6 +8,7 @@ Released on ...
                                           
 ### Fixed 
 - "Snakemake support is disabled. Not all features are available" is show in non Snakemake context  (see [#491](https://github.com/JetBrains-Research/snakecharm/issues/491))
+- Do not show error for conda env that looks like already existing env (see [#493](https://github.com/JetBrains-Research/snakecharm/issues/493)) 
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
        
 ### Added:
