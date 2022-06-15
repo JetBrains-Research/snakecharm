@@ -5,17 +5,22 @@
 
 ## [Unreleased]
 Released on ...
+- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
+                                          
+### Added:
+- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
+
+### Fixed ## [2022.1.749]
+Released on June 15th 2022
                                           
 ### Fixed 
 - "Snakemake support is disabled. Not all features are available" is show in non Snakemake context  (see [#491](https://github.com/JetBrains-Research/snakecharm/issues/491))
 - Do not show error for conda env that looks like already existing env (see [#493](https://github.com/JetBrains-Research/snakecharm/issues/493)) 
-- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
        
 ### Added:
 - "default_target:" directive support  (see [#473](https://github.com/JetBrains-Research/snakecharm/issues/473)) 
 - "retries:" directive support  (see [#490](https://github.com/JetBrains-Research/snakecharm/issues/490)) 
 - "ensure:" directive support  (see [#489](https://github.com/JetBrains-Research/snakecharm/issues/489)) 
-- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ## [2022.1.743]
 Released on May 4th 2022
