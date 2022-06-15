@@ -5,12 +5,14 @@
 
 ## [Unreleased]
 Released on ...
+
+### Fixed
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
                                           
 ### Added:
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
-### Fixed ## [2022.1.749]
+## [2022.1.749]
 Released on June 15th 2022
                                           
 ### Fixed 
