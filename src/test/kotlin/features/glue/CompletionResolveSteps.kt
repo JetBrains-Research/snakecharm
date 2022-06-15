@@ -72,7 +72,7 @@ class CompletionResolveSteps {
                 val editor = SnakemakeWorld.fixture().editor
                 val position = getPositionBySignature(editor, marker, false)
                 editor.caretModel.moveToOffset(position)
-            }                          
+            }
         }, ModalityState.NON_MODAL)
     }
 
@@ -89,7 +89,7 @@ class CompletionResolveSteps {
     }
 
     @When("^I change current file to <([^>]+)>\$")
-    fun iChangeCurrentFileTo(file: String){
+    fun iChangeCurrentFileTo(file: String) {
         val application = ApplicationManager.getApplication()
         application.invokeAndWait({
             application.runWriteAction {
@@ -149,7 +149,7 @@ class CompletionResolveSteps {
         assertNotNull(result)
 
         val injectionHost = SnakemakeWorld.injectionFixture().injectedLanguageManager
-                .getInjectionHost(result)
+            .getInjectionHost(result)
         val containingFile = (injectionHost ?: result).containingFile
         val msg = "Resolve result type: ${result::class.java.simpleName}," +
                 " file: ${containingFile.virtualFile.path}\n" +
@@ -175,21 +175,22 @@ class CompletionResolveSteps {
         assertNotNull(containingFile)
         val actualPath = containingFile.virtualFile.path
         val actualSubString = actualPath.subSequence(
-                max(0,  actualPath.length - file.length),
-                actualPath.length
+            max(0, actualPath.length - file.length),
+            actualPath.length
         )
         assertEquals(file, actualSubString, msg)
 
         assertTrue(
-                targetPrefix.length <= result.textLength,
-                "Expected result prefix <$targetPrefix> is longer than element <${result.text}>\n$msg"
+            targetPrefix.length <= result.textLength,
+            "Expected result prefix <$targetPrefix> is longer than element <${result.text}>\n$msg"
         )
 
         val elementText = TextRange.from(result.textOffset, targetPrefix.length).substring(result.containingFile.text)
 //        val elementText = TextRange.from(0, targetPrefix.length).substring(result.text)
         assertEquals(targetPrefix, elementText, msg)
 
-        val text = TextRange.from(injectionStartOffset + result.textOffset,  context.length).substring(containingFile.text)
+        val text =
+            TextRange.from(injectionStartOffset + result.textOffset, context.length).substring(containingFile.text)
         assertEquals(context, text, msg)
 
     }
@@ -230,15 +231,15 @@ class CompletionResolveSteps {
                 val key = row[0] to row[1]
                 val idx = resolveResults[key]
                 assertNotNull(
-                        idx,
-                        message = "Variant [${key.first}, ${key.second}] is missing in:\n$actualRefsInfo"
+                    idx,
+                    message = "Variant [${key.first}, ${key.second}] is missing in:\n$actualRefsInfo"
                 )
                 if (prev != null) {
                     val prevKey = prev!!.second
                     assertTrue(
-                            prev!!.first < idx,
-                            message = "Variant [${prevKey.first}, ${prevKey.second}] should be before" +
-                                    " [${key.first}, ${key.second}] in:\n$actualRefsInfo"
+                        prev!!.first < idx,
+                        message = "Variant [${prevKey.first}, ${prevKey.second}] should be before" +
+                                " [${key.first}, ${key.second}] in:\n$actualRefsInfo"
                     )
                 }
                 prev = idx to key
@@ -268,20 +269,20 @@ class CompletionResolveSteps {
             assertEquals(0, results.filter { it.containingFile == null }.size)
 
             val completionListKey2 = results
-                    .map { result ->
-                        itemText(result) to result.containingFile.name
-                    }
-                    .groupBy { it }
-                    .map { entry -> entry.key to entry.value.size }
-                    .toMap()
+                .map { result ->
+                    itemText(result) to result.containingFile.name
+                }
+                .groupBy { it }
+                .map { entry -> entry.key to entry.value.size }
+                .toMap()
 
             val completionListKey3 = results
-                    .map { result ->
-                        Triple(itemText(result), result.javaClass.simpleName, result.containingFile.name)
-                    }
-                    .groupBy { it }
-                    .map { entry -> entry.key to entry.value.size }
-                    .toMap()
+                .map { result ->
+                    Triple(itemText(result), result.javaClass.simpleName, result.containingFile.name)
+                }
+                .groupBy { it }
+                .map { entry -> entry.key to entry.value.size }
+                .toMap()
 
             val rows = table.asLists()
 
@@ -302,9 +303,9 @@ class CompletionResolveSteps {
                 }
 
                 assertEquals(
-                        actualTimes, expectedTimes,
-                        "Expected $expectedTimes but was $actualTimes occurrences of $key." +
-                                " Actual refs:\n$actualRefsInfo\n"
+                    actualTimes, expectedTimes,
+                    "Expected $expectedTimes but was $actualTimes occurrences of $key." +
+                            " Actual refs:\n$actualRefsInfo\n"
                 )
             }
         }
@@ -330,15 +331,15 @@ class CompletionResolveSteps {
             assertEquals(0, results.filter { it!!.containingFile == null }.size)
 
             val completionList = results.map { it!!.containingFile.name }
-            val actualRefsInfo = results.joinToString(separator = "\n") {el ->
-                "|${el!!.containingFile.name} | # ${ if (el is PsiNamedElement) el.name else el.text}"
+            val actualRefsInfo = results.joinToString(separator = "\n") { el ->
+                "|${el!!.containingFile.name} | # ${if (el is PsiNamedElement) el.name else el.text}"
             }
 
             table.asList().forEach { fileName ->
                 assertTrue(
-                        fileName !in completionList,
-                        "Expected no items from $fileName in completion list." +
-                                " Actual refs:\n$actualRefsInfo\n"
+                    fileName !in completionList,
+                    "Expected no items from $fileName in completion list." +
+                            " Actual refs:\n$actualRefsInfo\n"
                 )
             }
         }
@@ -375,30 +376,32 @@ class CompletionResolveSteps {
         val buff = StringBuilder()
         val actual = SnakemakeWorld.completionList().zip(SnakemakeWorld.completionListPresentations())
             .map { (lookupString, p) ->
-            buff.clear()
-            buff.append('|')
-            buff.append(lookupString) //XXX: 'p.itemText' could be wrapped in extra quotes for some reason
-            if (nCols > 1) {
+                buff.clear()
                 buff.append('|')
-                buff.append(p.tailText)
-            }
-            if (nCols > 2) {
+                buff.append(lookupString) //XXX: 'p.itemText' could be wrapped in extra quotes for some reason
+                if (nCols > 1) {
+                    buff.append('|')
+                    buff.append(p.tailText)
+                }
+                if (nCols > 2) {
+                    buff.append('|')
+                    buff.append(p.typeText)
+                }
                 buff.append('|')
-                buff.append(p.typeText)
+                buff.toString()
             }
-            buff.append('|')
-            buff.toString()
-        }
         assertHasElements(actual, expected)
     }
 
     @Then("^completion list should be empty")
     fun completionListShouldBeEmpty() {
         assertEquals(
-                0, SnakemakeWorld.completionList().size,
-                "Unexpected items: ${SnakemakeWorld.completionList().take(20)
-                        .joinToString(separator="\n")}\n"
-                )
+            0, SnakemakeWorld.completionList().size,
+            "Unexpected items: ${
+                SnakemakeWorld.completionList().take(20)
+                    .joinToString(separator = "\n")
+            }\n"
+        )
     }
 
     @Then("^completion list should only contain:$")
@@ -488,7 +491,8 @@ class CompletionResolveSteps {
                 )
                 checkCompletionResult(fixture, false, cleanText)
             },
-            ModalityState.NON_MODAL)
+            ModalityState.NON_MODAL
+        )
     }
     /*
     @When("^I press Enter$")
@@ -530,7 +534,7 @@ class CompletionResolveSteps {
             val results = ref.multiResolve(false)
             assertNotNull(results)
             assertTrue(results.isNotEmpty())
-            results.map { it.element}
+            results.map { it.element }
         }
         else -> listOf(ref.resolve())
     }
@@ -539,7 +543,8 @@ class CompletionResolveSteps {
         val fixture = SnakemakeWorld.fixture()
         fixture.complete(CompletionType.BASIC, invocationCount)
         SnakemakeWorld.myCompletionList = fixture.lookupElementStrings
-        SnakemakeWorld.myCompletionListPresentations = fixture.lookupElements?.map { TestLookupElementPresentation.renderReal(it) }
+        SnakemakeWorld.myCompletionListPresentations =
+            fixture.lookupElements?.map { TestLookupElementPresentation.renderReal(it) }
     }
 
     private fun getCompletionItemsPresentation(): List<LookupElementPresentation> {
@@ -562,10 +567,12 @@ class CompletionResolveSteps {
                 val results = ref.multiResolve(false)
                 assertNotNull(results)
                 assertEquals(
-                        0, results.size.toLong(),
-                        "Unexpected results: ${results.joinToString(separator= "\n") {
-                            "${it.element?.javaClass?.simpleName}: [${it.element?.text}]" }
-                        }"
+                    0, results.size.toLong(),
+                    "Unexpected results: ${
+                        results.joinToString(separator = "\n") {
+                            "${it.element?.javaClass?.simpleName}: [${it.element?.text}]"
+                        }
+                    }"
                 )
             }
             else -> TestCase.assertNull(ref.resolve())
@@ -573,8 +580,8 @@ class CompletionResolveSteps {
     }
 
     private fun assertNotInCompletionList(
-            actualLookupItems: List<String>,
-            expectedMissingVariants: List<String>
+        actualLookupItems: List<String>,
+        expectedMissingVariants: List<String>,
     ) {
         val lookupElementsSet = HashSet(actualLookupItems)
         val unexpectedVariants = ArrayList<String>()
@@ -587,19 +594,20 @@ class CompletionResolveSteps {
             return
         }
         org.junit.Assert.fail(
-                """
+            """
                     The following variants aren't expected in completion list.
                     Unexpected variants:
                     ${UsefulTestCase.toString(unexpectedVariants)}
                     Completion list:
                     ${UsefulTestCase.toString(actualLookupItems)}
-                """.trimIndent())
+                """.trimIndent()
+        )
     }
 
     private fun checkCompletionResult(
-            fixture: CodeInsightTestFixture,
-            checkByFilePath: Boolean,
-            completionResultTextOrFileRelativePath: String
+        fixture: CodeInsightTestFixture,
+        checkByFilePath: Boolean,
+        completionResultTextOrFileRelativePath: String,
     ) {
         if (checkByFilePath) {
             fixture.checkResultByFile(completionResultTextOrFileRelativePath)
@@ -645,18 +653,20 @@ class CompletionResolveSteps {
         lookup.currentItem = item
         UIUtil.invokeLaterIfNeeded {
             CommandProcessor.getInstance().executeCommand(
-                    project, { lookup.finishLookup(ch) }, "", null)
+                project, { lookup.finishLookup(ch) }, "", null
+            )
         }
     }
 
     companion object {
         fun getReferenceAtOffset() = SnakemakeWorld.fixture()
-                .file.findReferenceAt(getOffsetUnderCaret())
+            .file.findReferenceAt(getOffsetUnderCaret())
 
-        fun getReferenceInInjectedLanguageAtOffset(): PsiReference?  {
+        fun getReferenceInInjectedLanguageAtOffset(): PsiReference? {
             val fixture = SnakemakeWorld.injectionFixture()
             val element = fixture.injectedElement ?: return null
-            val host = fixture.injectedLanguageManager.getInjectionHost(element) as PyStringLiteralExpression? ?: return null
+            val host =
+                fixture.injectedLanguageManager.getInjectionHost(element) as PyStringLiteralExpression? ?: return null
             val offset = getOffsetUnderCaret() - (host.stringValueTextRange.startOffset + host.textOffset)
             return element.containingFile?.findReferenceAt(offset)
         }
@@ -674,8 +684,8 @@ class CompletionResolveSteps {
 }
 
 class LookupFilter private constructor(
-        private val myLookupString: String,
-        private val myTypeString: String?
+    private val myLookupString: String,
+    private val myTypeString: String?,
 ) : Condition<LookupElement> {
 
     override fun value(lookupElement: LookupElement?): Boolean {
@@ -708,8 +718,8 @@ class LookupFilter private constructor(
             }
             filteredElements.size > 1 -> {
                 val msg = generatedDetailedMsg(
-                        "Several elements with the same conditions: ",
-                        filteredElements
+                    "Several elements with the same conditions: ",
+                    filteredElements
                 )
                 org.junit.Assert.fail(msg)
             }
@@ -728,8 +738,8 @@ class LookupFilter private constructor(
     private fun dumpLookupItem(lookupElements: Array<LookupElement>): String {
         val itemsDump = lookupElements.joinToString { lookupElement ->
             val itemPresentableText = LookupElementPresentation()
-                    .also { lookupElement.renderElement(it) }
-                    .itemText
+                .also { lookupElement.renderElement(it) }
+                .itemText
             "${lookupElement.lookupString} [$itemPresentableText]"
         }
         return itemsDump
@@ -763,8 +773,8 @@ class LookupFilter private constructor(
 
 
 fun <T> assertHasElements(
-        actualLookupItems: List<T>,
-        expectedVariants: List<T>
+    actualLookupItems: List<T>,
+    expectedVariants: List<T>,
 ) {
     val unmetElements = ArrayList<T>()
 
@@ -775,7 +785,7 @@ fun <T> assertHasElements(
     }
     if (unmetElements.isNotEmpty()) {
         org.junit.Assert.fail(
-                """
+            """
             "Not all elements were found in real collection. Following elements were missed :[
             ${UsefulTestCase.toString(unmetElements)}] in collection:[
             ${UsefulTestCase.toString(actualLookupItems)}]
@@ -785,8 +795,8 @@ fun <T> assertHasElements(
 }
 
 fun assertHasOnlyElements(
-        actualLookupItems: List<String>,
-        expectedVariants: List<String>
+    actualLookupItems: List<String>,
+    expectedVariants: List<String>,
 ) {
     val extraElements = ArrayList<String>()
 
@@ -798,7 +808,7 @@ fun assertHasOnlyElements(
 
     if (extraElements.isNotEmpty()) {
         org.junit.Assert.fail(
-                """
+            """
             "Real collection contains unwanted elements. Following elements were extra :[
             ${UsefulTestCase.toString(extraElements)}] in collection:[
             ${UsefulTestCase.toString(actualLookupItems)}]
