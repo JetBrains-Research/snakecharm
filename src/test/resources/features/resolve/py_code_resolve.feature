@@ -4,7 +4,7 @@ Feature: Resolve in python part of snakemake file
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    print("foo")
+    repr("foo")
     """
-    When I put the caret at prin
-    Then reference should resolve to "print" in "builtins.pyi"
+    When I put the caret at repr
+    Then reference should resolve to "repr" in "builtins.pyi"
