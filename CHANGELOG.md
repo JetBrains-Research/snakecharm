@@ -7,6 +7,7 @@
 Released on ...
 
 ### Fixed
+- Compatibility with PyCharm 2022.2
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
                                           
 ### Added:
