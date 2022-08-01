@@ -228,7 +228,7 @@ Feature: Annotate additional syntax
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    use rule * from module as other_*
+    use rule * from module exclude xxx as other_*
     """
     Then I expect inspection info on <use> with message
     """
@@ -239,6 +239,10 @@ Feature: Annotate additional syntax
     SMK_KEYWORD
     """
     Then I expect inspection info on <from> with message
+    """
+    SMK_KEYWORD
+    """
+    Then I expect inspection info on <exclude> with message
     """
     SMK_KEYWORD
     """

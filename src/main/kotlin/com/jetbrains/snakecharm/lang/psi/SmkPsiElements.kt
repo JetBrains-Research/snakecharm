@@ -73,6 +73,7 @@ interface SmkUseNewNamePattern : PyElement {
 }
 
 class SmkImportedRulesNamesList(node: ASTNode) : PyElementImpl(node)
+class SmkExcludedRulesNamesList(node: ASTNode) : PyElementImpl(node)
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer
     /**

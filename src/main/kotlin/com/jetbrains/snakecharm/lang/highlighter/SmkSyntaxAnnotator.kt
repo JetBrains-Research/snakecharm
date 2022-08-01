@@ -1,7 +1,7 @@
 package com.jetbrains.snakecharm.lang.highlighter
 
 import com.jetbrains.python.PyTokenTypes
-import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.KEYWORD_LIKE_TOKENS_FOR_ANNOTATOR
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.validation.SmkAnnotator
@@ -30,15 +30,17 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
         var next = node.treeNext
         var done = false
         while (!done && next != null) {
-            when (next.elementType) {
-                SmkTokenTypes.RULE_KEYWORD, SmkTokenTypes.SMK_FROM_KEYWORD,
-                SmkTokenTypes.SMK_AS_KEYWORD, SmkTokenTypes.SMK_WITH_KEYWORD -> addHighlightingAnnotation(
+            val elementType = next.elementType
+            when (elementType) {
+                in KEYWORD_LIKE_TOKENS_FOR_ANNOTATOR -> addHighlightingAnnotation(
                     next,
                     SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD
                 )
+
                 SmkElementTypes.USE_NEW_NAME_PATTERN, PyTokenTypes.IDENTIFIER -> addHighlightingAnnotation(
                     next, SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION
                 )
+
                 PyTokenTypes.COLON -> done = true
             }
             next = next.treeNext

@@ -30,3 +30,19 @@ use rule z from M
     input: "myfile3"
 
 use rule z from M input: "myfile3"
+
+use rule * from last_module5 as other_* other 2
+
+use rule * from M exclude
+use rule * from M exclude N1 N2
+use rule * from M exclude N1,,N2
+use rule * from M exclude N*
+use rule * from M exclude N*,N2
+
+use rule * from M as new_* exclude N1, N2
+
+use rule * from M exclude N1, N2
+    input: "myfile3"
+
+use rule * from M exclude N1, N2 as other*
+    input: "myfile3"

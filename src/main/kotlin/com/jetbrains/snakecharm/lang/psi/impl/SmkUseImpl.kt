@@ -55,10 +55,10 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
     }
 
     override fun getProducedRulesNames(visitedFiles: MutableSet<PsiFile>): List<Pair<String, PsiElement>> {
-        val newName = getNewNamePattern()
+        val newNamePtn = getNewNamePattern()
 
-        if (newName != null && !newName.isWildcard()) {
-            return listOf(newName.text to newName.originalElement)
+        if (newNamePtn != null && !newNamePtn.isWildcard()) {
+            return listOf(newNamePtn.text to newNamePtn.originalElement)
         }
         val originalNames = mutableListOf<Pair<String, PsiElement>>()
         getDefinedReferencesOfImportedRuleNames()?.forEach { reference ->
@@ -68,10 +68,11 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
             val pairs = getPairsOfImportedRulesAndNames(visitedFiles) ?: return emptyList()
             originalNames.addAll(pairs)
         }
-        return if (newName != null) {
-            originalNames.map { newName.text.replace("*", it.first) to it.second }
+        return if (newNamePtn != null) {
+            val patten = newNamePtn.text.replace(" ", "")
+            originalNames.map { (name, psi) -> patten.replace("*", name) to psi }
         } else {
-            originalNames.map { it.first.replace("*", it.first) to it.second }
+            originalNames.map { (name, psi) -> name.replace("*", name) to psi }
         }
     }
 

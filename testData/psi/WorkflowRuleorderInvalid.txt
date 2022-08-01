@@ -4,7 +4,7 @@ SnakemakeFile: WorkflowRuleorderInvalid.smk
     PyArgumentList
       PsiElement(Py:COLON)(':')
       PsiWhiteSpace(' ')
-      PsiErrorElement:identifier expected
+      PsiErrorElement:Identifier expected
         PsiElement(Py:SINGLE_QUOTED_STRING)(''rule1'')
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
@@ -39,7 +39,7 @@ SnakemakeFile: WorkflowRuleorderInvalid.smk
       PsiWhiteSpace(' ')
       PsiElement(Py:GT)('>')
       PsiWhiteSpace(' ')
-      PsiErrorElement:identifier expected
+      PsiErrorElement:Identifier expected
         PsiElement(Py:SINGLE_QUOTED_STRING)(''rule7'')
   PsiWhiteSpace('\n\n')
   SmkWorkflowRuleorderSection

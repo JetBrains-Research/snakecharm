@@ -8,57 +8,82 @@ package com.jetbrains.snakecharm.lang.parser
 class SnakemakeLexerTest : PyLexerTestCase() {
     fun testPythonExprAssignment() {
         doTest(
-                "TRACK = 'hg19.gtf'\n",
-                "Py:IDENTIFIER", "Py:SPACE", "Py:EQ", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:STATEMENT_BREAK")
+            "TRACK = 'hg19.gtf'\n",
+            "Py:IDENTIFIER", "Py:SPACE", "Py:EQ", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:STATEMENT_BREAK"
+        )
     }
 
     fun testRule() {
-        doTest("""
+        doTest(
+            """
             |rule all:
             |""".trimMargin().trimStart(),
-                "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:STATEMENT_BREAK")
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:STATEMENT_BREAK"
+        )
     }
 
     fun testSubworkflow() {
-        doTest("""
+        doTest(
+            """
             |subworkflow otherworkflow:
             |""".trimMargin().trimStart(),
-                "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:STATEMENT_BREAK")
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:STATEMENT_BREAK"
+        )
     }
 
     fun testContainer() {
-        doTest("""
+        doTest(
+            """
             |container:  "ddd":
             |""".trimMargin().trimStart(),
-            "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK", "Py:STATEMENT_BREAK"
+            "Py:IDENTIFIER",
+            "Py:COLON",
+            "Py:SPACE",
+            "Py:SINGLE_QUOTED_STRING",
+            "Py:COLON",
+            "Py:STATEMENT_BREAK",
+            "Py:LINE_BREAK",
+            "Py:STATEMENT_BREAK"
         )
     }
 
     fun testEnvvars() {
-        doTest("""
+        doTest(
+            """
             |envvars:
             |    "SOME_VARIABLE"           
             |""".trimMargin().trimStart(),
-            "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK", "Py:INDENT", "Py:SINGLE_QUOTED_STRING", "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK", "Py:STATEMENT_BREAK"
+            "Py:IDENTIFIER",
+            "Py:COLON",
+            "Py:STATEMENT_BREAK",
+            "Py:LINE_BREAK",
+            "Py:INDENT",
+            "Py:SINGLE_QUOTED_STRING",
+            "Py:STATEMENT_BREAK",
+            "Py:DEDENT",
+            "Py:LINE_BREAK",
+            "Py:STATEMENT_BREAK"
         )
     }
 
     fun testRuleWithParams() {
-        doTest("""
+        doTest(
+            """
             |rule all:
             |    input: 'foo'
             |""".trimMargin().trimStart(),
-                "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
-                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
-                "Py:STATEMENT_BREAK")
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+            "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
+            "Py:STATEMENT_BREAK"
+        )
     }
     /* TODO #16
     fun testRuleParamStringLiteralWithLineBreak() {
@@ -82,21 +107,25 @@ class SnakemakeLexerTest : PyLexerTestCase() {
     */
 
     fun testToplevelKeywordsOnTopLevel() {
-        doTest("""
+        doTest(
+            """
             |wildcard_constraints:
             |    foo = ".*"
             |report: "foo.rst"
             |""".trimMargin().trimStart(),
-                "Py:IDENTIFIER", "Py:COLON",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:INDENT", "Py:IDENTIFIER", "Py:SPACE", "Py:EQ", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
-                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
-                "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:STATEMENT_BREAK")
+            "Py:IDENTIFIER", "Py:COLON",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:SPACE", "Py:EQ", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+            "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
+            "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:STATEMENT_BREAK"
+        )
     }
+
     fun testToplevelKeywordsInRule() {
-        doTest("""
+        doTest(
+            """
             |rule all:
             |    wildcard_constraints:
             |       boo = ".*"
@@ -105,21 +134,22 @@ class SnakemakeLexerTest : PyLexerTestCase() {
             |    singularity:
             |       "docker://continuumio/miniconda3:4.4.10"
             |""".trimMargin().trimStart(),
-                "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:INDENT", "Py:IDENTIFIER", "Py:COLON",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:INDENT", "Py:IDENTIFIER", "Py:SPACE", "Py:EQ", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
-                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
-                "Py:IDENTIFIER", "Py:COLON",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:INDENT", "Py:IDENTIFIER", "Py:LPAR", "Py:SINGLE_QUOTED_STRING", "Py:RPAR",
-                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
-                "Py:IDENTIFIER", "Py:COLON",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:INDENT", "Py:SINGLE_QUOTED_STRING",
-                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:DEDENT", "Py:LINE_BREAK",
-                "Py:STATEMENT_BREAK")
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:SPACE", "Py:EQ", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+            "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
+            "Py:IDENTIFIER", "Py:COLON",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:LPAR", "Py:SINGLE_QUOTED_STRING", "Py:RPAR",
+            "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
+            "Py:IDENTIFIER", "Py:COLON",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:SINGLE_QUOTED_STRING",
+            "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:DEDENT", "Py:LINE_BREAK",
+            "Py:STATEMENT_BREAK"
+        )
     }
 
 
@@ -157,66 +187,88 @@ class SnakemakeLexerTest : PyLexerTestCase() {
      */
 
     fun testSeveralRuleWithParams() {
-        doTest("""
+        doTest(
+            """
             |rule all:
             |    input: 'foo'
             |rule last:
             |    output: 'boo'
             |""".trimMargin().trimStart(),
-                "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
-                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
-                "Py:IDENTIFIER",  "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
-                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
-                "Py:STATEMENT_BREAK")
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+            "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+            "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
+            "Py:STATEMENT_BREAK"
+        )
     }
 
     fun testRuleIncomplete1() {
-        doTest("""
+        doTest(
+            """
             |rule all:
             |rule last:
             |    output: 'boo'
             |""".trimMargin().trimStart(),
-                "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:IDENTIFIER",  "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
-                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
-                "Py:STATEMENT_BREAK")
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+            "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
+            "Py:STATEMENT_BREAK"
+        )
     }
 
     fun testRuleIncomplete2() {
-        doTest("""
+        doTest(
+            """
             |rule all:
             |    
             |rule last:
             |    output: 'boo'
             |""".trimMargin().trimStart(),
-                "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:IDENTIFIER",  "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
-                "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-                "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
-                "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
-                "Py:STATEMENT_BREAK")
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
+            "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:SINGLE_QUOTED_STRING",
+            "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK",
+            "Py:STATEMENT_BREAK"
+        )
     }
 
     fun testIssue190() {
         // https//github.com/JetBrains-Research/snakecharm/issues/190
-        doTest("""
+        doTest(
+            """
             |rule all:    
             |   params:
             |       extra="--buffer_size 20G"     
             |       # fooo
-            |""".trimMargin().trimStart()
-            ,
-            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-            "Py:INDENT", "Py:IDENTIFIER", "Py:EQ", "Py:SINGLE_QUOTED_STRING", "Py:LINE_BREAK", "Py:END_OF_LINE_COMMENT", "Py:LINE_BREAK", "Py:STATEMENT_BREAK"
+            |""".trimMargin().trimStart(),
+            "Py:IDENTIFIER",
+            "Py:SPACE",
+            "Py:IDENTIFIER",
+            "Py:COLON",
+            "Py:STATEMENT_BREAK",
+            "Py:LINE_BREAK",
+            "Py:INDENT",
+            "Py:IDENTIFIER",
+            "Py:COLON",
+            "Py:STATEMENT_BREAK",
+            "Py:LINE_BREAK",
+            "Py:INDENT",
+            "Py:IDENTIFIER",
+            "Py:EQ",
+            "Py:SINGLE_QUOTED_STRING",
+            "Py:LINE_BREAK",
+            "Py:END_OF_LINE_COMMENT",
+            "Py:LINE_BREAK",
+            "Py:STATEMENT_BREAK"
         )
     }
 
@@ -235,8 +287,10 @@ class SnakemakeLexerTest : PyLexerTestCase() {
             "Py:DEDENT", "Py:DEDENT", "Py:LINE_BREAK", "Py:STATEMENT_BREAK"
         )
     }
+
     fun testIssue275_2() {
-        doTest("""
+        doTest(
+            """
             |if True:
             |   pass
             |   rule:
@@ -254,27 +308,32 @@ class SnakemakeLexerTest : PyLexerTestCase() {
 
 
     fun testRuleSectionIncomplete1() {
-        doTest("""
+        doTest(
+            """
             |rule foo:
             |    input:
             |       
         """.trimMargin().trimStart(),
             "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
             "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK",
-            "Py:DEDENT", "Py:LINE_BREAK", "Py:STATEMENT_BREAK")
+            "Py:DEDENT", "Py:LINE_BREAK", "Py:STATEMENT_BREAK"
+        )
     }
 
     fun testRuleSectionIncomplete2() {
-        doTest("""
+        doTest(
+            """
             |rule foo:
             |    input:
         """.trimMargin().trimStart(),
             "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
-            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK")
+            "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK"
+        )
     }
 
     fun testRuleSectionIncomplete3() {
-        doTest("""
+        doTest(
+            """
             |rule foo:
             |    input:
             |pass
@@ -282,7 +341,8 @@ class SnakemakeLexerTest : PyLexerTestCase() {
             "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK",
             "Py:INDENT", "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK",
             "Py:DEDENT", "Py:LINE_BREAK",
-            "Py:PASS_KEYWORD", "Py:STATEMENT_BREAK")
+            "Py:PASS_KEYWORD", "Py:STATEMENT_BREAK"
+        )
     }
 
     fun testModuleSection1() {
@@ -293,7 +353,8 @@ class SnakemakeLexerTest : PyLexerTestCase() {
         """.trimMargin().trimStart(),
             "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COLON",
             "Py:STATEMENT_BREAK", "Py:LINE_BREAK", "Py:INDENT", "Py:IDENTIFIER",
-            "Py:COLON", "Py:STATEMENT_BREAK")
+            "Py:COLON", "Py:STATEMENT_BREAK"
+        )
     }
 
     fun testUseSection1() {
@@ -305,7 +366,8 @@ class SnakemakeLexerTest : PyLexerTestCase() {
             "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER",
             "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER",
             "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK", "Py:INDENT", "Py:IDENTIFIER",
-            "Py:COLON", "Py:STATEMENT_BREAK")
+            "Py:COLON", "Py:STATEMENT_BREAK"
+        )
     }
 
     fun testUseSection2() {
@@ -315,7 +377,8 @@ class SnakemakeLexerTest : PyLexerTestCase() {
         """.trimMargin().trimStart(),
             "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE", "Py:MULT",
             "Py:SPACE", "Py:FROM_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER",
-            "Py:SPACE", "Py:IDENTIFIER", "Py:MULT", "Py:STATEMENT_BREAK")
+            "Py:SPACE", "Py:IDENTIFIER", "Py:MULT", "Py:STATEMENT_BREAK"
+        )
     }
 
     fun testUseSection3() {
@@ -325,7 +388,20 @@ class SnakemakeLexerTest : PyLexerTestCase() {
         """.trimMargin().trimStart(),
             "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER",
             "Py:SPACE", "Py:FROM_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER",
-            "Py:SPACE", "Py:IDENTIFIER", "Py:STATEMENT_BREAK")
+            "Py:SPACE", "Py:IDENTIFIER", "Py:STATEMENT_BREAK"
+        )
+    }
+
+    fun testUseExclude() {
+        doTest(
+            """
+            |use rule * from M exclude a, b as new_*
+        """.trimMargin().trimStart(),
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE", "Py:MULT", "Py:SPACE",
+            "Py:FROM_KEYWORD", "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE",
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:COMMA", "Py:SPACE", "Py:IDENTIFIER", "Py:SPACE",
+            "Py:IDENTIFIER", "Py:SPACE", "Py:IDENTIFIER", "Py:MULT", "Py:STATEMENT_BREAK"
+        )
     }
 
     private fun doTest(text: String, vararg expectedTokens: String) {

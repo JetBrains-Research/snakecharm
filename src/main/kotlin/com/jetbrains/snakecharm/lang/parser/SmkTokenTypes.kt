@@ -16,6 +16,7 @@ object SmkTokenTypes {
     val USE_KEYWORD = PyElementType("USE_KEYWORD")
 
     val SMK_FROM_KEYWORD = PyElementType("SMK_FROM_KEYWORD")
+    val SMK_EXCLUDE_KEYWORD = PyElementType("SMK_EXCLUDE_KEYWORD")
     val SMK_AS_KEYWORD = PyElementType("SMK_AS_KEYWORD")
     val SMK_WITH_KEYWORD = PyElementType("SMK_WITH_KEYWORD")
 
@@ -50,6 +51,11 @@ object SmkTokenTypes {
     val WORKFLOW_TOPLEVEL_DECORATORS = TokenSet.orSet(
         WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE,
         RULE_LIKE
+    )
+
+    val KEYWORD_LIKE_TOKENS_FOR_ANNOTATOR = TokenSet.create(
+        RULE_KEYWORD, SMK_FROM_KEYWORD, SMK_EXCLUDE_KEYWORD,
+        SMK_AS_KEYWORD, SMK_WITH_KEYWORD,
     )
 
     /**

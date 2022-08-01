@@ -19,6 +19,31 @@ SnakemakeFile: Use.smk
       PsiElement(Py:IDENTIFIER)('b')
     PyStatementList
       <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNamesList
+      SmkReferenceExpression: a
+        PsiElement(Py:IDENTIFIER)('a')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: my_module
+      PsiElement(Py:IDENTIFIER)('my_module')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNewNamePattern
+      PsiElement(Py:IDENTIFIER)('b')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:IDENTIFIER)('c')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:IDENTIFIER)('d')
+    PyStatementList
+      <empty list>
   PsiWhiteSpace('\n\n')
   SmkUse
     PsiElement(Py:USE_KEYWORD)('use')
@@ -162,6 +187,81 @@ SnakemakeFile: Use.smk
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     SmkImportedRulesNamesList
+      PsiElement(Py:MULT)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: last_module5
+      PsiElement(Py:IDENTIFIER)('last_module5')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNewNamePattern
+      PsiElement(Py:IDENTIFIER)('other_')
+      PsiElement(Py:MULT)('*')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:IDENTIFIER)('a')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:IDENTIFIER)('b')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNamesList
+      PsiElement(Py:MULT)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: last_module6
+      PsiElement(Py:IDENTIFIER)('last_module6')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNewNamePattern
+      PsiElement(Py:MULT)('*')
+      PsiElement(Py:IDENTIFIER)('a')
+      PsiElement(Py:MULT)('*')
+      PsiElement(Py:IDENTIFIER)('b')
+      PsiElement(Py:MULT)('*')
+      PsiElement(Py:IDENTIFIER)('c')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNamesList
+      PsiElement(Py:MULT)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: last_module7
+      PsiElement(Py:IDENTIFIER)('last_module7')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNewNamePattern
+      PsiElement(Py:IDENTIFIER)('new')
+      PsiElement(Py:MULT)('*')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:IDENTIFIER)('exclude')
+      PsiWhiteSpace(' ')
+      PsiElement(Py:IDENTIFIER)('a')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNamesList
       SmkReferenceExpression: a
         PsiElement(Py:IDENTIFIER)('a')
       PsiElement(Py:COMMA)(',')
@@ -260,3 +360,107 @@ SnakemakeFile: Use.smk
           PsiWhiteSpace(' ')
           PyStringLiteralExpression: dataset
             PsiElement(Py:SINGLE_QUOTED_STRING)('"dataset"')
+  PsiWhiteSpace('\n\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNamesList
+      PsiElement(Py:MULT)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: M
+      PsiElement(Py:IDENTIFIER)('M')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_EXCLUDE_KEYWORD)('exclude')
+    PsiWhiteSpace(' ')
+    SmkExcludedRulesNamesList
+      SmkReferenceExpression: a
+        PsiElement(Py:IDENTIFIER)('a')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNamesList
+      PsiElement(Py:MULT)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: M
+      PsiElement(Py:IDENTIFIER)('M')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_EXCLUDE_KEYWORD)('exclude')
+    PsiWhiteSpace(' ')
+    SmkExcludedRulesNamesList
+      SmkReferenceExpression: a
+        PsiElement(Py:IDENTIFIER)('a')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression: b
+        PsiElement(Py:IDENTIFIER)('b')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNamesList
+      PsiElement(Py:MULT)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: M
+      PsiElement(Py:IDENTIFIER)('M')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_EXCLUDE_KEYWORD)('exclude')
+    PsiWhiteSpace(' ')
+    SmkExcludedRulesNamesList
+      SmkReferenceExpression: a
+        PsiElement(Py:IDENTIFIER)('a')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNewNamePattern
+      PsiElement(Py:IDENTIFIER)('new_')
+      PsiElement(Py:MULT)('*')
+    PyStatementList
+      <empty list>
+  PsiWhiteSpace('\n')
+  SmkUse
+    PsiElement(Py:USE_KEYWORD)('use')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:RULE_KEYWORD)('rule')
+    PsiWhiteSpace(' ')
+    SmkImportedRulesNamesList
+      PsiElement(Py:MULT)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_FROM_KEYWORD)('from')
+    PsiWhiteSpace(' ')
+    SmkReferenceExpression: M
+      PsiElement(Py:IDENTIFIER)('M')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_EXCLUDE_KEYWORD)('exclude')
+    PsiWhiteSpace(' ')
+    SmkExcludedRulesNamesList
+      SmkReferenceExpression: a
+        PsiElement(Py:IDENTIFIER)('a')
+      PsiElement(Py:COMMA)(',')
+      PsiWhiteSpace(' ')
+      SmkReferenceExpression: b
+        PsiElement(Py:IDENTIFIER)('b')
+    PsiWhiteSpace(' ')
+    PsiElement(Py:SMK_AS_KEYWORD)('as')
+    PsiWhiteSpace(' ')
+    SmkUseNewNamePattern
+      PsiElement(Py:IDENTIFIER)('new_')
+      PsiElement(Py:MULT)('*')
+    PyStatementList
+      <empty list>

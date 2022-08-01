@@ -38,6 +38,7 @@ object SnakemakeNames {
     const val MODULE_REPLACE_PREFIX_KEYWORD = "replace_prefix"
 
     const val USE_KEYWORD = "use"
+    const val USE_EXCLUDE_KEYWORD = "exclude"
     const val SMK_FROM_KEYWORD = "from"
     const val SMK_AS_KEYWORD = "as"
     const val SMK_WITH_KEYWORD = "with"

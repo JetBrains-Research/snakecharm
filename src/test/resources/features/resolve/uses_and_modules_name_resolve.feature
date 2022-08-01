@@ -140,16 +140,18 @@ Feature: Resolve use and module name to its declaration
     use rule <original> with:
       output: "dir/log.log"
 
-    use rule other_b as NAME_other with:
+    use rule other_o as NAME_other with:
       input:
         "data_file.txt"
     """
-    When I put the caret at other_b as NAME
+    When I put the caret at other_o as NAME
     Then reference should resolve to "<resolve_to>" in "foo.smk"
     Examples:
       | original                  | resolve_to      |
-      | a,b,c from M as other_*   | other_*         |
-      | other_a,other_b from M as | other_a,other_b |
+      | a,o,c from M as other_*   | other_*         |
+      | a,o,c from M as o th er_* | o th er_*       |
+      | o from M as *ther_*       | *ther_*         |
+      | other_a,other_o from M as | other_a,other_o |
 
   Scenario: Module name refer to module declaration
     Given a snakemake project

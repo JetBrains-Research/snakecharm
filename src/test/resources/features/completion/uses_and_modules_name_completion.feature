@@ -68,6 +68,38 @@ Feature: Completion for 'use' and 'module' sections
       | rule       |
       | checkpoint |
 
+  Scenario Outline: Complete rule name using complex patterns
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <rule_like> rule_name:
+      log: "log_file.txt"
+
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module MODULE_2:
+      snakefile: "boo.smk"
+
+    use rule * from MODULE_2 as not_*_AND_*_AND_*
+
+    use rule a,b,c from MODULE as other_* XXX * YYY ZZZ
+
+    rule my_rule:
+      log: rules.
+    """
+    When I put the caret after rules.
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | not_rule_name_AND_rule_name_AND_rule_name |
+      | other_aXXXaYYYZZZ                         |
+      | other_bXXXbYYYZZZ                         |
+      | other_cXXXcYYYZZZ                         |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
   Scenario Outline: Complete rule name, declared in .smk file included to module
     Given a snakemake project
     And a file "boo.smk" with text
