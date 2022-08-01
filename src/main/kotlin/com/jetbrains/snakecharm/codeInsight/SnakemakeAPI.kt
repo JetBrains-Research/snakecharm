@@ -291,7 +291,12 @@ object SnakemakeAPI {
             SMK_VARS_WILDCARDS,
             SECTION_INPUT,
             SMK_VARS_ATTEMPT
-        )
+        ),
+        SECTION_CONDA to arrayOf(
+            SMK_VARS_WILDCARDS,
+            SECTION_PARAMS,
+            SECTION_INPUT,
+        ),
     )
     val SECTION_LAMBDA_ARG_POSSIBLE_PARAMS: Set<String> =
         ALLOWED_LAMBDA_OR_CALLABLE_ARGS.values.flatMap { it.asIterable() }.toMutableSet().also {

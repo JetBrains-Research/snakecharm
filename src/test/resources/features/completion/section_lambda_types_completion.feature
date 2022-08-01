@@ -22,8 +22,8 @@ Feature: Completion for section lambda params attrs
       | rule       | params         | resources    |
       | rule       | resources      | input        |
       | rule       | threads        | input        |
-      | checkpoint | params         | input        |
-      | checkpoint | params         | output       |
+      | rule       | conda          | input        |
+      | rule       | conda          | params       |
       | checkpoint | params         | resources    |
       | checkpoint | resources      | input        |
       | checkpoint | threads        | input        |
@@ -51,12 +51,9 @@ Feature: Completion for section lambda params attrs
       | rule       | group          | wd               |
       | rule       | resources      | wd               |
       | rule       | threads        | wd               |
+      | rule       | conda          | wd               |
       | checkpoint | params         | wildcards        |
-      | checkpoint | params         | wd               |
       | checkpoint | input          | wd               |
-      | checkpoint | group          | wd               |
-      | checkpoint | resources      | wd               |
-      | checkpoint | threads        | wd               |
 
   Scenario Outline: No completion for lambda callable
     Given a snakemake project
@@ -77,5 +74,7 @@ Feature: Completion for section lambda params attrs
       | rule_like  | lambda_section | lambda_param |
       | rule       | params         | input        |
       | rule       | threads        | input        |
+      | rule       | resources      | input        |
+      | rule       | conda          | params       |
       | checkpoint | params         | output       |
       | checkpoint | threads        | input        |

@@ -52,6 +52,8 @@ Feature: Inspection for unexpected callable arguments in rulelike sections
       | rule       | input     |
       | rule       | params    |
       | rule       | threads   |
+      | rule       | conda   |
+      | rule       | resources   |
       | checkpoint | resources |
       | checkpoint | group     |
 

@@ -18,6 +18,8 @@ Feature: Resolve for section lambda params attrs
       | rule       | params         | resources    |
       | rule       | resources      | input        |
       | rule       | threads        | input        |
+      | rule       | conda          | input        |
+      | rule       | conda          | params       |
       | checkpoint | params         | input        |
       | checkpoint | params         | output       |
       | checkpoint | params         | resources    |
@@ -43,6 +45,7 @@ Feature: Resolve for section lambda params attrs
       | rule       | group          | wd               |
       | rule       | resources      | wd               |
       | rule       | threads        | wd               |
+      | rule       | conda          | wd               |
       | checkpoint | params         | wildcards        |
       | checkpoint | params         | wd               |
       | checkpoint | input          | wd               |
@@ -66,5 +69,6 @@ Feature: Resolve for section lambda params attrs
       | rule_like  | lambda_section | lambda_param |
       | rule       | params         | input        |
       | rule       | threads        | input        |
+      | rule       | conda          | input        |
       | checkpoint | params         | output       |
       | checkpoint | threads        | input        |

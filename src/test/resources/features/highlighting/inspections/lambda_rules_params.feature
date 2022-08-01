@@ -1,402 +1,104 @@
 Feature: Inspection checking lambda parameter names in various sections
 
-  Scenario Outline: 'wildcards' parameter in input section
+  Scenario Outline: Correct lambda parameters in section
     Given a snakemake project
     Given I open a file "foo.smk" with text
-    """
-    <rule_like> bwa_map:
-      input:
-        "data/genome.fa",
-        lambda wildcards: config["samples"][wildcards.sample]
-      output:
-        "output.txt"
-    """
+      """
+      <rule_like> NAME:
+        <section>:
+          <lambda>
+        output:
+          "somedir/{sample}.csv"
+      """
     And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | section   | lambda                                                |
+      | rule       | input     | lambda wildcards: ""                                  |
+      | rule       | group     | lambda wildcards: config["samples"][wildcards.sample] |
+      | rule       | params    | p=lambda wildcards, output: ""                        |
+      | rule       | threads   | lambda wildcards, input, attempt: 10                  |
+      | rule       | resources | p=lambda wildcards, input, threads, attempt: 1        |
+      | rule       | conda     | lambda wildcards, params, input: ""                   |
+      | checkpoint | threads   | lambda wildcards, input, attempt: 10                  |
 
-  Scenario Outline: Incorrect lambda parameter in input section
+  Scenario Outline: Too many lambda parameters in section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-      input:
-        "input.txt",
-        lambda a: a + "addition"
-      output:
-        "output.txt"
+      <section>:
+        <lambda>
     """
     And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect inspection weak warning on <a> in <a:> with message
-    """
-    Snakemake documentation suggests it's preferable to name the first parameter 'wildcards'.
-    """
+    Then I expect inspection error on <<error_place>> with messages
+      | Don't use more than <n> lambda parameter(s) in '<section>' section.       |
+      | Only use 'wildcards<allowed>' as lambda parameter in '<section>' section. |
     When I check highlighting weak warnings
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | section   | lambda                                                         | error_place | n | allowed                         |
+      | rule       | input     | lambda wildcards, aaa: ""                                      | aaa         | 1 |                                 |
+      | rule       | group     | lambda wildcards, aaa: ""                                      | aaa         | 1 |                                 |
+      | rule       | params    | p=lambda wildcards, output, input, resources, threads, log: "" | log         | 5 | /input/output/resources/threads |
+      | rule       | threads   | lambda wildcards, input, attempt, params: 1                    | params      | 3 | /input/attempt                  |
+      | rule       | conda     | lambda wildcards, params, input, aaa: ""                       | aaa         | 3 | /params/input                   |
+      | rule       | resources | p=lambda wildcards, input, threads, attempt, aaa: ""           | aaa         | 4 | /input/threads/attempt          |
+      | checkpoint | threads   | lambda wildcards, input, attempt, params: 1                    | params      | 3 | /input/attempt                  |
 
-  Scenario Outline: Too many lambda parameters in input section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-      input:
-        "input.txt",
-        lambda wildcards, a: a + "addition"
-      output:
-        "output.txt"
-    """
-    And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect inspection error on <a> in <, a:> with messages
-      | Only use 'wildcards' as lambda parameter in 'input' section. |
-      | Don't use more than 1 lambda parameter(s) in 'input' section.  |
-
-    When I check highlighting weak warnings
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-  Scenario Outline: 'wildcards' parameter in group section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> bwa_map:
-      group:
-        lambda wildcards: config["samples"][wildcards.sample]
-      output:
-        "output.txt"
-    """
-    And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect no inspection weak warnings
-    When I check highlighting weak warnings
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-  Scenario Outline: Incorrect lambda parameter in group section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-      group:
-        lambda a: a + "addition"
-      output:
-        "output.txt"
-    """
-    And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect inspection weak warning on <a> in <a:> with message
-    """
-    Snakemake documentation suggests it's preferable to name the first parameter 'wildcards'.
-    """
-    When I check highlighting weak warnings
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-  Scenario Outline: Too many lambda parameters in group section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-      group:
-        lambda wildcards, a: a + "addition"
-      output:
-        "output.txt"
-    """
-    And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect inspection error on <a> in <, a:> with messages
-      | Only use 'wildcards' as lambda parameter in 'group' section. |
-      | Don't use more than 1 lambda parameter(s) in 'group' section.  |
-    When I check highlighting weak warnings
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-  Scenario Outline: Correct lambda parameters in params section
+  Scenario Outline: Only used supported lambda parameters in section
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
       input: "input.txt"
-      params:
-        prefix=lambda wildcards, output: output[0][:-4]
+      <section>:
+        <lambda>
       output:
         "somedir/{sample}.csv"
       shell:
         "somecommand -o {params.prefix}"
     """
     And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect no inspection weak warnings
-    When I check highlighting weak warnings
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-  Scenario Outline: Incorrect lambda parameter in params section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
+    Then I expect inspection error on <<error_place>> with message
     """
-    <rule_like> NAME:
-      input: "input.txt"
-      params:
-        prefix=lambda wildcards, output, input, resources, log: output[0][:-4]
-      output:
-        "somedir/{sample}.csv"
-      shell:
-        "somecommand -o {params.prefix}"
-    """
-    And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect inspection error on <log> with message
-    """
-    Only use 'wildcards/input/output/resources/threads' as lambda parameter in 'params' section.
+    Only use 'wildcards/<allowed>' as lambda parameter in '<section>' section.
     """
     When I check highlighting weak warnings
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | section   | lambda                                                            | error_place | allowed                        |
+      | rule       | params    | p=lambda wildcards, output, input, resources, log: output[0][:-4] | log         | input/output/resources/threads |
+      | rule       | resources | p=lambda wildcards, input, threads, params: threads * 100         | params      | input/threads/attempt          |
+      | rule       | conda     | lambda wildcards, aaa: 10                                         | aaa         | params/input                   |
+      | checkpoint | params    | p=lambda wildcards, output, input, resources, log: output[0][:-4] | log         | input/output/resources/threads |
 
-
-  Scenario Outline: Incorrect lambda parameters order in params section
+  Scenario Outline: Wildcards param should be first in lambda
     Given a snakemake project
     Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-      input: "input.txt"
-      params:
-        prefix=lambda output, wildcards, input, resources, threads: output[0][:-4]
-      shell:
-        "somecommand -o {params.prefix}"
-    """
+      """
+      <rule_like> NAME:
+        input: "input.txt"
+        <section>:
+          lambda <section_param>, wildcards: <lambda_body>
+      """
     And SmkLambdaRuleParamsInspection inspection is enabled
     Then I expect inspection error on <wildcards> with message
-    """
-    'wildcards' has to be the first lambda parameter.
-    """
-    And I expect inspection error on <output> with message
-    """
-    'output' cannot be the first lambda parameter in 'params' section.
-    """
+      """
+      'wildcards' has to be the first lambda parameter.
+      """
+    And I expect inspection error on <<section_param>> in <lambda <section_param>> with message
+      """
+      '<section_param>' cannot be the first lambda parameter in '<section>' section.
+      """
     When I check highlighting weak warnings
     Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
+      | rule_like  | section   | section_param | lambda_body    |
+      | rule       | params    | output        | output[0][:-4] |
+      | rule       | threads   | input         | 10             |
+      | rule       | resources | input         | 10             |
+      | rule       | conda     | input         | 10             |
+      | checkpoint | conda     | input         | 10             |
 
-
-  Scenario Outline: Too many lambda parameters in params section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-      input: "input.txt"
-      params:
-        prefix=lambda wildcards, output, input, resources, threads, log: output[0][:-4]
-      shell:
-        "somecommand -o {params.prefix}"
-    """
-    And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect inspection error on <log> with messages
-      | Only use 'wildcards/input/output/resources/threads' as lambda parameter in 'params' section. |
-      | Don't use more than 5 lambda parameter(s) in 'params' section.                                 |
-
-    When I check highlighting weak warnings
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-  Scenario Outline: Correct lambda parameters in resources section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-      input: "input.txt"
-      resources:
-        prefix=lambda wildcards, input, threads, attempt: attempt * 100
-      output:
-        "somedir/{sample}.csv"
-      shell:
-        "somecommand -o {resources.prefix}"
-    """
-    And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect no inspection weak warnings
-    When I check highlighting weak warnings
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-  Scenario Outline: Incorrect lambda parameter in resources section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-      input: "input.txt"
-      resources:
-        prefix=lambda wildcards, input, threads, params: threads * 100
-      output:
-        "somedir/{sample}.csv"
-      shell:
-        "somecommand -o {resources.prefix}"
-    """
-    And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect inspection error on <params> with message
-    """
-    Only use 'wildcards/input/threads/attempt' as lambda parameter in 'resources' section.
-    """
-    When I check highlighting weak warnings
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-
-  Scenario Outline: Incorrect lambda parameters order in resources section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-      input: "input.txt"
-      resources:
-        prefix=lambda threads, wildcards, input, attempt: attempt * 100
-      shell:
-        "somecommand -o {resources.prefix}"
-    """
-    And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect inspection error on <wildcards> with message
-    """
-    'wildcards' has to be the first lambda parameter.
-    """
-    And I expect inspection error on <threads> with message
-    """
-    'threads' cannot be the first lambda parameter in 'resources' section.
-    """
-    When I check highlighting weak warnings
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-
-  Scenario Outline: Too many lambda parameters in resources section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-      input: "input.txt"
-      resources:
-        prefix=lambda wildcards, input, threads, attempt, random_name: random_name * 100
-      shell:
-        "somecommand -o {resources.prefix}"
-    """
-    And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect inspection error on <random_name> with messages
-      | Don't use more than 4 lambda parameter(s) in 'resources' section.                      |
-      | Only use 'wildcards/input/threads/attempt' as lambda parameter in 'resources' section. |
-
-    When I check highlighting weak warnings
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-  Scenario Outline: Correct lambda parameters in threads section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-      input: "input.txt"
-      threads:
-        lambda wildcards, input, attempt: 10
-      output:
-        "somedir/{sample}.csv"
-    """
-    And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect no inspection weak warnings
-    When I check highlighting weak warnings
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-  Scenario Outline: Incorrect lambda parameter in threads section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-      input: "input.txt"
-      threads:
-        lambda wildcards, output: 10
-      output:
-        "somedir/{sample}.csv"
-    """
-    And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect inspection error on <output> with message
-    """
-    Only use 'wildcards/input/attempt' as lambda parameter in 'threads' section.
-    """
-    When I check highlighting weak warnings
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-
-  Scenario Outline: Incorrect lambda parameters order in threads section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-      input: "input.txt"
-      threads:
-        lambda input, wildcards: 10
-    """
-    And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect inspection error on <wildcards> with message
-    """
-    'wildcards' has to be the first lambda parameter.
-    """
-    And I expect inspection error on <input> in <lambda input> with message
-    """
-    'input' cannot be the first lambda parameter in 'threads' section.
-    """
-    When I check highlighting weak warnings
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-
-  Scenario Outline: Too many lambda parameters in threads section
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <rule_like> NAME:
-      input: "input.txt"
-      threads:
-        lambda wildcards, input, attempt, params: attempt % 8
-    """
-    And SmkLambdaRuleParamsInspection inspection is enabled
-    Then I expect inspection error on <params> with messages
-      | Don't use more than 3 lambda parameter(s) in 'threads' section.      |
-      | Only use 'wildcards/input/attempt' as lambda parameter in 'threads' section. |
-    When I check highlighting weak warnings
-    Examples:
-      | rule_like  |
-      | rule       |
-      | checkpoint |
-    
   Scenario Outline: lambda functions not allowed in section
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -413,7 +115,6 @@ Feature: Inspection checking lambda parameter names in various sections
     Examples:
       | section              | rule_like  |
       | benchmark            | rule       |
-      | conda                | rule       |
       | output               | rule       |
       | log                  | rule       |
       | singularity          | rule       |
@@ -425,18 +126,33 @@ Feature: Inspection checking lambda parameter names in various sections
       | cwl                  | rule       |
       | version              | rule       |
       | benchmark            | checkpoint |
-      | conda                | checkpoint |
-      | output               | checkpoint |
-      | log                  | checkpoint |
-      | singularity          | checkpoint |
-      | priority             | checkpoint |
-      | wildcard_constraints | checkpoint |
-      | shell                | checkpoint |
-      | wrapper              | checkpoint |
-      | script               | checkpoint |
-      | cwl                  | checkpoint |
       | version              | checkpoint |
-      | cache                | checkpoint |
+
+  Scenario Outline: First params is preferable to be wildcards
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+        """
+        <rule_like> NAME:
+          <section>:
+            lambda aaa: aaa
+          output:
+            "output.txt"
+        """
+    And SmkLambdaRuleParamsInspection inspection is enabled
+    Then I expect inspection weak warning on <aaa> with message
+        """
+        Snakemake documentation suggests it's preferable to name the first parameter 'wildcards'.
+        """
+    When I check highlighting weak warnings
+    Examples:
+      | rule_like  | section   |
+      | rule       | input     |
+      | rule       | group     |
+      | rule       | params    |
+      | rule       | threads   |
+      | rule       | resources |
+      | rule       | conda     |
+      | checkpoint | input     |
 
   Scenario Outline: lambda invocations in sections where lambdas are not allowed
     Given a snakemake project

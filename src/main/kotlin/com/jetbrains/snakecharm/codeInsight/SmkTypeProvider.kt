@@ -14,19 +14,18 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_OR_CALLABLE_ARGS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTION_ACCESSOR_CLASSES
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_CHECKPOINTS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_CONFIG
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_PEP
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_RULES
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_ACCESSOR_CLASS
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RESOURCES
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
-import com.jetbrains.snakecharm.lang.psi.types.*
+import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
+import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeSectionArgsType
+import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
+import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpressionImpl
 
@@ -87,6 +86,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
                 ruleLike.getSectionByName(refTargetSection)?.let { SmkRuleLikeSectionArgsType(it) }
 
             }
+
             fqn == WILDCARDS_ACCESSOR_CLASS -> {
                 val ruleLike = PsiTreeUtil.getParentOfType(
                     anchor, SmkRuleOrCheckpoint::class.java
@@ -94,6 +94,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
 
                 context.getType(ruleLike.wildcardsElement)
             }
+
             else -> null
         }
         return type?.let { Ref.create(it) }
@@ -116,25 +117,21 @@ class SmkTypeProvider : PyTypeProviderBase() {
         val isFstPositionalParam = !referenceTarget.isKeywordOnly
                 && lambda.parameterList.parameters.indexOf(referenceTarget) == 0
 
-        if (isFstPositionalParam || paramName in allowedArgs) {
-            val type = when (paramName) {
-                SECTION_INPUT, SECTION_OUTPUT, SECTION_RESOURCES -> {
-                    ruleLike.getSectionByName(paramName)?.let { SmkRuleLikeSectionArgsType(it) }
-                }
-                else -> {
-                    // 1st positional parameter in a lambda is wildcard
-                    if (isFstPositionalParam) SmkWildcardsType(ruleLike) else null
-                }
-            }
-            return type?.let { Ref.create(it) }
+        var type: PyType? = null
+        if (isFstPositionalParam) {
+            // 1st positional parameter in a lambda is wildcard
+            type = SmkWildcardsType(ruleLike)
+        } else if (paramName in allowedArgs && paramName != SMK_VARS_WILDCARDS) {
+            type = ruleLike.getSectionByName(paramName)?.let { SmkRuleLikeSectionArgsType(it) }
         }
-        return null
+
+        return type?.let { Ref.create(type) }
     }
 
     private fun <T : SmkSection> getParentSectionAndRuleLike(
         element: PsiElement,
         sectionClass: Class<T>,
-        vararg sectionStopAt: Class<out PsiElement>
+        vararg sectionStopAt: Class<out PsiElement>,
     ): Pair<T, SmkRuleOrCheckpoint>? {
         val section = PsiTreeUtil.getParentOfType(
             element, sectionClass, true, *sectionStopAt
@@ -149,7 +146,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
 
     override fun getReferenceExpressionType(
         referenceExpression: PyReferenceExpression,
-        context: TypeEvalContext
+        context: TypeEvalContext,
     ): PyType? {
         val smkExpression = when {
             SnakemakeLanguageDialect.isInsideSmkFile(referenceExpression) -> referenceExpression
@@ -157,6 +154,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
                 val manager = InjectedLanguageManager.getInstance(referenceExpression.project)
                 manager.getInjectionHost(referenceExpression)
             }
+
             else -> return null
         }
 
@@ -186,6 +184,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
                 parentDeclaration as? SmkRule,
                 psiFile
             )
+
             SMK_VARS_CHECKPOINTS -> SmkCheckpointType(
                 parentDeclaration as? SmkCheckPoint,
                 psiFile
@@ -211,6 +210,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
                     pepFile?.findTopLevelClass("Project")?.getType(TypeEvalContext.codeCompletion(project, pepFile))
                 }
             }
+
             else -> null
         }
     }

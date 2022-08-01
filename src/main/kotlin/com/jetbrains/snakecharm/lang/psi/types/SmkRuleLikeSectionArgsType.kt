@@ -23,7 +23,7 @@ import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
 
 class SmkRuleLikeSectionArgsType(
-        val section: SmkRuleOrCheckpointArgsSection
+    val section: SmkRuleOrCheckpointArgsSection,
 ) : PyStructuralType(
     getSectionArgsNames(getSectionArgs(section)),
     false
@@ -31,10 +31,9 @@ class SmkRuleLikeSectionArgsType(
     companion object {
         private const val MAX_PREVIEW_LENGTH = 20
 
-        private fun getSectionArgs(section: SmkRuleOrCheckpointArgsSection)
-                = section.argumentList?.arguments
-        private fun getSectionArgsNames(args: Array<PyExpression>?)
-                = args?.filterIsInstance<PyKeywordArgument>()?.mapNotNull { it.name }?.toSet() ?: emptySet()
+        private fun getSectionArgs(section: SmkRuleOrCheckpointArgsSection) = section.argumentList?.arguments
+        private fun getSectionArgsNames(args: Array<PyExpression>?) =
+            args?.filterIsInstance<PyKeywordArgument>()?.mapNotNull { it.name }?.toSet() ?: emptySet()
     }
 
     private val typeName: String = section.sectionKeyword ?: "section"
@@ -49,10 +48,10 @@ class SmkRuleLikeSectionArgsType(
     }
 
     override fun resolveMember(
-            name: String,
-            location: PyExpression?,
-            direction: AccessDirection,
-            resolveContext: PyResolveContext
+        name: String,
+        location: PyExpression?,
+        direction: AccessDirection,
+        resolveContext: PyResolveContext,
     ): List<RatedResolveResult> {
         if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location)) {
             return emptyList()
@@ -65,23 +64,23 @@ class SmkRuleLikeSectionArgsType(
 
         val resolveResult = ResolveResultList()
         sectionArgs.filterIsInstance<PyKeywordArgument>()
-                .filter { it.name == name }
-                .forEach {
-                    resolveResult.poke(it, SmkResolveUtil.RATE_NORMAL)
-                }
+            .filter { it.name == name }
+            .forEach {
+                resolveResult.poke(it, SmkResolveUtil.RATE_NORMAL)
+            }
 
         return resolveResult
     }
 
     private fun findProducedElementByIndex(
-            idx: Int,
+        idx: Int,
     ): PsiElement? {
         if (sectionArgs != null && isSimpleArgsList(sectionArgs) && idx >= 0) {
             var pos = idx
 
-            for(exp in sectionArgs){
-                val argNumber =  countProducedElements(exp)
-                if(pos < argNumber){
+            for (exp in sectionArgs) {
+                val argNumber = countProducedElements(exp)
+                if (pos < argNumber) {
                     return getProducedElementByIndex(exp, pos)
                 }
                 pos -= argNumber
@@ -104,9 +103,9 @@ class SmkRuleLikeSectionArgsType(
     }
 
     override fun getCompletionVariants(
-            completionPrefix: String?,
-            location: PsiElement,
-            context: ProcessingContext?
+        completionPrefix: String?,
+        location: PsiElement,
+        context: ProcessingContext?,
     ): Array<LookupElement> {
         val (list, priority) = getCompletionVariantsAndPriority(completionPrefix, location, context)
 
@@ -119,9 +118,9 @@ class SmkRuleLikeSectionArgsType(
     }
 
     override fun getCompletionVariantsAndPriority(
-            completionPrefix: String?,
-            location: PsiElement,
-            context: ProcessingContext?
+        completionPrefix: String?,
+        location: PsiElement,
+        context: ProcessingContext?,
     ): Pair<List<LookupElementBuilder>, Double> {
         val priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
 
@@ -180,7 +179,8 @@ class SmkRuleLikeSectionArgsType(
 
         val textPreview = when (el) {
             is PyStringLiteralExpression -> {
-                val containingCall = PsiTreeUtil.getParentOfType(el, PyCallExpression::class.java, true, SmkSection::class.java)
+                val containingCall =
+                    PsiTreeUtil.getParentOfType(el, PyCallExpression::class.java, true, SmkSection::class.java)
                 var text = el.stringValue
                 if (containingCall != null && containingCall.isCalleeText(SnakemakeNames.SNAKEMAKE_METHOD_MULTIEXT)) {
                     val multiExtFirstArg = containingCall.arguments.first()
@@ -190,6 +190,7 @@ class SmkRuleLikeSectionArgsType(
                 }
                 text
             }
+
             else -> el.text
         }
 

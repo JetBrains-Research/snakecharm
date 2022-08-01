@@ -8,8 +8,8 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 
 class SmkPyQualifiedReference(
-        element: PyQualifiedExpression,
-        context: PyResolveContext
+    element: PyQualifiedExpression,
+    context: PyResolveContext,
 ) : PyQualifiedReference(element, context) {
     override fun getUnresolvedHighlightSeverity(context: TypeEvalContext): HighlightSeverity? {
         val qualifier = this.myElement.qualifier
