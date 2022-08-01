@@ -6,6 +6,8 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.TokenType
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyElementVisitor
+import com.jetbrains.python.psi.PyExpression
+import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.SnakemakeNames
@@ -30,6 +32,7 @@ open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode) : SmkArgsSectionImp
                     stringLiteral, stringLiteral.stringValue
                 )
             }
+
             SnakemakeNames.SECTION_NOTEBOOK -> getSimplePathRelatedSectionReference { stringLiteral, offsetInParent ->
                 SmkNotebookReference(
                     this,
@@ -37,6 +40,7 @@ open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode) : SmkArgsSectionImp
                     stringLiteral, stringLiteral.stringValue
                 )
             }
+
             SnakemakeNames.SECTION_SCRIPT -> getSimplePathRelatedSectionReference { stringLiteral, offsetInParent ->
                 SmkScriptReference(
                     this,
@@ -44,16 +48,22 @@ open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode) : SmkArgsSectionImp
                     stringLiteral, stringLiteral.stringValue
                 )
             }
+
             else -> null
         }
 
     private fun getSimplePathRelatedSectionReference(
-        refFun: (PyStringLiteralExpression, Int) -> SmkFileReference
+        refFun: (PyStringLiteralExpression, Int) -> SmkFileReference,
     ): PsiReference? {
-        val stringLiteral =
-            argumentList?.arguments
-                ?.firstOrNull { it is PyStringLiteralExpression }
-                    as? PyStringLiteralExpression ?: return null
+        var pathExpressionCandidate: PyExpression? = argumentList?.arguments?.firstOrNull()
+
+        var offsetRelativeToSection = sectionKeyword!!.length
+        if (pathExpressionCandidate is PyLambdaExpression) {
+            offsetRelativeToSection += pathExpressionCandidate.startOffsetInParent
+            pathExpressionCandidate = pathExpressionCandidate.body
+        }
+
+        val stringLiteral = pathExpressionCandidate as? PyStringLiteralExpression ?: return null
 
         // No reference if language is injected
         val languageManager = InjectedLanguageManager.getInstance(project)
@@ -61,8 +71,8 @@ open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode) : SmkArgsSectionImp
             return null
         }
 
-        val offsetInParent = sectionKeyword!!.length + stringLiteral.startOffsetInParent
-        return refFun(stringLiteral, offsetInParent)
+        offsetRelativeToSection += stringLiteral.startOffsetInParent
+        return refFun(stringLiteral, offsetRelativeToSection)
     }
 
     override fun multilineSectionDefinition(): Boolean = multilineSectionDefinition(this)
@@ -78,6 +88,7 @@ open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode) : SmkArgsSectionImp
                         }
                         node.treeNext
                     }
+
                     PyTokenTypes.END_OF_LINE_COMMENT -> node.treeNext
                     else -> return false
                 }

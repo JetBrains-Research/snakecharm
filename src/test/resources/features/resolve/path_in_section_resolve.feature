@@ -72,6 +72,24 @@ Feature: Resolve file in conda/notebook sections
       | rule       | script   | jl    |
       | rule       | script   | rs    |
 
+  Scenario Outline: Resolve in lambda
+    Given a snakemake project
+    Given a file "dir/roo.yaml" with text
+    """
+    TEXT
+    """
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like>:
+      <section>: lambda wildcards, params, input: "dir/roo.yaml"
+    """
+    When I put the caret at roo
+    Then reference should resolve to "TEXT" in "roo.yaml"
+    Examples:
+      | rule_like  | section  |
+      | rule       | conda    |
+      | checkpoint | conda    |
+
   Scenario Outline: Resolve for strings in different quotes
     Given a snakemake project
     Given a file "roo.<ext>" with text

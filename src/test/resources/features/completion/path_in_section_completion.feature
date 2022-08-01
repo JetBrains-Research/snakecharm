@@ -79,6 +79,27 @@ Feature: Complete file name in conda section
       | rule       | script   | jl    |
       | rule       | script   | rs    |
 
+  Scenario Outline: Completion for file in lambda
+      Given a snakemake project
+      Given a file "dir/roo.<ext>" with text
+      """
+      """
+      Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        <section>: lambda wildcards, params: "di"
+      """
+      When I put the caret after di
+      Then I invoke autocompletion popup and see a text:
+      """
+      <rule_like> NAME:
+        <section>: lambda wildcards, params: "dir/roo.<ext>"
+      """
+      Examples:
+        | rule_like  | section  | ext   |
+        | rule       | conda    | yaml  |
+        | checkpoint | conda    | yaml  |
+    
   Scenario Outline: Complete in conda section for different quotes
     Given a snakemake project
     Given a file "roo.<ext>" with text
