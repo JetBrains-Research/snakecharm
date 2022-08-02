@@ -9,6 +9,7 @@ Released on ...
 ### Fixed
 - Compatibility with PyCharm 2022.2
 - Ignore whitespaces that could occur after `as` in `use` block 
+- Bundled wrappers repo updated to v1.7.1
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
                                           
 ### Added:
