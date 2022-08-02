@@ -2,7 +2,8 @@ package com.jetbrains.snakecharm.inspections
 
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
-import com.intellij.codeInspection.ProblemHighlightType.*
+import com.intellij.codeInspection.ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+import com.intellij.codeInspection.ProblemHighlightType.WEAK_WARNING
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
@@ -26,7 +27,7 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
             holder.file.let { psiFile ->
                 when (psiFile) {
                     is SmkFile -> {
-                        psiFile.collectRules().map { it.second }
+                        psiFile.filterRulesPsi().map { it.second }
                     }
                     else -> emptyList()
                 }
@@ -36,7 +37,7 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
             holder.file.let { psiFile ->
                 when (psiFile) {
                     is SmkFile -> {
-                        psiFile.collectCheckPoints().map { it.second }
+                        psiFile.filterCheckPointsPsi().map { it.second }
                     }
                     else -> emptyList()
                 }
@@ -46,7 +47,7 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
             holder.file.let { psiFile ->
                 when (psiFile) {
                     is SmkFile -> {
-                        psiFile.collectUses().map { it.second }
+                        psiFile.filterUsePsi().map { it.second }
                     }
                     else -> emptyList()
                 }

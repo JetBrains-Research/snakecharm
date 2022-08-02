@@ -19,6 +19,12 @@ Feature: Inspection: unresolved rule name in 'use' section declaration or after 
 
     use rule * from MODULE as other_*
 
+    use rule * from MODULE as a*b*cde
+    rules.aXXXbXXXcde
+
+    use rule * from MODULE as a*b*cpq
+    rules.aXXXbXXXcpq
+
     use rule other_NAME2 as name2_other with:
       input: "data.txt"
 
@@ -40,6 +46,14 @@ Feature: Inspection: unresolved rule name in 'use' section declaration or after 
     Cannot check rule names imported from remote modules
     """
     Then I expect inspection weak warning on <rules.other_rule_name> with message
+    """
+    Cannot check rule names imported from remote modules
+    """
+    Then I expect inspection weak warning on <rules.aXXXbXXXcde> with message
+    """
+    Cannot check rule names imported from remote modules
+    """
+    Then I expect inspection weak warning on <rules.aXXXbXXXcpq> with message
     """
     Cannot check rule names imported from remote modules
     """

@@ -30,7 +30,6 @@ import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECO
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.impl.SmkUseArgsSectionImpl
-import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 
 /**
  * @author Roman.Chernyatchik
@@ -295,14 +294,6 @@ object UseSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
                     ),
                     priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
                 )
-            )
-        }
-
-        val file = parameters.position.containingFile as? SmkFile
-        val data = file?.advancedCollectRules(mutableSetOf())
-        data?.forEach { (first, second) ->
-            result.addElement(
-                AbstractSmkRuleOrCheckpointType.createRuleLikeLookupItem(first, second)
             )
         }
     }

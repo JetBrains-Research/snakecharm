@@ -23,7 +23,7 @@ object SmkResolveUtil {
             visitedFiles: MutableSet<SmkFile>
     ) {
         visitedFiles.add(file)
-        val currentIncludes = file.collectIncludes()
+        val currentIncludes = file.filterIncludesPsi()
                 .flatMap { it.references.toList() }
                 .map { it.resolve() }
                 .filterIsInstance<SmkFile>()

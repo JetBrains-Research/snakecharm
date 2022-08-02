@@ -281,24 +281,44 @@ Feature: Completion for snakemake keyword-like things
       | module     | s   | skip_validation      |
       | module     | r   | replace_prefix       |
 
-  Scenario Outline: Use keyword completion
+  Scenario Outline: Completion in use declaration
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    <given>#
+    <given># here
     """
-    When I put the caret after <given>
+    When I put the caret at # here
     Then I invoke autocompletion popup, select "<choice>" lookup item and see a text:
     """
-    <result>
+    <result> here
     """
     Examples:
-      | given      | choice | result          |
-      | u          | use    | use rule #      |
-      | use ru     | rule   | use rule #      |
-      | use rule f | from   | use rule from # |
-      | use rule w | with   | use rule with:# |
+      | given               | choice  | result                      |
+      | u                   | use     | use rule #                  |
+      | use r               | rule    | use rule #                  |
+      | use rule * f        | from    | use rule * from #           |
+      | use rule a as b w   | with    | use rule a as b with:#      |
+      | use rule * from M e | exclude | use rule * from M exclude # |
 
+  Scenario Outline: Completion in use body
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <use_declaration>
+        # here
+    """
+    When I put the caret at # here
+    Then I invoke autocompletion popup
+    And completion list should contain:
+    | input |
+    | output |
+    | conda |
+    And completion list shouldn't contain:
+    | shell |
+    Examples:
+      | use_declaration      |
+      | use a from M         |
+      | use a from M as new* |
 
   Scenario Outline: Complete at use level
     Given a snakemake project

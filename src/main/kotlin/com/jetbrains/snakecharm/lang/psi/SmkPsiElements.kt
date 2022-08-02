@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.StubBasedPsiElement
+import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
 import com.jetbrains.python.psi.*
@@ -34,7 +35,9 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
      * Returns names and corresponded [PsiElement]s which are produced by this section.
      * [visitedFiles] is set of [PsiFile]s which are already visited.
      */
-    fun getProducedRulesNames(visitedFiles: MutableSet<PsiFile> = mutableSetOf()): List<Pair<String, PsiElement>>
+    fun getProducedRulesNames(
+        visitedFiles: MutableSet<PsiFile> = mutableSetOf(),
+    ): List<Pair<String, PsiElement>>
 
     /**
      * Returns [PsiElement] contains module name which imports rules
@@ -61,6 +64,12 @@ interface SmkUse : SmkRuleOrCheckpoint, StubBasedPsiElement<SmkUseStub> {
      */
     fun getNewNamePattern(): SmkUseNewNamePattern?
     fun getImportedNamesList(): SmkImportedRulesNamesList?
+    fun getExcludedRulesList(): SmkExcludedRulesNamesList?
+
+    fun collectImportedRuleNameAndPsi(
+        visitedFiles: MutableSet<PsiFile>,
+        ignoreExcludes: Boolean = false,
+    ): List<Pair<String, SmkRuleOrCheckpoint>>?
 }
 
 interface SmkUseNewNamePattern : PyElement {
@@ -70,10 +79,20 @@ interface SmkUseNewNamePattern : PyElement {
      */
     fun isWildcard(): Boolean
     fun getNameBeforeWildcard(): PsiElement
+
+    /**
+     * Pattern text with spaces removed
+     */
+    fun getValue(): String
 }
 
 class SmkImportedRulesNamesList(node: ASTNode) : PyElementImpl(node)
-class SmkExcludedRulesNamesList(node: ASTNode) : PyElementImpl(node)
+interface SmkExcludedRulesNamesList : PyElement {
+    fun namesPsi(): List<PyExpression>
+    fun names(): List<String>
+
+    fun getParentUse(): SmkUse = PsiTreeUtil.getParentOfType(this, SmkUse::class.java)!!
+}
 
 interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // PyNamedElementContainer
     /**

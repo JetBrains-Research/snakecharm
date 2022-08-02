@@ -14,7 +14,7 @@ class SmkCheckpointType(
     containingRule, SMK_VARS_CHECKPOINTS, KEY, SmkCheckPoint::class.java
 ) {
     override val currentFileDeclarations: List<SmkCheckPoint> by lazy {
-        smkFile.collectCheckPoints().map { it.second }
+        smkFile.filterCheckPointsPsi().map { it.second }
     }
 
     override fun getUseSections(name: String, location: PyExpression) = emptyList<RatedResolveResult>()

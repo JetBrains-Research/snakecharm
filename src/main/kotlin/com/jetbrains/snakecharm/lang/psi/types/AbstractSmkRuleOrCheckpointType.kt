@@ -12,7 +12,7 @@ import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
-import com.intellij.psi.util.elementType
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.intellij.util.Processors
@@ -25,7 +25,6 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex
@@ -78,10 +77,11 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
                 name,
                 SmkCheckpointNameIndex.KEY,
                 SmkCheckPoint::class.java
-            ) { (containingRule?.containingFile as? SmkFile)?.collectCheckPoints()?.map { it.second } ?: emptyList() }
+            ) { (containingRule?.containingFile as? SmkFile)?.filterCheckPointsPsi()?.map { it.second } ?: emptyList() }
         }
 
         return results.map { element ->
+            // XXX: Or ? SmkResolveUtil.RATE_NORMAL
             RatedResolveResult(RatedResolveResult.RATE_LOW, element)
         } + getUseSections(name, location)
     }
@@ -102,15 +102,27 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
         }
         val module = location.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
         val parent = location.parentOfType<SmkRuleOrCheckpoint>()
+        val useExcludedNamesList = PsiTreeUtil.getParentOfType(location, SmkExcludedRulesNamesList::class.java, SmkRuleLike::class.java)
+        val useToIgnore = (useExcludedNamesList as? SmkExcludedRulesNamesList)?.getParentUse()
         when (module) {
-            null -> (location.containingFile.originalFile as SmkFile).collectUses().map { it.second }
+            null -> (location.containingFile.originalFile as SmkFile).filterUsePsi().map { it.second }
             else -> getVariantsFromIndex(SmkUseNameIndex.KEY, module, SmkUse::class.java)
         }.forEach { use ->
-            use as SmkUse
-            val referTo = use.getProducedRulesNames()
-                .firstOrNull {
-                    it.first == name &&
-                            it.second.let { element -> if (element is SmkRuleOrCheckpoint) element else element.parentOfType() } != parent
+            val candidates = if (use == useToIgnore) {
+                use.collectImportedRuleNameAndPsi(mutableSetOf(), false)
+                    ?: emptyList<Pair<String, SmkRuleOrCheckpoint>>()
+            } else {
+                use.getProducedRulesNames()
+            }
+            val referTo = candidates
+                .firstOrNull { (candName, candPsi) ->
+                    when {
+                        candName != name -> false
+                        else -> {
+                            val candRuleOrCp = if (candPsi is SmkRuleOrCheckpoint) candPsi else candPsi.parentOfType()
+                            candRuleOrCp != parent
+                        }
+                    }
                 }
             if (referTo != null) {
                 result.add(RatedResolveResult(SmkResolveUtil.RATE_NORMAL, use))

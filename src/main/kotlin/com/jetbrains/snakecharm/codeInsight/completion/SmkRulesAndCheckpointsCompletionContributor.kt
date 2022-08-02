@@ -8,11 +8,15 @@ import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.patterns.PlatformPatterns.psiElement
+import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyReferenceExpression
+import com.jetbrains.python.psi.PyStatementList
+import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+import com.jetbrains.snakecharm.codeInsight.completion.InUseSectionProvider.Companion.IN_USE_SECTION_PROVIDER_CAPTURE
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionAfterRulesAndCheckpointsObjectProvider.Companion.IN_SMK_RULES_OR_CHECKPOINTS_OBJECT
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionInLocalRulesAndRuleOrderSectionsProvider.Companion.IN_SMK_LOCALRULES_OR_RULEORDER_RULE_NAME_REFERENCE
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
@@ -37,6 +41,11 @@ class SmkRulesAndCheckpointsCompletionContributor : CompletionContributor() {
             IN_SMK_RULES_OR_CHECKPOINTS_OBJECT,
             SmkCompletionAfterRulesAndCheckpointsObjectProvider()
         )
+        extend(
+            CompletionType.BASIC,
+            IN_USE_SECTION_PROVIDER_CAPTURE,
+            InUseSectionProvider()
+        )
     }
 }
 
@@ -54,7 +63,7 @@ private class SmkCompletionInLocalRulesAndRuleOrderSectionsProvider : Completion
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
-        result: CompletionResultSet
+        result: CompletionResultSet,
     ) {
         val position = parameters.position
         val rules = collectVariantsForElement(position, isCheckPoint = false)
@@ -99,7 +108,7 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
-        result: CompletionResultSet
+        result: CompletionResultSet,
     ) {
         // position is a leaf psi element, and it's wrapped in a reference, which is what we want to get
         val parentElement = parameters.position.parent
@@ -114,6 +123,7 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
                 parameters.position,
                 isCheckPoint = false
             ) + collectVariantsForElement(parameters.position, isCheckPoint = true)
+
             SnakemakeAPI.SMK_VARS_CHECKPOINTS -> collectVariantsForElement(parameters.position, isCheckPoint = true)
             else -> return
         }
@@ -156,18 +166,59 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
 }
 
 
+private class InUseSectionProvider : CompletionProvider<CompletionParameters>() {
+    companion object {
+        val IN_USE_SECTION_PROVIDER_CAPTURE = psiElement()
+            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+            .inside(psiElement().inside(SmkUse::class.java))
+            .andNot(
+                psiElement().insideOneOf(PyStatementList::class.java, PsiComment::class.java)
+            )
+    }
+
+    override fun addCompletions(
+        parameters: CompletionParameters,
+        context: ProcessingContext,
+        result: CompletionResultSet,
+    ) {
+        val position = parameters.position
+        val file = position.containingFile
+        if (file !is SmkFile) {
+            return
+        }
+        val excludePsi =
+            PsiTreeUtil.getParentOfType(position, SmkExcludedRulesNamesList::class.java, true, SmkUse::class.java)
+
+        val collectRules: List<Pair<String, SmkRuleOrCheckpoint>> = when {
+            excludePsi != null -> {
+                // Only rules from referenced Module and completion requested once:
+                excludePsi.getParentUse().collectImportedRuleNameAndPsi(mutableSetOf(), true) ?: emptyList()
+            }
+
+            else -> file.collectRules(mutableSetOf())
+        }
+        // TODO: for left part - same
+        collectRules.forEach { (first, second) ->
+            result.addElement(
+                AbstractSmkRuleOrCheckpointType.createRuleLikeLookupItem(first, second)
+            )
+        }
+        // XXX: optionally all rules on second completion
+    }
+}
+
 // the following functions can be used to implement completion for any section/object referring to rule names
 
 private fun collectVariantsForElement(
     element: PsiElement,
-    isCheckPoint: Boolean
+    isCheckPoint: Boolean,
 ): List<Pair<String, SmkRuleOrCheckpoint>> {
     val module = ModuleUtilCore.findModuleForPsiElement(element)
 
     if (module == null) {
         // if no module is given: try to collect local files
         val smkFile = element.containingFile.originalFile as SmkFile
-        return if (isCheckPoint) smkFile.collectCheckPoints() else smkFile.collectRules()
+        return if (isCheckPoint) smkFile.filterCheckPointsPsi() else smkFile.filterRulesPsi()
 
     }
     val results: List<SmkRuleOrCheckpoint> = when {
@@ -193,7 +244,7 @@ private fun collectVariantsForElement(
 private fun addVariantsToCompletionResultSet(
     completionVariants: List<Pair<String, SmkRuleOrCheckpoint>>,
     parameters: CompletionParameters,
-    result: CompletionResultSet
+    result: CompletionResultSet,
 ) {
     /*
       auto popup invocation count: 0
@@ -208,6 +259,7 @@ private fun addVariantsToCompletionResultSet(
             val languageManager = InjectedLanguageManager.getInstance(position.project)
             languageManager.getTopLevelFile(originalPosition)
         }
+
         SnakemakeLanguageDialect.isInsideSmkFile(position) -> parameters.originalFile
         else -> return
     }
@@ -235,6 +287,6 @@ private fun addVariantsToCompletionResultSet(
             .getAction(IdeActions.ACTION_CODE_COMPLETION)
     )
     if (StringUtil.isNotEmpty(shortcut)) {
-        result.addLookupAdvertisement("Pressing $shortcut twice would show all rules and checkpoints in the module.")
+        result.addLookupAdvertisement(SnakemakeBundle.message("snakemake.completion.twice.for.all.rules", shortcut))
     }
 }

@@ -12,11 +12,7 @@ import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
-import com.jetbrains.snakecharm.lang.psi.SmkFile
-import com.jetbrains.snakecharm.lang.psi.SmkModule
-import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
-import com.jetbrains.snakecharm.lang.psi.SmkUse
-import com.jetbrains.snakecharm.lang.psi.SmkImportedRulesNamesList
+import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
@@ -55,20 +51,22 @@ class SmkRuleOrCheckpointNameReference(
         results.addAll(collectModulesAndResolveThem(smkFile, element))
 
         val moduleRef = element.parentOfType<SmkUse>()?.getModuleName() as? SmkReferenceExpression
-        val itIsModuleMameReference = element.parent is SmkUse
+        val itIsModuleNameReference = element.parent is SmkUse
         val parentIsImportedRuleNames = element.parent is SmkImportedRulesNamesList
-        if (!parentIsImportedRuleNames && !itIsModuleMameReference) {
+        if (!parentIsImportedRuleNames && !itIsModuleNameReference) {
             return results
         }
-        val allImportedFiles = smkFile.collectIncludedFiles()
+        val allImportedFiles = smkFile.collectIncludedFilesRecursively()
         return results.filter { resolveResult ->
             // If we resolve module references, there must be only SmkModules
-            (resolveResult.element is SmkModule && itIsModuleMameReference) ||
+            val target = resolveResult.element
+            val targetFile = target?.containingFile?.originalFile
+            (target is SmkModule && itIsModuleNameReference) ||
                     // We don't want to suggest local resolve result for the reference of rule, which was imported
                     (moduleRef != null // Module name reference is defined and resolve result is from another file
-                            && element.containingFile.originalFile != resolveResult.element?.containingFile?.originalFile)
+                            && element.containingFile.originalFile != targetFile)
                     // OR There are no 'from *name*' combination, so it hasn't been imported
-                    || (moduleRef == null && resolveResult.element?.containingFile?.originalFile in allImportedFiles)
+                    || (moduleRef == null && targetFile in allImportedFiles)
         }.toMutableList()
     }
 

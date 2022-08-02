@@ -37,7 +37,7 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         val ruleModule = use.getModuleName()?.reference?.resolve() as? SmkModule
         val importedFile = ruleModule?.getPsiFile() as? SmkFile
         val inheritedRulesDeclaredViaWildcard =
-            importedFile?.advancedCollectRules(mutableSetOf())?.map { it.second } ?: emptyList()
+            importedFile?.collectRules(mutableSetOf())?.map { it.second } ?: emptyList()
         val results = inheritedRulesDeclaredExplicitly.ifEmpty { inheritedRulesDeclaredViaWildcard }
         if (results.isEmpty()) {
             return
@@ -74,7 +74,7 @@ class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
         }
         val overrides = mutableListOf<SmkRuleOrCheckpoint>()
         files.forEach { file ->
-            file.collectUses().forEach { (_, psi) ->
+            file.filterUsePsi().forEach { (_, psi) ->
                 if (psi.getImportedRules()?.firstOrNull { it == element } != null) {
                     overrides.add(psi)
                 }

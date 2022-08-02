@@ -201,3 +201,104 @@ Feature: Resolve use and module name to its declaration
     """
     When I put the caret at A
     Then reference should resolve to "A" in "boo.smk"
+
+  Scenario Outline: Resolve that not excluded
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+      <rule_like> rule_name1
+      <rule_like> rule_name2
+      <rule_like> rule_name3
+      <rule_like> rule_name4
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+      snakefile: "boo.smk"
+
+    use rule * from M exclude rule_name1, rule_name3 as new_*
+
+    rules.new_<rule_name>
+    """
+    When I put the caret after rules.
+    Then reference should resolve to "new_*" in "foo.smk"
+    Examples:
+      | rule_like  |  rule_name  |
+      | rule       |  rule_name2 |
+      | rule       |  rule_name4 |
+      | checkpoint |  rule_name2 |
+
+
+  Scenario Outline: Do not resolve that are excluded
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+      <rule_like> rule_name1
+      <rule_like> rule_name2
+      <rule_like> rule_name3
+      <rule_like> rule_name4
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+      snakefile: "boo.smk"
+
+    use rule * from M exclude rule_name1, rule_name3 as new_*
+
+    rules.new_<rule_name>
+    """
+    When I put the caret after rules.
+    Then reference should not resolve
+    Examples:
+      | rule_like  |  rule_name  |
+      | rule       |  rule_name1 |
+      | rule       |  rule_name3 |
+      | checkpoint |  rule_name1 |
+
+  Scenario Outline: Resolve candidates for exclude
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+      <rule_like> rule_name1
+      <rule_like> rule_name2
+      <rule_like> rule_name3
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+      snakefile: "boo.smk"
+
+    use rule * from M exclude rule_name2, <rule_name> as new_*
+    """
+    When I put the caret at <rule_name> as new_*
+    Then reference should resolve to "<rule_name>" in "boo.smk"
+    Examples:
+      | rule_like  |  rule_name  |
+      | rule       |  rule_name1 |
+      | rule       |  rule_name2 |
+      | rule       |  rule_name3 |
+      | checkpoint |  rule_name2 |
+
+  Scenario Outline: Do not resolve candidates expanded from pattern in exclude
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+      <rule_like> rule_name1
+      <rule_like> rule_name2
+      <rule_like> rule_name3
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+      snakefile: "boo.smk"
+
+    use rule * from M exclude rule_name2, <rule_name> as new_*
+    """
+    When I put the caret at <rule_name> as new_*
+    Then reference should not resolve
+    Examples:
+      | rule_like  |  rule_name  |
+      | rule       | new_rule_name1 |
+      | rule       | new_rule_name2 |
+      | rule       | new_rule_name3 |
+      | checkpoint | new_rule_name3 |

@@ -68,6 +68,93 @@ Feature: Completion for 'use' and 'module' sections
       | rule       |
       | checkpoint |
 
+  Scenario Outline: Complete rule name declared in module with excludes
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <rule_like> rule_name1
+    <rule_like> rule_name2
+    <rule_like> rule_name3
+    <rule_like> rule_name4
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+      snakefile: "boo.smk"
+
+    use rule * from M exclude rule_name1, rule_name3 as new_*
+
+    rule my_rule:
+      log: rules.
+    """
+    When I put the caret after rules.
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | new_rule_name2     |
+      | new_rule_name4     |
+    Then completion list shouldn't contain:
+      | new_rule_name1     |
+      | new_rule_name3     |
+    Examples:
+      | rule_like  |
+      | rule       |
+      | checkpoint |
+
+  Scenario Outline: Complete rule as candidate for exclude
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <rule_like> rule_name1
+    <rule_like> rule_name2
+    <rule_like> rule_name3
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+      snakefile: "boo.smk"
+
+    rule rule_other:
+
+    use rule * from M exclude rule_name2, rule_ as new_*
+    """
+    When I put the caret after exclude rule_name2, rule_
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | rule_name1 |
+      | rule_name2 |
+      | rule_name3 |
+    Then completion list shouldn't contain:
+      | new_rule_name1 |
+      | new_rule_name2 |
+      | new_rule_name3 |
+    Examples:
+      | rule_like |
+      | rule      |
+      | checkpoint |
+
+  Scenario: Completion in use body
+    Given a snakemake project
+    And a file "boo.smk" with text
+    """
+    <rule_like> rule_name1
+    <rule_like> rule_name2
+    <rule_like> rule_name3
+    """
+    Given I open a file "foo.smk" with text
+    """
+    module M:
+      snakefile: "boo.smk"
+
+    use rule * from M exclude rule_name2, rule_ as new_*
+        # here
+    """
+    When I put the caret at # here
+    Then I invoke autocompletion popup
+    And completion list shouldn't contain:
+    | new_rule_name2 |
+    | new_rule_name3 |
+
+
   Scenario Outline: Complete rule name using complex patterns
     Given a snakemake project
     And a file "boo.smk" with text

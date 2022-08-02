@@ -8,11 +8,12 @@ Released on ...
 
 ### Fixed
 - Compatibility with PyCharm 2022.2
+- Ignore whitespaces that could occur after `as` in `use` block 
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
                                           
 ### Added:
-- [7.10.0] - Support conda environment definitions to be passed as function pointers, similar to input, params, and resources #494  (see [#494](https://github.com/JetBrains-Research/snakecharm/issues/494)) 
-- [7.9.0] Basic syntax for `exclude` syntax in use rules #495  (see [#495](https://github.com/JetBrains-Research/snakecharm/issues/495)) 
+- [7.10.0] Support conda environment definitions to be passed as function pointers, similar to input, params, and resources #494  (see [#494](https://github.com/JetBrains-Research/snakecharm/issues/494)) 
+- [7.9.0] Syntax supprt for `exclude` keyword in use rules (see [#495](https://github.com/JetBrains-Research/snakecharm/issues/495), [#496](https://github.com/JetBrains-Research/snakecharm/issues/496)) 
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ## [2022.1.749]

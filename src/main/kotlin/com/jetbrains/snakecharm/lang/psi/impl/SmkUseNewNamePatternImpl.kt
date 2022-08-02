@@ -9,4 +9,6 @@ class SmkUseNewNamePatternImpl(node: ASTNode) : PyElementImpl(node), SmkUseNewNa
     override fun isWildcard(): Boolean = text.contains('*')
 
     override fun getNameBeforeWildcard(): PsiElement = firstChild
+
+    override fun getValue(): String = text.replace(" ", "")
 }

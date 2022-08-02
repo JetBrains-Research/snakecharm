@@ -2,7 +2,6 @@ package com.jetbrains.snakecharm.lang.psi.elementTypes
 
 import com.intellij.psi.tree.TokenSet
 import com.jetbrains.python.psi.PyElementType
-import com.jetbrains.snakecharm.lang.psi.SmkExcludedRulesNamesList
 import com.jetbrains.snakecharm.lang.psi.SmkImportedRulesNamesList
 import com.jetbrains.snakecharm.lang.psi.impl.*
 
@@ -50,7 +49,7 @@ object SmkElementTypes {
     val USE_EXCLUDE_RULES_NAMES_STATEMENT = PyElementType(
         "USE_EXCLUDE_RULES_NAMES_STATEMENT"
     ) {
-        SmkExcludedRulesNamesList(it)
+        SmkExcludedRulesNamesListImpl(it)
     }
 
     val WORKFLOW_ARGS_SECTION_STATEMENT = PyElementType(
