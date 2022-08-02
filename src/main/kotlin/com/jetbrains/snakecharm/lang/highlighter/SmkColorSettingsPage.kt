@@ -89,7 +89,7 @@ class SmkColorSettingsPage : RainbowColorSettingsPage {
         <keyword>configfile</keyword>: <text>"config/config.yaml"</text>
         <keyword>localrules</keyword>: NAME
         """.trimIndent() +
-        "\n<keyword>rule</keyword> <identifiers>NAME</identifiers>:\n" +
+                "\n<keyword>rule</keyword> <funcDef>NAME</funcDef>:\n" +
                 "    <TQS>\"\"\"\n" +
                 "    Syntax Highlighting Demo" +
                 RainbowHighlighter.generatePaletteExample("\n    ") +
@@ -106,9 +106,9 @@ class SmkColorSettingsPage : RainbowColorSettingsPage {
         
         <localVar>number</localVar> = 0.451 # Python elements are configured in Python color settings
         
-        <keyword>use</keyword> <keyword>rule</keyword> * <keyword>from</keyword> <identifiers>M</identifiers> <keyword>exclude</keyword> <identifiers>NAME_1</identifiers>
+        <keyword>use</keyword> <keyword>rule</keyword> * <keyword>from</keyword> M <keyword>exclude</keyword> NAME
         
-        <keyword>use</keyword> <keyword>rule</keyword> NAME <keyword>as</keyword> <identifiers>NAME_2</identifiers> <keyword>with</keyword>:
+        <keyword>use</keyword> <keyword>rule</keyword> NAME <keyword>as</keyword> <funcDef>NAME_2</funcDef> <keyword>with</keyword>:
             <sectionName>message</sectionName>:  
                 <text>"</text><injectedText>Float number: </injectedText><braces>{</braces><reference>number</reference><formatSpecifier>:2f</formatSpecifier><braces>}</braces><text>"</text>
         """.trimIndent()
@@ -116,7 +116,8 @@ class SmkColorSettingsPage : RainbowColorSettingsPage {
     override fun getAdditionalHighlightingTagToDescriptorMap(): MutableMap<String, TextAttributesKey> =
         mutableMapOf<String, TextAttributesKey>().also {
             it["keyword"] = SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD
-            it["identifiers"] = SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION
+            it["funcDef"] = SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION
+
             it["sectionName"] = SnakemakeSyntaxHighlighterFactory.SMK_DECORATOR
             it["run"] = SnakemakeSyntaxHighlighterFactory.SMK_PREDEFINED_DEFINITION
             it["text"] = SnakemakeSyntaxHighlighterFactory.SMK_TEXT
