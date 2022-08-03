@@ -130,16 +130,20 @@ Feature: Rule SmkUnusedLogFileInspection inspection
     """
     <rule_like> NAME:
         log: <log_variation>
-        wrapper: "0.60.1/bio/samtools/merge"
+        <section>
     """
     And SmkUnusedLogFileInspection inspection is enabled
     And I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
-      | rule_like  | log_variation |
-      | rule       | "log.log"     |
-      | checkpoint | "my_log.log"  |
-      | rule       | l1="foo.log"  |
+      | rule_like  | log_variation | section                              |
+      | rule       | "log.log"     | wrapper: "0.60.1/bio/samtools/merge" |
+      | rule       | l1="foo.log"  | wrapper: "0.60.1/bio/samtools/merge" |
+      | rule       | "log.log"     | notebook: ""                         |
+      | rule       | "log.log"     | script: ""                           |
+      | rule       | "log.log"     | cwl: ""                              |
+      | rule       | "log.log"     | template_engine: ""                                 |
+      | checkpoint | "my_log.log"  | wrapper: "0.60.1/bio/samtools/merge" |
 
   Scenario Outline: Unused in 'run' section 'log' section
     Given a snakemake project

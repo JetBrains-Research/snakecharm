@@ -15,6 +15,7 @@ Released on ...
 ### Added:
 - [7.10.0] Support conda environment definitions to be passed as function pointers, similar to input, params, and resources #494  (see [#494](https://github.com/JetBrains-Research/snakecharm/issues/494)) 
 - [7.9.0] Syntax supprt for `exclude` keyword in use rules (see [#495](https://github.com/JetBrains-Research/snakecharm/issues/495), [#496](https://github.com/JetBrains-Research/snakecharm/issues/496)) 
+- [ 7.0.0] template_engine: basic support (see [#497](https://github.com/JetBrains-Research/snakecharm/issues/497)) 
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ## [2022.1.749]

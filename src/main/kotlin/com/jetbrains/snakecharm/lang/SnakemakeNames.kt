@@ -71,6 +71,7 @@ object SnakemakeNames {
     const val SECTION_NAME = "name" // >= 5.31
     const val SECTION_HANDOVER = "handover" // >= 6.2
     const val SECTION_DEFAULT_TARGET = "default_target" // >= 5.12.0
+    const val SECTION_TEMPLATE_ENGINE = "template_engine" // >= 7.0.0
     const val SECTION_RETRIES = "retries" // >= 7.7.0
 
     const val RUN_SECTION_VARIABLE_RULE = "rule"

@@ -102,6 +102,7 @@ Feature: Completion for sections/variables in SmkSL injections
       | handover             |
       | default_target       |
       | retries              |
+      | template_engine      |
     Examples:
       | rule_like  | signature     |
       | rule       | shell: "{     |

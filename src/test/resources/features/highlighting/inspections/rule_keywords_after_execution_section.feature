@@ -18,13 +18,14 @@ Feature: Rule sections after execution sections inspection.
     """
     When I check highlighting errors
     Examples:
-      | rule_like  | sect1    | sect1_text           | sect2     | sect2_text |
-      | rule       | script   | "s.py"               | log       | "l.log"    |
-      | checkpoint | script   | "s.py"               | log       | "l.log"    |
-      | rule       | cwl      | "https://f.cwl" | resources | mem_mb=100 |
-      | rule       | wrapper  | "dir/wrapper"        | threads   | 8          |
-      | rule       | shell    | "cmd"                | params    | a="value"  |
-      | rule       | notebook | "n.r"                | params    | a="value"  |
+      | rule_like  | sect1           | sect1_text      | sect2     | sect2_text |
+      | rule       | script          | "s.py"          | log       | "l.log"    |
+      | checkpoint | script          | "s.py"          | log       | "l.log"    |
+      | rule       | cwl             | "https://f.cwl" | resources | mem_mb=100 |
+      | rule       | wrapper         | "dir/wrapper"   | threads   | 8          |
+      | rule       | shell           | "cmd"           | params    | a="value"  |
+      | rule       | notebook        | "n.r"           | params    | a="value"  |
+      | rule       | template_engine | "n.r"           | params    | a="value"  |
 
   Scenario Outline: Move execution section to the end of the rule fix test
     Given a snakemake project

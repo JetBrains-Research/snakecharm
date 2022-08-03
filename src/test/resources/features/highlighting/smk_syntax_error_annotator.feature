@@ -73,7 +73,7 @@ Feature: Annotate syntax errors
       | rule       |
       | checkpoint |
 
-  Scenario Outline: Annotate multiple run/shell/script/wrapper/cwl/notebook sections.
+  Scenario Outline: Annotate multiple run/shell/script/wrapper/cwl/notebook/template_engine sections.
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -89,12 +89,13 @@ Feature: Annotate syntax errors
     """
     When I check highlighting errors
     Examples:
-      | rule_like  | sect1  | sect1_text  | sect2    | sect2_text   |
-      | rule       | script | "script.py" | shell    | "cmd"        |
-      | checkpoint | script | "script.py" | shell    | "cmd"        |
-      | rule       | script | "script.py" | wrapper  | "dir"        |
-      | rule       | script | "script.py" | notebook | "fo.r.ipynb" |
-      | rule       | script | "script.py" | run      | pass         |
+      | rule_like  | sect1  | sect1_text  | sect2           | sect2_text   |
+      | rule       | script | "script.py" | shell           | "cmd"        |
+      | checkpoint | script | "script.py" | shell           | "cmd"        |
+      | rule       | script | "script.py" | wrapper         | "dir"        |
+      | rule       | script | "script.py" | notebook        | "fo.r.ipynb" |
+      | rule       | script | "script.py" | run             | pass         |
+      | rule       | script | "script.py" | template_engine | ""           |
 
 
   Scenario Outline: no error highlighting for star arguments

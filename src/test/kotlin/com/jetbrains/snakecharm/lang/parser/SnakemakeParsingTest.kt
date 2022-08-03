@@ -337,6 +337,10 @@ class SnakemakeParsingTest : ParsingTestCase(
         doTest()
     }
 
+    fun testRuleSectionTemplateEngine() {
+        doTest()
+    }
+
     fun testRuleSectionContainer() {
         doTest()
     }

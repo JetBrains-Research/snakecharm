@@ -99,6 +99,7 @@ Feature: Annotate additional syntax
       | rule       | handover             | ""         | SMK_DECORATOR            |
       | rule       | default_target       | ""         | SMK_DECORATOR            |
       | rule       | retries              | ""         | SMK_DECORATOR            |
+      | rule       | template_engine      | ""         | SMK_DECORATOR            |
       | checkpoint | output               | "file.txt" | SMK_DECORATOR            |
       | checkpoint | run                  | ""         | PY.PREDEFINED_DEFINITION |
 

@@ -1,5 +1,5 @@
 Feature: Inspection for multiple arguments in various sections
-  Scenario Outline: Multiple arguments in module/subworkflow section
+  Scenario Outline: module/subworkflow sections with only one argument
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -26,7 +26,7 @@ Feature: Inspection for multiple arguments in various sections
       | module      | skip_validation |
       | module      | meta_wrapper    |
 
-  Scenario Outline: Multiple arguments in execution sections
+  Scenario Outline: rule/checkpoint sections with only one argument
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -44,27 +44,28 @@ Feature: Inspection for multiple arguments in various sections
     """
     When I check highlighting errors
     Examples:
-      | section        |
-      | shell          |
-      | script         |
-      | wrapper        |
-      | cwl            |
-      | conda          |
-      | singularity    |
-      | priority       |
-      | version        |
-      | cache          |
-      | group          |
-      | message        |
-      | benchmark      |
-      | threads        |
-      | shadow         |
-      | notebook       |
-      | container      |
-      | containerized  |
-      | handover       |
-      | default_target |
-      | retries        |
+      | section         |
+      | shell           |
+      | script          |
+      | wrapper         |
+      | cwl             |
+      | conda           |
+      | singularity     |
+      | priority        |
+      | version         |
+      | cache           |
+      | group           |
+      | message         |
+      | benchmark       |
+      | threads         |
+      | shadow          |
+      | notebook        |
+      | container       |
+      | containerized   |
+      | handover        |
+      | default_target  |
+      | retries         |
+      | template_engine |
 
   Scenario Outline: Multiple arguments in workflow section
     Given a snakemake project
