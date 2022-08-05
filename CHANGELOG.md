@@ -15,7 +15,16 @@ Released on ...
 ### Added:
 - [7.10.0] Support conda environment definitions to be passed as function pointers, similar to input, params, and resources #494  (see [#494](https://github.com/JetBrains-Research/snakecharm/issues/494)) 
 - [7.9.0] Syntax supprt for `exclude` keyword in use rules (see [#495](https://github.com/JetBrains-Research/snakecharm/issues/495), [#496](https://github.com/JetBrains-Research/snakecharm/issues/496)) 
-- [ 7.0.0] template_engine: basic support (see [#497](https://github.com/JetBrains-Research/snakecharm/issues/497)) 
+- [ 7.0.0] template_engine: basic support (see [#497](https://github.com/JetBrains-Research/snakecharm/issues/497))
+  - Do not highlight `template_engine` as unrecognized section
+  - Inspections:
+    - Only one argument expected after `template_engine` 
+    - Keywords arguments not supported after `template_engine` 
+    - Do not warn about unused log section if rule with `template_engine` 
+    - `template_engine` is execution section, so could not be with run/shell/notebook/script 
+    - `template_engine` should be last in the rule 
+    - Completion for "yte", "jinja2" in template_engine string argument 
+    - Inspection that warns when template= keyword argument is required in section with template_engine
 - TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ## [2022.1.749]

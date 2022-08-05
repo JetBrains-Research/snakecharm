@@ -120,7 +120,7 @@
     />
     <completion.contributor
             language="Python"
-            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKShadowSettingsCompletionContributor"
+            implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionInSectionsWithFixedVariantsSetContributor"
     />
     <completion.contributor
             language="Python"
@@ -252,8 +252,19 @@
             suppressId="SmkShadowSettings"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.shadow.settings"
+            key="INSP.NAME.shadow.settings.title"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkShadowSettingsInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkTemplateEngineSettingsInspection"
+            enabledByDefault="true"
+            level="WARNING"
+            suppressId="SmkTemplateEngineSettings"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.template.engine.settings.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkTemplateEngineSettingsInspection"
     />
 
     <localInspection

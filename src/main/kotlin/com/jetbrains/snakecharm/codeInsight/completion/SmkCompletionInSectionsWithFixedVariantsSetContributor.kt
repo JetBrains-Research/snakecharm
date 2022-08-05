@@ -10,13 +10,40 @@ import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
-class SMKShadowSettingsCompletionContributor : CompletionContributor() {
+class SmkCompletionInSectionsWithFixedVariantsSetContributor : CompletionContributor() {
     init {
         extend(
             CompletionType.BASIC,
             ShadowSectionSettingsProvider.CAPTURE,
             ShadowSectionSettingsProvider
         )
+        extend(
+            CompletionType.BASIC,
+            TemplateEngineSettingsProvider.CAPTURE,
+            TemplateEngineSettingsProvider
+        )
+    }
+}
+
+object TemplateEngineSettingsProvider : CompletionProvider<CompletionParameters>() {
+    val CAPTURE = PlatformPatterns.psiElement()
+        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+        .inside(SmkRuleOrCheckpointArgsSection::class.java)
+        .inside(PyStringLiteralExpression::class.java)!!
+
+    val OPTIONS = listOf("yte", "jinja2")
+    override fun addCompletions(
+        parameters: CompletionParameters,
+        context: ProcessingContext,
+        result: CompletionResultSet,
+    ) {
+        val parentListStatement =
+            PsiTreeUtil.getParentOfType(parameters.position, SmkRuleOrCheckpointArgsSection::class.java)!!
+        if (parentListStatement.name == SnakemakeNames.SECTION_TEMPLATE_ENGINE) {
+            OPTIONS.forEach {
+                result.addElement(LookupElementBuilder.create(it).withIcon(PlatformIcons.PARAMETER_ICON))
+            }
+        }
     }
 }
 
@@ -26,7 +53,7 @@ object ShadowSectionSettingsProvider : CompletionProvider<CompletionParameters>(
         .inside(SmkRuleOrCheckpointArgsSection::class.java)
         .inside(PyStringLiteralExpression::class.java)!!
 
-    val SHADOW_SETTINGS = listOf("shallow", "full", "minimal", "copy-minimal")
+    val OPTIONS = listOf("shallow", "full", "minimal", "copy-minimal")
 
     override fun addCompletions(
         parameters: CompletionParameters,
@@ -36,7 +63,7 @@ object ShadowSectionSettingsProvider : CompletionProvider<CompletionParameters>(
         val parentListStatement =
             PsiTreeUtil.getParentOfType(parameters.position, SmkRuleOrCheckpointArgsSection::class.java)!!
         if (parentListStatement.name == SnakemakeNames.SECTION_SHADOW) {
-            SHADOW_SETTINGS.forEach {
+            OPTIONS.forEach {
                 result.addElement(LookupElementBuilder.create(it).withIcon(PlatformIcons.PARAMETER_ICON))
             }
         }
