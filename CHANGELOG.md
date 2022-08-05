@@ -3,14 +3,13 @@
 
 # SnakeCharm Plugin Changelog
 
-## [Unreleased]
-Released on ...
+## [2022.1.xxx]
+Released on August 5th 2022
 
 ### Fixed
 - Compatibility with PyCharm 2022.2
 - Ignore whitespaces that could occur after `as` in `use` block 
 - Bundled wrappers repo updated to v1.7.1
-- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
                                           
 ### Added:
 - [7.10.0] Support conda environment definitions to be passed as function pointers, similar to input, params, and resources #494  (see [#494](https://github.com/JetBrains-Research/snakecharm/issues/494)) 
@@ -25,7 +24,6 @@ Released on ...
     - `template_engine` should be last in the rule 
     - Completion for "yte", "jinja2" in template_engine string argument 
     - Inspection that warns when template= keyword argument is required in section with template_engine
-- TODO  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ## [2022.1.749]
 Released on June 15th 2022
