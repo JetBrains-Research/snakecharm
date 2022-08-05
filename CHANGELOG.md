@@ -3,7 +3,7 @@
 
 # SnakeCharm Plugin Changelog
 
-## [2022.1.xxx]
+## [Unreleased]
 Released on August 5th 2022
 
 ### Fixed
