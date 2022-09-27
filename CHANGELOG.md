@@ -3,6 +3,12 @@
 
 # SnakeCharm Plugin Changelog
 
+## [Unreleased]
+Released on ...
+
+### Fixed
+- Compatibility with PyCharm 2022.3
+
 ## [2022.2.761]
 Released on August 5th 2022
 
