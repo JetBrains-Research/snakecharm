@@ -93,6 +93,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             .put(SnakemakeNames.SUBWORKFLOW_KEYWORD, SmkTokenTypes.SUBWORKFLOW_KEYWORD)
             .put(SnakemakeNames.MODULE_KEYWORD, SmkTokenTypes.MODULE_KEYWORD)
             .put(SnakemakeNames.USE_KEYWORD, SmkTokenTypes.USE_KEYWORD)
+//            .put(SnakemakeNames.USE_EXCLUDE_KEYWORD, SmkTokenTypes.SMK_EXCLUDE_KEYWORD)
             .build()!!
 
 
