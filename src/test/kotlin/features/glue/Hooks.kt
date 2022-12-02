@@ -3,7 +3,6 @@ package features.glue
 import com.intellij.codeInspection.LocalInspectionEP
 import com.intellij.codeInspection.ex.InspectionProfileImpl
 import com.intellij.openapi.util.Disposer
-import com.intellij.testFramework.TestApplicationManager
 import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
 import io.cucumber.java.After
 import io.cucumber.java.Before
@@ -19,7 +18,7 @@ class Hooks {
     @Before
     fun initParamdefs() {
         // todo: most likely we should remove this call
-        TestApplicationManager.getInstance()
+        // TestApplicationManager.getInstance()
         SnakemakeWorld.myInspectionChecked = false
     }
 

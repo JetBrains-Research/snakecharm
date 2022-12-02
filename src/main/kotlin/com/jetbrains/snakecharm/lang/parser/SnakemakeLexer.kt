@@ -68,19 +68,19 @@ class SnakemakeLexer : PythonIndentingLexer() {
     private var isInToplevelSectionWithoutSubsections = false
 
     companion object {
-        val RULE_LIKE_KEYWORDS = ImmutableSet.Builder<String>()
+        val RULE_LIKE_KEYWORDS: ImmutableSet<String> = ImmutableSet.Builder<String>()
             .add(SnakemakeNames.RULE_KEYWORD)
             .add(SnakemakeNames.CHECKPOINT_KEYWORD)
             .add(SnakemakeNames.SUBWORKFLOW_KEYWORD)
             .add(SnakemakeNames.MODULE_KEYWORD)
             .add(SnakemakeNames.USE_KEYWORD)
-            .build()!!
+            .build()
 
-        val PYTHON_BLOCK_KEYWORDS = ImmutableSet.Builder<String>()
+        val PYTHON_BLOCK_KEYWORDS: ImmutableSet<String> = ImmutableSet.Builder<String>()
             .add(SnakemakeNames.WORKFLOW_ONSTART_KEYWORD)
             .add(SnakemakeNames.WORKFLOW_ONSUCCESS_KEYWORD)
             .add(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD)
-            .build()!!
+            .build()
 
         private val SPECIAL_KEYWORDS_2_TOKEN_TYPE = ImmutableMap.Builder<String, PyElementType>()
             .put(SnakemakeNames.RULE_KEYWORD, SmkTokenTypes.RULE_KEYWORD)
@@ -94,7 +94,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             .put(SnakemakeNames.MODULE_KEYWORD, SmkTokenTypes.MODULE_KEYWORD)
             .put(SnakemakeNames.USE_KEYWORD, SmkTokenTypes.USE_KEYWORD)
 //            .put(SnakemakeNames.USE_EXCLUDE_KEYWORD, SmkTokenTypes.SMK_EXCLUDE_KEYWORD)
-            .build()!!
+            .build()
 
 
         val KEYWORD_LIKE_SECTION_TOKEN_TYPE_2_KEYWORD: Map<PyElementType, String?> =
@@ -111,8 +111,10 @@ class SnakemakeLexer : PythonIndentingLexer() {
             when {
                 tokenType == PyTokenTypes.COLON || tokenType in PyTokenTypes.WHITESPACE ->
                     tokensBeforeRuleSection.add(tokenType!!)
+
                 tokenType == PyTokenTypes.IDENTIFIER && tokensBeforeRuleSection.all { it in PyTokenTypes.WHITESPACE } ->
                     tokensBeforeRuleSection.add(tokenType!!)
+
                 else -> {
                     expectingRuleSectionOnSameLine = false
                     if (!atToken(PyTokenTypes.IDENTIFIER)) {
@@ -160,7 +162,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
                 val identifierPosition = currentPosition
                 val identifierText = tokenText
                 // look ahead and update rule-like section indent if an identifier is followed by a colon
-                // this allows to avoid hardcoding section names and ensures correct lexing/parsing
+                // this allows to avoid hard coding section names and ensures correct lexing/parsing
                 // of new snakemake sections should they be introduced in future releases
                 advanceBase()
                 if (atBaseToken(PyTokenTypes.COLON)) {
@@ -178,7 +180,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
              * which replaces all line separators with '\n'.
              * Even if the original file had CRLF for line separator,
              * tokenText will never contain CR, only LF.
-             * Thus only '\n' can be used as a delimiter here, but [System.lineSeparator] cannot.
+             * Thus, only '\n' can be used as a delimiter here, but [System.lineSeparator] cannot.
              */
             val text = tokenText.substringAfterLast('\n')
             var spaces = 0
@@ -366,7 +368,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
         var insertIndex = myTokenQueue.size
         while (indent < lastIndent) {
-            myIndentStack.pop()
+            myIndentStack.popInt()
             lastIndent = myIndentStack.peekInt(0)
             myTokenQueue.add(insertIndex, PendingToken(PyTokenTypes.DEDENT, whiteSpaceStart, whiteSpaceStart))
             ++insertIndex
@@ -383,7 +385,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
 
             // handle incorrect unindents if necessary
             while (indent < lastIndent) {
-                myIndentStack.pop()
+                myIndentStack.popInt()
                 if (insertedIndentsCount > 0) insertedIndentsCount--
                 lastIndent = myIndentStack.peekInt(0)
                 if (indent > lastIndent) {
@@ -493,7 +495,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             if (myIndentStack.size == 1) { // don't pop the very first indent
                 insertedIndentsCount = 0
             } else {
-                myIndentStack.pop()
+                myIndentStack.popInt()
                 insertedIndentsCount--
             }
         }
@@ -506,6 +508,6 @@ class SnakemakeLexer : PythonIndentingLexer() {
         type: IElementType,
         start: Int,
         end: Int,
-        val indent: Int
+        val indent: Int,
     ) : PendingToken(type, start, end)
 }

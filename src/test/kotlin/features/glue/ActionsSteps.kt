@@ -19,6 +19,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
@@ -249,7 +250,7 @@ class ActionsSteps {
         text: String,
         signature: String,
         message: String,
-        searchInTags: Boolean = false
+        searchInTags: Boolean = false,
     ) {
         require(!Pattern.compile("(^|[^\\\\])\"").matcher(message).find()) {
             "Quotes (\") should be escaped (with \\) in message: $message"
@@ -280,7 +281,7 @@ class ActionsSteps {
     private fun findTextPositionInsideTags(
         tag: String,
         text: String,
-        fullText: String
+        fullText: String,
     ): Int {
         val textInsideTagsPattern = Pattern.compile("<$tag descr=.+?>([^<>]+)</$tag>")
         val matcher = textInsideTagsPattern.matcher(fullText)
@@ -291,7 +292,7 @@ class ActionsSteps {
         text: String,
         signature: String,
         document: Document,
-        psiFile: PsiFile
+        psiFile: PsiFile,
     ): Int {
         val pos = document.text.indexOf(signature)
         assertTrue(
@@ -457,8 +458,11 @@ class ActionsSteps {
     @Then("^go to symbol should contain:$")
     fun completionListShouldContain(table: DataTable) {
         val names = ApplicationManager.getApplication().runReadAction(Computable {
-            val model = GotoSymbolModel2(fixture().project)
-            model.getNames(false).toList()
+            val disposable = Disposer.newDisposable()
+            val model = GotoSymbolModel2(fixture().project, disposable)
+            val namesList = model.getNames(false).toList()
+            disposable.dispose()
+            namesList
         })
         val expected = table.asList()
         assertHasElements(names, expected)
@@ -586,7 +590,7 @@ class ActionsSteps {
             requireNotNull(element)
 
             val editor = fixture().editor
-            val targetElement = findTargetElementFor(element, editor)
+            val targetElement = findTargetElementFor(element, editor)!!
             val documentationProvider = DocumentationManager.getProviderFromElement(targetElement)
 
             myGeneratedDocPopupText = when {
