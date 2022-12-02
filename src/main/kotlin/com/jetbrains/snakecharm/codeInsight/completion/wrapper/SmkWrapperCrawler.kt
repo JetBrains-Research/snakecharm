@@ -28,13 +28,13 @@ object SmkWrapperCrawler {
         val wrappersFolder = args[0]
         val wrappersFolderPath = Paths.get(wrappersFolder)
         require(wrappersFolderPath.exists()) {
-            "Wrappers src folder doesn't exist: $wrappersFolder"
+            "Wrappers src folder doesn't exist: [$wrappersFolder]"
         }
         require(wrappersFolderPath.isDirectory()) {
-            "Wrappers src folder isn't a folder: $wrappersFolder"
+            "Wrappers src folder isn't a folder: [$wrappersFolder]"
         }
         require(Paths.get("$wrappersFolder/bio").exists()) {
-            "Wrappers src folder doesn't contain \"bio\" folder: $wrappersFolder"
+            "Wrappers src folder doesn't contain \"bio\" folder: [$wrappersFolder]"
         }
 
         val version = args[1]
