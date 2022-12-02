@@ -31,12 +31,12 @@ repositories {
 }
 
 dependencies {
-    testImplementation("io.cucumber:cucumber-java:7.2.3")
-    testImplementation("io.cucumber:cucumber-junit:7.2.3")
+    testImplementation("io.cucumber:cucumber-java:7.8.1")
+    testImplementation("io.cucumber:cucumber-junit:7.8.1")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.7.10")
     testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.7.10")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.3.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.4.1")
 }
 
 // Test plugin dynamic unload:
@@ -232,7 +232,7 @@ tasks {
 
     test {
         val test by getting(Test::class) {
-            setScanForTestClasses(false)
+            isScanForTestClasses = false
             // Only run tests from classes that end with "Test"
             include("**/*Test.class")
             //include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
