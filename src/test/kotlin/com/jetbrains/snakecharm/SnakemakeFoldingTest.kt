@@ -22,7 +22,7 @@ class SnakemakeFoldingTest : SnakemakeTestCase() {
     fun testRule() {
         doTest()
     }
-    
+
     fun testCheckpoint() {
         doTest()
     }
