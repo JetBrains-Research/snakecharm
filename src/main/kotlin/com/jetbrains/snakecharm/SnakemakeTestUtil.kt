@@ -27,7 +27,7 @@ object SnakemakeTestUtil {
                 val subDir = File(rootPath).toPath().parent.parent
                 when {
                     subDir.fileName.toString() == "out" -> subDir.parent
-                    subDir.parent.fileName.toString() == "build" -> subDir.parent.parent
+                    subDir.fileName.toString() == "build" -> subDir.parent
                     else -> null
                 }
             }

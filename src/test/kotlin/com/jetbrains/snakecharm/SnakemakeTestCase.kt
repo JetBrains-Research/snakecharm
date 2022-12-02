@@ -48,7 +48,9 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
         super.setUp()
         TestApplicationManager.getInstance()
         val factory = IdeaTestFixtureFactory.getFixtureFactory()
-        val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor)
+        val fixtureBuilder = factory.createLightFixtureBuilder(
+            projectDescriptor, getTestName(false)
+        )
         fixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(
                 fixtureBuilder.fixture,
                 createTempDirFixture()
