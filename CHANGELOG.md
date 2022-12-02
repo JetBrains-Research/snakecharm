@@ -9,6 +9,9 @@ Released on ...
 ### Fixed
 - Compatibility with PyCharm 2022.3
 
+### Changed:
+- Bundles snakemake wrappers list updated to `v1.20.0`
+
 ## [2022.2.761]
 Released on August 5th 2022
 
