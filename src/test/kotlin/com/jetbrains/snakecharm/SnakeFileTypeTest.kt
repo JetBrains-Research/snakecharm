@@ -7,7 +7,7 @@ import junit.framework.TestCase
  * @author Roman.Chernyatchik
  * @date 2019-02-02
  */
-class SnakeFileTypeTest: SnakemakeTestCase() {
+class SnakeFileTypeTest : SnakemakeTestCase() {
     fun testSnakefile() {
         doTest("Snakefile")
     }
