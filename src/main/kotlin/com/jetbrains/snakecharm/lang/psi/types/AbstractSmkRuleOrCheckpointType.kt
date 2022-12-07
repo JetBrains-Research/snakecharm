@@ -28,7 +28,6 @@ import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex
-import gnu.trove.THashSet
 
 
 abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
@@ -102,7 +101,9 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
         }
         val module = location.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
         val parent = location.parentOfType<SmkRuleOrCheckpoint>()
-        val useExcludedNamesList = PsiTreeUtil.getParentOfType(location, SmkExcludedRulesNamesList::class.java, SmkRuleLike::class.java)
+        val useExcludedNamesList = PsiTreeUtil.getParentOfType(
+            location, SmkExcludedRulesNamesList::class.java, SmkRuleLike::class.java
+        )
         val useToIgnore = (useExcludedNamesList as? SmkExcludedRulesNamesList)?.getParentUse()
         when (module) {
             null -> (location.containingFile.originalFile as SmkFile).filterUsePsi().map { it.second }
@@ -199,9 +200,9 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
             val results = mutableListOf<Psi>()
             val project = module.project
             val stubIndex = StubIndex.getInstance()
-            val allKeys = THashSet<String>()
+            val allKeys = HashSet<String>()
             stubIndex.processAllKeys(
-                indexKey, Processors.cancelableCollectProcessor<String>(allKeys), scope, null
+                indexKey, Processors.cancelableCollectProcessor(allKeys), scope, null
             )
 
             for (key in allKeys) {
@@ -212,7 +213,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
 
         private fun searchScope(module: Module): GlobalSearchScope {
             // module content root and all dependent modules:
-            val scope = GlobalSearchScope.moduleWithDependentsScope(module)
+            @Suppress("UnnecessaryVariable") val scope = globalSearchScope(module)
 
             // all project w/o tests from project sdk roots
             // PyProjectScopeBuilder.excludeSdkTestsScope(targetFile);
@@ -223,6 +224,11 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
 
             // project with all modules and libs:
             // GlobalSearchScope.allScope(project)
+            return scope
+        }
+
+        private fun globalSearchScope(module: Module): GlobalSearchScope {
+            val scope = GlobalSearchScope.moduleWithDependentsScope(module)
             return scope
         }
     }
