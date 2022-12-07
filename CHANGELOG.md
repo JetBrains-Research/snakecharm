@@ -7,7 +7,17 @@
 Released on ...
 
 ### Fixed
-- Compatibility with PyCharm 2022.3
+- TODO #NNN  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
+
+### Changed:
+- TODO #NNN  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
+
+
+## [2022.3.771]
+Released on December 7th 2022...
+
+### Fixed
+- Compatibility with PyCharm 2022.3 #501  (see [#501](https://github.com/JetBrains-Research/snakecharm/issues/501))
 
 ### Changed:
 - Bundles snakemake wrappers list updated to `v1.20.0`
