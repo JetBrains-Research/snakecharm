@@ -14,7 +14,7 @@ Released on ...
 
 
 ## [2022.3.771]
-Released on December 7th 2022...
+Released on December 7th 2022
 
 ### Fixed
 - Compatibility with PyCharm 2022.3 #501  (see [#501](https://github.com/JetBrains-Research/snakecharm/issues/501))
