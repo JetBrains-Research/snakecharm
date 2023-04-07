@@ -7,7 +7,6 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import com.intellij.util.io.exists
 import com.intellij.util.io.readBytes
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.SnakemakeTestUtil
@@ -20,6 +19,7 @@ import kotlinx.serialization.decodeFromByteArray
 import java.net.URL
 import java.nio.file.Path
 import java.util.*
+import kotlin.io.path.exists
 import kotlin.system.exitProcess
 
 class SmkWrapperStorage(val project: Project) : Disposable {

@@ -7,11 +7,11 @@
 Released on ...
 
 ### Fixed
+- Compatibility with PyCharm 2023.1 #505  (see [#501](https://github.com/JetBrains-Research/snakecharm/issues/505))
 - TODO #NNN  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Changed:
 - TODO #NNN  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
-
 
 ## [2022.3.771]
 Released on December 7th 2022

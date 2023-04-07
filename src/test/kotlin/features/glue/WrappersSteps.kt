@@ -2,12 +2,12 @@ package features.glue
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.io.FileUtil
-import com.intellij.util.io.exists
 import com.intellij.util.io.isDirectory
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import features.glue.StepDefs.Companion.waitEDTEventsDispatching
 import io.cucumber.java.en.Given
 import java.nio.file.Paths
+import kotlin.io.path.exists
 
 class WrappersSteps {
     @Given("^wrapper repo path in test dir \"(.+)\"")

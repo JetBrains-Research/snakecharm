@@ -4,11 +4,11 @@ import com.intellij.facet.ui.ValidationResult
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
-import com.intellij.util.io.exists
 import com.intellij.util.io.isDirectory
 import com.jetbrains.snakecharm.SnakemakeBundle
 import java.nio.file.Paths
 import javax.swing.JComponent
+import kotlin.io.path.exists
 
 /**
  * Registers project settings tab for snakemake settings ('supported framework')
@@ -48,7 +48,7 @@ class SmkFrameworkConfigurableProvider(
             if (state.snakemakeSupportEnabled) {
                 if (!state.useBundledWrappersInfo) {
                     val folderPathStr: String? = state.wrappersCustomSourcesFolder
-                    if (folderPathStr == null || folderPathStr.isBlank()) {
+                    if (folderPathStr.isNullOrBlank()) {
                         return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.wrappers.sources.path.is.blank"))
                     }
 

@@ -53,11 +53,13 @@ Feature: Documentation for 'shadow' settings
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
-    def f(number):
-      "Documentation"
+    def roo(number):
+      \"\"\"my documentation\"\"\"
       return number
-    f(1)
+    roo(1)
     """
-    When I put the caret at f(1)
+    When I put the caret at roo(1)
     Then I invoke quick navigation info
-    Then Documentation text should contain Documentation
+    Then Documentation text should contain def
+    Then Documentation text should contain roo
+    Then Documentation text should contain number

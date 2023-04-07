@@ -28,7 +28,7 @@ class SmkFrameworkSupportDirProjectConfigurator : DirectoryProjectConfigurator {
         if (module != null && SmkFrameworkType.isSuitableModuleType(module)) {
             ApplicationManager.getApplication().invokeLater({
                 if (detectSnakemake(baseDir)) {
-                    StartupManager.getInstance(project).runWhenProjectIsInitialized {
+                    StartupManager.getInstance(project).runAfterOpened {
                         enableSnakemakeSupport(module, baseDir)
                     }
                 }
