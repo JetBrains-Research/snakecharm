@@ -1,10 +1,12 @@
 package com.jetbrains.snakecharm.inspections
 
+import com.intellij.codeInsight.intention.FileModifier
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.SmartPointerManager
 import com.intellij.psi.SmartPsiElementPointer
@@ -44,12 +46,12 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
                     if (executionSection != null && !isExecutionSection) {
                         requireNotNull(executionSection.name)
 
-                        registerProblem(st,
+                        registerProblem(
+                            st,
                             SnakemakeBundle.message(
                                 "INSP.NAME.rule.section.after.execution.message",
                                 executionSection.name!!
                             ),
-                            null,
                             MoveExecutionSectionToEndOfRuleQuickFix(SmartPointerManager.createPointer(executionSection))
                         )
                     }
@@ -62,6 +64,11 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
         private val executionSectionPointer: SmartPsiElementPointer<SmkSection>,
     ) : LocalQuickFix {
         override fun getFamilyName() = SnakemakeBundle.message("INSP.INTN.move.execution.section.down.family")
+
+        override fun getFileModifierForPreview(target: PsiFile): FileModifier {
+            val pntInPreview = PsiTreeUtil.findSameElementInCopy(executionSectionPointer.element, target)
+            return MoveExecutionSectionToEndOfRuleQuickFix(SmartPointerManager.createPointer(pntInPreview))
+        }
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val executionSection = executionSectionPointer.element ?: return
