@@ -17,7 +17,7 @@ class SmkFrameworkConfigurableProvider(
     val project: Project
 ) : Configurable, Configurable.NoScroll {
 
-    private lateinit var projConfigurable: SearchableConfigurable
+    private var projConfigurable: SearchableConfigurable? = null
 
     override fun createComponent(): JComponent? {
         if (project.isDefault) {
@@ -25,19 +25,19 @@ class SmkFrameworkConfigurableProvider(
         }
 
         projConfigurable = SmkFrameworkConfigurable(project)
-        return projConfigurable.createComponent()
+        return projConfigurable!!.createComponent()
     }
 
-    override fun isModified() = projConfigurable.isModified
+    override fun isModified() = projConfigurable!!.isModified
 
-    override fun apply() = projConfigurable.apply()
-    override fun reset() = projConfigurable.reset()
+    override fun apply() = projConfigurable?.apply() ?: Unit
+    override fun reset() = projConfigurable?.reset() ?: Unit
     override fun getHelpTopic() = "snakemake_support"
     override fun getDisplayName() = SnakemakeBundle.message("smk.framework.configurable.display.name")
 
 
     override fun disposeUIResources() {
-        projConfigurable.disposeUIResources()
+        projConfigurable?.disposeUIResources()
     }
 
     companion object {
