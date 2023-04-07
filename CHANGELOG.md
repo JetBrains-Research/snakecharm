@@ -8,6 +8,7 @@ Released on ...
 
 ### Fixed
 - Compatibility with PyCharm 2023.1 #505  (see [#501](https://github.com/JetBrains-Research/snakecharm/issues/505))
+- Exception: "Access is allowed from write thread only" creating project in dumb mode #506  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/506)) 
 - TODO #NNN  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Changed:

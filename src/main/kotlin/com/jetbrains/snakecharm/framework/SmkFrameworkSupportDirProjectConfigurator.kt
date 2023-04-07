@@ -3,13 +3,16 @@ package com.jetbrains.snakecharm.framework
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.DumbAwareRunnable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupManager
+import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.intellij.platform.DirectoryProjectConfigurator
+import com.intellij.util.ui.EDT
 import com.jetbrains.snakecharm.SmkNotifier
 
 /**
@@ -22,17 +25,20 @@ class SmkFrameworkSupportDirProjectConfigurator : DirectoryProjectConfigurator {
         project: Project,
         baseDir: VirtualFile,
         moduleRef: Ref<Module>,
-        isProjectCreatedWithWizard: Boolean
+        isProjectCreatedWithWizard: Boolean,
     ) {
+        EDT.assertIsEdt()
         val module = moduleRef.get()
         if (module != null && SmkFrameworkType.isSuitableModuleType(module)) {
-            ApplicationManager.getApplication().invokeLater({
-                if (detectSnakemake(baseDir)) {
-                    StartupManager.getInstance(project).runAfterOpened {
-                        enableSnakemakeSupport(module, baseDir)
-                    }
-                }
-            }, ModalityState.current(), module.disposed)
+            if (detectSnakemake(baseDir)) {
+                // XXX: on project created is required to configure smk facet, SnakemakeStartupActivity will not help
+                StartupManager.getInstance(project).runAfterOpened(DumbAwareRunnable {
+                    enableSnakemakeSupport(
+                        module,
+                        baseDir
+                    )
+                })
+            }
         }
     }
 
@@ -47,18 +53,24 @@ class SmkFrameworkSupportDirProjectConfigurator : DirectoryProjectConfigurator {
 
     private fun enableSnakemakeSupport(module: Module, baseDir: VirtualFile) {
         val project = module.project
-        val settings = SmkSupportProjectSettings.getInstance(project)
-        if (settings.snakemakeSupportEnabled) {
+        val application = ApplicationManager.getApplication()
+        val isSupportEnabled = application.runReadAction(Computable {
+            SmkSupportProjectSettings.getInstance(project).snakemakeSupportEnabled
+        })
+
+        if (isSupportEnabled) {
             // already exists
             return;
         }
 
-        // add support
-        SmkSupportProjectSettings.addSupport(project)
-
-        ApplicationManager.getApplication().invokeLater({
+        application.invokeLater(DumbAwareRunnable {
+            // add support
+            application.runWriteAction(DumbAwareRunnable {
+                SmkSupportProjectSettings.addSupport(project)
+            })
+            // Notify
             SmkNotifier.notifySnakefileDetected(module)
-        }, ModalityState.current(), module.disposed)
+        }, ModalityState.defaultModalityState(), module.disposed)
     }
 
     private fun containsSnakefile(root: VirtualFile, depth: Int): Boolean {
