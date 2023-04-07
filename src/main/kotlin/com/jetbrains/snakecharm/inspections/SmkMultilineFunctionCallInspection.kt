@@ -32,11 +32,12 @@ class SmkMultilineFunctionCallInspection : SnakemakeInspection() {
                 }
             }
 
+            val invalidWsPnts = invalidWhitespaces.map { SmartPointerManager.createPointer(it) }
             invalidWhitespaces.forEach {
                 registerProblem(
                     it,
                     SnakemakeBundle.message("INSP.NAME.multiline.func.call"),
-                    ShiftToNextLine(st, invalidWhitespaces)
+                    ShiftToNextLine(st, invalidWsPnts)
                 )
             }
         }
@@ -61,7 +62,10 @@ class SmkMultilineFunctionCallInspection : SnakemakeInspection() {
         }
     }
 
-    private class ShiftToNextLine(expr: PsiElement, val incorrectElements: MutableList<PsiElement>) :
+    /**
+     * Quick-Fix is based on document, so preview not available for such implementation.
+     */
+    private class ShiftToNextLine(expr: PsiElement, val incorrectElements: List<SmartPsiElementPointer<PsiElement>>) :
         LocalQuickFixOnPsiElement(expr) {
 
         override fun getFamilyName() = SnakemakeBundle.message("INSP.NAME.multiline.func.call.fix")
@@ -84,7 +88,7 @@ class SmkMultilineFunctionCallInspection : SnakemakeInspection() {
             // Deletes every incorrect whitespace
             // If there are END_OF_LINE_COMMENT, new whitespace will be inserted automatically
             // Otherwise, we need to insert it manually
-            incorrectElements.forEach { space ->
+            incorrectElements.mapNotNull { it.element }.forEach { space ->
                 val hasComment = space.prevSibling.elementType == PyTokenTypes.END_OF_LINE_COMMENT
                 val offset = space.startOffset
                 space.delete()
