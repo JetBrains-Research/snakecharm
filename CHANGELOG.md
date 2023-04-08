@@ -3,7 +3,7 @@
 
 # SnakeCharm Plugin Changelog
 
-## [Unreleased]
+## [2023.1.SNAPSHOT]
 Released on ...
 
 ### Fixed

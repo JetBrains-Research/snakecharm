@@ -90,12 +90,27 @@ intellij {
 // Read more: https://github.com/JetBrains/gradle-changelog-plugin
 // Configuration: https://github.com/JetBrains/gradle-changelog-plugin#configuration
 changelog {
+    // Helps to organize content in CHANGLOG.md. Could generate change notes from it.
+
     version.set(project.version.toString())
-    groups.set(listOf("Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"))
-    header.set(provider { "[${version.get()}] - ${date()}" })
-    itemPrefix.set("-")
-    keepUnreleasedSection.set(true)
-    unreleasedTerm.set("[Unreleased]")
+    headerParserRegex.set("""(\d+\.\d+.(\d+|SNAPSHOT)(-\w+)?)""".toRegex())
+
+    // Optionally generate changed commits list url.
+    // NB: At the moment url title will be same as current version in changelog and in our case it is with 'SNAPSHOT'
+    //     tag instead of real build number => title will be not very nice-looking
+    //repositoryUrl.set("https://github.com/JetBrains-Research/snakecharm")  // url to compare commits beetween previous and current release
+    //sectionUrlBuilder.set(ChangelogSectionUrlBuilder { repositoryUrl, currentVersion, previousVersion, isUnreleased ->
+    //    "${repositoryUrl}/compare/v${previousVersion}...v${version.get()}"
+    //})
+
+    // default values:
+    // combinePreReleases.set(true) // default; Combines pre-releases (like 1.0.0-alpha, 1.0.0-beta.2) into the final release note when patching.
+    // header.set(provider { "[${version.get()}] - ${date()}" })
+    // groups.set(listOf("Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"))
+    // itemPrefix.set("-") // default
+    // path.set(file("CHANGELOG.md").canonicalPath)  // default value
+    // keepUnreleasedSection.set(true) // default
+    // unreleasedTerm.set("[Unreleased]") // default
 }
 
 
