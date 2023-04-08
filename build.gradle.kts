@@ -1,6 +1,6 @@
 @file:Suppress("SpellCheckingInspection")
 
-import org.jetbrains.changelog.date
+import org.jetbrains.changelog.exceptions.MissingVersionException
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -23,7 +23,12 @@ plugins {
 }
 
 group = properties("pluginGroup")
-version = "${properties("pluginVersion")}.${properties("pluginBuildCounter")}${properties("pluginPreReleaseSuffix")}"
+if (properties("pluginPreReleaseSuffix").isEmpty()) {
+    version = "${properties("pluginVersion")}${properties("pluginPreReleaseSuffix")}"
+} else {
+    version =
+        "${properties("pluginVersion")}${properties("pluginPreReleaseSuffix")}.${properties("pluginBuildCounter")}"
+}
 
 // Configure project's dependencies
 repositories {
@@ -96,12 +101,7 @@ changelog {
     headerParserRegex.set("""(\d+\.\d+.(\d+|SNAPSHOT)(-\w+)?)""".toRegex())
 
     // Optionally generate changed commits list url.
-    // NB: At the moment url title will be same as current version in changelog and in our case it is with 'SNAPSHOT'
-    //     tag instead of real build number => title will be not very nice-looking
-    //repositoryUrl.set("https://github.com/JetBrains-Research/snakecharm")  // url to compare commits beetween previous and current release
-    //sectionUrlBuilder.set(ChangelogSectionUrlBuilder { repositoryUrl, currentVersion, previousVersion, isUnreleased ->
-    //    "${repositoryUrl}/compare/v${previousVersion}...v${version.get()}"
-    //})
+    repositoryUrl.set("https://github.com/JetBrains-Research/snakecharm")  // url to compare commits beetween previous and current release
 
     // default values:
     // combinePreReleases.set(true) // default; Combines pre-releases (like 1.0.0-alpha, 1.0.0-beta.2) into the final release note when patching.
@@ -159,11 +159,21 @@ tasks {
         }.joinToString("\n").run { markdownToHTML(this) })
 
         // Get the latest available change notes from the changelog file
-        changeNotes.set(provider {
-            changelog.run {
-                getOrNull(properties("pluginVersion")) ?: getLatest()
-            }.toHTML()
-        })
+        changeNotes.set(
+            provider {
+                with(changelog) {
+                    val log = try {
+                        getUnreleased()
+                    } catch (e: MissingVersionException) {
+                        getOrNull(version.toString()) ?: getLatest()
+                    }
+                    renderItem(
+                        log,
+                        org.jetbrains.changelog.Changelog.OutputType.HTML,
+                    )
+                }
+            },
+        )
     }
 
     runPluginVerifier {

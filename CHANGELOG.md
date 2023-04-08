@@ -3,18 +3,18 @@
 
 # SnakeCharm Plugin Changelog
 
-## [2023.1.SNAPSHOT]
-Released on ...
+## [2023.1.1]
+Released on 9 April 2023
 
 ### Fixed
 - Compatibility with PyCharm 2023.1 #505  (see [#501](https://github.com/JetBrains-Research/snakecharm/issues/505))
 - Exception: "Access is allowed from write thread only" creating project in dumb mode (see [#506](https://github.com/JetBrains-Research/snakecharm/issues/506)) 
 - Make Snakecharm trusted plugins, even though it is provided not by JetBrains but by JetBrains Research (see [#503](https://github.com/JetBrains-Research/snakecharm/issues/503))
-- TODO #NNN  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
+- Empty `What's New` section fixed
 
 ### Changed:
 - Bundled snakemake wrappers list updated to `v1.25.0`
-- TODO #NNN  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
+- Plugin versioning changed, now minor version is not CI build, just manual counter 
 
 ## [2022.3.771]
 Released on December 7th 2022
