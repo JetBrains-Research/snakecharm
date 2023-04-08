@@ -13,6 +13,7 @@ Released on ...
 - TODO #NNN  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ### Changed:
+- Bundled snakemake wrappers list updated to `v1.25.0`
 - TODO #NNN  (see [#NNN](https://github.com/JetBrains-Research/snakecharm/issues/NNN)) 
 
 ## [2022.3.771]
