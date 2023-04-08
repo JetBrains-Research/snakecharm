@@ -11,13 +11,13 @@ plugins {
     id("java")
 
     // Kotlin support
-    kotlin("jvm") version "1.7.10"
-    kotlin("plugin.serialization") version "1.7.10"
+    kotlin("jvm") version "1.8.10"
+    kotlin("plugin.serialization") version "1.8.10"
 
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
-    id("org.jetbrains.intellij") version "1.13.3"
+    id("org.jetbrains.intellij") version "1.13.2"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
     id("org.jetbrains.changelog") version "1.3.1"
 }
@@ -30,12 +30,17 @@ repositories {
     mavenCentral()
 }
 
+// Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
+kotlin {
+    jvmToolchain(17)
+}
+
 dependencies {
     testImplementation("io.cucumber:cucumber-java:7.8.1")
     testImplementation("io.cucumber:cucumber-junit:7.8.1")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.7.10")
-    testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.7.10")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.8.10")
+    testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.10")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.4.1")
 }
 
