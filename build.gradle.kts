@@ -2,6 +2,7 @@
 
 import org.jetbrains.changelog.exceptions.MissingVersionException
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil.exists
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 fun properties(key: String) = project.findProperty(key).toString()
@@ -23,11 +24,10 @@ plugins {
 }
 
 group = properties("pluginGroup")
-if (properties("pluginPreReleaseSuffix").isEmpty()) {
-    version = "${properties("pluginVersion")}${properties("pluginPreReleaseSuffix")}"
+version = if (properties("pluginPreReleaseSuffix").isEmpty()) {
+    "${properties("pluginVersion")}${properties("pluginPreReleaseSuffix")}"
 } else {
-    version =
-        "${properties("pluginVersion")}${properties("pluginPreReleaseSuffix")}.${properties("pluginBuildCounter")}"
+    "${properties("pluginVersion")}${properties("pluginPreReleaseSuffix")}.${properties("pluginBuildCounter")}"
 }
 
 // Configure project's dependencies
@@ -66,9 +66,24 @@ intellij {
     val platformType = properties("platformType")
 
     pluginName.set(properties("pluginName"))
-    version.set(properties("platformVersion"))
+
+    val platformLocalPath = project.findProperty("platformLocalPath") as? String
+    if (platformLocalPath != null) {
+        if (!exists(platformLocalPath)) {
+            logger.error("Custom platfrom path not exist: $platformLocalPath")
+        } else {
+            logger.warn("Using custom platfrom path: $platformLocalPath")
+        }
+        //See https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html#intellij-extension-localpath
+        localPath.set(platformLocalPath)
+        downloadSources.set(false)
+    } else {
+        version.set(properties("platformVersion"))
+        logger.warn("Use version: ${version.get()}")
+        downloadSources.set(properties("platformDownloadSources").toBoolean())
+    }
+
     type.set(platformType)
-    downloadSources.set(properties("platformDownloadSources").toBoolean())
     updateSinceUntilBuild.set(true)
 
     val isPyCharm = platformType == "PC" || platformType == "PY" || platformType == "PD"
@@ -265,7 +280,8 @@ tasks {
             isScanForTestClasses = false
             // Only run tests from classes that end with "Test"
             include("**/*Test.class")
-            //include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
+//            include("**/SnakeFileTypeTest.class")  // Uncomment to disable gradle tests
+//            include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
         }
 
         dependsOn("buildTestWrappersBundle")
