@@ -2,6 +2,12 @@
 
 import org.jetbrains.changelog.exceptions.MissingVersionException
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.intellij.IntelliJPluginConstants.INSTRUMENT_CODE_TASK_NAME
+import org.jetbrains.intellij.IntelliJPluginConstants.INSTRUMENT_TEST_CODE_TASK_NAME
+import org.jetbrains.intellij.propertyProviders.IntelliJPlatformArgumentProvider
+import org.jetbrains.intellij.propertyProviders.LaunchSystemArgumentProvider
+import org.jetbrains.intellij.propertyProviders.PluginPathArgumentProvider
+import org.jetbrains.intellij.tasks.InstrumentCodeTask
 import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil.exists
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -207,18 +213,59 @@ tasks {
     }
 
     register("cucumber") {
+        // TODO: this config doesn't work at the moment, with Java > 8 we need to configure jvm modules and it isn't trivial
+        //  here. In general required args could be found in [pycharmPC-LATEST-EAP-SNAPSHOT]/product-info.json
+
         // Cucumber tests are executed using `AllCucumberFeaturesTest` JUnit runner
         // this task is an alternative if `AllCucumberFeaturesTest` stop working for
         // some reason, normally we don't need this
         dependsOn("assemble", "compileTestKotlin")
+
+        //TODO: Attempt to fix: export somehow 'sun.awt'  '--add-exports' could really mean that you have to '--add-opens'
+        // See: https://github.com/JetBrains/gradle-intellij-plugin/blob/ecd496160c989b0129eebb7ebb9a5f3608182645/src/main/kotlin/org/jetbrains/intellij/IntelliJPlugin.kt#L1252
+
         doLast {
             javaexec {
+                val ideDirProvider = setupDependencies.flatMap { task -> task.idea.map { it.classes } }
+                val sandboxDirProvider = intellij.sandboxDir.map {
+                    project.file(it)
+                }
+                val configDirectoryProvider = sandboxDirProvider.map {
+                    it.resolve("config-test").apply { mkdirs() }
+                }
+                val systemDirectoryProvider = sandboxDirProvider.map {
+                    it.resolve("system-test").apply { mkdirs() }
+                }
+                val pluginsDirectoryProvider = sandboxDirProvider.map {
+                    it.resolve("plugins-test").apply { mkdirs() }
+                }
+                val instrumentedCodeTaskProvider = project.tasks.named<InstrumentCodeTask>(INSTRUMENT_CODE_TASK_NAME)
+                val instrumentedTestCodeTaskProvider = project.tasks.named<InstrumentCodeTask>(INSTRUMENT_TEST_CODE_TASK_NAME)
+                val instrumentedCodeOutputsProvider = project.provider {
+                    project.files(instrumentedCodeTaskProvider.map { it.outputDir.asFile })
+                }
+                val instrumentedTestCodeOutputsProvider = project.provider {
+                    project.files(instrumentedTestCodeTaskProvider.map { it.outputDir.asFile })
+                }
+
+                jvmArgumentProviders.add(IntelliJPlatformArgumentProvider(ideDirProvider.get().toPath(), this))
+                jvmArgumentProviders.add(
+                        LaunchSystemArgumentProvider(
+                                ideDirProvider.get().toPath(),
+                                configDirectoryProvider.get(),
+                                systemDirectoryProvider.get(),
+                                pluginsDirectoryProvider.get(),
+                                listOf("SnakeCharm")
+                        )
+                )
+                jvmArgumentProviders.add(PluginPathArgumentProvider(pluginsDirectoryProvider.get()))
+
                 mainClass.set("io.cucumber.core.cli.Main")
                 classpath = project.sourceSets.test.get().runtimeClasspath
                 systemProperties(
-                    "idea.config.path" to "${intellij.sandboxDir.get()}/config-test",
-                    "idea.system.path" to "${intellij.sandboxDir.get()}/system-test",
-                    "idea.plugins.path" to "${intellij.sandboxDir.get()}/plugins-test",
+////                    "idea.config.path" to "${intellij.sandboxDir.get()}/config-test",
+////                    "idea.system.path" to "${intellij.sandboxDir.get()}/system-test",
+////                    "idea.plugins.path" to "${intellij.sandboxDir.get()}/plugins-test",
                     "idea.force.use.core.classloader" to "true",
                 )
                 args = listOf(
