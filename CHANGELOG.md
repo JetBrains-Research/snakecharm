@@ -9,6 +9,9 @@ Released on 27 Jul 2023
 ### Fixed
 - Compatibility with PyCharm 2023.2
 
+### Changed:
+- Bundled snakemake wrappers list updated to `v2.2.1`
+
 ## [2023.1.1]
 Released on 9 April 2023
 
