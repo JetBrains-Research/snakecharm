@@ -19,6 +19,7 @@
   </applicationListeners>
 
   <extensions defaultExtensionNs="com.intellij">
+    <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
     <fileType
                 name="Snakemake"
                 extensions="smk;rule;rules"
