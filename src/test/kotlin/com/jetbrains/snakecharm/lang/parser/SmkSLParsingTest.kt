@@ -1,15 +1,7 @@
 package com.jetbrains.snakecharm.lang.parser
 
-import com.intellij.lang.ASTFactory
-import com.intellij.lang.LanguageASTFactory
 import com.intellij.testFramework.ParsingTestCase
-import com.jetbrains.python.PythonDialectsTokenSetContributor
-import com.jetbrains.python.PythonLanguage
 import com.jetbrains.python.PythonParserDefinition
-import com.jetbrains.python.PythonTokenSetContributor
-import com.jetbrains.python.psi.PyPsiFacade
-import com.jetbrains.python.psi.impl.PyPsiFacadeImpl
-import com.jetbrains.python.psi.impl.PythonASTFactory
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLParserDefinition
 import org.intellij.lang.regexp.RegExpParserDefinition
@@ -21,17 +13,6 @@ class SmkSLParsingTest : ParsingTestCase(
     PythonParserDefinition(),
     RegExpParserDefinition()
 ) {
-
-    override fun setUp() {
-        super.setUp()
-        registerExtensionPoint(PythonDialectsTokenSetContributor.EP_NAME, PythonDialectsTokenSetContributor::class.java)
-        registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
-        addExplicitExtension<ASTFactory>(LanguageASTFactory.INSTANCE, PythonLanguage.getInstance(), PythonASTFactory())
-        project.registerService(
-            PyPsiFacade::class.java,
-            PyPsiFacadeImpl::class.java
-        )
-    }
 
     override fun getTestDataPath(): String = SnakemakeTestUtil.getTestDataPath().toString()
 

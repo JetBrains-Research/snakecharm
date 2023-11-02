@@ -4,10 +4,7 @@ import com.intellij.lang.LanguageASTFactory
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.ParsingTestCase
-import com.jetbrains.python.PythonDialectsTokenSetContributor
-import com.jetbrains.python.PythonLanguage
-import com.jetbrains.python.PythonParserDefinition
-import com.jetbrains.python.PythonTokenSetContributor
+import com.jetbrains.python.*
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyPsiFacade
@@ -47,6 +44,8 @@ class SnakemakeParsingTest : ParsingTestCase(
             PyPsiFacade::class.java,
             PyPsiFacadeImpl::class.java
         )
+        application.registerService<PyElementTypesFacade>(PyElementTypesFacade::class.java, PyElementTypesFacadeImpl::class.java)
+        application.registerService(PyLanguageFacade::class.java, PyLanguageFacadeImpl::class.java)
     }
 
     override fun tearDown() {
