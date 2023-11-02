@@ -16,7 +16,6 @@ Feature: Completion in python part of snakemake file
       | directory |
       | protected |
       | touch     |
-      | dynamic   |
       | unpack    |
       | ancient   |
       | ensure    |
@@ -37,6 +36,18 @@ Feature: Completion in python part of snakemake file
     Then completion list should contain:
       | scatter |
       | gather  |
+      | dynamic  |
+
+  Scenario: Complete at top-level (<= 7.32.4)
+    Given a snakemake:7.32.4 project
+    Given I open a file "foo.smk" with text
+    """
+    foo = 1;
+    """
+    When I put the caret after foo = 1;
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | dynamic  |
 
   Scenario: Not-completed at top-level
     Given a snakemake project

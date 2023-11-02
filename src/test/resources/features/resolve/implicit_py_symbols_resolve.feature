@@ -56,13 +56,14 @@ Feature: Resolve implicitly imported python names
       | snakemake:6.1 | ru  | rules.foo   | Rules       | common.py    |
       | snakemake:6.5 | ru  | rules       | Rules       | __init__.py  |
       | snakemake:6.5 | ru  | rules.foo   | Rules       | __init__.py  |
+      | snakemake:6.1    | dyn | dynamic()   | dynamic     | io.py        |
+      | snakemake:7.32.4    | dyn | dynamic()   | dynamic     | io.py        |
       | snakemake     | exp | expand()    | expand      | io.py        |
       | snakemake     | tem | temp()      | temp        | io.py        |
       | snakemake     | dir | directory() | directory   | io.py        |
       | snakemake     | dir | directory() | directory   | io.py        |
       | snakemake     | pro | protected() | protected   | io.py        |
       | snakemake     | tou | touch()     | touch       | io.py        |
-      | snakemake     | dyn | dynamic()   | dynamic     | io.py        |
       | snakemake     | un  | unpack()    | unpack      | io.py        |
       | snakemake     | anc | ancient()   | ancient     | io.py        |
       | snakemake     | ens | ensure()    | ensure      | io.py        |
