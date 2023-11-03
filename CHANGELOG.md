@@ -4,11 +4,13 @@
 # SnakeCharm Plugin Changelog
 
 ## [2023.3.1]
-Released on ...
+Released on 3 Nov 2023
 
 ### Fixed
-- Compatibility with PyCharm 2023.3  (see [#507](https://github.com/JetBrains-Research/snakecharm/issues/507))
+- Compatibility with PyCharm 2023.3 (see [#507](https://github.com/JetBrains-Research/snakecharm/issues/507))
 
+### Changed:
+- Bundled snakemake wrappers list updated to `v2.9.1`
 
 ## [2023.2.1]
 Released on 27 Jul 2023
