@@ -56,7 +56,7 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
                 createTempDirFixture()
         )
         fixture!!.testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
-
+        // TODO() replace with: runInEdtAndWait
         if (SwingUtilities.isEventDispatchThread()) {
             fixture!!.setUp()
         } else {
@@ -68,11 +68,30 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
                 }
             }
         }
+// TODO investigate is it required or not
+//        if (SwingUtilities.isEventDispatchThread()) {
+//            fixture!!.setUp()
+//        } else {
+//            ApplicationManager.getApplication().invokeAndWait {
+//                try {
+//                    fixture!!.setUp()
+//                } catch (e: java.lang.Exception) {
+//                    throw RuntimeException("Error running setup", e)
+//                }
+//            }
+//        }
     }
 
     @Throws(Exception::class)
     override fun tearDown() {
         try {
+// TODO investigate is it required or not
+//            InspectionProfileImpl.INIT_INSPECTIONS = false
+//
+//            (LocalInspectionEP.LOCAL_INSPECTION.extensionList
+//                    .first { it.shortName == "SmkUnrecognizedSectionInspection" }
+//                    .instance as SmkUnrecognizedSectionInspection).ignoredItems.clear()
+
             setLanguageLevel(null)
             fixture!!.tearDown()
             fixture = null
