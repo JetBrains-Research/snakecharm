@@ -12,10 +12,11 @@ Feature: Inspection warns about key quoting misuse in snakemake string language 
       Key quoting isn't expected in Snakemake string language get accessor.
       """
     When I check highlighting warnings
+    When I put the caret at <problem>
     And I invoke quick fix Unquote key and see text:
     """
     <rule_like>:
-        shell: <quote>/foo/{<content>}.fq<quote>
+        shell: <quote>/foo/{<content_fixed>}.fq<quote>
     """
     Examples:
       | rule_like  | quote | content               | problem | content_fixed        |
