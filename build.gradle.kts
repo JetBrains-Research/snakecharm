@@ -2,11 +2,13 @@
 
 import org.jetbrains.changelog.exceptions.MissingVersionException
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.intellij.IntelliJPluginConstants.INITIALIZE_INTELLIJ_PLUGIN_TASK_NAME
 import org.jetbrains.intellij.IntelliJPluginConstants.INSTRUMENT_CODE_TASK_NAME
 import org.jetbrains.intellij.IntelliJPluginConstants.INSTRUMENT_TEST_CODE_TASK_NAME
 import org.jetbrains.intellij.propertyProviders.IntelliJPlatformArgumentProvider
 import org.jetbrains.intellij.propertyProviders.LaunchSystemArgumentProvider
 import org.jetbrains.intellij.propertyProviders.PluginPathArgumentProvider
+import org.jetbrains.intellij.tasks.InitializeIntelliJPluginTask
 import org.jetbrains.intellij.tasks.InstrumentCodeTask
 import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil.exists
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -24,9 +26,9 @@ plugins {
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
-    id("org.jetbrains.intellij") version "1.14.2"
+    id("org.jetbrains.intellij") version "1.16.0"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
-    id("org.jetbrains.changelog") version "2.0.0"
+    id("org.jetbrains.changelog") version "2.2.0"
 }
 
 group = properties("pluginGroup")
@@ -247,8 +249,17 @@ tasks {
                 val instrumentedTestCodeOutputsProvider = project.provider {
                     project.files(instrumentedTestCodeTaskProvider.map { it.outputDir.asFile })
                 }
+                val initializeIntellijPluginTaskProvider = project.tasks.named<InitializeIntelliJPluginTask>(INITIALIZE_INTELLIJ_PLUGIN_TASK_NAME)
+                val coroutinesJavaAgentPathProvider = initializeIntellijPluginTaskProvider.flatMap {
+                    it.coroutinesJavaAgentPath
+                }
 
-                jvmArgumentProviders.add(IntelliJPlatformArgumentProvider(ideDirProvider.get().toPath(), this))
+                jvmArgumentProviders.add(IntelliJPlatformArgumentProvider(
+                        ideDirProvider.get().toPath(),
+                        coroutinesJavaAgentPathProvider.get(),
+                        this
+                ))
+
                 jvmArgumentProviders.add(
                         LaunchSystemArgumentProvider(
                                 ideDirProvider.get().toPath(),

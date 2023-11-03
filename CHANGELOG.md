@@ -3,6 +3,13 @@
 
 # SnakeCharm Plugin Changelog
 
+## [2023.3.1]
+Released on ...
+
+### Fixed
+- Compatibility with PyCharm 2023.3  (see [#507](https://github.com/JetBrains-Research/snakecharm/issues/507))
+
+
 ## [2023.2.1]
 Released on 27 Jul 2023
 
@@ -16,7 +23,7 @@ Released on 27 Jul 2023
 Released on 9 April 2023
 
 ### Fixed
-- Compatibility with PyCharm 2023.1 #505  (see [#501](https://github.com/JetBrains-Research/snakecharm/issues/505))
+- Compatibility with PyCharm 2023.1 #505  (see [#505](https://github.com/JetBrains-Research/snakecharm/issues/505))
 - Exception: "Access is allowed from write thread only" creating project in dumb mode (see [#506](https://github.com/JetBrains-Research/snakecharm/issues/506)) 
 - Make Snakecharm trusted plugins, even though it is provided not by JetBrains but by JetBrains Research (see [#503](https://github.com/JetBrains-Research/snakecharm/issues/503))
 - Empty `What's New` section fixed
