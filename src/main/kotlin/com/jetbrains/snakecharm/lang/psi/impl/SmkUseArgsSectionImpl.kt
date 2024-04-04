@@ -12,7 +12,7 @@ class SmkUseArgsSectionImpl(node: ASTNode) : SmkArgsSectionImpl(node), SmkRuleOr
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor?) {
         when (pyVisitor) {
             is SmkElementVisitor -> pyVisitor.visitSmkRuleOrCheckpointArgsSection(this)
-            else -> super.acceptPyVisitor(pyVisitor)
+            else -> super<SmkArgsSectionImpl>.acceptPyVisitor(pyVisitor)
         }
     }
 

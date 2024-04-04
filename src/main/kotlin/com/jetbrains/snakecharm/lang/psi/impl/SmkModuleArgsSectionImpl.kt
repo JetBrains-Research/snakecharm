@@ -13,7 +13,7 @@ class SmkModuleArgsSectionImpl(node: ASTNode) : SmkArgsSectionImpl(node), SmkMod
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor?) {
         when (pyVisitor) {
             is SmkElementVisitor -> pyVisitor.visitSmkModuleArgsSection(this)
-            else -> super.acceptPyVisitor(pyVisitor)
+            else -> super<SmkArgsSectionImpl>.acceptPyVisitor(pyVisitor)
         }
     }
 

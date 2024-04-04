@@ -76,7 +76,14 @@ class ImplicitPySymbolsProvider(
         val project = project
 
         DumbService.getInstance(project).runWhenSmart {
-            SlowOperations.allowSlowOperations<Throwable> { doRefreshCache(project, sdk, forceClear, null) }
+            SlowOperations.startSection(SlowOperations.KNOWN_ISSUE).use { ignore ->
+                // XXX: workaround because default code throws 100+ exceptions:  java.lang.Throwable: Slow operations are prohibited on EDT. See SlowOperations.assertSlowOperationsAreAllowed javadoc.
+                // SlowOperations.allowSlowOperations<Throwable> { .. }
+
+                // TODO: 1) should be in background 2) note that it requires some read actions to access PSI
+                // See: https://github.com/JetBrains-Research/snakecharm/issues/513
+                doRefreshCache(project, sdk, forceClear, null)
+            }
         }
     }
 

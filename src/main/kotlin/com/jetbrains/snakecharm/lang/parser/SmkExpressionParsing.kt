@@ -3,7 +3,7 @@ package com.jetbrains.snakecharm.lang.parser
 import com.intellij.lang.SyntaxTreeBuilder
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyElementTypes
-import com.jetbrains.python.PyPsiBundle.message
+import com.jetbrains.python.PyParsingBundle.message
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.ExpressionParsing
 import com.jetbrains.python.parsing.Parsing

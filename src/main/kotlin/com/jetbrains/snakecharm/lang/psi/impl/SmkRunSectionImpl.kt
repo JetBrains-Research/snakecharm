@@ -24,7 +24,7 @@ class SmkRunSectionImpl(node: ASTNode): PyElementImpl(node), SmkRunSection {
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SmkElementVisitor -> pyVisitor.visitSmkRunSection(this)
-        else -> super.acceptPyVisitor(pyVisitor)
+        else -> super<PyElementImpl>.acceptPyVisitor(pyVisitor)
     }
 
     override fun getPresentation() = getPresentation(this)

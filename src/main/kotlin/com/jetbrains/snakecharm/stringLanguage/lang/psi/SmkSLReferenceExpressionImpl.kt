@@ -36,7 +36,7 @@ class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(no
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SmkSLElementVisitor -> pyVisitor.visitSmkSLReferenceExpression(this)
-        else -> super.acceptPyVisitor(pyVisitor)
+        else -> super<PyReferenceExpressionImpl>.acceptPyVisitor(pyVisitor)
     }
 
     override fun getReference(context: PyResolveContext): PsiPolyVariantReference {

@@ -26,6 +26,6 @@ class SmkCheckPointImpl
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SmkElementVisitor -> pyVisitor.visitSmkCheckPoint(this)
-        else -> super.acceptPyVisitor(pyVisitor)
+        else -> super<SmkRuleLikeImpl>.acceptPyVisitor(pyVisitor)
     }
 }
