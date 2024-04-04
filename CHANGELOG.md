@@ -3,6 +3,13 @@
 
 # SnakeCharm Plugin Changelog
 
+## [2024.1.1]
+Released on ... 2024
+
+### Fixed
+- Compatibility with PyCharm 2024.1
+
+
 ## [2023.2.1]
 Released on 27 Jul 2023
 
