@@ -23,7 +23,7 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightProjectDescriptor
 import com.jetbrains.python.PythonMockSdk
-import com.jetbrains.python.module.PythonModuleType
+import com.jetbrains.python.PythonModuleTypeBase
 import java.nio.file.Path
 
 /**
@@ -55,8 +55,6 @@ class PyLightProjectDescriptor(
     }
 
     override fun getModuleTypeId(): String {
-        return PythonModuleType.getInstance().id
-        // return "EMPTY_MODULE"
-        //return "PYTHON_MODULE"
+        return  PythonModuleTypeBase.getInstance().id
     }
 }
