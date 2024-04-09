@@ -12,6 +12,7 @@
   <!-- PyCharm / Python plugin dependency -->
   <depends>com.intellij.modules.lang</depends>
   <depends>com.intellij.modules.python</depends>
+  <depends>org.toml.lang</depends>
   <depends>org.jetbrains.plugins.yaml</depends>
 
   <applicationListeners>
