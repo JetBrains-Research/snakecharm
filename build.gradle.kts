@@ -17,9 +17,9 @@ plugins {
     // Java support
     id("java")
 
-    // Kotlin support
-    kotlin("jvm") version "1.8.10"
-    kotlin("plugin.serialization") version "1.8.10"
+    // Kotlin support latest: 1.9.23
+    kotlin("jvm") version "1.9.23"
+    kotlin("plugin.serialization") version "1.9.23"
 
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     // This plugin allows you to build plugins for IntelliJ platform using specific
@@ -49,9 +49,9 @@ kotlin {
 dependencies {
     testImplementation("io.cucumber:cucumber-java:7.8.1")
     testImplementation("io.cucumber:cucumber-junit:7.8.1")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.8.10")
-    testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.10")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.23")
+    testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.9.23")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.23")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.4.1")
 }
 
