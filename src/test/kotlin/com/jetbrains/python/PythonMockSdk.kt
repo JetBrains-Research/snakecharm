@@ -39,18 +39,16 @@ import java.io.File
  *
  * @author yole
  */
-//
 object PythonMockSdk {
     fun create(
         testDataRoot: String,
-        version: String = LanguageLevel.getLatest().toPythonVersion(),
+        level: LanguageLevel = LanguageLevel.getLatest(),
         sdkNameSuffix: String = "",
         vararg additionalRoots: VirtualFile
     ): Sdk {
-        val level = LanguageLevel.fromPythonVersion(version)!!
         return create(
             "Mock ${PyNames.PYTHON_SDK_ID_NAME} ${level.toPythonVersion()}$sdkNameSuffix",
-            "$testDataRoot/MockSdk$version",
+            "$testDataRoot/MockSdk${level.toPythonVersion()}",
             PyMockSdkType(level),
             level,
             *additionalRoots
