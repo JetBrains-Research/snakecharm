@@ -8,6 +8,7 @@ Released on ... 2024
 
 ### Fixed
 - Compatibility with PyCharm 2024.1
+- Bundled snakemake wrappers list updated to `v3.8.0`
 
 
 ## [2023.3.1]
