@@ -17,6 +17,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
 import java.net.URL
+import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.exists
@@ -205,7 +206,7 @@ class SmkWrapperStorage(val project: Project) : Disposable {
         @ExperimentalSerializationApi
         private fun deserializeWrappers(storagePath: Path) =
             Cbor.decodeFromByteArray<Pair<String, List<SmkWrapperStorage.WrapperInfo>>>(
-                storagePath.readBytes()
+                Files.readAllBytes(storagePath)
             )
 
         @ExperimentalSerializationApi

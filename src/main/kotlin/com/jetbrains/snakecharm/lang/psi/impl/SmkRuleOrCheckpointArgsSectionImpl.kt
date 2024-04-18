@@ -20,7 +20,7 @@ open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode) : SmkArgsSectionImp
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SmkElementVisitor -> pyVisitor.visitSmkRuleOrCheckpointArgsSection(this)
-        else -> super.acceptPyVisitor(pyVisitor)
+        else -> super<SmkArgsSectionImpl>.acceptPyVisitor(pyVisitor)
     }
 
     override fun getReference(): PsiReference? =

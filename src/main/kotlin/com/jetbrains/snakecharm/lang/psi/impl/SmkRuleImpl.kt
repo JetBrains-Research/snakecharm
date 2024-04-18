@@ -33,7 +33,7 @@ class SmkRuleImpl
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SmkElementVisitor -> pyVisitor.visitSmkRule(this)
-        else -> super.acceptPyVisitor(pyVisitor)
+        else -> super<SmkRuleLikeImpl>.acceptPyVisitor(pyVisitor)
     }
 
     companion object {
