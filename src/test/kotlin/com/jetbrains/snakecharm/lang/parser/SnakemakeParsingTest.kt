@@ -52,6 +52,8 @@ class SnakemakeParsingTest : ParsingTestCase(
             PyPsiFacade::class.java,
             PyPsiFacadeImpl::class.java
         )
+        application.registerService<PyElementTypesFacade>(PyElementTypesFacade::class.java, PyElementTypesFacadeImpl::class.java)
+        application.registerService(PyLanguageFacade::class.java, PyLanguageFacadeImpl::class.java)
     }
 
     override fun tearDown() {
