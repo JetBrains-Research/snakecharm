@@ -153,9 +153,6 @@ tasks {
         withType<KotlinCompile> {
             kotlinOptions {
                 jvmTarget = it
-                languageVersion = "1.7"
-                // see https://plugins.jetbrains.com/docs/intellij/kotlin.html#kotlin-standard-library
-                apiVersion = "1.6"
                 freeCompilerArgs = listOf("-Xjvm-default=all")
             }
         }
