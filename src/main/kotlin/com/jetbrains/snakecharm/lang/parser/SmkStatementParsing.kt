@@ -180,20 +180,27 @@ class SmkStatementParsing(
         }
 
         // Other case: `rule` / `checkpoint` / etc.
+        var wasIdentifier = false
         if (atToken(PyTokenTypes.IDENTIFIER)) {
             // rule name
             //val ruleNameMarker: PsiBuilder.Marker = myBuilder.mark()
             nextToken()
+            wasIdentifier = true
         }
 
         // XXX at the moment we continue parsing rule even if colon missed, probably better
         // XXX to drop rule and scroll up to next STATEMENT_BREAK/RULE/CHECKPOINT/other toplevel keyword or eof()
         checkMatches(PyTokenTypes.COLON,
             "${
-                section.name.replaceFirstChar {
-                    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                if (!wasIdentifier) {
+                    section.name.replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                    } + " name identifier or "
                 }
-            } name identifier or ':' expected"
+                else {
+                    ""
+                }
+            }':' expected"
         ) // bundle
 
         val ruleStatements = myBuilder.mark()
