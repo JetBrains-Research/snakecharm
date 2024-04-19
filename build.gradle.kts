@@ -302,8 +302,16 @@ tasks {
     }
 
     jar {
-        dependsOn("buildWrappersBundle")
+        // original, non-instrumented JAR
         // :runIde, :test tasks launches the plugin from *.jar, so it is required also for development
+        dependsOn("buildWrappersBundle")
+        from("${project.buildDir}/bundledWrappers/smk-wrapper-storage-bundled.cbor")
+    }
+
+    instrumentedJar {
+        // modified (instrumented) JAR
+        // :runIde, :test tasks launches the plugin from *.jar, so it is required also for development
+        dependsOn("buildWrappersBundle")
         from("${project.buildDir}/bundledWrappers/smk-wrapper-storage-bundled.cbor")
     }
 
