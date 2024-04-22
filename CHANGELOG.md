@@ -3,6 +3,13 @@
 
 # SnakeCharm Plugin Changelog
 
+
+## [2024.1.2]
+Released on 22 April 2024
+
+### Fixed
+- Message suggest having multiple identifiers in snakemake rule (see [#515](https://github.com/JetBrains-Research/snakecharm/issues/515))
+
 ## [2024.1.1]
 Released on 20 April 2024
 
