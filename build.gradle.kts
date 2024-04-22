@@ -19,14 +19,14 @@ plugins {
     // Java support
     id("java")
 
-    // Kotlin support
-    kotlin("jvm") version "1.8.10"
-    kotlin("plugin.serialization") version "1.8.10"
+    // Kotlin support latest: 1.9.23
+    kotlin("jvm") version "1.9.23"
+    kotlin("plugin.serialization") version "1.9.23"
 
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     // This plugin allows you to build plugins for IntelliJ platform using specific
     // IntelliJ SDK and bundled plugins.
-    id("org.jetbrains.intellij") version "1.16.0"
+    id("org.jetbrains.intellij") version "1.17.3"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
     id("org.jetbrains.changelog") version "2.2.0"
 }
@@ -51,9 +51,9 @@ kotlin {
 dependencies {
     testImplementation("io.cucumber:cucumber-java:7.8.1")
     testImplementation("io.cucumber:cucumber-junit:7.8.1")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.8.10")
-    testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.10")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.23")
+    testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.9.23")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.23")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.4.1")
 }
 
@@ -153,9 +153,6 @@ tasks {
         withType<KotlinCompile> {
             kotlinOptions {
                 jvmTarget = it
-                languageVersion = "1.7"
-                // see https://plugins.jetbrains.com/docs/intellij/kotlin.html#kotlin-standard-library
-                apiVersion = "1.6"
                 freeCompilerArgs = listOf("-Xjvm-default=all")
             }
         }
@@ -305,8 +302,16 @@ tasks {
     }
 
     jar {
-        dependsOn("buildWrappersBundle")
+        // original, non-instrumented JAR
         // :runIde, :test tasks launches the plugin from *.jar, so it is required also for development
+        dependsOn("buildWrappersBundle")
+        from("${project.buildDir}/bundledWrappers/smk-wrapper-storage-bundled.cbor")
+    }
+
+    instrumentedJar {
+        // modified (instrumented) JAR
+        // :runIde, :test tasks launches the plugin from *.jar, so it is required also for development
+        dependsOn("buildWrappersBundle")
         from("${project.buildDir}/bundledWrappers/smk-wrapper-storage-bundled.cbor")
     }
 

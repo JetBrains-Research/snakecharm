@@ -36,7 +36,7 @@ class SmkSLSubscriptionIndexKeyExpressionImpl(node: ASTNode) : PyReferenceExpres
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SmkSLElementVisitor -> pyVisitor.visitSmkSLSubscriptionExpressionKey(this)
-        else -> super.acceptPyVisitor(pyVisitor)
+        else -> super<PyReferenceExpressionImpl>.acceptPyVisitor(pyVisitor)
     }
 
 

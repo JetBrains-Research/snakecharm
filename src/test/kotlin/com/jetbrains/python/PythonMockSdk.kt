@@ -15,10 +15,12 @@
  */
 package com.jetbrains.python
 
+import com.intellij.openapi.application.Application
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkAdditionalData
 import com.intellij.openapi.projectRoots.SdkTypeId
-import com.intellij.openapi.projectRoots.impl.MockSdk
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
@@ -27,6 +29,7 @@ import com.intellij.util.containers.MultiMap
 import com.jetbrains.python.codeInsight.typing.PyTypeShed.findRootsForLanguageLevel
 import com.jetbrains.python.codeInsight.userSkeletons.PyUserSkeletonsUtil
 import com.jetbrains.python.psi.LanguageLevel
+import com.jetbrains.python.sdk.PythonSdkType.MOCK_PY_MARKER_KEY
 import com.jetbrains.python.sdk.PythonSdkUtil
 import java.io.File
 
@@ -36,18 +39,16 @@ import java.io.File
  *
  * @author yole
  */
-//
 object PythonMockSdk {
     fun create(
         testDataRoot: String,
-        version: String = LanguageLevel.getLatest().toPythonVersion(),
+        level: LanguageLevel = LanguageLevel.getLatest(),
         sdkNameSuffix: String = "",
         vararg additionalRoots: VirtualFile
     ): Sdk {
-        val level = LanguageLevel.fromPythonVersion(version)!!
         return create(
             "Mock ${PyNames.PYTHON_SDK_ID_NAME} ${level.toPythonVersion()}$sdkNameSuffix",
-            "$testDataRoot/MockSdk$version",
+            "$testDataRoot/MockSdk${level.toPythonVersion()}",
             PyMockSdkType(level),
             level,
             *additionalRoots
@@ -55,7 +56,7 @@ object PythonMockSdk {
     }
 
     private fun create(
-         name: String = "MockSdk",
+        sdkName: String = "MockSdk",
          mockSdkPath: String,
          sdkType: SdkTypeId,
          level: LanguageLevel,
@@ -65,16 +66,30 @@ object PythonMockSdk {
         roots.putValues(OrderRootType.CLASSES, createRoots(mockSdkPath, level))
         roots.putValues(OrderRootType.CLASSES, listOf(*additionalRoots))
 
-        val sdk = MockSdk(
-            name,
-            "$mockSdkPath/bin/python${level.toPythonVersion()}",
-            toVersionString(level),
-            roots,
-            sdkType
-        )
+        val sdk = ProjectJdkTable.getInstance().createSdk(sdkName, sdkType)
+        val sdkModificator = sdk.sdkModificator
+        sdkModificator.homePath = "$mockSdkPath/bin/python${level.toPythonVersion()}"
+        sdkModificator.setVersionString(toVersionString(level))
 
-        // com.jetbrains.python.psi.resolve.PythonSdkPathCache.getInstance() corrupts SDK, so have to clone
-        return sdk.clone()
+        createRoots(mockSdkPath, level).forEach { vFile: VirtualFile? ->
+            sdkModificator.addRoot(
+                vFile!!, OrderRootType.CLASSES
+            )
+        }
+
+        additionalRoots.forEach { vFile ->
+            sdkModificator.addRoot(vFile, OrderRootType.CLASSES)
+        }
+
+        val application: Application = ApplicationManager.getApplication()
+        val runnable = Runnable { sdkModificator.commitChanges() }
+        if (application.isDispatchThread()) {
+            application.runWriteAction(runnable)
+        } else {
+            application.invokeAndWait { application.runWriteAction(runnable) }
+        }
+        sdk.putUserData(MOCK_PY_MARKER_KEY, true)
+        return sdk
     }
 
     private fun toVersionString( level: LanguageLevel) = "Python ${level.toPythonVersion()}"

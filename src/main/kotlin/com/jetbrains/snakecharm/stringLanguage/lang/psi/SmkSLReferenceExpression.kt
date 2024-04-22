@@ -9,6 +9,8 @@ import com.jetbrains.snakecharm.lang.psi.SmkSection
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
 interface SmkSLReferenceExpression : PyReferenceExpression, SmkSLExpression, PsiNameIdentifierOwner {
+    override fun getName(): String?
+
     fun containingRuleOrCheckpointSection(): SmkRuleOrCheckpointArgsSection? =
         PsiTreeUtil.getParentOfType(injectionHost(), SmkRuleOrCheckpointArgsSection::class.java)
 

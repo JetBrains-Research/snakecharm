@@ -30,7 +30,7 @@ class SmkUseImpl : SmkRuleLikeImpl<SmkUseStub, SmkUse, SmkRuleOrCheckpointArgsSe
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor?) {
         when (pyVisitor) {
             is SmkElementVisitor -> pyVisitor.visitSmkUse(this)
-            else -> super.acceptPyVisitor(pyVisitor)
+            else -> super<SmkRuleLikeImpl>.acceptPyVisitor(pyVisitor)
         }
     }
 

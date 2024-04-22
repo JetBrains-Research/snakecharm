@@ -40,6 +40,14 @@ class SnakemakeParsingTest : ParsingTestCase(
         addExplicitExtension(LanguageASTFactory.INSTANCE, PythonLanguage.getInstance(), PythonASTFactory())
 
         // w/o this fails due to NPEs on PyPsiFacade access
+        application.registerService(
+            PyElementTypesFacade::class.java,
+            PyElementTypesFacadeImpl::class.java
+        )
+        application.registerService(
+            PyLanguageFacade::class.java,
+            PyLanguageFacadeImpl::class.java
+        )
         project.registerService(
             PyPsiFacade::class.java,
             PyPsiFacadeImpl::class.java

@@ -14,7 +14,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>() {
-    private val WRAPPER_VERSION_REGEXP = Regex("(\\d+\\.\\d+\\.\\d+|master|latest).*")
+    private val WRAPPER_VERSION_REGEXP = Regex("(v?\\d+\\.\\d+\\.\\d+|master|latest).*")
 
     val CAPTURE = PlatformPatterns.psiElement()
             .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)

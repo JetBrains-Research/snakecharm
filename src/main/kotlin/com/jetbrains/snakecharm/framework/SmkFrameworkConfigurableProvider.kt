@@ -4,11 +4,11 @@ import com.intellij.facet.ui.ValidationResult
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
-import com.intellij.util.io.isDirectory
 import com.jetbrains.snakecharm.SnakemakeBundle
 import java.nio.file.Paths
 import javax.swing.JComponent
 import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
 
 /**
  * Registers project settings tab for snakemake settings ('supported framework')

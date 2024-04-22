@@ -28,7 +28,7 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SmkElementVisitor -> pyVisitor.visitSmkWorkflowArgsSection(this)
-        else -> super.acceptPyVisitor(pyVisitor)
+        else -> super<PyElementImpl>.acceptPyVisitor(pyVisitor)
     }
 
     override fun getSectionKeywordNode() = node

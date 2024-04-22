@@ -14,6 +14,7 @@ import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.jetbrains.python.PythonMockSdk
 import com.jetbrains.python.codeInsight.controlflow.ControlFlowCache
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
+import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
@@ -32,6 +33,7 @@ class StepDefs {
     @Throws(Exception::class)
     fun configureSnakemakeProject(projectType: String) {
         // Launched from 'Test worker' thread
+        val level = LanguageLevel.PYTHON37
 
         require(SnakemakeWorld.myFixture == null) {
             "fixture must be null here, looks like cleanup after prev test failed."
@@ -63,14 +65,10 @@ class StepDefs {
 
         // Write code here that turns the phrase above into concrete actions
         val testDataRoot = SnakemakeTestUtil.getTestDataPath().toString()
-        val projectDescriptor = PyLightProjectDescriptor(
-            SnakemakeTestCase.PYTHON_3_MOCK_SDK,
-            testDataRoot,
-            *additionalRoots
-        )
+        val projectDescriptor = PyLightProjectDescriptor(level, testDataRoot, *additionalRoots)
 
         SnakemakeWorld.myPythonOnlySdk = PythonMockSdk.create(
-            testDataRoot, SnakemakeTestCase.PYTHON_3_MOCK_SDK, sdkNameSuffix = "_wo_snakemake"
+            testDataRoot, level, sdkNameSuffix = "_wo_snakemake"
         )
 
         val factory = IdeaTestFixtureFactory.getFixtureFactory()

@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.codeInsight.completion.wrapper
 
 import com.intellij.openapi.util.io.FileUtil
-import com.intellij.util.io.isDirectory
 import com.intellij.util.io.write
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -11,6 +10,7 @@ import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.nio.file.Paths
 import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
 
 object SmkWrapperCrawler {
     private val VERBOSE = false

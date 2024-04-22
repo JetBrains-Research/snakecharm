@@ -14,7 +14,7 @@ class SmkWorkflowLocalrulesSectionImpl(node: ASTNode): PyElementImpl(node), SmkW
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SmkElementVisitor -> pyVisitor.visitSmkWorkflowLocalrulesSection(this)
-        else -> super.acceptPyVisitor(pyVisitor)
+        else -> super<PyElementImpl>.acceptPyVisitor(pyVisitor)
     }
 
     override fun getPresentation() = getPresentation(this)

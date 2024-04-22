@@ -101,7 +101,7 @@ class SmkSLSubscriptionExpressionImpl(node: ASTNode) : SmkSLElementImpl(node), S
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SmkSLElementVisitor -> pyVisitor.visitSmkSLSubscriptionExpression(this)
-        else -> super.acceptPyVisitor(pyVisitor)
+        else -> super<SmkSLElementImpl>.acceptPyVisitor(pyVisitor)
     }
 
     override fun getIndexExpression() = this.childToPsi<SmkSLSubscriptionIndexKeyExpressionImpl>(KEY_EXPRESSION)

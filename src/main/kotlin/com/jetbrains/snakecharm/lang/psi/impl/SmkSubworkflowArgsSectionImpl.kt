@@ -9,7 +9,7 @@ class SmkSubworkflowArgsSectionImpl(node: ASTNode): SmkArgsSectionImpl(node), Sm
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) {
         when (pyVisitor) {
             is SmkElementVisitor -> pyVisitor.visitSmkSubworkflowArgsSection(this)
-            else -> super.acceptPyVisitor(pyVisitor)
+            else -> super<SmkArgsSectionImpl>.acceptPyVisitor(pyVisitor)
         }
     }
 }
