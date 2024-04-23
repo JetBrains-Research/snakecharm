@@ -3,7 +3,7 @@ SnakemakeFile: RuleIncomplete2.smk
     PsiElement(Py:RULE_KEYWORD)('rule')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('foo')
-    PsiErrorElement:Rule name identifier or ':' expected
+    PsiErrorElement:':' expected
       <empty list>
     PyStatementList
       <empty list>
