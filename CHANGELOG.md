@@ -8,7 +8,7 @@
 Released on ...
 
 ### Fixed
-- Message suggest having multiple identifiers in snakemake rule (see [#515](https://github.com/JetBrains-Research/snakecharm/issues/515))
+- Improve parser error message when rule/module is declared with name but lacks ':' (see [#515](https://github.com/JetBrains-Research/snakecharm/issues/515))
 
 ## [2024.1.1]
 Released on 20 April 2024
