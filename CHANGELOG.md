@@ -5,7 +5,7 @@
 
 
 ## [2024.1.2]
-Released on ...
+Released on <not released>
 
 ### Fixed
 - Improve parser error message when rule/module is declared with name but lacks ':' (see [#515](https://github.com/JetBrains-Research/snakecharm/issues/515))
