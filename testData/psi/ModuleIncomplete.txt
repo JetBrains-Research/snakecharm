@@ -11,7 +11,7 @@ SnakemakeFile: ModuleIncomplete.smk
     PsiElement(Py:MODULE_KEYWORD)('module')
     PsiWhiteSpace(' ')
     PsiElement(Py:IDENTIFIER)('z')
-    PsiErrorElement:Module name identifier or ':' expected
+    PsiErrorElement:':' expected
       <empty list>
     PyStatementList
       PsiErrorElement:Indent expected
