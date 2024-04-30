@@ -34,6 +34,17 @@ class FilesSteps {
         createAndAddFile(name, text)
     }
 
+    @Given("I set snakemake version to (.+)")
+    fun iSetSmkVersion(name: String) {
+        //TODO implement
+    }
+
+    @Given("depreciation data file content is$")
+    fun deprecationDataIs(text: String) {
+        //TODO implement
+    }
+
+
     @Given("^I open a color settings page text$")
     fun iOpenAColorSettingsPAge() {
         val page = SmkColorSettingsPage()
