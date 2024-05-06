@@ -435,3 +435,54 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
       | version | smk_version |
       | 1.11.11 | 1.11.11     |
       | 1.10.01 | 1.10.21     |
+
+  Scenario Outline: New top level directive error appears when version is earlier that requested
+    Given a snakemake project
+    And depreciation data file content is
+    """
+    changelog:
+      - version: "<version>"
+        introduced:
+        - name: "module"
+          type: "top-level"
+    """
+    And I set snakemake version to <smk_version>
+    And I open a file "foo.smk" with text
+    """
+    module foo:
+        snakefile: "boo"
+    """
+    When SmkDepreciatedKeywords inspection is enabled
+    Then I expect inspection error on <module> with message
+    """
+      Top level directive 'module' was added in version <version>, but selected Snakemake version is <smk_version>
+    """
+    When I check highlighting errors
+    Examples:
+      | version | smk_version |
+      | 1.11.11 | 1.11.10     |
+      | 1.10.01 | 1.10.00      |
+
+  Scenario Outline: New top level directive error does not appear when version is correct
+    Given a snakemake project
+    And depreciation data file content is
+    """
+    changelog:
+      - version: "<version>"
+        introduced:
+        - name: "module"
+          type: "top-level"
+    """
+    And I set snakemake version to <smk_version>
+    And I open a file "foo.smk" with text
+    """
+    module foo:
+        snakefile: "boo"
+    """
+    When SmkDepreciatedKeywords inspection is enabled
+    Then I expect no inspection errors
+    When I check highlighting errors
+    Examples:
+      | version | smk_version |
+      | 1.11.11 | 1.11.11     |
+      | 1.10.01 | 1.10.21     |
