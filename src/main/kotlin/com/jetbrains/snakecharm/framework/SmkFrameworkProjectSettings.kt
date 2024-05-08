@@ -57,6 +57,11 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
             return internalState.snakemakeSupportBannerEnabled
         }
 
+    val snakemakeVersion: String?
+        get() {
+            return internalState.snakemakeVersion
+        }
+
     fun getActiveSdk() = when {
         !snakemakeSupportEnabled -> null
         else -> findPythonSdk(project, internalState.pythonSdkName)
@@ -132,6 +137,9 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
 
         @get:Attribute("smk_support_banner_enabled")
         var snakemakeSupportBannerEnabled by property(true)
+
+        @get:Attribute("smk_version")
+        var snakemakeVersion by string("")
     }
 
     companion object {
@@ -186,7 +194,7 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
 
         fun findPythonSdk(project: Project, sdkName: String?): Sdk? {
             val sdk: Sdk? = if (sdkName.isNullOrEmpty()) {
-                ProjectRootManager.getInstance(project).projectSdk;
+                ProjectRootManager.getInstance(project).projectSdk
             } else {
                 ProjectJdkTable.getInstance().findJdk(sdkName)
             }
