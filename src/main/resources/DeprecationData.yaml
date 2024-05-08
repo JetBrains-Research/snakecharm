@@ -1,0 +1,49 @@
+
+changelog:
+  - version: "1.10.01"
+    deprecated:
+      - name: "input"
+        type: "subsection"
+        parent:
+          - "rule"
+    removed:
+      - name: "input"
+        type: "subsection"
+        parent:
+          - "name"
+          - "sthelse"
+        advice: "someadvice"
+    introduced:
+      - name: "input"
+        type: "subsection"
+        parent:
+            - "name1"
+            - "sthelse2"
+        advice: "someadvice2"
+  - version: "1.10.02"
+    removed:
+      - name: "input"
+        type: "subsection"
+        parent:
+          - "rule"
+
+  - version: "1.10.21"
+    deprecated:
+      - name: "input"
+        type: "subsection"
+        parent:
+          - "rule"
+    removed:
+      - name: "input"
+        type: "subsection"
+        parent:
+            - "name"
+            - "sthelse"
+        advice: "someadvice"
+    introduced:
+      - name: "input"
+        type: "subsection"
+        parent:
+            - "name1"
+            - "sthelse2"
+        advice: "someadvice2"

@@ -10,7 +10,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "input"
           type: "subsection"
           parent:
-            "<rule_like>"
+            - "<rule_like>"
     """
     And I set snakemake version to 1.11.11
     And I open a file "foo.smk" with text
@@ -39,7 +39,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "input"
           type: "subsection"
           parent:
-            "rule"
+            - "rule"
     """
     And I set snakemake version to 1.11.11
     And I open a file "foo.smk" with text
@@ -64,13 +64,13 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "input"
           type: "subsection"
           parent:
-            "rule"
+            - "rule"
       - version: "1.10.02"
         removed:
         - name: "input"
           type: "subsection"
           parent:
-            "rule"
+            - "rule"
     """
     And I set snakemake version to 1.11.11
     And I open a file "foo.smk" with text
@@ -130,7 +130,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "input"
           type: "subsection"
           parent:
-            "<rule_like>"
+            - "<rule_like>"
     """
     And I set snakemake version to 1.11.11
     And I open a file "foo.smk" with text
@@ -253,8 +253,8 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "localname"
           type: "subsection"
           parent:
-            "checkpoint"
-            "rule"
+            - "checkpoint"
+            - "rule"
     """
     And I set snakemake version to <smk_version>
     And I open a file "foo.smk" with text
