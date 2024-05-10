@@ -1,20 +1,20 @@
 
 changelog:
-  - version: "1.10.01"
+  - version: "1.10.21"
     deprecated:
-      - name: "input"
+      - name: "input3"
         type: "subsection"
         parent:
           - "rule"
     removed:
-      - name: "input"
+      - name: "input2"
         type: "subsection"
         parent:
           - "name"
           - "sthelse"
         advice: "someadvice"
     introduced:
-      - name: "input"
+      - name: "output"
         type: "subsection"
         parent:
             - "name1"
@@ -27,7 +27,7 @@ changelog:
         parent:
           - "rule"
 
-  - version: "1.10.21"
+  - version: "1.10.01"
     deprecated:
       - name: "input"
         type: "subsection"
@@ -44,6 +44,6 @@ changelog:
       - name: "input"
         type: "subsection"
         parent:
-            - "name1"
-            - "sthelse2"
+            - "name1f"
+            - "sthelse2f"
         advice: "someadvice2"
