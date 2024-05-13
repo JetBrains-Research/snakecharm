@@ -429,8 +429,18 @@
             suppressId="SmkRuleOrCheckpointNameYetUndefined"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.rule.or.checkpoint.name.yet.undefined"
+            key="INSP.NAME.docstrings.will.be.ignored"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkRuleOrCheckpointNameYetUndefinedInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkDepreciatedKeywords"
+            enabledByDefault="true"
+            suppressId="SmkDepreciatedKeywords"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.deprecatiated.keywords.depreciated"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkDepreciatedKeywords"
     />
 
     <localInspection

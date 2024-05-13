@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.framework
 
+import com.jetbrains.snakecharm.lang.SmkVersion
 import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
@@ -85,7 +86,7 @@ class SmkFrameworkDeprecationProvider {
      * @return Pair of latest deprecation/removal update that was made to the top level keyword as of provided version,
      *           and advice if any was assigned to the change
      */
-    fun getTopLevelCorrection(name: String, version: SmkVersion): Pair<UpdateType, String?>? {
+    fun getTopLevelCorrection(name: String, version: SmkVersion): Pair<UpdateType, Pair<String?, SmkVersion>>? {
         return getKeywordCorrection(topLevelCorrection[name], version)
     }
 
@@ -96,7 +97,7 @@ class SmkFrameworkDeprecationProvider {
      * @return Pair of latest deprecation/removal update that was made to the subsection keyword as of provided version,
      *           and advice if any was assigned to the change
      */
-    fun getSubsectionCorrection(name: String, version: SmkVersion, parent: String): Pair<UpdateType, String?>? {
+    fun getSubsectionCorrection(name: String, version: SmkVersion, parent: String): Pair<UpdateType, Pair<String?, SmkVersion>>? {
         return getKeywordCorrection(subsectionCorrection[name to parent], version) ?:
                 getKeywordCorrection(subsectionCorrection[name to null], version)
     }
@@ -107,7 +108,7 @@ class SmkFrameworkDeprecationProvider {
      * @return Pair of latest deprecation/removal update that was made to the function keyword as of provided version,
      *           and advice if any was assigned to the change
      */
-    fun getFunctionCorrection(name: String, version: SmkVersion): Pair<UpdateType, String?>? {
+    fun getFunctionCorrection(name: String, version: SmkVersion): Pair<UpdateType, Pair<String?, SmkVersion>>? {
         return getKeywordCorrection(functionCorrection[name], version)
     }
 
@@ -122,9 +123,9 @@ class SmkFrameworkDeprecationProvider {
     private fun getKeywordCorrection(
         keywords: TreeMap<SmkVersion, SmkKeywordUpdateData>?,
         version: SmkVersion
-    ): Pair<UpdateType, String?>? {
-        val entry = keywords?.floorEntry(version)?.value ?: return null
-        return entry.type to entry.advice
+    ): Pair<UpdateType, Pair<String?, SmkVersion>>? {
+        val entry = keywords?.floorEntry(version) ?: return null
+        return entry.value.type to (entry.value.advice to entry.key)
     }
 
 
@@ -144,32 +145,6 @@ class SmkFrameworkDeprecationProvider {
         const val SUBSECTION_KEYWORD_TYPE = "subsection"
         const val FUNCTION_KEYWORD_TYPE = "function"
     }
-}
-
-class SmkVersion(
-    val version: String
-) : Comparable<SmkVersion> {
-    val major: Int
-    val minor: Int
-    val patch: Int
-
-    init {
-        val split = version.split('.')
-        if (split.size != 3) {
-            throw IllegalArgumentException("Provided snakemake version $version is not correct")
-        }
-        major = split[0].toInt()
-        minor = split[1].toInt()
-        patch = split[2].toInt()
-    }
-
-    override fun compareTo(other: SmkVersion): Int {
-        var res = major.compareTo(other.major)
-        if (res == 0) res = minor.compareTo(other.minor)
-        if (res == 0) res = patch.compareTo(other.patch)
-        return res
-    }
-
 }
 
 enum class UpdateType {

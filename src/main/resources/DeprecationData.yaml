@@ -1,49 +1,33 @@
 
 changelog:
-  - version: "1.10.21"
-    deprecated:
-      - name: "input3"
-        type: "subsection"
-        parent:
-          - "rule"
-    removed:
-      - name: "input2"
-        type: "subsection"
-        parent:
-          - "name"
-          - "sthelse"
-        advice: "someadvice"
+  - version: "1.20.36"
     introduced:
-      - name: "output"
-        type: "subsection"
-        parent:
-            - "name1"
-            - "sthelse2"
-        advice: "someadvice2"
-  - version: "1.10.02"
-    removed:
-      - name: "input"
-        type: "subsection"
-        parent:
-          - "rule"
-
-  - version: "1.10.01"
-    deprecated:
-      - name: "input"
-        type: "subsection"
-        parent:
-          - "rule"
-    removed:
-      - name: "input"
-        type: "subsection"
-        parent:
-            - "name"
-            - "sthelse"
-        advice: "someadvice"
+      - name: "checkpoint"
+        type: "top-level"
+  - version: "1.20.35"
     introduced:
-      - name: "input"
-        type: "subsection"
-        parent:
-            - "name1f"
-            - "sthelse2f"
-        advice: "someadvice2"
+      - name: "use"
+        type: "top-level"
+  - version: "1.20.34"
+    removed:
+      - name: "rule"
+        type: "top-level"
+        advice: "use something else too!"
+    deprecated:
+      - name: "module"
+        type: "top-level"
+        advice: "use something else!"
+    introduced:
+      - name: "subworkflow"
+        type: "top-level"
+  - version: "1.20.33"
+    deprecated:
+      - name: "rule"
+        type: "top-level"
+    introduced:
+      - name: "module"
+        type: "top-level"
+  - version: "1.20.32"
+    introduced:
+      - name: "rule"
+        type: "top-level"
