@@ -2,11 +2,13 @@ package features.glue
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.text.StringUtil
+import com.jetbrains.snakecharm.framework.SmkFrameworkDeprecationProvider
 import com.jetbrains.snakecharm.lang.highlighter.SmkColorSettingsPage
-import io.cucumber.java.en.Then
 import io.cucumber.java.en.Given
+import io.cucumber.java.en.Then
 import junit.framework.TestCase.assertEquals
 
 
@@ -17,7 +19,7 @@ class FilesSteps {
             ApplicationManager.getApplication().runWriteAction {
                 SnakemakeWorld.fixture().addFileToProject(name, text)
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @Given("^a directory \"(.+)\"")
@@ -26,7 +28,7 @@ class FilesSteps {
             ApplicationManager.getApplication().runWriteAction {
                 SnakemakeWorld.fixture().tempDirFixture.findOrCreateDir(name)
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @Given("^I open a file \"(.+)\" with text$")
@@ -34,14 +36,11 @@ class FilesSteps {
         createAndAddFile(name, text)
     }
 
-    @Given("I set snakemake version to (.+)")
-    fun iSetSmkVersion(name: String) {
-        //TODO implement
-    }
-
     @Given("depreciation data file content is$")
     fun deprecationDataIs(text: String) {
-        //TODO implement
+        ApplicationManager.getApplication().invokeAndWait({
+            ApplicationManager.getApplication().service<SmkFrameworkDeprecationProvider>().overrideInputFile(text.byteInputStream())
+        }, ModalityState.nonModal())
     }
 
 
@@ -70,7 +69,7 @@ class FilesSteps {
                 )
                 SnakemakeWorld.fixture().configureFromExistingVirtualFile(file.virtualFile)
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
 }

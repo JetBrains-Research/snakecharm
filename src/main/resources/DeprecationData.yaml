@@ -4,10 +4,29 @@ changelog:
     introduced:
       - name: "checkpoint"
         type: "top-level"
+    removed:
+      - name: "output"
+        type: "subsection"
+        advice: "try something else"
+    deprecated:
+      - name: "input"
+        type: "subsection"
+        advice: "remove it too"
   - version: "1.20.35"
     introduced:
       - name: "use"
         type: "top-level"
+    removed:
+      - name: "input"
+        type: "subsection"
+        parent:
+          - "rule"
+          - "use"
+        advice: "remove it!!!!!!!!!!!!!"
+    deprecated:
+      - name: "config"
+        type: "subsection"
+        advice: "strange"
   - version: "1.20.34"
     removed:
       - name: "rule"

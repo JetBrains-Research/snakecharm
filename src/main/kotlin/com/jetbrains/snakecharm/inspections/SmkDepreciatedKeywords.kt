@@ -51,7 +51,12 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            val parent = if (st.getParentRuleOrCheckPoint() is SmkRule) RULE_KEYWORD else CHECKPOINT_KEYWORD
+            val parent = when(st.getParentRuleOrCheckPoint()){
+                is SmkRule -> RULE_KEYWORD
+                is SmkCheckPoint -> CHECKPOINT_KEYWORD
+                is SmkUse -> USE_KEYWORD
+                else -> throw IllegalArgumentException()
+            }
             val name = st.name
             if (name != null) {
                 checkSubSectionDefinition(st, name, parent)
@@ -59,7 +64,12 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
         }
 
         override fun visitSmkRunSection(st: SmkRunSection) {
-            val parent = if (st.getParentRuleOrCheckPoint() is SmkRule) RULE_KEYWORD else CHECKPOINT_KEYWORD
+            val parent = when(st.getParentRuleOrCheckPoint()){
+                is SmkRule -> RULE_KEYWORD
+                is SmkCheckPoint -> CHECKPOINT_KEYWORD
+                is SmkUse -> USE_KEYWORD
+                else -> throw IllegalArgumentException()
+            }
             val name = st.name
             if (name != null) {
                 checkSubSectionDefinition(st, name, parent)

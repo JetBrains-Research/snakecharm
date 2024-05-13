@@ -5,22 +5,29 @@ import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
 import org.yaml.snakeyaml.introspector.BeanAccess
+import java.io.InputStream
 import java.util.*
 
 class SmkFrameworkDeprecationProvider {
 
-    val topLevelCorrection: Map<String, TreeMap<SmkVersion, SmkKeywordUpdateData>>
-    val functionCorrection: Map<String, TreeMap<SmkVersion, SmkKeywordUpdateData>>
-    val subsectionCorrection: Map<Pair<String, String?>, TreeMap<SmkVersion, SmkKeywordUpdateData>>
+    private lateinit var topLevelCorrection: Map<String, TreeMap<SmkVersion, SmkKeywordUpdateData>>
+    private lateinit var functionCorrection: Map<String, TreeMap<SmkVersion, SmkKeywordUpdateData>>
+    private lateinit var subsectionCorrection: Map<Pair<String, String?>, TreeMap<SmkVersion, SmkKeywordUpdateData>>
 
-    val subsectionIntroduction: Map<Pair<String, String?>, SmkVersion>
-    val topLevelIntroduction: Map<String, SmkVersion>
+    private lateinit var subsectionIntroduction: Map<Pair<String, String?>, SmkVersion>
+    private lateinit var topLevelIntroduction: Map<String, SmkVersion>
 
     init {
         val input = javaClass.getResourceAsStream(DEPRECATION_DATA_LOCATION)
+        initiate(input)
+    }
+    fun overrideInputFile(input: InputStream) {
+        initiate(input)
+    }
+    private fun initiate(inputStream: InputStream?) {
         val yaml = Yaml(CustomClassLoaderConstructor(SmkDeprecationData::class.java.classLoader, LoaderOptions()))
         yaml.setBeanAccess(BeanAccess.FIELD) // it must be set to be able to set vals
-        val deprecationData = yaml.loadAs(input, SmkDeprecationData::class.java)
+        val deprecationData = yaml.loadAs(inputStream, SmkDeprecationData::class.java)
         val topLevelData = emptyMap<String, TreeMap<SmkVersion, SmkKeywordUpdateData>>().toMutableMap()
         val functionData = emptyMap<String, TreeMap<SmkVersion, SmkKeywordUpdateData>>().toMutableMap()
         val subsectionData = emptyMap<Pair<String, String?>, TreeMap<SmkVersion, SmkKeywordUpdateData>>().toMutableMap()
@@ -78,6 +85,7 @@ class SmkFrameworkDeprecationProvider {
 
         subsectionIntroduction = subsectionIntroductionsMap
         topLevelIntroduction = topLevelIntroductionsMap
+
     }
 
     /**

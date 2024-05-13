@@ -16,7 +16,6 @@ import com.jetbrains.python.codeInsight.controlflow.ControlFlowCache
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFile
-import com.jetbrains.snakecharm.SnakemakeTestCase
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import io.cucumber.java.en.Given
@@ -169,6 +168,15 @@ class StepDefs {
         }
 
         waitEDTEventsDispatching()
+    }
+
+    @Given("I set snakemake version to (.+)")
+    fun iSetSmkVersion(version: String) {
+        val newState = SmkSupportProjectSettings.getInstance(SnakemakeWorld.fixture().project).stateSnapshot()
+        newState.snakemakeVersion = version
+        ApplicationManager.getApplication().invokeAndWait {
+            SmkSupportProjectSettings.updateStateAndFireEvent(SnakemakeWorld.fixture().project, newState)
+        }
     }
 
     @Given("^add snakemake framework support (with|without) wrappers loaded")
