@@ -655,7 +655,6 @@
     <projectService serviceImplementation="com.jetbrains.snakecharm.framework.SmkSupportProjectSettings"/>
     <projectService serviceImplementation="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider"/>
 
-    <applicationService serviceImplementation="com.jetbrains.snakecharm.framework.SmkFrameworkDeprecationProvider"/>
   </extensions>
 
 

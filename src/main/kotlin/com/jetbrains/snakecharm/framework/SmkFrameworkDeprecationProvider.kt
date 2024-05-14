@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.framework
 
+import com.intellij.openapi.components.Service
 import com.jetbrains.snakecharm.lang.SmkVersion
 import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
@@ -8,6 +9,7 @@ import org.yaml.snakeyaml.introspector.BeanAccess
 import java.io.InputStream
 import java.util.*
 
+@Service
 class SmkFrameworkDeprecationProvider {
 
     private lateinit var topLevelCorrection: Map<String, TreeMap<SmkVersion, SmkKeywordUpdateData>>

@@ -8,17 +8,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.projectRoots.ProjectJdkTable;
 import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.ui.popup.Balloon;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.CollectionComboBoxModel;
-import com.intellij.ui.DocumentAdapter;
-import com.intellij.ui.JBColor;
-import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.messages.MessageBusConnection;
@@ -35,8 +29,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -189,10 +181,7 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
 
     @Nullable
     private String getSnakemakeVersion() {
-        if (isCorrectVersion(snakemakeVersionField.getText())) {
-            return snakemakeVersionField.getText();
-        }
-        return null;
+        return snakemakeVersionField.getText();
     }
 
     private void createUIComponents() {
@@ -203,45 +192,10 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
         // it is API for custom comps initialization
 
         snakemakeVersionField = new JBTextField();
-        snakemakeVersionField.getDocument().addDocumentListener(new DocumentAdapter() {
-            Balloon currentBallon = null;
-            @Override
-            protected void textChanged(@NotNull DocumentEvent e) {
-                String input;
-                try {
-                    input = e.getDocument().getText(0, e.getDocument().getLength());
-                } catch (BadLocationException ex) {
-                    throw new RuntimeException(ex);
-                }
-                if (currentBallon != null) {
-                    currentBallon.hideImmediately();
-                }
-                if (!isCorrectVersion(input)) { // Implement this method for your validation rules
-                    snakemakeVersionField.setForeground(JBColor.RED); //TODO correct to use proper IntelliJ api
-                    currentBallon = showErrorBalloon("Input correct snakemake version", snakemakeVersionField);
-                } else {
-                    snakemakeVersionField.setForeground(UIManager.getColor("snakemakeVersionField.foreground"));
-                    currentBallon = null;
-                }
-            }
-        });
 
         pythonSdkCB = new PythonSdkChooserCombo(
                 project, null, Collections.emptyList(), sdk -> true
         );
-    }
-
-    private boolean isCorrectVersion(String version) {
-        String[] parts = version.split("\\.");
-        if (parts.length != 3) {
-            return false;
-        }
-        for (String part : parts) {
-            if (!StringUtil.isNumeric(part)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public static FileChooserDescriptor addFolderChooser(
@@ -288,15 +242,6 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
 
         updateWrappersSrcPanelEnabledPropertyRecursively();
 
-    }
-
-    private Balloon showErrorBalloon(String message, JBTextField field) {
-        Balloon balloon = JBPopupFactory.getInstance()
-                .createHtmlTextBalloonBuilder(message, MessageType.ERROR, null)
-                .setFadeoutTime(3000)
-                .createBalloon();
-        balloon.show(RelativePoint.getNorthWestOf(field), Balloon.Position.above);
-        return balloon;
     }
 
     public void disposeUIResources() {
