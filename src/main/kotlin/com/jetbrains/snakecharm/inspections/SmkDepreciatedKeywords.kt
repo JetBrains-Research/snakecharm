@@ -57,7 +57,7 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
                 is SmkUse -> USE_KEYWORD
                 else -> throw IllegalArgumentException()
             }
-            val name = st.name
+            val name = st.sectionKeyword
             if (name != null) {
                 checkSubSectionDefinition(st, name, parent)
             }
@@ -70,28 +70,28 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
                 is SmkUse -> USE_KEYWORD
                 else -> throw IllegalArgumentException()
             }
-            val name = st.name
+            val name = st.sectionKeyword
             if (name != null) {
                 checkSubSectionDefinition(st, name, parent)
             }
         }
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
-            val name = st.name
+            val name = st.sectionKeyword
             if (name != null) {
                 checkSubSectionDefinition(st, name, SUBWORKFLOW_KEYWORD)
             }
         }
 
         override fun visitSmkModuleArgsSection(st: SmkModuleArgsSection) {
-            val name = st.name
+            val name = st.sectionKeyword
             if (name != null) {
                 checkSubSectionDefinition(st, name, MODULE_KEYWORD)
             }
         }
 
         override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
-            val name = st.name
+            val name = st.sectionKeyword
             if (name != null) {
                 checkTopLevelDefinition(st, name)
             }

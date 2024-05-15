@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.framework
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.BaseState
@@ -119,6 +120,25 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
 
         })
 
+
+        // Register inspection refresh after settings were changed
+        connection.subscribe(TOPIC, object : SmkSupportProjectSettingsListener {
+            override fun stateChanged(
+                newSettings: SmkSupportProjectSettings,
+                oldState: State,
+                sdkRenamed: Boolean,
+                sdkRemoved: Boolean
+            ) {
+                if (oldState.snakemakeVersion != newSettings.snakemakeVersion) {
+                    DaemonCodeAnalyzer.getInstance(project).restart()
+                }
+            }
+
+            override fun enabled(newSettings: SmkSupportProjectSettings) {}
+
+            override fun disabled(newSettings: SmkSupportProjectSettings) {}
+        })
+
         Disposer.register(this, connection)
     }
 
@@ -139,7 +159,7 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
         var snakemakeSupportBannerEnabled by property(true)
 
         @get:Attribute("smk_version")
-        var snakemakeVersion by string("")
+        var snakemakeVersion by string("7.32.4")
     }
 
     companion object {

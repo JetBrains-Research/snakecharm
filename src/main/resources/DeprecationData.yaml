@@ -1,5 +1,11 @@
 
 changelog:
+  - version: "2.0.0"
+    removed:
+      - name: "config"
+        type: "top-level"
+      - name: "expand"
+        type: "function"
   - version: "1.20.36"
     introduced:
       - name: "checkpoint"
