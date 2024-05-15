@@ -6,10 +6,13 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.psi.PsiElement
+import com.jetbrains.python.psi.PyArgumentList
+import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyClass
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.framework.SmkFrameworkDeprecationProvider
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.UpdateType
@@ -51,7 +54,7 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            val parent = when(st.getParentRuleOrCheckPoint()){
+            val parent = when (st.getParentRuleOrCheckPoint()) {
                 is SmkRule -> RULE_KEYWORD
                 is SmkCheckPoint -> CHECKPOINT_KEYWORD
                 is SmkUse -> USE_KEYWORD
@@ -64,7 +67,7 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
         }
 
         override fun visitSmkRunSection(st: SmkRunSection) {
-            val parent = when(st.getParentRuleOrCheckPoint()){
+            val parent = when (st.getParentRuleOrCheckPoint()) {
                 is SmkRule -> RULE_KEYWORD
                 is SmkCheckPoint -> CHECKPOINT_KEYWORD
                 is SmkUse -> USE_KEYWORD
@@ -107,14 +110,17 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
 
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {
             val declaration = node.reference.resolve()
-            if (declaration is PyClass || declaration is PyFunction) {
+            if ((declaration is PyClass || declaration is PyFunction)
+                && declaration.containingFile.name == SnakemakeAPI.SNAKEMAKE_MODULE_NAME_IO_PY
+            ) {
                 val settings = SmkSupportProjectSettings.getInstance(holder.project)
                 val deprecationProvider = ApplicationManager.getApplication().service<SmkFrameworkDeprecationProvider>()
                 val currentVersionString = settings.snakemakeVersion
                 val currentVersion = if (currentVersionString == null) null else SmkVersion(currentVersionString)
                 val name = node.name
                 if (name != null && currentVersion != null) {
-                    val issue = deprecationProvider.getFunctionCorrection(name, currentVersion)
+                    val possibleParent = getSectionNameIfFunctionCall(node)
+                    val issue = deprecationProvider.getFunctionCorrection(name, currentVersion, possibleParent)
                     if (issue != null) {
                         val versionWithAdvice = if (issue.second.first != null) {
                             issue.second.second.toString() + " - you should " + issue.second.first
@@ -123,26 +129,39 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
                         }
                         when (issue.first) {
                             UpdateType.REMOVED -> {
-                                registerProblem(
-                                    node,
+                                val message = if (possibleParent != null) {
+                                    SnakemakeBundle.message(
+                                        "INSP.NAME.deprecated.keywords.removed.func.parent",
+                                        name,
+                                        possibleParent,
+                                        versionWithAdvice
+                                    )
+                                } else {
                                     SnakemakeBundle.message(
                                         "INSP.NAME.deprecated.keywords.removed.func",
                                         name,
                                         versionWithAdvice
-                                    ),
-                                    ProblemHighlightType.GENERIC_ERROR
-                                )
+                                    )
+                                }
+                                registerProblem(node, message, ProblemHighlightType.GENERIC_ERROR)
                             }
+
                             UpdateType.DEPRECATED -> {
-                                registerProblem(
-                                    node,
+                                val message = if (possibleParent != null) {
+                                    SnakemakeBundle.message(
+                                        "INSP.NAME.deprecated.keywords.deprecated.func.parent",
+                                        name,
+                                        possibleParent,
+                                        versionWithAdvice
+                                    )
+                                } else {
                                     SnakemakeBundle.message(
                                         "INSP.NAME.deprecated.keywords.deprecated.func",
                                         name,
                                         versionWithAdvice
-                                    ),
-                                    ProblemHighlightType.WEAK_WARNING
-                                )
+                                    )
+                                }
+                                registerProblem(node, message, ProblemHighlightType.WEAK_WARNING)
                             }
                         }
                     }
@@ -150,6 +169,11 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
             }
         }
 
+        private fun getSectionNameIfFunctionCall(node: PyReferenceExpression): String? {
+            val callExpr = node.parent as? PyCallExpression ?: return null
+            val sectionArgs = callExpr.parent as? PyArgumentList ?: return null
+            return (sectionArgs.parent as? SmkSection)?.sectionKeyword
+        }
 
         private fun checkTopLevelDefinition(psiElement: PsiElement, name: String) {
             val settings = SmkSupportProjectSettings.getInstance(holder.project)

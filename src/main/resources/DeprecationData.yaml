@@ -6,6 +6,15 @@ changelog:
         type: "top-level"
       - name: "expand"
         type: "function"
+        parent:
+          - "input"
+    deprecated:
+      - name: "print"
+        type: "function"
+        parent:
+          - "output"
+      - name: "expand"
+        type: "function"
   - version: "1.20.36"
     introduced:
       - name: "checkpoint"
