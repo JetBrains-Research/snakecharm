@@ -429,7 +429,7 @@
             suppressId="SmkRuleOrCheckpointNameYetUndefined"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.docstrings.will.be.ignored"
+            key="INSP.NAME.rule.or.checkpoint.name.yet.undefined"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkRuleOrCheckpointNameYetUndefinedInspection"
     />
 
@@ -439,7 +439,6 @@
             suppressId="SmkDepreciatedKeywords"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            key="INSP.NAME.deprecatiated.keywords.depreciated"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkDepreciatedKeywords"
     />
 
@@ -654,7 +653,6 @@
 
     <projectService serviceImplementation="com.jetbrains.snakecharm.framework.SmkSupportProjectSettings"/>
     <projectService serviceImplementation="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider"/>
-
   </extensions>
 
 

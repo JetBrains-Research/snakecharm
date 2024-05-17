@@ -78,24 +78,6 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
                 wrappersSrcPathTF, project
         );
 
-        snakemakeVersionField.setInputVerifier(new InputVerifier() {
-            @Override
-            public boolean verify(JComponent input) {
-                JTextField tf = (JTextField) input;
-                String text = tf.getText();
-                String[] parts = text.split("\\.");
-                if (parts.length != 3) {
-                    return false;
-                }
-                for (String part : parts) {
-                    if (!StringUtil.isNumeric(part)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        });
-
         wrappersFromSrcRB.addActionListener(e -> updateWrappersSrcPanelEnabledPropertyRecursively());
         wrappersBundledRB.addActionListener(e -> updateWrappersSrcPanelEnabledPropertyRecursively());
 
@@ -241,7 +223,6 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
         snakemakeVersionField.setText(state.getSnakemakeVersion());
 
         updateWrappersSrcPanelEnabledPropertyRecursively();
-
     }
 
     public void disposeUIResources() {
