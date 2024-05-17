@@ -34,30 +34,30 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkRule(rule: SmkRule) {
-            checkTopLevelDefinition(rule, RULE_KEYWORD)
+            checkTopLevelDefinition(rule.firstChild, RULE_KEYWORD)
         }
 
         override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
-            checkTopLevelDefinition(checkPoint, CHECKPOINT_KEYWORD)
+            checkTopLevelDefinition(checkPoint.firstChild, CHECKPOINT_KEYWORD)
         }
 
         override fun visitSmkSubworkflow(subworkflow: SmkSubworkflow) {
-            checkTopLevelDefinition(subworkflow, SUBWORKFLOW_KEYWORD)
+            checkTopLevelDefinition(subworkflow.firstChild, SUBWORKFLOW_KEYWORD)
         }
 
         override fun visitSmkModule(module: SmkModule) {
-            checkTopLevelDefinition(module, MODULE_KEYWORD)
+            checkTopLevelDefinition(module.firstChild, MODULE_KEYWORD)
         }
 
         override fun visitSmkUse(use: SmkUse) {
-            checkTopLevelDefinition(use, USE_KEYWORD)
+            checkTopLevelDefinition(use.firstChild, USE_KEYWORD)
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
             val parent = st.getParentRuleOrCheckPoint().sectionKeyword!!
             val name = st.sectionKeyword
             if (name != null) {
-                checkSubSectionDefinition(st, name, parent)
+                checkSubSectionDefinition(st.firstChild, name, parent)
             }
         }
 
@@ -65,37 +65,37 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
             val parent = st.getParentRuleOrCheckPoint().sectionKeyword!!
             val name = st.sectionKeyword
             if (name != null) {
-                checkSubSectionDefinition(st, name, parent)
+                checkSubSectionDefinition(st.firstChild, name, parent)
             }
         }
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
             val name = st.sectionKeyword
             if (name != null) {
-                checkSubSectionDefinition(st, name, SUBWORKFLOW_KEYWORD)
+                checkSubSectionDefinition(st.firstChild, name, SUBWORKFLOW_KEYWORD)
             }
         }
 
         override fun visitSmkModuleArgsSection(st: SmkModuleArgsSection) {
             val name = st.sectionKeyword
             if (name != null) {
-                checkSubSectionDefinition(st, name, MODULE_KEYWORD)
+                checkSubSectionDefinition(st.firstChild, name, MODULE_KEYWORD)
             }
         }
 
         override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
             val name = st.sectionKeyword
             if (name != null) {
-                checkTopLevelDefinition(st, name)
+                checkTopLevelDefinition(st.firstChild, name)
             }
         }
 
         override fun visitSmkWorkflowRuleorderSection(st: SmkWorkflowRuleorderSection) {
-            checkTopLevelDefinition(st, WORKFLOW_RULEORDER_KEYWORD)
+            checkTopLevelDefinition(st.firstChild, WORKFLOW_RULEORDER_KEYWORD)
         }
 
         override fun visitSmkWorkflowLocalrulesSection(st: SmkWorkflowLocalrulesSection) {
-            checkTopLevelDefinition(st, WORKFLOW_LOCALRULES_KEYWORD)
+            checkTopLevelDefinition(st.firstChild, WORKFLOW_LOCALRULES_KEYWORD)
         }
 
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {

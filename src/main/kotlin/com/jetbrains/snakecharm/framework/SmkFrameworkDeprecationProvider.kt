@@ -126,8 +126,15 @@ class SmkFrameworkDeprecationProvider {
      * @return Pair of latest deprecation/removal update that was made to the function keyword as of provided version,
      *           and advice if any was assigned to the change
      */
-    fun getFunctionCorrection(name: String, version: SmkVersion, parent: String?): Pair<UpdateType, Pair<String?, SmkVersion>>? {
-        return getKeywordCorrection(functionCorrection[name to parent], version)
+    fun getFunctionCorrection(
+        name: String,
+        version: SmkVersion,
+        parent: String?
+    ): Pair<UpdateType, Pair<String?, SmkVersion>>? {
+        return getKeywordCorrection(functionCorrection[name to parent], version) ?: getKeywordCorrection(
+            functionCorrection[name to null],
+            version
+        )
     }
 
     fun getTopLevelIntroductionVersion(name: String): SmkVersion? {
