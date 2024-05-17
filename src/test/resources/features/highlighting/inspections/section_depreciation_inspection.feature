@@ -354,6 +354,36 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
       | 1.11.11 | 1.11.11     |
       | 1.10.01 | 1.10.21     |
 
+  Scenario Outline: Functions can be deprecated only in specified sections
+    Given a snakemake project
+    And I set snakemake version to <smk_version>
+    And depreciation data file content is
+    """
+    changelog:
+      - version: "<version>"
+        deprecated:
+        - name: "dynamic"
+          type: "function"
+          advice: "use 'expand' instead"
+          parent: <section_name>
+
+    """
+    And I open a file "foo.smk" with text
+    """
+    rule foo:
+        <section_name>: dynamic("")
+    """
+    When SmkDepreciatedKeywords inspection is enabled
+    Then I expect inspection warning on <dynamic> with message
+    """
+      Usage of function ''dynamic'' in section ''<section_name>'' was deprecated in version <version> - you should use 'expand' instead
+    """
+    When I check highlighting warnings
+    Examples:
+      | version | smk_version | section_name |
+      | 1.11.11 | 1.11.11     | output       |
+      | 1.10.01 | 1.10.21     | input        |
+
   Scenario Outline: Top level directives can be deprecated
     Given a snakemake project
     And I set snakemake version to <smk_version>

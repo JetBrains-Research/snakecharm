@@ -113,7 +113,10 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
                     val issue = deprecationProvider.getFunctionCorrection(name, currentVersion, possibleParent)
                     if (issue != null) {
                         val versionWithAdvice = if (issue.second.first != null) {
-                            issue.second.second.toString() + " - you should " + issue.second.first
+                            SnakemakeBundle.message("INSP.NAME.deprecated.keywords.version.and.advice.join",
+                                issue.second.second.toString(),
+                                issue.second.first.toString()
+                            )
                         } else {
                             issue.second.second.toString()
                         }
@@ -191,7 +194,10 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
                 val issue = deprecationProvider.getTopLevelCorrection(name, currentVersion)
                 if (issue != null) {
                     val versionWithAdvice = if (issue.second.first != null) {
-                        issue.second.second.toString() + " - you should " + issue.second.first
+                        SnakemakeBundle.message("INSP.NAME.deprecated.keywords.version.and.advice.join",
+                            issue.second.second.toString(),
+                            issue.second.first.toString()
+                        )
                     } else {
                         issue.second.second.toString()
                     }
@@ -252,7 +258,10 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
                 val issue = deprecationProvider.getSubsectionCorrection(name, currentVersion, parentName)
                 if (issue != null) {
                     val versionWithAdvice = if (issue.second.first != null) {
-                        issue.second.second.toString() + " - you should " + issue.second.first
+                        SnakemakeBundle.message("INSP.NAME.deprecated.keywords.version.and.advice.join",
+                            issue.second.second.toString(),
+                            issue.second.first.toString()
+                        )
                     } else {
                         issue.second.second.toString()
                     }
