@@ -58,9 +58,9 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
             return internalState.snakemakeSupportBannerEnabled
         }
 
-    val snakemakeVersion: String?
+    val snakemakeLanguageVersion: String?
         get() {
-            return internalState.snakemakeVersion
+            return internalState.snakemakeLanguageVersion
         }
 
     fun getActiveSdk() = when {
@@ -129,7 +129,7 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
                 sdkRenamed: Boolean,
                 sdkRemoved: Boolean
             ) {
-                if (oldState.snakemakeVersion != newSettings.snakemakeVersion) {
+                if (oldState.snakemakeLanguageVersion != newSettings.snakemakeLanguageVersion) {
                     DaemonCodeAnalyzer.getInstance(project).restart()
                 }
             }
@@ -158,8 +158,8 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
         @get:Attribute("smk_support_banner_enabled")
         var snakemakeSupportBannerEnabled by property(true)
 
-        @get:Attribute("smk_version")
-        var snakemakeVersion by string(SmkFrameworkDeprecationProvider.getInstance().getDefaultVersion())
+        @get:Attribute("smk_language_version")
+        var snakemakeLanguageVersion by string(SmkFrameworkDeprecationProvider.getInstance().getDefaultVersion())
     }
 
     companion object {

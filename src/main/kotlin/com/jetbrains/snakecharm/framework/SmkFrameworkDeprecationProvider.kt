@@ -2,7 +2,7 @@ package com.jetbrains.snakecharm.framework
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
-import com.jetbrains.snakecharm.lang.SmkVersion
+import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
@@ -13,12 +13,12 @@ import java.util.*
 @Service
 class SmkFrameworkDeprecationProvider {
 
-    private lateinit var topLevelCorrection: Map<String, TreeMap<SmkVersion, SmkKeywordUpdateData>>
-    private lateinit var functionCorrection: Map<String, TreeMap<SmkVersion, SmkKeywordUpdateData>>
-    private lateinit var subsectionCorrection: Map<Pair<String, String?>, TreeMap<SmkVersion, SmkKeywordUpdateData>>
+    private lateinit var topLevelCorrection: Map<String, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>
+    private lateinit var functionCorrection: Map<String, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>
+    private lateinit var subsectionCorrection: Map<Pair<String, String?>, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>
 
-    private lateinit var subsectionIntroduction: Map<Pair<String, String?>, SmkVersion>
-    private lateinit var topLevelIntroduction: Map<String, SmkVersion>
+    private lateinit var subsectionIntroduction: Map<Pair<String, String?>, SmkLanguageVersion>
+    private lateinit var topLevelIntroduction: Map<String, SmkLanguageVersion>
 
     private lateinit var defaultVersion: String
     init {
@@ -34,16 +34,16 @@ class SmkFrameworkDeprecationProvider {
         val yaml = Yaml(CustomClassLoaderConstructor(SmkDeprecationData::class.java.classLoader, LoaderOptions()))
         yaml.setBeanAccess(BeanAccess.FIELD) // it must be set to be able to set vals
         val deprecationData = yaml.loadAs(inputStream, SmkDeprecationData::class.java)
-        val topLevelData = emptyMap<String, TreeMap<SmkVersion, SmkKeywordUpdateData>>().toMutableMap()
-        val functionData = emptyMap<String, TreeMap<SmkVersion, SmkKeywordUpdateData>>().toMutableMap()
-        val subsectionData = emptyMap<Pair<String, String?>, TreeMap<SmkVersion, SmkKeywordUpdateData>>().toMutableMap()
+        val topLevelData = emptyMap<String, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>().toMutableMap()
+        val functionData = emptyMap<String, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>().toMutableMap()
+        val subsectionData = emptyMap<Pair<String, String?>, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>().toMutableMap()
 
-        val subsectionIntroductionsMap = emptyMap<Pair<String, String?>, SmkVersion>().toMutableMap()
-        val topLevelIntroductionsMap = emptyMap<String, SmkVersion>().toMutableMap()
+        val subsectionIntroductionsMap = emptyMap<Pair<String, String?>, SmkLanguageVersion>().toMutableMap()
+        val topLevelIntroductionsMap = emptyMap<String, SmkLanguageVersion>().toMutableMap()
 
         defaultVersion = deprecationData.defaultVersion
         for (data in deprecationData.changelog) {
-            val version = SmkVersion(data.version)
+            val version = SmkLanguageVersion(data.version)
 
             val mapGetter = { src: SmkDeprecationKeywordData, newValue: SmkKeywordUpdateData ->
                 when (src.type) {
@@ -104,7 +104,7 @@ class SmkFrameworkDeprecationProvider {
      * @return Pair of latest deprecation/removal update that was made to the top level keyword as of provided version,
      *           and advice if any was assigned to the change
      */
-    fun getTopLevelCorrection(name: String, version: SmkVersion): SmkKeywordData? {
+    fun getTopLevelCorrection(name: String, version: SmkLanguageVersion): SmkKeywordData? {
         return getKeywordCorrection(topLevelCorrection[name], version)
     }
 
@@ -115,7 +115,7 @@ class SmkFrameworkDeprecationProvider {
      * @return Pair of latest deprecation/removal update that was made to the subsection keyword as of provided version,
      *           and advice if any was assigned to the change
      */
-    fun getSubsectionCorrection(name: String, version: SmkVersion, parent: String): SmkKeywordData? {
+    fun getSubsectionCorrection(name: String, version: SmkLanguageVersion, parent: String): SmkKeywordData? {
         return getKeywordCorrection(subsectionCorrection[name to parent], version, false) ?: getKeywordCorrection(
             subsectionCorrection[name to null],
             version
@@ -130,7 +130,7 @@ class SmkFrameworkDeprecationProvider {
      */
     fun getFunctionCorrection(
         name: String,
-        version: SmkVersion
+        version: SmkLanguageVersion
     ): SmkKeywordData? {
         return getKeywordCorrection(
             functionCorrection[name],
@@ -138,17 +138,17 @@ class SmkFrameworkDeprecationProvider {
         )
     }
 
-    fun getTopLevelIntroductionVersion(name: String): SmkVersion? {
+    fun getTopLevelIntroductionVersion(name: String): SmkLanguageVersion? {
         return topLevelIntroduction[name]
     }
 
-    fun getSubSectionIntroductionVersion(name: String, parent: String): SmkVersion? {
+    fun getSubSectionIntroductionVersion(name: String, parent: String): SmkLanguageVersion? {
         return subsectionIntroduction[name to parent] ?: subsectionIntroduction[name to null]
     }
 
     private fun getKeywordCorrection(
-        keywords: TreeMap<SmkVersion, SmkKeywordUpdateData>?,
-        version: SmkVersion,
+        keywords: TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>?,
+        version: SmkLanguageVersion,
         isGlobalChange: Boolean = true
     ): SmkKeywordData? {
         val entry = keywords?.floorEntry(version) ?: return null
@@ -209,6 +209,6 @@ data class SmkDeprecationData(
 data class SmkKeywordData(
     val updateType: UpdateType,
     val advice: String?,
-    val version: SmkVersion,
+    val version: SmkLanguageVersion,
     val isGlobalChange: Boolean
 )

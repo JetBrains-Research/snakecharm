@@ -56,7 +56,7 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
     private JBLabel pythonInterpreterHintLabel;
     // See sdk chooser (Combobox+PySdkListCellRenderer) in 'PyPluginCommonOptionsForm' or use `PythonSdkChooserCombo`
     private PythonSdkChooserCombo pythonSdkCB;
-    private JBTextField snakemakeVersionField;
+    private JBTextField snakemakeLanguageVersionField;
 
     public SmkFrameworkSettingsPanel(@Nullable final Project project) {
         this.project = project != null ? project : ProjectManager.getInstance().getDefaultProject();
@@ -162,8 +162,8 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
     }
 
     @Nullable
-    private String getSnakemakeVersion() {
-        return snakemakeVersionField.getText();
+    private String getSnakemakeLanguageVersion() {
+        return snakemakeLanguageVersionField.getText();
     }
 
     private void createUIComponents() {
@@ -173,7 +173,7 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
         // Do nothing, no custom components, just use this methods as a remainder that
         // it is API for custom comps initialization
 
-        snakemakeVersionField = new JBTextField();
+        snakemakeLanguageVersionField = new JBTextField();
 
         pythonSdkCB = new PythonSdkChooserCombo(
                 project, null, Collections.emptyList(), sdk -> true
@@ -197,8 +197,8 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
         state.setWrappersCustomSourcesFolder(FileUtil.toSystemIndependentName(wrappersSrcPathTF.getText().trim()));
         final Sdk sdk = getSelectedSdk();
         state.setPythonSdkName(sdk == null ? "" : sdk.getName());
-        final String snakemakeVersion = getSnakemakeVersion();
-        state.setSnakemakeVersion(snakemakeVersion == null ? "" : snakemakeVersion);
+        final String snakemakeLanguageVersion = getSnakemakeLanguageVersion();
+        state.setSnakemakeLanguageVersion(snakemakeLanguageVersion == null ? "" : snakemakeLanguageVersion);
     }
 
     public void reset(@NotNull SmkSupportProjectSettings.State state) {
@@ -220,7 +220,7 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
             }
         }
         pythonSdkCB.getComboBox().setSelectedItem(sdk);
-        snakemakeVersionField.setText(state.getSnakemakeVersion());
+        snakemakeLanguageVersionField.setText(state.getSnakemakeLanguageVersion());
 
         updateWrappersSrcPanelEnabledPropertyRecursively();
     }

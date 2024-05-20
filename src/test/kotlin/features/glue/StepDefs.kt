@@ -172,7 +172,7 @@ class StepDefs {
     @Given("^I set snakemake version to \"(.+)\"")
     fun setSmkVersion(version: String) {
         val newState = SmkSupportProjectSettings.getInstance(SnakemakeWorld.fixture().project).stateSnapshot()
-        newState.snakemakeVersion = version
+        newState.snakemakeLanguageVersion = version
         ApplicationManager.getApplication().invokeAndWait {
             SmkSupportProjectSettings.updateStateAndFireEvent(SnakemakeWorld.fixture().project, newState)
         }

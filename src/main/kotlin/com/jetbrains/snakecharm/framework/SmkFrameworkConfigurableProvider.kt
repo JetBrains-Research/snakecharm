@@ -79,13 +79,13 @@ class SmkFrameworkConfigurableProvider(
         ): ValidationResult {
             if (state.snakemakeSupportEnabled) {
 
-                val parts = state.snakemakeVersion?.split("\\.".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()
+                val parts = state.snakemakeLanguageVersion?.split("\\.".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()
                 if (parts?.size != 3) {
-                    return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.version.not.valid"))
+                    return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.language.version.not.valid"))
                 }
                 for (part in parts) {
                     if (!StringUtil.isNumeric(part)) {
-                        return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.version.not.valid"))
+                        return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.language.version.not.valid"))
                     }
                 }
             }

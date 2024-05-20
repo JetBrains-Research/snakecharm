@@ -11,7 +11,7 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.framework.SmkFrameworkDeprecationProvider
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.UpdateType
-import com.jetbrains.snakecharm.lang.SmkVersion
+import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import com.jetbrains.snakecharm.lang.SnakemakeNames.CHECKPOINT_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RULE_KEYWORD
@@ -100,8 +100,8 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
             ) {
                 val settings = SmkSupportProjectSettings.getInstance(holder.project)
                 val deprecationProvider = SmkFrameworkDeprecationProvider.getInstance()
-                val currentVersionString = settings.snakemakeVersion
-                val currentVersion = if (currentVersionString == null) null else SmkVersion(currentVersionString)
+                val currentVersionString = settings.snakemakeLanguageVersion
+                val currentVersion = if (currentVersionString == null) null else SmkLanguageVersion(currentVersionString)
                 val name = node.name
                 if (name != null && currentVersion != null) {
                     val issue = deprecationProvider.getFunctionCorrection(name, currentVersion)
@@ -145,8 +145,8 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
             val settings = SmkSupportProjectSettings.getInstance(holder.project)
             val deprecationProvider = SmkFrameworkDeprecationProvider.getInstance()
             val lowestVersion = deprecationProvider.getTopLevelIntroductionVersion(name)
-            val currentVersionString = settings.snakemakeVersion
-            val currentVersion = if (currentVersionString == null) null else SmkVersion(currentVersionString)
+            val currentVersionString = settings.snakemakeLanguageVersion
+            val currentVersion = if (currentVersionString == null) null else SmkLanguageVersion(currentVersionString)
             if (lowestVersion != null
                 && currentVersion != null
                 && lowestVersion > currentVersion
@@ -209,8 +209,8 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
             val settings = SmkSupportProjectSettings.getInstance(holder.project)
             val deprecationProvider = SmkFrameworkDeprecationProvider.getInstance()
             val lowestVersion = deprecationProvider.getSubSectionIntroductionVersion(name, parentName)
-            val currentVersionString = settings.snakemakeVersion
-            val currentVersion = if (currentVersionString == null) null else SmkVersion(currentVersionString)
+            val currentVersionString = settings.snakemakeLanguageVersion
+            val currentVersion = if (currentVersionString == null) null else SmkLanguageVersion(currentVersionString)
             if (lowestVersion != null
                 && currentVersion != null
                 && lowestVersion > currentVersion

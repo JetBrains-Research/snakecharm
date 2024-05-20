@@ -1,8 +1,8 @@
 package com.jetbrains.snakecharm.lang
 
-class SmkVersion(
+class SmkLanguageVersion(
     val version: String
-) : Comparable<SmkVersion> {
+) : Comparable<SmkLanguageVersion> {
     val major: Int
     val minor: Int
     val patch: Int
@@ -19,7 +19,7 @@ class SmkVersion(
 
     override fun toString(): String = version
 
-    override fun compareTo(other: SmkVersion): Int {
+    override fun compareTo(other: SmkLanguageVersion): Int {
         var res = major.compareTo(other.major)
         if (res == 0) res = minor.compareTo(other.minor)
         if (res == 0) res = patch.compareTo(other.patch)
