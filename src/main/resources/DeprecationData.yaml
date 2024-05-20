@@ -1,4 +1,4 @@
-
+defaultVersion: "7.32.4"
 changelog:
   - version: "1.11.11"
     deprecated:

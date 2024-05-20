@@ -20,6 +20,7 @@ class SmkFrameworkDeprecationProvider {
     private lateinit var subsectionIntroduction: Map<Pair<String, String?>, SmkVersion>
     private lateinit var topLevelIntroduction: Map<String, SmkVersion>
 
+    private lateinit var defaultVersion: String
     init {
         val input = javaClass.getResourceAsStream(DEPRECATION_DATA_LOCATION)
         initiate(input)
@@ -39,6 +40,8 @@ class SmkFrameworkDeprecationProvider {
 
         val subsectionIntroductionsMap = emptyMap<Pair<String, String?>, SmkVersion>().toMutableMap()
         val topLevelIntroductionsMap = emptyMap<String, SmkVersion>().toMutableMap()
+
+        defaultVersion = deprecationData.defaultVersion
         for (data in deprecationData.changelog) {
             val version = SmkVersion(data.version)
 
@@ -92,6 +95,8 @@ class SmkFrameworkDeprecationProvider {
         topLevelIntroduction = topLevelIntroductionsMap
 
     }
+
+    fun getDefaultVersion() = defaultVersion
 
     /**
      * @param name name of keyword to check
@@ -198,6 +203,7 @@ data class SmkDeprecationVersionData(
 
 data class SmkDeprecationData(
     val changelog: List<SmkDeprecationVersionData> = emptyList(),
+    val defaultVersion: String = "7.32.4"
 )
 
 data class SmkKeywordData(

@@ -159,7 +159,7 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
         var snakemakeSupportBannerEnabled by property(true)
 
         @get:Attribute("smk_version")
-        var snakemakeVersion by string("7.32.4")
+        var snakemakeVersion by string(SmkFrameworkDeprecationProvider.getInstance().getDefaultVersion())
     }
 
     companion object {
