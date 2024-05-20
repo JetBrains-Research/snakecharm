@@ -112,7 +112,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     When SmkDepreciatedKeywords inspection is enabled
     Then I expect inspection weak warning on <output> with message
     """
-    Usage of 'output' in 'rule' was deprecated in version <version> - you should use 'input' instead
+    Usage of 'output' was deprecated in version <version> - you should use 'input' instead
     """
     When I check highlighting weak warnings
     Examples:
@@ -169,7 +169,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     When SmkDepreciatedKeywords inspection is enabled
     Then I expect inspection error on <shell> with message
     """
-    Usage of 'shell' in 'rule' was removed in version <version> - you should use 'input' instead
+    Usage of 'shell' was removed in version <version> - you should use 'input' instead
     """
     When I check highlighting errors
     Examples:
@@ -232,13 +232,13 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         output: "boo"
     """
     When SmkDepreciatedKeywords inspection is enabled
+    And I expect no inspection weak warnings
+    When I check highlighting weak warnings ignoring extra highlighting
     Then I expect inspection error on <output> with message
     """
-    Usage of 'output' was removed in version <version2>
+    Usage of 'output' was removed in version <version2> - you should use 'input' instead
     """
     When I check highlighting errors
-    And I expect no inspection weak warnings
-    When I check highlighting weak warnings
     Examples:
       | version1 | version2 | new_version |
       | 1.11.8   | 1.11.11  | 1.11.11     |
@@ -429,8 +429,8 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     """
     And I open a file "foo.smk" with text
     """
-      module:
-        config: ""
+    module:
+      config: ""
     """
     When SmkDepreciatedKeywords inspection is enabled
     Then I expect no inspection weak warnings

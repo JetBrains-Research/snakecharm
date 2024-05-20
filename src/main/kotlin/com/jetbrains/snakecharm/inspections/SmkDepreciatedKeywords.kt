@@ -6,9 +6,6 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.psi.PsiElement
-import com.jetbrains.python.psi.PyArgumentList
-import com.jetbrains.python.psi.PyCallExpression
-import com.jetbrains.python.psi.PyClass
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -100,8 +97,8 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
 
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {
             val declaration = node.reference.resolve()
-            if ((declaration is PyClass || declaration is PyFunction)
-                && declaration.containingFile.name == SnakemakeAPI.SNAKEMAKE_MODULE_NAME_IO_PY
+            if (
+                declaration is PyFunction && declaration.containingFile.name == SnakemakeAPI.SNAKEMAKE_MODULE_NAME_IO_PY
             ) {
                 val settings = SmkSupportProjectSettings.getInstance(holder.project)
                 val deprecationProvider = ApplicationManager.getApplication().service<SmkFrameworkDeprecationProvider>()
@@ -109,63 +106,41 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
                 val currentVersion = if (currentVersionString == null) null else SmkVersion(currentVersionString)
                 val name = node.name
                 if (name != null && currentVersion != null) {
-                    val possibleParent = getSectionNameIfFunctionCall(node)
-                    val issue = deprecationProvider.getFunctionCorrection(name, currentVersion, possibleParent)
+                    val issue = deprecationProvider.getFunctionCorrection(name, currentVersion)
                     if (issue != null) {
-                        val versionWithAdvice = if (issue.second.first != null) {
-                            SnakemakeBundle.message("INSP.NAME.deprecated.keywords.version.and.advice.join",
-                                issue.second.second.toString(),
-                                issue.second.first.toString()
+                        val versionWithAdvice = if (issue.advice != null) {
+                            SnakemakeBundle.message(
+                                "INSP.NAME.deprecated.keywords.version.and.advice.join",
+                                issue.version,
+                                issue.advice
                             )
                         } else {
-                            issue.second.second.toString()
+                            issue.version
                         }
-                        when (issue.first) {
+                        when (issue.updateType) {
                             UpdateType.REMOVED -> {
-                                val message = if (possibleParent != null) {
-                                    SnakemakeBundle.message(
-                                        "INSP.NAME.deprecated.keywords.removed.func.parent",
-                                        name,
-                                        possibleParent,
-                                        versionWithAdvice
-                                    )
-                                } else {
-                                    SnakemakeBundle.message(
-                                        "INSP.NAME.deprecated.keywords.removed.func",
-                                        name,
-                                        versionWithAdvice
-                                    )
-                                }
+                                val message = SnakemakeBundle.message(
+                                    "INSP.NAME.deprecated.keywords.removed.func",
+                                    name,
+                                    versionWithAdvice
+                                )
+
                                 registerProblem(node, message, ProblemHighlightType.GENERIC_ERROR)
                             }
 
                             UpdateType.DEPRECATED -> {
-                                val message = if (possibleParent != null) {
-                                    SnakemakeBundle.message(
-                                        "INSP.NAME.deprecated.keywords.deprecated.func.parent",
-                                        name,
-                                        possibleParent,
-                                        versionWithAdvice
-                                    )
-                                } else {
-                                    SnakemakeBundle.message(
-                                        "INSP.NAME.deprecated.keywords.deprecated.func",
-                                        name,
-                                        versionWithAdvice
-                                    )
-                                }
+                                val message = SnakemakeBundle.message(
+                                    "INSP.NAME.deprecated.keywords.deprecated.func",
+                                    name,
+                                    versionWithAdvice
+                                )
+
                                 registerProblem(node, message, ProblemHighlightType.WEAK_WARNING)
                             }
                         }
                     }
                 }
             }
-        }
-
-        private fun getSectionNameIfFunctionCall(node: PyReferenceExpression): String? {
-            val callExpr = node.parent as? PyCallExpression ?: return null
-            val sectionArgs = callExpr.parent as? PyArgumentList ?: return null
-            return (sectionArgs.parent as? SmkSection)?.sectionKeyword
         }
 
         private fun checkTopLevelDefinition(psiElement: PsiElement, name: String) {
@@ -193,15 +168,16 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
             if (currentVersion != null) {
                 val issue = deprecationProvider.getTopLevelCorrection(name, currentVersion)
                 if (issue != null) {
-                    val versionWithAdvice = if (issue.second.first != null) {
-                        SnakemakeBundle.message("INSP.NAME.deprecated.keywords.version.and.advice.join",
-                            issue.second.second.toString(),
-                            issue.second.first.toString()
+                    val versionWithAdvice = if (issue.advice != null) {
+                        SnakemakeBundle.message(
+                            "INSP.NAME.deprecated.keywords.version.and.advice.join",
+                            issue.version,
+                            issue.advice
                         )
                     } else {
-                        issue.second.second.toString()
+                        issue.version
                     }
-                    when (issue.first) {
+                    when (issue.updateType) {
                         UpdateType.REMOVED -> {
                             registerProblem(
                                 psiElement,
@@ -257,39 +233,50 @@ class SmkDepreciatedKeywords : SnakemakeInspection() {
             if (currentVersion != null) {
                 val issue = deprecationProvider.getSubsectionCorrection(name, currentVersion, parentName)
                 if (issue != null) {
-                    val versionWithAdvice = if (issue.second.first != null) {
-                        SnakemakeBundle.message("INSP.NAME.deprecated.keywords.version.and.advice.join",
-                            issue.second.second.toString(),
-                            issue.second.first.toString()
+                    val versionWithAdvice = if (issue.advice != null) {
+                        SnakemakeBundle.message(
+                            "INSP.NAME.deprecated.keywords.version.and.advice.join",
+                            issue.version,
+                            issue.advice
                         )
                     } else {
-                        issue.second.second.toString()
+                        issue.version
                     }
-                    when (issue.first) {
+                    when (issue.updateType) {
                         UpdateType.REMOVED -> {
-                            registerProblem(
-                                psiElement,
+                            val message = if (issue.isGlobalChange) {
+                                SnakemakeBundle.message(
+                                    "INSP.NAME.deprecated.keywords.removed.sub.no.parent",
+                                    name,
+                                    versionWithAdvice
+                                )
+                            } else {
                                 SnakemakeBundle.message(
                                     "INSP.NAME.deprecated.keywords.removed.sub",
                                     name,
                                     parentName,
                                     versionWithAdvice
-                                ),
-                                ProblemHighlightType.GENERIC_ERROR
-                            )
+                                )
+                            }
+                            registerProblem(psiElement, message, ProblemHighlightType.GENERIC_ERROR)
                         }
 
                         UpdateType.DEPRECATED -> {
-                            registerProblem(
-                                psiElement,
+                            val message = if (issue.isGlobalChange) {
+                                SnakemakeBundle.message(
+                                    "INSP.NAME.deprecated.keywords.deprecated.sub.no.parent",
+                                    name,
+                                    versionWithAdvice
+                                )
+                            } else {
                                 SnakemakeBundle.message(
                                     "INSP.NAME.deprecated.keywords.deprecated.sub",
                                     name,
                                     parentName,
                                     versionWithAdvice
-                                ),
-                                ProblemHighlightType.WEAK_WARNING
-                            )
+                                )
+                            }
+                            registerProblem(psiElement, message, ProblemHighlightType.WEAK_WARNING)
                         }
                     }
                 }

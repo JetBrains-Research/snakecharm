@@ -13,7 +13,7 @@ import java.util.*
 class SmkFrameworkDeprecationProvider {
 
     private lateinit var topLevelCorrection: Map<String, TreeMap<SmkVersion, SmkKeywordUpdateData>>
-    private lateinit var functionCorrection: Map<Pair<String, String?>, TreeMap<SmkVersion, SmkKeywordUpdateData>>
+    private lateinit var functionCorrection: Map<String, TreeMap<SmkVersion, SmkKeywordUpdateData>>
     private lateinit var subsectionCorrection: Map<Pair<String, String?>, TreeMap<SmkVersion, SmkKeywordUpdateData>>
 
     private lateinit var subsectionIntroduction: Map<Pair<String, String?>, SmkVersion>
@@ -33,7 +33,7 @@ class SmkFrameworkDeprecationProvider {
         yaml.setBeanAccess(BeanAccess.FIELD) // it must be set to be able to set vals
         val deprecationData = yaml.loadAs(inputStream, SmkDeprecationData::class.java)
         val topLevelData = emptyMap<String, TreeMap<SmkVersion, SmkKeywordUpdateData>>().toMutableMap()
-        val functionData = emptyMap<Pair<String, String?>, TreeMap<SmkVersion, SmkKeywordUpdateData>>().toMutableMap()
+        val functionData = emptyMap<String, TreeMap<SmkVersion, SmkKeywordUpdateData>>().toMutableMap()
         val subsectionData = emptyMap<Pair<String, String?>, TreeMap<SmkVersion, SmkKeywordUpdateData>>().toMutableMap()
 
         val subsectionIntroductionsMap = emptyMap<Pair<String, String?>, SmkVersion>().toMutableMap()
@@ -43,17 +43,17 @@ class SmkFrameworkDeprecationProvider {
 
             val mapGetter = { src: SmkDeprecationKeywordData, newValue: SmkKeywordUpdateData ->
                 when (src.type) {
-                    TOP_LEVEL_KEYWORD_TYPE -> {
-                        topLevelData.getOrPut(src.name) { TreeMap() }[version] = newValue
+                    FUNCTION_KEYWORD_TYPE, TOP_LEVEL_KEYWORD_TYPE -> {
+                        val dataToInsert = if (src.type == FUNCTION_KEYWORD_TYPE) functionData else topLevelData
+                        dataToInsert.getOrPut(src.name) { TreeMap() }[version] = newValue
                     }
 
-                    FUNCTION_KEYWORD_TYPE, SUBSECTION_KEYWORD_TYPE -> {
-                        val dataToInsert = if (src.type == FUNCTION_KEYWORD_TYPE) functionData else subsectionData
+                    SUBSECTION_KEYWORD_TYPE -> {
                         if (src.parent.isEmpty()) {
-                            dataToInsert.getOrPut(src.name to null) { TreeMap() }[version] = newValue
+                            subsectionData.getOrPut(src.name to null) { TreeMap() }[version] = newValue
                         } else {
                             for (parent in src.parent) {
-                                dataToInsert.getOrPut(src.name to parent) { TreeMap() }[version] = newValue
+                                subsectionData.getOrPut(src.name to parent) { TreeMap() }[version] = newValue
                             }
                         }
                     }
@@ -98,7 +98,7 @@ class SmkFrameworkDeprecationProvider {
      * @return Pair of latest deprecation/removal update that was made to the top level keyword as of provided version,
      *           and advice if any was assigned to the change
      */
-    fun getTopLevelCorrection(name: String, version: SmkVersion): Pair<UpdateType, Pair<String?, SmkVersion>>? {
+    fun getTopLevelCorrection(name: String, version: SmkVersion): SmkKeywordData? {
         return getKeywordCorrection(topLevelCorrection[name], version)
     }
 
@@ -109,12 +109,8 @@ class SmkFrameworkDeprecationProvider {
      * @return Pair of latest deprecation/removal update that was made to the subsection keyword as of provided version,
      *           and advice if any was assigned to the change
      */
-    fun getSubsectionCorrection(
-        name: String,
-        version: SmkVersion,
-        parent: String
-    ): Pair<UpdateType, Pair<String?, SmkVersion>>? {
-        return getKeywordCorrection(subsectionCorrection[name to parent], version) ?: getKeywordCorrection(
+    fun getSubsectionCorrection(name: String, version: SmkVersion, parent: String): SmkKeywordData? {
+        return getKeywordCorrection(subsectionCorrection[name to parent], version, false) ?: getKeywordCorrection(
             subsectionCorrection[name to null],
             version
         )
@@ -128,11 +124,10 @@ class SmkFrameworkDeprecationProvider {
      */
     fun getFunctionCorrection(
         name: String,
-        version: SmkVersion,
-        parent: String?
-    ): Pair<UpdateType, Pair<String?, SmkVersion>>? {
-        return getKeywordCorrection(functionCorrection[name to parent], version) ?: getKeywordCorrection(
-            functionCorrection[name to null],
+        version: SmkVersion
+    ): SmkKeywordData? {
+        return getKeywordCorrection(
+            functionCorrection[name],
             version
         )
     }
@@ -147,10 +142,11 @@ class SmkFrameworkDeprecationProvider {
 
     private fun getKeywordCorrection(
         keywords: TreeMap<SmkVersion, SmkKeywordUpdateData>?,
-        version: SmkVersion
-    ): Pair<UpdateType, Pair<String?, SmkVersion>>? {
+        version: SmkVersion,
+        isGlobalChange: Boolean = true
+    ): SmkKeywordData? {
         val entry = keywords?.floorEntry(version) ?: return null
-        return entry.value.type to (entry.value.advice to entry.key)
+        return SmkKeywordData(entry.value.type, entry.value.advice, entry.key, isGlobalChange)
     }
 
 
@@ -198,4 +194,11 @@ data class SmkDeprecationVersionData(
 
 data class SmkDeprecationData(
     val changelog: List<SmkDeprecationVersionData> = emptyList(),
+)
+
+data class SmkKeywordData(
+    val updateType: UpdateType,
+    val advice: String?,
+    val version: SmkVersion,
+    val isGlobalChange: Boolean
 )
