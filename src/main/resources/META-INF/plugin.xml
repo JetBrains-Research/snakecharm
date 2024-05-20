@@ -434,12 +434,12 @@
     />
 
     <localInspection
-            language="Snakemake" shortName="SmkDepreciatedKeywords"
+            language="Snakemake" shortName="SmkDepreciatedKeywordsInspection"
             enabledByDefault="true"
             suppressId="SmkDepreciatedKeywords"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
-            implementationClass="com.jetbrains.snakecharm.inspections.SmkDepreciatedKeywords"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkDepreciatedKeywordsInspection"
     />
 
     <localInspection

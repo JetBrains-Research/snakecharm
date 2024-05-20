@@ -23,7 +23,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_LOCALRULES_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_RULEORDER_KEYWORD
 import com.jetbrains.snakecharm.lang.psi.*
 
-class SmkDepreciatedKeywords : SnakemakeInspection() {
+class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
     override fun buildVisitor(
         holder: ProblemsHolder,
         isOnTheFly: Boolean,

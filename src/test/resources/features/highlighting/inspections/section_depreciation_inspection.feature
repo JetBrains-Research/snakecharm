@@ -18,7 +18,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     <rule_like> foo:
         input: "boo"
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect inspection weak warning on <input> with message
     """
     Usage of 'input' in '<rule_like>' was deprecated in version 1.10.01
@@ -47,7 +47,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     checkpoint foo:
         input: "boo"
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
@@ -80,7 +80,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     checkpoint foo:
         input: "boo"
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect inspection error on <input> with message
     """
     Usage of 'input' in 'rule' was removed in version 1.10.02
@@ -109,7 +109,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     rule foo:
         output: "boo"
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect inspection weak warning on <output> with message
     """
     Usage of 'output' was deprecated in version <version> - you should use 'input' instead
@@ -138,7 +138,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     <rule_like> foo:
         input: "boo"
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect inspection error on <input> with message
     """
     Usage of 'input' in '<rule_like>' was removed in version 1.10.01
@@ -166,7 +166,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     rule foo:
         shell: "boo"
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect inspection error on <shell> with message
     """
     Usage of 'shell' was removed in version <version> - you should use 'input' instead
@@ -199,7 +199,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         <removed_keyword>: "boo"
         <deprecated_keyword>: "foo"
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     And I expect no inspection errors
@@ -231,7 +231,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     rule foo:
         output: "boo"
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     And I expect no inspection weak warnings
     When I check highlighting weak warnings ignoring extra highlighting
     Then I expect inspection error on <output> with message
@@ -263,7 +263,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     rule foo:
         localname: "boo"
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect inspection error on <localname> with message
     """
     Usage of 'localname' in 'rule' was added in version <version>, but selected Snakemake version is <smk_version>
@@ -290,7 +290,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     rule foo:
         localname: "boo"
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect no inspection errors
     When I check highlighting errors
     Examples:
@@ -315,7 +315,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     rule foo:
         output: expand("")
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect no inspection errors
     When I check highlighting errors
     Then I expect inspection weak warning on <expand> with message
@@ -347,7 +347,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     rule foo:
         output: expand("")
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect inspection weak warning on <expand> with message
     """
     Function 'expand' was deprecated in version <version> - you should use 'expand2' instead
@@ -374,7 +374,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     subworkflow foo:
        snakefile: "bar"
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect inspection weak warning on <subworkflow> with message
     """
     Top level directive 'subworkflow' was deprecated in version <version>
@@ -403,7 +403,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     subworkflow foo:
        snakefile: "bar"
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect inspection weak warning on <subworkflow> with message
     """
     Top level directive 'subworkflow' was deprecated in version <version> - you should use 'module' instead
@@ -432,7 +432,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     module:
       config: ""
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
@@ -456,7 +456,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     module foo:
         snakefile: "boo"
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect inspection error on <module> with message
     """
     Top level directive 'module' was added in version <version>, but selected Snakemake version is <smk_version>
@@ -483,7 +483,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     module foo:
         snakefile: "boo"
     """
-    When SmkDepreciatedKeywords inspection is enabled
+    When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect no inspection errors
     When I check highlighting errors
     Examples:
