@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.framework
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.jetbrains.snakecharm.lang.SmkVersion
 import org.yaml.snakeyaml.LoaderOptions
@@ -165,6 +166,9 @@ class SmkFrameworkDeprecationProvider {
         const val TOP_LEVEL_KEYWORD_TYPE = "top-level"
         const val SUBSECTION_KEYWORD_TYPE = "subsection"
         const val FUNCTION_KEYWORD_TYPE = "function"
+
+        fun getInstance() =
+            ApplicationManager.getApplication().getService(SmkFrameworkDeprecationProvider::class.java)!!
     }
 }
 

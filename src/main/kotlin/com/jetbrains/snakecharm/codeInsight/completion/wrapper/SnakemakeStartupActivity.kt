@@ -1,6 +1,5 @@
 package com.jetbrains.snakecharm.codeInsight.completion.wrapper
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
@@ -20,6 +19,6 @@ class SnakemakeStartupActivity : ProjectActivity {
         val implicitPySymbolsProvider = project.service<ImplicitPySymbolsProvider>()
         implicitPySymbolsProvider.initOnStartup()
 
-        ApplicationManager.getApplication().getService(SmkFrameworkDeprecationProvider::class.java)
+        SmkFrameworkDeprecationProvider.getInstance()
     }
 }

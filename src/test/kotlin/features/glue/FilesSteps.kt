@@ -2,7 +2,6 @@ package features.glue
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.text.StringUtil
 import com.jetbrains.snakecharm.framework.SmkFrameworkDeprecationProvider
@@ -39,7 +38,7 @@ class FilesSteps {
     @Given("depreciation data file content is$")
     fun deprecationDataIs(text: String) {
         ApplicationManager.getApplication().invokeAndWait({
-            ApplicationManager.getApplication().service<SmkFrameworkDeprecationProvider>().overrideInputFile(text.byteInputStream())
+            SmkFrameworkDeprecationProvider.getInstance().overrideInputFile(text.byteInputStream())
         }, ModalityState.nonModal())
     }
 
