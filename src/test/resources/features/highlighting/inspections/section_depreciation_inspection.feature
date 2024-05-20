@@ -112,7 +112,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect inspection weak warning on <output> with message
     """
-    Usage of 'output' was deprecated in version <version> - you should use 'input' instead
+    Section 'output' was deprecated in version <version> - you should use 'input' instead
     """
     When I check highlighting weak warnings
     Examples:
@@ -169,7 +169,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect inspection error on <shell> with message
     """
-    Usage of 'shell' was removed in version <version> - you should use 'input' instead
+    Section 'shell' was removed in version <version> - you should use 'input' instead
     """
     When I check highlighting errors
     Examples:
@@ -236,7 +236,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     When I check highlighting weak warnings ignoring extra highlighting
     Then I expect inspection error on <output> with message
     """
-    Usage of 'output' was removed in version <version2> - you should use 'input' instead
+    Section 'output' was removed in version <version2> - you should use 'input' instead
     """
     When I check highlighting errors
     Examples:
@@ -273,6 +273,43 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
       | version | smk_version |
       | 1.11.11 | 1.11.10     |
       | 1.10.01 | 1.9.0       |
+
+  Scenario Outline: Subsection can be deprecated from multiple top level directives
+    Given a snakemake project
+    And I set snakemake version to "<smk_version>"
+    And depreciation data file content is
+    """
+    changelog:
+      - version: "<version>"
+        deprecated:
+        - name: "localname"
+          type: "subsection"
+          parent:
+            - "checkpoint"
+            - "rule"
+    """
+    And I open a file "foo.smk" with text
+    """
+    rule foo:
+        localname: "boo"
+    checkpoint boo:
+        localname: "foo"
+    """
+    When SmkDepreciatedKeywordsInspection inspection is enabled
+    Then I expect inspection weak warning on <localname> in <localname: "boo"> with message
+    """
+    Usage of 'localname' in 'rule' was deprecated in version <version>
+    """
+    Then I expect inspection weak warning on <localname> in <localname: "foo"> with message
+    """
+    Usage of 'localname' in 'checkpoint' was deprecated in version <version>
+    """
+    When I check highlighting weak warnings
+    Examples:
+      | version | smk_version |
+      | 1.11.11 | 1.11.11     |
+      | 1.10.01 | 1.13.0      |
+
 
   Scenario Outline: New subsection keywords error does not appear when version is correct
     Given a snakemake project
@@ -380,6 +417,34 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     Top level directive 'subworkflow' was deprecated in version <version>
     """
     When I check highlighting weak warnings
+    Examples:
+      | version | smk_version |
+      | 1.11.11 | 1.11.11     |
+      | 1.10.01 | 1.10.21     |
+
+
+  Scenario Outline: Top level directives can be removed
+    Given a snakemake project
+    And I set snakemake version to "<smk_version>"
+    And depreciation data file content is
+    """
+    changelog:
+      - version: "<version>"
+        removed:
+        - name: "subworkflow"
+          type: "top-level"
+    """
+    And I open a file "foo.smk" with text
+    """
+    subworkflow foo:
+       snakefile: "bar"
+    """
+    When SmkDepreciatedKeywordsInspection inspection is enabled
+    Then I expect inspection error on <subworkflow> with message
+    """
+    Top level directive 'subworkflow' was removed in version <version>
+    """
+    When I check highlighting errors
     Examples:
       | version | smk_version |
       | 1.11.11 | 1.11.11     |
