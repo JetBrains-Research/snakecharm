@@ -311,6 +311,39 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
       | 1.10.01 | 1.13.0      |
 
 
+  Scenario Outline: Subsection can be deprecated from everywhere
+    Given a snakemake project
+    And I set snakemake version to "<smk_version>"
+    And depreciation data file content is
+    """
+    changelog:
+      - version: "<version>"
+        deprecated:
+        - name: "localname"
+          type: "subsection"
+    """
+    And I open a file "foo.smk" with text
+    """
+    rule foo:
+        localname: "boo"
+    checkpoint boo:
+        localname: "foo"
+    """
+    When SmkDepreciatedKeywordsInspection inspection is enabled
+    Then I expect inspection weak warning on <localname> in <localname: "boo"> with message
+    """
+    Section 'localname' was deprecated in version <version>
+    """
+    Then I expect inspection weak warning on <localname> in <localname: "foo"> with message
+    """
+    Section 'localname' was deprecated in version <version>
+    """
+    When I check highlighting weak warnings
+    Examples:
+      | version | smk_version |
+      | 1.11.11 | 1.11.11     |
+      | 1.10.01 | 1.13.0      |
+
   Scenario Outline: New subsection keywords error does not appear when version is correct
     Given a snakemake project
     And I set snakemake version to "<smk_version>"
@@ -555,3 +588,34 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
       | version | smk_version |
       | 1.11.11 | 1.11.11     |
       | 1.10.01 | 1.10.21     |
+
+  Scenario Outline: Default version can be defined in file
+    Given a snakemake project
+    And I set snakemake version to "<smk_version>"
+    And depreciation data file content is
+    """
+    defaultVersion: "<smk_version>"
+    changelog:
+      - version: "<version>"
+        introduced:
+        - name: "localname"
+          type: "subsection"
+          parent:
+            - "checkpoint"
+            - "rule"
+    """
+    And I open a file "foo.smk" with text
+    """
+    rule foo:
+        localname: "boo"
+    """
+    When SmkDepreciatedKeywordsInspection inspection is enabled
+    Then I expect inspection error on <localname> with message
+    """
+    Usage of 'localname' in 'rule' was added in version <version>, but selected Snakemake version is <smk_version>
+    """
+    When I check highlighting errors
+    Examples:
+      | version | smk_version |
+      | 1.11.11 | 1.11.10     |
+      | 1.10.01 | 1.9.0       |
