@@ -27,6 +27,16 @@ changelog:
     introduced:
       - name: "handover"
         type: "subsection"
+  - version: "6.0.0"
+    introduced:
+      - name: "use"
+        type: "top-level"
+      - name: "module"
+        type: "top-level"
+    removed:
+      - name: "subworkflow"
+        type: "top-level"
+        advice: "use the module directive instead."
   - version: "5.31.0"
     introduced:
       - name: "name"

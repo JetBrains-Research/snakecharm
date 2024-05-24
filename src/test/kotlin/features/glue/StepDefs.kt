@@ -169,8 +169,8 @@ class StepDefs {
 
         waitEDTEventsDispatching()
     }
-    @Given("^I set snakemake version to \"(.+)\"")
-    fun setSmkVersion(version: String) {
+    @Given("^I set snakemake language version to \"(.+)\"")
+    fun setLanguageSmkVersion(version: String) {
         val newState = SmkSupportProjectSettings.getInstance(SnakemakeWorld.fixture().project).stateSnapshot()
         newState.snakemakeLanguageVersion = version
         ApplicationManager.getApplication().invokeAndWait {
