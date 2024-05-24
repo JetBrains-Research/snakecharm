@@ -23,14 +23,14 @@ class SmkFrameworkDeprecationProvider {
     private lateinit var defaultVersion: String
     init {
         val input = javaClass.getResourceAsStream(DEPRECATION_DATA_LOCATION)
-        initiate(input)
+        initialize(input)
     }
 
     fun overrideInputFile(input: InputStream) {
-        initiate(input)
+        initialize(input)
     }
 
-    private fun initiate(inputStream: InputStream?) {
+    private fun initialize(inputStream: InputStream?) {
         val yaml = Yaml(CustomClassLoaderConstructor(SmkDeprecationData::class.java.classLoader, LoaderOptions()))
         yaml.setBeanAccess(BeanAccess.FIELD) // it must be set to be able to set vals
         val deprecationData = yaml.loadAs(inputStream, SmkDeprecationData::class.java)
@@ -104,7 +104,7 @@ class SmkFrameworkDeprecationProvider {
      * @return Pair of latest deprecation/removal update that was made to the top level keyword as of provided version,
      *           and advice if any was assigned to the change
      */
-    fun getTopLevelCorrection(name: String, version: SmkLanguageVersion): SmkKeywordData? {
+    fun getTopLevelCorrection(name: String, version: SmkLanguageVersion): SmkCorrectionInfo? {
         return getKeywordCorrection(topLevelCorrection[name], version)
     }
 
@@ -115,7 +115,7 @@ class SmkFrameworkDeprecationProvider {
      * @return Pair of latest deprecation/removal update that was made to the subsection keyword as of provided version,
      *           and advice if any was assigned to the change
      */
-    fun getSubsectionCorrection(name: String, version: SmkLanguageVersion, parent: String): SmkKeywordData? {
+    fun getSubsectionCorrection(name: String, version: SmkLanguageVersion, parent: String): SmkCorrectionInfo? {
         return getKeywordCorrection(subsectionCorrection[name to parent], version, false) ?: getKeywordCorrection(
             subsectionCorrection[name to null],
             version
@@ -131,7 +131,7 @@ class SmkFrameworkDeprecationProvider {
     fun getFunctionCorrection(
         name: String,
         version: SmkLanguageVersion
-    ): SmkKeywordData? {
+    ): SmkCorrectionInfo? {
         return getKeywordCorrection(
             functionCorrection[name],
             version
@@ -150,9 +150,9 @@ class SmkFrameworkDeprecationProvider {
         keywords: TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>?,
         version: SmkLanguageVersion,
         isGlobalChange: Boolean = true
-    ): SmkKeywordData? {
+    ): SmkCorrectionInfo? {
         val entry = keywords?.floorEntry(version) ?: return null
-        return SmkKeywordData(entry.value.type, entry.value.advice, entry.key, isGlobalChange)
+        return SmkCorrectionInfo(entry.value.type, entry.value.advice, entry.key, isGlobalChange)
     }
 
 
@@ -206,7 +206,7 @@ data class SmkDeprecationData(
     val defaultVersion: String = "7.32.4"
 )
 
-data class SmkKeywordData(
+data class SmkCorrectionInfo(
     val updateType: UpdateType,
     val advice: String?,
     val version: SmkLanguageVersion,
