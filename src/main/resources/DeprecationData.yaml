@@ -33,7 +33,7 @@ changelog:
         type: "top-level"
       - name: "module"
         type: "top-level"
-    removed:
+    deprecated:
       - name: "subworkflow"
         type: "top-level"
         advice: "use the module directive instead."
