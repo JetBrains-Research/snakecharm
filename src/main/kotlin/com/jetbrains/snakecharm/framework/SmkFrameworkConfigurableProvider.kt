@@ -4,6 +4,7 @@ import com.intellij.facet.ui.ValidationResult
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.text.StringUtil
 import com.jetbrains.snakecharm.SnakemakeBundle
 import java.nio.file.Paths
 import javax.swing.JComponent
@@ -68,6 +69,24 @@ class SmkFrameworkConfigurableProvider(
                         return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.sdk.project.not.valid"))
                     }
                     return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.sdk.not.valid", sdkName))
+                }
+            }
+            return ValidationResult.OK
+        }
+
+        fun validateLanguageVersion(
+            state: SmkSupportProjectSettings.State
+        ): ValidationResult {
+            if (state.snakemakeSupportEnabled) {
+
+                val parts = state.snakemakeLanguageVersion?.split("\\.".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()
+                if (parts?.size != 3) {
+                    return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.language.version.not.valid"))
+                }
+                for (part in parts) {
+                    if (!StringUtil.isNumeric(part)) {
+                        return ValidationResult(SnakemakeBundle.message("smk.framework.configurable.panel.language.version.not.valid"))
+                    }
                 }
             }
             return ValidationResult.OK

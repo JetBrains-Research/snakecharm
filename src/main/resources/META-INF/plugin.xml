@@ -434,6 +434,15 @@
     />
 
     <localInspection
+            language="Snakemake" shortName="SmkDepreciatedKeywordsInspection"
+            enabledByDefault="true"
+            suppressId="SmkDepreciatedKeywords"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkDepreciatedKeywordsInspection"
+    />
+
+    <localInspection
             language="Snakemake" shortName="SmkDocstringsWillBeIgnoredInspection"
             enabledByDefault="true"
             level="WEAK WARNING"
