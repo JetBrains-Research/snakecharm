@@ -80,6 +80,10 @@ public class SmkFrameworkConfigurable implements SearchableConfigurable {
             if (!validationResult.isOk()) {
                 throw new ConfigurationException(validationResult.getErrorMessage());
             }
+            final ValidationResult versionValidation = SmkFrameworkConfigurableProvider.Companion.validateLanguageVersion(uiState);
+            if (!versionValidation.isOk()) {
+                throw new ConfigurationException(versionValidation.getErrorMessage());
+            }
             SmkSupportProjectSettings.Companion.updateStateAndFireEvent(project, uiState);
         } catch (ConfigurationException e) {
             throw e;

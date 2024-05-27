@@ -14,6 +14,7 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.xml.util.XmlStringUtil;
@@ -39,7 +40,7 @@ import java.util.List;
  * Snakemake framework settings for:
  * - supported frameworks page
  * - new project wizards
- *
+ * <p>
  * Let's rewrite it in Kotlin in some distant future, especially if IDEA will improve *.form integration with Kotlin
  */
 public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
@@ -55,6 +56,7 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
     private JBLabel pythonInterpreterHintLabel;
     // See sdk chooser (Combobox+PySdkListCellRenderer) in 'PyPluginCommonOptionsForm' or use `PythonSdkChooserCombo`
     private PythonSdkChooserCombo pythonSdkCB;
+    private JBTextField snakemakeLanguageVersionField;
 
     public SmkFrameworkSettingsPanel(@Nullable final Project project) {
         this.project = project != null ? project : ProjectManager.getInstance().getDefaultProject();
@@ -97,7 +99,7 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
                 XmlStringUtil.wrapInHtml(SnakemakeBundle.message("smk.framework.configurable.panel.sdk.hint"))
         );
         pythonInterpreterHintLabel.setComponentStyle(UIUtil.ComponentStyle.SMALL);
-        
+
         // final String nullSdkLabel = PyBundle.message("python.sdk.there.is.no.interpreter");
         final String nullSdkLabel = PyBundle.message("python.sdk.rendering.project.default");
         final JComboBox sdksCombobox = pythonSdkCB.getComboBox();
@@ -159,12 +161,19 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
         return (Sdk) pythonSdkCB.getComboBox().getSelectedItem();
     }
 
+    @Nullable
+    private String getSnakemakeLanguageVersion() {
+        return snakemakeLanguageVersionField.getText();
+    }
+
     private void createUIComponents() {
         // method that is called after form initialization from xml  (reflection)
         // required for custom components initialization
 
         // Do nothing, no custom components, just use this methods as a remainder that
         // it is API for custom comps initialization
+
+        snakemakeLanguageVersionField = new JBTextField();
 
         pythonSdkCB = new PythonSdkChooserCombo(
                 project, null, Collections.emptyList(), sdk -> true
@@ -188,6 +197,8 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
         state.setWrappersCustomSourcesFolder(FileUtil.toSystemIndependentName(wrappersSrcPathTF.getText().trim()));
         final Sdk sdk = getSelectedSdk();
         state.setPythonSdkName(sdk == null ? "" : sdk.getName());
+        final String snakemakeLanguageVersion = getSnakemakeLanguageVersion();
+        state.setSnakemakeLanguageVersion(snakemakeLanguageVersion == null ? "" : snakemakeLanguageVersion);
     }
 
     public void reset(@NotNull SmkSupportProjectSettings.State state) {
@@ -209,6 +220,7 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
             }
         }
         pythonSdkCB.getComboBox().setSelectedItem(sdk);
+        snakemakeLanguageVersionField.setText(state.getSnakemakeLanguageVersion());
 
         updateWrappersSrcPanelEnabledPropertyRecursively();
     }
