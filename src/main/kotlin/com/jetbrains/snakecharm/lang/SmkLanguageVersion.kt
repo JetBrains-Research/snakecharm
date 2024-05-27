@@ -1,5 +1,7 @@
 package com.jetbrains.snakecharm.lang
 
+import org.jsoup.internal.StringUtil
+
 class SmkLanguageVersion(
     val version: String
 ) : Comparable<SmkLanguageVersion> {
@@ -9,12 +11,17 @@ class SmkLanguageVersion(
 
     init {
         val split = version.split('.')
-        if (split.size != 3) {
+        if (split.size > 3 || split.isEmpty()) {
             throw IllegalArgumentException("Provided snakemake version $version is not correct")
         }
+        for (s in split) {
+            if (!StringUtil.isNumeric(s)) {
+                throw IllegalArgumentException("Provided snakemake version $version is not correct")
+            }
+        }
         major = split[0].toInt()
-        minor = split[1].toInt()
-        patch = split[2].toInt()
+        minor = if (split.size > 1) split[1].toInt() else 0
+        patch = if (split.size > 2) split[2].toInt() else 0
     }
 
     override fun toString(): String = version

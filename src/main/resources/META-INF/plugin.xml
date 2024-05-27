@@ -443,6 +443,15 @@
     />
 
     <localInspection
+            language="Snakemake" shortName="SmkMinVersionWarningInspection"
+            enabledByDefault="true"
+            suppressId="SmkMinVersionWarning"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkMinVersionWarningInspection"
+    />
+
+    <localInspection
             language="Snakemake" shortName="SmkDocstringsWillBeIgnoredInspection"
             enabledByDefault="true"
             level="WEAK WARNING"
