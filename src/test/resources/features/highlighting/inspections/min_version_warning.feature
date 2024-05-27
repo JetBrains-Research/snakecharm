@@ -53,8 +53,8 @@ Feature: Inspection warns min_version specifying version smaller than the one se
     Then I expect no inspection errors
     When I check highlighting errors
     Examples:
-      | version  | set_version |
-      | 7.6.5    | 7.7         |
-      | 7.6.32   | 8           |
-      | 8.6.4    | 8.7         |
-      | 10.10.10 | 11          |
+      | set_version | version |
+      | 7.6.5       | 7.7     |
+      | 7.6.32      | 8       |
+      | 8.6.4       | 8.7     |
+      | 10.10.10    | 11      |
