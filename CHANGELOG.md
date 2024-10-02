@@ -4,11 +4,14 @@
 # SnakeCharm Plugin Changelog
 
 
-## [2024.1.2]
+## [2024.2.1]
 Released on <not released>
 
 ### Fixed
 - Improve parser error message when rule/module is declared with name but lacks ':' (see [#515](https://github.com/JetBrains-Research/snakecharm/issues/515))
+
+### Changed
+- Switch plugin build scripts to intellij-gradle-plugin 2.1.0 API version (required for 2024.2+ PyCharm) 
 
 ## [2024.1.1]
 Released on 20 April 2024
