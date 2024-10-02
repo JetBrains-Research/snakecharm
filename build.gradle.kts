@@ -292,18 +292,13 @@ tasks {
     }
 
 
-    jar {
-        // original, non-instrumented JAR
-        // :runIde, :test tasks launches the plugin from *.jar, so it is required also for development
+    prepareSandbox {
+        // Pack wrappers bundle into plugin:
         dependsOn("buildWrappersBundle")
-        from("${project.buildDir}/bundledWrappers/smk-wrapper-storage-bundled.cbor")
-    }
 
-    instrumentedJar {
-        // modified (instrumented) JAR
-        // :runIde, :test tasks launches the plugin from *.jar, so it is required also for development
-        dependsOn("buildWrappersBundle")
-        from("${project.buildDir}/bundledWrappers/smk-wrapper-storage-bundled.cbor")
+        from(layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage-bundled.cbor")) {
+            into(pluginName.map { "$it/extra" })
+        }
     }
 
     test {

@@ -12,6 +12,7 @@ Released on <not released>
 
 ### Changed
 - Switch plugin build scripts to intellij-gradle-plugin 2.1.0 API version (required for 2024.2+ PyCharm) 
+- Move cached wrappers info out of plugin JAR file to `../extra` directory 
 
 ## [2024.1.1]
 Released on 20 April 2024
