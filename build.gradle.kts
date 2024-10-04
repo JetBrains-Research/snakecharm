@@ -298,4 +298,14 @@ tasks {
             html.required.set(false)
         }
     }
+
+    printProductsReleases {
+        channels = listOf(ProductRelease.Channel.EAP)
+        types = listOf(IntelliJPlatformType.PyCharmCommunity)
+        untilBuild = provider { null }
+
+        doLast {
+            val latestEap = productsReleases.get().max()
+        }
+    }
 }
