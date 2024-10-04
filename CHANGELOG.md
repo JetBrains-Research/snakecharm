@@ -8,6 +8,7 @@
 Released on <not released>
 
 ### Fixed
+- Compatibility with PyCharm 2024.2 (see [#532](https://github.com/JetBrains-Research/snakecharm/issues/532))
 - Improve parser error message when rule/module is declared with name but lacks ':' (see [#515](https://github.com/JetBrains-Research/snakecharm/issues/515))
 
 ### Changed
