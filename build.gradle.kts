@@ -9,9 +9,8 @@ import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil.exists
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-fun properties(key: String) = project.findProperty(key).toString()
-fun propertiesNullable(key: String) = project.findProperty(key)?.toString()
-fun properties2(key: String) = providers.gradleProperty(key)
+fun gradlePropertyOptional(key: String) = project.findProperty(key)?.toString()
+fun gradleProperty(key: String) = providers.gradleProperty(key)
 
 plugins {
     // Java support
@@ -26,20 +25,20 @@ plugins {
     alias(libs.plugins.kover) // Gradle Kover Plugin
 }
 
-group = providers.gradleProperty("pluginGroup").get()
-version = if (properties("pluginPreReleaseSuffix").isEmpty()) {
-    "${properties("pluginVersion")}${properties("pluginPreReleaseSuffix")}"
+group = gradleProperty("pluginGroup").get()
+version = if (gradleProperty("pluginPreReleaseSuffix").get().isEmpty()) {
+    "${gradleProperty("pluginVersion").get()}${gradleProperty("pluginPreReleaseSuffix").get()}"
 } else {
-    "${properties("pluginVersion")}${properties("pluginPreReleaseSuffix")}.${properties("pluginBuildCounter")}"
+    "${gradleProperty("pluginVersion").get()}${gradleProperty("pluginPreReleaseSuffix").get()}.${gradleProperty("pluginBuildCounter").get()}"
 }
 
 /// Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
 kotlin {
-    jvmToolchain(properties("javaVersion").toInt())
+    jvmToolchain(gradleProperty("javaVersion").get().toInt())
 }
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(properties("javaVersion"))
+        languageVersion = JavaLanguageVersion.of(gradleProperty("javaVersion").get())
     }
 }
 
@@ -65,9 +64,9 @@ dependencies {
     testImplementation(libs.opentest4j)
 
     intellijPlatform {
-        val platformType = properties("platformType")
+        val platformType = gradleProperty("platformType")
 
-        val platformLocalPath = propertiesNullable("platformLocalPath")
+        val platformLocalPath = gradlePropertyOptional("platformLocalPath")
         if (platformLocalPath != null) {
             if (!exists(platformLocalPath)) {
                 logger.error("Custom platfrom path not exist: $platformLocalPath")
@@ -77,12 +76,12 @@ dependencies {
             //See https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html#intellij-extension-localpath
             local(platformLocalPath)
         } else {
-            logger.warn("Use version: ${properties("platformVersion")}")
-            create(platformType, properties("platformVersion"))
+            logger.warn("Use version: ${gradleProperty("platformVersion")}")
+            create(platformType, gradleProperty("platformVersion"))
         }
 
         // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-        when (platformType) {
+        when (platformType.get()) {
             "PC" -> bundledPlugin("PythonCore")
             "PY", "PD" -> {
                 bundledPlugin("Pythonid")
@@ -92,13 +91,13 @@ dependencies {
                 bundledPlugin("com.intellij.platform.images")
             }
             // E.g. IDEA + require python plugin
-            else -> plugin(properties("pythonPlugin"))
+            else -> plugin(gradleProperty("pythonPlugin"))
         }
         // Plugin Dependencies. Uses `platformBundledPlugins` property from the gradle.properties file for bundled IntelliJ Platform plugins.
-        bundledPlugins(properties("platformBundledPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
+        bundledPlugins(gradleProperty("platformBundledPlugins").get().split(',').map(String::trim).filter(String::isNotEmpty))
 
         // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file for plugin from JetBrains Marketplace.
-        plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })
+        plugins(gradleProperty("platformPlugins").map { it.split(',') })
 
         instrumentationTools()
         pluginVerifier()
@@ -114,12 +113,12 @@ intellijPlatform {
     instrumentCode = true
     projectName = project.name
 
-    val platformType = properties("platformType")
+    val platformType = gradleProperty("platformType").get()
     val isPyCharm = platformType == "PC" || platformType == "PY" || platformType == "PD"
     sandboxContainer = file("${project.rootDir}/.sandbox${if (isPyCharm) "_pycharm" else ""}")
 
     pluginConfiguration {
-        name = properties2("pluginName")
+        name = gradleProperty("pluginName")
 
         version = project.version.toString()
 
@@ -139,7 +138,7 @@ intellijPlatform {
         val changelog = project.changelog // local variable for configuration cache compatibility
         // Get the latest available change notes from the changelog file
         // here use plugin version to w/o EAP or build suffix, just major to match changenotes!
-        changeNotes = providers.gradleProperty("pluginVersion").map { pluginVersion ->
+        changeNotes = gradleProperty("pluginVersion").map { pluginVersion ->
             with(changelog) {
                 renderItem(
                     // XXX: our previos logic was different: 1) unreleased 2) plugin 3) latest
@@ -152,21 +151,19 @@ intellijPlatform {
         }
 
         ideaVersion {
-            sinceBuild = providers.gradleProperty("pluginSinceBuild")
-            untilBuild = providers.gradleProperty("pluginUntilBuild")
+            sinceBuild = gradleProperty("pluginSinceBuild")
+            untilBuild = gradleProperty("pluginUntilBuild")
         }
     }
 
 
     publishing {
-        token.set(properties("intellijPublishToken"))
+        token.set(gradleProperty("intellijPublishToken"))
 
         // plugin version is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
         // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-        channels.set(listOf("$version".split('-').getOrElse(1) { "default" }.split('.').first()))
-        // TODO: is ok to use version? or project.version? or ?
-        //channels = providers.gradleProperty("pluginVersion").map { listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" }) }
+        channels.set(listOf("${project.version}".split('-').getOrElse(1) { "default" }.split('.').first()))
     }
 
     pluginVerification {
@@ -226,7 +223,7 @@ tasks {
     }
 
     wrapper {
-        gradleVersion = properties("gradleVersion")
+        gradleVersion = gradleProperty("gradleVersion").get()
     }
 
     publishPlugin {
@@ -243,8 +240,8 @@ tasks {
         enableAssertions = true
 
         args(
-            providers.gradleProperty("snakemakeWrappersRepoPath").get(),
-            providers.gradleProperty("snakemakeWrappersRepoVersion").get(),
+            gradleProperty("snakemakeWrappersRepoPath").get(),
+            gradleProperty("snakemakeWrappersRepoVersion").get(),
             layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage-bundled.cbor").get(),
         )
         maxHeapSize = "1024m" // Not much RAM is available on TC agents
