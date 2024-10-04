@@ -172,12 +172,13 @@ intellijPlatform {
     pluginVerification {
         ides {
             recommended()
-            select {
-                types = listOf(IntelliJPlatformType.PyCharmCommunity, IntelliJPlatformType.PyCharmProfessional)
-                channels = listOf(ProductRelease.Channel.EAP, ProductRelease.Channel.RELEASE)
-                sinceBuild = "242"
-                untilBuild = "243.*"
-            }
+// TODO: cleanup or not?
+//            select {
+//                types = listOf(IntelliJPlatformType.PyCharmCommunity, IntelliJPlatformType.PyCharmProfessional)
+//                channels = listOf(ProductRelease.Channel.EAP, ProductRelease.Channel.RELEASE)
+//                sinceBuild = "242"
+//                untilBuild = "243.*"
+//            }
         }
     }
 }
