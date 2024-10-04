@@ -17,16 +17,13 @@ plugins {
     // Java support
     id("java")
 
-    // Kotlin support latest: 1.9.25
-    kotlin("jvm") version "1.9.25"
-    kotlin("plugin.serialization") version "1.9.25"
+    alias(libs.plugins.kotlin) // Kotlin support
+    alias(libs.plugins.serialization) // Kotlin Serialization support
 
-    // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
-    // This plugin allows you to build plugins for IntelliJ platform using specific
-    // IntelliJ SDK and bundled plugins.
-    id("org.jetbrains.intellij.platform") version "2.1.0"
-    // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
-    id("org.jetbrains.changelog") version "2.2.1"
+    alias(libs.plugins.intelliJPlatform) // IntelliJ Platform Gradle Plugin - https://github.com/JetBrains/gradle-intellij-plugin
+    alias(libs.plugins.changelog) // Gradle Changelog Plugin - https://github.com/JetBrains/gradle-changelog-plugin
+    alias(libs.plugins.qodana) // Gradle Qodana Plugin
+    alias(libs.plugins.kover) // Gradle Kover Plugin
 }
 
 group = providers.gradleProperty("pluginGroup").get()
@@ -56,14 +53,16 @@ repositories {
 
 
 dependencies {
-    // TODO: refactor using aliases
-    testImplementation("io.cucumber:cucumber-java:7.8.1")
-    testImplementation("io.cucumber:cucumber-junit:7.8.1")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.25")
-    testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.9.25")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.25")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.4.1")
-    testImplementation("org.opentest4j:opentest4j:1.3.0")
+    implementation(libs.kotlinStdlibJdk8)
+    implementation(libs.kotlinxCbor)
+
+    testImplementation(platform(libs.junit))
+    testImplementation(platform(libs.cucumber))
+    testImplementation("io.cucumber:cucumber-java")
+    testImplementation("io.cucumber:cucumber-junit")
+    testImplementation(libs.kotlinTestJunit)
+    testImplementation(libs.kotlinReflect)
+    testImplementation(libs.opentest4j)
 
     intellijPlatform {
         val platformType = properties("platformType")
