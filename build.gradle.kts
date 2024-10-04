@@ -7,7 +7,6 @@ import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil.exists
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 fun properties(key: String) = project.findProperty(key).toString()
@@ -37,9 +36,14 @@ version = if (properties("pluginPreReleaseSuffix").isEmpty()) {
     "${properties("pluginVersion")}${properties("pluginPreReleaseSuffix")}.${properties("pluginBuildCounter")}"
 }
 
-// Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
+/// Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(properties("javaVersion").toInt())
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(properties("javaVersion"))
+    }
 }
 
 // Configure project's dependencies
@@ -201,14 +205,6 @@ changelog {
     // unreleasedTerm.set("[Unreleased]") // default
 }
 
-java {
-    // TODO: not sure, do we really need this, let's try to cleanup?
-    // Set bytecode version project level
-    val javaVersion = JavaVersion.toVersion(properties("javaVersion"))
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-}
-
 tasks {
 
 //    runIde {
@@ -224,24 +220,9 @@ tasks {
 //    }
 
     withType<KotlinCompile> {
-        // Set Bycode version on task-level
-        // TODO: not sure, do we really need this, let's try to cleanup?
-        compilerOptions {
-            jvmTarget = JvmTarget.fromTarget(properties("javaVersion"))
-        }
-
-
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjvm-default=all")
         }
-    }
-
-    withType<JavaCompile> {
-        // Set Bycode version on task-level
-        // TODO: not sure, do we really need this, let's try to cleanup?
-        val javaVersion = providers.gradleProperty("javaVersion").get()
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
     }
 
     wrapper {
