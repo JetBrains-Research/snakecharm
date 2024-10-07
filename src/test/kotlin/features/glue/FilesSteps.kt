@@ -17,7 +17,7 @@ class FilesSteps {
             ApplicationManager.getApplication().runWriteAction {
                 SnakemakeWorld.fixture().addFileToProject(name, text)
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @Given("^a directory \"(.+)\"")
@@ -26,7 +26,7 @@ class FilesSteps {
             ApplicationManager.getApplication().runWriteAction {
                 SnakemakeWorld.fixture().tempDirFixture.findOrCreateDir(name)
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @Given("^I open a file \"(.+)\" with text$")
@@ -59,7 +59,7 @@ class FilesSteps {
                 )
                 SnakemakeWorld.fixture().configureFromExistingVirtualFile(file.virtualFile)
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
 }

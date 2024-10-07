@@ -158,7 +158,7 @@ class ActionsSteps {
                         .firstOrNull { it.icon == icon } as? LineMarkerInfo.LineMarkerGutterIconRenderer<*>)?.lineMarkerInfo?.navigationHandler as? NavigationGutterIconRenderer)?.targetElements?.map { it as SmkRuleOrCheckpoint }
                         ?: emptyList())
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
         // Checks, that there are an appropriate number of markers
         if (expectNoGutters) {
             assertTrue(targetRulesOrCheckpoints.isEmpty(), "${currentElement?.text} should not have markers.")
@@ -184,7 +184,7 @@ class ActionsSteps {
                     "Extras: ${targetRulesOrCheckpoints.joinToString { "${it.name} in file ${it.containingFile.name}" }}"
                 )
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @Then("^I expect the tag highlighting to be the same as the annotator highlighting$")
@@ -535,7 +535,7 @@ class ActionsSteps {
             ApplicationManager.getApplication().runWriteAction {
                 myFixture?.performEditorAction(actionId)
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @Given("^I expect caret (at|after) (.+)$")
@@ -549,7 +549,7 @@ class ActionsSteps {
             )
 
             assertEquals(pos, caretModel.offset)
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @Then("^I expect no language injection")
@@ -568,7 +568,7 @@ class ActionsSteps {
             ApplicationManager.getApplication().runWriteAction {
                 myFixture?.performEditorAction(actionId)
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @Given("^editor content will be$")
@@ -577,10 +577,11 @@ class ActionsSteps {
             ApplicationManager.getApplication().runWriteAction {
                 fixture().checkResult(text)
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     private fun findTargetElementFor(element: PsiElement, editor: Editor) =
+        // TODO: See new API in JavaDocumentationTest,HtmlDocumentationTest
         DocumentationManager.getInstance(element.project)
             .findTargetElement(editor, element.containingFile, element)
 

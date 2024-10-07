@@ -137,9 +137,10 @@ open class SmkStatementMover : PyStatementMover() {
 
     private fun isAvailableForMoveOut(elementToMove: PsiElement, down: Boolean): Boolean {
         val statementList = getStatementList(elementToMove) ?: return true
-        val statements = statementList.children
+        val statements: Array<out PyStatement> = statementList.statements
 
         // if statement is a candidate for moving out of statement list:
+        if (statements.isEmpty()) return false
         val boundaryStatement = when {
             down -> statements.last() == elementToMove
             else -> statements.first() == elementToMove
@@ -189,7 +190,7 @@ open class SmkStatementMover : PyStatementMover() {
     private fun <T : SmkRuleLike<S>, S : SmkArgsSection> searchForRuleLikeElement(
         elementToMove: PsiElement,
         down: Boolean,
-        statements: Array<PsiElement>,
+        statements: Array<out PyStatement>,
         clazz: Class<T>
     ): Boolean {
         val parent =

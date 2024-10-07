@@ -42,7 +42,7 @@ class CompletionResolveSteps {
         ApplicationManager.getApplication().invokeAndWait({
             val ref = getReferenceAtOffset()
             assertNull(ref)
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @Then("^reference should not resolve$")
@@ -51,7 +51,7 @@ class CompletionResolveSteps {
             val ref = getReferenceAtOffset()
             assertNotNull(ref)
             assertUnresolvedReference(ref)
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
 
@@ -61,7 +61,7 @@ class CompletionResolveSteps {
             val ref = getReferenceInInjectedLanguageAtOffset()
             assertNotNull(ref)
             assertUnresolvedReference(ref)
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @When("^I put the caret at (.+)$")
@@ -73,7 +73,7 @@ class CompletionResolveSteps {
                 val position = getPositionBySignature(editor, marker, false)
                 editor.caretModel.moveToOffset(position)
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @When("^I put the caret after (.+)$")
@@ -85,7 +85,7 @@ class CompletionResolveSteps {
                 val position = getPositionBySignature(editor, marker, true)
                 editor.caretModel.moveToOffset(position)
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @When("^I change current file to <([^>]+)>\$")
@@ -95,7 +95,7 @@ class CompletionResolveSteps {
             application.runWriteAction {
                 SnakemakeWorld.fixture().openFileInEditor(SnakemakeWorld.fixture().findFileInTempDir(file))
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
 
@@ -491,7 +491,7 @@ class CompletionResolveSteps {
                 )
                 checkCompletionResult(fixture, false, cleanText)
             },
-            ModalityState.NON_MODAL
+            ModalityState.nonModal()
         )
     }
     /*
