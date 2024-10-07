@@ -36,10 +36,6 @@ import com.jetbrains.snakecharm.lang.psi.impl.SmkUseArgsSectionImpl
  * @date 2019-05-23
  */
 class SmkKeywordCompletionContributor : CompletionContributor() {
-    companion object {
-        val IN_SNAKEMAKE = PlatformPatterns.psiFile().withLanguage(SnakemakeLanguageDialect)
-    }
-
     init {
         extend(
             CompletionType.BASIC,
@@ -82,7 +78,7 @@ object RuleKeywordTail : TailType() {
 
 object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
-        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+        .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
         .andNot(
             psiElement().insideOneOf(
                 SmkSection::class.java, PsiComment::class.java
@@ -173,7 +169,7 @@ object ColonAndWhiteSpaceTail : TailType() {
 
 object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
-        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+        .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
         .inside(SmkRuleOrCheckpoint::class.java)!!
         .andNot(
             psiElement().insideOneOf(
@@ -206,7 +202,7 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
 
 object SubworkflowSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
-        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+        .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
         .inside(psiElement().inside(SmkSubworkflow::class.java))
         .andNot(
             psiElement().insideOneOf(PyArgumentList::class.java, PsiComment::class.java)
@@ -234,7 +230,7 @@ object SubworkflowSectionKeywordsProvider : CompletionProvider<CompletionParamet
 
 object ModuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
-        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+        .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
         .inside(psiElement().inside(SmkModule::class.java))
         .andNot(
             psiElement().insideOneOf(PyArgumentList::class.java, PsiComment::class.java)
@@ -261,7 +257,7 @@ object ModuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>(
 
 object UseSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = psiElement()
-        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+        .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
         .inside(psiElement().inside(SmkUse::class.java))
         .andNot(
             psiElement().insideOneOf(PyArgumentList::class.java, PsiComment::class.java)

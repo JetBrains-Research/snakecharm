@@ -12,15 +12,15 @@ import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionContributorPattern
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
-import com.jetbrains.snakecharm.codeInsight.completion.SmkKeywordCompletionContributor
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 object SmkWrapperArgsCompletionProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = PlatformPatterns.psiElement()
-            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+            .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
             .inside(SmkRuleOrCheckpointArgsSection::class.java)
             .inside(PyArgumentList::class.java)!!
 

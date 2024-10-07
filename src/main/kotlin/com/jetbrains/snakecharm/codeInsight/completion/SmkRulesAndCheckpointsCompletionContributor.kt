@@ -169,7 +169,7 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
 private class InUseSectionProvider : CompletionProvider<CompletionParameters>() {
     companion object {
         val IN_USE_SECTION_PROVIDER_CAPTURE = psiElement()
-            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+            .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
             .inside(psiElement().inside(SmkUse::class.java))
             .andNot(
                 psiElement().insideOneOf(PyStatementList::class.java, PsiComment::class.java)

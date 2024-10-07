@@ -23,7 +23,7 @@ class SmkDictionaryTypesCompletionContributor : CompletionContributor() {
         extend(
                 CompletionType.BASIC,
                 psiElement()
-                        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+                        .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
                         .and(psiElement().inside(PySubscriptionExpression::class.java))
                         .and(psiElement().inside(SmkRunSection::class.java)),
                 SmkDictionaryTypesCompletionProvider

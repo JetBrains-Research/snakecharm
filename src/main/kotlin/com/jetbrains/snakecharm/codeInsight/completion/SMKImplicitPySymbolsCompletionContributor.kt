@@ -22,8 +22,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
-    companion object {
-        val IN_PY_REF = psiElement().inside(PyReferenceExpression::class.java)
+    val IN_PY_REF = psiElement().inside(PyReferenceExpression::class.java)
 
         private val REF_CAPTURE = psiElement()
             .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
@@ -32,12 +31,19 @@ class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
                 override fun accepts(element: PsiElement, context: ProcessingContext): Boolean {
                     // check that this element is "first" in parent PyReferenceExpression, e.g. that
                     // we don't have some prefix with '.', e.g. element is 'exp<caret>', not 'foo.exp<caret>'
+    private val REF_CAPTURE = psiElement()
+        .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
+        .and(IN_PY_REF)
+        .with(object : PatternCondition<PsiElement>("isFirstChild") {
+            override fun accepts(element: PsiElement, context: ProcessingContext): Boolean {
+                // check that this element is "first" in parent PyReferenceExpression, e.g. that
+                // we don't have some prefix with '.', e.g. element is 'exp<caret>', not 'foo.exp<caret>'
 
-                    val refExpression = PsiTreeUtil.getParentOfType(element, PyReferenceExpression::class.java)
-                    return !(refExpression?.isQualified ?: true)
-                }
-            })
-    }
+                val refExpression = PsiTreeUtil.getParentOfType(element, PyReferenceExpression::class.java)
+                return refExpression?.isQualified == false
+            }
+        })
+
 
     init {
         extend(CompletionType.BASIC, REF_CAPTURE, SMKImplicitPySymbolsCompletionProvider())

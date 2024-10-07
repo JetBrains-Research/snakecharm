@@ -9,7 +9,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.PlatformIcons
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyStringLiteralExpression
-import com.jetbrains.snakecharm.codeInsight.completion.SmkKeywordCompletionContributor
+import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionContributorPattern
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
@@ -17,7 +17,7 @@ object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>()
     private val WRAPPER_VERSION_REGEXP = Regex("(v?\\d+\\.\\d+\\.\\d+|master|latest).*")
 
     val CAPTURE = PlatformPatterns.psiElement()
-            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+            .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
             .inside(SmkRuleOrCheckpointArgsSection::class.java)
             .inside(PyStringLiteralExpression::class.java)!!
 
