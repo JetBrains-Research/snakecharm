@@ -8,6 +8,9 @@ import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.lang.validation.SmkAnnotator
 import com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLSyntaxHighlighter.Companion.HIGHLIGHTING_WILDCARDS_KEY
 
+/**
+ * Annotator to add syntax highlighting for wildcard references within Snakemake or SmkSL files.
+ */
 object SmkWildcardsAnnotator : SmkAnnotator() {
     @Suppress("UnstableApiUsage")
     override fun visitPyReferenceExpression(expr: PyReferenceExpression) {

@@ -38,14 +38,14 @@ abstract class SmkAnnotatorManager : Annotator, DumbAware {
 
 class SmkStandardAnnotatorManager : SmkAnnotatorManager() {
     override val annotators: List<PyAnnotator> = listOf(
-            SmkReturnAnnotator
+        SmkReturnAnnotator,
+        SmkWildcardsAnnotator // requires resolve, that based on indexes access
     )
 }
 
 class SmkDumbAwareAnnotatorManager : SmkAnnotatorManager(), DumbAware {
     override val annotators = listOf(
             SmkSyntaxAnnotator,
-            SmkSyntaxErrorAnnotator,
-            SmkWildcardsAnnotator
+            SmkSyntaxErrorAnnotator
     )
 }
