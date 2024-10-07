@@ -51,7 +51,7 @@ object SmkWrapperArgsCompletionProvider : CompletionProvider<CompletionParameter
 
         val wrapperSection = containingRuleLike?.getSectionByName(SnakemakeNames.SECTION_WRAPPER) ?: return
 
-        val wrappers = SmkWrapperStorage.getInstance(parameters.position.project)?.wrappers ?: return
+        val wrappers = SmkWrapperStorage.getInstance(parameters.position.project).wrappers
 
         val wrapperFstArg = wrapperSection.argumentList?.arguments?.firstOrNull()
         if (wrapperFstArg !is PyStringLiteralExpression) {
