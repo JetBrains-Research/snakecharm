@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm
 
 import com.intellij.AbstractBundle
-import com.intellij.reference.SoftReference
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 import java.lang.ref.Reference
@@ -16,10 +15,10 @@ class SnakemakeBundle {
         // Cached loading
         private val bundle: ResourceBundle?
             get() {
-                var bundle = SoftReference.dereference(ourBundle)
+                var bundle = ourBundle?.get()
                 if (bundle == null) {
                     bundle = ResourceBundle.getBundle(BUNDLE)
-                    ourBundle = SoftReference(bundle)
+                    ourBundle = java.lang.ref.SoftReference(bundle)
                 }
                 return bundle
             }
