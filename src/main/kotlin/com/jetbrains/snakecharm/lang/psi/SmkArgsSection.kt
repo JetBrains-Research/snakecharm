@@ -7,6 +7,7 @@ interface SmkArgsSection: SmkSection {
     val argumentList: PyArgumentList?
         get() = children.firstOrNull { it is PyArgumentList } as PyArgumentList?
 
+    @Suppress("unused")
     val keywordArguments: List<PyKeywordArgument>?
         get() = argumentList?.arguments?.filterIsInstance<PyKeywordArgument>()
 }

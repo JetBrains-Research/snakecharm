@@ -483,7 +483,7 @@ class SmkStatementParsing(
                 PyTokenTypes.IDENTIFIER -> {
                     val referenceMarker = myBuilder.mark() // Register new name
                     list.add(myBuilder.tokenText ?: return)
-                    Parsing.advanceIdentifierLike(myBuilder)
+                    advanceIdentifierLike(myBuilder)
                     referenceMarker.done(SmkElementTypes.REFERENCE_EXPRESSION)
                     registerCommaOrEndOfNames()
                 }

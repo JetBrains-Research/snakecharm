@@ -387,7 +387,7 @@ class ImplicitPySymbolsProvider(
             //    pyClass.project,
             //    pyClass.originalElement.containingFile
             //)
-            val ctx = null
+            //val ctx = null
             // val ctx = TypeEvalContext.codeInsightFallback(pyClass.project)
             pyClass.methods.forEach { method ->
                 if (method != null) {

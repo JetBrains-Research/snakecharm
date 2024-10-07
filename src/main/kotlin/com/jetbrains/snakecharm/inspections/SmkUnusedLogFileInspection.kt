@@ -120,7 +120,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
                             if (res is SmkUse) {
                                 res.getProducedRulesNames().any { pair -> pair.first == ruleReference.text }
                             } else {
-                                val name = it.name
+                                @Suppress("UnstableApiUsage") val name = it.name
                                 name != null && ruleReference.text == useParent.name?.replace("*", name)
                             }
                         } ?: useParent.getProducedRulesNames()

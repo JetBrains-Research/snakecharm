@@ -1,6 +1,5 @@
 package com.jetbrains.snakecharm.inspections
 
-import com.intellij.codeInspection.InspectionProfileEntry
 import com.intellij.codeInspection.LocalInspectionTool
 import com.jetbrains.snakecharm.SnakemakeBundle
 import org.intellij.lang.annotations.Pattern

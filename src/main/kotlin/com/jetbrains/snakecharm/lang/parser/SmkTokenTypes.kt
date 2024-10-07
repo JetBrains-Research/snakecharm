@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.lang.parser
 
 import com.intellij.psi.tree.TokenSet
-import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyElementType
 
 /**
