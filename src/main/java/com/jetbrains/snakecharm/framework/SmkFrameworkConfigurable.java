@@ -32,6 +32,7 @@ public class SmkFrameworkConfigurable implements SearchableConfigurable {
     public SmkFrameworkConfigurable(@NotNull Project project) {
         this.project = project;
 
+        //noinspection DataFlowIssue
         enableSmkSupportCB.addActionListener(e -> updateCompEnabledPropertyRecursively());
 
         settingsPanel = new SmkFrameworkSettingsPanel(project);

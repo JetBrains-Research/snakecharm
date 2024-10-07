@@ -38,7 +38,7 @@ object SmkWrapperCompletionProvider : CompletionProvider<CompletionParameters>()
         val storage = SmkWrapperStorage.getInstance(parameters.position.project)
         val version: String
         val prefix: String
-        var doNotFilterByPrefix: Boolean = false
+        var doNotFilterByPrefix = false
 
         if (WRAPPER_VERSION_REGEXP.matches(result.prefixMatcher.prefix)) {
             version = result.prefixMatcher.prefix.substringBefore('/')

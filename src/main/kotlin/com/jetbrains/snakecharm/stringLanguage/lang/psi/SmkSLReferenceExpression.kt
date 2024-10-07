@@ -8,6 +8,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSection
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
+@Suppress("UnstableApiUsage")
 interface SmkSLReferenceExpression : PyReferenceExpression, SmkSLExpression, PsiNameIdentifierOwner {
     override fun getName(): String?
 

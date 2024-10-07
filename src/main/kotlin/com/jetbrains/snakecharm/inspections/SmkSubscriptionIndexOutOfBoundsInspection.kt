@@ -23,6 +23,7 @@ class SmkSubscriptionIndexOutOfBoundsInspection : SnakemakeInspection() {
 
             // negative numbers not supported
             if (indexExp is PyNumericLiteralExpression) {
+                @Suppress("UnstableApiUsage")
                 val idx = indexExp.longValue?.toInt() ?: return
 
                 PsiTreeUtil.getParentOfType(expr, SmkRuleOrCheckpoint::class.java) ?: return

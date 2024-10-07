@@ -24,6 +24,7 @@ class SmkImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
         if (SnakemakeLanguageDialect.isInsideSmkFile(context.origin)) {
 
             val contextScope = SmkCodeInsightScope[element]
+            @Suppress("UnstableApiUsage")
             val referencedName = element.referencedName
             val items = arrayListOf<RatedResolveResult>()
 
@@ -59,7 +60,7 @@ class SmkImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
 
             addSyntheticSymbols(contextScope, cache, referencedName, items)
 
-            SmkCodeInsightScope.values().asSequence()
+            SmkCodeInsightScope.entries.asSequence()
                 .filter { symbolScope -> contextScope.includes(symbolScope) }
                 .flatMap { symbolScope -> cache.filter(symbolScope, element.name!!).asSequence() }
                 .map {
@@ -80,7 +81,7 @@ class SmkImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
             referencedName: String?,
             items: ArrayList<RatedResolveResult>,
         ) {
-            SmkCodeInsightScope.values().forEach { symbolScope ->
+            SmkCodeInsightScope.entries.forEach { symbolScope ->
                 if (contextScope.includes(symbolScope)) {
                     for (l in cache.getSynthetic(symbolScope)) {
                         // TODO: Introduce ImplicitLookupItem class

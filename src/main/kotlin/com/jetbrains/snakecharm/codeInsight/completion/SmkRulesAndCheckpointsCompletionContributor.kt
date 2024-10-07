@@ -74,6 +74,7 @@ private class SmkCompletionInLocalRulesAndRuleOrderSectionsProvider : Completion
         val ruleOrderOrLocalRulesSection: SmkArgsSection? =
             (ruleorderSection ?: PsiTreeUtil.getParentOfType(position, SmkWorkflowLocalrulesSection::class.java))
 
+        @Suppress("UnstableApiUsage")
         val references = ruleOrderOrLocalRulesSection?.argumentList?.arguments
             ?.filterIsInstance<SmkReferenceExpression>()
             ?.map { it.name }
@@ -118,6 +119,7 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
             .originalPosition
             ?.parent as? PyReferenceExpression ?: return
 
+        @Suppress("UnstableApiUsage")
         val variants = when (rulesOrCheckpointsObject.name) {
             SnakemakeAPI.SMK_VARS_RULES -> collectVariantsForElement(
                 parameters.position,

@@ -20,10 +20,12 @@ class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {
+            @Suppress("UnstableApiUsage")
             if (node.isQualified) {
                 // Not suitable case
                 return
             }
+            @Suppress("UnstableApiUsage")
             val varName = node.referencedName
             if (varName == null || varName !in SECTION_LAMBDA_ARG_POSSIBLE_PARAMS) {
                 // Not suitable case

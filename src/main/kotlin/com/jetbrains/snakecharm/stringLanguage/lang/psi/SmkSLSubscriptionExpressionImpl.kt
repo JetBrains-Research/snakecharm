@@ -20,6 +20,7 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLElemen
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLElementTypes.KEY_EXPRESSION
 import java.util.function.Predicate
 
+@Suppress("UnstableApiUsage")
 class SmkSLSubscriptionExpressionImpl(node: ASTNode) : SmkSLElementImpl(node), SmkSLSubscriptionExpression {
     //    override fun toString() = "${this::class.java.simpleName}(${node.elementType})"
 

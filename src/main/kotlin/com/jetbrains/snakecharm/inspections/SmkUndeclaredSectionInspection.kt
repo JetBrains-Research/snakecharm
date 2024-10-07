@@ -25,6 +25,7 @@ class SmkUndeclaredSectionInspection : SnakemakeInspection() {
                 return
             }
 
+            @Suppress("UnstableApiUsage")
             val referencedName = expr.referencedName
             if (!SmkSLUndeclaredSectionInspection.isSectionNameOfInterest(referencedName)) {
                 return

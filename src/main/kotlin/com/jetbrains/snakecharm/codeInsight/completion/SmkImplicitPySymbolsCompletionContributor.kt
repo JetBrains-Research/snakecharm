@@ -21,20 +21,14 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_RULE
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
-class SMKImplicitPySymbolsCompletionContributor : CompletionContributor() {
+class SmkImplicitPySymbolsCompletionContributor : CompletionContributor() {
     val IN_PY_REF = psiElement().inside(PyReferenceExpression::class.java)
 
-        private val REF_CAPTURE = psiElement()
-            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
-            .and(IN_PY_REF)
-            .with(object : PatternCondition<PsiElement>("isFirstChild") {
-                override fun accepts(element: PsiElement, context: ProcessingContext): Boolean {
-                    // check that this element is "first" in parent PyReferenceExpression, e.g. that
-                    // we don't have some prefix with '.', e.g. element is 'exp<caret>', not 'foo.exp<caret>'
     private val REF_CAPTURE = psiElement()
         .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
         .and(IN_PY_REF)
         .with(object : PatternCondition<PsiElement>("isFirstChild") {
+            @Suppress("UnstableApiUsage")
             override fun accepts(element: PsiElement, context: ProcessingContext): Boolean {
                 // check that this element is "first" in parent PyReferenceExpression, e.g. that
                 // we don't have some prefix with '.', e.g. element is 'exp<caret>', not 'foo.exp<caret>'
@@ -128,7 +122,7 @@ class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
         }
 
         // Add synthetic symbols
-        SmkCodeInsightScope.values().forEach { symbolScope ->
+        SmkCodeInsightScope.entries.forEach { symbolScope ->
             if (contextScope.includes(symbolScope)) {
                 cache.getSynthetic(symbolScope).forEach(result::addElement)
             }
@@ -136,7 +130,7 @@ class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
 
         val processor = SmkCompletionVariantsProcessor(contextElement)
 
-        SmkCodeInsightScope.values().asSequence()
+        SmkCodeInsightScope.entries.asSequence()
             .filter { symbolScope -> contextScope.includes(symbolScope) }
             .flatMap { symbolScope -> cache[symbolScope].asSequence() }
             .forEach { symbol ->

@@ -56,6 +56,7 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
     // See sdk chooser (Combobox+PySdkListCellRenderer) in 'PyPluginCommonOptionsForm' or use `PythonSdkChooserCombo`
     private PythonSdkChooserCombo pythonSdkCB;
 
+    @SuppressWarnings("unchecked")
     public SmkFrameworkSettingsPanel(@Nullable final Project project) {
         this.project = project != null ? project : ProjectManager.getInstance().getDefaultProject();
 
@@ -63,11 +64,11 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
         add(myContentPane, BorderLayout.CENTER);
 
         final SmkWrapperStorage wrapperStorage = SmkWrapperStorage.Companion.getInstance(this.project);
-        final String wrappersRepoVersion = wrapperStorage != null ? wrapperStorage.getVersion() : null;
+        final String wrappersRepoVersion = wrapperStorage.getVersion();
         wrappersBundledRB.setText(
                 SnakemakeBundle.message(
                         "smk.framework.configurable.panel.wrappers.bundled",
-                        wrappersRepoVersion == null || wrappersRepoVersion.isEmpty() ? "n/a" : wrappersRepoVersion
+                        wrappersRepoVersion.isEmpty() ? "n/a" : wrappersRepoVersion
                 )
         );
 
@@ -145,6 +146,7 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
         committedSdks.sort(new PreferredSdkComparator());
         sdks.addAll(committedSdks);
 
+        //noinspection unchecked
         pythonSdkCB.getComboBox().setModel(new CollectionComboBoxModel(sdks, sdkToSelect));
     }
 

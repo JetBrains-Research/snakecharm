@@ -29,6 +29,7 @@ object SmkSyntaxErrorAnnotator : SmkAnnotator() {
         argsSection.argumentList?.arguments?.forEach { arg ->
             when (arg) {
                 is PyKeywordArgument -> {
+                    @Suppress("UnstableApiUsage")
                     arg.keyword?.let { keyword ->
                         val keywordValue = seenKeywords2Value[keyword]
                         if (keywordValue == null) {

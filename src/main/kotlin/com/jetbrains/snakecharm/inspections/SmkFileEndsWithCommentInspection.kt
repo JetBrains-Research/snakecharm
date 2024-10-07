@@ -11,7 +11,6 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.util.nextLeaf
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.SmkFile
-import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLExpression
 
 class SmkFileEndsWithCommentInspection : SnakemakeInspection() {
     override fun buildVisitor(

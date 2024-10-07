@@ -10,7 +10,9 @@ import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
  * @date 2018-12-31
  */
 object SnakemakeLanguageDialect : Language(PythonLanguage.getInstance(), "Snakemake") {
-     val fileElementType = SmkFileElementType(this)
+    private fun readResolve(): Any = SnakemakeLanguageDialect
+
+    val fileElementType = SmkFileElementType(this)
 
      /**
       * Used as a check to find all the code that knows about Snake.

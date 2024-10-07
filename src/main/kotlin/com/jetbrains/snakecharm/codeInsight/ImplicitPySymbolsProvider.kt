@@ -41,6 +41,7 @@ import javax.swing.SwingUtilities
  * @author Roman.Chernyatchik
  * @date 2019-05-07
  */
+@Suppress("UnstableApiUsage")
 class ImplicitPySymbolsProvider(
     val project: Project,
 ) : Disposable {
@@ -372,6 +373,7 @@ class ImplicitPySymbolsProvider(
         }
     }
 
+    @Suppress("unused")
     private fun collectClassInstanceMethods(
         moduleAndClass: List<Pair<String, String>>,
         scope: SmkCodeInsightScope,
@@ -395,6 +397,7 @@ class ImplicitPySymbolsProvider(
         }
     }
 
+    @Suppress("unused")
     private fun collectClassConstructors(
         moduleAndClass: List<Pair<String, String>>,
         scope: SmkCodeInsightScope,

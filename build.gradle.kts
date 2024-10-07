@@ -1,4 +1,4 @@
-@file:Suppress("SpellCheckingInspection")
+@file:Suppress("SpellCheckingInspection", "UnstableApiUsage")
 
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML

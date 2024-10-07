@@ -21,6 +21,7 @@ import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLInitialReference
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
 
+@Suppress("UnstableApiUsage")
 class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(node),
     SmkSLReferenceExpression {
 

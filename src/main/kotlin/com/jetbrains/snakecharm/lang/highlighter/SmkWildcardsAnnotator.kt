@@ -9,11 +9,11 @@ import com.jetbrains.snakecharm.lang.validation.SmkAnnotator
 import com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLSyntaxHighlighter.Companion.HIGHLIGHTING_WILDCARDS_KEY
 
 object SmkWildcardsAnnotator : SmkAnnotator() {
+    @Suppress("UnstableApiUsage")
     override fun visitPyReferenceExpression(expr: PyReferenceExpression) {
         if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(expr)) {
             return
         }
-
         val exprIdentifier = expr.nameElement?.psi ?: return
 
         val qualifier = expr.qualifier

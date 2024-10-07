@@ -41,6 +41,7 @@ class SmkSLInitialReference(
 
     override fun getElement() = myElement as SmkSLReferenceExpression
 
+    @Suppress("UnstableApiUsage")
     override fun resolveInner(): MutableList<RatedResolveResult> {
         require(!element.isQualified) // this reference is supposed to be not qualified
 
@@ -80,7 +81,7 @@ class SmkSLInitialReference(
 
             SmkImplicitPySymbolsResolveProvider.addSyntheticSymbols(contextScope, cache, referencedName, ret)
 
-            SmkCodeInsightScope.values().asSequence()
+            SmkCodeInsightScope.entries.asSequence()
                 .filter { symbolScope -> contextScope.includes(symbolScope) }
                 .flatMap { symbolScope -> cache.filter(symbolScope, element.name!!).asSequence() }
                 .filter { symbol -> symbol.usageType == ImplicitPySymbolUsageType.VARIABLE }
@@ -96,7 +97,7 @@ class SmkSLInitialReference(
             val processor = PyResolveProcessor(referencedName)
             val scopeOwner = ScopeUtil.getScopeOwner(host) ?: host.containingFile   // not clear what should be here
             val topLevel = scopeOwner.containingFile
-            PyResolveUtil.scopeCrawlUp(processor, host, referencedName, topLevel);
+            PyResolveUtil.scopeCrawlUp(processor, host, referencedName, topLevel)
 
             val scopeControlFlowAnchor = host.containingFile  // not clear what should be here
             val resultList = getResultsFromProcessor(referencedName, processor, scopeControlFlowAnchor, topLevel)
@@ -172,13 +173,13 @@ class SmkSLInitialReference(
             val implicitsProcessor = SmkCompletionVariantsProcessor(host)
 
             val cache = ImplicitPySymbolsProvider.instance(element.project).cache
-            SmkCodeInsightScope.values().forEach { symbolScope ->
+            SmkCodeInsightScope.entries.forEach { symbolScope ->
                 if (contextScope.includes(symbolScope)) {
                     variants.addAll(cache.getSynthetic(symbolScope))
                 }
             }
 
-            SmkCodeInsightScope.values().asSequence()
+            SmkCodeInsightScope.entries.asSequence()
                 .filter { symbolScope -> contextScope.includes(symbolScope) }
                 .flatMap { symbolScope -> cache[symbolScope].asSequence() }
                 .filter { symbol -> symbol.usageType == ImplicitPySymbolUsageType.VARIABLE }
@@ -190,7 +191,7 @@ class SmkSLInitialReference(
             variants.addAll(implicitsProcessor.resultList)
 
             // Python: XXX consider possible reuse of PyReference completion list + filter items
-            val builtinCache = PyBuiltinCache.getInstance(host);
+            val builtinCache = PyBuiltinCache.getInstance(host)
 
             // perhaps processor should be from 'element', not clear
             val processor = CompletionVariantsProcessor(host, { e ->
@@ -209,7 +210,7 @@ class SmkSLInitialReference(
 
             }, null)
             //TODO: [ScopeImpl.collectDeclarations.visitPyElement; PsiNameIdentifierOwner is namedElement => added to symbols..]
-            PyResolveUtil.scopeCrawlUp(processor, host, null, null);
+            PyResolveUtil.scopeCrawlUp(processor, host, null, null)
             processor.resultList
                 .asSequence()
                 .filter { isSupportedElementType(it.psiElement) }

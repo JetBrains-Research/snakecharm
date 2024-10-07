@@ -330,10 +330,12 @@ object SnakemakeAPI {
     const val PEPPY_CONFIG_SAMPLE_MODIFIERS = "sample_modifiers"
     const val PEPPY_CONFIG_PROJECT_MODIFIERS = "project_modifiers"
 
+    @Suppress("unused")
     val PEPPY_CONFIG_TEXT_KEYS = setOf(
         PEPPY_CONFIG_PEP_VERSION, PEPPY_CONFIG_SAMPLE_TABLE, PEPPY_CONFIG_SUBSAMPLE_TABLE,
     )
 
+    @Suppress("unused")
     val PEPPY_CONFIG_MAPPING_KEYS = setOf(
         PEPPY_CONFIG_SAMPLE_MODIFIERS, PEPPY_CONFIG_PROJECT_MODIFIERS
     )

@@ -17,6 +17,7 @@ import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 
+@Suppress("UnstableApiUsage")
 class SmkRuleOrCheckpointNameReference(
     element: SmkReferenceExpression,
     context: PyResolveContext

@@ -114,6 +114,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
         val allowedArgs = ALLOWED_LAMBDA_OR_CALLABLE_ARGS[parentSection.sectionKeyword] ?: emptyArray()
         val paramName = referenceTarget.text
 
+        @Suppress("UnstableApiUsage")
         val isFstPositionalParam = !referenceTarget.isKeywordOnly
                 && lambda.parameterList.parameters.indexOf(referenceTarget) == 0
 
@@ -179,6 +180,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
 
         // XXX: at the moment affects all "rules" variables in a *.smk file, better to
         // affect only "rules" which is resolved to appropriate place
+        @Suppress("UnstableApiUsage")
         return when (referenceExpression.referencedName) {
             SMK_VARS_RULES -> SmkRulesType(
                 parentDeclaration as? SmkRule,

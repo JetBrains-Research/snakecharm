@@ -178,8 +178,7 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
         }.map { (name, psi) -> name to psi as SmkUse }
 
     /**
-     * Collects elements of type [SmkRuleOrCheckpoint] from a current [SmkFile] using [additionalCollector]
-     * and collects elements from other files which were imported via 'include:'
+     * Collects recursively this and files which were imported via 'include:'
      */
     fun collectIncludedFilesRecursively(
         visitedFiles: MutableSet<PsiFile> = mutableSetOf(),

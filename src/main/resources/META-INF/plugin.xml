@@ -113,7 +113,7 @@
 
     <completion.contributor
         language="Python"
-        implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor"
+        implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkImplicitPySymbolsCompletionContributor"
     />
 
     <completion.contributor

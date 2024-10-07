@@ -21,13 +21,13 @@ class SmkLambdaParameterInSectionCompletionContributor : CompletionContributor()
     init {
         extend(
                 CompletionType.BASIC,
-                SMKLambdaParameterInSectionCompletionProvider.CAPTURE,
-                SMKLambdaParameterInSectionCompletionProvider
+                SmkLambdaParameterInSectionCompletionProvider.CAPTURE,
+                SmkLambdaParameterInSectionCompletionProvider
         )
     }
 }
 
-object SMKLambdaParameterInSectionCompletionProvider : CompletionProvider<CompletionParameters>() {
+object SmkLambdaParameterInSectionCompletionProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = PlatformPatterns.psiElement(PyTokenTypes.IDENTIFIER)
             .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
             .inside(PyParameterList::class.java)

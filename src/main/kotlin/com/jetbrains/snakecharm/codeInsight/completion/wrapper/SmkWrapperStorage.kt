@@ -134,7 +134,7 @@ class SmkWrapperStorage(val project: Project) : Disposable {
     )
 
     companion object {
-        fun getInstance(project: Project) = project.getService(SmkWrapperStorage::class.java)
+        fun getInstance(project: Project) = project.getService(SmkWrapperStorage::class.java)!!
 
         @ExperimentalSerializationApi
         fun loadOrCollectLocalWrappers(project: Project, forced: Boolean = false) {
@@ -213,12 +213,13 @@ class SmkWrapperStorage(val project: Project) : Disposable {
 
         @ExperimentalSerializationApi
         private fun deserializeWrappers(storagePath: Path) =
-            Cbor.decodeFromByteArray<Pair<String, List<SmkWrapperStorage.WrapperInfo>>>(
+            Cbor.decodeFromByteArray<Pair<String, List<WrapperInfo>>>(
                 Files.readAllBytes(storagePath)
             )
 
+        @Suppress("unused")
         @ExperimentalSerializationApi
-        private fun deserializeWrappers(url: URL): Pair<String, List<SmkWrapperStorage.WrapperInfo>> =
+        private fun deserializeWrappers(url: URL): Pair<String, List<WrapperInfo>> =
             Cbor.decodeFromByteArray(url.readBytes())
     }
 

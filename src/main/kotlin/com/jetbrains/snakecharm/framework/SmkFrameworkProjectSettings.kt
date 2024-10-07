@@ -186,7 +186,7 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
 
         fun findPythonSdk(project: Project, sdkName: String?): Sdk? {
             val sdk: Sdk? = if (sdkName.isNullOrEmpty()) {
-                ProjectRootManager.getInstance(project).projectSdk;
+                ProjectRootManager.getInstance(project).projectSdk
             } else {
                 ProjectJdkTable.getInstance().findJdk(sdkName)
             }

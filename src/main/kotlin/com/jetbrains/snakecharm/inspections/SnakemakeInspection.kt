@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nls
 
 abstract class SnakemakeInspection : LocalInspectionTool() {
     @Pattern(VALID_ID_PATTERN)
-    override fun getID(): String = InspectionProfileEntry.getShortName(super.getID())
+    override fun getID(): String = getShortName(super.getID())
 
     @Nls
     override fun getGroupDisplayName(): String = SnakemakeBundle.message("INSP.GROUP.snakemake")

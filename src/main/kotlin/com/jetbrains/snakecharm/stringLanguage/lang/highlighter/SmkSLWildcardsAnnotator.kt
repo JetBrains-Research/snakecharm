@@ -11,6 +11,7 @@ object SmkSLWildcardsAnnotator : AbstractSmkSLAnnotator() {
     override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpression) {
         val exprIdentifier = expr.nameIdentifier
 
+        @Suppress("UnstableApiUsage")
         when {
             expr.isWildcard() -> {
                 addHighlightingAnnotation(

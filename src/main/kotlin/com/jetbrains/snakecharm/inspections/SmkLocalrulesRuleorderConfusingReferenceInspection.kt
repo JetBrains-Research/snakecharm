@@ -32,6 +32,7 @@ class SmkLocalrulesRuleorderConfusingReferenceInspection : SnakemakeInspection()
             if (args != null) {
                 val ruleLike = file.collectRules(mutableSetOf()).map { it.first }.toSet()
                 args.forEach { expr ->
+                    @Suppress("UnstableApiUsage")
                     val name = expr.name
                     if (name != null && name !in ruleLike) {
                         registerProblem(

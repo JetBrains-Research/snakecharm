@@ -43,6 +43,7 @@ class SmkMisuseUsageIOFlagMethodsInspection : SnakemakeInspection() {
                     val callee = callExpr.callee
                     if (callee is PyReferenceExpression) {
                         // We don't need qualified refs here (e.g. like `foo.boo.ancient`)
+                        @Suppress("UnstableApiUsage")
                         val callName = when (callee.qualifier) {
                             null -> callee.referencedName
                             else -> null

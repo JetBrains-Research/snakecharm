@@ -138,6 +138,7 @@ interface SmkWorkflowLocalrulesSection : PyStatement, SmkArgsSection, SmkTopleve
 
 interface SmkWorkflowRuleorderSection : PyStatement, SmkArgsSection, SmkToplevelSection
 
+@Suppress("UnstableApiUsage")
 interface SmkReferenceExpression : PyReferenceExpression {
     override fun getNameElement(): ASTNode? = node.findChildByType(PyTokenTypes.IDENTIFIER)
 }

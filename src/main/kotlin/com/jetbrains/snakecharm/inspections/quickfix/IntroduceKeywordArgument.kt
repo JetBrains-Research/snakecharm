@@ -42,6 +42,7 @@ class IntroduceKeywordArgument(element: PyExpression) : LocalQuickFixAndIntentio
         } ?: return
 
         val builder = TemplateBuilderFactory.getInstance().createTemplateBuilder(newElement)
+        @Suppress("UnstableApiUsage")
         val keywordArgument = (newElement as PyKeywordArgument).keywordNode!!.psi
         builder.replaceElement(keywordArgument, defaultArgumentName)
         builder.run(editor, false)

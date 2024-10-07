@@ -70,6 +70,7 @@ class SmkWrapperMissedArgumentsInspection : SnakemakeInspection() {
             section: SmkArgsSection,
             required: List<String>,
         ) {
+            @Suppress("UnstableApiUsage")
             val usedKeywords = argumentList.arguments.filterIsInstance<PyKeywordArgument>().map { it.keyword }
             required.forEach { arg ->
                 if (arg !in usedKeywords) {

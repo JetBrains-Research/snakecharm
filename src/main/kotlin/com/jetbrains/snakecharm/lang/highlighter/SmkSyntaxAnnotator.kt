@@ -31,6 +31,7 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
         var done = false
         while (!done && next != null) {
             val elementType = next.elementType
+            @Suppress("UnstableApiUsage")
             when (elementType) {
                 in KEYWORD_LIKE_TOKENS_FOR_ANNOTATOR -> addHighlightingAnnotation(
                     next,
@@ -61,6 +62,7 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
 
     override fun visitSmkRunSection(st: SmkRunSection) {
         st.getSectionKeywordNode()?.let {
+            @Suppress("UnstableApiUsage")
             addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterFactory.SMK_PREDEFINED_DEFINITION)
         }
     }
@@ -85,18 +87,21 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
         highlightWorkflowSection(ruleLike)
 
         ruleLike.nameIdentifier?.let { nameElement ->
+            @Suppress("UnstableApiUsage")
             addHighlightingAnnotation(nameElement, SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION)
         }
     }
 
     private fun highlightWorkflowSection(st: SmkSection) {
         st.getSectionKeywordNode()?.let {
+            @Suppress("UnstableApiUsage")
             addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD)
         }
     }
 
     private fun highlightRuleLikeSection(st: SmkSection) {
         st.getSectionKeywordNode()?.let {
+            @Suppress("UnstableApiUsage")
             addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterFactory.SMK_DECORATOR)
         }
     }

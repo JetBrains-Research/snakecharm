@@ -340,8 +340,8 @@ class SmkStatementParsing(
 
     private fun parseIdentifier(): Boolean {
         val referenceMarker = myBuilder.mark()
-        if (Parsing.isIdentifier(myBuilder)) {
-            Parsing.advanceIdentifierLike(myBuilder)
+        if (isIdentifier(myBuilder)) {
+            advanceIdentifierLike(myBuilder)
             referenceMarker.done(SmkElementTypes.REFERENCE_EXPRESSION)
             return true
         }

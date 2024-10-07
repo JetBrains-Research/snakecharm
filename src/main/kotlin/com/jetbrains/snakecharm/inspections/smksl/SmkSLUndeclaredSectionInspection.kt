@@ -23,6 +23,7 @@ class SmkSLUndeclaredSectionInspection : SnakemakeInspection() {
         override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpression) {
             val ref = expr.reference
             if (ref is SmkSLInitialReference) {
+                @Suppress("UnstableApiUsage")
                 val referencedName = expr.referencedName
                 if (isSectionNameOfInterest(referencedName)) {
                     // ensure in rule

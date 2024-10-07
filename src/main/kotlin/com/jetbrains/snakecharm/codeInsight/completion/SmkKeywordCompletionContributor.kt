@@ -1,11 +1,11 @@
 package com.jetbrains.snakecharm.codeInsight.completion
 
 import com.intellij.codeInsight.TailType
+import com.intellij.codeInsight.TailTypes
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.TailTypeDecorator
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
-import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.patterns.PsiElementPattern
 import com.intellij.patterns.StandardPatterns
@@ -23,7 +23,6 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KE
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.TOPLEVEL_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_DECLARATION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_LIKE
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE
@@ -120,7 +119,7 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
         }
         listOf(
             colonAndWhiteSpaceTailKeys to ColonAndWhiteSpaceTail,
-            spaceTailKeys to TailType.SPACE,
+            spaceTailKeys to TailTypes.spaceType(),
         ).forEach { (tokenSet, tail) ->
             tokenSet.forEach { s ->
                 val modifiedTail = if (s == SnakemakeNames.USE_KEYWORD) RuleKeywordTail else tail
@@ -269,7 +268,7 @@ object UseSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
         result: CompletionResultSet
     ) {
         USE_DECLARATION_KEYWORDS.forEach { s ->
-            val tail = if (s != SnakemakeNames.SMK_WITH_KEYWORD) TailType.SPACE else TailType.CASE_COLON
+            val tail = if (s != SnakemakeNames.SMK_WITH_KEYWORD) TailTypes.spaceType() else TailTypes.caseColonType()
             result.addElement(
                 SmkCompletionUtil.createPrioritizedLookupElement(
                     TailTypeDecorator.withTail(
@@ -303,4 +302,4 @@ fun PsiElementPattern.Capture<PsiElement>.insideOneOf(
             StandardPatterns.instanceOf(it)
         }.toTypedArray()
     )
-)
+)!!

@@ -62,6 +62,7 @@ class SmkRuleOrCheckpointNameYetUndefinedInspection : SnakemakeInspection() {
                     "INSP.NAME.rule.or.checkpoint.name.yet.undefined.msg",
                     targetRuleLikeElem.name ?: "n/a"
                 )
+                @Suppress("UnstableApiUsage")
                 registerProblem(ruleNameReference.nameElement?.psi, message)
             }
         }

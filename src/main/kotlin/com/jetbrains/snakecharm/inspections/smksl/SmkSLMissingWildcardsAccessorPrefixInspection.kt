@@ -24,6 +24,7 @@ class SmkSLMissingWildcardsAccessorPrefixInspection : SnakemakeInspection() {
     ) = object : SmkSLInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpression) {
+            @Suppress("UnstableApiUsage")
             if (expr.isQualified) {
                 return
             }
@@ -43,6 +44,7 @@ class SmkSLMissingWildcardsAccessorPrefixInspection : SnakemakeInspection() {
                 return
             }
 
+            @Suppress("UnstableApiUsage")
             val referencedName = expr.referencedName
             val typeEvalContext = TypeEvalContext.codeAnalysis(host.project, host.containingFile)
             val type = typeEvalContext.getType(ruleLike.wildcardsElement)

@@ -38,7 +38,7 @@ object SmkResolveUtil {
     fun <T : PyElement> renameNameNode(newElementName: String, nameElement: ASTNode?, element: T): T {
         if (nameElement != null && PyNames.isIdentifier(newElementName)) {
             val newNameElement = PyUtil.createNewName(element, newElementName)
-            element.node.replaceChild(nameElement, newNameElement);
+            element.node.replaceChild(nameElement, newNameElement)
         }
         return element
     }

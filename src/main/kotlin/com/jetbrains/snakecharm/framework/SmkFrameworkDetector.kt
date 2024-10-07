@@ -15,7 +15,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import java.util.*
 
 /**
- * For [IDEA]
+ * For IntelliJ IDEA:
  * Detects 'Snakemake' in project by snakemake related files
  * For some reason works in IDEA, not in PyCharm
  */
@@ -33,11 +33,11 @@ class SmkFrameworkDetector : FrameworkDetector("snakemake") {
         for (file in newFiles) {
             val module = ModuleUtilCore.findModuleForFile(file, project)
             if (module != null) {
-                filesByModule.putValue(module, file);
+                filesByModule.putValue(module, file)
             }
         }
 
-        val supportedFiles = ArrayList<VirtualFile>();
+        val supportedFiles = ArrayList<VirtualFile>()
         for (module in filesByModule.keySet()) {
             if (!SmkFrameworkType.isSuitableModuleType(module)) {
                 continue
@@ -56,7 +56,7 @@ class SmkFrameworkDetector : FrameworkDetector("snakemake") {
             return mutableListOf()
         }
 
-        return mutableListOf(FrameworkDescription(supportedFiles, context, project, this));
+        return mutableListOf(FrameworkDescription(supportedFiles, context, project, this))
     }
 
     class FrameworkDescription(
