@@ -51,12 +51,13 @@ class StepDefs {
         //if (enabledInspections != null) {
         //    InspectionProfileImpl.INIT_INSPECTIONS = true
         //}
+
         val additionalRoots = if (projectType.startsWith("snakemake")) {
             val smkModuleRootName = if (projectType.startsWith("snakemake:")) {
                 val suffix = projectType.replace("snakemake:", "")
                 "MockPackages3_smk_${suffix}"
             }   else {
-                "MockPackages3"
+                "MockPackages3" // XXX: uses 'snakemake' symlink from 'MockPackages3' to attach snakemake libs
             }
             arrayOf(SnakemakeTestUtil.getTestDataPath().resolve(smkModuleRootName))
         } else {

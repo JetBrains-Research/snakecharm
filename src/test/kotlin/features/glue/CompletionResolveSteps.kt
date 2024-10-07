@@ -437,6 +437,14 @@ class CompletionResolveSteps {
     fun iInvokeAutocompletionPopupAndSelectItem(lookupText: String, text: String) {
         autoCompleteAndCheck(lookupText, text, Lookup.NORMAL_SELECT_CHAR)
     }
+    @Then("^I invoke autocompletion popup, select \"([^\"]+)\" lookup item with tail text \"([^\"]+)\" and see a text:")
+    fun iInvokeAutocompletionPopupAndSelectItemWithTailText(lookupText: String, tailText: String, text: String) {
+        autoCompleteAndCheck(lookupText, text, Lookup.NORMAL_SELECT_CHAR, tailText=tailText)
+    }
+    @Then("^I invoke autocompletion popup, select \"([^\"]+)\" lookup item with type text \"([^\"]+)\" and see a text:")
+    fun iInvokeAutocompletionPopupAndSelectItemWithTypeText(lookupText: String, typeText: String, text: String) {
+        autoCompleteAndCheck(lookupText, text, Lookup.NORMAL_SELECT_CHAR, typeText=typeText)
+    }
 
     @Then("^I invoke autocompletion popup and see a text:")
     fun iInvokeAutocompletionPopupAndSelectNoItem(text: String) {
@@ -456,7 +464,13 @@ class CompletionResolveSteps {
         autoCompleteAndCheck(lookupText, text, ch)
     }
 
-    private fun autoCompleteAndCheck(lookupText: String?, text: String, ch: Char) {
+    private fun autoCompleteAndCheck(
+        lookupText: String?,
+        text: String,
+        completionChar: Char,
+        tailText: String? = null,
+        typeText: String? = null
+    ) {
         iInvokeAutocompletionPopup()
 
         val fixture = SnakemakeWorld.fixture()
@@ -483,7 +497,9 @@ class CompletionResolveSteps {
                     )
                     assertTrue(lookupElements.isNotEmpty(), message = "Completion list was empty")
 
-                    selectItem(LookupFilter.create(lookupText).findElement(lookupElements), ch, fixture.project)
+                    val lookupFilter = LookupFilter.create(lookupText, typeText, tailText)
+                    val lookupElement = lookupFilter.findElement(lookupElements)
+                    selectItem(lookupElement, completionChar, fixture.project)
                 }
 
                 val cleanText = StringUtil.convertLineSeparators(
@@ -647,13 +663,13 @@ class CompletionResolveSteps {
 
     }*/
 
-    private fun selectItem(item: LookupElement, ch: Char, project: Project) {
+    private fun selectItem(item: LookupElement, completionChar: Char, project: Project) {
         val lookup = LookupManager.getInstance(project).activeLookup as LookupImpl?
         assertNotNull(lookup, message = "Lookup didn't show")
         lookup.currentItem = item
         UIUtil.invokeLaterIfNeeded {
             CommandProcessor.getInstance().executeCommand(
-                project, { lookup.finishLookup(ch) }, "", null
+                project, { lookup.finishLookup(completionChar) }, "", null
             )
         }
     }
@@ -685,7 +701,8 @@ class CompletionResolveSteps {
 
 class LookupFilter private constructor(
     private val myLookupString: String,
-    private val myTypeString: String?,
+    private val myTypeText: String?,
+    private val myTailText: String?,
 ) : Condition<LookupElement> {
 
     override fun value(lookupElement: LookupElement?): Boolean {
@@ -700,13 +717,16 @@ class LookupFilter private constructor(
         val presentation = LookupElementPresentation()
         lookupElement.renderElement(presentation)
 
-        return if (myLookupString != presentation.itemText) {
-            false
-        } else StringUtil.isEmpty(myTypeString) || myTypeString == presentation.typeText
+        if (myLookupString != presentation.itemText) {
+            return false
+        }
+        val matchTypeText = StringUtil.isEmpty(myTypeText) || myTypeText == presentation.typeText
+        val matchTailText = StringUtil.isEmpty(myTailText) || myTailText == presentation.tailText
+        return matchTypeText && matchTailText
     }
 
     override fun toString(): String {
-        return "Text: <" + myLookupString + ">; Type text: <" + (myTypeString ?: "any") + ">"
+        return "Text: <" + myLookupString + ">; Type text: <" + (myTypeText ?: "any") + ">"
     }
 
     fun findElement(lookupElements: Array<LookupElement>): LookupElement {
@@ -746,14 +766,8 @@ class LookupFilter private constructor(
     }
 
     companion object {
-
-        fun create(lookupString: String): LookupFilter {
-            return LookupFilter(lookupString, null)
-        }
-
-        fun create(lookupString: String, typeString: String): LookupFilter {
-            return LookupFilter(lookupString, typeString)
-        }
+        fun create(lookupString: String, typeString: String?=null, tailText: String?=null) =
+            LookupFilter(lookupString, typeString, tailText)
 
         private fun dumpElement(element: LookupElement?): String {
             if (element == null) {

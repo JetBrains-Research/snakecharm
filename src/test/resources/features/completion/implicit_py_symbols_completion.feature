@@ -217,14 +217,29 @@ Feature: Completion in python part of snakemake file
       | pep    | pep           |
 
   #noinspection SpellCheckingInspection
-  Scenario: Complete in not-empty context
+  Scenario: Complete in not-empty context and select by tail text
      Given a snakemake project
      Given I open a file "foo.smk" with text
      """
      expan
      """
      When I put the caret after expan
-     Then I invoke autocompletion popup and see a text:
+      # Several 'expand' are in completion
+     Then I invoke autocompletion popup, select "expand" lookup item with tail text "(args, wildcards)" and see a text:
+     """
+     expand()
+     """
+
+  #noinspection SpellCheckingInspection
+  Scenario: Complete in not-empty context and select by ty[e text
+     Given a snakemake project
+     Given I open a file "foo.smk" with text
+     """
+     expan
+     """
+     When I put the caret after expan
+      # Several 'expand' are in completion
+     Then I invoke autocompletion popup, select "expand" lookup item with type text "snakemake.io" and see a text:
      """
      expand()
      """
