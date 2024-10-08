@@ -226,7 +226,9 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
         return result
     }
 
+    @Suppress("unused")
     fun findPepfile(): SmkWorkflowArgsSection? {
+        // XXX: for #360, #433 feature
         var pepfile: SmkWorkflowArgsSection? = null
         acceptChildren(object : PyElementVisitor(), SmkElementVisitor {
             override val pyElementVisitor: PyElementVisitor = this
