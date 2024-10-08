@@ -79,7 +79,7 @@ class ImplicitPySymbolsProvider(
         val project = project
 
         DumbService.getInstance(project).runWhenSmart {
-            SlowOperations.startSection(SlowOperations.KNOWN_ISSUE).use { ignore ->
+            SlowOperations.knownIssue("https://github.com/JetBrains-Research/snakecharm/issues/533").use { ignore ->
                 // XXX: workaround because default code throws 100+ exceptions:  java.lang.Throwable: Slow operations are prohibited on EDT. See SlowOperations.assertSlowOperationsAreAllowed javadoc.
                 // SlowOperations.allowSlowOperations<Throwable> { .. }
 
