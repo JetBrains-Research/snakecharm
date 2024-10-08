@@ -130,7 +130,7 @@ class SmkWrapperStorage(val project: Project) : Disposable {
     data class WrapperInfo(
         val path: String = "", // system independent separators
         val args: Map<String, List<String>> = emptyMap(),
-        val description: String = ""
+        val description: String = "" // yaml description
     )
 
     companion object {
