@@ -11,6 +11,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 fun gradlePropertyOptional(key: String) = project.findProperty(key)?.toString()
 fun gradleProperty(key: String) = providers.gradleProperty(key)
+fun gradlePropertyWithPriorityToSystemProperty(key: String): String = System.getProperty(key)?.let {
+    providers.gradleProperty(key).get()
+}.toString()
 
 plugins {
     // Java support
@@ -64,7 +67,7 @@ dependencies {
     testImplementation(libs.opentest4j)
 
     intellijPlatform {
-        val platformType = gradleProperty("platformType")
+        val platformType = gradlePropertyWithPriorityToSystemProperty("platformType")
 
         val platformLocalPath = gradlePropertyOptional("platformLocalPath")
         if (platformLocalPath != null) {
@@ -76,13 +79,14 @@ dependencies {
             //See https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html#intellij-extension-localpath
             local(platformLocalPath)
         } else {
-            val isSnapshot = gradleProperty("platformVersion").get().endsWith("-SNAPSHOT")
-            logger.warn("Use IntelliJ Platform Version: ${platformType.get()}-${gradleProperty("platformVersion").get()}. SNAPSHOT: $isSnapshot")
-            create(platformType, gradleProperty("platformVersion"), useInstaller = !isSnapshot)
+            val platformVersion = gradlePropertyWithPriorityToSystemProperty("platformVersion")
+            val isSnapshot = platformVersion.endsWith("-SNAPSHOT")
+            logger.warn("Use IntelliJ Platform Version: ${platformType}-${platformVersion}. SNAPSHOT: $isSnapshot")
+            create(platformType, platformVersion, useInstaller = !isSnapshot)
         }
 
         // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-        when (platformType.get()) {
+        when (platformType) {
             "PC" -> bundledPlugin("PythonCore")
             "PY", "PD" -> {
                 bundledPlugin("Pythonid")
@@ -114,7 +118,7 @@ intellijPlatform {
     instrumentCode = true
     projectName = project.name
 
-    val platformType = gradleProperty("platformType").get()
+    val platformType = gradlePropertyWithPriorityToSystemProperty("platformType")
     val isPyCharm = platformType == "PC" || platformType == "PY" || platformType == "PD"
     sandboxContainer = file("${project.rootDir}/.sandbox${if (isPyCharm) "_pycharm" else ""}")
 
