@@ -77,7 +77,7 @@ dependencies {
             local(platformLocalPath)
         } else {
             val isSnapshot = gradleProperty("platformVersion").get().endsWith("-SNAPSHOT")
-            logger.warn("Use IntelliJ Platform Version: ${gradleProperty("platformVersion")}. SNAPSHOT: $isSnapshot")
+            logger.warn("Use IntelliJ Platform Version: ${platformType.get()}-${gradleProperty("platformVersion").get()}. SNAPSHOT: $isSnapshot")
             create(platformType, gradleProperty("platformVersion"), useInstaller = !isSnapshot)
         }
 
