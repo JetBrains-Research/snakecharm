@@ -5,7 +5,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.StubElement
 import com.jetbrains.snakecharm.lang.psi.SmkUse
 import com.jetbrains.snakecharm.lang.psi.impl.SmkUseImpl
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex.Companion.KEY
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndexCompanion.KEY
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseStub
 
 class SmkUseElementType

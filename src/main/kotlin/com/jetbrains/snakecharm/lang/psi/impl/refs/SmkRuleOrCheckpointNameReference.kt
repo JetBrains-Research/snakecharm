@@ -13,7 +13,7 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndexCompanion
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 
@@ -84,7 +84,7 @@ class SmkRuleOrCheckpointNameReference(
             smkFile.collectModules().map { it.second }.filter { modulePsi -> modulePsi.name == target }
         } else {
             StubIndex.getElements(
-                SmkModuleNameIndex.KEY,
+                SmkModuleNameIndexCompanion.KEY,
                 target,
                 module.project,
                 GlobalSearchScope.moduleWithDependentsScope(module),

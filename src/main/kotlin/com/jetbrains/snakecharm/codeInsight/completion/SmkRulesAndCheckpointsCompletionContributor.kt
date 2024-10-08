@@ -22,9 +22,9 @@ import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionInLocalRules
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndexCompanion
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndexCompanion
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndexCompanion
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType.Companion.getVariantsFromIndex
 import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
@@ -224,8 +224,8 @@ private fun collectVariantsForElement(
 
     }
     val results: List<SmkRuleOrCheckpoint> = when {
-        isCheckPoint -> getVariantsFromIndex(SmkCheckpointNameIndex.KEY, module, SmkCheckPoint::class.java)
-        else -> getVariantsFromIndex(SmkRuleNameIndex.KEY, module, SmkRule::class.java)
+        isCheckPoint -> getVariantsFromIndex(SmkCheckpointNameIndexCompanion.KEY, module, SmkCheckPoint::class.java)
+        else -> getVariantsFromIndex(SmkRuleNameIndexCompanion.KEY, module, SmkRule::class.java)
     }
 
     val resultList = results.mapNotNull { psi ->
@@ -234,7 +234,7 @@ private fun collectVariantsForElement(
     }
     val usesRules = mutableListOf<Pair<String, SmkRuleOrCheckpoint>>()
     if (!isCheckPoint) {
-        getVariantsFromIndex(SmkUseNameIndex.KEY, module, SmkUse::class.java).forEach { use ->
+        getVariantsFromIndex(SmkUseNameIndexCompanion.KEY, module, SmkUse::class.java).forEach { use ->
             use.getProducedRulesNames().forEach { (first) ->
                 usesRules.add(first to use)
             }

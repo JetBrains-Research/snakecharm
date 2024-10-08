@@ -30,7 +30,7 @@ import com.jetbrains.snakecharm.FakeSnakemakeInjector
 import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler
 import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
 import com.jetbrains.snakecharm.lang.highlighter.SmkColorSettingsPage
-import com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterFactory
+import com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterAttributes
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLSyntaxHighlighter
 import features.glue.SnakemakeWorld.findPsiElementUnderCaret
@@ -193,11 +193,11 @@ class ActionsSteps {
         val attributesToCheck = arrayOf(
             // Currently, IDK how to check all used tags
             // Snakemake:
-            SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD,
-            SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION,
-            SnakemakeSyntaxHighlighterFactory.SMK_DECORATOR,
-            SnakemakeSyntaxHighlighterFactory.SMK_PREDEFINED_DEFINITION,
-            SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD_ARGUMENT,
+            SnakemakeSyntaxHighlighterAttributes.SMK_KEYWORD,
+            SnakemakeSyntaxHighlighterAttributes.SMK_FUNC_DEFINITION,
+            SnakemakeSyntaxHighlighterAttributes.SMK_DECORATOR,
+            SnakemakeSyntaxHighlighterAttributes.SMK_PREDEFINED_DEFINITION,
+            SnakemakeSyntaxHighlighterAttributes.SMK_KEYWORD_ARGUMENT,
             // SnakemakeSL:
             SmkSLSyntaxHighlighter.HIGHLIGHTING_WILDCARDS_KEY
         )

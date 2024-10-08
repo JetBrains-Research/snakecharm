@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.framework
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.options.ShowSettingsUtil
@@ -16,6 +17,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import java.util.function.Function
 
+@Service
 class SmkSupportDisabledBannerNotification {
     var hiddenUntilRestart = false
     companion object {
@@ -28,9 +30,7 @@ class SmkSupportDisabledBannerNotification {
  * Shows [EditorNotificationPanel] if 'Enable Snakemake support' setting is disabled
  */
 class SmkSupportDisabledBannerProvider : EditorNotificationProvider {
-    private companion object {
-        val DISABLE_NOTIFICATION = Key.create<Boolean>("smk.notification.disabled.hide")
-    }
+    private val DISABLE_NOTIFICATION = Key.create<Boolean>("smk.notification.disabled.hide")
 
     private fun createNotificationPanel(
         file: VirtualFile,

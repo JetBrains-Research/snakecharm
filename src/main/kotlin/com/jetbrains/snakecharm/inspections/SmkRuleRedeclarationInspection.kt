@@ -11,9 +11,9 @@ import com.jetbrains.python.psi.PyStatement
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.quickfix.RenameElementWithoutUsagesQuickFix
 import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndexCompanion
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndexCompanion
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndexCompanion
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 
 class SmkRuleRedeclarationInspection : SnakemakeInspection() {
@@ -71,16 +71,16 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
             val nameToCheck = ruleLike.name ?: return
 
             val ruleResolveResults = AbstractSmkRuleOrCheckpointType.findAvailableRuleLikeElementByName(
-                ruleLike, nameToCheck, SmkRuleNameIndex.KEY, SmkRule::class.java
+                ruleLike, nameToCheck, SmkRuleNameIndexCompanion.KEY, SmkRule::class.java
             ) { localRules }
 
             val cpResolveResults = AbstractSmkRuleOrCheckpointType.findAvailableRuleLikeElementByName(
-                ruleLike, nameToCheck, SmkCheckpointNameIndex.KEY, SmkCheckPoint::class.java
+                ruleLike, nameToCheck, SmkCheckpointNameIndexCompanion.KEY, SmkCheckPoint::class.java
             ) { localCheckpoints }
 
             val usesResolveResults: Collection<PsiElement> =
                 AbstractSmkRuleOrCheckpointType.findAvailableRuleLikeElementByName(
-                    ruleLike, nameToCheck, SmkUseNameIndex.KEY, SmkUse::class.java
+                    ruleLike, nameToCheck, SmkUseNameIndexCompanion.KEY, SmkUse::class.java
                 ) { localUses }
 
             val resolveResults = ruleResolveResults + cpResolveResults + usesResolveResults

@@ -4,7 +4,7 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.inspections.smksl.SmkSLUndeclaredSectionInspection
+import com.jetbrains.snakecharm.inspections.smksl.SmkSLUndeclaredSectionInspectionUtil
 import com.jetbrains.snakecharm.lang.psi.impl.refs.SmkPyReferenceImpl
 
 class SmkUndeclaredSectionInspection : SnakemakeInspection() {
@@ -27,11 +27,11 @@ class SmkUndeclaredSectionInspection : SnakemakeInspection() {
 
             @Suppress("UnstableApiUsage")
             val referencedName = expr.referencedName
-            if (!SmkSLUndeclaredSectionInspection.isSectionNameOfInterest(referencedName)) {
+            if (!SmkSLUndeclaredSectionInspectionUtil.isSectionNameOfInterest(referencedName)) {
                 return
             }
 
-            if (SmkSLUndeclaredSectionInspection.checkIsSectionNameUnresolved(ref)) {
+            if (SmkSLUndeclaredSectionInspectionUtil.checkIsSectionNameUnresolved(ref)) {
                 registerProblem(
                     expr,
                     SnakemakeBundle.message("INSP.NAME.undeclared.section.message", referencedName!!)

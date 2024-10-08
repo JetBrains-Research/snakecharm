@@ -45,7 +45,6 @@
             nonDefaultProject="true"
     />
     <editorNotificationProvider implementation="com.jetbrains.snakecharm.framework.SmkSupportDisabledBannerProvider"/>
-    <applicationService serviceImplementation="com.jetbrains.snakecharm.framework.SmkSupportDisabledBannerNotification"/>
     <notificationGroup
             id="SnakeCharmPluginNotifier"
             displayType="BALLOON"
@@ -148,7 +147,10 @@
             implementationClass="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperArgsCompletionContributor"
     />
 
-    <psi.referenceContributor implementation="com.jetbrains.snakecharm.lang.psi.references.SmkPySubscriptionReferenceContributor"/>
+    <psi.referenceContributor
+            language="Python"
+            implementation="com.jetbrains.snakecharm.lang.psi.references.SmkPySubscriptionReferenceContributor"
+    />
 
 <!--    <psi.referenceContributor implementation="com.jetbrains.snakecharm.lang.psi.references.SmkPepReferenceContributor"/>-->
     <lang.inspectionSuppressor language="Snakemake" implementationClass="com.jetbrains.snakecharm.inspections.SmkInspectionsSuppressor"/>

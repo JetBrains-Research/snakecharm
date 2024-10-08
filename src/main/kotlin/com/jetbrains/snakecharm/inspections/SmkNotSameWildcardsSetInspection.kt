@@ -9,10 +9,9 @@ import com.intellij.psi.util.parentOfType
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.*
 
+
 class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
-    companion object {
-        val KEY = Key<HashMap<SmkRuleOrCheckpoint, Ref<List<WildcardDescriptor>>>>("SmkNotSameWildcardsSetInspection_Wildcards")
-    }
+    private val KEY = Key<HashMap<SmkRuleOrCheckpoint, Ref<List<WildcardDescriptor>>>>("SmkNotSameWildcardsSetInspection_Wildcards")
 
     override fun buildVisitor(
         holder: ProblemsHolder,

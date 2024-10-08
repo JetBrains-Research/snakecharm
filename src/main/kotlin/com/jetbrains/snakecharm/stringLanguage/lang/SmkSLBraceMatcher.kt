@@ -7,13 +7,6 @@ import com.intellij.psi.tree.IElementType
 import com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLTokenTypes
 
 class SmkSLBraceMatcher : PairedBraceMatcher {
-    companion object {
-        val myBraces = arrayOf(
-                BracePair(SmkSLTokenTypes.LBRACE, SmkSLTokenTypes.RBRACE, true),
-                BracePair(SmkSLTokenTypes.LBRACKET, SmkSLTokenTypes.RBRACKET, true)
-        )
-    }
-
     override fun getCodeConstructStart(file: PsiFile?, openingBraceOffset: Int) = openingBraceOffset
 
     override fun getPairs() = myBraces
@@ -21,4 +14,10 @@ class SmkSLBraceMatcher : PairedBraceMatcher {
     override fun isPairedBracesAllowedBeforeType(
             lbraceType: IElementType,
             contextType: IElementType?) = true
+
+    private val myBraces = arrayOf(
+        BracePair(SmkSLTokenTypes.LBRACE, SmkSLTokenTypes.RBRACE, true),
+        BracePair(SmkSLTokenTypes.LBRACKET, SmkSLTokenTypes.RBRACKET, true)
+    )
+
 }

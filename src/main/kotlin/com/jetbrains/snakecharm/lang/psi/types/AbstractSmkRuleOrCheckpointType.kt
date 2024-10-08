@@ -26,8 +26,8 @@ import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndexCompanion
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndexCompanion
 
 
 abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
@@ -74,7 +74,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
             results += findAvailableRuleLikeElementByName(
                 location.originalElement,
                 name,
-                SmkCheckpointNameIndex.KEY,
+                SmkCheckpointNameIndexCompanion.KEY,
                 SmkCheckPoint::class.java
             ) { (containingRule?.containingFile as? SmkFile)?.filterCheckPointsPsi()?.map { it.second } ?: emptyList() }
         }
@@ -107,7 +107,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
         val useToIgnore = (useExcludedNamesList as? SmkExcludedRulesNamesList)?.getParentUse()
         when (module) {
             null -> (location.containingFile.originalFile as SmkFile).filterUsePsi().map { it.second }
-            else -> getVariantsFromIndex(SmkUseNameIndex.KEY, module, SmkUse::class.java)
+            else -> getVariantsFromIndex(SmkUseNameIndexCompanion.KEY, module, SmkUse::class.java)
         }.forEach { use ->
             val candidates = if (use == useToIgnore) {
                 use.collectImportedRuleNameAndPsi(mutableSetOf(), false)

@@ -5,7 +5,7 @@ import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_CHECKPOINTS
 import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SmkFile
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex.Companion.KEY
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndexCompanion.KEY
 
 class SmkCheckpointType(
     containingRule: SmkCheckPoint?,

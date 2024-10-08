@@ -22,31 +22,31 @@ class SmkColorSettingsPage : RainbowColorSettingsPage {
     override fun getAttributeDescriptors(): Array<AttributesDescriptor> = arrayOf(
         AttributesDescriptor(
             SnakemakeBundle.message("smk.color.keyword"),
-            SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD
+            SnakemakeSyntaxHighlighterAttributes.SMK_KEYWORD
         ),
         AttributesDescriptor(
             SnakemakeBundle.message("smk.color.definition"),
-            SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION
+            SnakemakeSyntaxHighlighterAttributes.SMK_FUNC_DEFINITION
         ),
         AttributesDescriptor(
             SnakemakeBundle.message("smk.color.subsection"),
-            SnakemakeSyntaxHighlighterFactory.SMK_DECORATOR
+            SnakemakeSyntaxHighlighterAttributes.SMK_DECORATOR
         ),
         AttributesDescriptor(
             SnakemakeBundle.message("smk.color.run"),
-            SnakemakeSyntaxHighlighterFactory.SMK_PREDEFINED_DEFINITION
+            SnakemakeSyntaxHighlighterAttributes.SMK_PREDEFINED_DEFINITION
         ),
         AttributesDescriptor(
             SnakemakeBundle.message("smk.color.keyword.arg"),
-            SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD_ARGUMENT
+            SnakemakeSyntaxHighlighterAttributes.SMK_KEYWORD_ARGUMENT
         ),
         AttributesDescriptor(
             SnakemakeBundle.message("smk.color.string.text"),
-            SnakemakeSyntaxHighlighterFactory.SMK_TEXT
+            SnakemakeSyntaxHighlighterAttributes.SMK_TEXT
         ),
         AttributesDescriptor(
             SnakemakeBundle.message("smk.color.string.tqs"),
-            SnakemakeSyntaxHighlighterFactory.SMK_TRIPLE_QUOTED_STRING
+            SnakemakeSyntaxHighlighterAttributes.SMK_TRIPLE_QUOTED_STRING
         ),
         AttributesDescriptor(
             SnakemakeBundle.message("smk.color.string.SL.content"),
@@ -115,14 +115,14 @@ class SmkColorSettingsPage : RainbowColorSettingsPage {
 
     override fun getAdditionalHighlightingTagToDescriptorMap(): MutableMap<String, TextAttributesKey> =
         mutableMapOf<String, TextAttributesKey>().also {
-            it["keyword"] = SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD
-            it["funcDef"] = SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION
+            it["keyword"] = SnakemakeSyntaxHighlighterAttributes.SMK_KEYWORD
+            it["funcDef"] = SnakemakeSyntaxHighlighterAttributes.SMK_FUNC_DEFINITION
 
-            it["sectionName"] = SnakemakeSyntaxHighlighterFactory.SMK_DECORATOR
-            it["run"] = SnakemakeSyntaxHighlighterFactory.SMK_PREDEFINED_DEFINITION
-            it["text"] = SnakemakeSyntaxHighlighterFactory.SMK_TEXT
-            it["TQS"] = SnakemakeSyntaxHighlighterFactory.SMK_TRIPLE_QUOTED_STRING
-            it["keywordArg"] = SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD_ARGUMENT
+            it["sectionName"] = SnakemakeSyntaxHighlighterAttributes.SMK_DECORATOR
+            it["run"] = SnakemakeSyntaxHighlighterAttributes.SMK_PREDEFINED_DEFINITION
+            it["text"] = SnakemakeSyntaxHighlighterAttributes.SMK_TEXT
+            it["TQS"] = SnakemakeSyntaxHighlighterAttributes.SMK_TRIPLE_QUOTED_STRING
+            it["keywordArg"] = SnakemakeSyntaxHighlighterAttributes.SMK_KEYWORD_ARGUMENT
 
             it["injectedText"] = SmkSLSyntaxHighlighter.STRING_CONTENT
             it["braces"] = SmkSLSyntaxHighlighter.BRACES

@@ -7,13 +7,14 @@ import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.Ref
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
-import com.jetbrains.snakecharm.lang.psi.*
+import com.jetbrains.snakecharm.lang.psi.AdvancedWildcardsCollector
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.SmkUse
+import com.jetbrains.snakecharm.lang.psi.WildcardDescriptor
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 
 class SmkWildcardNotDefinedInspection : SnakemakeInspection() {
-    companion object {
-        val KEY = Key<HashMap<SmkRuleOrCheckpoint, Ref<List<WildcardDescriptor>>>>("SmkWildcardNotDefinedInspection_Wildcards")
-    }
+    private val KEY = Key<HashMap<SmkRuleOrCheckpoint, Ref<List<WildcardDescriptor>>>>("SmkWildcardNotDefinedInspection_Wildcards")
 
     override fun buildVisitor(
         holder: ProblemsHolder,

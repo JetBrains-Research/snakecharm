@@ -20,17 +20,17 @@ import java.util.*
  * @author Roman.Chernyatchik
  * @date 2019-02-03
  */
+
+private val FOLDED_ELEMENTS = TokenSet.create(
+    SmkStubElementTypes.RULE_DECLARATION_STATEMENT,
+    SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT,
+    SmkElementTypes.WORKFLOW_PY_BLOCK_SECTION_STATEMENT,
+    // Sections
+    SmkElementTypes.RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT,
+    SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT
+)
+
 class SmkMakeFoldingBuilder : PythonFoldingBuilder() {
-    companion object {
-        val FOLDED_ELEMENTS = TokenSet.create(
-                SmkStubElementTypes.RULE_DECLARATION_STATEMENT,
-                SmkStubElementTypes.CHECKPOINT_DECLARATION_STATEMENT,
-                SmkElementTypes.WORKFLOW_PY_BLOCK_SECTION_STATEMENT,
-                // Sections
-                SmkElementTypes.RULE_OR_CHECKPOINT_RUN_SECTION_STATEMENT,
-                SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT
-        )
-    }
 //    override fun isRegionCollapsedByDefault(node: ASTNode): Boolean {
 ////        // TODO: snakemake specific settings fot this
 ////        return super.isRegionCollapsedByDefault(node)

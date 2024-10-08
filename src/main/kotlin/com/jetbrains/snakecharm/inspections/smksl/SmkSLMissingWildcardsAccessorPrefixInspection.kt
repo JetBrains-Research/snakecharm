@@ -13,7 +13,7 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
-import com.jetbrains.snakecharm.stringLanguage.lang.SmkSLInjector.Companion.isInExpandCallExpression
+import com.jetbrains.snakecharm.stringLanguage.lang.isInExpandCallExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 
 class SmkSLMissingWildcardsAccessorPrefixInspection : SnakemakeInspection() {

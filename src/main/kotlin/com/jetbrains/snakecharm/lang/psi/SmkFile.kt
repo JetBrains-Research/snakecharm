@@ -19,7 +19,7 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
     // consider extend SnakemakeScopeOwner:ScopeOwner
     // e.g. CythonFile, CythonScopeOwner
 
-    override fun getIcon(flags: Int) = SmkFileType.INSTANCE.icon
+    override fun getIcon(flags: Int) = SmkFileType.icon
 
     override fun toString() = "SnakemakeFile: $name"
 

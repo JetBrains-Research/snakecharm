@@ -9,6 +9,7 @@ import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
+import com.jetbrains.snakecharm.codeInsight.resolve.SmkImplicitPySymbolsResolveProviderCompanion.addSyntheticSymbols
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil.RATE_IMPLICIT_SYMBOLS
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_JOBID
@@ -24,6 +25,7 @@ class SmkImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
         if (SnakemakeLanguageDialect.isInsideSmkFile(context.origin)) {
 
             val contextScope = SmkCodeInsightScope[element]
+
             @Suppress("UnstableApiUsage")
             val referencedName = element.referencedName
             val items = arrayListOf<RatedResolveResult>()
@@ -73,27 +75,25 @@ class SmkImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
         }
         return emptyList()
     }
-
-    companion object {
-        fun addSyntheticSymbols(
-            contextScope: SmkCodeInsightScope,
-            cache: ImplicitPySymbolsCache,
-            referencedName: String?,
-            items: ArrayList<RatedResolveResult>,
-        ) {
-            SmkCodeInsightScope.entries.forEach { symbolScope ->
-                if (contextScope.includes(symbolScope)) {
-                    for (l in cache.getSynthetic(symbolScope)) {
-                        // TODO: Introduce ImplicitLookupItem class
-                        val psi = l.psiElement
-                        if (l.lookupString == referencedName && psi != null && psi.isValid) {
-                            items.add(RatedResolveResult(RATE_IMPLICIT_SYMBOLS, psi))
-                            break
-                        }
+}
+object SmkImplicitPySymbolsResolveProviderCompanion {
+    fun addSyntheticSymbols(
+        contextScope: SmkCodeInsightScope,
+        cache: ImplicitPySymbolsCache,
+        referencedName: String?,
+        items: ArrayList<RatedResolveResult>,
+    ) {
+        SmkCodeInsightScope.entries.forEach { symbolScope ->
+            if (contextScope.includes(symbolScope)) {
+                for (l in cache.getSynthetic(symbolScope)) {
+                    // TODO: Introduce ImplicitLookupItem class
+                    val psi = l.psiElement
+                    if (l.lookupString == referencedName && psi != null && psi.isValid) {
+                        items.add(RatedResolveResult(RATE_IMPLICIT_SYMBOLS, psi))
+                        break
                     }
                 }
             }
         }
-
     }
 }

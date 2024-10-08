@@ -9,8 +9,8 @@ import com.intellij.util.indexing.FindSymbolParameters
 import com.intellij.util.indexing.IdFilter
 import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
 import com.jetbrains.snakecharm.lang.psi.SmkRule
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndexCompanion
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndexCompanion
 
 class SmkGotoSymbolContributor : ChooseByNameContributorEx {
 
@@ -19,8 +19,8 @@ class SmkGotoSymbolContributor : ChooseByNameContributorEx {
         scope: GlobalSearchScope,
         filter: IdFilter?
     ) {
-        StubIndex.getInstance().processAllKeys(SmkRuleNameIndex.KEY, processor, scope, filter)
-        StubIndex.getInstance().processAllKeys(SmkCheckpointNameIndex.KEY, processor, scope, filter)
+        StubIndex.getInstance().processAllKeys(SmkRuleNameIndexCompanion.KEY, processor, scope, filter)
+        StubIndex.getInstance().processAllKeys(SmkCheckpointNameIndexCompanion.KEY, processor, scope, filter)
     }
 
     override fun processElementsWithName(
@@ -33,13 +33,13 @@ class SmkGotoSymbolContributor : ChooseByNameContributorEx {
         val index = StubIndex.getInstance()
 
         index.processElements(
-            SmkRuleNameIndex.KEY, name,
+            SmkRuleNameIndexCompanion.KEY, name,
             project, scope, parameters.idFilter,
             SmkRule::class.java,
             processor
         )
         index.processElements(
-            SmkCheckpointNameIndex.KEY, name,
+            SmkCheckpointNameIndexCompanion.KEY, name,
             project, scope, parameters.idFilter,
             SmkCheckPoint::class.java,
             processor

@@ -35,11 +35,11 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
             when (elementType) {
                 in KEYWORD_LIKE_TOKENS_FOR_ANNOTATOR -> addHighlightingAnnotation(
                     next,
-                    SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD
+                    SnakemakeSyntaxHighlighterAttributes.SMK_KEYWORD
                 )
 
                 SmkElementTypes.USE_NEW_NAME_PATTERN, PyTokenTypes.IDENTIFIER -> addHighlightingAnnotation(
-                    next, SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION
+                    next, SnakemakeSyntaxHighlighterAttributes.SMK_FUNC_DEFINITION
                 )
 
                 PyTokenTypes.COLON -> done = true
@@ -63,7 +63,7 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
     override fun visitSmkRunSection(st: SmkRunSection) {
         st.getSectionKeywordNode()?.let {
             @Suppress("UnstableApiUsage")
-            addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterFactory.SMK_PREDEFINED_DEFINITION)
+            addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterAttributes.SMK_PREDEFINED_DEFINITION)
         }
     }
 
@@ -88,21 +88,21 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
 
         ruleLike.nameIdentifier?.let { nameElement ->
             @Suppress("UnstableApiUsage")
-            addHighlightingAnnotation(nameElement, SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION)
+            addHighlightingAnnotation(nameElement, SnakemakeSyntaxHighlighterAttributes.SMK_FUNC_DEFINITION)
         }
     }
 
     private fun highlightWorkflowSection(st: SmkSection) {
         st.getSectionKeywordNode()?.let {
             @Suppress("UnstableApiUsage")
-            addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD)
+            addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterAttributes.SMK_KEYWORD)
         }
     }
 
     private fun highlightRuleLikeSection(st: SmkSection) {
         st.getSectionKeywordNode()?.let {
             @Suppress("UnstableApiUsage")
-            addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterFactory.SMK_DECORATOR)
+            addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterAttributes.SMK_DECORATOR)
         }
     }
 }

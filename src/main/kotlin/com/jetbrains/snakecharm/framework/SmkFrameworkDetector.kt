@@ -21,7 +21,7 @@ import java.util.*
  */
 class SmkFrameworkDetector : FrameworkDetector("snakemake") {
     override fun createSuitableFilePattern() = FileContentPattern.fileContent()!!
-    override fun getFileType() = SmkFileType.INSTANCE
+    override fun getFileType() = SmkFileType
 
     override fun detect(
         newFiles: MutableCollection<out VirtualFile>,

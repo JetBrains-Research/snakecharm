@@ -12,36 +12,14 @@ import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.highlighting.PyHighlighter
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.impl.PythonLanguageLevelPusher
+import com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterAttributes.SMK_TEXT
+import com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterAttributes.SMK_TRIPLE_QUOTED_STRING
 
 /**
  * @author Roman.Chernyatchik
  * @date 2018-12-31
  */
 class SnakemakeSyntaxHighlighterFactory : SyntaxHighlighterFactory() {
-    companion object {
-        val SMK_KEYWORD = TextAttributesKey.createTextAttributesKey(
-            "SMK_KEYWORD",
-            DefaultLanguageHighlighterColors.KEYWORD
-        )
-        val SMK_FUNC_DEFINITION = TextAttributesKey.createTextAttributesKey(
-            "SMK_FUNC_DEFINITION",
-            DefaultLanguageHighlighterColors.FUNCTION_DECLARATION
-        )
-        val SMK_DECORATOR = TextAttributesKey.createTextAttributesKey(
-            "SMK_DECORATOR",
-            DefaultLanguageHighlighterColors.METADATA
-        )
-        val SMK_PREDEFINED_DEFINITION: TextAttributesKey =
-            PyHighlighter.PY_PREDEFINED_DEFINITION // IDK why, but explicit creating via '.createText...' works improperly
-        val SMK_KEYWORD_ARGUMENT: TextAttributesKey =
-            PyHighlighter.PY_KEYWORD_ARGUMENT // The same to SMK_PREDEFINED_DEFINITION case
-        val SMK_TEXT = TextAttributesKey.createTextAttributesKey("SMK_TEXT", DefaultLanguageHighlighterColors.STRING)
-        val SMK_TRIPLE_QUOTED_STRING = TextAttributesKey.createTextAttributesKey(
-            "SMK_TRIPLE_QUOTED_STRING",
-            DefaultLanguageHighlighterColors.STRING
-        )
-    }
-
     private val myMap = FactoryMap.create<LanguageLevel, PyHighlighter> { key ->
         object : PyHighlighter(key) {
             override fun getTokenHighlights(tokenType: IElementType?): Array<TextAttributesKey> {
@@ -69,4 +47,34 @@ class SnakemakeSyntaxHighlighterFactory : SyntaxHighlighterFactory() {
     }
 
     fun getSyntaxHighlighterForLanguageLevel(level: LanguageLevel): SyntaxHighlighter = myMap[level]!!
+}
+
+object SnakemakeSyntaxHighlighterAttributes {
+    val SMK_KEYWORD = TextAttributesKey.createTextAttributesKey(
+        "SMK_KEYWORD",
+        DefaultLanguageHighlighterColors.KEYWORD
+    )
+
+    val SMK_FUNC_DEFINITION = TextAttributesKey.createTextAttributesKey(
+        "SMK_FUNC_DEFINITION",
+        DefaultLanguageHighlighterColors.FUNCTION_DECLARATION
+    )
+
+    val SMK_DECORATOR = TextAttributesKey.createTextAttributesKey(
+        "SMK_DECORATOR",
+        DefaultLanguageHighlighterColors.METADATA
+    )
+
+    val SMK_PREDEFINED_DEFINITION: TextAttributesKey =
+        PyHighlighter.PY_PREDEFINED_DEFINITION // IDK why, but explicit creating via '.createText...' works improperly
+
+    val SMK_KEYWORD_ARGUMENT: TextAttributesKey =
+        PyHighlighter.PY_KEYWORD_ARGUMENT // The same to SMK_PREDEFINED_DEFINITION case
+
+    val SMK_TEXT = TextAttributesKey.createTextAttributesKey("SMK_TEXT", DefaultLanguageHighlighterColors.STRING)
+
+    val SMK_TRIPLE_QUOTED_STRING = TextAttributesKey.createTextAttributesKey(
+        "SMK_TRIPLE_QUOTED_STRING",
+        DefaultLanguageHighlighterColors.STRING
+    )
 }

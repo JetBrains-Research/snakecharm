@@ -21,6 +21,10 @@ import java.util.regex.Pattern
  * Snakemake specific suppressor, e.g. for Rule-like sections and it's subsections
  */
 class SmkInspectionsSuppressor : InspectionSuppressor {
+    // TODO: as for PyCharm API
+    private val SUPPRESS_PATTERN =
+        Pattern.compile("\\s*noinspection\\s+([a-zA-Z_0-9.-]+(\\s*,\\s*[a-zA-Z_0-9.-]+)*)\\s*\\w*")
+
     override fun isSuppressedFor(element: PsiElement, toolId: String): Boolean {
         // Here Could be any QuickFix, not only registered via #getSuppressActions
 
@@ -95,51 +99,45 @@ class SmkInspectionsSuppressor : InspectionSuppressor {
     fun getContainingArgsSection(context: PsiElement?) =
         PsiTreeUtil.getParentOfType(context, SmkArgsSection::class.java)
 
-    companion object {
-        // TODO: as for PyCharm API
-        private val SUPPRESS_PATTERN =
-            Pattern.compile("\\s*noinspection\\s+([a-zA-Z_0-9.-]+(\\s*,\\s*[a-zA-Z_0-9.-]+)*)\\s*\\w*")
+    fun <T : PsiElement?> getTopmostParentOfType(
+        element: PsiElement?,
+        aClass: Class<T>,
+        strict: Boolean,
+        vararg stopAt: Class<out PsiElement>
+    ): T? {
+        var answer = PsiTreeUtil.getParentOfType(element, aClass, strict, *stopAt)
+        do {
+            val next = PsiTreeUtil.getParentOfType(answer, aClass, true, *stopAt) ?: break
+            answer = next
+        } while (true)
+        return answer
+    }
 
-        fun <T : PsiElement?> getTopmostParentOfType(
-            element: PsiElement?,
-            aClass: Class<T>,
-            strict: Boolean,
-            vararg stopAt: Class<out PsiElement>
-        ): T? {
-            var answer = PsiTreeUtil.getParentOfType(element, aClass, strict, *stopAt)
-            do {
-                val next = PsiTreeUtil.getParentOfType(answer, aClass, true, *stopAt) ?: break
-                answer = next
-            } while (true)
-            return answer
-        }
-
-        // TODO: as for PyCharm API
-        private fun isSuppressedForElement(stmt: PyElement, suppressId: String): Boolean {
-            var prevSibling = stmt.prevSibling
-            if (prevSibling == null) {
-                val parent = stmt.parent
-                if (parent != null) {
-                    prevSibling = parent.prevSibling
-                }
+    // TODO: as for PyCharm API
+    private fun isSuppressedForElement(stmt: PyElement, suppressId: String): Boolean {
+        var prevSibling = stmt.prevSibling
+        if (prevSibling == null) {
+            val parent = stmt.parent
+            if (parent != null) {
+                prevSibling = parent.prevSibling
             }
-            while (prevSibling is PsiComment || prevSibling is PsiWhiteSpace) {
-                if (prevSibling is PsiComment && isSuppressedInComment(
-                        prevSibling.getText().substring(1).trim { it <= ' ' }, suppressId
-                    )
-                ) {
-                    return true
-                }
-                prevSibling = prevSibling.prevSibling
+        }
+        while (prevSibling is PsiComment || prevSibling is PsiWhiteSpace) {
+            if (prevSibling is PsiComment && isSuppressedInComment(
+                    prevSibling.getText().substring(1).trim { it <= ' ' }, suppressId
+                )
+            ) {
+                return true
             }
-            return false
+            prevSibling = prevSibling.prevSibling
         }
+        return false
+    }
 
 
-        // TODO: as for PyCharm API
-        private fun isSuppressedInComment(commentText: String, suppressId: String): Boolean {
-            val m = SUPPRESS_PATTERN.matcher(commentText)
-            return m.matches() && SuppressionUtil.isInspectionToolIdMentioned(m.group(1), suppressId)
-        }
+    // TODO: as for PyCharm API
+    private fun isSuppressedInComment(commentText: String, suppressId: String): Boolean {
+        val m = SUPPRESS_PATTERN.matcher(commentText)
+        return m.matches() && SuppressionUtil.isInspectionToolIdMentioned(m.group(1), suppressId)
     }
 }

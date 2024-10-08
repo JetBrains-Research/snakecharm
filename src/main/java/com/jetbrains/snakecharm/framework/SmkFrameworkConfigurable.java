@@ -77,7 +77,7 @@ public class SmkFrameworkConfigurable implements SearchableConfigurable {
             @NotNull final Project project
     ) throws ConfigurationException {
         try {
-            final ValidationResult validationResult = SmkFrameworkConfigurableProvider.Companion.validateWrappersPath(project, uiState);
+            final ValidationResult validationResult = SmkFrameworkConfigurableProviderCompanion.INSTANCE.validateWrappersPath(project, uiState);
             if (!validationResult.isOk()) {
                 throw new ConfigurationException(validationResult.getErrorMessage());
             }
