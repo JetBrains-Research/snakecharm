@@ -10,8 +10,8 @@ Feature: Documentation for wrapper section
     And add snakemake framework support with wrappers loaded
     When I put the caret at <example>
     And I invoke quick documentation popup
-    Then Documentation text should contain <doc_link>
-    And Documentation text should contain <src_link>
+    Then Documentation text should contain a substring: <doc_link>
+    And Documentation text should contain a substring: <src_link>
     Examples:
       | example                       | doc_link                                                                             | src_link                                                                           |
       | 0.50.0/bio/bismark/bismark    | https://snakemake-wrappers.readthedocs.io/en/0.50.0/wrappers/bismark/bismark.html    | https://github.com/snakemake/snakemake-wrappers/tree/0.50.0/bio/bismark/bismark    |
@@ -22,7 +22,7 @@ Feature: Documentation for wrapper section
       | master/bio/multiqc            | https://snakemake-wrappers.readthedocs.io/en/latest/wrappers/multiqc.html            | https://github.com/snakemake/snakemake-wrappers/tree/master/bio/multiqc            |
       | latest/bio/arriba             | https://snakemake-wrappers.readthedocs.io/en/latest/wrappers/arriba.html             | https://github.com/snakemake/snakemake-wrappers/tree/master/bio/arriba             |
 
-  Scenario Outline: Documentation links for default settings
+  Scenario Outline: Documentation sections from wrapper
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -32,9 +32,9 @@ Feature: Documentation for wrapper section
     And add snakemake framework support with wrappers loaded
     When I put the caret at <example>
     And I invoke quick documentation popup
-    And Documentation text should contain <name>
-    And Documentation text should contain <description>
-    And Documentation text should contain <authors>
+    And Documentation text should contain a substring: <name>
+    And Documentation text should contain a substring: <description>
+    And Documentation text should contain a substring: <authors>
     Examples:
       | quote | example                       | name                 | authors      | description                   |
       | '     | 0.50.0/bio/bismark/bismark    | bismark              | Cherniatchik | BS-Seq reads using Bismark    |
@@ -44,3 +44,26 @@ Feature: Documentation for wrapper section
       | """   | 0.63.0/bio/samtools/sort      | samtools sort        | Köster       | Sort bam file with samtools   |
       | "     | master/bio/multiqc            | multiqc              | Ruiter       | qc report using multiqc       |
       | '     | latest/bio/arriba             | name                 | authors      | gene fusions                  |
+
+  Scenario Outline: Documentation text from wrapper
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule NAME:
+      wrapper: '<example>'
+    """
+    And add snakemake framework support with wrappers loaded
+    When I put the caret at <example>
+    And I invoke quick documentation popup
+    And Documentation text should contain substrings:
+      | name:        |
+      | description: |
+      | url:         |
+      | authors:     |
+      | input:       |
+      | output:      |
+      | notes:       |
+
+    Examples:
+      | example            |
+      | v4.6.0/bio/bwa/mem |

@@ -23,6 +23,27 @@ Feature: Completion for arguments used in wrapper
       | checkpoint | params  | utils/cairosvg             | extra            |
       | checkpoint | output  | bio/last/lastal            | blasttab         |
 
+  Scenario Outline: Do not suggest service sections as sections in completion
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> foo:
+      <section>:
+      wrapper: "0.64.0/<wrapper>"
+    """
+    And add snakemake framework support with wrappers loaded
+    When I put the caret after <section>:
+    And I invoke autocompletion popup
+    Then completion list shouldn't contain:
+      | <completion> |
+    Examples:
+      | rule_like | section | wrapper     | completion  |
+      | rule      | params  | bio/bwa/mem | name        |
+      | rule      | params  | bio/bwa/mem | description |
+      | rule      | params  | bio/bwa/mem | url         |
+      | rule      | params  | bio/bwa/mem | authors     |
+      | rule      | params  | bio/bwa/mem | notes       |
+
   Scenario Outline: Simple completion for bundled wrappers using different declaration styles
     Given a snakemake project
     Given I open a file "foo.smk" with text

@@ -133,6 +133,23 @@ Feature: Wrappers params parsing for wrapper.py, wrapper.R
     output:()
     """
 
+  Scenario: Ignore service keys in meta.yaml
+    Given a snakemake project
+    Given a file "meta.yaml" with text
+      """
+      name: gatk3 PrintReads
+      description: some description
+      url: http://bio-bwa.sourceforge.net/bwa.shtml
+      booooo: fooo
+      authors:
+        - Patrik Smeds
+      notes: |
+        * The `java_opts` param allows for additional arguments to be passed to the java compiler, e.g. "-Xmx4G" for one, and "-Xmx4G -XX:ParallelGCThreads=10" for two options.
+      """
+    When Parse wrapper args for "meta.yaml" and "wrapper.py" result is:
+    """
+    """
+
   Scenario: Parsing arguments from meta.yaml and wrapper.py (example 1)
     Given a snakemake project
     Given a file "meta.yaml" with text

@@ -367,9 +367,14 @@ class ActionsSteps {
         assertEquals(text, docPopupText, "Expected <$text> to be equal to  <$docPopupText>")
     }
 
-    @Then("^Documentation text should contain (.*)$")
+    @Then("^Documentation text should contain a substring: (.*)$")
     fun documentationShouldContain(text: String) {
         documentationTextShouldContain(text)
+    }
+    @Then("^Documentation text should contain substrings:$")
+    fun documentationShouldContainItems(table: DataTable) {
+        val substrings = table.asList()
+        substrings.forEach { substring -> documentationTextShouldContain(substring) }
     }
 
     @Then("^Documentation text should contain$")
