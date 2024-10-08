@@ -76,8 +76,9 @@ dependencies {
             //See https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html#intellij-extension-localpath
             local(platformLocalPath)
         } else {
-            logger.warn("Use version: ${gradleProperty("platformVersion")}")
-            create(platformType, gradleProperty("platformVersion"))
+            val isSnapshot = gradleProperty("platformVersion").get().endsWith("-SNAPSHOT")
+            logger.warn("Use IntelliJ Platform Version: ${gradleProperty("platformVersion")}. SNAPSHOT: $isSnapshot")
+            create(platformType, gradleProperty("platformVersion"), useInstaller = !isSnapshot)
         }
 
         // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
@@ -168,14 +169,15 @@ intellijPlatform {
 
     pluginVerification {
         ides {
+            // releases based on since/until builds
             recommended()
-// TODO: cleanup or not?
-//            select {
-//                types = listOf(IntelliJPlatformType.PyCharmCommunity, IntelliJPlatformType.PyCharmProfessional)
-//                channels = listOf(ProductRelease.Channel.EAP, ProductRelease.Channel.RELEASE)
-//                sinceBuild = "242"
-//                untilBuild = "243.*"
-//            }
+            // EAP snapshots
+            select {
+                types = listOf(IntelliJPlatformType.PyCharmProfessional)
+                channels = listOf(ProductRelease.Channel.EAP, ProductRelease.Channel.RELEASE)
+                sinceBuild = "242"
+                untilBuild = "301.*"
+            }
         }
     }
 }
