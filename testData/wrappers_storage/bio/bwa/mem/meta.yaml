@@ -1,6 +1,17 @@
 name: "bwa mem"
 description: Map reads using bwa mem, with optional sorting using
   samtools or picard.
+url: http://bio-bwa.sourceforge.net/bwa.shtml
 authors:
   - Johannes Köster
   - Julian de Ruiter
+  - Filipe G. Vieira
+input:
+  - FASTQ file(s)
+  - reference genome
+output:
+  - SAM/BAM/CRAM file
+notes: |
+  * The `extra` param allows for additional arguments for bwa-mem.
+  * The `sorting` param allows to enable sorting, and can be either 'none', 'samtools', 'fgbio' or 'picard'.
+  * The `sort_extra` allows for extra arguments for samtools/picard

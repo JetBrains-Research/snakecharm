@@ -10,6 +10,7 @@ Released on <not released>
 ### Fixed
 - Compatibility with PyCharm 2024.2-2024.3 EAPs (see [#532](https://github.com/JetBrains-Research/snakecharm/issues/532))
 - Improve parser error message when rule/module is declared with name but lacks ':' (see [#515](https://github.com/JetBrains-Research/snakecharm/issues/515))
+- For some wrappers documentation popup show wrong description (e.g. bio/bwa/mem-samblaster for bio/bwa/mem)
 
 ### Changed
 - Switch plugin build scripts to intellij-gradle-plugin 2.1.0 API version (required for 2024.2+ PyCharm) 

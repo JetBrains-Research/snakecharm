@@ -4,64 +4,73 @@ __email__ = "koester@jimmy.harvard.edu, julianderuiter@gmail.com"
 __license__ = "MIT"
 
 
+import tempfile
 from os import path
-
 from snakemake.shell import shell
+from snakemake_wrapper_utils.java import get_java_opts
+from snakemake_wrapper_utils.samtools import get_samtools_opts
 
 
 # Extract arguments.
 extra = snakemake.params.get("extra", "")
-
-sort = snakemake.params.get("sort", "none")
+log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+sort = snakemake.params.get("sorting", "none")
 sort_order = snakemake.params.get("sort_order", "coordinate")
 sort_extra = snakemake.params.get("sort_extra", "")
+samtools_opts = get_samtools_opts(snakemake, param_name="sort_extra")
+java_opts = get_java_opts(snakemake)
 
-log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
+index = snakemake.input.idx
+if isinstance(index, str):
+    index = path.splitext(snakemake.input.idx)[0]
+else:
+    index = path.splitext(snakemake.input.idx[0])[0]
+
 
 # Check inputs/arguments.
 if not isinstance(snakemake.input.reads, str) and len(snakemake.input.reads) not in {
     1,
     2,
 }:
-    raise ValueError("input must have 1 (single-end) or " "2 (paired-end) elements")
+    raise ValueError("input must have 1 (single-end) or 2 (paired-end) elements")
+
 
 if sort_order not in {"coordinate", "queryname"}:
     raise ValueError("Unexpected value for sort_order ({})".format(sort_order))
 
+
 # Determine which pipe command to use for converting to bam or sorting.
 if sort == "none":
-
     # Simply convert to bam using samtools view.
-    pipe_cmd = "samtools view -Sbh -o {snakemake.output[0]} -"
+    pipe_cmd = "samtools view {samtools_opts}"
 
 elif sort == "samtools":
-
-    # Sort alignments using samtools sort.
-    pipe_cmd = "samtools sort {sort_extra} -o {snakemake.output[0]} -"
-
     # Add name flag if needed.
     if sort_order == "queryname":
         sort_extra += " -n"
 
-    prefix = path.splitext(snakemake.output[0])[0]
-    sort_extra += " -T " + prefix + ".tmp"
+    # Sort alignments using samtools sort.
+    pipe_cmd = "samtools sort {samtools_opts} {sort_extra} -T {tmpdir}"
+
+elif sort == "fgbio":
+    if sort_order == "queryname":
+        sort_extra += " -s Queryname"
+    pipe_cmd = "fgbio SortBam -i /dev/stdin -o {snakemake.output[0]} {sort_extra}"
 
 elif sort == "picard":
-
     # Sort alignments using picard SortSam.
-    pipe_cmd = (
-        "picard SortSam {sort_extra} INPUT=/dev/stdin"
-        " OUTPUT={snakemake.output[0]} SORT_ORDER={sort_order}"
-    )
+    pipe_cmd = "picard SortSam {java_opts} {sort_extra} --INPUT /dev/stdin --TMP_DIR {tmpdir} --SORT_ORDER {sort_order} --OUTPUT {snakemake.output[0]}"
 
 else:
-    raise ValueError("Unexpected value for params.sort ({})".format(sort))
+    raise ValueError(f"Unexpected value for params.sort ({sort})")
 
-shell(
-    "(bwa mem"
-    " -t {snakemake.threads}"
-    " {extra}"
-    " {snakemake.params.index}"
-    " {snakemake.input.reads}"
-    " | " + pipe_cmd + ") {log}"
-)
+with tempfile.TemporaryDirectory() as tmpdir:
+    shell(
+        "(bwa mem"
+        " -t {snakemake.threads}"
+        " {extra}"
+        " {index}"
+        " {snakemake.input.reads}"
+        " | " + pipe_cmd + ") {log}"
+    )
