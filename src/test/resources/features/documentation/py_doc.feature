@@ -13,8 +13,8 @@ Feature: Check documentation popup for python file
     """
     When I put the caret at foo() #here
     Then I invoke quick documentation popup
-    Then Documentation text should contain def
-    Then Documentation text should contain foo
+    Then Documentation text should contain a substring: def
+    Then Documentation text should contain a substring: foo
     #    And Documentation text should contain
     #    """
     #    my documentation
@@ -32,7 +32,7 @@ Feature: Check documentation popup for python file
       """
     When I put the caret at foo() #here
     Then I invoke quick navigation info
-    Then Documentation text should contain foo
+    Then Documentation text should contain a substring: foo
     #    And Documentation text should contain
     #    """
     #    my documentation
