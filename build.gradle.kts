@@ -204,6 +204,19 @@ changelog {
     // unreleasedTerm.set("[Unreleased]") // default
 }
 
+// Configure Gradle Kover Plugin - read more: https://github.com/Kotlin/kotlinx-kover#configuration
+kover {
+    reports {
+        total {
+            xml {
+                onCheck = true
+            }
+        }
+    }
+}
+
+qodana {}
+
 tasks {
 
 //    runIde {
