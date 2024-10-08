@@ -4,7 +4,6 @@ import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyParsingBundle
 import com.jetbrains.python.PyTokenTypes
-import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.SnakemakeBundle

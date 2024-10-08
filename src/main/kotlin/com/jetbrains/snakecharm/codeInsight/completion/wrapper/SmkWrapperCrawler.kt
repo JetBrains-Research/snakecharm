@@ -195,7 +195,7 @@ object SmkWrapperCrawler {
 
     fun parseArgsPython(text: String): List<Pair<String, String>> {
         val sectionAndArgPairs =
-            Regex("(?<!from\\s|import\\s)snakemake\\.\\w*(\\.(get\\(\"\\w*\"|[^get]\\w*)|\\[\\d+\\])?")
+            Regex("(?<!from\\s|import\\s)snakemake\\.\\w*(\\.(get\\(\"\\w*\"|[^get]\\w*)|\\[\\d+])?")
                 .findAll(text).map { str ->
                     str.value
                         .substringAfter("snakemake.")
@@ -220,7 +220,7 @@ object SmkWrapperCrawler {
     }
 
     fun parseArgsR(text: String): List<Pair<String, String>> {
-        val sectionAndArgPairs = Regex("(?<!from\\s)snakemake@\\w*(\\[\\[\"\\w*\"\\]\\])?")
+        val sectionAndArgPairs = Regex("(?<!from\\s)snakemake@\\w*(\\[\\[\"\\w*\"]])?")
             .findAll(text).map { str ->
                 str.value
                     .substringAfter("snakemake@")

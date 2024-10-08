@@ -513,7 +513,6 @@ open class SmkStatementMover : PyStatementMover() {
         return null
     }
 
-    @Suppress("NAME_SHADOWING")
     private fun getCommentOrStatement(document: Document, destination: PsiElement): PsiElement {
         val statement = PsiTreeUtil.getParentOfType(
             destination, PyStatement::class.java, false
@@ -521,7 +520,7 @@ open class SmkStatementMover : PyStatementMover() {
 
         return when (destination) {
             is PsiComment -> {
-                if (document.getLineNumber(destination.getTextOffset()) == document.getLineNumber(statement.textOffset)) {
+                if (document.getLineNumber(destination.textOffset) == document.getLineNumber(statement.textOffset)) {
                     statement
                 } else {
                     destination
