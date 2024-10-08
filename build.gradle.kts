@@ -11,9 +11,21 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 fun gradlePropertyOptional(key: String) = project.findProperty(key)?.toString()
 fun gradleProperty(key: String) = providers.gradleProperty(key)
-fun gradlePropertyWithPriorityToSystemProperty(key: String): String = System.getProperty(key)?.let {
-    providers.gradleProperty(key).get()
-}.toString()
+fun gradlePropertyWithPriorityToSystemProperty(key: String): String {
+    val envVar = System.getenv(key.uppercase())
+    if (envVar != null) {
+        logger.warn("Using env variable for '${key.uppercase()}': $envVar")
+        return envVar
+    }
+    val sysProperty = System.getenv(key)
+    if (sysProperty != null) {
+        logger.warn("Using system property for '$key': $sysProperty")
+        return sysProperty
+    }
+    val gradleProperty = providers.gradleProperty(key).get()
+    logger.warn("Using gradle property for '$key': $gradleProperty")
+    return gradleProperty
+}
 
 plugins {
     // Java support
