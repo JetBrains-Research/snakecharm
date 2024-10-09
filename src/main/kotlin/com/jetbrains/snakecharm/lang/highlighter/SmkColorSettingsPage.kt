@@ -77,7 +77,7 @@ class SmkColorSettingsPage : RainbowColorSettingsPage {
 
     override fun getHighlighter(): SyntaxHighlighter {
         val lang = SnakemakeLanguageDialect.baseLanguage ?: PythonLanguage.getInstance()
-        val factory = SyntaxHighlighterFactory.LANGUAGE_FACTORY.forLanguage(lang)
+        val factory = SyntaxHighlighterFactory.getLanguageFactory().forLanguage(lang)
         if (factory is SnakemakeSyntaxHighlighterFactory) {
             return factory.getSyntaxHighlighterForLanguageLevel(LanguageLevel.getLatest())
         }
