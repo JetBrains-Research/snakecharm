@@ -8,19 +8,19 @@ import com.jetbrains.snakecharm.lang.validation.SmkAnnotator
 
 object SmkSyntaxAnnotator : SmkAnnotator() {
     override fun visitSmkRule(rule: SmkRule) {
-        highlightSMKRuleLike(rule)
+        highlightSmkRuleLike(rule)
     }
 
     override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
-        highlightSMKRuleLike(checkPoint)
+        highlightSmkRuleLike(checkPoint)
     }
 
     override fun visitSmkSubworkflow(subworkflow: SmkSubworkflow) {
-        highlightSMKRuleLike(subworkflow)
+        highlightSmkRuleLike(subworkflow)
     }
 
     override fun visitSmkModule(module: SmkModule) {
-        highlightSMKRuleLike(module)
+        highlightSmkRuleLike(module)
     }
 
     override fun visitSmkUse(use: SmkUse) {
@@ -83,7 +83,7 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
         highlightWorkflowSection(st)
     }
 
-    private fun highlightSMKRuleLike(ruleLike: SmkRuleLike<SmkArgsSection>) {
+    private fun highlightSmkRuleLike(ruleLike: SmkRuleLike<SmkArgsSection>) {
         highlightWorkflowSection(ruleLike)
 
         ruleLike.nameIdentifier?.let { nameElement ->

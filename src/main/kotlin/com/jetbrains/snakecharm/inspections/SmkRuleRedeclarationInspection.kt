@@ -55,18 +55,18 @@ class SmkRuleRedeclarationInspection : SnakemakeInspection() {
         }
 
         override fun visitSmkRule(rule: SmkRule) {
-            visitSMKRuleLike(rule)
+            visitSmkRuleLike(rule)
         }
 
         override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
-            visitSMKRuleLike(checkPoint)
+            visitSmkRuleLike(checkPoint)
         }
 
         override fun visitSmkUse(use: SmkUse) {
-            visitSMKRuleLike(use)
+            visitSmkRuleLike(use)
         }
 
-        private fun visitSMKRuleLike(ruleLike: SmkRuleLike<SmkRuleOrCheckpointArgsSection>) {
+        private fun visitSmkRuleLike(ruleLike: SmkRuleLike<SmkRuleOrCheckpointArgsSection>) {
             val containingFile = ruleLike.containingFile
             val nameToCheck = ruleLike.name ?: return
 
