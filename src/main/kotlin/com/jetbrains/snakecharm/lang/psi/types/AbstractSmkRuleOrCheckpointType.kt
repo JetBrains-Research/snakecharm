@@ -5,6 +5,7 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.psi.PsiElement
@@ -105,8 +106,10 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
             location, SmkExcludedRulesNamesList::class.java, SmkRuleLike::class.java
         )
         val useToIgnore = (useExcludedNamesList as? SmkExcludedRulesNamesList)?.getParentUse()
-        when (module) {
-            null -> (location.containingFile.originalFile as SmkFile).filterUsePsi().map { it.second }
+        when {
+            (module == null) || DumbService.isDumb(location.project) -> (location.containingFile.originalFile as SmkFile)
+                .filterUsePsi()
+                .map { it.second }
             else -> getVariantsFromIndex(SmkUseNameIndexCompanion.KEY, module, SmkUse::class.java)
         }.forEach { use ->
             val candidates = if (use == useToIgnore) {
@@ -180,14 +183,16 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
             getCurrentFileDeclarationsFunction: () -> List<T>
         ): Collection<PsiElement> {
             val module = location.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
-            return if (module != null) {
+            if (module != null) {
                 val scope = searchScope(module)
-                StubIndex.getElements(indexKey, name, module.project, scope, clazz)
-            } else {
-                // try local resolve
-                getCurrentFileDeclarationsFunction().filter { elem ->
-                    elem.name == name
+                if (!DumbService.isDumb(module.project)) {
+                    return StubIndex.getElements(indexKey, name, module.project, scope, clazz)
                 }
+            }
+
+            // try local resolve
+            return getCurrentFileDeclarationsFunction().filter { elem ->
+                elem.name == name
             }
         }
 

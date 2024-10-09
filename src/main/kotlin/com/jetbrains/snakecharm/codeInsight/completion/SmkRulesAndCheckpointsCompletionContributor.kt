@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiComment
@@ -217,11 +218,10 @@ private fun collectVariantsForElement(
 ): List<Pair<String, SmkRuleOrCheckpoint>> {
     val module = ModuleUtilCore.findModuleForPsiElement(element)
 
-    if (module == null) {
+    if ((module == null) || DumbService.isDumb(element.project)) {
         // if no module is given: try to collect local files
         val smkFile = element.containingFile.originalFile as SmkFile
         return if (isCheckPoint) smkFile.filterCheckPointsPsi() else smkFile.filterRulesPsi()
-
     }
     val results: List<SmkRuleOrCheckpoint> = when {
         isCheckPoint -> getVariantsFromIndex(SmkCheckpointNameIndexCompanion.KEY, module, SmkCheckPoint::class.java)
