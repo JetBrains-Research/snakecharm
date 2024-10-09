@@ -5,7 +5,7 @@
 
 
 ## [2024.2.1]
-Released on <not released>
+Released on 9 October 2024
 
 ### Fixed
 - Compatibility with PyCharm 2024.2-2024.3 EAPs (see [#532](https://github.com/JetBrains-Research/snakecharm/issues/532))
