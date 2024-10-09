@@ -4,6 +4,15 @@
 # SnakeCharm Plugin Changelog
 
 
+## [2024.2.2]
+Released on ...
+
+### Fixed
+- TODO
+
+### Changed
+- TODO
+
 ## [2024.2.1]
 Released on 9 October 2024
 
