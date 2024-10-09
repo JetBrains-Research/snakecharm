@@ -62,16 +62,6 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
         else -> findPythonSdk(project, internalState.pythonSdkName)
     }
 
-    fun isSdkValid(): Boolean {
-        val sdkName = internalState.pythonSdkName
-        val sdk = findPythonSdk(project, sdkName)
-
-        return when {
-            sdkName.isNullOrEmpty() -> sdk != null // i.e. project sdk exists
-            else -> sdkName == sdk?.name  // sdk with requested name was found in sdks table
-        }
-    }
-
     fun stateSnapshot(): State {
         val snapshot = State()
         snapshot.copyFrom(state)
@@ -91,8 +81,7 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
 
     fun initOnStartup() {
         val connection = project.messageBus.connect()
-        //TODO: project JDR e
-        
+
         // Listen SDK removed changed
         connection.subscribe(ProjectJdkTable.JDK_TABLE_TOPIC, object : ProjectJdkTable.Listener {
             override fun jdkNameChanged(jdk: Sdk, previousName: String) {

@@ -40,11 +40,11 @@ class SmkImplicitPySymbolsCompletionContributor : CompletionContributor() {
 
 
     init {
-        extend(CompletionType.BASIC, REF_CAPTURE, SMKImplicitPySymbolsCompletionProvider())
+        extend(CompletionType.BASIC, REF_CAPTURE, SmkImplicitPySymbolsCompletionProvider())
     }
 }
 
-class SMKImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionParameters>() {
+class SmkImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionParameters>() {
 
     override fun addCompletions(
         parameters: CompletionParameters,

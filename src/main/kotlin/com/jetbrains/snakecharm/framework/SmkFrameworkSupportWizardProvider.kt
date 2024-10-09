@@ -55,7 +55,7 @@ class SmkFrameworkSupportWizardConfigurable(project: Project?) : FrameworkSuppor
         // get settings
         val uiState = SmkSupportProjectSettings.State()
         uiState.snakemakeSupportEnabled = true
-        settingsPanel.apply(uiState)
+        settingsPanel.applyTo(uiState)
 
         // apply
         SmkFrameworkConfigurable.applyUIStateToProject(uiState, model.project)

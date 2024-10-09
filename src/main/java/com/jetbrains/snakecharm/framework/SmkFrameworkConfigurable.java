@@ -114,7 +114,7 @@ public class SmkFrameworkConfigurable implements SearchableConfigurable {
     private SmkSupportProjectSettings.State getUIState() {
         final SmkSupportProjectSettings.State st = new SmkSupportProjectSettings.State();
         st.setSnakemakeSupportEnabled(enableSmkSupportCB.isSelected());
-        settingsPanel.apply(st);
+        settingsPanel.applyTo(st);
         return st;
     }
 
