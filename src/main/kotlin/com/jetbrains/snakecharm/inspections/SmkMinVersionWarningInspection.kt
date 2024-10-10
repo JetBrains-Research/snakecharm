@@ -18,8 +18,16 @@ class SmkMinVersionWarningInspection : SnakemakeInspection() {
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
+        @Suppress("UnstableApiUsage")
         override fun visitPyCallExpression(node: PyCallExpression) {
-            val function = node.firstChild.reference?.resolve() as? PyFunction ?: return
+            val callee = node.callee
+            if (callee?.name != "min_version") {
+                return
+            }
+
+            val reference = callee.reference
+            val resolveResult = reference?.resolve()
+            val function = resolveResult as? PyFunction ?: return
             if (function.name != "min_version" || function.containingFile.name != SNAKEMAKE_MODULE_NAME_UTILS_PY) {
                 return
             }

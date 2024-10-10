@@ -280,7 +280,5 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
                 }
             }
         }
-
-
     }
 }
