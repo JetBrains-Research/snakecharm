@@ -309,6 +309,9 @@ tasks {
         from(layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage-bundled.cbor")) {
             into(pluginName.map { "$it/extra" })
         }
+        from(layout.projectDirectory.file("snakemake_api.yaml")) {
+            into(pluginName.map { "$it/extra" })
+        }
     }
 
     test {
