@@ -4,7 +4,7 @@
 # SnakeCharm Plugin Changelog
 
 
-## [2024.1.2]
+## [2024.2.2]
 Released on <not released>
 
 ### Features
