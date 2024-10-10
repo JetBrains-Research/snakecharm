@@ -26,6 +26,52 @@ Feature: Completion for snakemake keyword-like things
       | pepfile              |
       | pepschema            |
 
+  Scenario Outline: Complete at top-level with respect to deprecations
+    Given a snakemake project
+    And I set snakemake language version to "<lang_version>"
+    And depreciation data file content is
+    """
+    changelog:
+      - version: "2.0.0"
+        introduced:
+        - name: "container"
+          type: "top-level"
+        removed:
+        - name: "singularity"
+          type: "top-level"
+        deprecated:
+        - name: "wildcard_constraints"
+          type: "top-level"
+
+      - version: "1.0.0"
+        deprecated:
+        - name: "singularity"
+          type: "top-level"
+        removed:
+        - name: "subworkflow"
+          type: "top-level"
+      - version: "0.0.1"
+        introduced:
+        - name: "wildcard_constraints"
+          type: "top-level"
+    """
+    Given I open a file "foo.smk" with text
+    """
+    "foo"
+    """
+    When I put the caret at "foo"
+    Then I invoke autocompletion popup
+    Then completion list should contain these items with type text:
+      | <expected_item> | <expected_item_type> |
+    Then completion list shouldn't contain:
+      | <missing_item> |
+    Examples:
+      | lang_version | expected_item        | expected_item_type           | missing_item |
+      | 1.0.0        | singularity          | deprecated in 1.0.0          | subworkflow  |
+      | 2.0.0        | container            | >=2.0.0                      | singularity  |
+      | 1.0.0        | wildcard_constraints | >=0.0.1                      | xxx          |
+      | 2.0.0        | wildcard_constraints | >=0.0.1, deprecated in 2.0.0 | xxx          |
+
   Scenario: Complete report at top-level
     # We have 2 'report' in completion list, so prev scenario outline doesn't work  for 'report'
     Given a snakemake project
@@ -282,6 +328,79 @@ Feature: Completion for snakemake keyword-like things
       | module     | s   | skip_validation      |
       | module     | r   | replace_prefix       |
 
+  Scenario Outline: Complete at rule/checkpoint/module level with respect to deprecations
+    Given a snakemake project
+    And I set snakemake language version to "<lang_version>"
+    And depreciation data file content is
+    """
+    changelog:
+      - version: "2.0.0"
+        introduced:
+        - name: "<introduced_key>"
+          type: "subsection"
+          parent:
+            - "<rule_like>"
+        removed:
+        - name: "<deprecated_key>"
+          type: "subsection"
+          parent:
+            - "<rule_like>"
+        deprecated:
+        - name: "threads"
+          type: "subsection"
+          parent:
+            - "rule"
+        - name: "skip_validation"
+          type: "subsection"
+          parent:
+            - "module"
+
+      - version: "1.0.0"
+        deprecated:
+        - name: "<deprecated_key>"
+          type: "subsection"
+          parent:
+            - "<rule_like>"
+        removed:
+        - name: "<removed_key>"
+          type: "subsection"
+          parent:
+            - "<rule_like_removed>"
+      - version: "0.0.1"
+        introduced:
+        - name: "threads"
+          type: "subsection"
+          parent:
+            - "rule"
+        - name: "skip_validation"
+          type: "subsection"
+          parent:
+            - "module"
+    """
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        #here
+      """
+    When I put the caret at #here
+    Then I invoke autocompletion popup
+    Then completion list should contain these items with type text:
+      | <expected_item> | <expected_item_type> |
+      Then completion list shouldn't contain:
+        | <missing_item> |
+    Examples:
+      | rule_like | rule_like_removed | lang_version | expected_item   | expected_item_type           | missing_item | deprecated_key | removed_key | introduced_key |
+      | rule       | rule              | 1.0.0        | input         | deprecated in 1.0.0 | output       | input          | output      | log            |
+      | rule       | checkpoint        | 1.0.0        | output        |                     | xxx          | input          | output      | log            |
+      | rule       | module            | 1.0.0        | output        |                     | xxx          | input          | output      | log            |
+      | checkpoint | checkpoint        | 1.0.0        | input         | deprecated in 1.0.0 | output       | input          | output      | log            |
+      | rule      | rule              | 2.0.0        | log           | >=2.0.0            | input        | input          | output      | log            |
+      | rule      | rule              | 1.0.0        | threads         |  >=0.0.1              | xxx        | input          | output      | log            |
+      | rule      | rule              | 2.0.0        | threads         |  >=0.0.1, deprecated in 2.0.0                | xxx        | input          | output      | log            |
+      | module    | module            | 1.0.0        | config          | deprecated in 1.0.0          | snakefile    | config         | snakefile   | meta_wrapper   |
+      | module    | module            | 1.0.0        | skip_validation | >=0.0.1                      | snakefile          | input          | snakefile      | log            |
+      | module    | module            | 2.0.0        | skip_validation | >=0.0.1, deprecated in 2.0.0 | snakefile          | input          | snakefile      | log            |
+
   Scenario Outline: Completion in use declaration
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -327,6 +446,65 @@ Feature: Completion for snakemake keyword-like things
       | MODULE as NAME2 | l   | log     |
       | MODULE as NAME2 | th  | threads |
       | MODULE as NAME2 | c   | conda   |
+
+  Scenario Outline: Complete in use with respect to deprecations
+    Given a snakemake project
+    And I set snakemake language version to "<lang_version>"
+    And depreciation data file content is
+    """
+    changelog:
+      - version: "2.0.0"
+        introduced:
+        - name: "log"
+          type: "subsection"
+          parent:
+            - "use"
+        removed:
+        - name: "input"
+          type: "subsection"
+          parent:
+            - "use"
+        deprecated:
+        - name: "threads"
+          type: "subsection"
+          parent:
+            - "use"
+
+      - version: "1.0.0"
+        deprecated:
+        - name: "input"
+          type: "subsection"
+          parent:
+            - "use"
+        removed:
+        - name: "output"
+          type: "subsection"
+          parent:
+            - "use"
+      - version: "0.0.1"
+        introduced:
+        - name: "threads"
+          type: "subsection"
+          parent:
+            - "use"
+    """
+    Given I open a file "foo.smk" with text
+      """
+      use rule NAME1 from MODULE as NAME2 with:
+        #here
+      """
+    When I put the caret at #here
+    Then I invoke autocompletion popup
+    Then completion list should contain these items with type text:
+      | <expected_item> | <expected_item_type> |
+    Then completion list shouldn't contain:
+      | <missing_item> |
+    Examples:
+      | lang_version | expected_item | expected_item_type           | missing_item |
+      | 1.0.0        | input         | deprecated in 1.0.0          | output       |
+      | 2.0.0        | log           | >=2.0.0                      | input        |
+      | 1.0.0        | threads       | >=0.0.1                      | xxx          |
+      | 2.0.0        | threads       | >=0.0.1, deprecated in 2.0.0 | xxx          |
 
   Scenario: No rule execution sections in use body
     Given a snakemake project
