@@ -4,8 +4,8 @@
 # SnakeCharm Plugin Changelog
 
 
-## [2024.2.2]
-Released on ...
+## [2024.1.2]
+Released on <not released>
 
 ### Features
 - Inspection: Warn about deprecated or not yet available features based on snakemake language level (see [#508](https://github.com/JetBrains-Research/snakecharm/issues/508)
@@ -13,7 +13,7 @@ Released on ...
 - Inspection: Warn if snakemake section type or API function isn't supported in the current snakemake project based on a snakemake version (see [#500](https://github.com/JetBrains-Research/snakecharm/issues/500)
 
 ### Fixed
-- TODO
+- Improve parser error message when rule/module is declared with name but lacks ':' (see [#515](https://github.com/JetBrains-Research/snakecharm/issues/515))
 
 ### Changed
 - TODO

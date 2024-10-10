@@ -10,6 +10,8 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.nextLeaf
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
+import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 
 class SmkFileEndsWithCommentInspection : SnakemakeInspection() {
@@ -20,19 +22,33 @@ class SmkFileEndsWithCommentInspection : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
         override fun visitComment(comment: PsiComment) {
-            if(comment.containingFile !is SmkFile) {
+            if (comment.containingFile !is SmkFile) {
+                return
+            }
+            val settingsVersion = SmkSupportProjectSettings.getInstance(holder.project).snakemakeLanguageVersion
+
+            if (settingsVersion != null && SmkLanguageVersion(settingsVersion) >= END_COMMENT_ERROR_FIX_VERSION) {
                 return
             }
 
+            val message = if (settingsVersion != null) {
+                SnakemakeBundle.message(
+                    "INSP.NAME.file.ends.with.comment.message.version",
+                    END_COMMENT_ERROR_FIX_VERSION,
+                    settingsVersion
+                )
+            } else {
+                SnakemakeBundle.message("INSP.NAME.file.ends.with.comment.message")
+            }
             val nextLeaf = comment.nextLeaf(true)
             if (nextLeaf == null) {
-                registerProblem(
-                    comment,
-                    SnakemakeBundle.message("INSP.NAME.file.ends.with.comment.message"),
-                    InsertEmptyLine(comment)
-                )
+                registerProblem(comment, message, InsertEmptyLine(comment))
             }
         }
+    }
+
+    companion object {
+        private val END_COMMENT_ERROR_FIX_VERSION = SmkLanguageVersion("7.20.0")
     }
 }
 
