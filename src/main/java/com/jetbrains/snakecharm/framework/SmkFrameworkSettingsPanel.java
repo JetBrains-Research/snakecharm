@@ -17,6 +17,7 @@ import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.ui.ComboboxSpeedSearch;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
+import com.intellij.util.SlowOperations;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.xml.util.XmlStringUtil;
@@ -134,16 +135,19 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
         refreshSdkList(null);
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private void refreshSdkList(Sdk sdkToSelect) {
         final List<Sdk> sdks = new ArrayList<>();
         sdks.add(null);
 
-        final List<Sdk> committedSdks = new ArrayList<>(getPythonSdks());
+        final ArrayList<Sdk> committedSdks = new ArrayList<>();
+        try (var ignored = SlowOperations.knownIssue("https://github.com/JetBrains-Research/snakecharm/issues/534")) {
+            committedSdks.addAll(getPythonSdks());
+        }
         committedSdks.sort(new PreferredSdkComparator());
         sdks.addAll(committedSdks);
 
-        //noinspection unchecked
-        pythonSdkCB.setModel(new CollectionComboBoxModel(sdks, sdkToSelect));
+        pythonSdkCB.setModel(new CollectionComboBoxModel<>(sdks, sdkToSelect));
     }
 
     @NotNull
