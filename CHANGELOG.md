@@ -7,6 +7,9 @@
 ## [2024.2.2]
 Released on ...
 
+### Features
+- Inspection: Warn if snakemake section type or API function isn't supported in the current snakemake project based on a snakemake version (see [#500](https://github.com/JetBrains-Research/snakecharm/issues/500)
+
 ### Fixed
 - TODO
 
