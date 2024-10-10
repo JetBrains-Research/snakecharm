@@ -15,7 +15,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
  * In IDEA this code tells new project dialog wizard that it should suggest add Snakemake framework (if project module type in python)
  *
  * Here it is possible to provide a settings panel comp via [SmkFrameworkSupportWizardProvider.createConfigurable],
- * e.g. we could use [SmkSupportSettings] like component. But there are 2 limitations:
+ * e.g. we could use [SmkSupportProjectSettings] like component. But there are 2 limitations:
  *  - Validation of settings cannot be implemented here, e.g. check that directory exists. We could validate only on
  *  - Project is always null, so be careful with impl
  */
@@ -55,7 +55,7 @@ class SmkFrameworkSupportWizardConfigurable(project: Project?) : FrameworkSuppor
         // get settings
         val uiState = SmkSupportProjectSettings.State()
         uiState.snakemakeSupportEnabled = true
-        settingsPanel.apply(uiState)
+        settingsPanel.applyTo(uiState)
 
         // apply
         SmkFrameworkConfigurable.applyUIStateToProject(uiState, model.project)

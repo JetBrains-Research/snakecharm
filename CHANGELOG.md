@@ -7,8 +7,31 @@
 ## [2024.1.2]
 Released on <not released>
 
+### Features
+- Inspection: Warn about deprecated or not yet available features based on snakemake language level (see [#508](https://github.com/JetBrains-Research/snakecharm/issues/508)
+- Move snakemake API addition/removal info from JAR into `extra/snakemake_api.yaml` in plugin directory
+- Inspection: Warn if snakemake section type or API function isn't supported in the current snakemake project based on a snakemake version (see [#500](https://github.com/JetBrains-Research/snakecharm/issues/500)
+
 ### Fixed
 - Improve parser error message when rule/module is declared with name but lacks ':' (see [#515](https://github.com/JetBrains-Research/snakecharm/issues/515))
+
+### Changed
+- TODO
+
+## [2024.2.1]
+Released on 9 October 2024
+
+### Fixed
+- Compatibility with PyCharm 2024.2-2024.3 EAPs (see [#532](https://github.com/JetBrains-Research/snakecharm/issues/532))
+- Improve the parser error message when rule/module is declared with name but lacks ':' (see [#515](https://github.com/JetBrains-Research/snakecharm/issues/515))
+- For some wrappers the documentation popup shows the wrong description (e.g. `bio/bwa/mem-samblaster` for `bio/bwa/mem`)
+- Bundled snakemake wrappers list updated to `v4.6.0`
+- Use SDK chooser w/o mange sdks button on the Snakemake Language Frameworks Settings page. The previous version used legacy API that doesn't manage SDKs correctly.   
+- Exceptions: EA-655, EA-220, EA-100, EA-40
+
+### Changed
+- Switch plugin build scripts to `intellij-gradle-plugin` 2.1.0 API version (required for 2024.2+ PyCharm) 
+- Move cached wrappers info out of plugin JAR file to `../extra` directory 
 
 ## [2024.1.1]
 Released on 20 April 2024
@@ -23,6 +46,7 @@ Released on 6 Dec 2023 (EAP on 3 Nov 2023)
 
 ### Fixed
 - Compatibility with PyCharm 2023.3 (see [#507](https://github.com/JetBrains-Research/snakecharm/issues/507))
+- Exceptions: EA-232
 
 ### Changed:
 - Bundled snakemake wrappers list updated to `v2.9.1`

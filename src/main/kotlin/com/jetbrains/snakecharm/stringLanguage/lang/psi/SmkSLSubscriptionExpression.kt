@@ -5,6 +5,7 @@ import com.jetbrains.python.ast.PyAstElementVisitor
 import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.PySubscriptionExpression
 
+@Suppress("UnstableApiUsage")
 interface SmkSLSubscriptionExpression : SmkSLReferenceExpression, PySubscriptionExpression {
     override fun acceptPyVisitor(pyVisitor: PyAstElementVisitor?) {
         super<SmkSLReferenceExpression>.acceptPyVisitor(pyVisitor)

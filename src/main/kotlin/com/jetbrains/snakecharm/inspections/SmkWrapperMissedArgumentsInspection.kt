@@ -30,8 +30,7 @@ class SmkWrapperMissedArgumentsInspection : SnakemakeInspection() {
         fun visitSmkRuleOrCheckpoint(ruleOrCheckpoint: SmkRuleOrCheckpoint) {
             val wrapper = ruleOrCheckpoint.getSectionByName(SnakemakeNames.SECTION_WRAPPER) ?: return
 
-            val wrappers = SmkWrapperStorage.getInstance(ruleOrCheckpoint.project)
-                ?.wrappers ?: return
+            val wrappers = SmkWrapperStorage.getInstance(ruleOrCheckpoint.project).wrappers
             val wrapperName = wrapper.argumentList?.text ?: return
             val wrapperInfo = wrappers.find { wrapperName.contains(it.path) } ?: return
 
@@ -70,6 +69,7 @@ class SmkWrapperMissedArgumentsInspection : SnakemakeInspection() {
             section: SmkArgsSection,
             required: List<String>,
         ) {
+            @Suppress("UnstableApiUsage")
             val usedKeywords = argumentList.arguments.filterIsInstance<PyKeywordArgument>().map { it.keyword }
             required.forEach { arg ->
                 if (arg !in usedKeywords) {

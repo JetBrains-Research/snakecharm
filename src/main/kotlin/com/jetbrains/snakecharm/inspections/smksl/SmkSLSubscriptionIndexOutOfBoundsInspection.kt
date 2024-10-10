@@ -5,6 +5,7 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElement
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
+import com.jetbrains.snakecharm.inspections.smksl.SmkSLSubscriptionIndexOutOfBoundsInspectionUtil.checkOutOfBounds
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionIndexKeyExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLSubscriptionKeyReference
@@ -31,27 +32,27 @@ class SmkSLSubscriptionIndexOutOfBoundsInspection : SnakemakeInspection() {
             }
         }
     }
+}
 
-    companion object {
-        fun checkOutOfBounds(
-            type: SmkAvailableForSubscriptionType,
-            expr: PsiElement,
-            idx: Int,
-        ): String? {
-            val argsNumber = type.getPositionArgsNumber(expr)
+object SmkSLSubscriptionIndexOutOfBoundsInspectionUtil {
+    fun checkOutOfBounds(
+        type: SmkAvailableForSubscriptionType,
+        expr: PsiElement,
+        idx: Int,
+    ): String? {
+        val argsNumber = type.getPositionArgsNumber(expr)
 
-            if (argsNumber > 0) {
-                if (idx >= argsNumber || idx < 0) {
-                    return if (argsNumber == 1) {
-                        SnakemakeBundle.message("INSP.NAME.section.arg.idx.aiobe.zero.message")
-                    } else {
-                        SnakemakeBundle.message(
-                            "INSP.NAME.section.arg.idx.aiobe.message", argsNumber - 1
-                        )
-                    }
+        if (argsNumber > 0) {
+            if (idx >= argsNumber || idx < 0) {
+                return if (argsNumber == 1) {
+                    SnakemakeBundle.message("INSP.NAME.section.arg.idx.aiobe.zero.message")
+                } else {
+                    SnakemakeBundle.message(
+                        "INSP.NAME.section.arg.idx.aiobe.message", argsNumber - 1
+                    )
                 }
             }
-            return null
         }
+        return null
     }
 }

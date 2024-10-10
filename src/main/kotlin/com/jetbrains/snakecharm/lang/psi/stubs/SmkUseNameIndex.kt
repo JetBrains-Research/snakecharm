@@ -9,16 +9,16 @@ import com.intellij.psi.stubs.StubIndexKey
 import com.jetbrains.snakecharm.lang.psi.SmkUse
 
 class SmkUseNameIndex : StringStubIndexExtension<SmkUse>() {
-    override fun getKey() = KEY
+    override fun getKey() = SmkUseNameIndexCompanion.KEY
+}
 
-    companion object {
-        val KEY = StubIndexKey.createIndexKey<String, SmkUse>("Smk.use.shortName")
+object SmkUseNameIndexCompanion {
+    val KEY = StubIndexKey.createIndexKey<String, SmkUse>("Smk.use.shortName")
 
-        fun find(
-            name: String,
-            project: Project,
-            scope: GlobalSearchScope = ProjectScope.getAllScope(project)
-        ): Collection<SmkUse> =
-            StubIndex.getElements(KEY, name, project, scope, SmkUse::class.java)
-    }
+    fun find(
+        name: String,
+        project: Project,
+        scope: GlobalSearchScope = ProjectScope.getAllScope(project)
+    ): Collection<SmkUse> =
+        StubIndex.getElements(KEY, name, project, scope, SmkUse::class.java)
 }

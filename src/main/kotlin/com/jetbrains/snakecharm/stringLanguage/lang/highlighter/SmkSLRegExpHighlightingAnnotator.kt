@@ -7,10 +7,9 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.intellij.lang.regexp.RegExpHighlighter
 
+
 class SmkSLRegExpHighlightingAnnotator : Annotator {
-    companion object {
-        val REGEXP_HIGHLIGHTER = RegExpHighlighter(null, null)
-    }
+    private val REGEXP_HIGHLIGHTER = RegExpHighlighter(null, null)
 
     override fun annotate(
             element: PsiElement,

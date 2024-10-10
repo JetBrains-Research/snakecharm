@@ -45,7 +45,6 @@
             nonDefaultProject="true"
     />
     <editorNotificationProvider implementation="com.jetbrains.snakecharm.framework.SmkSupportDisabledBannerProvider"/>
-    <applicationService serviceImplementation="com.jetbrains.snakecharm.framework.SmkSupportDisabledBannerNotification"/>
     <notificationGroup
             id="SnakeCharmPluginNotifier"
             displayType="BALLOON"
@@ -113,7 +112,7 @@
 
     <completion.contributor
         language="Python"
-        implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SMKImplicitPySymbolsCompletionContributor"
+        implementationClass="com.jetbrains.snakecharm.codeInsight.completion.SmkImplicitPySymbolsCompletionContributor"
     />
 
     <completion.contributor
@@ -148,7 +147,10 @@
             implementationClass="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperArgsCompletionContributor"
     />
 
-    <psi.referenceContributor implementation="com.jetbrains.snakecharm.lang.psi.references.SmkPySubscriptionReferenceContributor"/>
+    <psi.referenceContributor
+            language="Python"
+            implementation="com.jetbrains.snakecharm.lang.psi.references.SmkPySubscriptionReferenceContributor"
+    />
 
 <!--    <psi.referenceContributor implementation="com.jetbrains.snakecharm.lang.psi.references.SmkPepReferenceContributor"/>-->
     <lang.inspectionSuppressor language="Snakemake" implementationClass="com.jetbrains.snakecharm.inspections.SmkInspectionsSuppressor"/>
@@ -439,7 +441,18 @@
             suppressId="SmkDepreciatedKeywords"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.deprecated.keywords.title"
             implementationClass="com.jetbrains.snakecharm.inspections.SmkDepreciatedKeywordsInspection"
+    />
+
+    <localInspection
+            language="Snakemake" shortName="SmkMinVersionWarningInspection"
+            enabledByDefault="true"
+            suppressId="SmkMinVersionWarning"
+            bundle="SnakemakeBundle"
+            groupKey="INSP.GROUP.snakemake"
+            key="INSP.NAME.min.version.too.early.title"
+            implementationClass="com.jetbrains.snakecharm.inspections.SmkMinVersionWarningInspection"
     />
 
     <localInspection
@@ -651,7 +664,6 @@
 
     <projectService serviceImplementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage"/>
 
-    <projectService serviceImplementation="com.jetbrains.snakecharm.framework.SmkSupportProjectSettings"/>
     <projectService serviceImplementation="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider"/>
   </extensions>
 

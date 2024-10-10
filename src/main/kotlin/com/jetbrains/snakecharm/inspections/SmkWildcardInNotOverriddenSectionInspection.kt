@@ -10,11 +10,10 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkUse
 import com.jetbrains.snakecharm.lang.psi.WildcardDescriptor
 
+
 class SmkWildcardInNotOverriddenSectionInspection : SnakemakeInspection() {
-    companion object {
-        val KEY_DefiningSections = Key<HashMap<SmkRuleOrCheckpoint, Ref<List<WildcardDescriptor>>>>("SmkWildcardInNotOverriddenSectionInspection_DefiningSections_Wildcards")
-        val KEY_AllSections = Key<HashMap<SmkRuleOrCheckpoint, Ref<List<WildcardDescriptor>>>>("SmkWildcardInNotOverriddenSectionInspection_AllSections _Wildcards")
-    }
+    private val KEY_DefiningSections = Key<HashMap<SmkRuleOrCheckpoint, Ref<List<WildcardDescriptor>>>>("SmkWildcardInNotOverriddenSectionInspection_DefiningSections_Wildcards")
+    private val KEY_AllSections = Key<HashMap<SmkRuleOrCheckpoint, Ref<List<WildcardDescriptor>>>>("SmkWildcardInNotOverriddenSectionInspection_AllSections _Wildcards")
 
     override fun buildVisitor(
         holder: ProblemsHolder,

@@ -4,7 +4,6 @@ import com.intellij.framework.FrameworkType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleType
 import com.jetbrains.python.PythonModuleTypeBase
-import com.jetbrains.python.module.PythonModuleType
 import com.jetbrains.snakecharm.SnakemakeBundle
 
 class SmkFrameworkType : FrameworkType(ID) {
@@ -19,7 +18,7 @@ class SmkFrameworkType : FrameworkType(ID) {
         fun isSuitableModuleType(moduleType: ModuleType<*>?): Boolean {
             // XXX let's allow in python modules only, but actually some user could
             // also want this in other language module + python facet
-            return (moduleType is PythonModuleTypeBase) || (moduleType?.id == PythonModuleType.getInstance().id)
+            return (moduleType is PythonModuleTypeBase) || (moduleType?.id == PythonModuleTypeBase.getInstance().id)
         }
     }
 }

@@ -7,7 +7,7 @@ import com.jetbrains.python.psi.PyNumericLiteralExpression
 import com.jetbrains.python.psi.PySubscriptionExpression
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.inspections.smksl.SmkSLInspectionVisitor
-import com.jetbrains.snakecharm.inspections.smksl.SmkSLSubscriptionIndexOutOfBoundsInspection
+import com.jetbrains.snakecharm.inspections.smksl.SmkSLSubscriptionIndexOutOfBoundsInspectionUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
 
@@ -23,13 +23,14 @@ class SmkSubscriptionIndexOutOfBoundsInspection : SnakemakeInspection() {
 
             // negative numbers not supported
             if (indexExp is PyNumericLiteralExpression) {
+                @Suppress("UnstableApiUsage")
                 val idx = indexExp.longValue?.toInt() ?: return
 
                 PsiTreeUtil.getParentOfType(expr, SmkRuleOrCheckpoint::class.java) ?: return
 
                 val type = TypeEvalContext.codeAnalysis(expr.project, expr.containingFile).getType(psiOperand)
                 if (type is SmkAvailableForSubscriptionType) {
-                    val errorMsg = SmkSLSubscriptionIndexOutOfBoundsInspection.checkOutOfBounds(type, expr, idx)
+                    val errorMsg = SmkSLSubscriptionIndexOutOfBoundsInspectionUtil.checkOutOfBounds(type, expr, idx)
                     if (errorMsg != null) {
                         registerProblem(indexExp, errorMsg)
                     }

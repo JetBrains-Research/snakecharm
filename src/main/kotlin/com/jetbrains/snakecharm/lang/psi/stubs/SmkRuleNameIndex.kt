@@ -10,18 +10,18 @@ import com.jetbrains.snakecharm.lang.psi.SmkRule
 
 
 class SmkRuleNameIndex : StringStubIndexExtension<SmkRule>() {
-    override fun getKey() = KEY
+    override fun getKey() = SmkRuleNameIndexCompanion.KEY
+}
 
-    companion object {
-        val KEY = StubIndexKey.createIndexKey<String, SmkRule>("Smk.rule.shortName")
+object SmkRuleNameIndexCompanion {
+    val KEY = StubIndexKey.createIndexKey<String, SmkRule>("Smk.rule.shortName")
 
-        fun find(
-                name: String,
-                project: Project,
-                scope: GlobalSearchScope = ProjectScope.getAllScope(project)
-        ): Collection<SmkRule> =
-                StubIndex.getElements(KEY, name, project, scope, SmkRule::class.java)
+    fun find(
+        name: String,
+        project: Project,
+        scope: GlobalSearchScope = ProjectScope.getAllScope(project)
+    ): Collection<SmkRule> =
+        StubIndex.getElements(KEY, name, project, scope, SmkRule::class.java)
 
-        // fun allKeys(project: Project) = StubIndex.getInstance().getAllKeys(KEY, project)
-    }
+    // fun allKeys(project: Project) = StubIndex.getInstance().getAllKeys(KEY, project)
 }

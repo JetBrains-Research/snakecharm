@@ -4,7 +4,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.StubElement
 import com.jetbrains.snakecharm.lang.psi.SmkRule
 import com.jetbrains.snakecharm.lang.psi.impl.SmkRuleImpl
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex.Companion.KEY
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndexCompanion.KEY
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleStub
 
 class SmkRuleElementType

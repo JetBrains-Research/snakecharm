@@ -7,8 +7,8 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import com.intellij.util.io.readBytes
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.SnakemakePluginUtil
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
@@ -129,11 +129,11 @@ class SmkWrapperStorage(val project: Project) : Disposable {
     data class WrapperInfo(
         val path: String = "", // system independent separators
         val args: Map<String, List<String>> = emptyMap(),
-        val description: String = ""
+        val description: String = "" // yaml description
     )
 
     companion object {
-        fun getInstance(project: Project) = project.getService(SmkWrapperStorage::class.java)
+        fun getInstance(project: Project) = project.getService(SmkWrapperStorage::class.java)!!
 
         @ExperimentalSerializationApi
         fun loadOrCollectLocalWrappers(project: Project, forced: Boolean = false) {
@@ -194,23 +194,25 @@ class SmkWrapperStorage(val project: Project) : Disposable {
 
         @ExperimentalSerializationApi
         private fun loadBundledWrappers(storage: SmkWrapperStorage) {
-            val resourceName = "/smk-wrapper-storage-bundled.cbor"
-            val resource = SmkWrapperStorage::class.java.getResource(resourceName)
-            requireNotNull(resource) {
-                "Missing '$resourceName' wrappers bundle"
+            val pluginSandboxPath = SnakemakePluginUtil.getPluginSandboxPath(SmkWrapperStorage::class.java)
+            val wrappersBundlePath = pluginSandboxPath.resolve("extra/smk-wrapper-storage-bundled.cbor")
+            requireNotNull(!wrappersBundlePath.exists()) {
+                "Missing wrappers bundle in plugin bundle: '$wrappersBundlePath' doesn't exist"
             }
-            val (repoVersion, wrappers) = deserializeWrappers(resource)
+            val (repoVersion, wrappers) = deserializeWrappers(wrappersBundlePath)
             storage.initFrom(repoVersion, wrappers)
         }
 
+
         @ExperimentalSerializationApi
         private fun deserializeWrappers(storagePath: Path) =
-            Cbor.decodeFromByteArray<Pair<String, List<SmkWrapperStorage.WrapperInfo>>>(
+            Cbor.decodeFromByteArray<Pair<String, List<WrapperInfo>>>(
                 Files.readAllBytes(storagePath)
             )
 
+        @Suppress("unused")
         @ExperimentalSerializationApi
-        private fun deserializeWrappers(url: URL): Pair<String, List<SmkWrapperStorage.WrapperInfo>> =
+        private fun deserializeWrappers(url: URL): Pair<String, List<WrapperInfo>> =
             Cbor.decodeFromByteArray(url.readBytes())
     }
 

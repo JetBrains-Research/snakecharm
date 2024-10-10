@@ -13,7 +13,7 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
-import com.jetbrains.snakecharm.stringLanguage.lang.SmkSLInjector.Companion.isInExpandCallExpression
+import com.jetbrains.snakecharm.stringLanguage.lang.isInExpandCallExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 
 class SmkSLMissingWildcardsAccessorPrefixInspection : SnakemakeInspection() {
@@ -24,6 +24,7 @@ class SmkSLMissingWildcardsAccessorPrefixInspection : SnakemakeInspection() {
     ) = object : SmkSLInspectionVisitor(holder, getContext(session)) {
 
         override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpression) {
+            @Suppress("UnstableApiUsage")
             if (expr.isQualified) {
                 return
             }
@@ -43,6 +44,7 @@ class SmkSLMissingWildcardsAccessorPrefixInspection : SnakemakeInspection() {
                 return
             }
 
+            @Suppress("UnstableApiUsage")
             val referencedName = expr.referencedName
             val typeEvalContext = TypeEvalContext.codeAnalysis(host.project, host.containingFile)
             val type = typeEvalContext.getType(ruleLike.wildcardsElement)

@@ -8,6 +8,7 @@ import com.jetbrains.python.codeInsight.PyInjectorBase
 import com.jetbrains.python.codeInsight.regexp.PythonRegexpLanguage
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.python.psi.PyStringLiteralExpression
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 
@@ -33,8 +34,9 @@ open class SmkWildcardConstraintsRegExpInjector : PyInjectorBase() {
     private fun PsiElement.isInWildcardConstraintsSection(): Boolean {
         val keyword = PsiTreeUtil.getParentOfType(this, SmkArgsSection::class.java)?.sectionKeyword
 
+        @Suppress("KotlinConstantConditions")
         return keyword == WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD ||
-                keyword == WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD
+                keyword == SECTION_WILDCARD_CONSTRAINTS
     }
 
     private fun PsiElement.isValidForInjection(): Boolean =

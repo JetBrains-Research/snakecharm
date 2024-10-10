@@ -9,7 +9,7 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.psi.SmkReferenceExpression
 import com.jetbrains.snakecharm.lang.psi.impl.refs.SmkRuleOrCheckpointNameReference
 
-
+@Suppress("UnstableApiUsage")
 class SmkReferenceExpressionImpl(node: ASTNode): PyReferenceExpressionImpl(node), SmkReferenceExpression {
     override fun getName() = nameElement?.text
 

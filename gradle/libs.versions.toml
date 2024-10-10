@@ -1,0 +1,31 @@
+[versions]
+# libraries
+junit = "5.11.1"
+cucumber = "7.19.0"
+cbor = "1.4.1"
+opentest4j = "1.3.0"
+
+# plugins
+kotlin = "1.9.25"
+intelliJPlatform = "2.1.0"
+changelog = "2.2.1"
+kover = "0.8.3"
+qodana = "2024.2.3"
+
+[libraries]
+junit = { group = "org.junit", name = "junit-bom", version.ref = "junit" }
+cucumber = { group = "io.cucumber", name = "cucumber-bom", version.ref = "cucumber" }
+kotlinTestJunit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
+kotlinReflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
+kotlinStdlibJdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
+kotlinxCbor = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-cbor", version.ref = "cbor" }
+opentest4j = { group = "org.opentest4j", name = "opentest4j", version.ref = "opentest4j" }
+
+
+[plugins]
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+intelliJPlatform = { id = "org.jetbrains.intellij.platform", version.ref = "intelliJPlatform" }
+changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+qodana = { id = "org.jetbrains.qodana", version.ref = "qodana" }

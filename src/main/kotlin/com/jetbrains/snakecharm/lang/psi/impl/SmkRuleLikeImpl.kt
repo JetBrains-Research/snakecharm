@@ -70,6 +70,7 @@ abstract class SmkRuleLikeImpl<StubT : NamedStub<PsiT>, PsiT : SmkRuleLike<S>, o
         } as? S
     }
 
+    @Suppress("UnstableApiUsage")
     override fun getStatementList() = childToPsiNotNull<PyStatementList>(PyElementTypes.STATEMENT_LIST)
 
     // iterate over children, not statements, since SMKRuleRunParameter isn't a statement

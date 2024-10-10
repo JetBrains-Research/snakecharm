@@ -7,9 +7,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.util.endOffset
 import com.intellij.psi.util.parentOfType
-import com.intellij.refactoring.suggested.endOffset
-import com.intellij.refactoring.suggested.startOffset
+import com.intellij.psi.util.startOffset
 import com.jetbrains.python.psi.PyBinaryExpression
 import com.jetbrains.python.psi.PyStringElement
 import com.jetbrains.python.psi.PyStringLiteralExpression
@@ -120,7 +120,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
                             if (res is SmkUse) {
                                 res.getProducedRulesNames().any { pair -> pair.first == ruleReference.text }
                             } else {
-                                val name = it.name
+                                @Suppress("UnstableApiUsage") val name = it.name
                                 name != null && ruleReference.text == useParent.name?.replace("*", name)
                             }
                         } ?: useParent.getProducedRulesNames()
@@ -174,13 +174,16 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
             var fixText = REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT
             var startOffset = 1
             val stringElements = stringArgument.stringElements as List<PyStringElement>
+            @Suppress("UnstableApiUsage")
             if (stringElements.firstOrNull()?.isTripleQuoted == true) {
                 startOffset = 3
             }
             val endOffset = startOffset
+            @Suppress("UnstableApiUsage")
             if (stringElements.firstOrNull()?.isFormatted == true) {
                 startOffset += 1
             }
+            @Suppress("UnstableApiUsage")
             if (stringElements.lastOrNull()?.isFormatted == true) {
                 fixText = F_STRING_REDIRECT_STDERR_STDOUT_TO_LOG_CMD_TEXT
             }

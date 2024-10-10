@@ -9,7 +9,7 @@ Feature: Documentation for 'shadow' settings
     """
     When I put the caret after shadow: "
     Then I invoke quick documentation popup
-    Then Documentation text should contain <documentation>
+    Then Documentation text should contain a substring: <documentation>
     Examples:
       | setting      | documentation                                                                                      |
       | full         | The setting shadow: "full" fully shadows the entire subdirectory structure of the current workdir. |
@@ -60,6 +60,6 @@ Feature: Documentation for 'shadow' settings
     """
     When I put the caret at roo(1)
     Then I invoke quick navigation info
-    Then Documentation text should contain def
-    Then Documentation text should contain roo
-    Then Documentation text should contain number
+    Then Documentation text should contain a substring: def
+    Then Documentation text should contain a substring: roo
+    Then Documentation text should contain a substring: number

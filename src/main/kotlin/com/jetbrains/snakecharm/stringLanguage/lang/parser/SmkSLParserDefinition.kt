@@ -12,9 +12,7 @@ import com.jetbrains.snakecharm.stringLanguage.lang.psi.*
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.elementTypes.SmkSLElementTypes
 
 class SmkSLParserDefinition : PythonParserDefinition() {
-    companion object {
-        val FILE = IFileElementType(SmkSLanguage)
-    }
+    private val FILE = IFileElementType(SmkSLanguage)
 
     override fun createElement(node: ASTNode): PsiElement =
         when (node.elementType) {

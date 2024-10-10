@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiComment
@@ -22,9 +23,9 @@ import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionInLocalRules
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndex
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndex
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndexCompanion
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndexCompanion
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkUseNameIndexCompanion
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.AbstractSmkRuleOrCheckpointType.Companion.getVariantsFromIndex
 import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
@@ -74,6 +75,7 @@ private class SmkCompletionInLocalRulesAndRuleOrderSectionsProvider : Completion
         val ruleOrderOrLocalRulesSection: SmkArgsSection? =
             (ruleorderSection ?: PsiTreeUtil.getParentOfType(position, SmkWorkflowLocalrulesSection::class.java))
 
+        @Suppress("UnstableApiUsage")
         val references = ruleOrderOrLocalRulesSection?.argumentList?.arguments
             ?.filterIsInstance<SmkReferenceExpression>()
             ?.map { it.name }
@@ -118,6 +120,7 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
             .originalPosition
             ?.parent as? PyReferenceExpression ?: return
 
+        @Suppress("UnstableApiUsage")
         val variants = when (rulesOrCheckpointsObject.name) {
             SnakemakeAPI.SMK_VARS_RULES -> collectVariantsForElement(
                 parameters.position,
@@ -169,7 +172,7 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
 private class InUseSectionProvider : CompletionProvider<CompletionParameters>() {
     companion object {
         val IN_USE_SECTION_PROVIDER_CAPTURE = psiElement()
-            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+            .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
             .inside(psiElement().inside(SmkUse::class.java))
             .andNot(
                 psiElement().insideOneOf(PyStatementList::class.java, PsiComment::class.java)
@@ -215,15 +218,14 @@ private fun collectVariantsForElement(
 ): List<Pair<String, SmkRuleOrCheckpoint>> {
     val module = ModuleUtilCore.findModuleForPsiElement(element)
 
-    if (module == null) {
+    if ((module == null) || DumbService.isDumb(element.project)) {
         // if no module is given: try to collect local files
         val smkFile = element.containingFile.originalFile as SmkFile
         return if (isCheckPoint) smkFile.filterCheckPointsPsi() else smkFile.filterRulesPsi()
-
     }
     val results: List<SmkRuleOrCheckpoint> = when {
-        isCheckPoint -> getVariantsFromIndex(SmkCheckpointNameIndex.KEY, module, SmkCheckPoint::class.java)
-        else -> getVariantsFromIndex(SmkRuleNameIndex.KEY, module, SmkRule::class.java)
+        isCheckPoint -> getVariantsFromIndex(SmkCheckpointNameIndexCompanion.KEY, module, SmkCheckPoint::class.java)
+        else -> getVariantsFromIndex(SmkRuleNameIndexCompanion.KEY, module, SmkRule::class.java)
     }
 
     val resultList = results.mapNotNull { psi ->
@@ -232,7 +234,7 @@ private fun collectVariantsForElement(
     }
     val usesRules = mutableListOf<Pair<String, SmkRuleOrCheckpoint>>()
     if (!isCheckPoint) {
-        getVariantsFromIndex(SmkUseNameIndex.KEY, module, SmkUse::class.java).forEach { use ->
+        getVariantsFromIndex(SmkUseNameIndexCompanion.KEY, module, SmkUse::class.java).forEach { use ->
             use.getProducedRulesNames().forEach { (first) ->
                 usesRules.add(first to use)
             }

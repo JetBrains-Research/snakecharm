@@ -9,7 +9,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex.Companion.KEY
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndexCompanion.KEY
 
 class SnakemakeRuleInheritanceMarkerProvider : RelatedItemLineMarkerProvider() {
 

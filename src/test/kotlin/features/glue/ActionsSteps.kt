@@ -30,7 +30,7 @@ import com.jetbrains.snakecharm.FakeSnakemakeInjector
 import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler
 import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
 import com.jetbrains.snakecharm.lang.highlighter.SmkColorSettingsPage
-import com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterFactory
+import com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterAttributes
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLSyntaxHighlighter
 import features.glue.SnakemakeWorld.findPsiElementUnderCaret
@@ -158,7 +158,7 @@ class ActionsSteps {
                         .firstOrNull { it.icon == icon } as? LineMarkerInfo.LineMarkerGutterIconRenderer<*>)?.lineMarkerInfo?.navigationHandler as? NavigationGutterIconRenderer)?.targetElements?.map { it as SmkRuleOrCheckpoint }
                         ?: emptyList())
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
         // Checks, that there are an appropriate number of markers
         if (expectNoGutters) {
             assertTrue(targetRulesOrCheckpoints.isEmpty(), "${currentElement?.text} should not have markers.")
@@ -184,7 +184,7 @@ class ActionsSteps {
                     "Extras: ${targetRulesOrCheckpoints.joinToString { "${it.name} in file ${it.containingFile.name}" }}"
                 )
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @Then("^I expect the tag highlighting to be the same as the annotator highlighting$")
@@ -193,11 +193,11 @@ class ActionsSteps {
         val attributesToCheck = arrayOf(
             // Currently, IDK how to check all used tags
             // Snakemake:
-            SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD,
-            SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION,
-            SnakemakeSyntaxHighlighterFactory.SMK_DECORATOR,
-            SnakemakeSyntaxHighlighterFactory.SMK_PREDEFINED_DEFINITION,
-            SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD_ARGUMENT,
+            SnakemakeSyntaxHighlighterAttributes.SMK_KEYWORD,
+            SnakemakeSyntaxHighlighterAttributes.SMK_FUNC_DEFINITION,
+            SnakemakeSyntaxHighlighterAttributes.SMK_DECORATOR,
+            SnakemakeSyntaxHighlighterAttributes.SMK_PREDEFINED_DEFINITION,
+            SnakemakeSyntaxHighlighterAttributes.SMK_KEYWORD_ARGUMENT,
             // SnakemakeSL:
             SmkSLSyntaxHighlighter.HIGHLIGHTING_WILDCARDS_KEY
         )
@@ -367,9 +367,14 @@ class ActionsSteps {
         assertEquals(text, docPopupText, "Expected <$text> to be equal to  <$docPopupText>")
     }
 
-    @Then("^Documentation text should contain (.*)$")
+    @Then("^Documentation text should contain a substring: (.*)$")
     fun documentationShouldContain(text: String) {
         documentationTextShouldContain(text)
+    }
+    @Then("^Documentation text should contain substrings:$")
+    fun documentationShouldContainItems(table: DataTable) {
+        val substrings = table.asList()
+        substrings.forEach { substring -> documentationTextShouldContain(substring) }
     }
 
     @Then("^Documentation text should contain$")
@@ -535,7 +540,7 @@ class ActionsSteps {
             ApplicationManager.getApplication().runWriteAction {
                 myFixture?.performEditorAction(actionId)
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @Given("^I expect caret (at|after) (.+)$")
@@ -549,7 +554,7 @@ class ActionsSteps {
             )
 
             assertEquals(pos, caretModel.offset)
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @Then("^I expect no language injection")
@@ -568,7 +573,7 @@ class ActionsSteps {
             ApplicationManager.getApplication().runWriteAction {
                 myFixture?.performEditorAction(actionId)
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     @Given("^editor content will be$")
@@ -577,10 +582,11 @@ class ActionsSteps {
             ApplicationManager.getApplication().runWriteAction {
                 fixture().checkResult(text)
             }
-        }, ModalityState.NON_MODAL)
+        }, ModalityState.nonModal())
     }
 
     private fun findTargetElementFor(element: PsiElement, editor: Editor) =
+        // TODO: See new API in JavaDocumentationTest,HtmlDocumentationTest
         DocumentationManager.getInstance(element.project)
             .findTargetElement(editor, element.containingFile, element)
 

@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.lang.psi.impl.refs
 
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.project.DumbService
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.parentOfType
@@ -13,10 +14,11 @@ import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.*
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndex
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkModuleNameIndexCompanion
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
 import com.jetbrains.snakecharm.lang.psi.types.SmkRulesType
 
+@Suppress("UnstableApiUsage")
 class SmkRuleOrCheckpointNameReference(
     element: SmkReferenceExpression,
     context: PyResolveContext
@@ -79,11 +81,12 @@ class SmkRuleOrCheckpointNameReference(
     ): List<RatedResolveResult> {
         val module = element.let { ModuleUtilCore.findModuleForPsiElement(it.originalElement) }
         val target = element.referencedName ?: return emptyList()
-        val modules = if (module == null) {
+        val modules = if (module == null || DumbService.isDumb(smkFile.project)) {
+            // file out of project or in dumb mode, resolve by local file PSE
             smkFile.collectModules().map { it.second }.filter { modulePsi -> modulePsi.name == target }
         } else {
             StubIndex.getElements(
-                SmkModuleNameIndex.KEY,
+                SmkModuleNameIndexCompanion.KEY,
                 target,
                 module.project,
                 GlobalSearchScope.moduleWithDependentsScope(module),

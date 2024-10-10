@@ -22,6 +22,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkSection
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
 
+@Suppress("UnstableApiUsage")
 class SmkRuleLikeSectionArgsType(
     val section: SmkRuleOrCheckpointArgsSection,
 ) : PyStructuralType(

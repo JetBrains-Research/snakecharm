@@ -4,7 +4,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.StubElement
 import com.jetbrains.snakecharm.lang.psi.SmkCheckPoint
 import com.jetbrains.snakecharm.lang.psi.impl.SmkCheckPointImpl
-import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndex.Companion.KEY
+import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndexCompanion.KEY
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointStub
 
 class SmkCheckpointElementType

@@ -6,7 +6,7 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.*
 import com.intellij.psi.util.elementType
-import com.intellij.refactoring.suggested.startOffset
+import com.intellij.psi.util.startOffset
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.snakecharm.SnakemakeBundle

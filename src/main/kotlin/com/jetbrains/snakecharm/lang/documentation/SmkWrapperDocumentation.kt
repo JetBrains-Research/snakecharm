@@ -32,9 +32,11 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
         } else {
             text.substringAfter("/")
         }
-        val wrappers = SmkWrapperStorage.getInstance(node.navigationElement.project)
-                ?.wrappers ?: return ""
-        val wrapper =  wrappers.find { wrapper -> wrapper.path.contains(result) }
+        val wrappers = SmkWrapperStorage.getInstance(node.navigationElement.project).wrappers
+        val filterWrappers =  wrappers.filter { wrapper -> wrapper.path == result }
+        require(filterWrappers.size <= 1) { "Found multiple wrappers (${filterWrappers.size}) for path: $result" }
+        val wrapper = filterWrappers.firstOrNull()
+        require(wrapper == null || wrapper.path == result) { "Found wrapper with different path: ${wrapper!!.path} != $result" }
         if (text.startsWith("file://")) {
             return if (wrapper != null)
                 """
@@ -46,11 +48,11 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
                 <p><a href="$text">Folder</a></p>
                 """.trimIndent()
         } else {
-            val urlDocs = "https://snakemake-wrappers.readthedocs.io/en/${node.stringValue}"
+            val urlDocs = "https://snakemake-wrappers.readthedocs.io/en/${text}"
                     .replace("/master/", "/latest/")
                     .replace("/bio/", "/wrappers/")
                     .replace("/utils/", "/wrappers/") + ".html"
-            val urlCode = "https://github.com/snakemake/snakemake-wrappers/tree/${node.stringValue}"
+            val urlCode = "https://github.com/snakemake/snakemake-wrappers/tree/${text}"
                     .replace("/latest/", "/master/")
             return if (wrapper != null)
                 """

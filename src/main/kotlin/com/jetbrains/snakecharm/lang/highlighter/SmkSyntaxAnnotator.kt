@@ -8,19 +8,19 @@ import com.jetbrains.snakecharm.lang.validation.SmkAnnotator
 
 object SmkSyntaxAnnotator : SmkAnnotator() {
     override fun visitSmkRule(rule: SmkRule) {
-        highlightSMKRuleLike(rule)
+        highlightSmkRuleLike(rule)
     }
 
     override fun visitSmkCheckPoint(checkPoint: SmkCheckPoint) {
-        highlightSMKRuleLike(checkPoint)
+        highlightSmkRuleLike(checkPoint)
     }
 
     override fun visitSmkSubworkflow(subworkflow: SmkSubworkflow) {
-        highlightSMKRuleLike(subworkflow)
+        highlightSmkRuleLike(subworkflow)
     }
 
     override fun visitSmkModule(module: SmkModule) {
-        highlightSMKRuleLike(module)
+        highlightSmkRuleLike(module)
     }
 
     override fun visitSmkUse(use: SmkUse) {
@@ -31,14 +31,15 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
         var done = false
         while (!done && next != null) {
             val elementType = next.elementType
+            @Suppress("UnstableApiUsage")
             when (elementType) {
                 in KEYWORD_LIKE_TOKENS_FOR_ANNOTATOR -> addHighlightingAnnotation(
                     next,
-                    SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD
+                    SnakemakeSyntaxHighlighterAttributes.SMK_KEYWORD
                 )
 
                 SmkElementTypes.USE_NEW_NAME_PATTERN, PyTokenTypes.IDENTIFIER -> addHighlightingAnnotation(
-                    next, SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION
+                    next, SnakemakeSyntaxHighlighterAttributes.SMK_FUNC_DEFINITION
                 )
 
                 PyTokenTypes.COLON -> done = true
@@ -61,7 +62,8 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
 
     override fun visitSmkRunSection(st: SmkRunSection) {
         st.getSectionKeywordNode()?.let {
-            addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterFactory.SMK_PREDEFINED_DEFINITION)
+            @Suppress("UnstableApiUsage")
+            addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterAttributes.SMK_PREDEFINED_DEFINITION)
         }
     }
 
@@ -81,23 +83,26 @@ object SmkSyntaxAnnotator : SmkAnnotator() {
         highlightWorkflowSection(st)
     }
 
-    private fun highlightSMKRuleLike(ruleLike: SmkRuleLike<SmkArgsSection>) {
+    private fun highlightSmkRuleLike(ruleLike: SmkRuleLike<SmkArgsSection>) {
         highlightWorkflowSection(ruleLike)
 
         ruleLike.nameIdentifier?.let { nameElement ->
-            addHighlightingAnnotation(nameElement, SnakemakeSyntaxHighlighterFactory.SMK_FUNC_DEFINITION)
+            @Suppress("UnstableApiUsage")
+            addHighlightingAnnotation(nameElement, SnakemakeSyntaxHighlighterAttributes.SMK_FUNC_DEFINITION)
         }
     }
 
     private fun highlightWorkflowSection(st: SmkSection) {
         st.getSectionKeywordNode()?.let {
-            addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterFactory.SMK_KEYWORD)
+            @Suppress("UnstableApiUsage")
+            addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterAttributes.SMK_KEYWORD)
         }
     }
 
     private fun highlightRuleLikeSection(st: SmkSection) {
         st.getSectionKeywordNode()?.let {
-            addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterFactory.SMK_DECORATOR)
+            @Suppress("UnstableApiUsage")
+            addHighlightingAnnotation(it, SnakemakeSyntaxHighlighterAttributes.SMK_DECORATOR)
         }
     }
 }

@@ -32,6 +32,7 @@ public class SmkFrameworkConfigurable implements SearchableConfigurable {
     public SmkFrameworkConfigurable(@NotNull Project project) {
         this.project = project;
 
+        //noinspection DataFlowIssue
         enableSmkSupportCB.addActionListener(e -> updateCompEnabledPropertyRecursively());
 
         settingsPanel = new SmkFrameworkSettingsPanel(project);
@@ -76,11 +77,11 @@ public class SmkFrameworkConfigurable implements SearchableConfigurable {
             @NotNull final Project project
     ) throws ConfigurationException {
         try {
-            final ValidationResult validationResult = SmkFrameworkConfigurableProvider.Companion.validateWrappersPath(project, uiState);
+            final ValidationResult validationResult = SmkFrameworkConfigurableProviderCompanion.INSTANCE.validateWrappersPath(project, uiState);
             if (!validationResult.isOk()) {
                 throw new ConfigurationException(validationResult.getErrorMessage());
             }
-            final ValidationResult versionValidation = SmkFrameworkConfigurableProvider.Companion.validateLanguageVersion(uiState);
+            final ValidationResult versionValidation = SmkFrameworkConfigurableProviderCompanion.INSTANCE.validateLanguageVersion(uiState);
             if (!versionValidation.isOk()) {
                 throw new ConfigurationException(versionValidation.getErrorMessage());
             }
@@ -117,7 +118,7 @@ public class SmkFrameworkConfigurable implements SearchableConfigurable {
     private SmkSupportProjectSettings.State getUIState() {
         final SmkSupportProjectSettings.State st = new SmkSupportProjectSettings.State();
         st.setSnakemakeSupportEnabled(enableSmkSupportCB.isSelected());
-        settingsPanel.apply(st);
+        settingsPanel.applyTo(st);
         return st;
     }
 

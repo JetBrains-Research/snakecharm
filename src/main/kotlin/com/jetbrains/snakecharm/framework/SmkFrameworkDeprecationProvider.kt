@@ -2,6 +2,8 @@ package com.jetbrains.snakecharm.framework
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
+import com.jetbrains.snakecharm.SnakemakePluginUtil
+import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
@@ -9,6 +11,8 @@ import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
 import org.yaml.snakeyaml.introspector.BeanAccess
 import java.io.InputStream
 import java.util.*
+import kotlin.io.path.exists
+import kotlin.io.path.inputStream
 
 @Service
 class SmkFrameworkDeprecationProvider {
@@ -21,9 +25,22 @@ class SmkFrameworkDeprecationProvider {
     private lateinit var topLevelIntroduction: Map<String, SmkLanguageVersion>
 
     private lateinit var defaultVersion: String
+
     init {
-        val input = javaClass.getResourceAsStream(DEPRECATION_DATA_LOCATION)
-        initialize(input)
+        val unitTestMode = ApplicationManager.getApplication().isUnitTestMode
+
+        val snakemakeApiFile = if (!unitTestMode) {
+            val pluginSandboxPath =
+                SnakemakePluginUtil.getPluginSandboxPath(SmkFrameworkDeprecationProvider::class.java)
+            pluginSandboxPath.resolve("extra/snakemake_api.yaml")
+        } else {
+            SnakemakeTestUtil.getTestDataPath().parent.resolve("snakemake_api.yaml")
+        }
+
+        requireNotNull(!snakemakeApiFile.exists()) {
+            "Missing wrappers bundle in plugin bundle: '$snakemakeApiFile' doesn't exist"
+        }
+        initialize(snakemakeApiFile.inputStream())
     }
 
     fun overrideInputFile(input: InputStream) {
@@ -36,7 +53,8 @@ class SmkFrameworkDeprecationProvider {
         val deprecationData = yaml.loadAs(inputStream, SmkDeprecationData::class.java)
         val topLevelData = emptyMap<String, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>().toMutableMap()
         val functionData = emptyMap<String, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>().toMutableMap()
-        val subsectionData = emptyMap<Pair<String, String?>, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>().toMutableMap()
+        val subsectionData =
+            emptyMap<Pair<String, String?>, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>().toMutableMap()
 
         val subsectionIntroductionsMap = emptyMap<Pair<String, String?>, SmkLanguageVersion>().toMutableMap()
         val topLevelIntroductionsMap = emptyMap<String, SmkLanguageVersion>().toMutableMap()
@@ -167,7 +185,6 @@ class SmkFrameworkDeprecationProvider {
     }
 
     companion object {
-        const val DEPRECATION_DATA_LOCATION = "/DeprecationData.yaml"
         const val TOP_LEVEL_KEYWORD_TYPE = "top-level"
         const val SUBSECTION_KEYWORD_TYPE = "subsection"
         const val FUNCTION_KEYWORD_TYPE = "function"

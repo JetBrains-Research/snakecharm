@@ -34,6 +34,7 @@ Feature: Fixes for PyTypeCheckerInspection related false positives
         run:
             with open(output[0], 'w') as out:
                 for p in input:
+                    # noinspection PyTypeChecker
                     print(p, file=out)
             for i,s in enumerate(output):
                         print(i, s)

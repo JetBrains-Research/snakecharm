@@ -19,8 +19,10 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.util.QualifiedName
 import com.intellij.util.SlowOperations
-import com.jetbrains.extensions.python.inherits
-import com.jetbrains.python.packaging.PyPackageManager
+import com.jetbrains.python.extensions.inherits
+import com.jetbrains.python.packaging.PyPackage
+import com.jetbrains.python.packaging.common.PythonPackageManagementListener
+import com.jetbrains.python.packaging.management.PythonPackageManager
 import com.jetbrains.python.packaging.pyRequirement
 import com.jetbrains.python.packaging.requirement.PyRequirementRelation.LT
 import com.jetbrains.python.psi.*
@@ -39,6 +41,7 @@ import javax.swing.SwingUtilities
  * @author Roman.Chernyatchik
  * @date 2019-05-07
  */
+@Suppress("UnstableApiUsage")
 class ImplicitPySymbolsProvider(
     val project: Project,
 ) : Disposable {
@@ -76,7 +79,7 @@ class ImplicitPySymbolsProvider(
         val project = project
 
         DumbService.getInstance(project).runWhenSmart {
-            SlowOperations.startSection(SlowOperations.KNOWN_ISSUE).use { ignore ->
+            SlowOperations.knownIssue("https://github.com/JetBrains-Research/snakecharm/issues/533").use { ignore ->
                 // XXX: workaround because default code throws 100+ exceptions:  java.lang.Throwable: Slow operations are prohibited on EDT. See SlowOperations.assertSlowOperationsAreAllowed javadoc.
                 // SlowOperations.allowSlowOperations<Throwable> { .. }
 
@@ -223,15 +226,15 @@ class ImplicitPySymbolsProvider(
             return false
         }
 
-        val packages = PyPackageManager.getInstance(sdk).packages
+        val packages = PythonPackageManager.forSdk(project, sdk).installedPackages
 
-        val pkgSnakemake = packages?.firstOrNull { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK }
+        val pkgSnakemake = packages.firstOrNull { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK }
         if (pkgSnakemake != null) {
-            return pkgSnakemake.matches(requirementSnakemake)
+            return PyPackage(pkgSnakemake.name, pkgSnakemake.version).matches(requirementSnakemake)
         }
-        val pkgSnakemakeMinimal = packages?.firstOrNull { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK_MINIMAL }
+        val pkgSnakemakeMinimal = packages.firstOrNull { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK_MINIMAL }
         if (pkgSnakemakeMinimal != null) {
-            return pkgSnakemakeMinimal.matches(requirementSnakemakeMinimal)
+            return PyPackage(pkgSnakemakeMinimal.name, pkgSnakemakeMinimal.version).matches(requirementSnakemakeMinimal)
         }
         return false
     }
@@ -312,15 +315,17 @@ class ImplicitPySymbolsProvider(
         })
 
         // Listen packages installed / removed
-        connection.subscribe(PyPackageManager.PACKAGE_MANAGER_TOPIC, PyPackageManager.Listener { sdk ->
-            val settings = SmkSupportProjectSettings.getInstance(project)
-            if (settings.snakemakeSupportEnabled) {
-                val activeSdk = settings.getActiveSdk()
-                if (sdk.name == activeSdk?.name) {
-                    LOG.debug("[PACKAGE_MANAGER_TOPIC]: sdk == [$sdk]")
+        connection.subscribe(PythonPackageManager.PACKAGE_MANAGEMENT_TOPIC, object : PythonPackageManagementListener {
+            override fun packagesChanged(sdk: Sdk) {
+                val settings = SmkSupportProjectSettings.getInstance(project)
+                if (settings.snakemakeSupportEnabled) {
+                    val activeSdk = settings.getActiveSdk()
+                    if (sdk.name == activeSdk?.name) {
+                        LOG.debug("[PACKAGE_MANAGER_TOPIC]: sdk == [$sdk]")
 
-                    // This events is submitted on module settings closing even if no modifications
-                    doRefresh(false)
+                        // This events is submitted on module settings closing even if no modifications
+                        doRefresh(false)
+                    }
                 }
             }
         })
@@ -368,6 +373,7 @@ class ImplicitPySymbolsProvider(
         }
     }
 
+    @Suppress("unused")
     private fun collectClassInstanceMethods(
         moduleAndClass: List<Pair<String, String>>,
         scope: SmkCodeInsightScope,
@@ -381,7 +387,7 @@ class ImplicitPySymbolsProvider(
             //    pyClass.project,
             //    pyClass.originalElement.containingFile
             //)
-            val ctx = null
+            //val ctx = null
             // val ctx = TypeEvalContext.codeInsightFallback(pyClass.project)
             pyClass.methods.forEach { method ->
                 if (method != null) {
@@ -391,6 +397,7 @@ class ImplicitPySymbolsProvider(
         }
     }
 
+    @Suppress("unused")
     private fun collectClassConstructors(
         moduleAndClass: List<Pair<String, String>>,
         scope: SmkCodeInsightScope,

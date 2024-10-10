@@ -3,10 +3,7 @@ package com.jetbrains.snakecharm.framework
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.BaseState
-import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.State
-import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
@@ -17,6 +14,7 @@ import com.intellij.util.xmlb.annotations.Attribute
 import com.jetbrains.python.PyNames
 import com.jetbrains.snakecharm.SnakemakeIcons
 
+@Service(Service.Level.PROJECT)
 @State(name = "SmkProjectSettings", storages = [Storage("snakemake-settings.xml")])
 class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent<SmkSupportProjectSettings.State>,
     Disposable {
@@ -68,16 +66,6 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
         else -> findPythonSdk(project, internalState.pythonSdkName)
     }
 
-    fun isSdkValid(): Boolean {
-        val sdkName = internalState.pythonSdkName
-        val sdk = findPythonSdk(project, sdkName)
-
-        return when {
-            sdkName.isNullOrEmpty() -> sdk != null // i.e. project sdk exists
-            else -> sdkName == sdk?.name  // sdk with requested name was found in sdks table
-        }
-    }
-
     fun stateSnapshot(): State {
         val snapshot = State()
         snapshot.copyFrom(state)
@@ -97,8 +85,7 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
 
     fun initOnStartup() {
         val connection = project.messageBus.connect()
-        //TODO: project JDR e
-        
+
         // Listen SDK removed changed
         connection.subscribe(ProjectJdkTable.JDK_TABLE_TOPIC, object : ProjectJdkTable.Listener {
             override fun jdkNameChanged(jdk: Sdk, previousName: String) {

@@ -6,7 +6,6 @@ import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyParsingBundle.message
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.ExpressionParsing
-import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes.SMK_PY_REFERENCE_EXPRESSION
@@ -110,6 +109,7 @@ class SmkExpressionParsing(context: SmkParserContext) : ExpressionParsing(contex
                         break
                     }
                 } else {
+                    @Suppress("KotlinConstantConditions")
                     if (atToken(PyTokenTypes.INCONSISTENT_DEDENT) && incorrectUnindentMarker == null) {
                         incorrectUnindentMarker = myBuilder.mark()
                     } else {
@@ -166,9 +166,9 @@ class SmkExpressionParsing(context: SmkParserContext) : ExpressionParsing(contex
             starArgMarker.done(PyElementTypes.STAR_ARGUMENT_EXPRESSION)
         } else {
             // arg or named arg:
-            if (Parsing.isIdentifier(myBuilder)) {
+            if (isIdentifier(myBuilder)) {
                 val keywordArgMarker = myBuilder.mark()
-                Parsing.advanceIdentifierLike(myBuilder)
+                advanceIdentifierLike(myBuilder)
                 if (myBuilder.tokenType === PyTokenTypes.EQ) {
                     myBuilder.advanceLexer()
                     if (!parseSingleExpression(false)) {

@@ -8,7 +8,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.types.TypeEvalContext
-import com.jetbrains.snakecharm.codeInsight.completion.SmkKeywordCompletionContributor
+import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionContributorPattern
 import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
 import com.jetbrains.snakecharm.lang.psi.types.SmkAvailableForSubscriptionType
 import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
@@ -18,25 +18,24 @@ import com.jetbrains.snakecharm.stringLanguage.lang.callSimpleName
  * reference providers, so cannot add referent to output[0].
  */
 class SmkPySubscriptionReferenceContributor : PsiReferenceContributor() {
-    companion object {
-        private val IN_SUBSCRIPTION_PATTERN = psiElement(PyStringLiteralExpression::class.java)
-                .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
-                .inside(
-                        true,
-                        instanceOf(PySubscriptionExpression::class.java),
-                        or(
-                                instanceOf(PyReferenceExpression::class.java),
-                                instanceOf(PyCallExpression::class.java)
-                        )
-                )
-                .inside(instanceOf(SmkRuleLike::class.java))
+    private val IN_SUBSCRIPTION_PATTERN = psiElement(PyStringLiteralExpression::class.java)
+        .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
+        .inside(
+            true,
+            instanceOf(PySubscriptionExpression::class.java),
+            or(
+                instanceOf(PyReferenceExpression::class.java),
+                instanceOf(PyCallExpression::class.java)
+            )
+        )
+        .inside(instanceOf(SmkRuleLike::class.java))
 
-        private val IN_GET_ACCESSOR_PATTERN = psiElement(PyStringLiteralExpression::class.java)
-                .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
-                .inside(instanceOf(PyArgumentList::class.java))
-                .inside(instanceOf(PyCallExpression::class.java))
-                .inside(instanceOf(SmkRuleLike::class.java))
-    }
+    private val IN_GET_ACCESSOR_PATTERN = psiElement(PyStringLiteralExpression::class.java)
+        .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
+        .inside(instanceOf(PyArgumentList::class.java))
+        .inside(instanceOf(PyCallExpression::class.java))
+        .inside(instanceOf(SmkRuleLike::class.java))
+
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
         registrar.registerReferenceProvider(
                 IN_SUBSCRIPTION_PATTERN, SmkSectionNameArgInSubscriptionReferenceProvider

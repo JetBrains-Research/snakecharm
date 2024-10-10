@@ -4,7 +4,6 @@ import com.intellij.psi.tree.IElementType
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyParsingBundle
 import com.jetbrains.python.PyTokenTypes
-import com.jetbrains.python.parsing.Parsing
 import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
@@ -340,8 +339,8 @@ class SmkStatementParsing(
 
     private fun parseIdentifier(): Boolean {
         val referenceMarker = myBuilder.mark()
-        if (Parsing.isIdentifier(myBuilder)) {
-            Parsing.advanceIdentifierLike(myBuilder)
+        if (isIdentifier(myBuilder)) {
+            advanceIdentifierLike(myBuilder)
             referenceMarker.done(SmkElementTypes.REFERENCE_EXPRESSION)
             return true
         }
@@ -483,7 +482,7 @@ class SmkStatementParsing(
                 PyTokenTypes.IDENTIFIER -> {
                     val referenceMarker = myBuilder.mark() // Register new name
                     list.add(myBuilder.tokenText ?: return)
-                    Parsing.advanceIdentifierLike(myBuilder)
+                    advanceIdentifierLike(myBuilder)
                     referenceMarker.done(SmkElementTypes.REFERENCE_EXPRESSION)
                     registerCommaOrEndOfNames()
                 }

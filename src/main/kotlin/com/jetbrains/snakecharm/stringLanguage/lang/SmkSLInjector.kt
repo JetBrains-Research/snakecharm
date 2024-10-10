@@ -29,6 +29,7 @@ open class SmkSLInjector : PyInjectorBase() {
 
     private fun PyStringLiteralExpression.containsLBraceOrIsEmpty(): Boolean {
         var allIsEmpty = true
+        @Suppress("UnstableApiUsage")
         stringElements.forEach {
             val content = it.content
             allIsEmpty = allIsEmpty && content.isEmpty()
@@ -63,15 +64,15 @@ open class SmkSLInjector : PyInjectorBase() {
                             this, PyLambdaExpression::class.java) == null
                             ) &&
                     (this as PyStringLiteralExpression).containsLBraceOrIsEmpty()
-    companion object {
-        fun isInExpandCallExpression(element: PsiElement): Boolean {
-                val parentCallExpr = PsiTreeUtil.getParentOfType(element, PyCallExpression::class.java)
-                return parentCallExpr?.callSimpleName() == SMK_FUN_EXPAND
-            }
-    }
+}
+
+fun isInExpandCallExpression(element: PsiElement): Boolean {
+    val parentCallExpr = PsiTreeUtil.getParentOfType(element, PyCallExpression::class.java)
+    return parentCallExpr?.callSimpleName() == SMK_FUN_EXPAND
 }
 
 fun PyCallExpression.callSimpleName() = this.callee.let { expression ->
+    @Suppress("UnstableApiUsage")
     when (expression) {
         is PyReferenceExpression -> expression.referencedName
         else -> null

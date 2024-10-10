@@ -13,7 +13,7 @@ import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes.RULE_LIKE_
 
 class SnakemakeFormattingModelBuilder: PythonFormattingModelBuilder() {
     companion object {
-        const val DUMP_FORMATTING_AST = false;
+        const val DUMP_FORMATTING_AST = false
     }
     override fun createSpacingBuilder(settings: CodeStyleSettings): SpacingBuilder {
         // TODO API: pass python language dialect into parent  !!!
@@ -68,9 +68,9 @@ class SnakemakeFormattingModelBuilder: PythonFormattingModelBuilder() {
         val settings = formattingContext.codeStyleSettings
 
         if (DUMP_FORMATTING_AST) {
-            val fileNode = element.containingFile.node;
-              println("AST tree for " + element.containingFile.name + ":");
-              printAST(fileNode, 0);
+            val fileNode = element.containingFile.node
+            println("AST tree for " + element.containingFile.name + ":")
+            printAST(fileNode, 0)
         }
 
         val context = SmkBlockContext(settings, createSpacingBuilder(settings), formattingContext.formattingMode)
@@ -79,7 +79,7 @@ class SnakemakeFormattingModelBuilder: PythonFormattingModelBuilder() {
             FormattingModelDumper.dumpFormattingModel(block, 2, System.out)
         }
 
-        return FormattingModelProvider.createFormattingModelForPsiFile(element.containingFile, block, settings);
+        return FormattingModelProvider.createFormattingModelForPsiFile(element.containingFile, block, settings)
     }
 
     private fun printAST(node: ASTNode?, indent: Int) {
@@ -99,7 +99,7 @@ class SnakemakeFormattingModelBuilder: PythonFormattingModelBuilder() {
 class SmkBlockContext(settings: CodeStyleSettings, builder: SpacingBuilder, mode: FormattingMode)
     : PyBlockContext(settings, builder, mode) {
 
-    private val smkSpecificCommonSettings =  settings.getCommonSettings(SnakemakeLanguageDialect);
+    private val smkSpecificCommonSettings =  settings.getCommonSettings(SnakemakeLanguageDialect)
 
     // Override ALIGN_MULTILINE_PARAMETERS_IN_CALLS
     override fun getSettings() = smkSpecificCommonSettings

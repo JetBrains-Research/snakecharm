@@ -19,7 +19,7 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
     // consider extend SnakemakeScopeOwner:ScopeOwner
     // e.g. CythonFile, CythonScopeOwner
 
-    override fun getIcon(flags: Int) = SmkFileType.INSTANCE.icon
+    override fun getIcon(flags: Int) = SmkFileType.icon
 
     override fun toString() = "SnakemakeFile: $name"
 
@@ -178,8 +178,7 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
         }.map { (name, psi) -> name to psi as SmkUse }
 
     /**
-     * Collects elements of type [SmkRuleOrCheckpoint] from a current [SmkFile] using [additionalCollector]
-     * and collects elements from other files which were imported via 'include:'
+     * Collects recursively this and files which were imported via 'include:'
      */
     fun collectIncludedFilesRecursively(
         visitedFiles: MutableSet<PsiFile> = mutableSetOf(),
@@ -227,7 +226,9 @@ class SmkFile(viewProvider: FileViewProvider) : PyFileImpl(viewProvider, Snakema
         return result
     }
 
+    @Suppress("unused")
     fun findPepfile(): SmkWorkflowArgsSection? {
+        // XXX: for #360, #433 feature
         var pepfile: SmkWorkflowArgsSection? = null
         acceptChildren(object : PyElementVisitor(), SmkElementVisitor {
             override val pyElementVisitor: PyElementVisitor = this

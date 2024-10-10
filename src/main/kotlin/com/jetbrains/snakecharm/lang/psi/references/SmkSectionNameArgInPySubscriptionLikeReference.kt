@@ -45,6 +45,6 @@ class SmkSectionNameArgInPySubscriptionLikeReference(
     override fun getUnresolvedDescription(): String =
         SmkSLSubscriptionKeyReference.unresolvedErrorMsg(element)
 
-    override fun getUnresolvedHighlightSeverity(context: TypeEvalContext?): HighlightSeverity? =
+    override fun getUnresolvedHighlightSeverity(context: TypeEvalContext?): HighlightSeverity =
         SmkSLSubscriptionKeyReference.INSPECTION_SEVERITY
 }

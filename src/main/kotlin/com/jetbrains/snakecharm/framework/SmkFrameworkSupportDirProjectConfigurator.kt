@@ -32,6 +32,7 @@ class SmkFrameworkSupportDirProjectConfigurator : DirectoryProjectConfigurator {
         if (module != null && SmkFrameworkType.isSuitableModuleType(module)) {
             if (detectSnakemake(baseDir)) {
                 // XXX: on project created is required to configure smk facet, SnakemakeStartupActivity will not help
+                @Suppress("UnstableApiUsage")
                 StartupManager.getInstance(project).runAfterOpened(DumbAwareRunnable {
                     enableSnakemakeSupport(
                         module,
@@ -60,7 +61,7 @@ class SmkFrameworkSupportDirProjectConfigurator : DirectoryProjectConfigurator {
 
         if (isSupportEnabled) {
             // already exists
-            return;
+            return
         }
 
         application.invokeLater(DumbAwareRunnable {
@@ -91,7 +92,7 @@ class SmkFrameworkSupportDirProjectConfigurator : DirectoryProjectConfigurator {
     fun containsSnakefileInRoot(root: VirtualFile): Boolean {
         for (child in root.children) {
             if (!child.isDirectory && child.name == "Snakefile") {
-                return true;
+                return true
             }
         }
         return false

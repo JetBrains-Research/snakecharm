@@ -16,6 +16,7 @@ class SmkPyReferenceExpressionImpl(astNode: ASTNode): PyReferenceExpressionImpl(
     override fun getReference(context: PyResolveContext): PsiPolyVariantReference {
         val baseRef = super.getReference(context)
 
+        @Suppress("UnstableApiUsage")
         val qualified = isQualified
         if (qualified && baseRef.javaClass == PyQualifiedReference::class.java) {
             return SmkPyQualifiedReference(this, context)

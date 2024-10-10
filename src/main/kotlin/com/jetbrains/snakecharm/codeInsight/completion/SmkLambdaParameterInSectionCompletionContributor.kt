@@ -21,15 +21,15 @@ class SmkLambdaParameterInSectionCompletionContributor : CompletionContributor()
     init {
         extend(
                 CompletionType.BASIC,
-                SMKLambdaParameterInSectionCompletionProvider.CAPTURE,
-                SMKLambdaParameterInSectionCompletionProvider
+                SmkLambdaParameterInSectionCompletionProvider.CAPTURE,
+                SmkLambdaParameterInSectionCompletionProvider
         )
     }
 }
 
-object SMKLambdaParameterInSectionCompletionProvider : CompletionProvider<CompletionParameters>() {
+object SmkLambdaParameterInSectionCompletionProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = PlatformPatterns.psiElement(PyTokenTypes.IDENTIFIER)
-            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+            .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
             .inside(PyParameterList::class.java)
             .inside(PyLambdaExpression::class.java)
             .andNot(PlatformPatterns.psiElement().inside(PyCallExpression::class.java)) // don't target lambda invocations

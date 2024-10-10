@@ -45,7 +45,5 @@ class SmkRuleImpl
 class SmkWildcardFakePsiElement(val element: SmkRuleOrCheckpoint): SmkFakePsiElement(
         element, SnakemakeAPI.SMK_VARS_WILDCARDS, PlatformIcons.PARAMETER_ICON
 ), PyTypedElement {
-    override fun getType(typeEvalContext: TypeEvalContext, key: TypeEvalContext.Key): PyType? {
-        return SmkWildcardsType(element)
-    }
+    override fun getType(typeEvalContext: TypeEvalContext, key: TypeEvalContext.Key): PyType = SmkWildcardsType(element)
 }

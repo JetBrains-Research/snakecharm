@@ -27,7 +27,7 @@ class SmkCompletionInSectionsWithFixedVariantsSetContributor : CompletionContrib
 
 object TemplateEngineSettingsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = PlatformPatterns.psiElement()
-        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+        .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
         .inside(SmkRuleOrCheckpointArgsSection::class.java)
         .inside(PyStringLiteralExpression::class.java)!!
 
@@ -49,7 +49,7 @@ object TemplateEngineSettingsProvider : CompletionProvider<CompletionParameters>
 
 object ShadowSectionSettingsProvider : CompletionProvider<CompletionParameters>() {
     val CAPTURE = PlatformPatterns.psiElement()
-        .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+        .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
         .inside(SmkRuleOrCheckpointArgsSection::class.java)
         .inside(PyStringLiteralExpression::class.java)!!
 

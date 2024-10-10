@@ -14,7 +14,7 @@
 //    companion object {
 //
 //        val IN_PEP_CONFIG = psiElement(PyStringLiteralExpression::class.java)
-//            .inFile(SmkKeywordCompletionContributor.IN_SNAKEMAKE)
+//            .inFile(SmkCompletionContributorPattern.IN_SNAKEMAKE)
 //            .inside(true, instanceOf(PySubscriptionExpression::class.java))
 //            .with(object : PatternCondition<PsiElement>("is after pep.config") {
 //                override fun accepts(element: PsiElement, context: ProcessingContext): Boolean =

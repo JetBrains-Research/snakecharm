@@ -6,5 +6,5 @@ import com.jetbrains.snakecharm.stringLanguage.SmkSLFileType
 import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage
 
 class SmkSLFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, SmkSLanguage) {
-    override fun getFileType() = SmkSLFileType.INSTANCE
+    override fun getFileType() = SmkSLFileType
 }

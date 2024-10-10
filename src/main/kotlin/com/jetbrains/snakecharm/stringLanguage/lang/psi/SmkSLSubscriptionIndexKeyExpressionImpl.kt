@@ -13,6 +13,7 @@ import com.jetbrains.snakecharm.stringLanguage.lang.SmkSLElementVisitor
 import com.jetbrains.snakecharm.stringLanguage.lang.parser.SmkSLTokenTypes
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLSubscriptionKeyReference
 
+@Suppress("UnstableApiUsage")
 class SmkSLSubscriptionIndexKeyExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(node),
     SmkSLSubscriptionIndexKeyExpression {
     override fun getName() = referencedName
