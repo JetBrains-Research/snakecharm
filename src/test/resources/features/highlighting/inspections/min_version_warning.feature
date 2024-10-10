@@ -8,7 +8,12 @@ Feature: Inspection warns min_version specifying version smaller than the one se
     from snakemake.utils import min_version
     min_version("7.6.5")
     """
-    When SmkMinVersionWarningInspection inspection is enabled
+    When I put the caret at _version(
+    # ensure, that `min_version` could be resolved, so inspection is applicable
+    Then reference should multi resolve to name, file, times[, class name]
+      | min_version | utils.py | 1 |
+    # main check:
+    And SmkMinVersionWarningInspection inspection is enabled
     Then I expect inspection weak warning on <min_version("7.6.5")> with message
     """
     Language version specified in settings <version> is earlier than the one specified using min_version. Try changing language version in Snakemake settings
@@ -29,7 +34,12 @@ Feature: Inspection warns min_version specifying version smaller than the one se
     from snakemake.utils import min_version
     min_version("7.6.5")
     """
-    When SmkMinVersionWarningInspection inspection is enabled
+    When I put the caret at _version(
+    # ensure, that `min_version` could be resolved, so inspection is applicable
+    Then reference should multi resolve to name, file, times[, class name]
+      | min_version | utils.py | 1 |
+    # main check:
+    And SmkMinVersionWarningInspection inspection is enabled
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
@@ -47,7 +57,12 @@ Feature: Inspection warns min_version specifying version smaller than the one se
     from snakemake.utils import min_version
     min_version("<set_version>")
     """
-    When SmkMinVersionWarningInspection inspection is enabled
+    When I put the caret at _version(
+    # ensure, that `min_version` could be resolved, so inspection is applicable
+    Then reference should multi resolve to name, file, times[, class name]
+      | min_version | utils.py | 1 |
+    # main check:
+    And SmkMinVersionWarningInspection inspection is enabled
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Then I expect no inspection errors
