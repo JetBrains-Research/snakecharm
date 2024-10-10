@@ -3,10 +3,7 @@ package com.jetbrains.snakecharm.framework
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.BaseState
-import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.State
-import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
@@ -17,6 +14,7 @@ import com.intellij.util.xmlb.annotations.Attribute
 import com.jetbrains.python.PyNames
 import com.jetbrains.snakecharm.SnakemakeIcons
 
+@Service(Service.Level.PROJECT)
 @State(name = "SmkProjectSettings", storages = [Storage("snakemake-settings.xml")])
 class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent<SmkSupportProjectSettings.State>,
     Disposable {
