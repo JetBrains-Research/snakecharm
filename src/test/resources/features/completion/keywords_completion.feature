@@ -301,47 +301,34 @@ Feature: Completion for snakemake keyword-like things
       | use rule a as b w   | with    | use rule a as b with:#      |
       | use rule * from M e | exclude | use rule * from M exclude # |
 
-  Scenario Outline: Completion in use body
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-    """
-    <use_declaration>
-        # here
-    """
-    When I put the caret at # here
-    Then I invoke autocompletion popup
-    And completion list should contain:
-    | input |
-    | output |
-    | conda |
-    And completion list shouldn't contain:
-    | shell |
-    Examples:
-      | use_declaration      |
-      | use a from M         |
-      | use a from M as new* |
-
-  Scenario Outline: Complete at use level
+  Scenario Outline: Complete and insert in use body
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
-      use rule NAME1 from MODULE as NAME2 with:
+      use rule NAME1 from <use_declaration> with:
         <str>#here
       """
+    When I put the caret at <str>#here
+    Then I invoke autocompletion popup
+    And completion list should contain:
+      | <result> |
     When I put the caret at #here
     Then I invoke autocompletion popup, select "<result>" lookup item and see a text:
       """
-      use rule NAME1 from MODULE as NAME2 with:
+      use rule NAME1 from <use_declaration> with:
         <result>: #here
       """
     Examples:
-      | str | result  |
-      | in  | input   |
-      | ou  | output  |
-      | l   | log     |
-      | th  | threads |
+      | use_declaration | str | result  |
+      | MODULE as NAME2 | in  | input   |
+      | MODULE as new*  | in  | input   |
+      | MODULE          | in  | input   |
+      | MODULE as NAME2 | ou  | output  |
+      | MODULE as NAME2 | l   | log     |
+      | MODULE as NAME2 | th  | threads |
+      | MODULE as NAME2 | c   | conda   |
 
-  Scenario: No rule execution sections in use section
+  Scenario: No rule execution sections in use body
     Given a snakemake project
     Given I open a file "foo.py" with text
     """
