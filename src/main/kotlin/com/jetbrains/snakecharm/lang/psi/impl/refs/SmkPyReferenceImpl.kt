@@ -3,6 +3,8 @@ package com.jetbrains.snakecharm.lang.psi.impl.refs
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
+import com.intellij.psi.ResolveResult
+import com.intellij.util.containers.toArray
 import com.jetbrains.python.psi.PyQualifiedExpression
 import com.jetbrains.python.psi.impl.references.PyReferenceImpl
 import com.jetbrains.python.psi.resolve.PyReferenceResolveProvider
@@ -25,6 +27,24 @@ class SmkPyReferenceImpl(
         val inRunSection: Boolean,
         val containingRuleOrCheckpoint: SmkRuleOrCheckpoint?
 ): PyReferenceImpl(element, context) {
+    val USE_CACHE = true
+
+    @Suppress("UsePropertyAccessSyntax")
+    override fun multiResolve(incompleteCode: Boolean): Array<out ResolveResult?> {
+        if (USE_CACHE) {
+            // XXX: default impl that is dependent on PyReferenceImpl.USE_CACHE
+            return super.multiResolve(incompleteCode)
+        }
+
+        // DEBUG: Hack for debug to void using CACHING
+        val referencedName = myElement.getReferencedName();
+        if (referencedName == null) return ResolveResult.EMPTY_ARRAY;
+
+        val targets: List<RatedResolveResult> = resolveInner();
+        if (targets.isEmpty()) return ResolveResult.EMPTY_ARRAY;
+
+        return RatedResolveResult.sorted(targets).toArray(ResolveResult.EMPTY_ARRAY)
+    }
 
     override fun resolveInner(): MutableList<RatedResolveResult> {
         val results = super.resolveInner()

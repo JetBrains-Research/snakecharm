@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.framework
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.BaseState
@@ -57,6 +58,11 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
             return internalState.snakemakeSupportBannerEnabled
         }
 
+    val snakemakeLanguageVersion: String?
+        get() {
+            return internalState.snakemakeLanguageVersion
+        }
+
     fun getActiveSdk() = when {
         !snakemakeSupportEnabled -> null
         else -> findPythonSdk(project, internalState.pythonSdkName)
@@ -103,6 +109,25 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
 
         })
 
+
+        // Register inspection refresh after settings were changed
+        connection.subscribe(TOPIC, object : SmkSupportProjectSettingsListener {
+            override fun stateChanged(
+                newSettings: SmkSupportProjectSettings,
+                oldState: State,
+                sdkRenamed: Boolean,
+                sdkRemoved: Boolean
+            ) {
+                if (oldState.snakemakeLanguageVersion != newSettings.snakemakeLanguageVersion) {
+                    DaemonCodeAnalyzer.getInstance(project).restart()
+                }
+            }
+
+            override fun enabled(newSettings: SmkSupportProjectSettings) {}
+
+            override fun disabled(newSettings: SmkSupportProjectSettings) {}
+        })
+
         Disposer.register(this, connection)
     }
 
@@ -121,6 +146,9 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
 
         @get:Attribute("smk_support_banner_enabled")
         var snakemakeSupportBannerEnabled by property(true)
+
+        @get:Attribute("smk_language_version")
+        var snakemakeLanguageVersion by string(SmkFrameworkDeprecationProvider.getInstance().getDefaultVersion())
     }
 
     companion object {

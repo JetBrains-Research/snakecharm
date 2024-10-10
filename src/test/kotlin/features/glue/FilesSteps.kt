@@ -4,9 +4,10 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.text.StringUtil
+import com.jetbrains.snakecharm.framework.SmkFrameworkDeprecationProvider
 import com.jetbrains.snakecharm.lang.highlighter.SmkColorSettingsPage
-import io.cucumber.java.en.Then
 import io.cucumber.java.en.Given
+import io.cucumber.java.en.Then
 import junit.framework.TestCase.assertEquals
 
 
@@ -33,6 +34,14 @@ class FilesSteps {
     fun iOpenAFile(name: String, text: String) {
         createAndAddFile(name, text)
     }
+
+    @Given("depreciation data file content is$")
+    fun deprecationDataIs(text: String) {
+        ApplicationManager.getApplication().invokeAndWait({
+            SmkFrameworkDeprecationProvider.getInstance().overrideInputFile(text.byteInputStream())
+        }, ModalityState.nonModal())
+    }
+
 
     @Given("^I open a color settings page text$")
     fun iOpenAColorSettingsPAge() {
