@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.jetbrains.snakecharm.SnakemakePluginUtil
 import com.jetbrains.snakecharm.SnakemakeTestUtil
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import org.jetbrains.annotations.TestOnly
 import org.yaml.snakeyaml.LoaderOptions
@@ -21,11 +22,11 @@ class SmkFrameworkDeprecationProvider {
 
     private lateinit var topLevelCorrection: Map<String, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>
     private lateinit var functionCorrection: Map<String, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>
-    private lateinit var subsectionCorrection: Map<Pair<String, String?>, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>
+    private lateinit var subsectionCorrection: Map<Pair<String, String>, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>
 
-    private lateinit var subsectionIntroduction: Map<Pair<String, String?>, SmkLanguageVersion>
-    private lateinit var subsectionRemoval: Map<Pair<String, String?>, SmkLanguageVersion>
-    private lateinit var subsectionDeprecation: Map<Pair<String, String?>, SmkLanguageVersion>
+    private lateinit var subsectionIntroduction: Map<Pair<String, String>, SmkLanguageVersion>
+    private lateinit var subsectionRemoval: Map<Pair<String, String>, SmkLanguageVersion>
+    private lateinit var subsectionDeprecation: Map<Pair<String, String>, SmkLanguageVersion>
     private lateinit var topLevelIntroduction: Map<String, SmkLanguageVersion>
     private lateinit var topLevelRemoval: Map<String, SmkLanguageVersion>
     private lateinit var topLevelDeprecation: Map<String, SmkLanguageVersion>
@@ -68,11 +69,11 @@ class SmkFrameworkDeprecationProvider {
         val topLevelData = emptyMap<String, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>().toMutableMap()
         val functionData = emptyMap<String, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>().toMutableMap()
         val subsectionData =
-            emptyMap<Pair<String, String?>, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>().toMutableMap()
+            emptyMap<Pair<String, String>, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>().toMutableMap()
 
-        val subsectionIntroductionsMap = emptyMap<Pair<String, String?>, SmkLanguageVersion>().toMutableMap()
-        val subsectionDeprecationsMap = emptyMap<Pair<String, String?>, SmkLanguageVersion>().toMutableMap()
-        val subsectionRemovalMap = emptyMap<Pair<String, String?>, SmkLanguageVersion>().toMutableMap()
+        val subsectionIntroductionsMap = emptyMap<Pair<String, String>, SmkLanguageVersion>().toMutableMap()
+        val subsectionDeprecationsMap = emptyMap<Pair<String, String>, SmkLanguageVersion>().toMutableMap()
+        val subsectionRemovalMap = emptyMap<Pair<String, String>, SmkLanguageVersion>().toMutableMap()
         val topLevelIntroductionsMap = emptyMap<String, SmkLanguageVersion>().toMutableMap()
         val topLevelDeprecationsMap = emptyMap<String, SmkLanguageVersion>().toMutableMap()
         val topLevelRemovalMap = emptyMap<String, SmkLanguageVersion>().toMutableMap()
@@ -82,23 +83,23 @@ class SmkFrameworkDeprecationProvider {
             val version = SmkLanguageVersion(data.version)
 
             val mapGetter = { src: SmkDeprecationKeywordData, newValue: SmkKeywordUpdateData ->
-                when (src.type) {
-                    FUNCTION_KEYWORD_TYPE, TOP_LEVEL_KEYWORD_TYPE -> {
-                        val dataToInsert = if (src.type == FUNCTION_KEYWORD_TYPE) functionData else topLevelData
+                val srcType = src.type
+                when (srcType) {
+                    SmkAPIKeywordContextType.FUNCTION.typeStr, SmkAPIKeywordContextType.TOP_LEVEL.typeStr -> {
+                        val dataToInsert = if (srcType == SmkAPIKeywordContextType.FUNCTION.typeStr) functionData else topLevelData
                         dataToInsert.getOrPut(src.name) { TreeMap() }[version] = newValue
                     }
-
-                    SUBSECTION_KEYWORD_TYPE -> {
-                        if (src.parent.isEmpty()) {
-                            subsectionData.getOrPut(src.name to null) { TreeMap() }[version] = newValue
-                        } else {
-                            for (parent in src.parent) {
-                                subsectionData.getOrPut(src.name to parent) { TreeMap() }[version] = newValue
+                    // else: subsection type:
+                    else -> {
+                        if (srcType == SmkAPIKeywordContextType.RULE_LIKE.typeStr) {
+                            SnakemakeAPI.RULE_LIKE_KEYWORDS.forEach { directive ->
+                                subsectionData.getOrPut(src.name to directive) { TreeMap() }[version] = newValue
                             }
                         }
+                        else {
+                            subsectionData.getOrPut(src.name to srcType) { TreeMap() }[version] = newValue
+                        }
                     }
-
-                    else -> throw IllegalArgumentException("Unknown keyword type: ${src.type}")
                 }
             }
 
@@ -126,26 +127,24 @@ class SmkFrameworkDeprecationProvider {
     private fun foo(
         topLevelEventsMap: MutableMap<String, SmkLanguageVersion>,
         version: SmkLanguageVersion,
-        subsectionEventsMap: MutableMap<Pair<String, String?>, SmkLanguageVersion>,
+        subsectionEventsMap: MutableMap<Pair<String, String>, SmkLanguageVersion>,
         events: List<SmkDeprecationKeywordData>
         )
     {
         for (event in events) {
             when (event.type) {
-                TOP_LEVEL_KEYWORD_TYPE -> topLevelEventsMap[event.name] = version
-                SUBSECTION_KEYWORD_TYPE -> {
-                    if (event.parent.isEmpty()) {
-                        subsectionEventsMap[event.name to null] = version
-                    }
-                    for (parent in event.parent) {
-                        subsectionEventsMap[event.name to parent] = version
-                    }
-                }
-                FUNCTION_KEYWORD_TYPE -> {
+                SmkAPIKeywordContextType.TOP_LEVEL.typeStr -> topLevelEventsMap[event.name] = version
+                SmkAPIKeywordContextType.FUNCTION.typeStr -> {
                     // TODO do nothing, functions processed isn't implemented, issue: ......
                 }
-
-                else -> throw IllegalArgumentException("Type ${event.type} is not supported")
+                SmkAPIKeywordContextType.RULE_LIKE.typeStr -> {
+                    SnakemakeAPI.RULE_LIKE_KEYWORDS.forEach { directive ->
+                        subsectionEventsMap[event.name to directive] = version
+                    }
+                }
+                else -> {
+                    subsectionEventsMap[event.name to event.type] = version
+                }
             }
         }
     }
@@ -165,16 +164,13 @@ class SmkFrameworkDeprecationProvider {
     /**
      * @param name name of keyword to check
      * @param version version in which keyword status should be checked
-     * @param parent section in which keyword was used
+     * @param contextSectionKeyword section in which keyword was used
      * @return Pair of latest deprecation/removal update that was made to the subsection keyword as of provided version,
      *           and advice if any was assigned to the change
      */
-    fun getSubsectionCorrection(name: String, version: SmkLanguageVersion, parent: String): SmkCorrectionInfo? {
-        return getKeywordCorrection(subsectionCorrection[name to parent], version, false) ?: getKeywordCorrection(
-            subsectionCorrection[name to null],
-            version
-        )
-    }
+    fun getSubsectionCorrection(name: String, version: SmkLanguageVersion, contextSectionKeyword: String): SmkCorrectionInfo? =
+        // XXX: at the moment we don't have any subsections with context `section`, that was global in the past
+        getKeywordCorrection(subsectionCorrection[name to contextSectionKeyword], version, false)
 
     /**
      * @param name name of keyword to check
@@ -202,15 +198,14 @@ class SmkFrameworkDeprecationProvider {
         return topLevelDeprecation[name]
     }
 
-    fun getSubSectionIntroductionVersion(name: String, parent: String): SmkLanguageVersion? {
-        return subsectionIntroduction[name to parent] ?: subsectionIntroduction[name to null]
-    }
+    fun getSubSectionIntroductionVersion(name: String, contextSectionKeyword: String): SmkLanguageVersion? =
+        subsectionIntroduction[name to contextSectionKeyword]
 
-    fun getSubSectionDeprecationVersion(name: String, parent: String): SmkLanguageVersion? {
-        return subsectionDeprecation[name to parent] ?: subsectionDeprecation[name to null]
+    fun getSubSectionDeprecationVersion(name: String, contextSectionKeyword: String): SmkLanguageVersion? {
+        return subsectionDeprecation[name to contextSectionKeyword]
     }
-    fun getSubSectionRemovalVersion(name: String, parent: String): SmkLanguageVersion? {
-        return subsectionRemoval[name to parent] ?: subsectionRemoval[name to null]
+    fun getSubSectionRemovalVersion(name: String, contextSectionKeyword: String): SmkLanguageVersion? {
+        return subsectionRemoval[name to contextSectionKeyword]
     }
 
     private fun getKeywordCorrection(
@@ -232,15 +227,15 @@ class SmkFrameworkDeprecationProvider {
             updateMap(keyword, SmkKeywordUpdateData(updateType, keyword.advice.ifEmpty { null }))
         }
     }
-
     companion object {
-        const val TOP_LEVEL_KEYWORD_TYPE = "top-level"
-        const val SUBSECTION_KEYWORD_TYPE = "subsection"
-        const val FUNCTION_KEYWORD_TYPE = "function"
-
         fun getInstance() =
             ApplicationManager.getApplication().getService(SmkFrameworkDeprecationProvider::class.java)!!
     }
+}
+enum class SmkAPIKeywordContextType(val typeStr: String) {
+    TOP_LEVEL("top-level"),
+    RULE_LIKE("rule-like"),
+    FUNCTION("function"),
 }
 
 enum class UpdateType {
@@ -256,7 +251,6 @@ data class SmkKeywordUpdateData(
 data class SmkDeprecationKeywordData(
     val name: String = "",
     val type: String = "",
-    val parent: List<String> = emptyList(),
     val advice: String = "",
 )
 
@@ -276,5 +270,5 @@ data class SmkCorrectionInfo(
     val updateType: UpdateType,
     val advice: String?,
     val version: SmkLanguageVersion,
-    val isGlobalChange: Boolean
+    val isGlobalChange: Boolean // XXX seems we don't need it any more, was for `global` subsections mainly
 )

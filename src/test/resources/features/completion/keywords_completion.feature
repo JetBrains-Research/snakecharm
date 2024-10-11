@@ -29,7 +29,7 @@ Feature: Completion for snakemake keyword-like things
   Scenario Outline: Complete at top-level with respect to deprecations
     Given a snakemake project
     And I set snakemake language version to "<lang_version>"
-    And depreciation data file content is
+    And snakemake framework api yaml descriptor is
     """
     changelog:
       - version: "2.0.0"
@@ -334,51 +334,35 @@ Feature: Completion for snakemake keyword-like things
   Scenario Outline: Complete at rule/checkpoint/module level with respect to deprecations
     Given a snakemake project
     And I set snakemake language version to "<lang_version>"
-    And depreciation data file content is
+    And snakemake framework api yaml descriptor is
     """
     changelog:
       - version: "2.0.0"
         introduced:
         - name: "<introduced_key>"
-          type: "subsection"
-          parent:
-            - "<rule_like>"
+          type: "<rule_like>"
         removed:
         - name: "<deprecated_key>"
-          type: "subsection"
-          parent:
-            - "<rule_like>"
+          type: "<rule_like>"
         deprecated:
         - name: "threads"
-          type: "subsection"
-          parent:
-            - "rule"
+          type: "rule"
         - name: "skip_validation"
-          type: "subsection"
-          parent:
-            - "module"
+          type: "module"
 
       - version: "1.0.0"
         deprecated:
         - name: "<deprecated_key>"
-          type: "subsection"
-          parent:
-            - "<rule_like>"
+          type: "<rule_like>"
         removed:
         - name: "<removed_key>"
-          type: "subsection"
-          parent:
-            - "<rule_like_removed>"
+          type: "<rule_like_removed>"
       - version: "0.0.1"
         introduced:
         - name: "threads"
-          type: "subsection"
-          parent:
-            - "rule"
+          type: "rule"
         - name: "skip_validation"
-          type: "subsection"
-          parent:
-            - "module"
+          type: "module"
     """
     Given I open a file "foo.smk" with text
       """
@@ -453,43 +437,31 @@ Feature: Completion for snakemake keyword-like things
   Scenario Outline: Complete in use with respect to deprecations
     Given a snakemake project
     And I set snakemake language version to "<lang_version>"
-    And depreciation data file content is
+    And snakemake framework api yaml descriptor is
     """
     changelog:
       - version: "2.0.0"
         introduced:
         - name: "log"
-          type: "subsection"
-          parent:
-            - "use"
+          type: "use"
         removed:
         - name: "input"
-          type: "subsection"
-          parent:
-            - "use"
+          type: "use"
         deprecated:
         - name: "threads"
-          type: "subsection"
-          parent:
-            - "use"
+          type: "use"
 
       - version: "1.0.0"
         deprecated:
         - name: "input"
-          type: "subsection"
-          parent:
-            - "use"
+          type: "use"
         removed:
         - name: "output"
-          type: "subsection"
-          parent:
-            - "use"
+          type: "use"
       - version: "0.0.1"
         introduced:
         - name: "threads"
-          type: "subsection"
-          parent:
-            - "use"
+          type: "use"
     """
     Given I open a file "foo.smk" with text
       """

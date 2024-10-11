@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.codeInsight
 
 import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.lang.SnakemakeNames.CHECKPOINT_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_CONFIG_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_META_WRAPPER_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_REPLACE_PREFIX_KEYWORD
@@ -52,6 +53,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_TEMP
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_TOUCH
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_UNPACK
 import com.jetbrains.snakecharm.lang.SnakemakeNames.USE_EXCLUDE_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.USE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINERIZED_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD
@@ -209,6 +211,13 @@ object SnakemakeAPI {
         SMK_AS_KEYWORD,
         SMK_WITH_KEYWORD,
         USE_EXCLUDE_KEYWORD
+    )
+
+    /**
+     * For Snakemake YAML api descriptor
+     */
+    val RULE_LIKE_KEYWORDS = setOf(
+        RULE_KEYWORD, CHECKPOINT_KEYWORD, USE_KEYWORD
     )
 
     /**

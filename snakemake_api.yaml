@@ -1,4 +1,16 @@
+# Default Language Level used for all projects:
 defaultVersion: "7.32.4"
+
+# 'type' specifies type of element (or its context). Supported values:
+#    * function - python functions (deprecations/removals only supported)
+#    * top-level - directives on file top-level, e.g. subworkflow, rule, use, wildcard_constraints, ..
+#    * rule-like - shortcut for a set of rules for directives: rule, use, checkpoint
+#    * rule - snakemake rule subsection directives
+#    * use - snakemake use subsection directives
+#    * checkpoint - snakemake checkpoint subsection directives
+#    * module - snakemake module subsection directives
+
+# =========================================
 changelog:
   - version: "8.0.0"
     removed:
@@ -6,7 +18,7 @@ changelog:
         type: "function"
         advice: "use checkpoints instead."
       - name: "version"
-        type: "subsection"
+        type: "rule-like"
         advice: "conda or container integration instead."
       - name: "subworkflow"
         type: "top-level"
@@ -14,19 +26,19 @@ changelog:
   - version: "7.25.0"
     introduced:
       - name: "localrule"
-        type: "subsection"
+        type: "rule-like"
   - version: "7.7.0"
     introduced:
       - name: "retries"
-        type: "subsection"
+        type: "rule-like"
   - version: "6.15.0"
     introduced:
       - name: "default_rule"
-        type: "subsection"
+        type: "rule-like"
   - version: "6.2.0"
     introduced:
       - name: "handover"
-        type: "subsection"
+        type: "rule-like"
   - version: "6.0.0"
     introduced:
       - name: "use"
@@ -40,14 +52,14 @@ changelog:
   - version: "5.31.0"
     introduced:
       - name: "name"
-        type: "subsection"
+        type: "rule-like"
   - version: "5.11.0"
     deprecated:
       - name: "singularity"
         type: "top-level"
         advice: "use container directive instead."
       - name: "singularity"
-        type: "subsection"
+        type: "rule-like"
         advice: "use container directive instead."
     introduced:
       - name: "envvars"
@@ -55,7 +67,7 @@ changelog:
       - name: "container"
         type: "top-level"
       - name: "container"
-        type: "subsection"
+        type: "rule-like"
   - version: "5.4.0"
     deprecated:
       - name: "dynamic"
@@ -64,24 +76,22 @@ changelog:
   - version: "4.8.0"
     introduced:
       - name: "cwl"
-        type: "subsection"
+        type: "rule-like"
       - name: "singularity"
         type: "top-level"
   - version: "3.8.0"
     introduced:
       - name: "wildcard_constraints"
-        type: "subsection"
+        type: "rule-like"
       - name: "wildcard_constraints"
         type: "top-level"
       - name: "configfile"
-        type: "subsection"
-        parent:
-          - "subworkflow"
+        type: "subworkflow"
   - version: "3.5.5"
     introduced:
       - name: "wrapper"
-        type: "subsection"
+        type: "rule-like"
   - version: "3.5.2"
     introduced:
       - name: "script"
-        type: "subsection"
+        type: "rule-like"

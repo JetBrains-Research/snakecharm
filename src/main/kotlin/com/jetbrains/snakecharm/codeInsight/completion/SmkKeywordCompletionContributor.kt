@@ -24,8 +24,8 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KE
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.TOPLEVEL_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_DECLARATION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.framework.SmkFrameworkDeprecationProvider
-import com.jetbrains.snakecharm.framework.SmkFrameworkDeprecationProvider.Companion.TOP_LEVEL_KEYWORD_TYPE
+import com.jetbrains.snakecharm.framework.SmkAPIKeywordContextType
+import com.jetbrains.snakecharm.framework.SmkFrameworkAPIProvider
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.UpdateType
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
@@ -135,7 +135,7 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
                 customTailTypes = tokenSet.filter { it == SnakemakeNames.USE_KEYWORD}.associate { it to RuleKeywordTail},
                 defaultTailType = tail,
                 priority = SmkCompletionUtil.KEYWORDS_PRIORITY) {
-                TOP_LEVEL_KEYWORD_TYPE
+                SmkAPIKeywordContextType.TOP_LEVEL.typeStr
             }
         }
     }

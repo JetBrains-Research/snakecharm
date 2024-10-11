@@ -35,8 +35,8 @@ class FilesSteps {
         createAndAddFile(name, text)
     }
 
-    @Given("depreciation data file content is$")
-    fun deprecationDataIs(text: String) {
+    @Given("snakemake framework api yaml descriptor is$")
+    fun snakemakeFrameworkApiInfoContent(text: String) {
         ApplicationManager.getApplication().invokeAndWait({
             SmkFrameworkDeprecationProvider.getInstance().reinitializeInTests(text.byteInputStream())
         }, ModalityState.nonModal())
