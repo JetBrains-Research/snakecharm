@@ -140,7 +140,7 @@ class SnakemakeFrameworkAPIProvider(
         // info from 'deprecated section'
         for (record: SmkAPIAnnParsingDeprecationRecord in versionChangeNotes.deprecated) {
             updateBasedOnRecContextType(
-                record, SmkKeywordDeprecationParams.createFrom(SmkAPIAnnDeprecationType.DEPRECATED, record),
+                record, SmkKeywordDeprecationParams.createFrom(false, record),
                 languageVersion, functionDeprecationInfo, topLevelDeprecationInfo, subsectionDeprecationInfo
             )
         }
@@ -148,7 +148,7 @@ class SnakemakeFrameworkAPIProvider(
         // info from 'removed section'
         for (record: SmkAPIAnnParsingDeprecationRecord in versionChangeNotes.removed) {
             updateBasedOnRecContextType(
-                record, SmkKeywordDeprecationParams.createFrom(SmkAPIAnnDeprecationType.REMOVED, record),
+                record, SmkKeywordDeprecationParams.createFrom(true, record),
                 languageVersion, functionDeprecationInfo, topLevelDeprecationInfo, subsectionDeprecationInfo
             )
         }
@@ -232,13 +232,13 @@ class SnakemakeFrameworkAPIProvider(
 
     fun getTopLevelRemovedVersion(name: String): SmkLanguageVersion? =
         topLevelName2Deprecations[name]?.let { deprecations ->
-            val latestDeprecated = deprecations.descendingMap().asIterable().firstOrNull() { it.value.type == SmkAPIAnnDeprecationType.REMOVED }
+            val latestDeprecated = deprecations.descendingMap().asIterable().firstOrNull { it.value.itemRemoved }
             latestDeprecated?.key
         }
 
     fun getTopLevelDeprecationVersion(name: String): SmkLanguageVersion? =
         topLevelName2Deprecations[name]?.let { deprecations ->
-            val latestDeprecated = deprecations.descendingMap().asIterable().firstOrNull() { it.value.type == SmkAPIAnnDeprecationType.DEPRECATED }
+            val latestDeprecated = deprecations.descendingMap().asIterable().firstOrNull { !it.value.itemRemoved }
             latestDeprecated?.key
         }
 
@@ -247,13 +247,13 @@ class SnakemakeFrameworkAPIProvider(
 
     fun getSubSectionDeprecationVersion(name: String, contextSectionKeyword: String): SmkLanguageVersion? =
         subsectionName2Deprecations[name to contextSectionKeyword]?.let { deprecations ->
-            val latestDeprecated = deprecations.descendingMap().asIterable().firstOrNull() { it.value.type == SmkAPIAnnDeprecationType.DEPRECATED }
+            val latestDeprecated = deprecations.descendingMap().asIterable().firstOrNull { !it.value.itemRemoved }
             latestDeprecated?.key
         }
 
     fun getSubSectionRemovalVersion(name: String, contextSectionKeyword: String): SmkLanguageVersion? =
         subsectionName2Deprecations[name to contextSectionKeyword]?.let { deprecations ->
-            val latestDeprecated = deprecations.descendingMap().asIterable().firstOrNull() { it.value.type == SmkAPIAnnDeprecationType.REMOVED }
+            val latestDeprecated = deprecations.descendingMap().asIterable().firstOrNull { it.value.itemRemoved }
             latestDeprecated?.key
         }
 
@@ -288,7 +288,7 @@ class SnakemakeFrameworkAPIProvider(
         isGlobalChange: Boolean = true
     ): SmkAPIAnnDeprecationInfo? {
         val entry = keywords?.floorEntry(version) ?: return null
-        return SmkAPIAnnDeprecationInfo(entry.value.type, entry.value.advice, entry.key, isGlobalChange)
+        return SmkAPIAnnDeprecationInfo(entry.value.itemRemoved, entry.value.advice, entry.key, isGlobalChange)
     }
 
     companion object {

@@ -24,7 +24,6 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_DECLARATION_KEYWORD
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIService
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
-import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkAPIAnnDeprecationType
 import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkAPIAnnParsingContextType
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import com.jetbrains.snakecharm.lang.SnakemakeNames
@@ -328,7 +327,7 @@ private fun filterByDeprecationAndAddLookupItems(
                     else -> deprecationProvider.getSubsectionDeprecation(s, it, contextName)
                 }
             }
-            if (issue?.updateType == SmkAPIAnnDeprecationType.REMOVED) {
+            if (issue?.itemRemoved == true) {
                 // removed in the current version
                 return@forEach
             }

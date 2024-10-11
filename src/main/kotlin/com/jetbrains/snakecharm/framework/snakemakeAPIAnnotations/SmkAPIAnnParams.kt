@@ -3,12 +3,12 @@ package com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 
 data class SmkKeywordDeprecationParams(
-    val type: SmkAPIAnnDeprecationType,
+    val itemRemoved: Boolean,
     val advice: String?,
 ) {
     companion object {
-        fun createFrom(type: SmkAPIAnnDeprecationType, record: SmkAPIAnnParsingDeprecationRecord) = SmkKeywordDeprecationParams(
-            type = type,
+        fun createFrom(itemRemoved: Boolean, record: SmkAPIAnnParsingDeprecationRecord) = SmkKeywordDeprecationParams(
+            itemRemoved = itemRemoved,
             advice = record.advice.ifEmpty { null },
         )
     }
@@ -30,12 +30,8 @@ data class SmkKeywordIntroductionParams(
     }
 }
 
-enum class SmkAPIAnnDeprecationType {
-    REMOVED, DEPRECATED
-}
-
 data class SmkAPIAnnDeprecationInfo(
-    val updateType: SmkAPIAnnDeprecationType,
+    val itemRemoved: Boolean,
     val advice: String?,
     val version: SmkLanguageVersion,
     val isGlobalChange: Boolean // XXX seems we don't need it any more, was for `global` subsections mainly
