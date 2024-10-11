@@ -8,9 +8,9 @@ import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
-import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
-import com.jetbrains.snakecharm.framework.UpdateType
+import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
+import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkAPIAnnDeprecationType
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import com.jetbrains.snakecharm.lang.SnakemakeNames.CHECKPOINT_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_KEYWORD
@@ -104,7 +104,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
                 val currentVersion = if (currentVersionString == null) null else SmkLanguageVersion(currentVersionString)
                 val name = node.name
                 if (name != null && currentVersion != null) {
-                    val issue = deprecationProvider.getFunctionCorrection(name, currentVersion)
+                    val issue = deprecationProvider.getFunctionDeprecation(name, currentVersion)
                     if (issue != null) {
                         val versionWithAdvice = if (issue.advice != null) {
                             SnakemakeBundle.message(
@@ -116,7 +116,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
                             issue.version
                         }
                         when (issue.updateType) {
-                            UpdateType.REMOVED -> {
+                            SmkAPIAnnDeprecationType.REMOVED -> {
                                 val message = SnakemakeBundle.message(
                                     "INSP.NAME.deprecated.keywords.removed.func",
                                     name,
@@ -126,7 +126,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
                                 registerProblem(node, message, ProblemHighlightType.GENERIC_ERROR)
                             }
 
-                            UpdateType.DEPRECATED -> {
+                            SmkAPIAnnDeprecationType.DEPRECATED -> {
                                 val message = SnakemakeBundle.message(
                                     "INSP.NAME.deprecated.keywords.deprecated.func",
                                     name,
@@ -164,7 +164,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
                 return
             }
             if (currentVersion != null) {
-                val issue = deprecationProvider.getTopLevelCorrection(name, currentVersion)
+                val issue = deprecationProvider.getTopLevelDeprecation(name, currentVersion)
                 if (issue != null) {
                     val versionWithAdvice = if (issue.advice != null) {
                         SnakemakeBundle.message(
@@ -176,7 +176,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
                         issue.version
                     }
                     when (issue.updateType) {
-                        UpdateType.REMOVED -> {
+                        SmkAPIAnnDeprecationType.REMOVED -> {
                             registerProblem(
                                 psiElement,
                                 SnakemakeBundle.message(
@@ -188,7 +188,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
                             )
                         }
 
-                        UpdateType.DEPRECATED -> {
+                        SmkAPIAnnDeprecationType.DEPRECATED -> {
                             registerProblem(
                                 psiElement,
                                 SnakemakeBundle.message(
@@ -229,7 +229,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
                 return
             }
             if (currentVersion != null) {
-                val issue = deprecationProvider.getSubsectionCorrection(name, currentVersion, parentName)
+                val issue = deprecationProvider.getSubsectionDeprecation(name, currentVersion, parentName)
                 if (issue != null) {
                     val versionWithAdvice = if (issue.advice != null) {
                         SnakemakeBundle.message(
@@ -241,7 +241,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
                         issue.version
                     }
                     when (issue.updateType) {
-                        UpdateType.REMOVED -> {
+                        SmkAPIAnnDeprecationType.REMOVED -> {
                             val message = if (issue.isGlobalChange) {
                                 SnakemakeBundle.message(
                                     "INSP.NAME.deprecated.keywords.removed.sub.no.parent",
@@ -259,7 +259,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
                             registerProblem(psiElement, message, ProblemHighlightType.GENERIC_ERROR)
                         }
 
-                        UpdateType.DEPRECATED -> {
+                        SmkAPIAnnDeprecationType.DEPRECATED -> {
                             val message = if (issue.isGlobalChange) {
                                 SnakemakeBundle.message(
                                     "INSP.NAME.deprecated.keywords.deprecated.sub.no.parent",

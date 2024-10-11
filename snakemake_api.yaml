@@ -3,6 +3,12 @@ annotationsFormatVersion: 1
 # Default Language Level used for all projects:
 defaultVersion: "7.32.4"
 
+# supported types of sections in each version:
+# * 'introduced' - API was introduced
+# * 'override' - API was changed, need to set all required fields, it is not incremental update to prev. version
+# * 'deprecated' - Deprecate API and optionally provide Hint, how to fix it using `advice:`
+# * 'removed' - API was finally removed
+
 # 'type' specifies type of element (or its context). Supported values:
 #    * function - python functions (deprecations/removals only supported)
 #    * top-level - directives on file top-level, e.g. subworkflow, rule, use, wildcard_constraints, ..
@@ -14,108 +20,176 @@ defaultVersion: "7.32.4"
 
 # =========================================
 changelog:
+  # ---------------------------------------
   - version: "8.0.0"
+
     removed:
       - name: "dynamic"
         type: "function"
         advice: "use checkpoints instead."
+
       - name: "version"
         type: "rule-like"
         advice: "conda or container integration instead."
+
       - name: "subworkflow"
         type: "top-level"
         advice: "use the module directive instead."
+
+  # ---------------------------------------
   - version: "7.25.0"
+
     introduced:
       - name: "localrule"
         type: "rule-like"
+
+  # ----------------------
   - version: "7.7.0"
+
     introduced:
       - name: "retries"
         type: "rule-like"
+
+  # ----------------------
   - version: "7.0.0"
+
     introduced:
       - name: "template_engine"
         type: "rule-like"
+
+  # ----------------------
   - version: "6.15.0"
+
     introduced:
       - name: "default_target"
         type: "rule-like"
+
+  # ----------------------
   - version: "6.2.0"
+
     introduced:
       - name: "handover"
         type: "rule-like"
+
+  # ----------------------
   - version: "6.0.0"
+
     introduced:
       - name: "use"
         type: "top-level"
+
       - name: "module"
         type: "top-level"
+
       - name: "containerized"
         type: "top-level"
+
       - name: "containerized"
         type: "rule-like"
+
     deprecated:
       - name: "subworkflow"
         type: "top-level"
         advice: "use the module directive instead."
+
+  # ----------------------
   - version: "5.31.0"
+
     introduced:
       - name: "name"
         type: "rule-like"
+
+  # ----------------------
   - version: "5.12.0"
+
     introduced:
       - name: "cache"
         type: "rule-like"
+
+  # ----------------------
   - version: "5.11.0"
+
     deprecated:
       - name: "singularity"
         type: "top-level"
         advice: "use container directive instead."
+
       - name: "singularity"
         type: "rule-like"
         advice: "use container directive instead."
+
     introduced:
       - name: "envvars"
         type: "top-level"
+
       - name: "container"
         type: "top-level"
+
       - name: "container"
         type: "rule-like"
+
+  # ----------------------
   - version: "5.9.0"
+
     introduced:
       - name: "envmodules"
         type: "rule-like"
+
+  # ----------------------
   - version: "5.4.0"
+
     deprecated:
       - name: "dynamic"
         type: "function"
         advice: "use checkpoints instead."
+
+  # ----------------------
   - version: "4.8.0"
+
     introduced:
       - name: "cwl"
         type: "rule-like"
+
       - name: "conda"
         type: "rule-like"
+        lambda_args:
+          - "wildcards"
+          - "params"
+          - "input"
+
       - name: "singularity"
         type: "rule-like"
+        keyword_args_allowed: False
+        multiple_args_allowed: False
+
       - name: "singularity"
         type: "top-level"
+
+  # ----------------------
   - version: "3.8.0"
     introduced:
       - name: "wildcard_constraints"
         type: "rule-like"
+
       - name: "wildcard_constraints"
         type: "top-level"
+
       - name: "configfile"
         type: "subworkflow"
+
+  # ----------------------
   - version: "3.5.5"
+
     introduced:
       - name: "wrapper"
         type: "rule-like"
+
+  # ----------------------
   - version: "3.5.2"
+
     introduced:
       - name: "script"
         type: "rule-like"
+
       - name: "notebook"
         type: "rule-like"

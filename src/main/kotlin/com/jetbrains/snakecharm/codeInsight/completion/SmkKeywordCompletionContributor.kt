@@ -18,16 +18,14 @@ import com.intellij.util.ProcessingContext
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.completion.PythonLookupElement
 import com.jetbrains.python.psi.*
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.MODULE_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.TOPLEVEL_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_DECLARATION_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.framework.SmkAPIKeywordContextType
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIService
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
-import com.jetbrains.snakecharm.framework.UpdateType
+import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkAPIAnnDeprecationType
+import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkAPIAnnParsingContextType
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_LIKE
@@ -135,7 +133,7 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
                 customTailTypes = tokenSet.filter { it == SnakemakeNames.USE_KEYWORD}.associate { it to RuleKeywordTail},
                 defaultTailType = tail,
                 priority = SmkCompletionUtil.KEYWORDS_PRIORITY) {
-                SmkAPIKeywordContextType.TOP_LEVEL.typeStr
+                SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr
             }
         }
     }
@@ -190,7 +188,8 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
         result: CompletionResultSet
     ) {
         val element = parameters.position
-        filterByDeprecationAndAddLookupItems(element.project, RULE_OR_CHECKPOINT_SECTION_KEYWORDS, result, priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY){
+        val keywords = SnakemakeAPIService.getInstance().RULE_OR_CHECKPOINT_SECTION_KEYWORDS
+        filterByDeprecationAndAddLookupItems(element.project, keywords, result, priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY){
             val smkRuleOrCheckpoint = PsiTreeUtil.getParentOfType(element, SmkRuleOrCheckpoint::class.java)
             requireNotNull(smkRuleOrCheckpoint) {
                 "According to CAPTURE should be inside rule or checkpoint: <${element.text}> at ${element.textRange}"
@@ -242,7 +241,8 @@ object ModuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>(
         result: CompletionResultSet
     ) {
         val element = parameters.position
-        filterByDeprecationAndAddLookupItems(element.project, MODULE_SECTIONS_KEYWORDS, result, priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY) {
+        val keywords = SnakemakeAPIService.getInstance().MODULE_SECTIONS_KEYWORDS
+        filterByDeprecationAndAddLookupItems(element.project, keywords, result, priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY) {
             val smkModule = PsiTreeUtil.getParentOfType(element, SmkModule::class.java)
             requireNotNull(smkModule) {
                 "According to CAPTURE should be inside module: <${element.text}> at ${element.textRange}"
@@ -278,9 +278,10 @@ object UseSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
             )
         }
 
+        val keywords = SnakemakeAPIService.getInstance().USE_SECTIONS_KEYWORDS
         filterByDeprecationAndAddLookupItems(
             parameters.position.project,
-            USE_SECTIONS_KEYWORDS,
+            keywords,
             result,
             priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
         ) {
@@ -323,11 +324,11 @@ private fun filterByDeprecationAndAddLookupItems(
 
             val issue = currentVersion?.let {
                 when {
-                    isTopLevel -> deprecationProvider.getTopLevelCorrection(s, it)
-                    else -> deprecationProvider.getSubsectionCorrection(s, it, contextName)
+                    isTopLevel -> deprecationProvider.getTopLevelDeprecation(s, it)
+                    else -> deprecationProvider.getSubsectionDeprecation(s, it, contextName)
                 }
             }
-            if (issue?.updateType == UpdateType.REMOVED) {
+            if (issue?.updateType == SmkAPIAnnDeprecationType.REMOVED) {
                 // removed in the current version
                 return@forEach
             }

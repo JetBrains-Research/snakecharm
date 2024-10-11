@@ -9,8 +9,8 @@ import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_OR_CALLABLE_ARGS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTION_LAMBDA_ARG_POSSIBLE_PARAMS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIService
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 
 class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
@@ -27,7 +27,7 @@ class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
             }
             @Suppress("UnstableApiUsage")
             val varName = node.referencedName
-            if (varName == null || varName !in SECTION_LAMBDA_ARG_POSSIBLE_PARAMS) {
+            if (varName == null || varName !in SnakemakeAPIService.getInstance().SECTION_LAMBDA_ARG_POSSIBLE_PARAMS) {
                 // Not suitable case
                 return
             }

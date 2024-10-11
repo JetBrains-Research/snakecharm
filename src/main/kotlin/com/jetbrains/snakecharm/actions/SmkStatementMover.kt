@@ -15,8 +15,8 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.codeInsight.editorActions.moveUpDown.PyStatementMover
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.TOPLEVEL_ARGS_SECTION_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIService
 import com.jetbrains.snakecharm.lang.psi.*
 
 open class SmkStatementMover : PyStatementMover() {
@@ -124,18 +124,23 @@ open class SmkStatementMover : PyStatementMover() {
         }
     }
 
-    private fun isNotAvailableForMoveInto(elementToMove: PsiElement, destination: PsiElement?): Boolean =
-        (elementToMove is SmkSection && elementToMove !is SmkRunSection &&
+    private fun isNotAvailableForMoveInto(elementToMove: PsiElement, destination: PsiElement?): Boolean {
+        val service = SnakemakeAPIService.getInstance()
+
+        return (elementToMove is SmkSection && elementToMove !is SmkRunSection &&
                 ((destination is SmkRuleOrCheckpoint &&
-                        elementToMove.sectionKeyword !in RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS) ||
+                        elementToMove.sectionKeyword !in service.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS) ||
                         (destination is SmkSubworkflow &&
                                 elementToMove.sectionKeyword !in SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS) ||
                         (destination is SmkModule &&
-                                elementToMove.sectionKeyword !in SnakemakeAPI.MODULE_SECTIONS_KEYWORDS) ||
+                                elementToMove.sectionKeyword !in service.MODULE_SECTIONS_KEYWORDS) ||
                         (destination is SmkUse &&
-                                elementToMove.sectionKeyword !in SnakemakeAPI.USE_SECTIONS_KEYWORDS)))
+                                elementToMove.sectionKeyword !in service.USE_SECTIONS_KEYWORDS)))
+    }
 
     private fun isAvailableForMoveOut(elementToMove: PsiElement, down: Boolean): Boolean {
+        val useSectionsKeywords = SnakemakeAPIService.getInstance().USE_SECTIONS_KEYWORDS
+
         val statementList = getStatementList(elementToMove) ?: return true
         val statements: Array<out PyStatement> = statementList.statements
 
@@ -158,12 +163,14 @@ open class SmkStatementMover : PyStatementMover() {
                 elementToMove,
                 down,
                 statements,
-                SmkRuleOrCheckpoint::class.java
+                SmkRuleOrCheckpoint::class.java,
+                useSectionsKeywords
             )) || (elementToMove is SmkModuleArgsSection && searchForRuleLikeElement(
                 elementToMove,
                 down,
                 statements,
-                SmkModule::class.java
+                SmkModule::class.java,
+                useSectionsKeywords
             ))
         ) {
             return true
@@ -191,10 +198,10 @@ open class SmkStatementMover : PyStatementMover() {
         elementToMove: PsiElement,
         down: Boolean,
         statements: Array<out PyStatement>,
-        clazz: Class<T>
+        clazz: Class<T>,
+        useSectionsKeywords: Set<String>
     ): Boolean {
-        val parent =
-            PsiTreeUtil.getParentOfType(elementToMove, clazz)
+        val parent = PsiTreeUtil.getParentOfType(elementToMove, clazz)
         if (!down && statements.first() == elementToMove || down && statements.last() == elementToMove) {
 
             var sibling = if (!down) parent?.prevSibling else parent?.nextSibling
@@ -209,7 +216,7 @@ open class SmkStatementMover : PyStatementMover() {
                     // Check if not execution section
                     if (!(parentSibling is SmkUse &&
                                 elementToMove is SmkSection &&
-                                elementToMove.sectionKeyword !in SnakemakeAPI.USE_SECTIONS_KEYWORDS)
+                                elementToMove.sectionKeyword !in useSectionsKeywords)
                     ) {
                         return true
                     }
@@ -271,6 +278,8 @@ open class SmkStatementMover : PyStatementMover() {
         statements: Array<PyStatement>,
         clazz: Class<T>
     ): ScopeRange? {
+        val useSectionsKeywords = SnakemakeAPIService.getInstance().USE_SECTIONS_KEYWORDS
+
         val parent =
             PsiTreeUtil.getParentOfType(elementToMove, clazz)
         if (!down && statements.first() == elementToMove || down && statements.last() == elementToMove) {
@@ -284,7 +293,7 @@ open class SmkStatementMover : PyStatementMover() {
                     // Check if not execution section
                     if (!(parentSibling is SmkUse &&
                                 elementToMove is SmkSection &&
-                                elementToMove.sectionKeyword !in SnakemakeAPI.USE_SECTIONS_KEYWORDS)
+                                elementToMove.sectionKeyword !in useSectionsKeywords)
                     ) {
                         val list = parentSibling.statementList
                         if (list.statements.isEmpty()) {

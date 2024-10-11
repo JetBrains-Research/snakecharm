@@ -6,10 +6,8 @@ import com.intellij.codeInspection.ui.ListEditForm
 import com.intellij.psi.util.elementType
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.MODULE_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_SECTIONS_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIService
 import com.jetbrains.snakecharm.inspections.quickfix.AddIgnoredElementQuickFix
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RUN
 import com.jetbrains.snakecharm.lang.psi.*
@@ -25,6 +23,7 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+        val snakeApiService = SnakemakeAPIService.getInstance()
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
             isSectionRecognized(st, SUBWORKFLOW_SECTIONS_KEYWORDS)
@@ -32,14 +31,14 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
             if (st.originalElement.elementType == SmkElementTypes.USE_ARGS_SECTION_STATEMENT) {
-                isSectionRecognized(st, USE_SECTIONS_KEYWORDS)
+                isSectionRecognized(st, snakeApiService.USE_SECTIONS_KEYWORDS)
             } else {
-                isSectionRecognized(st, RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS)
+                isSectionRecognized(st, snakeApiService.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS)
             }
         }
 
         override fun visitSmkModuleArgsSection(st: SmkModuleArgsSection) {
-            isSectionRecognized(st, MODULE_SECTIONS_KEYWORDS)
+            isSectionRecognized(st, snakeApiService.MODULE_SECTIONS_KEYWORDS)
         }
 
         /**

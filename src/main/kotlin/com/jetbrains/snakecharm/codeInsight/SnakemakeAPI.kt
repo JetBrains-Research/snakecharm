@@ -1,5 +1,9 @@
 package com.jetbrains.snakecharm.codeInsight
 
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.Service
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_OR_CALLABLE_ARGS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPICompanion.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED
 import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
 import com.jetbrains.snakecharm.lang.SnakemakeNames
@@ -159,11 +163,6 @@ object SnakemakeAPI {
         WORKFLOW_PEPFILE_KEYWORD
     )
 
-    val RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS = RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED +
-            SnakemakeFrameworkAPIProvider.getInstance().collectAllPossibleRuleOrCheckpointSubsectionKeywords()
-
-    val RULE_OR_CHECKPOINT_SECTION_KEYWORDS = (RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS + setOf(SECTION_RUN))
-
     /**
      * For codeInsight
      */
@@ -174,22 +173,8 @@ object SnakemakeAPI {
     )
 
     /**
-     * For modules codeInsight
-     */
-    val MODULE_SECTIONS_KEYWORDS = setOf(
-        MODULE_SNAKEFILE_KEYWORD,
-        MODULE_CONFIG_KEYWORD,
-        MODULE_SKIP_VALIDATION_KEYWORD,
-        MODULE_META_WRAPPER_KEYWORD,
-        MODULE_REPLACE_PREFIX_KEYWORD
-    ) + SnakemakeFrameworkAPIProvider.getInstance()
-        .collectAllPossibleModuleSubsectionKeywords()
-
-    /**
      * For uses codeInsight
      */
-    val USE_SECTIONS_KEYWORDS = RULE_OR_CHECKPOINT_SECTION_KEYWORDS + SnakemakeFrameworkAPIProvider.getInstance()
-        .collectAllPossibleUseSubsectionKeywords() - EXECUTION_SECTIONS_KEYWORDS - SECTION_RUN
 
     val USE_DECLARATION_KEYWORDS = setOf(
         RULE_KEYWORD,
@@ -294,10 +279,6 @@ object SnakemakeAPI {
             SECTION_INPUT,
         ),
     )
-    val SECTION_LAMBDA_ARG_POSSIBLE_PARAMS: Set<String> =
-        ALLOWED_LAMBDA_OR_CALLABLE_ARGS.values.flatMap { it.asIterable() }.toMutableSet().also {
-            it.addAll(RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS)
-        }
 
     /**
      * Rule/checkpoint sections that does not allow keyword arguments
@@ -367,4 +348,37 @@ object SnakemakeAPICompanion {
         SECTION_BENCHMARK, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS,
         SECTION_PRIORITY, SECTION_GROUP, SECTION_SHADOW,
     )
+}
+
+@Service
+class SnakemakeAPIService {
+    val RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS = RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED +
+        SnakemakeFrameworkAPIProvider.getInstance().collectAllPossibleRuleOrCheckpointSubsectionKeywords()
+
+    val SECTION_LAMBDA_ARG_POSSIBLE_PARAMS: Set<String> =
+        ALLOWED_LAMBDA_OR_CALLABLE_ARGS.values.flatMap { it.asIterable() }.toMutableSet().also {
+            // TODO merge with deprecation provider keywords
+            it.addAll(RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS)
+        }
+
+    val RULE_OR_CHECKPOINT_SECTION_KEYWORDS = (RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS + setOf(SECTION_RUN))
+
+    val USE_SECTIONS_KEYWORDS = RULE_OR_CHECKPOINT_SECTION_KEYWORDS + SnakemakeFrameworkAPIProvider.getInstance()
+        .collectAllPossibleUseSubsectionKeywords() - EXECUTION_SECTIONS_KEYWORDS - SECTION_RUN
+
+    /**
+     * For modules codeInsight
+     */
+    val MODULE_SECTIONS_KEYWORDS = setOf(
+        MODULE_SNAKEFILE_KEYWORD,
+        MODULE_CONFIG_KEYWORD,
+        MODULE_SKIP_VALIDATION_KEYWORD,
+        MODULE_META_WRAPPER_KEYWORD,
+        MODULE_REPLACE_PREFIX_KEYWORD
+    ) + SnakemakeFrameworkAPIProvider.getInstance()
+        .collectAllPossibleModuleSubsectionKeywords()
+
+    companion object {
+        fun getInstance() = ApplicationManager.getApplication().getService(SnakemakeAPIService::class.java)!!
+    }
 }
