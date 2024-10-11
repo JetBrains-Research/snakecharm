@@ -6,6 +6,7 @@ import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.TailTypeDecorator
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.project.Project
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.patterns.PsiElementPattern
 import com.intellij.patterns.StandardPatterns
@@ -23,6 +24,11 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KE
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.TOPLEVEL_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_DECLARATION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_SECTIONS_KEYWORDS
+import com.jetbrains.snakecharm.framework.SmkFrameworkDeprecationProvider
+import com.jetbrains.snakecharm.framework.SmkFrameworkDeprecationProvider.Companion.TOP_LEVEL_KEYWORD_TYPE
+import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
+import com.jetbrains.snakecharm.framework.UpdateType
+import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_LIKE
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE
@@ -117,20 +123,19 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
         val spaceTailKeys = RULE_LIKE.types.map { tt ->
             tokenType2Name[tt]!!
         }
+
+        // top-level
+        val project = parameters.position.project
         listOf(
             colonAndWhiteSpaceTailKeys to ColonAndWhiteSpaceTail,
             spaceTailKeys to TailTypes.spaceType(),
         ).forEach { (tokenSet, tail) ->
-            tokenSet.forEach { s ->
-                val modifiedTail = if (s == SnakemakeNames.USE_KEYWORD) RuleKeywordTail else tail
-                result.addElement(
-                    SmkCompletionUtil.createPrioritizedLookupElement(
-                        TailTypeDecorator.withTail(
-                            PythonLookupElement(s, true, null), modifiedTail
-                        ),
-                        SmkCompletionUtil.KEYWORDS_PRIORITY
-                    )
-                )
+
+            filterByDeprecationAndAddLookupItems(project, tokenSet, result, isTopLevel=true,
+                customTailTypes = tokenSet.filter { it == SnakemakeNames.USE_KEYWORD}.associate { it to RuleKeywordTail},
+                defaultTailType = tail,
+                priority = SmkCompletionUtil.KEYWORDS_PRIORITY) {
+                TOP_LEVEL_KEYWORD_TYPE
             }
         }
     }
@@ -184,17 +189,13 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
         context: ProcessingContext,
         result: CompletionResultSet
     ) {
-        RULE_OR_CHECKPOINT_SECTION_KEYWORDS.forEach { s ->
-
-            result.addElement(
-                SmkCompletionUtil.createPrioritizedLookupElement(
-                    TailTypeDecorator.withTail(
-                        PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
-                        ColonAndWhiteSpaceTail
-                    ),
-                    priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
-                )
-            )
+        val element = parameters.position
+        filterByDeprecationAndAddLookupItems(element.project, RULE_OR_CHECKPOINT_SECTION_KEYWORDS, result, priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY){
+            val smkRuleOrCheckpoint = PsiTreeUtil.getParentOfType(element, SmkRuleOrCheckpoint::class.java)
+            requireNotNull(smkRuleOrCheckpoint) {
+                "According to CAPTURE should be inside rule or checkpoint: <${element.text}> at ${element.textRange}"
+            }
+            smkRuleOrCheckpoint.sectionKeyword
         }
     }
 }
@@ -240,16 +241,13 @@ object ModuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>(
         context: ProcessingContext,
         result: CompletionResultSet
     ) {
-        MODULE_SECTIONS_KEYWORDS.forEach { s ->
-            result.addElement(
-                SmkCompletionUtil.createPrioritizedLookupElement(
-                    TailTypeDecorator.withTail(
-                        PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
-                        ColonAndWhiteSpaceTail
-                    ),
-                    priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
-                )
-            )
+        val element = parameters.position
+        filterByDeprecationAndAddLookupItems(element.project, MODULE_SECTIONS_KEYWORDS, result, priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY) {
+            val smkModule = PsiTreeUtil.getParentOfType(element, SmkModule::class.java)
+            requireNotNull(smkModule) {
+                "According to CAPTURE should be inside module: <${element.text}> at ${element.textRange}"
+            }
+            smkModule.sectionKeyword
         }
     }
 }
@@ -280,19 +278,106 @@ object UseSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
             )
         }
 
-        USE_SECTIONS_KEYWORDS.forEach { s ->
-            result.addElement(
-                SmkCompletionUtil.createPrioritizedLookupElement(
-                    TailTypeDecorator.withTail(
-                        PythonLookupElement(s, true, PlatformIcons.PROPERTY_ICON),
-                        ColonAndWhiteSpaceTail
-                    ),
-                    priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
-                )
-            )
+        filterByDeprecationAndAddLookupItems(
+            parameters.position.project,
+            USE_SECTIONS_KEYWORDS,
+            result,
+            priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
+        ) {
+            SnakemakeNames.USE_KEYWORD
         }
     }
 }
+
+private fun filterByDeprecationAndAddLookupItems(
+    project: Project,
+    candidateKeywords: Iterable<String>,
+    result: CompletionResultSet,
+    priority: Double,
+    isTopLevel: Boolean = false,
+    customTailTypes: Map<String, TailType>? = null,
+    defaultTailType: TailType = ColonAndWhiteSpaceTail,
+    parentContextProvider: () -> String?
+) {
+    val deprecationProvider = SmkFrameworkDeprecationProvider.getInstance()
+    val settings = SmkSupportProjectSettings.getInstance(project)
+    val contextName = parentContextProvider()
+
+    candidateKeywords.forEach { s ->
+        val versionInfo: String?
+        if (contextName != null) {
+            val introducedVersion = when {
+                isTopLevel -> deprecationProvider.getTopLevelIntroductionVersion(s)
+                else -> deprecationProvider.getSubSectionIntroductionVersion(s, contextName)
+            }
+            val deprecatedVersion = when {
+                isTopLevel -> deprecationProvider.getTopLevelDeprecationVersion(s)
+                else -> deprecationProvider.getSubSectionDeprecationVersion(s, contextName)
+            }
+            val removedVersion = when {
+                isTopLevel -> deprecationProvider.getTopLevelRemovedVersion(s)
+                else -> deprecationProvider.getSubSectionRemovalVersion(s, contextName)
+            }
+            val currentVersionString = settings.snakemakeLanguageVersion
+            val currentVersion = if (currentVersionString == null) null else SmkLanguageVersion(currentVersionString)
+
+            val issue = currentVersion?.let {
+                when {
+                    isTopLevel -> deprecationProvider.getTopLevelCorrection(s, it)
+                    else -> deprecationProvider.getSubsectionCorrection(s, it, contextName)
+                }
+            }
+            if (issue?.updateType == UpdateType.REMOVED) {
+                // removed in the current version
+                return@forEach
+            }
+
+            // version info:
+            val buf = StringBuffer()
+            if (introducedVersion != null) {
+                buf.append(">=${introducedVersion}")
+            }
+            if (deprecatedVersion != null) {
+                if (buf.isNotEmpty()) {
+                    buf.append(", ")
+                }
+                buf.append("deprecated $deprecatedVersion")
+            }
+            if (removedVersion != null) {
+                if (buf.isNotEmpty()) {
+                    buf.append(", ")
+                }
+                buf.append("removed $removedVersion")
+            }
+//            if (currentVersion != null) {
+//                if (issue?.updateType == UpdateType.DEPRECATED) {
+//                    if (buf.isNotEmpty()) {
+//                        buf.append(", ")
+//                    }
+//                    buf.append("deprecated in $currentVersion")
+//                }
+//            }
+            versionInfo = buf.toString()
+        } else {
+            versionInfo = null
+        }
+
+        var tailType = defaultTailType;
+        if (customTailTypes != null && s in customTailTypes.keys) {
+            tailType = customTailTypes[s]!!
+        }
+        result.addElement(
+            SmkCompletionUtil.createPrioritizedLookupElement(
+                TailTypeDecorator.withTail(
+                    PythonLookupElement(s, null, versionInfo, true, PlatformIcons.PROPERTY_ICON, null),
+                    tailType
+                ),
+                priority = priority
+            )
+        )
+    }
+}
+
 
 fun PsiElementPattern.Capture<PsiElement>.insideOneOf(
     vararg classes: Class<out PsiElement>

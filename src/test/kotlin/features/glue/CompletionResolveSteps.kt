@@ -433,10 +433,16 @@ class CompletionResolveSteps {
         assertNotInCompletionList(SnakemakeWorld.completionList(), lookupStrings)
     }
 
-    @Then("^I invoke autocompletion popup, select \"([^\"]+)\" lookup item and see a text:")
+    @Then("^I invoke autocompletion popup, select \"([^\"]+)\" lookup item and see a text ignoring trailing spaces:")
     fun iInvokeAutocompletionPopupAndSelectItem(lookupText: String, text: String) {
+        autoCompleteAndCheck(lookupText, text, Lookup.NORMAL_SELECT_CHAR, stripTrailingSpaces = true)
+    }
+
+    @Then("^I invoke autocompletion popup, select \"([^\"]+)\" lookup item and see a text:")
+    fun iInvokeAutocompletionPopupAndSelectItemIgnoringTrailingSpaces(lookupText: String, text: String) {
         autoCompleteAndCheck(lookupText, text, Lookup.NORMAL_SELECT_CHAR)
     }
+
     @Then("^I invoke autocompletion popup, select \"([^\"]+)\" lookup item with tail text \"([^\"]+)\" and see a text:")
     fun iInvokeAutocompletionPopupAndSelectItemWithTailText(lookupText: String, tailText: String, text: String) {
         autoCompleteAndCheck(lookupText, text, Lookup.NORMAL_SELECT_CHAR, tailText=tailText)
@@ -448,7 +454,12 @@ class CompletionResolveSteps {
 
     @Then("^I invoke autocompletion popup and see a text:")
     fun iInvokeAutocompletionPopupAndSelectNoItem(text: String) {
-        autoCompleteAndCheck(null, text, Lookup.NORMAL_SELECT_CHAR)
+        autoCompleteAndCheck(null, text, Lookup.NORMAL_SELECT_CHAR, stripTrailingSpaces=false)
+    }
+
+    @Then("^I invoke autocompletion popup and see a text ignoring trailing spaces:")
+    fun iInvokeAutocompletionPopupAndSelectNoItemAndIgnoringTrailingSpaces(text: String) {
+        autoCompleteAndCheck(null, text, Lookup.NORMAL_SELECT_CHAR, stripTrailingSpaces=true)
     }
 
     @Then("^I invoke autocompletion popup, select \"([^\"]+)\" lookup item in (normal|replace|statement|auto) mode and see a text:$")
@@ -469,7 +480,8 @@ class CompletionResolveSteps {
         text: String,
         completionChar: Char,
         tailText: String? = null,
-        typeText: String? = null
+        typeText: String? = null,
+        stripTrailingSpaces: Boolean = false,
     ) {
         iInvokeAutocompletionPopup()
 
@@ -505,7 +517,7 @@ class CompletionResolveSteps {
                 val cleanText = StringUtil.convertLineSeparators(
                     text.replace("\${TEST_DATA}", FileUtil.toSystemIndependentName(fixture.testDataPath))
                 )
-                checkCompletionResult(fixture, false, cleanText)
+                checkCompletionResult(fixture, false, cleanText, stripTrailingSpaces = stripTrailingSpaces)
             },
             ModalityState.nonModal()
         )
@@ -624,11 +636,12 @@ class CompletionResolveSteps {
         fixture: CodeInsightTestFixture,
         checkByFilePath: Boolean,
         completionResultTextOrFileRelativePath: String,
+        stripTrailingSpaces: Boolean
     ) {
         if (checkByFilePath) {
             fixture.checkResultByFile(completionResultTextOrFileRelativePath)
         } else {
-            fixture.checkResult(completionResultTextOrFileRelativePath)
+            fixture.checkResult(completionResultTextOrFileRelativePath, stripTrailingSpaces)
         }
     }
 

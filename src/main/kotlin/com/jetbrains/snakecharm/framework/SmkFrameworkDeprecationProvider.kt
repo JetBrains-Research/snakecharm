@@ -5,11 +5,13 @@ import com.intellij.openapi.components.Service
 import com.jetbrains.snakecharm.SnakemakePluginUtil
 import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
+import org.jetbrains.annotations.TestOnly
 import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
 import org.yaml.snakeyaml.introspector.BeanAccess
 import java.io.InputStream
+import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
@@ -22,31 +24,43 @@ class SmkFrameworkDeprecationProvider {
     private lateinit var subsectionCorrection: Map<Pair<String, String?>, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>
 
     private lateinit var subsectionIntroduction: Map<Pair<String, String?>, SmkLanguageVersion>
+    private lateinit var subsectionRemoval: Map<Pair<String, String?>, SmkLanguageVersion>
+    private lateinit var subsectionDeprecation: Map<Pair<String, String?>, SmkLanguageVersion>
     private lateinit var topLevelIntroduction: Map<String, SmkLanguageVersion>
+    private lateinit var topLevelRemoval: Map<String, SmkLanguageVersion>
+    private lateinit var topLevelDeprecation: Map<String, SmkLanguageVersion>
 
     private lateinit var defaultVersion: String
 
     init {
-        val unitTestMode = ApplicationManager.getApplication().isUnitTestMode
-
-        val snakemakeApiFile = if (!unitTestMode) {
-            val pluginSandboxPath =
-                SnakemakePluginUtil.getPluginSandboxPath(SmkFrameworkDeprecationProvider::class.java)
-            pluginSandboxPath.resolve("extra/snakemake_api.yaml")
+        if (ApplicationManager.getApplication().isUnitTestMode) {
+            reinitializeInTests()
         } else {
-            SnakemakeTestUtil.getTestDataPath().parent.resolve("snakemake_api.yaml")
+            val pluginSandboxPath = SnakemakePluginUtil.getPluginSandboxPath(
+                SmkFrameworkDeprecationProvider::class.java
+            )
+            initialize(pluginSandboxPath.resolve("extra/snakemake_api.yaml"))
         }
+    }
 
+    @TestOnly
+    fun reinitializeInTests() {
+        require(ApplicationManager.getApplication().isUnitTestMode)
+        initialize(SnakemakeTestUtil.getTestDataPath().parent.resolve("snakemake_api.yaml"))
+    }
+
+    @TestOnly
+    fun reinitializeInTests(input: InputStream) {
+        initialize(input)
+    }
+
+    private fun initialize(snakemakeApiFile: Path) {
         requireNotNull(!snakemakeApiFile.exists()) {
             "Missing wrappers bundle in plugin bundle: '$snakemakeApiFile' doesn't exist"
         }
         initialize(snakemakeApiFile.inputStream())
-    }
 
-    fun overrideInputFile(input: InputStream) {
-        initialize(input)
     }
-
     private fun initialize(inputStream: InputStream?) {
         val yaml = Yaml(CustomClassLoaderConstructor(SmkDeprecationData::class.java.classLoader, LoaderOptions()))
         yaml.setBeanAccess(BeanAccess.FIELD) // it must be set to be able to set vals
@@ -57,7 +71,11 @@ class SmkFrameworkDeprecationProvider {
             emptyMap<Pair<String, String?>, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>().toMutableMap()
 
         val subsectionIntroductionsMap = emptyMap<Pair<String, String?>, SmkLanguageVersion>().toMutableMap()
+        val subsectionDeprecationsMap = emptyMap<Pair<String, String?>, SmkLanguageVersion>().toMutableMap()
+        val subsectionRemovalMap = emptyMap<Pair<String, String?>, SmkLanguageVersion>().toMutableMap()
         val topLevelIntroductionsMap = emptyMap<String, SmkLanguageVersion>().toMutableMap()
+        val topLevelDeprecationsMap = emptyMap<String, SmkLanguageVersion>().toMutableMap()
+        val topLevelRemovalMap = emptyMap<String, SmkLanguageVersion>().toMutableMap()
 
         defaultVersion = deprecationData.defaultVersion
         for (data in deprecationData.changelog) {
@@ -88,21 +106,9 @@ class SmkFrameworkDeprecationProvider {
             putKeywordDataIntoMap(data.deprecated, UpdateType.DEPRECATED, mapGetter)
             putKeywordDataIntoMap(data.removed, UpdateType.REMOVED, mapGetter)
 
-            for (introduction in data.introduced) {
-                when (introduction.type) {
-                    TOP_LEVEL_KEYWORD_TYPE -> topLevelIntroductionsMap[introduction.name] = version
-                    SUBSECTION_KEYWORD_TYPE -> {
-                        if (introduction.parent.isEmpty()) {
-                            subsectionIntroductionsMap[introduction.name to null] = version
-                        }
-                        for (parent in introduction.parent) {
-                            subsectionIntroductionsMap[introduction.name to parent] = version
-                        }
-                    }
-
-                    else -> throw IllegalArgumentException("Type ${introduction.type} introduction is not supported")
-                }
-            }
+            foo(topLevelIntroductionsMap, version, subsectionIntroductionsMap, data.introduced)
+            foo(topLevelDeprecationsMap, version, subsectionDeprecationsMap, data.deprecated)
+            foo(topLevelRemovalMap, version, subsectionRemovalMap, data.removed)
         }
 
         topLevelCorrection = topLevelData
@@ -111,7 +117,37 @@ class SmkFrameworkDeprecationProvider {
 
         subsectionIntroduction = subsectionIntroductionsMap
         topLevelIntroduction = topLevelIntroductionsMap
+        subsectionRemoval = subsectionRemovalMap
+        topLevelRemoval = topLevelRemovalMap
+        subsectionDeprecation = subsectionDeprecationsMap
+        topLevelDeprecation = topLevelDeprecationsMap
+    }
 
+    private fun foo(
+        topLevelEventsMap: MutableMap<String, SmkLanguageVersion>,
+        version: SmkLanguageVersion,
+        subsectionEventsMap: MutableMap<Pair<String, String?>, SmkLanguageVersion>,
+        events: List<SmkDeprecationKeywordData>
+        )
+    {
+        for (event in events) {
+            when (event.type) {
+                TOP_LEVEL_KEYWORD_TYPE -> topLevelEventsMap[event.name] = version
+                SUBSECTION_KEYWORD_TYPE -> {
+                    if (event.parent.isEmpty()) {
+                        subsectionEventsMap[event.name to null] = version
+                    }
+                    for (parent in event.parent) {
+                        subsectionEventsMap[event.name to parent] = version
+                    }
+                }
+                FUNCTION_KEYWORD_TYPE -> {
+                    // TODO do nothing, functions processed isn't implemented, issue: ......
+                }
+
+                else -> throw IllegalArgumentException("Type ${event.type} is not supported")
+            }
+        }
     }
 
     fun getDefaultVersion() = defaultVersion
@@ -159,9 +195,22 @@ class SmkFrameworkDeprecationProvider {
     fun getTopLevelIntroductionVersion(name: String): SmkLanguageVersion? {
         return topLevelIntroduction[name]
     }
+    fun getTopLevelRemovedVersion(name: String): SmkLanguageVersion? {
+        return topLevelRemoval[name]
+    }
+    fun getTopLevelDeprecationVersion(name: String): SmkLanguageVersion? {
+        return topLevelDeprecation[name]
+    }
 
     fun getSubSectionIntroductionVersion(name: String, parent: String): SmkLanguageVersion? {
         return subsectionIntroduction[name to parent] ?: subsectionIntroduction[name to null]
+    }
+
+    fun getSubSectionDeprecationVersion(name: String, parent: String): SmkLanguageVersion? {
+        return subsectionDeprecation[name to parent] ?: subsectionDeprecation[name to null]
+    }
+    fun getSubSectionRemovalVersion(name: String, parent: String): SmkLanguageVersion? {
+        return subsectionRemoval[name to parent] ?: subsectionRemoval[name to null]
     }
 
     private fun getKeywordCorrection(

@@ -66,11 +66,14 @@ Feature: Completion for snakemake keyword-like things
     Then completion list shouldn't contain:
       | <missing_item> |
     Examples:
-      | lang_version | expected_item        | expected_item_type           | missing_item |
-      | 1.0.0        | singularity          | deprecated in 1.0.0          | subworkflow  |
-      | 2.0.0        | container            | >=2.0.0                      | singularity  |
-      | 1.0.0        | wildcard_constraints | >=0.0.1                      | xxx          |
-      | 2.0.0        | wildcard_constraints | >=0.0.1, deprecated in 2.0.0 | xxx          |
+      | lang_version | expected_item        | expected_item_type              | missing_item |
+      | 0.0.1        | singularity          | deprecated 1.0.0, removed 2.0.0 | xxx          |
+      | 1.0.0        | singularity          | deprecated 1.0.0, removed 2.0.0 | subworkflow  |
+      | 2.0.0        | container            | >=2.0.0                         | singularity  |
+      | 0.0.0        | wildcard_constraints | >=0.0.1, deprecated 2.0.0       | xxx          |
+      | 1.0.0        | wildcard_constraints | >=0.0.1, deprecated 2.0.0       | xxx          |
+      | 2.0.0        | wildcard_constraints | >=0.0.1, deprecated 2.0.0       | xxx          |
+      | 3.0.0        | wildcard_constraints | >=0.0.1, deprecated 2.0.0       | xxx          |
 
   Scenario: Complete report at top-level
     # We have 2 'report' in completion list, so prev scenario outline doesn't work  for 'report'
@@ -389,17 +392,17 @@ Feature: Completion for snakemake keyword-like things
       Then completion list shouldn't contain:
         | <missing_item> |
     Examples:
-      | rule_like | rule_like_removed | lang_version | expected_item   | expected_item_type           | missing_item | deprecated_key | removed_key | introduced_key |
-      | rule       | rule              | 1.0.0        | input         | deprecated in 1.0.0 | output       | input          | output      | log            |
-      | rule       | checkpoint        | 1.0.0        | output        |                     | xxx          | input          | output      | log            |
-      | rule       | module            | 1.0.0        | output        |                     | xxx          | input          | output      | log            |
-      | checkpoint | checkpoint        | 1.0.0        | input         | deprecated in 1.0.0 | output       | input          | output      | log            |
-      | rule      | rule              | 2.0.0        | log           | >=2.0.0            | input        | input          | output      | log            |
-      | rule      | rule              | 1.0.0        | threads         |  >=0.0.1              | xxx        | input          | output      | log            |
-      | rule      | rule              | 2.0.0        | threads         |  >=0.0.1, deprecated in 2.0.0                | xxx        | input          | output      | log            |
-      | module    | module            | 1.0.0        | config          | deprecated in 1.0.0          | snakefile    | config         | snakefile   | meta_wrapper   |
-      | module    | module            | 1.0.0        | skip_validation | >=0.0.1                      | snakefile          | input          | snakefile      | log            |
-      | module    | module            | 2.0.0        | skip_validation | >=0.0.1, deprecated in 2.0.0 | snakefile          | input          | snakefile      | log            |
+      | rule_like  | rule_like_removed | lang_version | expected_item   | expected_item_type              | missing_item | deprecated_key | removed_key | introduced_key |
+      | rule       | rule              | 1.0.0        | input           | deprecated 1.0.0, removed 2.0.0 | output       | input          | output      | log            |
+      | rule       | checkpoint        | 1.0.0        | output          |                                 | xxx          | input          | output      | log            |
+      | rule       | module            | 1.0.0        | output          |                                 | xxx          | input          | output      | log            |
+      | checkpoint | checkpoint        | 1.0.0        | input           | deprecated 1.0.0, removed 2.0.0 | output       | input          | output      | log            |
+      | rule       | rule              | 2.0.0        | log             | >=2.0.0                         | input        | input          | output      | log            |
+      | rule       | rule              | 1.0.0        | threads         | >=0.0.1, deprecated 2.0.0       | xxx          | input          | output      | log            |
+      | rule       | rule              | 2.0.0        | threads         | >=0.0.1, deprecated 2.0.0       | xxx          | input          | output      | log            |
+      | module     | module            | 1.0.0        | config          | deprecated 1.0.0, removed 2.0.0 | snakefile    | config         | snakefile   | meta_wrapper   |
+      | module     | module            | 1.0.0        | skip_validation | >=0.0.1, deprecated 2.0.0       | snakefile    | input          | snakefile   | log            |
+      | module     | module            | 2.0.0        | skip_validation | >=0.0.1, deprecated 2.0.0       | snakefile    | input          | snakefile   | log            |
 
   Scenario Outline: Completion in use declaration
     Given a snakemake project
@@ -500,11 +503,11 @@ Feature: Completion for snakemake keyword-like things
     Then completion list shouldn't contain:
       | <missing_item> |
     Examples:
-      | lang_version | expected_item | expected_item_type           | missing_item |
-      | 1.0.0        | input         | deprecated in 1.0.0          | output       |
-      | 2.0.0        | log           | >=2.0.0                      | input        |
-      | 1.0.0        | threads       | >=0.0.1                      | xxx          |
-      | 2.0.0        | threads       | >=0.0.1, deprecated in 2.0.0 | xxx          |
+      | lang_version | expected_item | expected_item_type              | missing_item |
+      | 1.0.0        | input         | deprecated 1.0.0, removed 2.0.0 | output       |
+      | 2.0.0        | log           | >=2.0.0                         | input        |
+      | 1.0.0        | threads       | >=0.0.1, deprecated 2.0.0       | xxx          |
+      | 2.0.0        | threads       | >=0.0.1, deprecated 2.0.0       | xxx          |
 
   Scenario: No rule execution sections in use body
     Given a snakemake project

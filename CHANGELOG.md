@@ -11,7 +11,8 @@ Released on <not released>
 - Inspection: Warn about deprecated or not yet available features based on snakemake language level (see [#508](https://github.com/JetBrains-Research/snakecharm/issues/508)
 - Move snakemake API addition/removal info from JAR into `extra/snakemake_api.yaml` in plugin directory
 - Inspection: Warn if snakemake section type or API function isn't supported in the current snakemake project based on a snakemake version (see [#500](https://github.com/JetBrains-Research/snakecharm/issues/500)
-
+- Code completion: For section keywords show 'since' version and deprecation notice in the completion list. Do not suggest already removed keywords (see [#535](https://github.com/JetBrains-Research/snakecharm/issues/535)
+- 
 ### Fixed
 - Improve parser error message when rule/module is declared with name but lacks ':' (see [#515](https://github.com/JetBrains-Research/snakecharm/issues/515))
 

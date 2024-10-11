@@ -38,7 +38,7 @@ class FilesSteps {
     @Given("depreciation data file content is$")
     fun deprecationDataIs(text: String) {
         ApplicationManager.getApplication().invokeAndWait({
-            SmkFrameworkDeprecationProvider.getInstance().overrideInputFile(text.byteInputStream())
+            SmkFrameworkDeprecationProvider.getInstance().reinitializeInTests(text.byteInputStream())
         }, ModalityState.nonModal())
     }
 
