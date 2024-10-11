@@ -25,8 +25,8 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.TOPLEVEL_ARGS_SECTION_K
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_DECLARATION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.framework.SmkAPIKeywordContextType
-import com.jetbrains.snakecharm.framework.SmkFrameworkAPIProvider
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
+import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
 import com.jetbrains.snakecharm.framework.UpdateType
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import com.jetbrains.snakecharm.lang.SnakemakeNames
@@ -299,7 +299,7 @@ private fun filterByDeprecationAndAddLookupItems(
     defaultTailType: TailType = ColonAndWhiteSpaceTail,
     parentContextProvider: () -> String?
 ) {
-    val deprecationProvider = SmkFrameworkDeprecationProvider.getInstance()
+    val deprecationProvider = SnakemakeFrameworkAPIProvider.getInstance()
     val settings = SmkSupportProjectSettings.getInstance(project)
     val contextName = parentContextProvider()
 
@@ -349,20 +349,12 @@ private fun filterByDeprecationAndAddLookupItems(
                 }
                 buf.append("removed $removedVersion")
             }
-//            if (currentVersion != null) {
-//                if (issue?.updateType == UpdateType.DEPRECATED) {
-//                    if (buf.isNotEmpty()) {
-//                        buf.append(", ")
-//                    }
-//                    buf.append("deprecated in $currentVersion")
-//                }
-//            }
-            versionInfo = buf.toString()
+            versionInfo = if (buf.isEmpty()) null else buf.toString()
         } else {
             versionInfo = null
         }
 
-        var tailType = defaultTailType;
+        var tailType = defaultTailType
         if (customTailTypes != null && s in customTailTypes.keys) {
             tailType = customTailTypes[s]!!
         }

@@ -1,11 +1,16 @@
 package com.jetbrains.snakecharm.framework
 
+import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.jetbrains.snakecharm.SnakemakePluginUtil
 import com.jetbrains.snakecharm.SnakemakeTestUtil
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
+import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.lang.SnakemakeNames.CHECKPOINT_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.RULE_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.USE_KEYWORD
+import io.ktor.util.*
 import org.jetbrains.annotations.TestOnly
 import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
@@ -18,8 +23,9 @@ import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 
 @Service
-class SmkFrameworkDeprecationProvider {
-
+class SnakemakeFrameworkAPIProvider(
+    application: Application? // required to launch outside of IDEA process
+) {
     private lateinit var topLevelCorrection: Map<String, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>
     private lateinit var functionCorrection: Map<String, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>
     private lateinit var subsectionCorrection: Map<Pair<String, String>, TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>>
@@ -34,15 +40,24 @@ class SmkFrameworkDeprecationProvider {
     private lateinit var defaultVersion: String
 
     init {
-        if (ApplicationManager.getApplication().isUnitTestMode) {
-            reinitializeInTests()
-        } else {
-            val pluginSandboxPath = SnakemakePluginUtil.getPluginSandboxPath(
-                SmkFrameworkDeprecationProvider::class.java
-            )
-            initialize(pluginSandboxPath.resolve("extra/snakemake_api.yaml"))
+        if (application != null) {
+            if (application.isUnitTestMode) {
+                reinitializeInTests()
+            } else {
+                val pluginSandboxPath = SnakemakePluginUtil.getPluginSandboxPath(
+                    SnakemakeFrameworkAPIProvider::class.java
+                )
+                initialize(pluginSandboxPath.resolve("extra/snakemake_api.yaml"))
+            }
         }
     }
+
+    /**
+     * Constructor for service creation in IDEA (default usage)
+     */
+    constructor() : this(ApplicationManager.getApplication())
+
+
 
     @TestOnly
     fun reinitializeInTests() {
@@ -92,7 +107,7 @@ class SmkFrameworkDeprecationProvider {
                     // else: subsection type:
                     else -> {
                         if (srcType == SmkAPIKeywordContextType.RULE_LIKE.typeStr) {
-                            SnakemakeAPI.RULE_LIKE_KEYWORDS.forEach { directive ->
+                            RULE_LIKE_KEYWORDS.forEach { directive ->
                                 subsectionData.getOrPut(src.name to directive) { TreeMap() }[version] = newValue
                             }
                         }
@@ -107,9 +122,9 @@ class SmkFrameworkDeprecationProvider {
             putKeywordDataIntoMap(data.deprecated, UpdateType.DEPRECATED, mapGetter)
             putKeywordDataIntoMap(data.removed, UpdateType.REMOVED, mapGetter)
 
-            foo(topLevelIntroductionsMap, version, subsectionIntroductionsMap, data.introduced)
-            foo(topLevelDeprecationsMap, version, subsectionDeprecationsMap, data.deprecated)
-            foo(topLevelRemovalMap, version, subsectionRemovalMap, data.removed)
+            fillEventsMapWithKeywordsAndVersions(topLevelIntroductionsMap, version, subsectionIntroductionsMap, data.introduced)
+            fillEventsMapWithKeywordsAndVersions(topLevelDeprecationsMap, version, subsectionDeprecationsMap, data.deprecated)
+            fillEventsMapWithKeywordsAndVersions(topLevelRemovalMap, version, subsectionRemovalMap, data.removed)
         }
 
         topLevelCorrection = topLevelData
@@ -124,7 +139,7 @@ class SmkFrameworkDeprecationProvider {
         topLevelDeprecation = topLevelDeprecationsMap
     }
 
-    private fun foo(
+    private fun fillEventsMapWithKeywordsAndVersions(
         topLevelEventsMap: MutableMap<String, SmkLanguageVersion>,
         version: SmkLanguageVersion,
         subsectionEventsMap: MutableMap<Pair<String, String>, SmkLanguageVersion>,
@@ -138,7 +153,7 @@ class SmkFrameworkDeprecationProvider {
                     // TODO do nothing, functions processed isn't implemented, issue: ......
                 }
                 SmkAPIKeywordContextType.RULE_LIKE.typeStr -> {
-                    SnakemakeAPI.RULE_LIKE_KEYWORDS.forEach { directive ->
+                    RULE_LIKE_KEYWORDS.forEach { directive ->
                         subsectionEventsMap[event.name to directive] = version
                     }
                 }
@@ -208,6 +223,31 @@ class SmkFrameworkDeprecationProvider {
         return subsectionRemoval[name to contextSectionKeyword]
     }
 
+    fun collectAllPossibleUseSubsectionKeywords() = collectAllPossibleSubsectionKeywords { type ->
+        type == USE_KEYWORD
+    }
+
+    fun collectAllPossibleModuleSubsectionKeywords() = collectAllPossibleSubsectionKeywords { type ->
+        type == SnakemakeNames.MODULE_KEYWORD
+    }
+
+    fun collectAllPossibleRuleOrCheckpointSubsectionKeywords() = collectAllPossibleSubsectionKeywords { type ->
+            (type == RULE_KEYWORD) || (type == CHECKPOINT_KEYWORD)
+        }
+
+    private fun collectAllPossibleSubsectionKeywords(ctxTypeFilter: (String) -> Boolean): Set<String> {
+        val mutableSet = mutableSetOf<String>()
+
+        // Collect all sections ignoring deprecation/removal/introduction marks:
+        listOf(subsectionIntroduction.keys, subsectionDeprecation.keys, subsectionRemoval.keys).forEach { keys ->
+            mutableSet.addAll(
+                keys.filter { (_, type) -> ctxTypeFilter(type) }
+                    .map { (name, _) -> name }
+            )
+        }
+        return mutableSet.unmodifiable()
+    }
+
     private fun getKeywordCorrection(
         keywords: TreeMap<SmkLanguageVersion, SmkKeywordUpdateData>?,
         version: SmkLanguageVersion,
@@ -216,7 +256,6 @@ class SmkFrameworkDeprecationProvider {
         val entry = keywords?.floorEntry(version) ?: return null
         return SmkCorrectionInfo(entry.value.type, entry.value.advice, entry.key, isGlobalChange)
     }
-
 
     private fun putKeywordDataIntoMap(
         keywords: List<SmkDeprecationKeywordData>,
@@ -228,8 +267,15 @@ class SmkFrameworkDeprecationProvider {
         }
     }
     companion object {
+        /**
+         * For Snakemake YAML api descriptor
+         */
+        private val RULE_LIKE_KEYWORDS = setOf(
+            RULE_KEYWORD, CHECKPOINT_KEYWORD, USE_KEYWORD
+        )
+
         fun getInstance() =
-            ApplicationManager.getApplication().getService(SmkFrameworkDeprecationProvider::class.java)!!
+            ApplicationManager.getApplication().getService(SnakemakeFrameworkAPIProvider::class.java)!!
     }
 }
 enum class SmkAPIKeywordContextType(val typeStr: String) {
@@ -263,7 +309,8 @@ data class SmkDeprecationVersionData(
 
 data class SmkDeprecationData(
     val changelog: List<SmkDeprecationVersionData> = emptyList(),
-    val defaultVersion: String = "7.32.4"
+    val defaultVersion: String = "0.0.0",
+    val annotationsFormatVersion: Int = 0
 )
 
 data class SmkCorrectionInfo(

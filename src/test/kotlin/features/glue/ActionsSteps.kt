@@ -27,6 +27,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.FakeSnakemakeInjector
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler
 import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
 import com.jetbrains.snakecharm.lang.highlighter.SmkColorSettingsPage
@@ -624,7 +625,7 @@ class ActionsSteps {
             } ?: ""
 
             val info = SmkWrapperCrawler.collectWrapperInfo(
-                "wrapper", wrapperFileContent, ext, metaYamlContent
+                "wrapper", wrapperFileContent, ext, metaYamlContent, SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
             )
 
             val args = info.args

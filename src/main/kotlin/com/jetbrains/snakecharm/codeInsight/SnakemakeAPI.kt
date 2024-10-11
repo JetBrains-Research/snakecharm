@@ -1,7 +1,8 @@
 package com.jetbrains.snakecharm.codeInsight
 
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPICompanion.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED
+import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.SnakemakeNames.CHECKPOINT_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_CONFIG_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_META_WRAPPER_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_REPLACE_PREFIX_KEYWORD
@@ -53,7 +54,6 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_TEMP
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_TOUCH
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_UNPACK
 import com.jetbrains.snakecharm.lang.SnakemakeNames.USE_EXCLUDE_KEYWORD
-import com.jetbrains.snakecharm.lang.SnakemakeNames.USE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINERIZED_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD
@@ -159,29 +159,13 @@ object SnakemakeAPI {
         WORKFLOW_PEPFILE_KEYWORD
     )
 
-    /**
-     * For rules parsing
-     */
-    val RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS = setOf(
-        SECTION_OUTPUT, SECTION_INPUT, SECTION_PARAMS, SECTION_LOG, SECTION_RESOURCES,
-        SECTION_BENCHMARK, SECTION_VERSION, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS, SECTION_SINGULARITY,
-        SECTION_PRIORITY, SECTION_WILDCARD_CONSTRAINTS, SECTION_GROUP, SECTION_SHADOW,
-        SECTION_CONDA,
-        SECTION_SCRIPT, SECTION_WRAPPER, SECTION_CWL, SECTION_NOTEBOOK, SECTION_TEMPLATE_ENGINE,
-        SECTION_CACHE,
-        SECTION_CONTAINER,
-        SECTION_CONTAINERIZED,
-        SECTION_ENVMODULES,
-        SECTION_NAME,
-        SECTION_HANDOVER,
-        SECTION_DEFAULT_TARGET,
-        SECTION_RETRIES
-    )
+    val RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS = RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED +
+            SnakemakeFrameworkAPIProvider.getInstance().collectAllPossibleRuleOrCheckpointSubsectionKeywords()
 
     val RULE_OR_CHECKPOINT_SECTION_KEYWORDS = (RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS + setOf(SECTION_RUN))
 
     /**
-     * For subworkflows parsing
+     * For codeInsight
      */
     val SUBWORKFLOW_SECTIONS_KEYWORDS = setOf(
         SnakemakeNames.SUBWORKFLOW_WORKDIR_KEYWORD,
@@ -190,7 +174,7 @@ object SnakemakeAPI {
     )
 
     /**
-     * For modules parsing
+     * For modules codeInsight
      */
     val MODULE_SECTIONS_KEYWORDS = setOf(
         MODULE_SNAKEFILE_KEYWORD,
@@ -198,12 +182,14 @@ object SnakemakeAPI {
         MODULE_SKIP_VALIDATION_KEYWORD,
         MODULE_META_WRAPPER_KEYWORD,
         MODULE_REPLACE_PREFIX_KEYWORD
-    )
+    ) + SnakemakeFrameworkAPIProvider.getInstance()
+        .collectAllPossibleModuleSubsectionKeywords()
 
     /**
-     * For uses parsing
+     * For uses codeInsight
      */
-    val USE_SECTIONS_KEYWORDS = RULE_OR_CHECKPOINT_SECTION_KEYWORDS - EXECUTION_SECTIONS_KEYWORDS - SECTION_RUN
+    val USE_SECTIONS_KEYWORDS = RULE_OR_CHECKPOINT_SECTION_KEYWORDS + SnakemakeFrameworkAPIProvider.getInstance()
+        .collectAllPossibleUseSubsectionKeywords() - EXECUTION_SECTIONS_KEYWORDS - SECTION_RUN
 
     val USE_DECLARATION_KEYWORDS = setOf(
         RULE_KEYWORD,
@@ -211,13 +197,6 @@ object SnakemakeAPI {
         SMK_AS_KEYWORD,
         SMK_WITH_KEYWORD,
         USE_EXCLUDE_KEYWORD
-    )
-
-    /**
-     * For Snakemake YAML api descriptor
-     */
-    val RULE_LIKE_KEYWORDS = setOf(
-        RULE_KEYWORD, CHECKPOINT_KEYWORD, USE_KEYWORD
     )
 
     /**
@@ -376,4 +355,16 @@ object SnakemakeAPI {
     val SMK_API_PKG_NAME_SMK = "snakemake"
     val SMK_API_PKG_NAME_SMK_MINIMAL = "snakemake-minimal"
     val SMK_API_VERS_6_1 = "6.1"
+}
+
+object SnakemakeAPICompanion {
+    /**
+     * For codeInsight
+     */
+    val RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED = setOf(
+        // hardcoded list missing in 'snakmake_api.yaml'
+        SECTION_OUTPUT, SECTION_INPUT, SECTION_PARAMS, SECTION_LOG, SECTION_RESOURCES,
+        SECTION_BENCHMARK, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS,
+        SECTION_PRIORITY, SECTION_GROUP, SECTION_SHADOW,
+    )
 }

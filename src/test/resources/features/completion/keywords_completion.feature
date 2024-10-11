@@ -263,8 +263,6 @@ Feature: Completion for snakemake keyword-like things
       | checkpoint | out  | output          |
       | rule       | par  | params          |
       | checkpoint | par  | params          |
-      | rule       | lo   | log             |
-      | checkpoint | lo   | log             |
       | rule       | be   | benchmark       |
       | checkpoint | be   | benchmark       |
       | rule       | vers | version         |
@@ -296,7 +294,7 @@ Feature: Completion for snakemake keyword-like things
       | rule       | retr | retries         |
       | rule       | temp | template_engine |
 
-  Scenario Outline: Complete at rule/checkpoint/module level
+  Scenario Outline: Complete at rule/checkpoint/module level (multiple variants)
     Given a snakemake project
     Given I open a file "foo.smk" with text
       """
@@ -325,7 +323,8 @@ Feature: Completion for snakemake keyword-like things
       | checkpoint | co  | conda                |
       | rule       | sh  | shell                |
       | checkpoint | sh  | shell                |
-      | module     | s   | snakefile            |
+      | rule       | lo  | log                  |
+      | checkpoint | lo  | log                  |
       | module     | c   | config               |
       | module     | m   | meta_wrapper         |
       | module     | s   | skip_validation      |

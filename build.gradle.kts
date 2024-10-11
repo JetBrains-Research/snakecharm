@@ -275,6 +275,7 @@ tasks {
             gradleProperty("snakemakeWrappersRepoPath").get(),
             gradleProperty("snakemakeWrappersRepoVersion").get(),
             layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage-bundled.cbor").get(),
+            layout.projectDirectory.file("snakemake_api.yaml")
         )
         maxHeapSize = "1024m" // Not much RAM is available on TC agents
     }
@@ -297,6 +298,7 @@ tasks {
             layout.projectDirectory.file("testData/wrappers_storage"),
             "test",
             layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage.test.cbor").get(),
+            layout.projectDirectory.file("snakemake_api.yaml")
         )
         maxHeapSize = "1024m" // Not much RAM is available on TC agents
     }

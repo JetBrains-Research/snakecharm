@@ -10,6 +10,7 @@ import com.intellij.openapi.util.Disposer
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.SnakemakePluginUtil
 import com.jetbrains.snakecharm.SnakemakeTestUtil
+import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -170,7 +171,10 @@ class SmkWrapperStorage(val project: Project) : Disposable {
                 }
                 storage.initFrom(
                     "file://${config.wrappersCustomSourcesFolder}",
-                    SmkWrapperCrawler.localWrapperParser(config.wrappersCustomSourcesFolder)
+                    SmkWrapperCrawler.localWrapperParser(
+                        config.wrappersCustomSourcesFolder,
+                        SnakemakeFrameworkAPIProvider.getInstance()
+                    )
                 )
             }
         }

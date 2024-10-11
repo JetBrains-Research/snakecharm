@@ -2,7 +2,8 @@ package com.jetbrains.snakecharm.codeInsight.completion.wrapper
 
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.io.write
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPICompanion.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED
+import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.encodeToByteArray
@@ -10,8 +11,12 @@ import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.nio.file.Paths
 import kotlin.io.path.exists
+import kotlin.io.path.inputStream
 import kotlin.io.path.isDirectory
 
+/**
+ * Should be used ouside
+ */
 object SmkWrapperCrawler {
     private val VERBOSE = false
     private val YAML_WRAPPER_DETAILS_KEYS = listOf("name", "description", "authors", "url", "notes")
@@ -19,10 +24,10 @@ object SmkWrapperCrawler {
     @ExperimentalSerializationApi
     @JvmStatic
     fun main(args: Array<String>) {
-        println("Usage: SmkWrapperCrawler {WRAPPERS_SRC_ROOT_FOLDER} {WRAPPERS_REPO_VERSION} {WRAPPERS_INFO_CBOR_OUTPUT}")
+        println("Usage: SmkWrapperCrawler {WRAPPERS_SRC_ROOT_FOLDER} {WRAPPERS_REPO_VERSION} {WRAPPERS_INFO_CBOR_OUTPUT} {SNAKEMAKE_API_YAML}")
         println("Smk wrapper crawler args: ${args.joinToString()}")
-        require(args.size == 3) {
-            "3 input args expected, but was: ${args.size}"
+        require(args.size == 4) {
+            "4 input args expected, but was: ${args.size}"
         }
 
         val wrappersFolder = args[0]
@@ -42,8 +47,16 @@ object SmkWrapperCrawler {
 
         val outputFile = args[2]
 
+        val snakemakeAPIYaml = args[3]
+        val snakemakeAPIYamlPath = Paths.get(snakemakeAPIYaml)
+        require(snakemakeAPIYamlPath.exists()) {
+            "Snakemake API YAML file doesn't exist: [$snakemakeAPIYamlPath]"
+        }
+
         println("Launching smk wrappers crawler...")
-        val wrappers = localWrapperParser(wrappersFolder, true)
+        val provider = SnakemakeFrameworkAPIProvider(null)
+        provider.reinitializeInTests(snakemakeAPIYamlPath.inputStream())
+        val wrappers = localWrapperParser(wrappersFolder, provider=provider)
         wrappers.forEach { wrapper ->
             println(wrapper.path)
         }
@@ -99,9 +112,16 @@ object SmkWrapperCrawler {
 
      */
 
-    fun localWrapperParser(folder: String, relativePath: Boolean = false): List<SmkWrapperStorage.WrapperInfo> {
+    fun localWrapperParser(
+        folder: String,
+        provider: SnakemakeFrameworkAPIProvider
+    ): List<SmkWrapperStorage.WrapperInfo> {
         val wrappers = mutableListOf<SmkWrapperStorage.WrapperInfo>()
         val mainFolder = File(folder)
+
+        // could be launched also outside IDE process, so, we need to init manually:
+        val allowedKeywords = RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED +
+                provider.collectAllPossibleRuleOrCheckpointSubsectionKeywords()
 
         mainFolder.walkTopDown()
             .filter { it.isFile && it.name.startsWith("wrapper") }
@@ -123,7 +143,7 @@ object SmkWrapperCrawler {
                 val metaYamlContent = metaYaml.readText()
 
                 wrappers.add(
-                    collectWrapperInfo(path, wrapperFileContent, wrapperFileExt, metaYamlContent)
+                    collectWrapperInfo(path, wrapperFileContent, wrapperFileExt, metaYamlContent, allowedKeywords)
                 )
             }
 
@@ -134,7 +154,8 @@ object SmkWrapperCrawler {
         wrapperFullName: String,
         wrapperFileContent: String,
         wrapperFileExt: String,
-        metaYamlContent: String
+        metaYamlContent: String,
+        allowedKeywords: Set<String>
     ): SmkWrapperStorage.WrapperInfo {
         val wrapperArgs: List<Pair<String, String>> = when (wrapperFileExt.lowercase()) {
             "py" -> parseArgsPython(wrapperFileContent)
@@ -146,7 +167,7 @@ object SmkWrapperCrawler {
 
         return SmkWrapperStorage.WrapperInfo(
             path = FileUtil.toSystemIndependentName(wrapperFullName),
-            args = toParamsMapping(wrapperArgs + yamlArgs),
+            args = toParamsMapping(wrapperArgs + yamlArgs, allowedKeywords),
             description = metaYamlContent
         )
     }
@@ -238,11 +259,18 @@ object SmkWrapperCrawler {
         return sectionAndArgPairs
     }
 
-    private fun toParamsMapping(sectionAndArgPairs: List<Pair<String, String>>): Map<String, List<String>> {
+    private fun toParamsMapping(
+        sectionAndArgPairs: List<Pair<String, String>>,
+        allowedKeywords: Set<String>
+    ): Map<String, List<String>> {
         val map = HashMap<String, ArrayList<String>>()
         sectionAndArgPairs
-            // XXX: parse not sections here, e.g. 'notes:' or 'url:' should be ignored
-            .filter { (section, _) -> section in SnakemakeAPI.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS }
+            .filter {
+                // XXX: alg could find a lot of garbage, especialy from PY and R files
+                // + some sections form YAML description that not needed (e.g. notes, url)
+                // Lets do filtering:
+                (section, _) -> section in allowedKeywords
+            }
             .forEach { (section, arg) ->
                 val sectionKeywords = map.getOrPut(section) { arrayListOf() }
                 if (arg.isNotEmpty() && arg !in sectionKeywords) {

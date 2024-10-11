@@ -4,7 +4,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.text.StringUtil
-import com.jetbrains.snakecharm.framework.SmkFrameworkDeprecationProvider
+import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
 import com.jetbrains.snakecharm.lang.highlighter.SmkColorSettingsPage
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
@@ -38,7 +38,7 @@ class FilesSteps {
     @Given("snakemake framework api yaml descriptor is$")
     fun snakemakeFrameworkApiInfoContent(text: String) {
         ApplicationManager.getApplication().invokeAndWait({
-            SmkFrameworkDeprecationProvider.getInstance().reinitializeInTests(text.byteInputStream())
+            SnakemakeFrameworkAPIProvider.getInstance().reinitializeInTests(text.byteInputStream())
         }, ModalityState.nonModal())
     }
 

@@ -17,11 +17,10 @@ import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestUtil
-import com.jetbrains.snakecharm.framework.SmkFrameworkDeprecationProvider
+import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import io.cucumber.java.en.Given
 import javax.swing.SwingUtilities
-import kotlin.Throws
 import kotlin.test.fail
 
 
@@ -136,7 +135,7 @@ class StepDefs {
         // XXX: reset Snakemake API settings if smth was overridden in other tests
         ApplicationManager.getApplication().invokeAndWait {
             ApplicationManager.getApplication().runWriteAction {
-                SmkFrameworkDeprecationProvider.getInstance().reinitializeInTests()
+                SnakemakeFrameworkAPIProvider.getInstance().reinitializeInTests()
             }
         }
         setProjectSdk("python with snakemake")

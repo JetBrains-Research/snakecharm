@@ -8,7 +8,7 @@ import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
-import com.jetbrains.snakecharm.framework.SmkFrameworkDeprecationProvider
+import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.UpdateType
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
@@ -99,7 +99,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
                 declaration is PyFunction && declaration.containingFile.name == SnakemakeAPI.SNAKEMAKE_MODULE_NAME_IO_PY
             ) {
                 val settings = SmkSupportProjectSettings.getInstance(holder.project)
-                val deprecationProvider = SmkFrameworkDeprecationProvider.getInstance()
+                val deprecationProvider = SnakemakeFrameworkAPIProvider.getInstance()
                 val currentVersionString = settings.snakemakeLanguageVersion
                 val currentVersion = if (currentVersionString == null) null else SmkLanguageVersion(currentVersionString)
                 val name = node.name
@@ -143,7 +143,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
 
         private fun checkTopLevelDefinition(psiElement: PsiElement, name: String) {
             val settings = SmkSupportProjectSettings.getInstance(holder.project)
-            val deprecationProvider = SmkFrameworkDeprecationProvider.getInstance()
+            val deprecationProvider = SnakemakeFrameworkAPIProvider.getInstance()
             val lowestVersion = deprecationProvider.getTopLevelIntroductionVersion(name)
             val currentVersionString = settings.snakemakeLanguageVersion
             val currentVersion = if (currentVersionString == null) null else SmkLanguageVersion(currentVersionString)
@@ -207,7 +207,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
 
         private fun checkSubSectionDefinition(psiElement: PsiElement, name: String, parentName: String) {
             val settings = SmkSupportProjectSettings.getInstance(holder.project)
-            val deprecationProvider = SmkFrameworkDeprecationProvider.getInstance()
+            val deprecationProvider = SnakemakeFrameworkAPIProvider.getInstance()
             val lowestVersion = deprecationProvider.getSubSectionIntroductionVersion(name, parentName)
             val currentVersionString = settings.snakemakeLanguageVersion
             val currentVersion = if (currentVersionString == null) null else SmkLanguageVersion(currentVersionString)
