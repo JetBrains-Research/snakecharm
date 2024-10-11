@@ -12,7 +12,6 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.CHECKPOINT_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RULE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.USE_KEYWORD
 import io.ktor.util.*
-import kotlinx.collections.immutable.toImmutableMap
 import org.jetbrains.annotations.TestOnly
 import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
@@ -34,14 +33,6 @@ class SnakemakeFrameworkAPIProvider(
 
     private lateinit var topLevelName2Introduction: Map<String, TreeMap<SmkLanguageVersion, SmkKeywordIntroductionParams>>
     private lateinit var subsectionName2Introduction: Map<Pair<String, String>, TreeMap<SmkLanguageVersion, SmkKeywordIntroductionParams>>
-
-    private lateinit var subsectionIntroduction: Map<Pair<String, String>, SmkLanguageVersion?>
-    private lateinit var topLevelIntroduction: Map<String, SmkLanguageVersion?>
-
-    private lateinit var subsectionRemoval: Map<Pair<String, String>, SmkLanguageVersion?>
-    private lateinit var topLevelRemoval: Map<String, SmkLanguageVersion?>
-    private lateinit var subsectionDeprecation: Map<Pair<String, String>, SmkLanguageVersion?>
-    private lateinit var topLevelDeprecation: Map<String, SmkLanguageVersion?>
 
     private lateinit var defaultVersion: String
 
@@ -113,39 +104,6 @@ class SnakemakeFrameworkAPIProvider(
 
         topLevelName2Introduction = topLevelIntroductionInfo
         subsectionName2Introduction = subsectionIntroductionInfo
-
-        // Cached first (intro) and last deprecated/removed infos:
-        topLevelIntroduction = topLevelIntroductionInfo.map { (name, changes) ->
-            name to changes.firstEntry().key
-        }.toMap().toImmutableMap()
-
-        subsectionIntroduction = subsectionIntroductionInfo.map { (nameAndCtx, changes) ->
-            nameAndCtx to changes.firstEntry().key
-        }.toMap().toImmutableMap()
-
-        topLevelRemoval = topLevelDeprecationInfo.map { (name, deprecations) ->
-            val latestDeprecated =
-                deprecations.descendingMap().asIterable().firstOrNull() { it.value.type == SmkAPIAnnDeprecationType.REMOVED }
-            name to latestDeprecated?.key
-        }.toMap().toImmutableMap()
-
-        topLevelDeprecation = topLevelDeprecationInfo.map { (name, deprecations) ->
-            val latestDeprecated =
-                deprecations.descendingMap().asIterable().firstOrNull() { it.value.type == SmkAPIAnnDeprecationType.DEPRECATED }
-            name to latestDeprecated?.key
-        }.toMap().toImmutableMap()
-
-        subsectionDeprecation = subsectionDeprecationInfo.map { (nameAndCtx, deprecations) ->
-            val latestDeprecated =
-                deprecations.descendingMap().asIterable().firstOrNull() { it.value.type == SmkAPIAnnDeprecationType.DEPRECATED }
-            nameAndCtx to latestDeprecated?.key
-        }.toMap().toImmutableMap()
-
-        subsectionRemoval = subsectionDeprecationInfo.map { (nameAndCtx, deprecations) ->
-            val latestDeprecated =
-                deprecations.descendingMap().asIterable().firstOrNull() { it.value.type == SmkAPIAnnDeprecationType.REMOVED }
-            nameAndCtx to latestDeprecated?.key
-        }.toMap().toImmutableMap()
     }
 
     private fun filIntroductionData(
@@ -269,25 +227,35 @@ class SnakemakeFrameworkAPIProvider(
         )
     }
 
-    fun getTopLevelIntroductionVersion(name: String): SmkLanguageVersion? {
-        return topLevelIntroduction[name]
-    }
-    fun getTopLevelRemovedVersion(name: String): SmkLanguageVersion? {
-        return topLevelRemoval[name]
-    }
-    fun getTopLevelDeprecationVersion(name: String): SmkLanguageVersion? {
-        return topLevelDeprecation[name]
-    }
+    fun getTopLevelIntroductionVersion(name: String): SmkLanguageVersion? =
+        topLevelName2Introduction[name]?.firstEntry()?.key
+
+    fun getTopLevelRemovedVersion(name: String): SmkLanguageVersion? =
+        topLevelName2Deprecations[name]?.let { deprecations ->
+            val latestDeprecated = deprecations.descendingMap().asIterable().firstOrNull() { it.value.type == SmkAPIAnnDeprecationType.REMOVED }
+            latestDeprecated?.key
+        }
+
+    fun getTopLevelDeprecationVersion(name: String): SmkLanguageVersion? =
+        topLevelName2Deprecations[name]?.let { deprecations ->
+            val latestDeprecated = deprecations.descendingMap().asIterable().firstOrNull() { it.value.type == SmkAPIAnnDeprecationType.DEPRECATED }
+            latestDeprecated?.key
+        }
 
     fun getSubSectionIntroductionVersion(name: String, contextSectionKeyword: String): SmkLanguageVersion? =
-        subsectionIntroduction[name to contextSectionKeyword]
+        subsectionName2Introduction[name to contextSectionKeyword]?.firstEntry()?.key
 
-    fun getSubSectionDeprecationVersion(name: String, contextSectionKeyword: String): SmkLanguageVersion? {
-        return subsectionDeprecation[name to contextSectionKeyword]
-    }
-    fun getSubSectionRemovalVersion(name: String, contextSectionKeyword: String): SmkLanguageVersion? {
-        return subsectionRemoval[name to contextSectionKeyword]
-    }
+    fun getSubSectionDeprecationVersion(name: String, contextSectionKeyword: String): SmkLanguageVersion? =
+        subsectionName2Deprecations[name to contextSectionKeyword]?.let { deprecations ->
+            val latestDeprecated = deprecations.descendingMap().asIterable().firstOrNull() { it.value.type == SmkAPIAnnDeprecationType.DEPRECATED }
+            latestDeprecated?.key
+        }
+
+    fun getSubSectionRemovalVersion(name: String, contextSectionKeyword: String): SmkLanguageVersion? =
+        subsectionName2Deprecations[name to contextSectionKeyword]?.let { deprecations ->
+            val latestDeprecated = deprecations.descendingMap().asIterable().firstOrNull() { it.value.type == SmkAPIAnnDeprecationType.REMOVED }
+            latestDeprecated?.key
+        }
 
     fun collectAllPossibleUseSubsectionKeywords() = collectAllPossibleSubsectionKeywords { type ->
         type == USE_KEYWORD
@@ -305,7 +273,7 @@ class SnakemakeFrameworkAPIProvider(
         val mutableSet = mutableSetOf<String>()
 
         // Collect all sections ignoring deprecation/removal/introduction marks:
-        listOf(subsectionIntroduction.keys, subsectionDeprecation.keys, subsectionRemoval.keys).forEach { keys ->
+        listOf(subsectionName2Introduction.keys, subsectionName2Deprecations.keys).forEach { keys ->
             mutableSet.addAll(
                 keys.filter { (_, type) -> ctxTypeFilter(type) }
                     .map { (name, _) -> name }
