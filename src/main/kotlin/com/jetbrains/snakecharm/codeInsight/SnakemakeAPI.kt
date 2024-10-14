@@ -370,7 +370,6 @@ class SnakemakeAPIService {
 
 @Service(Service.Level.PROJECT)
 class SnakemakeAPIProjectService(val project: Project) {
-    fun isSingleArgumentSectionKeyword(keyword: String, contextKeyword: String): Boolean {
     fun isSingleArgumentSectionKeyword(keyword: String, contextKeywordOrType: String): Boolean {
 
         val settings = SmkSupportProjectSettings.getInstance(project)

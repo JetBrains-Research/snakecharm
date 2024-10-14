@@ -199,6 +199,7 @@ changelog:
 
       - name: "configfile"
         type: "subworkflow"
+        multiple_args_allowed: False
 
   # ----------------------
   - version: "3.5.5"
@@ -265,10 +266,6 @@ changelog:
         type: "subworkflow"
         multiple_args_allowed: False
 
-      - name: "configfile"
+      - name: "snakefile"
         type: "subworkflow"
-        multiple_args_allowed: False
-
-      - name: "configfile"
-        type: "snakefile"
         multiple_args_allowed: False
