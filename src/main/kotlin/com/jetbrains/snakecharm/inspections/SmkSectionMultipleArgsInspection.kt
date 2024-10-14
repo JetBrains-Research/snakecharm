@@ -4,8 +4,8 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SINGLE_ARGUMENT_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SINGLE_ARGUMENT_WORKFLOWS_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkSectionMultipleArgsInspection : SnakemakeInspection() {
@@ -14,13 +14,18 @@ class SmkSectionMultipleArgsInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+        val apiService = SnakemakeAPIProjectService.getInstance(holder.project)
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
             checkArgumentList(st.argumentList, "subworkflow")
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            checkArgumentList(st, SINGLE_ARGUMENT_SECTIONS_KEYWORDS)
+            val keyword = st.sectionKeyword
+            val contextKeyword = st.getParentRuleOrCheckPoint().sectionKeyword
+            if (keyword != null && contextKeyword != null && apiService.isSingleArgumentSectionKeyword(keyword, contextKeyword)) {
+                checkArgumentList(st.argumentList, keyword)
+            }
         }
 
         override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {

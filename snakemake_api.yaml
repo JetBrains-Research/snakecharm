@@ -22,7 +22,6 @@ defaultVersion: "7.32.4"
 changelog:
   # ---------------------------------------
   - version: "8.0.0"
-
     removed:
       - name: "dynamic"
         type: "function"
@@ -49,6 +48,7 @@ changelog:
     introduced:
       - name: "retries"
         type: "rule-like"
+        multiple_args_allowed: False
 
   # ----------------------
   - version: "7.0.0"
@@ -56,6 +56,7 @@ changelog:
     introduced:
       - name: "template_engine"
         type: "rule-like"
+        multiple_args_allowed: False
 
   # ----------------------
   - version: "6.15.0"
@@ -63,6 +64,7 @@ changelog:
     introduced:
       - name: "default_target"
         type: "rule-like"
+        multiple_args_allowed: False
 
   # ----------------------
   - version: "6.2.0"
@@ -70,6 +72,7 @@ changelog:
     introduced:
       - name: "handover"
         type: "rule-like"
+        multiple_args_allowed: False
 
   # ----------------------
   - version: "6.0.0"
@@ -83,9 +86,11 @@ changelog:
 
       - name: "containerized"
         type: "top-level"
+        multiple_args_allowed: False
 
       - name: "containerized"
         type: "rule-like"
+        multiple_args_allowed: False
 
     deprecated:
       - name: "subworkflow"
@@ -105,6 +110,7 @@ changelog:
     introduced:
       - name: "cache"
         type: "rule-like"
+        multiple_args_allowed: False
 
   # ----------------------
   - version: "5.11.0"
@@ -124,9 +130,11 @@ changelog:
 
       - name: "container"
         type: "top-level"
+        multiple_args_allowed: False
 
       - name: "container"
         type: "rule-like"
+        multiple_args_allowed: False
 
   # ----------------------
   - version: "5.9.0"
@@ -149,9 +157,11 @@ changelog:
     introduced:
       - name: "cwl"
         type: "rule-like"
+        multiple_args_allowed: False
 
       - name: "conda"
         type: "rule-like"
+        multiple_args_allowed: False
         lambda_args:
           - "wildcards"
           - "params"
@@ -183,6 +193,7 @@ changelog:
     introduced:
       - name: "wrapper"
         type: "rule-like"
+        multiple_args_allowed: False
 
   # ----------------------
   - version: "3.5.2"
@@ -190,6 +201,46 @@ changelog:
     introduced:
       - name: "script"
         type: "rule-like"
+        multiple_args_allowed: False
 
       - name: "notebook"
         type: "rule-like"
+        multiple_args_allowed: False
+
+  # ----------------------
+  # Not sure when these sections were introduced, let's use `1.0` version
+  - version: "1.0.0"
+
+    introduced:
+      - name: "shadow"
+        type: "rule-like"
+        multiple_args_allowed: False
+
+      - name: "group"
+        type: "rule-like"
+        multiple_args_allowed: False
+
+      - name: "priority"
+        type: "rule-like"
+        multiple_args_allowed: False
+
+      - name: "threads"
+        type: "rule-like"
+        multiple_args_allowed: False
+
+      - name: "message"
+        type: "rule-like"
+        multiple_args_allowed: False
+
+      - name: "version"
+        type: "rule-like"
+        multiple_args_allowed: False
+
+      - name: "benchmark"
+        type: "rule-like"
+        multiple_args_allowed: False
+
+      - name: "shell"
+        type: "rule-like"
+        multiple_args_allowed: False
+

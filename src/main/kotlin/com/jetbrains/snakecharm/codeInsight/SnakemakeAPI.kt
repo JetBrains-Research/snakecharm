@@ -2,10 +2,13 @@ package com.jetbrains.snakecharm.codeInsight
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.project.Project
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_OR_CALLABLE_ARGS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPICompanion.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED
+import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
+import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_CONFIG_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_META_WRAPPER_KEYWORD
@@ -127,20 +130,6 @@ object SnakemakeAPI {
     )
 
     /**
-     * Rule or checkpoint sections that allows only single argument
-     */
-    val SINGLE_ARGUMENT_SECTIONS_KEYWORDS = setOf(
-        SECTION_SHELL, SECTION_SCRIPT, SECTION_WRAPPER,
-        SECTION_CWL, SECTION_BENCHMARK, SECTION_VERSION,
-        SECTION_MESSAGE, SECTION_THREADS, SECTION_SINGULARITY,
-        SECTION_PRIORITY, SECTION_CONDA, SECTION_GROUP,
-        SECTION_SHADOW, SECTION_CACHE, SECTION_NOTEBOOK, SECTION_CONTAINER, SECTION_TEMPLATE_ENGINE,
-        SECTION_HANDOVER, SECTION_CONTAINERIZED,
-        SECTION_DEFAULT_TARGET,
-        SECTION_RETRIES
-    )
-
-    /**
      * Workflow top-level sections that allows only single argument
      */
     val SINGLE_ARGUMENT_WORKFLOWS_KEYWORDS = setOf(
@@ -149,6 +138,7 @@ object SnakemakeAPI {
     )
 
     // List of top-level sections
+    // TODO merge with deprecation provider keywords
     val TOPLEVEL_ARGS_SECTION_KEYWORDS = setOf(
         WORKFLOW_CONFIGFILE_KEYWORD,
         WORKFLOW_REPORT_KEYWORD,
@@ -217,6 +207,7 @@ object SnakemakeAPI {
         SECTION_VERSION
     )
 
+    // TODO: move to `snakemake_api.yaml' - injector
     val SECTIONS_INVALID_FOR_INJECTION = setOf(
         SECTION_WILDCARD_CONSTRAINTS,
         SECTION_SHADOW,
@@ -283,6 +274,7 @@ object SnakemakeAPI {
     /**
      * Rule/checkpoint sections that does not allow keyword arguments
      */
+    // TODO: move to `snakemake_api.yaml' - only inspections
     val SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED = setOf(
         SECTION_BENCHMARK, SECTION_VERSION, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS, SECTION_SINGULARITY,
         SECTION_PRIORITY, SECTION_GROUP, SECTION_SHADOW, SECTION_CONDA, SECTION_SCRIPT, SECTION_WRAPPER,
@@ -380,5 +372,32 @@ class SnakemakeAPIService {
 
     companion object {
         fun getInstance() = ApplicationManager.getApplication().getService(SnakemakeAPIService::class.java)!!
+    }
+}
+
+@Service(Service.Level.PROJECT)
+class SnakemakeAPIProjectService(val project: Project) {
+    fun isSingleArgumentSectionKeyword(keyword: String, contextKeyword: String): Boolean {
+
+        val settings = SmkSupportProjectSettings.getInstance(project)
+        val currentVersionString = settings.snakemakeLanguageVersion
+        val currentVersion = if (currentVersionString == null) null else SmkLanguageVersion(currentVersionString)
+
+        if (currentVersion == null) {
+            // No information
+            return false
+        }
+        val entry = SnakemakeFrameworkAPIProvider.getInstance()
+            .getSubsectionIntroduction(keyword, currentVersion, contextKeyword)
+        if (entry == null) {
+            // No Information
+            return false
+        }
+        return !entry.value.multipleArgsAllowed
+
+    }
+
+    companion object {
+        fun getInstance(project: Project) = project.getService(SnakemakeAPIProjectService::class.java)!!
     }
 }

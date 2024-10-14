@@ -10,7 +10,7 @@ import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyParenthesizedExpression
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
@@ -21,6 +21,8 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+        val apiService = SnakemakeAPIProjectService.getInstance(holder.project)
+
         private val stringVisitor = object : MultilineStringVisitor() {
             override fun reportSmkProblem(psiElement: PsiElement, text: String) {
                 registerProblem(psiElement, text)
@@ -38,7 +40,8 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
         private fun checkArgsSection(st: SmkArgsSection) {
             val argumentList = st.argumentList
             val keyword = st.sectionKeyword
-            if (argumentList == null || keyword == null || keyword in SnakemakeAPI.SINGLE_ARGUMENT_SECTIONS_KEYWORDS) {
+            val contextKeyword = st.getParentRuleOrCheckPoint()?.sectionKeyword
+            if (argumentList == null || keyword == null || contextKeyword == null || apiService.isSingleArgumentSectionKeyword(keyword, contextKeyword)) {
                 return
             }
 

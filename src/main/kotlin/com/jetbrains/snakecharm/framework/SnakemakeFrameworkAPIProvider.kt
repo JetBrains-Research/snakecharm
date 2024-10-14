@@ -282,6 +282,13 @@ class SnakemakeFrameworkAPIProvider(
         return mutableSet.unmodifiable()
     }
 
+    fun getSubsectionIntroduction(
+        name: String, version: SmkLanguageVersion, contextSectionKeyword: String
+    ): Map.Entry<SmkLanguageVersion, SmkKeywordIntroductionParams>? {
+        val vers2ParamsTree = subsectionName2Introduction[name to contextSectionKeyword]
+        return vers2ParamsTree?.floorEntry(version)
+    }
+
     private fun getKeywordDeprecation(
         keywords: TreeMap<SmkLanguageVersion, SmkKeywordDeprecationParams>?,
         version: SmkLanguageVersion,
