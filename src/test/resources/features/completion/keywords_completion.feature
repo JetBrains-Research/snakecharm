@@ -28,7 +28,6 @@ Feature: Completion for snakemake keyword-like things
 
   Scenario Outline: Complete at top-level with respect to deprecations
     Given a snakemake project
-    And I set snakemake language version to "<lang_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -55,6 +54,7 @@ Feature: Completion for snakemake keyword-like things
         - name: "wildcard_constraints"
           type: "top-level"
     """
+    And I set snakemake language version to "<lang_version>"
     Given I open a file "foo.smk" with text
     """
     "foo"
@@ -332,7 +332,6 @@ Feature: Completion for snakemake keyword-like things
 
   Scenario Outline: Complete at rule/checkpoint/module level with respect to deprecations
     Given a snakemake project
-    And I set snakemake language version to "<lang_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -363,6 +362,7 @@ Feature: Completion for snakemake keyword-like things
         - name: "skip_validation"
           type: "module"
     """
+    And I set snakemake language version to "<lang_version>"
     Given I open a file "foo.smk" with text
       """
       <rule_like> NAME:
@@ -435,7 +435,6 @@ Feature: Completion for snakemake keyword-like things
 
   Scenario Outline: Complete in use with respect to deprecations
     Given a snakemake project
-    And I set snakemake language version to "<lang_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -462,6 +461,7 @@ Feature: Completion for snakemake keyword-like things
         - name: "threads"
           type: "use"
     """
+    And I set snakemake language version to "<lang_version>"
     Given I open a file "foo.smk" with text
       """
       use rule NAME1 from MODULE as NAME2 with:

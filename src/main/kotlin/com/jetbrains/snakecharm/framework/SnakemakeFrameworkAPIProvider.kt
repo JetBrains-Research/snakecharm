@@ -294,15 +294,17 @@ class SnakemakeFrameworkAPIProvider(
 
     fun getToplevelIntroductions(
         version: SmkLanguageVersion
-    ) = topLevelName2Introduction.map { (directive, vers2ParamsTree) ->
-        directive to vers2ParamsTree.floorEntry(version)
+    ): List<Pair<String, Map.Entry<SmkLanguageVersion, SmkKeywordIntroductionParams>>> = topLevelName2Introduction.mapNotNull { (directive, vers2ParamsTree) ->
+        val entry = vers2ParamsTree.floorEntry(version)
+        if (entry == null) null else (directive to entry)
     }
 
     fun getSubsectionsIntroductions(
         version: SmkLanguageVersion
     ): List<Pair<SmkAPISubsectionContextAndDirective, Map.Entry<SmkLanguageVersion, SmkKeywordIntroductionParams>>> {
-        return subsectionName2Introduction.map { (ctxAndDirective, vers2ParamsTree) ->
-            ctxAndDirective to vers2ParamsTree.floorEntry(version)
+        return subsectionName2Introduction.mapNotNull { (ctxAndDirective, vers2ParamsTree) ->
+            val entry = vers2ParamsTree.floorEntry(version)
+            if (entry == null) null else (ctxAndDirective to vers2ParamsTree.floorEntry(version))
         }
     }
 

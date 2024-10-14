@@ -70,7 +70,6 @@ Feature: Inspection for multiple arguments in various sections
 
   Scenario Outline: Subsections with only one argument when API settings allow
     Given a snakemake project
-    And I set snakemake language version to "<lang_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -89,6 +88,7 @@ Feature: Inspection for multiple arguments in various sections
           type: "top-level"
           multiple_args_allowed: False
     """
+    And I set snakemake language version to "<lang_version>"
     Given I open a file "foo.smk" with text
     """
     <keyword> NAME:
@@ -110,7 +110,6 @@ Feature: Inspection for multiple arguments in various sections
 
   Scenario Outline: Subsections with only one argument when API settings do not allow
     Given a snakemake project
-    And I set snakemake language version to "<lang_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -128,6 +127,7 @@ Feature: Inspection for multiple arguments in various sections
           type: "<keyword>"
           multiple_args_allowed: False
     """
+    And I set snakemake language version to "<lang_version>"
     Given I open a file "foo.smk" with text
     """
     <keyword> NAME:
@@ -155,7 +155,6 @@ Feature: Inspection for multiple arguments in various sections
 
   Scenario Outline: workflow sections with only one argument when API settings allow
     Given a snakemake project
-    And I set snakemake language version to "<lang_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -174,6 +173,7 @@ Feature: Inspection for multiple arguments in various sections
           type: "rule-like"
           multiple_args_allowed: False
     """
+    And I set snakemake language version to "<lang_version>"
     Given I open a file "foo.smk" with text
     """
     fooboodoo: "a", "b", "c"
@@ -189,7 +189,6 @@ Feature: Inspection for multiple arguments in various sections
 
   Scenario Outline: workflow sections with only one argument when API settings do not allow
     Given a snakemake project
-    And I set snakemake language version to "<lang_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -208,6 +207,7 @@ Feature: Inspection for multiple arguments in various sections
           type: "top-level"
           multiple_args_allowed: False
     """
+    And I set snakemake language version to "<lang_version>"
     Given I open a file "foo.smk" with text
     """
     fooboodoo: "a", "b", "c"

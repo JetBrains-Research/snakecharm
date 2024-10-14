@@ -2,7 +2,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Using deprecated subsection keyword
     Given a snakemake project
-    And I set snakemake language version to "1.11.11"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -11,6 +10,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "input"
           type: "<rule_like>"
     """
+    And I set snakemake language version to "1.11.11"
     And I open a file "foo.smk" with text
     """
     <rule_like> foo:
@@ -29,7 +29,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Deprecation does not affect other sections
     Given a snakemake project
-    Given I set snakemake language version to "1.11.11"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -38,6 +37,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "input"
           type: "rule"
     """
+    Given I set snakemake language version to "1.11.11"
     And I open a file "foo.smk" with text
     """
     checkpoint foo:
@@ -52,7 +52,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Removal does affect only selected sections
     Given a snakemake project
-    And I set snakemake language version to "1.11.11"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -65,6 +64,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "input"
           type: "rule"
     """
+    And I set snakemake language version to "1.11.11"
     And I open a file "foo.smk" with text
     """
     rule boo:
@@ -86,7 +86,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Using deprecated subsection keyword with advice
     Given a snakemake project
-    And I set snakemake language version to "1.11.11"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -96,6 +95,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
           type: "rule-like"
           advice: "use 'input' instead"
     """
+    And I set snakemake language version to "1.11.11"
     And I open a file "foo.smk" with text
     """
     rule foo:
@@ -114,7 +114,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Using deprecated top-level keyword with advice
     Given a snakemake project
-    And I set snakemake language version to "1.11.11"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -124,6 +123,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
           type: "top-level"
           advice: "use 'input' instead"
     """
+    And I set snakemake language version to "1.11.11"
     And I open a file "foo.smk" with text
     """
     wildcard_constraints: "boo"
@@ -141,7 +141,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Using removed subsection keyword
     Given a snakemake project
-    And I set snakemake language version to "1.11.11"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -150,6 +149,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "input"
           type: "<rule_like>"
     """
+    And I set snakemake language version to "1.11.11"
     And I open a file "foo.smk" with text
     """
     <rule_like> foo:
@@ -168,7 +168,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Using removed subsection keyword with advice
     Given a snakemake project
-    And I set snakemake language version to "1.11.11"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -178,6 +177,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
           type: "rule"
           advice: "use 'input' instead"
     """
+    And I set snakemake language version to "1.11.11"
     And I open a file "foo.smk" with text
     """
     rule foo:
@@ -196,7 +196,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Using removed top-level keyword with advice
     Given a snakemake project
-    And I set snakemake language version to "1.11.11"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -206,6 +205,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
           type: "top-level"
           advice: "use 'input' instead"
     """
+    And I set snakemake language version to "1.11.11"
     And I open a file "foo.smk" with text
     """
     wildcard_constraints: "boo"
@@ -223,7 +223,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Warnings not trigger on older versions
     Given a snakemake project
-    And I set snakemake language version to "<old_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -237,6 +236,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
           advice: "use 'input' instead"
           type: "subsection"
     """
+    And I set snakemake language version to "<old_version>"
     And I open a file "foo.smk" with text
     """
     rule foo:
@@ -255,7 +255,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Only the latest update is applied
     Given a snakemake project
-    And I set snakemake language version to "<new_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -270,6 +269,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
           advice: "use 'input' instead"
           type: "rule-like"
     """
+    And I set snakemake language version to "<new_version>"
     And I open a file "foo.smk" with text
     """
     rule foo:
@@ -290,7 +290,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: New subsection keywords introduced
     Given a snakemake project
-    And I set snakemake language version to "<smk_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -299,6 +298,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "localname"
           type: "<rule_like>"
     """
+    And I set snakemake language version to "<smk_version>"
     And I open a file "foo.smk" with text
     """
     <section> foo:
@@ -321,7 +321,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Subsection can be deprecated from multiple top level directives
     Given a snakemake project
-    And I set snakemake language version to "<smk_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -330,6 +329,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "localname"
           type: "rule-like"
     """
+    And I set snakemake language version to "<smk_version>"
     And I open a file "foo.smk" with text
     """
     rule foo:
@@ -354,7 +354,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Subsection can be deprecated from everywhere
     Given a snakemake project
-    And I set snakemake language version to "<smk_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -363,6 +362,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "localname"
           type: "rule-like"
     """
+    And I set snakemake language version to "<smk_version>"
     And I open a file "foo.smk" with text
     """
     rule foo:
@@ -395,7 +395,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: New subsection keywords error does not appear when version is correct
     Given a snakemake project
-    And I set snakemake language version to "<smk_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -404,6 +403,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "localname"
           type: "subsection"
     """
+    And I set snakemake language version to "<smk_version>"
     And I open a file "foo.smk" with text
     """
     rule foo:
@@ -420,7 +420,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Functions can be deprecated
     Given a snakemake project
-    And I set snakemake language version to "<smk_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -429,6 +428,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "expand"
           type: "function"
     """
+    And I set snakemake language version to "<smk_version>"
     And I open a file "foo.smk" with text
     """
     rule foo:
@@ -450,7 +450,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Functions can be deprecated with advice
     Given a snakemake project
-    And I set snakemake language version to "<smk_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -461,6 +460,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
           advice: "use 'expand2' instead"
 
     """
+    And I set snakemake language version to "<smk_version>"
     And I open a file "foo.smk" with text
     """
     rule foo:
@@ -479,7 +479,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Top level directives can be deprecated
     Given a snakemake project
-    And I set snakemake language version to "<smk_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -488,6 +487,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "subworkflow"
           type: "top-level"
     """
+    And I set snakemake language version to "<smk_version>"
     And I open a file "foo.smk" with text
     """
     subworkflow foo:
@@ -507,7 +507,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Top level directives can be removed
     Given a snakemake project
-    And I set snakemake language version to "<smk_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -516,6 +515,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "subworkflow"
           type: "top-level"
     """
+    And I set snakemake language version to "<smk_version>"
     And I open a file "foo.smk" with text
     """
     subworkflow foo:
@@ -535,7 +535,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Top level directives can be deprecated with advice
     Given a snakemake project
-    And I set snakemake language version to "<smk_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -545,6 +544,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
           type: "top-level"
           advice: "use 'module' instead"
     """
+    And I set snakemake language version to "<smk_version>"
     And I open a file "foo.smk" with text
     """
     subworkflow foo:
@@ -564,7 +564,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Top level directives don't affect subdirectives
     Given a snakemake project
-    And I set snakemake language version to "<smk_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -574,6 +573,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
           type: "top-level"
           advice: "use 'module' instead"
     """
+    And I set snakemake language version to "<smk_version>"
     And I open a file "foo.smk" with text
     """
     module:
@@ -589,7 +589,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: New top level directive error appears when version is earlier that requested
     Given a snakemake project
-    And I set snakemake language version to "<smk_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -598,6 +597,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "module"
           type: "top-level"
     """
+    And I set snakemake language version to "<smk_version>"
     And I open a file "foo.smk" with text
     """
     module foo:
@@ -616,7 +616,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: New top level directive error does not appear when version is correct
     Given a snakemake project
-    And I set snakemake language version to "<smk_version>"
     And snakemake framework api yaml descriptor is
     """
     changelog:
@@ -625,6 +624,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "module"
           type: "top-level"
     """
+    And I set snakemake language version to "<smk_version>"
     And I open a file "foo.smk" with text
     """
     module foo:
@@ -640,7 +640,6 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
 
   Scenario Outline: Default version can be defined in file
     Given a snakemake project
-    And I set snakemake language version to "<smk_version>"
     And snakemake framework api yaml descriptor is
     """
     defaultVersion: "<smk_version>"
@@ -650,6 +649,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
         - name: "localname"
           type: "rule-like"
     """
+    And I set snakemake language version to "<smk_version>"
     And I open a file "foo.smk" with text
     """
     rule foo:
