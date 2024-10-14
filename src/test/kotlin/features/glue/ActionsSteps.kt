@@ -29,6 +29,7 @@ import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.FakeSnakemakeInjector
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIService
 import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler
+import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
 import com.jetbrains.snakecharm.lang.highlighter.SmkColorSettingsPage
 import com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterAttributes
@@ -273,8 +274,15 @@ class ActionsSteps {
 
         updatedInspectionProblemsCounter(highlightingLevel)
         ApplicationManager.getApplication().invokeAndWait {
+            var annotation = newText
+            val smkLangLevel = SmkSupportProjectSettings.getInstance(fixture.project).snakemakeLanguageVersion
+            if (smkLangLevel != null) {
+                annotation = annotation.replace("CURR_SMK_LANG_VERS", smkLangLevel)
+            }
             performAction(project) {
-                fixture.editor.document.replaceString(startPos, startPos + text.length, newText)
+                fixture.editor.document.replaceString(
+                    startPos, startPos + text.length, annotation
+                )
             }
         }
     }

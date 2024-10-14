@@ -1,5 +1,6 @@
 Feature: Inspection for multiple arguments in various sections
-  Scenario Outline: module/subworkflow sections with only one argument
+
+  Scenario Outline: module/subworkflow sections with only one argument in latest language level
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -9,22 +10,17 @@ Feature: Inspection for multiple arguments in various sections
     And SmkSectionMultipleArgsInspection inspection is enabled
     Then I expect inspection error on <"b"> with message
     """
-    Only one argument is allowed for '<keyword>' section.
+    Only one argument is allowed for '<section>' section in Snakemake 'CURR_SMK_LANG_VERS'.
     """
     And I expect inspection error on <"c"> with message
     """
-    Only one argument is allowed for '<keyword>' section.
+    Only one argument is allowed for '<section>' section in Snakemake 'CURR_SMK_LANG_VERS'.
     """
     When I check highlighting errors
     Examples:
       | keyword     | section         |
-      | subworkflow | workdir         |
-      | subworkflow | snakefile       |
       | subworkflow | configfile      |
       | module      | snakefile       |
-      | module      | config          |
-      | module      | skip_validation |
-      | module      | meta_wrapper    |
 
   Scenario Outline: rule/checkpoint sections with only one argument in latest language level
     Given a snakemake project
@@ -36,11 +32,11 @@ Feature: Inspection for multiple arguments in various sections
     And SmkSectionMultipleArgsInspection inspection is enabled
     Then I expect inspection error on <"b"> with message
     """
-    Only one argument is allowed for '<section>' section.
+    Only one argument is allowed for '<section>' section in Snakemake 'CURR_SMK_LANG_VERS'.
     """
     And I expect inspection error on <"c"> with message
     """
-    Only one argument is allowed for '<section>' section.
+    Only one argument is allowed for '<section>' section in Snakemake 'CURR_SMK_LANG_VERS'.
     """
     When I check highlighting errors
     Examples:
@@ -58,11 +54,11 @@ Feature: Inspection for multiple arguments in various sections
     And SmkSectionMultipleArgsInspection inspection is enabled
     Then I expect inspection error on <"b"> with message
     """
-    Only one argument is allowed for '<section_name>' section.
+    Only one argument is allowed for '<section_name>' section in Snakemake 'CURR_SMK_LANG_VERS'.
     """
     And I expect inspection error on <"c"> with message
     """
-    Only one argument is allowed for '<section_name>' section.
+    Only one argument is allowed for '<section_name>' section in Snakemake 'CURR_SMK_LANG_VERS'.
     """
       When I check highlighting errors
     Examples:
@@ -112,7 +108,6 @@ Feature: Inspection for multiple arguments in various sections
       | 1.0.0        | subworkflow |
       | 3.0.0        | subworkflow |
 
-  @here2
   Scenario Outline: Subsections with only one argument when API settings do not allow
     Given a snakemake project
     And I set snakemake language version to "<lang_version>"
@@ -141,11 +136,11 @@ Feature: Inspection for multiple arguments in various sections
     And SmkSectionMultipleArgsInspection inspection is enabled
     Then I expect inspection error on <"b"> with message
     """
-    Only one argument is allowed for 'fooboodoo' section.
+    Only one argument is allowed for 'fooboodoo' section in Snakemake '<lang_version>'.
     """
     And I expect inspection error on <"c"> with message
     """
-    Only one argument is allowed for 'fooboodoo' section.
+    Only one argument is allowed for 'fooboodoo' section in Snakemake '<lang_version>'.
     """
     When I check highlighting errors
     Examples:
@@ -220,15 +215,15 @@ Feature: Inspection for multiple arguments in various sections
     And SmkSectionMultipleArgsInspection inspection is enabled
     Then I expect inspection error on <"b"> with message
     """
-    Only one argument is allowed for 'fooboodoo' section.
+    Only one argument is allowed for 'fooboodoo' section in Snakemake '<lang_version>'.
     """
     And I expect inspection error on <"c"> with message
     """
-    Only one argument is allowed for 'fooboodoo' section.
+    Only one argument is allowed for 'fooboodoo' section in Snakemake '<lang_version>'.
     """
     When I check highlighting errors
     Examples:
       | lang_version |
       | 2.0.0        |
-#      | 2.10.0       |
+      | 2.10.0       |
 
