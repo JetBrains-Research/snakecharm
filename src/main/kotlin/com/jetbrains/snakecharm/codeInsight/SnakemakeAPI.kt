@@ -403,8 +403,8 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
             )
             // add subsections data:
             val subsectionIntroductions = apiProvider.getSubsectionsIntroductions(SmkLanguageVersion(version))
-            subsectionIntroductions.forEach { (ctxAndName, e) ->
-                if (!e.value.multipleArgsAllowed) {
+            subsectionIntroductions.forEach { (ctxAndName, versAndParams) ->
+                if (!versAndParams.second.multipleArgsAllowed) {
                     val context = ctxAndName.contextType
                     val keywords = contextType2SingleArgSectionKeywords.getOrPut(context) { arrayListOf<String>() }
                     keywords.add(ctxAndName.directiveKeyword)

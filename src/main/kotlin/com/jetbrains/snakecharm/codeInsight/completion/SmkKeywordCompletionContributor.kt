@@ -321,13 +321,13 @@ private fun filterByDeprecationAndAddLookupItems(
             val currentVersionString = settings.snakemakeLanguageVersion
             val currentVersion = if (currentVersionString == null) null else SmkLanguageVersion(currentVersionString)
 
-            val entry = currentVersion?.let {
+            val versAndParams = currentVersion?.let {
                 when {
                     isTopLevel -> deprecationProvider.getTopLevelDeprecation(s, it)
                     else -> deprecationProvider.getSubsectionDeprecation(s, it, contextName)
                 }
             }
-            if (entry?.value?.itemRemoved == true) {
+            if (versAndParams?.second?.itemRemoved == true) {
                 // removed in the current version
                 return@forEach
             }

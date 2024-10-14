@@ -101,12 +101,11 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
                 val deprecationProvider = SnakemakeFrameworkAPIProvider.getInstance()
                 val currentVersionString = settings.snakemakeLanguageVersion
                 val currentVersion = if (currentVersionString == null) null else SmkLanguageVersion(currentVersionString)
-                val name = node.name
+                @Suppress("UnstableApiUsage") val name = node.name
                 if (name != null && currentVersion != null) {
                     val deprecationEntry = deprecationProvider.getFunctionDeprecation(name, currentVersion)
                     if (deprecationEntry != null) {
-                        val deprecationDetails = deprecationEntry.value
-                        val version = deprecationEntry.key
+                        val (version, deprecationDetails) = deprecationEntry
 
                         val versionWithAdvice = if (deprecationDetails.advice != null) {
                             SnakemakeBundle.message(
@@ -168,8 +167,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
             if (currentVersion != null) {
                 val deprecationEntry = deprecationProvider.getTopLevelDeprecation(name, currentVersion)
                 if (deprecationEntry != null) {
-                    val deprecationDetails = deprecationEntry.value
-                    val version = deprecationEntry.key
+                    val (version, deprecationDetails) = deprecationEntry
                     val versionWithAdvice = if (deprecationDetails.advice != null) {
                         SnakemakeBundle.message(
                             "INSP.NAME.deprecated.keywords.version.and.advice.join",
@@ -233,10 +231,9 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
                 return
             }
             if (currentVersion != null) {
-                val deprecationEntry = deprecationProvider.getSubsectionDeprecation(name, currentVersion, parentName)
-                if (deprecationEntry != null) {
-                    val deprecationDetails = deprecationEntry.value
-                    val version = deprecationEntry.key
+                val versAndParams = deprecationProvider.getSubsectionDeprecation(name, currentVersion, parentName)
+                if (versAndParams != null) {
+                    val (version, deprecationDetails) = versAndParams
                     val versionWithAdvice = if (deprecationDetails.advice != null) {
                         SnakemakeBundle.message(
                             "INSP.NAME.deprecated.keywords.version.and.advice.join",
