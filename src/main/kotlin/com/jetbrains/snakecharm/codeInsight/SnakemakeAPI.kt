@@ -1,12 +1,15 @@
 package com.jetbrains.snakecharm.codeInsight
 
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_OR_CALLABLE_ARGS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPICompanion.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
+import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
 import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
 import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkAPIAnnParsingContextType
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
@@ -73,6 +76,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_REPORT_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_SINGULARITY_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_WILDCARD_CONSTRAINTS_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD
+import kotlinx.collections.immutable.toImmutableMap
 
 /**
  * Also see [ImplicitPySymbolsProvider] class
@@ -369,33 +373,93 @@ class SnakemakeAPIService {
 }
 
 @Service(Service.Level.PROJECT)
-class SnakemakeAPIProjectService(val project: Project) {
+class SnakemakeAPIProjectService(val project: Project): Disposable {
+    private var state: SnakemakeAPIProjectState = SnakemakeAPIProjectState()
+
     fun isSingleArgumentSectionKeyword(keyword: String, contextKeywordOrType: String): Boolean {
-
-        val settings = SmkSupportProjectSettings.getInstance(project)
-        val currentVersionString = settings.snakemakeLanguageVersion
-        val currentVersion = if (currentVersionString == null) null else SmkLanguageVersion(currentVersionString)
-
-        if (currentVersion == null) {
-            // No information
-            return false
-        }
-
-        val apiProvider = SnakemakeFrameworkAPIProvider.getInstance()
-        val entry = if (contextKeywordOrType == SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr) {
-            apiProvider.getToplevelIntroduction(keyword, currentVersion)
+        val list =  if (contextKeywordOrType == SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr) {
+            state.contextType2SingleArgSectionKeywords[SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr]
         } else {
-            apiProvider.getSubsectionIntroduction(keyword, currentVersion, contextKeywordOrType)
+            state.contextType2SingleArgSectionKeywords[contextKeywordOrType]
         }
-        if (entry == null) {
-            // No Information
-            return false
-        }
-        return !entry.value.multipleArgsAllowed
+        return list?.contains(keyword) == true
+    }
 
+    private fun doRefresh(version: String?) {
+        val newState = if (version == null) {
+            SnakemakeAPIProjectState()
+        } else {
+            val apiProvider = SnakemakeFrameworkAPIProvider.getInstance()
+
+            val contextType2SingleArgSectionKeywords = HashMap<String, MutableList<String>>()
+
+            // add top-level data:
+            val toplevelIntroductions = apiProvider.getToplevelIntroductions(SmkLanguageVersion(version))
+            contextType2SingleArgSectionKeywords.put(
+                SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr,
+                toplevelIntroductions.mapNotNull { (name, e) ->
+                    if (e.value.multipleArgsAllowed) null else name
+                }.toMutableList()
+            )
+            // add subsections data:
+            val subsectionIntroductions = apiProvider.getSubsectionsIntroductions(SmkLanguageVersion(version))
+            subsectionIntroductions.forEach { (ctxAndName, e) ->
+                if (!e.value.multipleArgsAllowed) {
+                    val context = ctxAndName.contextType
+                    val keywords = contextType2SingleArgSectionKeywords.getOrPut(context) { arrayListOf<String>() }
+                    keywords.add(ctxAndName.directiveKeyword)
+                }
+            }
+
+            SnakemakeAPIProjectState(
+                contextType2SingleArgSectionKeywords = contextType2SingleArgSectionKeywords.toImmutableMap()
+            )
+        }
+        state = newState
+    }
+
+    fun initOnStartup(smkSettings: SmkSupportProjectSettings) {
+        val connection = project.messageBus.connect()
+
+        connection.subscribe(SmkSupportProjectSettings.TOPIC, object : SmkSupportProjectSettingsListener {
+            override fun stateChanged(
+                newSettings: SmkSupportProjectSettings,
+                oldState: SmkSupportProjectSettings.State,
+                sdkRenamed: Boolean,
+                sdkRemoved: Boolean
+            ) {
+                if (!newSettings.snakemakeSupportEnabled) {
+                    // otherwise update later on enabled
+                    return
+                }
+
+                val sdkNameNotChanged = oldState.snakemakeLanguageVersion == newSettings.snakemakeLanguageVersion
+                if (sdkNameNotChanged) {
+                    return
+                }
+
+                doRefresh(newSettings.snakemakeLanguageVersion)
+            }
+
+            override fun enabled(newSettings: SmkSupportProjectSettings) {
+                doRefresh(newSettings.snakemakeLanguageVersion)
+            }
+        })
+        Disposer.register(this, connection)
+
+
+        doRefresh(smkSettings.snakemakeLanguageVersion)
+    }
+
+    override fun dispose() {
+        // Do nothing, used as parent disposable
     }
 
     companion object {
         fun getInstance(project: Project) = project.getService(SnakemakeAPIProjectService::class.java)!!
     }
 }
+
+internal data class SnakemakeAPIProjectState(
+    val contextType2SingleArgSectionKeywords: Map<String, List<String>> = emptyMap()
+)

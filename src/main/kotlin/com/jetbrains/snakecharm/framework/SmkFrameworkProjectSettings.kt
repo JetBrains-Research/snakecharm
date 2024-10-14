@@ -107,25 +107,6 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
 
         })
 
-
-        // Register inspection refresh after settings were changed
-        connection.subscribe(TOPIC, object : SmkSupportProjectSettingsListener {
-            override fun stateChanged(
-                newSettings: SmkSupportProjectSettings,
-                oldState: State,
-                sdkRenamed: Boolean,
-                sdkRemoved: Boolean
-            ) {
-                if (oldState.snakemakeLanguageVersion != newSettings.snakemakeLanguageVersion) {
-                    DaemonCodeAnalyzer.getInstance(project).restart()
-                }
-            }
-
-            override fun enabled(newSettings: SmkSupportProjectSettings) {}
-
-            override fun disabled(newSettings: SmkSupportProjectSettings) {}
-        })
-
         Disposer.register(this, connection)
     }
 
@@ -197,6 +178,7 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
             }
 
             // no after* event in facets topic
+            DaemonCodeAnalyzer.getInstance(project).restart()
         }
 
         fun findPythonSdk(project: Project, sdkName: String?): Sdk? {
