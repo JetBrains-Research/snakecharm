@@ -19,6 +19,10 @@ class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+        val apiService = SnakemakeAPIService.getInstance()
+        val SECTION_LAMBDA_ARG_POSSIBLE_PARAMS: Set<String> =
+            ALLOWED_LAMBDA_OR_CALLABLE_ARGS.values.flatMap { it.asIterable() }.toSet()
+
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {
             @Suppress("UnstableApiUsage")
             if (node.isQualified) {
@@ -27,7 +31,11 @@ class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
             }
             @Suppress("UnstableApiUsage")
             val varName = node.referencedName
-            if (varName == null || varName !in SnakemakeAPIService.getInstance().SECTION_LAMBDA_ARG_POSSIBLE_PARAMS) {
+            // Not allowed arg (e.g. wildcards, ..) and not section keyword (e.g. 'threads', 'version' etc)
+            if (varName == null || (
+                        (varName !in SECTION_LAMBDA_ARG_POSSIBLE_PARAMS) &&
+                                ( varName !in apiService.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS))
+                ) {
                 // Not suitable case
                 return
             }
