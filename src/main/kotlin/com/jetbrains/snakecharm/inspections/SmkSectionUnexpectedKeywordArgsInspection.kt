@@ -5,8 +5,10 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WORKFLOWS_WHERE_KEYWORD_ARGS_PROHIBITED
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
+import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkAPIAnnParsingContextType
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkSectionUnexpectedKeywordArgsInspection : SnakemakeInspection() {
@@ -15,31 +17,34 @@ class SmkSectionUnexpectedKeywordArgsInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+        val apiService = SnakemakeAPIProjectService.getInstance(holder.project)
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
-            checkArgumentList(st.argumentList, st)
+            processSubSection(st, SnakemakeNames.SUBWORKFLOW_KEYWORD)
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            checkArgumentList(st, SECTIONS_WHERE_KEYWORD_ARGS_PROHIBITED)
+            val contextKeyword = st.getParentRuleOrCheckPoint().sectionKeyword
+            processSubSection(st, contextKeyword)
         }
 
         override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
-            checkArgumentList(st, WORKFLOWS_WHERE_KEYWORD_ARGS_PROHIBITED)
+            processSubSection(st, SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr)
         }
 
-        private fun checkArgumentList(
-            st: SmkArgsSection,
-            sectionKeywords: Set<String>,
-        ) {
+        private fun processSubSection(st: SmkArgsSection, contextKeyword: String?) {
             val keyword = st.sectionKeyword
-            if (keyword != null && keyword in sectionKeywords) {
+            if (keyword != null && contextKeyword != null && apiService.isSectionWithOnlyPositionalArguments(
+                    keyword,
+                    contextKeyword
+                )
+            ) {
                 checkArgumentList(st.argumentList, st)
             }
         }
 
         override fun visitSmkModuleArgsSection(st: SmkModuleArgsSection) {
-            checkArgumentList(st.argumentList, st)
+            processSubSection(st, SnakemakeNames.MODULE_KEYWORD)
         }
 
         private fun checkArgumentList(
@@ -47,13 +52,20 @@ class SmkSectionUnexpectedKeywordArgsInspection : SnakemakeInspection() {
             section: SmkArgsSection
         ) {
             val args = argumentList?.arguments ?: emptyArray()
+            if (args.isEmpty()) {
+                return
+            }
+            val settings = SmkSupportProjectSettings.getInstance(argumentList!!.project)
+            val currentVersionString = settings.snakemakeLanguageVersion
+            val sectionName = section.sectionKeyword!!
             args.forEach { arg ->
                 if (arg is PyKeywordArgument) {
                     registerProblem(
                         arg,
                         SnakemakeBundle.message(
-                            "INSP.NAME.section.unexpected.keyword.args.message",
-                            section.sectionKeyword!!
+                            "INSP.NAME.section.unexpected.keyword.args.in.lang.level.message",
+                            sectionName,
+                            currentVersionString ?: "Unknown"
                         )
                     )
                 }
