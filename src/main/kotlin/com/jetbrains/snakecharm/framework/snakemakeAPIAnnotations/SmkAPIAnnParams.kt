@@ -1,7 +1,5 @@
 package com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations
 
-import com.jetbrains.snakecharm.lang.SmkLanguageVersion
-
 data class SmkKeywordDeprecationParams(
     val itemRemoved: Boolean,
     val advice: String?,
@@ -29,10 +27,3 @@ data class SmkKeywordIntroductionParams(
         )
     }
 }
-
-data class SmkAPIAnnDeprecationInfo(
-    val itemRemoved: Boolean,
-    val advice: String?,
-    val version: SmkLanguageVersion,
-    val isGlobalChange: Boolean // XXX seems we don't need it any more, was for `global` subsections mainly
-)

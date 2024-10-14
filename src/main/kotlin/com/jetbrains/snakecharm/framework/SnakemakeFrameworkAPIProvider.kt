@@ -196,9 +196,8 @@ class SnakemakeFrameworkAPIProvider(
      * @return Pair of latest deprecation/removal update that was made to the top level keyword as of provided version,
      *           and advice if any was assigned to the change
      */
-    fun getTopLevelDeprecation(name: String, version: SmkLanguageVersion): SmkAPIAnnDeprecationInfo? {
-        return getKeywordDeprecation(topLevelName2Deprecations[name], version)
-    }
+    fun getTopLevelDeprecation(name: String, version: SmkLanguageVersion): Map.Entry<SmkLanguageVersion, SmkKeywordDeprecationParams>? =
+        getKeywordDeprecation(topLevelName2Deprecations[name], version)
 
     /**
      * @param name name of keyword to check
@@ -207,9 +206,8 @@ class SnakemakeFrameworkAPIProvider(
      * @return Pair of latest deprecation/removal update that was made to the subsection keyword as of provided version,
      *           and advice if any was assigned to the change
      */
-    fun getSubsectionDeprecation(name: String, version: SmkLanguageVersion, contextSectionKeyword: String): SmkAPIAnnDeprecationInfo? =
-        // XXX: at the moment we don't have any subsections with context `section`, that was global in the past
-        getKeywordDeprecation(subsectionName2Deprecations[SmkAPISubsectionContextAndDirective(contextSectionKeyword, name)], version, false)
+    fun getSubsectionDeprecation(name: String, version: SmkLanguageVersion, contextSectionKeyword: String): Map.Entry<SmkLanguageVersion, SmkKeywordDeprecationParams>? =
+        getKeywordDeprecation(subsectionName2Deprecations[SmkAPISubsectionContextAndDirective(contextSectionKeyword, name)], version)
 
     /**
      * @param name name of keyword to check
@@ -220,12 +218,10 @@ class SnakemakeFrameworkAPIProvider(
     fun getFunctionDeprecation(
         name: String,
         version: SmkLanguageVersion
-    ): SmkAPIAnnDeprecationInfo? {
-        return getKeywordDeprecation(
-            functionName2Deprecations[name],
-            version
-        )
-    }
+    ):  Map.Entry<SmkLanguageVersion, SmkKeywordDeprecationParams>? = getKeywordDeprecation(
+        functionName2Deprecations[name],
+        version
+    )
 
     fun getTopLevelIntroductionVersion(name: String): SmkLanguageVersion? =
         topLevelName2Introduction[name]?.firstEntry()?.key
@@ -312,12 +308,8 @@ class SnakemakeFrameworkAPIProvider(
 
     private fun getKeywordDeprecation(
         keywords: TreeMap<SmkLanguageVersion, SmkKeywordDeprecationParams>?,
-        version: SmkLanguageVersion,
-        isGlobalChange: Boolean = true
-    ): SmkAPIAnnDeprecationInfo? {
-        val entry = keywords?.floorEntry(version) ?: return null
-        return SmkAPIAnnDeprecationInfo(entry.value.itemRemoved, entry.value.advice, entry.key, isGlobalChange)
-    }
+        version: SmkLanguageVersion
+    ): Map.Entry<SmkLanguageVersion, SmkKeywordDeprecationParams>? = keywords?.floorEntry(version)
 
     companion object {
         /**
