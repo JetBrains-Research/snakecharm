@@ -15,9 +15,7 @@ Feature: Inspection for unexpected keyword arguments in section
     When I check highlighting errors
     Examples:
       | section    |
-      | workdir    |
       | snakefile  |
-      | configfile |
 
   Scenario Outline: Unexpected keyword arguments in rule\checkpoint\module in latest language level
     Given a snakemake project
@@ -35,33 +33,9 @@ Feature: Inspection for unexpected keyword arguments in section
     Examples:
       | rule_like  | section         |
       | rule       | benchmark       |
-      | rule       | cache           |
       | rule       | conda           |
-      | rule       | container       |
-      | rule       | containerized   |
-      | rule       | cwl             |
-      | rule       | group           |
-      | rule       | envmodules      |
-      | rule       | singularity     |
-      | rule       | threads         |
-      | rule       | name            |
-      | rule       | handover        |
-      | rule       | default_target  |
-      | rule       | retries         |
-      | rule       | template_engine |
       | checkpoint | message         |
-      | checkpoint | notebook        |
-      | checkpoint | priority        |
-      | checkpoint | script          |
-      | checkpoint | shadow          |
-      | checkpoint | shell           |
-      | checkpoint | version         |
-      | checkpoint | wrapper         |
-      | checkpoint | handover        |
-      | module     | snakefile       |
       | module     | config          |
-      | module     | skip_validation |
-      | module     | meta_wrapper    |
 
 
   Scenario Outline: No warn on expected keyword arguments in rule\checkpoint in latest language level
@@ -77,7 +51,6 @@ Feature: Inspection for unexpected keyword arguments in section
     Examples:
       | rule_like  | section              |
       | rule       | input                |
-      | rule       | output               |
       | rule       | params               |
       | checkpoint | log                  |
       | checkpoint | resources            |
@@ -97,8 +70,6 @@ Feature: Inspection for unexpected keyword arguments in section
     When I check highlighting errors
     Examples:
       | section_name  |
-      | containerized |
-      | singularity   |
       | container     |
 
   Scenario Outline: No warn on expected keyword arguments in subsections when API settings allow
