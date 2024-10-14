@@ -4,8 +4,9 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SINGLE_ARGUMENT_WORKFLOWS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkAPIAnnParsingContextType
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkSectionMultipleArgsInspection : SnakemakeInspection() {
@@ -17,30 +18,36 @@ class SmkSectionMultipleArgsInspection : SnakemakeInspection() {
         val apiService = SnakemakeAPIProjectService.getInstance(holder.project)
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
-            checkArgumentList(st.argumentList, "subworkflow")
+            processSubSection(st, SnakemakeNames.SUBWORKFLOW_KEYWORD)
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
+            val contextKeyword = st.getParentRuleOrCheckPoint()?.sectionKeyword
+            processSubSection(st, contextKeyword)
+        }
+
+        private fun processSubSection(st: SmkArgsSection, contextKeyword: String?) {
             val keyword = st.sectionKeyword
-            val contextKeyword = st.getParentRuleOrCheckPoint().sectionKeyword
-            if (keyword != null && contextKeyword != null && apiService.isSingleArgumentSectionKeyword(keyword, contextKeyword)) {
+            if (keyword != null && contextKeyword != null && apiService.isSingleArgumentSectionKeyword(
+                    keyword,
+                    contextKeyword
+                )
+            ) {
                 checkArgumentList(st.argumentList, keyword)
             }
         }
 
         override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
-            checkArgumentList(st, SINGLE_ARGUMENT_WORKFLOWS_KEYWORDS)
-        }
-
-        private fun checkArgumentList(st: SmkArgsSection, sectionKeywords: Set<String>) {
             val keyword = st.sectionKeyword
-            if (keyword != null && keyword in sectionKeywords) {
+            val contextType = SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr
+            if (keyword != null && apiService.isSingleArgumentSectionKeyword(keyword, contextType)) {
                 checkArgumentList(st.argumentList, keyword)
             }
         }
 
         override fun visitSmkModuleArgsSection(st: SmkModuleArgsSection) {
-            checkArgumentList(st.argumentList, "module")
+
+            processSubSection(st, SnakemakeNames.MODULE_KEYWORD)
         }
 
         private fun checkArgumentList(

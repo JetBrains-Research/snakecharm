@@ -8,6 +8,7 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_KEYW
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPICompanion.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
+import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkAPIAnnParsingContextType
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_CONFIG_KEYWORD
@@ -127,14 +128,6 @@ object SnakemakeAPI {
     val EXECUTION_SECTIONS_KEYWORDS = setOf(
         SECTION_SHELL,
         *EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE.toTypedArray()
-    )
-
-    /**
-     * Workflow top-level sections that allows only single argument
-     */
-    val SINGLE_ARGUMENT_WORKFLOWS_KEYWORDS = setOf(
-        WORKFLOW_CONTAINERIZED_KEYWORD, WORKFLOW_CONTAINER_KEYWORD,
-        WORKFLOW_SINGULARITY_KEYWORD, WORKFLOW_WORKDIR_KEYWORD
     )
 
     // List of top-level sections
@@ -378,6 +371,7 @@ class SnakemakeAPIService {
 @Service(Service.Level.PROJECT)
 class SnakemakeAPIProjectService(val project: Project) {
     fun isSingleArgumentSectionKeyword(keyword: String, contextKeyword: String): Boolean {
+    fun isSingleArgumentSectionKeyword(keyword: String, contextKeywordOrType: String): Boolean {
 
         val settings = SmkSupportProjectSettings.getInstance(project)
         val currentVersionString = settings.snakemakeLanguageVersion
@@ -387,8 +381,13 @@ class SnakemakeAPIProjectService(val project: Project) {
             // No information
             return false
         }
-        val entry = SnakemakeFrameworkAPIProvider.getInstance()
-            .getSubsectionIntroduction(keyword, currentVersion, contextKeyword)
+
+        val apiProvider = SnakemakeFrameworkAPIProvider.getInstance()
+        val entry = if (contextKeywordOrType == SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr) {
+            apiProvider.getToplevelIntroduction(keyword, currentVersion)
+        } else {
+            apiProvider.getSubsectionIntroduction(keyword, currentVersion, contextKeywordOrType)
+        }
         if (entry == null) {
             // No Information
             return false

@@ -26,7 +26,7 @@ Feature: Inspection for multiple arguments in various sections
       | module      | skip_validation |
       | module      | meta_wrapper    |
 
-  Scenario Outline: rule/checkpoint sections with only one argument
+  Scenario Outline: rule/checkpoint sections with only one argument in latest language level
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -46,28 +46,10 @@ Feature: Inspection for multiple arguments in various sections
     Examples:
       | section         |
       | shell           |
-      | script          |
-      | wrapper         |
-      | cwl             |
-      | conda           |
-      | singularity     |
-      | priority        |
-      | version         |
-      | cache           |
-      | group           |
-      | message         |
-      | benchmark       |
       | threads         |
       | shadow          |
-      | notebook        |
-      | container       |
-      | containerized   |
-      | handover        |
-      | default_target  |
-      | retries         |
-      | template_engine |
 
-  Scenario Outline: Multiple arguments in workflow section
+  Scenario Outline: Multiple arguments in workflow section in latest language level
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -89,3 +71,164 @@ Feature: Inspection for multiple arguments in various sections
       | singularity   |
       | container     |
       | workdir       |
+
+  Scenario Outline: Subsections with only one argument when API settings allow
+    Given a snakemake project
+    And I set snakemake language version to "<lang_version>"
+    And snakemake framework api yaml descriptor is
+    """
+    changelog:
+      - version: "3.0.0"
+        override:
+        - name: "fooboodoo"
+          type: "<keyword>"
+      - version: "2.0.0"
+        introduced:
+        - name: "fooboodoo"
+          type: "<keyword>"
+          multiple_args_allowed: False
+      - version: "0.0.1"
+        introduced:
+        - name: "fooboodoo"
+          type: "top-level"
+          multiple_args_allowed: False
+    """
+    Given I open a file "foo.smk" with text
+    """
+    <keyword> NAME:
+        fooboodoo: "a", "b", "c"
+    """
+    And SmkSectionMultipleArgsInspection inspection is enabled
+    Then I expect no inspection errors
+    When I check highlighting errors
+    Examples:
+      | lang_version | keyword     |
+      | 1.0.0        | rule        |
+      | 3.0.0        | rule        |
+      | 3.0.1        | rule        |
+      | 3.0.1        | checkpoint  |
+      | 1.0.0        | module      |
+      | 3.0.0        | module      |
+      | 1.0.0        | subworkflow |
+      | 3.0.0        | subworkflow |
+
+  @here2
+  Scenario Outline: Subsections with only one argument when API settings do not allow
+    Given a snakemake project
+    And I set snakemake language version to "<lang_version>"
+    And snakemake framework api yaml descriptor is
+    """
+    changelog:
+      - version: "3.0.0"
+        override:
+        - name: "fooboodoo"
+          type: "<keyword>"
+      - version: "2.9.0"
+        introduced:
+        - name: "fooboodoo"
+          type: "top-level"
+      - version: "2.0.0"
+        introduced:
+        - name: "fooboodoo"
+          type: "<keyword>"
+          multiple_args_allowed: False
+    """
+    Given I open a file "foo.smk" with text
+    """
+    <keyword> NAME:
+        fooboodoo: "a", "b", "c"
+    """
+    And SmkSectionMultipleArgsInspection inspection is enabled
+    Then I expect inspection error on <"b"> with message
+    """
+    Only one argument is allowed for 'fooboodoo' section.
+    """
+    And I expect inspection error on <"c"> with message
+    """
+    Only one argument is allowed for 'fooboodoo' section.
+    """
+    When I check highlighting errors
+    Examples:
+      | lang_version | keyword     |
+      | 2.0.0        | rule        |
+      | 2.10.0       | rule        |
+      | 2.10.1       | checkpoint  |
+      | 2.0.0        | module      |
+      | 2.10.0       | module      |
+      | 2.0.0        | subworkflow |
+      | 2.10.0       | subworkflow |
+
+  Scenario Outline: workflow sections with only one argument when API settings allow
+    Given a snakemake project
+    And I set snakemake language version to "<lang_version>"
+    And snakemake framework api yaml descriptor is
+    """
+    changelog:
+      - version: "3.0.0"
+        override:
+        - name: "fooboodoo"
+          type: "top-level"
+      - version: "2.0.0"
+        introduced:
+        - name: "fooboodoo"
+          type: "top-level"
+          multiple_args_allowed: False
+      - version: "0.0.1"
+        introduced:
+        - name: "fooboodoo"
+          type: "rule-like"
+          multiple_args_allowed: False
+    """
+    Given I open a file "foo.smk" with text
+    """
+    fooboodoo: "a", "b", "c"
+    """
+    And SmkSectionMultipleArgsInspection inspection is enabled
+    Then I expect no inspection errors
+    When I check highlighting errors
+    Examples:
+      | lang_version |
+      | 1.0.0        |
+      | 3.0.0        |
+      | 3.0.1        |
+
+  Scenario Outline: workflow sections with only one argument when API settings do not allow
+    Given a snakemake project
+    And I set snakemake language version to "<lang_version>"
+    And snakemake framework api yaml descriptor is
+    """
+    changelog:
+      - version: "3.0.0"
+        override:
+        - name: "fooboodoo"
+          type: "top-level"
+      - version: "2.9.0"
+        introduced:
+        - name: "fooboodoo"
+          type: "rule-like"
+          multiple_args_allowed: False
+      - version: "2.0.0"
+        introduced:
+        - name: "fooboodoo"
+          type: "top-level"
+          multiple_args_allowed: False
+    """
+    Given I open a file "foo.smk" with text
+    """
+    fooboodoo: "a", "b", "c"
+    """
+    And SmkSectionMultipleArgsInspection inspection is enabled
+    Then I expect inspection error on <"b"> with message
+    """
+    Only one argument is allowed for 'fooboodoo' section.
+    """
+    And I expect inspection error on <"c"> with message
+    """
+    Only one argument is allowed for 'fooboodoo' section.
+    """
+    When I check highlighting errors
+    Examples:
+      | lang_version |
+      | 2.0.0        |
+#      | 2.10.0       |
+

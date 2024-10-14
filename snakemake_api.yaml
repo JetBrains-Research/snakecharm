@@ -84,6 +84,18 @@ changelog:
       - name: "module"
         type: "top-level"
 
+      - name: "meta_wrapper"
+        type: "module"
+
+      - name: "skip_validation"
+        type: "module"
+
+      - name: "config"
+        type: "module"
+
+      - name: "snakefile"
+        type: "module"
+
       - name: "containerized"
         type: "top-level"
         multiple_args_allowed: False
@@ -174,6 +186,7 @@ changelog:
 
       - name: "singularity"
         type: "top-level"
+        multiple_args_allowed: False
 
   # ----------------------
   - version: "3.8.0"
@@ -244,3 +257,18 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
 
+      - name: "workdir"
+        type: "top-level"
+        multiple_args_allowed: False
+
+      - name: "workdir"
+        type: "subworkflow"
+        multiple_args_allowed: False
+
+      - name: "configfile"
+        type: "subworkflow"
+        multiple_args_allowed: False
+
+      - name: "configfile"
+        type: "snakefile"
+        multiple_args_allowed: False

@@ -289,6 +289,13 @@ class SnakemakeFrameworkAPIProvider(
         return vers2ParamsTree?.floorEntry(version)
     }
 
+    fun getToplevelIntroduction(
+        name: String, version: SmkLanguageVersion
+    ): Map.Entry<SmkLanguageVersion, SmkKeywordIntroductionParams>? {
+        val vers2ParamsTree = topLevelName2Introduction[name]
+        return vers2ParamsTree?.floorEntry(version)
+    }
+
     private fun getKeywordDeprecation(
         keywords: TreeMap<SmkLanguageVersion, SmkKeywordDeprecationParams>?,
         version: SmkLanguageVersion,
