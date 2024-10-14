@@ -7,7 +7,7 @@ import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.types.PyFunctionType
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_OR_CALLABLE_ARGS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
@@ -18,23 +18,24 @@ class SmkSectionUnexpectedCallableArgsInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+        val apiService = SnakemakeAPIProjectService.getInstance(holder.project)
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
-            if (st.sectionKeyword !in ALLOWED_LAMBDA_OR_CALLABLE_ARGS) {
-                checkArgumentList(st.argumentList, st)
-            }
+            checkArgumentList(st.argumentList, st)
         }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            if (st.sectionKeyword !in ALLOWED_LAMBDA_OR_CALLABLE_ARGS) {
-                checkArgumentList(st.argumentList, st)
-            }
+            checkArgumentList(st.argumentList, st)
         }
 
         private fun checkArgumentList(
             argumentList: PyArgumentList?,
             section: SmkArgsSection,
         ) {
+            if (apiService.getLambdaArgsFor(section.sectionKeyword) == null) {
+                return
+            }
+
             val args = argumentList?.arguments ?: emptyArray()
             args.forEach { arg ->
                 if (arg is PyReferenceExpression && arg !is PyLambdaExpression) {

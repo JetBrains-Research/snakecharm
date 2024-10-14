@@ -8,7 +8,7 @@ import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_OR_CALLABLE_ARGS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
@@ -17,6 +17,7 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+        val apiService = SnakemakeAPIProjectService.getInstance(holder.project)
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
             val lambdas = st.argumentList?.arguments?.filterIsInstance<PyLambdaExpression>() ?: emptyList()
@@ -30,7 +31,7 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
             // for more info on which sections are allowed to use callables and why
 
             val sectionKeyword = st.sectionKeyword
-            val allowedArgs = ALLOWED_LAMBDA_OR_CALLABLE_ARGS[sectionKeyword]
+            val allowedArgs = apiService.getLambdaArgsFor(sectionKeyword)
             if (allowedArgs != null) {
                 registerParamsProblemsForLambdasWithWildcards(
                     allLambdas,

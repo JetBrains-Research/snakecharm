@@ -8,8 +8,8 @@ import com.intellij.psi.util.parentOfTypes
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_OR_CALLABLE_ARGS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIService
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 
@@ -20,8 +20,7 @@ class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
         val apiService = SnakemakeAPIService.getInstance()
-        val SECTION_LAMBDA_ARG_POSSIBLE_PARAMS: Set<String> =
-            ALLOWED_LAMBDA_OR_CALLABLE_ARGS.values.flatMap { it.asIterable() }.toSet()
+        val apiProjectService = SnakemakeAPIProjectService.getInstance(holder.project)
 
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {
             @Suppress("UnstableApiUsage")
@@ -33,7 +32,7 @@ class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
             val varName = node.referencedName
             // Not allowed arg (e.g. wildcards, ..) and not section keyword (e.g. 'threads', 'version' etc)
             if (varName == null || (
-                        (varName !in SECTION_LAMBDA_ARG_POSSIBLE_PARAMS) &&
+                        (varName !in apiProjectService.getPossibleLambdaParamNames()) &&
                                 ( varName !in apiService.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS))
                 ) {
                 // Not suitable case
@@ -51,8 +50,8 @@ class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
                 (lambdaOrSectionExpr as PyLambdaExpression) to sectionArg
             }
 
-            val supportedVarNames = ALLOWED_LAMBDA_OR_CALLABLE_ARGS[containingArgsSection.sectionKeyword]
-            val varNameIsSupportedByLambda = supportedVarNames?.contains(varName) ?: false
+            val supportedVarNames = apiProjectService.getLambdaArgsFor(containingArgsSection.sectionKeyword)
+            val varNameIsSupportedByLambda = supportedVarNames?.contains(varName) == true
 
             val resolve = node.reference.resolve()
             if (resolve == null) {

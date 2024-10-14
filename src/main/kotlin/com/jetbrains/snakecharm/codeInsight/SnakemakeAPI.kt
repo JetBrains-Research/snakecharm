@@ -6,6 +6,8 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_ATTEMPT
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPICompanion.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
@@ -238,36 +240,6 @@ object SnakemakeAPI {
         SECTION_OUTPUT, SECTION_LOG, SECTION_BENCHMARK
     )
 
-    /**
-     * Set of rule/checkpoint sections that supports lambdas/callable arguments
-     */
-    val ALLOWED_LAMBDA_OR_CALLABLE_ARGS = mapOf(
-        SECTION_INPUT to arrayOf(SMK_VARS_WILDCARDS),
-        SECTION_GROUP to arrayOf(SMK_VARS_WILDCARDS),
-        SECTION_PARAMS to arrayOf(
-            SMK_VARS_WILDCARDS,
-            SECTION_INPUT,
-            SECTION_OUTPUT,
-            SECTION_RESOURCES,
-            SECTION_THREADS
-        ),
-        SECTION_RESOURCES to arrayOf(
-            SMK_VARS_WILDCARDS,
-            SECTION_INPUT,
-            SECTION_THREADS,
-            SMK_VARS_ATTEMPT
-        ),
-        SECTION_THREADS to arrayOf(
-            SMK_VARS_WILDCARDS,
-            SECTION_INPUT,
-            SMK_VARS_ATTEMPT
-        ),
-        SECTION_CONDA to arrayOf(
-            SMK_VARS_WILDCARDS,
-            SECTION_PARAMS,
-            SECTION_INPUT,
-        ),
-    )
 
     /**
      * Peppy config keys in yaml file
@@ -396,6 +368,45 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
     fun getTopLevelsKeywords(): Set<String> {
         // XXX: Used in parsing/lexing, cannot collect from YAML file
         return SnakemakeLexer.KEYWORD_LIKE_SECTION_NAME_2_TOKEN_TYPE.keys.unmodifiable()
+    }
+
+    private val ALLOWED_LAMBDA_OR_CALLABLE_ARGS = mapOf(
+        SECTION_INPUT to arrayOf(SMK_VARS_WILDCARDS),
+        SECTION_GROUP to arrayOf(SMK_VARS_WILDCARDS),
+        SECTION_PARAMS to arrayOf(
+            SMK_VARS_WILDCARDS,
+            SECTION_INPUT,
+            SECTION_OUTPUT,
+            SECTION_RESOURCES,
+            SECTION_THREADS
+        ),
+        SECTION_RESOURCES to arrayOf(
+            SMK_VARS_WILDCARDS,
+            SECTION_INPUT,
+            SECTION_THREADS,
+            SMK_VARS_ATTEMPT
+        ),
+        SECTION_THREADS to arrayOf(
+            SMK_VARS_WILDCARDS,
+            SECTION_INPUT,
+            SMK_VARS_ATTEMPT
+        ),
+        SECTION_CONDA to arrayOf(
+            SMK_VARS_WILDCARDS,
+            SECTION_PARAMS,
+            SECTION_INPUT,
+        ),
+    )
+
+    fun getPossibleLambdaParamNames(): Set<String> {
+        return ALLOWED_LAMBDA_OR_CALLABLE_ARGS.values.flatMap { it.asIterable() }.toSet()
+    }
+
+    fun getLambdaArgsFor(keyword: String?): Array<String>? {
+        /**
+         * Set of rule/checkpoint sections that supports lambdas/callable arguments
+         */
+        return ALLOWED_LAMBDA_OR_CALLABLE_ARGS[keyword]
     }
 
     private fun doRefresh(version: String?) {

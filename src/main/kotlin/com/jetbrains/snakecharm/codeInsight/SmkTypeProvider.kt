@@ -11,7 +11,6 @@ import com.jetbrains.python.psi.resolve.resolveQualifiedName
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.PyTypeProviderBase
 import com.jetbrains.python.psi.types.TypeEvalContext
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.ALLOWED_LAMBDA_OR_CALLABLE_ARGS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTION_ACCESSOR_CLASSES
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_CHECKPOINTS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_PEP
@@ -111,7 +110,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
             lambda, SmkRuleOrCheckpointArgsSection::class.java, PyCallExpression::class.java
         ) ?: return null
 
-        val allowedArgs = ALLOWED_LAMBDA_OR_CALLABLE_ARGS[parentSection.sectionKeyword] ?: emptyArray()
+        val allowedArgs = SnakemakeAPIProjectService.getInstance(lambda.project).getLambdaArgsFor(parentSection.sectionKeyword) ?: emptyArray()
         val paramName = referenceTarget.text
 
         @Suppress("UnstableApiUsage")
