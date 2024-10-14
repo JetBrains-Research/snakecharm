@@ -86,15 +86,19 @@ changelog:
 
       - name: "meta_wrapper"
         type: "module"
+        multiple_args_allowed: False
 
       - name: "skip_validation"
         type: "module"
+        multiple_args_allowed: False
 
       - name: "config"
         type: "module"
+        multiple_args_allowed: False
 
       - name: "snakefile"
         type: "module"
+        multiple_args_allowed: False
 
       - name: "containerized"
         type: "top-level"
