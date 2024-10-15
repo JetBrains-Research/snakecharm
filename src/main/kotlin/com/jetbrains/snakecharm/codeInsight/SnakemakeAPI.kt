@@ -199,20 +199,7 @@ object SnakemakeAPI {
     )
 
     /**
-     * This sections considers all injection identifiers to be wildcards
-     *
-     * TODO: Consider implementing this as PSI interface in order not to compare keyword string each time
-     */
-    val WILDCARDS_EXPANDING_SECTIONS_KEYWORDS = setOf(
-        SECTION_INPUT, SECTION_OUTPUT, SECTION_CONDA,
-        SECTION_RESOURCES, SECTION_GROUP, SECTION_BENCHMARK,
-        SECTION_LOG, SECTION_PARAMS
-    )
-
-    /**
      * Ordered list of sections which defines wildcards
-     *
-     * TODO: Consider implementing this as PSI interface in order not to compare keyword string each time
      */
     val WILDCARDS_DEFINING_SECTIONS_KEYWORDS = listOf(
         SECTION_OUTPUT, SECTION_LOG, SECTION_BENCHMARK
@@ -351,6 +338,23 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
             return state.contextTypeAndSection2LambdaArgs[key] ?: emptyArray<String>()
         }
         return emptyArray()
+    }
+
+    /**
+     * Determines if the given keyword is part of the wildcards expanding sections.
+     * These sections consider all injection identifiers to be wildcards
+     *
+     * @param keyword the keyword to check, which may be null.
+     * @param contextKeywordOrType the context keyword or type, currently not utilized.
+     * @return true if the keyword is found within the set of wildcards expanding sections, false otherwise.
+     */
+    fun isWildcardsExpandingSection(keyword: String?, contextKeywordOrType: String?): Boolean   {
+        val WILDCARDS_EXPANDING_SECTIONS_KEYWORDS = setOf(
+            SECTION_INPUT, SECTION_OUTPUT, SECTION_CONDA,
+            SECTION_RESOURCES, SECTION_GROUP, SECTION_BENCHMARK,
+            SECTION_LOG, SECTION_PARAMS
+        )
+        return keyword in WILDCARDS_EXPANDING_SECTIONS_KEYWORDS
     }
 
     private fun doRefresh(version: String?) {

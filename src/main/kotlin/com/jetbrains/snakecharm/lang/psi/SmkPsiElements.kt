@@ -9,8 +9,6 @@ import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.controlflow.ScopeOwner
 import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.impl.PyElementImpl
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_EXPANDING_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.stubs.*
 
 interface SmkToplevelSection : SmkSection {
@@ -98,12 +96,12 @@ interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // P
     /**
      * Considers any variable as wildcard
      */
-    fun isWildcardsExpandingSection() = sectionKeyword in WILDCARDS_EXPANDING_SECTIONS_KEYWORDS
+    val isWildcardsExpandingSection: Boolean
 
     /**
      * Defines wildcards
      */
-    fun isWildcardsDefiningSection() = sectionKeyword in WILDCARDS_DEFINING_SECTIONS_KEYWORDS
+    val isWildcardsDefiningSection: Boolean
 
     override fun getParentRuleOrCheckPoint(): SmkRuleOrCheckpoint = super.getParentRuleOrCheckPoint()!!
 

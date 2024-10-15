@@ -43,7 +43,7 @@ class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(no
     override fun getReference(context: PyResolveContext): PsiPolyVariantReference {
         val parentSection = containingSection()
 
-        if (parentSection is SmkRuleOrCheckpointArgsSection && parentSection.isWildcardsExpandingSection()) {
+        if (parentSection is SmkRuleOrCheckpointArgsSection && parentSection.isWildcardsExpandingSection) {
             val parentRuleOrCheckPoint = parentSection.getParentRuleOrCheckPoint()
             val injectionHost = injectionHost()
             val callExpression = PsiTreeUtil.getParentOfType(injectionHost, PyCallExpression::class.java)

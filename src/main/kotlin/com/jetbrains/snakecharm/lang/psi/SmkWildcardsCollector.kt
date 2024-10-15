@@ -68,8 +68,8 @@ class SmkWildcardsCollector(
 
             if (
                 visitAllSections ||
-                (visitDefiningSections && st.isWildcardsDefiningSection()) ||
-                (visitExpandingSections && st.isWildcardsExpandingSection())
+                (visitDefiningSections && st.isWildcardsDefiningSection) ||
+                (visitExpandingSections && st.isWildcardsExpandingSection)
             ) {
                 currentSectionName = st.sectionKeyword
                 super.visitSmkRuleOrCheckpointArgsSection(st)
@@ -265,7 +265,7 @@ class AdvancedWildcardsCollector(
             val wildcardsDefiningSectionsAvailable = ruleLike.getSections()
                 .asSequence()
                 .filterIsInstance(SmkRuleOrCheckpointArgsSection::class.java)
-                .filter { it.isWildcardsDefiningSection() }.firstOrNull() != null
+                .filter { it.isWildcardsDefiningSection }.firstOrNull() != null
             val collector = SmkWildcardsCollector(
                 visitDefiningSections = visitDefiningSections,
                 visitExpandingSections = visitExpandingSections,

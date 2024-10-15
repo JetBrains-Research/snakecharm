@@ -18,6 +18,6 @@ interface SmkRuleOrCheckpoint : SmkRuleLike<SmkRuleOrCheckpointArgsSection>,
     fun getWildcardDefiningSection() =
         statementList.statements
                 .filterIsInstance<SmkRuleOrCheckpointArgsSection>()
-                .filter { it.isWildcardsDefiningSection() }
+                .filter { it.isWildcardsDefiningSection }
                 .minByOrNull { WILDCARDS_DEFINING_SECTIONS_KEYWORDS.indexOf(it.sectionKeyword) }
 }

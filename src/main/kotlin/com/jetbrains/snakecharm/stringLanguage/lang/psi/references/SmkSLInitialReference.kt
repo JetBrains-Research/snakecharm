@@ -18,9 +18,9 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolUsageType
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionVariantsProcessor
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkImplicitPySymbolsResolveProviderCompanion
@@ -38,6 +38,7 @@ class SmkSLInitialReference(
     private val parentDeclaration: SmkRuleOrCheckpoint?,
     context: PyResolveContext?,
 ) : PyQualifiedReference(expr, context), SmkSLBaseReference {
+    val apiService = SnakemakeAPIProjectService.getInstance(expr.project)
 
     override fun getElement() = myElement as SmkSLReferenceExpression
 
@@ -224,8 +225,9 @@ class SmkSLInitialReference(
     private fun getSmkScopeForInjection(host: PsiLanguageInjectionHost): SmkCodeInsightScope {
         val section = PsiTreeUtil.getParentOfType(host, SmkSection::class.java)
         val sectionKeyword = section?.sectionKeyword
+        val contextKeyword = section?.getParentRuleOrCheckPoint()?.sectionKeyword
 
-        return if (section is SmkRunSection || sectionKeyword !in SnakemakeAPI.WILDCARDS_EXPANDING_SECTIONS_KEYWORDS) {
+        return if (section is SmkRunSection || !apiService.isWildcardsExpandingSection(sectionKeyword, contextKeyword)) {
             SmkCodeInsightScope.RULELIKE_RUN_SECTION
         } else {
             SmkCodeInsightScope.TOP_LEVEL

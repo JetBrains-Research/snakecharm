@@ -140,7 +140,7 @@ class SmkNotSameWildcardsSetInspection : SnakemakeInspection() {
             wildcards: Set<String>
         ) {
             ruleLike.getSections().forEach { section ->
-                if (section.sectionKeyword in visitedSections || section !is SmkRuleOrCheckpointArgsSection || !section.isWildcardsDefiningSection()) {
+                if (section.sectionKeyword in visitedSections || section !is SmkRuleOrCheckpointArgsSection || !section.isWildcardsDefiningSection) {
                     return@forEach
                 }
                 visitedSections.add(section.sectionKeyword ?: return@forEach)
