@@ -33,8 +33,7 @@ interface SmkSection: PyStatement, PsiNameIdentifierOwner {
 
     // override fun getPresentation() = getPresentation(this) // XXX see #145:
     //override fun getIcon(flags: Int) = PlatformIcons.PROPERTY_ICON!! // XXX see #145:
-
-    fun getParentRuleOrCheckPoint(): SmkRuleOrCheckpoint? = PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpoint::class.java)!!
+    fun getParentRuleOrCheckPoint(): SmkRuleOrCheckpoint?
 
     /**
      * Returns text of the previous PSI element

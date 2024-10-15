@@ -103,7 +103,7 @@ interface SmkRuleOrCheckpointArgsSection : SmkArgsSection, PyTypedElement { // P
      */
     val isWildcardsDefiningSection: Boolean
 
-    override fun getParentRuleOrCheckPoint(): SmkRuleOrCheckpoint = super.getParentRuleOrCheckPoint()!!
+    override fun getParentRuleOrCheckPoint(): SmkRuleOrCheckpoint =  getParentRuleOrCheckPoint(this)!!
 
     /**
      * Checks if section argument list starts from new line
@@ -124,7 +124,7 @@ interface SmkWorkflowArgsSection : SmkArgsSection, SmkToplevelSection // PyNamed
 interface SmkRunSection : SmkSection, PyStatementListContainer, PyDocStringOwner {
     //ScopeOwner, // for control flow
 
-    override fun getParentRuleOrCheckPoint(): SmkRuleOrCheckpoint = super.getParentRuleOrCheckPoint()!!
+    override fun getParentRuleOrCheckPoint(): SmkRuleOrCheckpoint =  getParentRuleOrCheckPoint(this)!!
 }
 
 interface SmkWorkflowPythonBlockSection : SmkSection, SmkToplevelSection,
@@ -140,3 +140,5 @@ interface SmkWorkflowRuleorderSection : PyStatement, SmkArgsSection, SmkToplevel
 interface SmkReferenceExpression : PyReferenceExpression {
     override fun getNameElement(): ASTNode? = node.findChildByType(PyTokenTypes.IDENTIFIER)
 }
+
+private fun getParentRuleOrCheckPoint(smkSection: SmkSection): SmkRuleOrCheckpoint? = PsiTreeUtil.getParentOfType(smkSection, SmkRuleOrCheckpoint::class.java)
