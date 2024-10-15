@@ -2,7 +2,6 @@ package com.jetbrains.snakecharm.codeInsight.completion.wrapper
 
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.io.write
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPICompanion.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED
 import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
@@ -120,8 +119,7 @@ object SmkWrapperCrawler {
         val mainFolder = File(folder)
 
         // could be launched also outside IDE process, so, we need to init manually:
-        val allowedKeywords = RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED +
-                provider.collectAllPossibleRuleOrCheckpointSubsectionKeywords()
+        val allowedKeywords = provider.collectAllPossibleRuleOrCheckpointSubsectionKeywords()
 
         mainFolder.walkTopDown()
             .filter { it.isFile && it.name.startsWith("wrapper") }

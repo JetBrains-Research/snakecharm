@@ -258,6 +258,12 @@ changelog:
     introduced:
       - name: "input"
         type: "rule-like"
+
+      - name: "log"
+        type: "rule-like"
+
+      - name: "input"
+        type: "rule-like"
         lambda_args:
           - "wildcards"
 

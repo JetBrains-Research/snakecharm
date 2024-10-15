@@ -7,7 +7,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPICompanion.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED
 import com.jetbrains.snakecharm.framework.SmkAPISubsectionContextAndDirective
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
@@ -295,8 +294,8 @@ object SnakemakeAPICompanion {
 
 @Service
 class SnakemakeAPIService {
-    val RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS = RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED +
-        SnakemakeFrameworkAPIProvider.getInstance().collectAllPossibleRuleOrCheckpointSubsectionKeywords()
+    val RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS = SnakemakeFrameworkAPIProvider.getInstance()
+        .collectAllPossibleRuleOrCheckpointSubsectionKeywords()
 
     val RULE_OR_CHECKPOINT_SECTION_KEYWORDS = (RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS + setOf(SECTION_RUN))
 
