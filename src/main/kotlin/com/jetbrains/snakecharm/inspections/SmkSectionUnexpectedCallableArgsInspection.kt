@@ -32,7 +32,7 @@ class SmkSectionUnexpectedCallableArgsInspection : SnakemakeInspection() {
             argumentList: PyArgumentList?,
             section: SmkArgsSection,
         ) {
-            if (apiService.getLambdaArgsFor(section.sectionKeyword) == null) {
+            if (apiService.getLambdaArgsFor(section.sectionKeyword) != null) {
                 return
             }
 

@@ -79,16 +79,16 @@ Feature: Inspection for unexpected keyword arguments in section
     changelog:
       - version: "3.0.0"
         override:
-        - name: "fooboodoo"
+        - name: "<section>"
           type: "<keyword>"
       - version: "2.0.0"
         introduced:
-        - name: "fooboodoo"
+        - name: "<section>"
           type: "<keyword>"
           keyword_args_allowed: False
       - version: "0.0.1"
         introduced:
-        - name: "fooboodoo"
+        - name: "configfile"
           type: "top-level"
           keyword_args_allowed: False
     """
@@ -96,21 +96,21 @@ Feature: Inspection for unexpected keyword arguments in section
     Given I open a file "foo.smk" with text
     """
     <keyword> NAME:
-        fooboodoo: a="foo.bar", b="boo.bar"
+        <section>: a="foo.bar", b="boo.bar"
     """
     And SmkSectionUnexpectedKeywordArgsInspection inspection is enabled
     Then I expect no inspection errors
     When I check highlighting errors
     Examples:
-      | lang_version | keyword     |
-      | 1.0.0        | rule        |
-      | 3.0.0        | rule        |
-      | 3.0.1        | rule        |
-      | 3.0.1        | checkpoint  |
-      | 1.0.0        | module      |
-      | 3.0.0        | module      |
-      | 1.0.0        | subworkflow |
-      | 3.0.0        | subworkflow |
+      | lang_version | keyword     | section    |
+      | 1.0.0        | rule        | configfile |
+      | 3.0.0        | rule        | fooboodoo  |
+      | 3.0.1        | rule        | fooboodoo  |
+      | 3.0.1        | checkpoint  | fooboodoo  |
+      | 1.0.0        | module      | configfile |
+      | 3.0.0        | module      | fooboodoo  |
+      | 1.0.0        | subworkflow | configfile |
+      | 3.0.0        | subworkflow | fooboodoo  |
 
   Scenario Outline: Unexpected keyword arguments in subsections when API settings do not allow
     Given a snakemake project
@@ -119,15 +119,15 @@ Feature: Inspection for unexpected keyword arguments in section
     changelog:
       - version: "3.0.0"
         override:
-        - name: "fooboodoo"
+        - name: "<section>"
           type: "<keyword>"
       - version: "2.9.0"
         introduced:
-        - name: "fooboodoo"
+        - name: "configfile"
           type: "top-level"
       - version: "2.0.0"
         introduced:
-        - name: "fooboodoo"
+        - name: "<section>"
           type: "<keyword>"
           keyword_args_allowed: False
     """
@@ -135,27 +135,27 @@ Feature: Inspection for unexpected keyword arguments in section
     Given I open a file "foo.smk" with text
     """
     <keyword> NAME:
-        fooboodoo: a="foo.bar", b="boo.bar"
+        <section>: a="foo.bar", b="boo.bar"
     """
     And SmkSectionUnexpectedKeywordArgsInspection inspection is enabled
     Then I expect inspection error on <a="foo.bar"> with message
     """
-    Section 'fooboodoo' does not support keyword arguments in Snakemake '<lang_version>'.
+    Section '<section>' does not support keyword arguments in Snakemake '<lang_version>'.
     """
     Then I expect inspection error on <b="boo.bar"> with message
     """
-    Section 'fooboodoo' does not support keyword arguments in Snakemake '<lang_version>'.
+    Section '<section>' does not support keyword arguments in Snakemake '<lang_version>'.
     """
     When I check highlighting errors
     Examples:
-      | lang_version | keyword     |
-      | 2.0.0        | rule        |
-      | 2.10.0       | rule        |
-      | 2.10.1       | checkpoint  |
-      | 2.0.0        | module      |
-      | 2.10.0       | module      |
-      | 2.0.0        | subworkflow |
-      | 2.10.0       | subworkflow |
+      | lang_version | keyword     | section    |
+      | 2.0.0        | rule        | fooboodoo  |
+      | 2.10.0       | rule        | configfile |
+      | 2.10.1       | checkpoint  | configfile |
+      | 2.0.0        | module      | fooboodoo  |
+      | 2.10.0       | module      | configfile |
+      | 2.0.0        | subworkflow | fooboodoo  |
+      | 2.10.0       | subworkflow | configfile |
   
   Scenario Outline: No warn on expected keyword arguments on top-level when API settings allow
     Given a snakemake project

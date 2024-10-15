@@ -75,16 +75,18 @@ Feature: Inspection for multiple arguments in various sections
     changelog:
       - version: "3.0.0"
         override:
-        - name: "fooboodoo"
+        - name: "<section>"
           type: "<keyword>"
+
       - version: "2.0.0"
         introduced:
-        - name: "fooboodoo"
+        - name: "<section>"
           type: "<keyword>"
           multiple_args_allowed: False
+
       - version: "0.0.1"
         introduced:
-        - name: "fooboodoo"
+        - name: "configfile"
           type: "top-level"
           multiple_args_allowed: False
     """
@@ -92,21 +94,21 @@ Feature: Inspection for multiple arguments in various sections
     Given I open a file "foo.smk" with text
     """
     <keyword> NAME:
-        fooboodoo: "a", "b", "c"
+        <section>: "a", "b", "c"
     """
     And SmkSectionMultipleArgsInspection inspection is enabled
     Then I expect no inspection errors
     When I check highlighting errors
     Examples:
-      | lang_version | keyword     |
-      | 1.0.0        | rule        |
-      | 3.0.0        | rule        |
-      | 3.0.1        | rule        |
-      | 3.0.1        | checkpoint  |
-      | 1.0.0        | module      |
-      | 3.0.0        | module      |
-      | 1.0.0        | subworkflow |
-      | 3.0.0        | subworkflow |
+      | lang_version | keyword     | section              |
+      | 1.0.0        | rule        | configfile           |
+      | 3.0.0        | rule        | wildcard_constraints |
+      | 3.0.1        | rule        | fooboodoo            |
+      | 3.0.1        | checkpoint  | fooboodoo            |
+      | 1.0.0        | module      | configfile           |
+      | 3.0.0        | module      | fooboodoo            |
+      | 1.0.0        | subworkflow | configfile           |
+      | 3.0.0        | subworkflow | fooboodoo            |
 
   Scenario Outline: Subsections with only one argument when API settings do not allow
     Given a snakemake project
@@ -115,15 +117,17 @@ Feature: Inspection for multiple arguments in various sections
     changelog:
       - version: "3.0.0"
         override:
-        - name: "fooboodoo"
+        - name: "<section>"
           type: "<keyword>"
+
       - version: "2.9.0"
         introduced:
-        - name: "fooboodoo"
+        - name: "configfile"
           type: "top-level"
+
       - version: "2.0.0"
         introduced:
-        - name: "fooboodoo"
+        - name: "<section>"
           type: "<keyword>"
           multiple_args_allowed: False
     """
@@ -131,27 +135,27 @@ Feature: Inspection for multiple arguments in various sections
     Given I open a file "foo.smk" with text
     """
     <keyword> NAME:
-        fooboodoo: "a", "b", "c"
+        <section>: "a", "b", "c"
     """
     And SmkSectionMultipleArgsInspection inspection is enabled
     Then I expect inspection error on <"b"> with message
     """
-    Only one argument is allowed for 'fooboodoo' section in Snakemake '<lang_version>'.
+    Only one argument is allowed for '<section>' section in Snakemake '<lang_version>'.
     """
     And I expect inspection error on <"c"> with message
     """
-    Only one argument is allowed for 'fooboodoo' section in Snakemake '<lang_version>'.
+    Only one argument is allowed for '<section>' section in Snakemake '<lang_version>'.
     """
     When I check highlighting errors
     Examples:
-      | lang_version | keyword     |
-      | 2.0.0        | rule        |
-      | 2.10.0       | rule        |
-      | 2.10.1       | checkpoint  |
-      | 2.0.0        | module      |
-      | 2.10.0       | module      |
-      | 2.0.0        | subworkflow |
-      | 2.10.0       | subworkflow |
+      | lang_version | keyword     | section    |
+      | 2.0.0        | rule        | fooboodoo  |
+      | 2.10.0       | rule        | configfile |
+      | 2.10.1       | checkpoint  | fooboodoo  |
+      | 2.0.0        | module      | fooboodoo  |
+      | 2.10.0       | module      | configfile |
+      | 2.0.0        | subworkflow | fooboodoo  |
+      | 2.10.0       | subworkflow | configfile |
 
   Scenario Outline: workflow sections with only one argument when API settings allow
     Given a snakemake project
@@ -160,32 +164,34 @@ Feature: Inspection for multiple arguments in various sections
     changelog:
       - version: "3.0.0"
         override:
-        - name: "fooboodoo"
+        - name: "<section>"
           type: "top-level"
+
       - version: "2.0.0"
         introduced:
-        - name: "fooboodoo"
+        - name: "<section>"
           type: "top-level"
           multiple_args_allowed: False
+
       - version: "0.0.1"
         introduced:
-        - name: "fooboodoo"
+        - name: "<section>"
           type: "rule-like"
           multiple_args_allowed: False
     """
     And I set snakemake language version to "<lang_version>"
     Given I open a file "foo.smk" with text
     """
-    fooboodoo: "a", "b", "c"
+    <section>: "a", "b", "c"
     """
     And SmkSectionMultipleArgsInspection inspection is enabled
     Then I expect no inspection errors
     When I check highlighting errors
     Examples:
-      | lang_version |
-      | 1.0.0        |
-      | 3.0.0        |
-      | 3.0.1        |
+      | lang_version | section              |
+      | 1.0.0        | configfile           |
+      | 3.0.0        | wildcard_constraints |
+      | 3.0.1        | wildcard_constraints |
 
   Scenario Outline: workflow sections with only one argument when API settings do not allow
     Given a snakemake project
@@ -194,36 +200,36 @@ Feature: Inspection for multiple arguments in various sections
     changelog:
       - version: "3.0.0"
         override:
-        - name: "fooboodoo"
+        - name: "<section>"
           type: "top-level"
       - version: "2.9.0"
         introduced:
-        - name: "fooboodoo"
+        - name: "<section>"
           type: "rule-like"
           multiple_args_allowed: False
       - version: "2.0.0"
         introduced:
-        - name: "fooboodoo"
+        - name: "<section>"
           type: "top-level"
           multiple_args_allowed: False
     """
     And I set snakemake language version to "<lang_version>"
     Given I open a file "foo.smk" with text
     """
-    fooboodoo: "a", "b", "c"
+    <section>: "a", "b", "c"
     """
     And SmkSectionMultipleArgsInspection inspection is enabled
     Then I expect inspection error on <"b"> with message
     """
-    Only one argument is allowed for 'fooboodoo' section in Snakemake '<lang_version>'.
+    Only one argument is allowed for '<section>' section in Snakemake '<lang_version>'.
     """
     And I expect inspection error on <"c"> with message
     """
-    Only one argument is allowed for 'fooboodoo' section in Snakemake '<lang_version>'.
+    Only one argument is allowed for '<section>' section in Snakemake '<lang_version>'.
     """
     When I check highlighting errors
     Examples:
-      | lang_version |
-      | 2.0.0        |
-      | 2.10.0       |
+      | lang_version | section              |
+      | 2.0.0        | configfile           |
+      | 2.10.0       | wildcard_constraints |
 
