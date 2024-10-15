@@ -79,9 +79,11 @@ open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode) : SmkArgsSectionImp
         return refFun(stringLiteral, offsetRelativeToSection)
     }
 
-    override val isWildcardsExpandingSection = SnakemakeAPIProjectService.getInstance(this.project).isWildcardsExpandingSection(
-        sectionKeyword, getParentRuleOrCheckPoint().sectionKeyword
-    )
+    override val isWildcardsExpandingSection by lazy {
+        SnakemakeAPIProjectService.getInstance(this.project).isWildcardsExpandingSection(
+            sectionKeyword, getParentRuleOrCheckPoint().sectionKeyword
+        )
+    }
 
     override val isWildcardsDefiningSection = sectionKeyword in WILDCARDS_DEFINING_SECTIONS_KEYWORDS
 

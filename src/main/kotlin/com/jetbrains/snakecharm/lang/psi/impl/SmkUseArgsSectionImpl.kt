@@ -27,9 +27,11 @@ class SmkUseArgsSectionImpl(node: ASTNode) : SmkArgsSectionImpl(node), SmkRuleOr
     override fun getType(context: TypeEvalContext, key: TypeEvalContext.Key): PyType =
         SmkRuleLikeSectionArgsType(this)
 
-    override val isWildcardsExpandingSection = SnakemakeAPIProjectService.getInstance(this.project).isWildcardsExpandingSection(
-        sectionKeyword, SnakemakeNames.USE_KEYWORD
-    )
+    override val isWildcardsExpandingSection by lazy {
+        SnakemakeAPIProjectService.getInstance(this.project).isWildcardsExpandingSection(
+            sectionKeyword, SnakemakeNames.USE_KEYWORD
+        )
+    }
 
     override val isWildcardsDefiningSection = sectionKeyword in WILDCARDS_DEFINING_SECTIONS_KEYWORDS
 }
