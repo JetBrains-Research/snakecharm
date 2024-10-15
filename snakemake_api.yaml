@@ -19,11 +19,11 @@ defaultVersion: "7.32.4"
 #    * module - snakemake module subsection directives
 
 # default values in `introduced` / `override`:
-#    * section: True
-#    * multiple_args_allowed: True
-#    * keyword_args_allowed: True
-#    * placeholders_resolved_as_wildcards: False
-#    * lambda_args: []
+#    * multiple_args_allowed: True                 | e.g. 'output' allows multiple args, and 'message' not
+#    * keyword_args_allowed: True                  | e.g. in 'params' sections is allowed, in 'script' - not
+#    * placeholders_resolved_as_wildcards: False   | e.g. in output: "{params}" - 'params' is not params section, but wildcard name
+#    * is_accessible_in_rule_obj: False            | for things like rules.NAME.<section>
+#    * lambda_args: []                             | e.g. lambda args for 'params' and 'input' sections are different
 # =========================================
 changelog:
   # ---------------------------------------
@@ -232,6 +232,7 @@ changelog:
       - name: "wildcard_constraints"
         type: "rule-like"
         placeholders_injection_allowed: False
+        is_accessible_in_rule_obj: True
 
       - name: "wildcard_constraints"
         type: "top-level"
@@ -250,6 +251,7 @@ changelog:
         multiple_args_allowed: False
         keyword_args_allowed: False
         placeholders_injection_allowed: False
+        is_accessible_in_rule_obj: True
 
   # ----------------------
   - version: "3.5.2"
@@ -274,20 +276,24 @@ changelog:
       - name: "output"
         type: "rule-like"
         placeholders_resolved_as_wildcards: True
+        is_accessible_in_rule_obj: True
 
       - name: "log"
         type: "rule-like"
         placeholders_resolved_as_wildcards: True
+        is_accessible_in_rule_obj: True
 
       - name: "input"
         type: "rule-like"
         placeholders_resolved_as_wildcards: True
+        is_accessible_in_rule_obj: True
         lambda_args:
           - "wildcards"
 
       - name: "params"
         type: "rule-like"
         placeholders_resolved_as_wildcards: True
+        is_accessible_in_rule_obj: True
         lambda_args:
           - "wildcards"
           - "input"
@@ -298,6 +304,7 @@ changelog:
       - name: "resources"
         type: "rule-like"
         placeholders_resolved_as_wildcards: True
+        is_accessible_in_rule_obj: True
         lambda_args:
           - "wildcards"
           - "input"
@@ -333,23 +340,27 @@ changelog:
         multiple_args_allowed: False
         keyword_args_allowed: False
         placeholders_injection_allowed: False
+        is_accessible_in_rule_obj: True
 
       - name: "message"
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        is_accessible_in_rule_obj: True
 
       - name: "version"
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
         placeholders_injection_allowed: False
+        is_accessible_in_rule_obj: True
 
       - name: "benchmark"
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
         placeholders_resolved_as_wildcards: True
+        is_accessible_in_rule_obj: True
 
       - name: "shell"
         type: "rule-like"

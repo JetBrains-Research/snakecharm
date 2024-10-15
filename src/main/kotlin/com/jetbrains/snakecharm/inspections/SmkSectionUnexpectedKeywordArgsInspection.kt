@@ -34,7 +34,7 @@ class SmkSectionUnexpectedKeywordArgsInspection : SnakemakeInspection() {
 
         private fun processSubSection(st: SmkArgsSection, contextKeyword: String?) {
             val keyword = st.sectionKeyword
-            if (keyword != null && contextKeyword != null && apiService.isSectionWithOnlyPositionalArguments(
+            if (keyword != null && contextKeyword != null && apiService.isSubsectionWithOnlyPositionalArguments(
                     keyword,
                     contextKeyword
                 )

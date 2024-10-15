@@ -41,7 +41,7 @@ class SmkSectionMultilineStringArgsInspection : SnakemakeInspection() {
             val argumentList = st.argumentList
             val keyword = st.sectionKeyword
             val contextKeyword = st.getParentRuleOrCheckPoint()?.sectionKeyword
-            if (argumentList == null || keyword == null || contextKeyword == null || apiService.isSingleArgumentSectionKeyword(keyword, contextKeyword)) {
+            if (argumentList == null || keyword == null || contextKeyword == null || apiService.isSubsectionSingleArgumentOnly(keyword, contextKeyword)) {
                 return
             }
 

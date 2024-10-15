@@ -28,7 +28,7 @@ class SmkUseArgsSectionImpl(node: ASTNode) : SmkArgsSectionImpl(node), SmkRuleOr
         SmkRuleLikeSectionArgsType(this)
 
     override val isWildcardsExpandingSection by lazy {
-        SnakemakeAPIProjectService.getInstance(this.project).isWildcardsExpandingSection(
+        SnakemakeAPIProjectService.getInstance(this.project).isSubsectionWildcardsExpanding(
             sectionKeyword, SnakemakeNames.USE_KEYWORD
         )
     }

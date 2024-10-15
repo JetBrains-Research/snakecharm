@@ -24,11 +24,9 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_BENCHMARK
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CWL
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_LOG
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_MESSAGE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_NOTEBOOK
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_PARAMS
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_PRIORITY
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RESOURCES
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RUN
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_SCRIPT
@@ -36,7 +34,6 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_SHELL
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_TEMPLATE_ENGINE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_THREADS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_VERSION
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_WILDCARD_CONSTRAINTS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_WRAPPER
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_AS_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_FROM_KEYWORD
@@ -165,26 +162,6 @@ object SnakemakeAPI {
 
     /**
      * For type inference:
-     * Some sections in snakemake are inaccessible after `rules.NAME.<section>`, so this set is required
-     * to filter these sections for resolve and completion
-     */
-    val RULE_TYPE_ACCESSIBLE_SECTIONS = setOf(
-        SECTION_INPUT,
-        SECTION_LOG,
-        SECTION_OUTPUT,
-        SECTION_PARAMS,
-        SECTION_RESOURCES,
-        SECTION_VERSION,
-
-        SECTION_MESSAGE,
-        SECTION_WILDCARD_CONSTRAINTS,
-        SECTION_BENCHMARK,
-        SECTION_PRIORITY,
-        SECTION_WRAPPER
-    )
-
-    /**
-     * For type inference:
      * In SnakemakeSL some sections are inaccessible in `shell: "{<section>}"` and other sections, which doesn't
      * expand wildcards.
      */
@@ -281,7 +258,7 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
      * @param contextKeywordOrType The context keyword or type to check against.
      * @return `true` if the keyword is a single argument section keyword within the given context, otherwise `false`.
      */
-    fun isSingleArgumentSectionKeyword(keyword: String, contextKeywordOrType: String): Boolean {
+    fun isSubsectionSingleArgumentOnly(keyword: String, contextKeywordOrType: String): Boolean {
         val list =  if (contextKeywordOrType == SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr) {
             state.contextType2SingleArgSectionKeywords[SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr]
         } else {
@@ -297,7 +274,7 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
      * @param contextKeywordOrType The context or type of keyword, indicating whether it is a top-level workflow, module, or subworkflow.
      * @return A Boolean indicating whether the given section only allows positional arguments.
      */
-    fun isSectionWithOnlyPositionalArguments(keyword: String, contextKeywordOrType: String): Boolean {
+    fun isSubsectionWithOnlyPositionalArguments(keyword: String, contextKeywordOrType: String): Boolean {
         val list =  if (contextKeywordOrType == SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr) {
             state.contextType2PositionalOnlySectionKeywords[SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr]
         } else {
@@ -324,7 +301,7 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
     fun getSubsectionPossibleLambdaParamNames(): Set<String> = state.subsectionsAllPossibleArgNames
 
     fun isSubsectionValidForInjection(keyword: String, contextKeywordOrType: String): Boolean {
-        val keywords = state.contextType2NotValidForInjectionKeywords[contextKeywordOrType]
+        val keywords = state.contextType2NotValidForInjectionSubsectionKeywords[contextKeywordOrType]
         return (keywords != null) && (keyword !in keywords)
     }
     /**
@@ -333,7 +310,7 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
     fun getLambdaArgsForSubsection(keyword: String?, contextKeywordOrType: String?): Array<String> {
         if (keyword != null && contextKeywordOrType != null) {
             val key = SmkAPISubsectionContextAndDirective(contextKeywordOrType, keyword)
-            return state.contextTypeAndSection2LambdaArgs[key] ?: emptyArray<String>()
+            return state.contextTypeAndSubsection2LambdaArgs[key] ?: emptyArray<String>()
         }
         return emptyArray()
     }
@@ -346,11 +323,30 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
      * @param contextKeywordOrType the context keyword or type, currently not utilized.
      * @return true if the keyword is found within the set of wildcards expanding sections, false otherwise.
      */
-    fun isWildcardsExpandingSection(keyword: String?, contextKeywordOrType: String?): Boolean   {
+    fun isSubsectionWildcardsExpanding(keyword: String?, contextKeywordOrType: String?): Boolean   {
         if (keyword != null && contextKeywordOrType != null) {
-            val keywords = state.contextType2WildcardsExpandingKeywords[contextKeywordOrType]
+            val keywords = state.contextType2WildcardsExpandingSubsectionKeywords[contextKeywordOrType]
             return (keywords != null) && (keyword in keywords)
         }
+        return false
+    }
+
+    /**
+     * For type inference:
+     * Some sections in snakemake are inaccessible after `rules.NAME.<section>`, so this set is required
+     * to filter these sections for resolve and completion
+     */
+    fun isSubsectionAccessibleInRuleObject(keyword: String?, contextKeywordOrType: String?): Boolean   {
+        if (keyword != null && contextKeywordOrType != null) {
+            val keywords = state.contextType2AccessibleInRuleObjectSubsectionKeywords[contextKeywordOrType]
+            return (keywords != null) && (keyword in keywords)
+        }
+        return false
+
+//        if (keyword != null && contextKeywordOrType != null) {
+//            val keywords = state.contextType2WildcardsExpandingKeywords[contextKeywordOrType]
+//            return (keywords != null) && (keyword in keywords)
+//        }
         return false
     }
 
@@ -362,9 +358,10 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
 
             val contextType2SingleArgSectionKeywords = HashMap<String, MutableList<String>>()
             val contextType2PositionalOnlySectionKeywords = HashMap<String, MutableList<String>>()
-            val contextTypeAndSection2LambdaArgs = HashMap<SmkAPISubsectionContextAndDirective, Array<String>>()
-            val contextType2NotValidForInjectionKeywords = HashMap<String, MutableSet<String>>()
-            val contextType2WildcardsExpandingKeywords = HashMap<String, MutableSet<String>>()
+            val contextTypeAndSubsection2LambdaArgs = HashMap<SmkAPISubsectionContextAndDirective, Array<String>>()
+            val contextType2NotValidForInjectionSubsectionKeywords = HashMap<String, MutableSet<String>>()
+            val contextType2WildcardsExpandingSubsectionKeywords = HashMap<String, MutableSet<String>>()
+            val contextType2AccessibleInRuleObjectSubsectionKeywords = HashMap<String, MutableSet<String>>()
 
             // add top-level data:
             val toplevelIntroductions = apiProvider.getToplevelIntroductions(SmkLanguageVersion(version))
@@ -407,12 +404,17 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
                 }
                 if (!params.isPlaceholderInjectionAllowed) {
                     val context = ctxAndName.contextType
-                    val keywords = contextType2NotValidForInjectionKeywords.getOrPut(context) { mutableSetOf<String>() }
+                    val keywords = contextType2NotValidForInjectionSubsectionKeywords.getOrPut(context) { mutableSetOf<String>() }
                     keywords.add(ctxAndName.directiveKeyword)
                 }
                 if (params.isPlaceholderExpandedToWildcard) {
                     val context = ctxAndName.contextType
-                    val keywords = contextType2WildcardsExpandingKeywords.getOrPut(context) { mutableSetOf<String>() }
+                    val keywords = contextType2WildcardsExpandingSubsectionKeywords.getOrPut(context) { mutableSetOf<String>() }
+                    keywords.add(ctxAndName.directiveKeyword)
+                }
+                if (params.isAccessibleInRuleObj) {
+                    val context = ctxAndName.contextType
+                    val keywords = contextType2AccessibleInRuleObjectSubsectionKeywords.getOrPut(context) { mutableSetOf<String>() }
                     keywords.add(ctxAndName.directiveKeyword)
                 }
 
@@ -425,16 +427,17 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
                         "YAML format error: first lambda argument for directive '${ctxAndName.directiveKeyword}' should be '${SMK_VARS_WILDCARDS}'. If not" +
                                 " then please file a feature request at https://github.com/JetBrains-Research/snakecharm/issues ."
                     }
-                    contextTypeAndSection2LambdaArgs.put(ctxAndName, value)
+                    contextTypeAndSubsection2LambdaArgs.put(ctxAndName, value)
                 }
             }
 
             SnakemakeAPIProjectState(
                 contextType2SingleArgSectionKeywords = contextType2SingleArgSectionKeywords.toImmutableMap(),
                 contextType2PositionalOnlySectionKeywords = contextType2PositionalOnlySectionKeywords.toImmutableMap(),
-                contextTypeAndSection2LambdaArgs = contextTypeAndSection2LambdaArgs.toImmutableMap(),
-                contextType2NotValidForInjectionKeywords=contextType2NotValidForInjectionKeywords.toImmutableMap(),
-                contextType2WildcardsExpandingKeywords=contextType2WildcardsExpandingKeywords.toImmutableMap()
+                contextTypeAndSubsection2LambdaArgs = contextTypeAndSubsection2LambdaArgs.toImmutableMap(),
+                contextType2NotValidForInjectionSubsectionKeywords=contextType2NotValidForInjectionSubsectionKeywords.toImmutableMap(),
+                contextType2WildcardsExpandingSubsectionKeywords=contextType2WildcardsExpandingSubsectionKeywords.toImmutableMap(),
+                contextType2AccessibleInRuleObjectSubsectionKeywords = contextType2AccessibleInRuleObjectSubsectionKeywords.toImmutableMap()
             )
         }
         state = newState
@@ -485,13 +488,14 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
 internal data class SnakemakeAPIProjectState(
     val contextType2SingleArgSectionKeywords: Map<String, List<String>>,
     val contextType2PositionalOnlySectionKeywords: Map<String, List<String>>,
-    val contextTypeAndSection2LambdaArgs:  Map<SmkAPISubsectionContextAndDirective, Array<String>>,
-    val contextType2NotValidForInjectionKeywords:  Map<String, Set<String>>,
-    val contextType2WildcardsExpandingKeywords:  Map<String, Set<String>>,
+    val contextTypeAndSubsection2LambdaArgs:  Map<SmkAPISubsectionContextAndDirective, Array<String>>,
+    val contextType2NotValidForInjectionSubsectionKeywords:  Map<String, Set<String>>,
+    val contextType2WildcardsExpandingSubsectionKeywords:  Map<String, Set<String>>,
+    val contextType2AccessibleInRuleObjectSubsectionKeywords:  Map<String, Set<String>>,
 ) {
-    val subsectionsAllPossibleArgNames = contextTypeAndSection2LambdaArgs.values.flatMap { it.asIterable() }.toImmutableSet()
+    val subsectionsAllPossibleArgNames = contextTypeAndSubsection2LambdaArgs.values.flatMap { it.asIterable() }.toImmutableSet()
 
     companion object {
-        val EMPTY = SnakemakeAPIProjectState(emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap())
+        val EMPTY = SnakemakeAPIProjectState(emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap())
     }
 }

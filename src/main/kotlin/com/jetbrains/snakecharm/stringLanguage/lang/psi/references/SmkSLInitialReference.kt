@@ -227,7 +227,7 @@ class SmkSLInitialReference(
         val sectionKeyword = section?.sectionKeyword
         val contextKeyword = section?.getParentRuleOrCheckPoint()?.sectionKeyword
 
-        return if (section is SmkRunSection || !apiService.isWildcardsExpandingSection(sectionKeyword, contextKeyword)) {
+        return if (section is SmkRunSection || !apiService.isSubsectionWildcardsExpanding(sectionKeyword, contextKeyword)) {
             SmkCodeInsightScope.RULELIKE_RUN_SECTION
         } else {
             SmkCodeInsightScope.TOP_LEVEL

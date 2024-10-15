@@ -5,10 +5,11 @@ import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.AccessDirection
 import com.jetbrains.python.psi.PyExpression
+import com.jetbrains.python.psi.PyStatement
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.RULE_TYPE_ACCESSIBLE_SECTIONS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
@@ -52,8 +53,14 @@ class SmkRuleLikeSectionType(private val declaration: SmkRuleOrCheckpoint) : PyT
                 .toTypedArray()
     }
 
-    private fun getAccessibleStatements() =
-            declaration.statementList.statements.filter { it.name in RULE_TYPE_ACCESSIBLE_SECTIONS }
+    private fun getAccessibleStatements(): List<PyStatement> {
+        val api = SnakemakeAPIProjectService.getInstance(declaration.project)
+        val contextKeyword = declaration.sectionKeyword
+
+        return declaration.statementList.statements.filter { st ->
+            api.isSubsectionAccessibleInRuleObject(st.name, contextKeyword)
+        }
+    }
 
     override fun isBuiltin() = false
 }

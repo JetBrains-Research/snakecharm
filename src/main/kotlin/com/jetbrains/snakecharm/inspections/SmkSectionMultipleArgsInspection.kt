@@ -29,7 +29,7 @@ class SmkSectionMultipleArgsInspection : SnakemakeInspection() {
 
         private fun processSubSection(st: SmkArgsSection, contextKeyword: String?) {
             val keyword = st.sectionKeyword
-            if (keyword != null && contextKeyword != null && apiService.isSingleArgumentSectionKeyword(
+            if (keyword != null && contextKeyword != null && apiService.isSubsectionSingleArgumentOnly(
                     keyword,
                     contextKeyword
                 )
@@ -41,7 +41,7 @@ class SmkSectionMultipleArgsInspection : SnakemakeInspection() {
         override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
             val keyword = st.sectionKeyword
             val contextType = SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr
-            if (keyword != null && apiService.isSingleArgumentSectionKeyword(keyword, contextType)) {
+            if (keyword != null && apiService.isSubsectionSingleArgumentOnly(keyword, contextType)) {
                 checkArgumentList(st.argumentList, keyword)
             }
         }
