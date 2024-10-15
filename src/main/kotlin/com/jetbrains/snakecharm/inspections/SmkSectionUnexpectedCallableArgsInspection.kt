@@ -20,9 +20,6 @@ class SmkSectionUnexpectedCallableArgsInspection : SnakemakeInspection() {
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
         val apiService = SnakemakeAPIProjectService.getInstance(holder.project)
 
-        override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
-            checkArgumentList(st.argumentList, st)
-        }
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
             checkArgumentList(st.argumentList, st)

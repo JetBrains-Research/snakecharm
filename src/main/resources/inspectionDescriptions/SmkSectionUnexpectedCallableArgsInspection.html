@@ -1,5 +1,7 @@
 <html>
 <body>
-Only following sections support callable arguments: input, params, threads, resources, group.
+Not all rule/checkpoint sections accept a function name as a parameter (e.g input functions) that will be called by Snakemake with wildcards and
+other parameters. E.g.: <code>input, params, threads, resources, group</code> sections support this feature. See <code>lambda_args</code> section
+in `snakemake_api.yaml` for more details.
 </body>
 </html>
