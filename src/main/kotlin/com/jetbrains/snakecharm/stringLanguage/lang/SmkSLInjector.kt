@@ -7,8 +7,8 @@ import com.jetbrains.python.codeInsight.PyInjectionUtil.InjectionResult
 import com.jetbrains.python.codeInsight.PyInjectorBase
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_ALLOWING_SMKSL_INJECTION
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTIONS_INVALID_FOR_INJECTION
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_FUN_EXPAND
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
@@ -50,9 +50,15 @@ open class SmkSLInjector : PyInjectorBase() {
 
     private fun PsiElement.isInValidArgsSection(): Boolean {
         val parentSection = PsiTreeUtil.getParentOfType(this, SmkRuleOrCheckpointArgsSection::class.java)
-
-        return (parentSection != null && parentSection.name !in SECTIONS_INVALID_FOR_INJECTION) ||
-                PsiTreeUtil.getParentOfType(this, SmkRunSection::class.java) != null
+        if (parentSection != null) {
+            val context = parentSection.getParentRuleOrCheckPoint().sectionKeyword
+            val sectionKeyword = parentSection.sectionKeyword
+            if (context != null && sectionKeyword != null) {
+                val apiService = SnakemakeAPIProjectService.getInstance(project)
+                return apiService.isSubsectionValidForInjection(sectionKeyword, context)
+            }
+        }
+        return PsiTreeUtil.getParentOfType(this, SmkRunSection::class.java) != null
     }
 
     private fun PsiElement.isValidForInjection() =

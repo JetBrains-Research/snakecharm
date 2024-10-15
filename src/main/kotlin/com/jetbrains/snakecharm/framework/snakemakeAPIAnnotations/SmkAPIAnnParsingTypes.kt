@@ -27,6 +27,7 @@ data class SmkAPIAnnParsingIntroductionRecord(
     val section: Boolean = true,
     val keyword_args_allowed: Boolean = true,
     val multiple_args_allowed: Boolean = true,
+    val placeholders_injection_allowed: Boolean = true,
 ): SmkAPIAnnParsingAbstractRecord
 
 data class SmkAPIAnnParsingConfig(

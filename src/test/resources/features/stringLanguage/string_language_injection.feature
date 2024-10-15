@@ -1,5 +1,7 @@
 Feature: Tests on snakemake string language injection
 
+  #TODO: If lambda args need to be changed, please refactor all test here & move cases into mock Snakemake API YAML file
+
   Scenario Outline: Injection for different quotes
     Given a snakemake project
     Given I open a file "foo.smk" with text

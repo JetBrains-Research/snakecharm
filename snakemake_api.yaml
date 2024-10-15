@@ -54,6 +54,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_injection_allowed: False
 
   # ----------------------
   - version: "7.0.0"
@@ -63,6 +64,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_injection_allowed: False
 
   # ----------------------
   - version: "6.15.0"
@@ -72,6 +74,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_injection_allowed: False
 
   # ----------------------
   - version: "6.2.0"
@@ -81,6 +84,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_injection_allowed: False
 
   # ----------------------
   - version: "6.0.0"
@@ -121,6 +125,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_injection_allowed: False
 
     deprecated:
       - name: "subworkflow"
@@ -143,6 +148,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_injection_allowed: False
 
   # ----------------------
   - version: "5.11.0"
@@ -169,6 +175,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_injection_allowed: False
 
   # ----------------------
   - version: "5.9.0"
@@ -177,6 +184,7 @@ changelog:
       - name: "envmodules"
         type: "rule-like"
         keyword_args_allowed: False
+        placeholders_injection_allowed: False
 
   # ----------------------
   - version: "5.4.0"
@@ -208,6 +216,7 @@ changelog:
         type: "rule-like"
         keyword_args_allowed: False
         multiple_args_allowed: False
+        placeholders_injection_allowed: False
 
       - name: "singularity"
         type: "top-level"
@@ -219,6 +228,7 @@ changelog:
     introduced:
       - name: "wildcard_constraints"
         type: "rule-like"
+        placeholders_injection_allowed: False
 
       - name: "wildcard_constraints"
         type: "top-level"
@@ -236,6 +246,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_injection_allowed: False
 
   # ----------------------
   - version: "3.5.2"
@@ -250,6 +261,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_injection_allowed: False
 
   # ----------------------
   # Not sure when these sections were introduced, let's use `1.0` version
@@ -288,6 +300,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_injection_allowed: False
 
       - name: "group"
         type: "rule-like"
@@ -300,6 +313,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_injection_allowed: False
         lambda_args:
           - "wildcards"
           - "input"
@@ -309,6 +323,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_injection_allowed: False
 
       - name: "message"
         type: "rule-like"
@@ -319,6 +334,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_injection_allowed: False
 
       - name: "benchmark"
         type: "rule-like"

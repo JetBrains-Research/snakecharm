@@ -21,15 +21,9 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_SKIP_VALIDATION_KEYWO
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_SNAKEFILE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RULE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_BENCHMARK
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CACHE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CONDA
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CONTAINER
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CONTAINERIZED
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CWL
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_DEFAULT_TARGET
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_ENVMODULES
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_GROUP
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_HANDOVER
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_LOG
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_MESSAGE
@@ -38,12 +32,9 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_PARAMS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_PRIORITY
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RESOURCES
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RETRIES
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RUN
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_SCRIPT
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_SHADOW
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_SHELL
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_SINGULARITY
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_TEMPLATE_ENGINE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_THREADS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_VERSION
@@ -207,19 +198,6 @@ object SnakemakeAPI {
         SECTION_VERSION
     )
 
-    // TODO: move to `snakemake_api.yaml' - injector
-    val SECTIONS_INVALID_FOR_INJECTION = setOf(
-        SECTION_WILDCARD_CONSTRAINTS,
-        SECTION_SHADOW,
-        SECTION_WRAPPER,
-        SECTION_VERSION, SECTION_THREADS,
-        SECTION_PRIORITY, SECTION_SINGULARITY, SECTION_CACHE,
-        SECTION_CONTAINER, SECTION_CONTAINERIZED, SECTION_NOTEBOOK,
-        SECTION_ENVMODULES, SECTION_HANDOVER, SECTION_DEFAULT_TARGET,
-        SECTION_RETRIES,
-        SECTION_TEMPLATE_ENGINE
-    )
-
     /**
      * This sections considers all injection identifiers to be wildcards
      *
@@ -321,7 +299,7 @@ class SnakemakeAPIService {
 
 @Service(Service.Level.PROJECT)
 class SnakemakeAPIProjectService(val project: Project): Disposable {
-    private var state: SnakemakeAPIProjectState = SnakemakeAPIProjectState(emptyMap(), emptyMap(), emptyMap())
+    private var state: SnakemakeAPIProjectState = SnakemakeAPIProjectState.EMPTY
 
     /**
      * Checks if a given keyword requires only one argument
@@ -372,6 +350,10 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
 
     fun getSubsectionPossibleLambdaParamNames(): Set<String> = state.subsectionsAllPossibleArgNames
 
+    fun isSubsectionValidForInjection(keyword: String, contextKeywordOrType: String): Boolean {
+        val keywords = state.contextType2NotValidForInjectionKeywords[contextKeywordOrType]
+        return (keywords != null) && (keyword !in keywords)
+    }
     /**
      * Get set of lambda/function arguments for rule/checkpoint sections that supports support such access
      */
@@ -385,13 +367,14 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
 
     private fun doRefresh(version: String?) {
         val newState = if (version == null) {
-            SnakemakeAPIProjectState(emptyMap(), emptyMap(), emptyMap())
+            SnakemakeAPIProjectState.EMPTY
         } else {
             val apiProvider = SnakemakeFrameworkAPIProvider.getInstance()
 
             val contextType2SingleArgSectionKeywords = HashMap<String, MutableList<String>>()
             val contextType2PositionalOnlySectionKeywords = HashMap<String, MutableList<String>>()
             val contextTypeAndSection2LambdaArgs = HashMap<SmkAPISubsectionContextAndDirective, Array<String>>()
+            val contextType2NotValidForInjectionKeywords = HashMap<String, MutableSet<String>>()
 
             // add top-level data:
             val toplevelIntroductions = apiProvider.getToplevelIntroductions(SmkLanguageVersion(version))
@@ -432,6 +415,11 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
                     val keywords = contextType2PositionalOnlySectionKeywords.getOrPut(context) { arrayListOf<String>() }
                     keywords.add(ctxAndName.directiveKeyword)
                 }
+                if (!params.isPlaceholderInjectionAllowed) {
+                    val context = ctxAndName.contextType
+                    val keywords = contextType2NotValidForInjectionKeywords.getOrPut(context) { mutableSetOf<String>() }
+                    keywords.add(ctxAndName.directiveKeyword)
+                }
 
                 if (params.lambdaArgs.isNotEmpty()) {
                     val value = versAndParams.second.lambdaArgs.toTypedArray()
@@ -449,7 +437,8 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
             SnakemakeAPIProjectState(
                 contextType2SingleArgSectionKeywords = contextType2SingleArgSectionKeywords.toImmutableMap(),
                 contextType2PositionalOnlySectionKeywords = contextType2PositionalOnlySectionKeywords.toImmutableMap(),
-                contextTypeAndSection2LambdaArgs = contextTypeAndSection2LambdaArgs.toImmutableMap()
+                contextTypeAndSection2LambdaArgs = contextTypeAndSection2LambdaArgs.toImmutableMap(),
+                contextType2NotValidForInjectionKeywords=contextType2NotValidForInjectionKeywords.toImmutableMap()
             )
         }
         state = newState
@@ -501,6 +490,11 @@ internal data class SnakemakeAPIProjectState(
     val contextType2SingleArgSectionKeywords: Map<String, List<String>>,
     val contextType2PositionalOnlySectionKeywords: Map<String, List<String>>,
     val contextTypeAndSection2LambdaArgs:  Map<SmkAPISubsectionContextAndDirective, Array<String>>,
+    val contextType2NotValidForInjectionKeywords:  Map<String, Set<String>>,
 ) {
     val subsectionsAllPossibleArgNames = contextTypeAndSection2LambdaArgs.values.flatMap { it.asIterable() }.toImmutableSet()
+
+    companion object {
+        val EMPTY = SnakemakeAPIProjectState(emptyMap(), emptyMap(), emptyMap(), emptyMap())
+    }
 }
