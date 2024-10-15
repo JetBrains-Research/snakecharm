@@ -268,7 +268,7 @@ changelog:
   - version: "1.0.0"
 
     introduced:
-      - name: "input"
+      - name: "output"
         type: "rule-like"
 
       - name: "log"
