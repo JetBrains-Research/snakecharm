@@ -20,6 +20,7 @@ data class SmkKeywordIntroductionParams(
     val isPlaceholderInjectionAllowed: Boolean,
     val isPlaceholderExpandedToWildcard: Boolean,
     val isAccessibleInRuleObj: Boolean,
+    val isAccessibleAsPlaceholder: Boolean,
 ) {
     companion object {
         fun createFrom(rec: SmkAPIAnnParsingIntroductionRecord) = SmkKeywordIntroductionParams(
@@ -30,6 +31,7 @@ data class SmkKeywordIntroductionParams(
             isPlaceholderInjectionAllowed = rec.placeholders_injection_allowed,
             isPlaceholderExpandedToWildcard = rec.placeholders_resolved_as_wildcards,
             isAccessibleInRuleObj = rec.is_accessible_in_rule_obj,
+            isAccessibleAsPlaceholder = rec.is_accessible_as_placeholder,
         )
     }
 }

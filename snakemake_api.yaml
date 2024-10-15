@@ -23,6 +23,7 @@ defaultVersion: "7.32.4"
 #    * keyword_args_allowed: True                  | e.g. in 'params' sections is allowed, in 'script' - not
 #    * placeholders_resolved_as_wildcards: False   | e.g. in output: "{params}" - 'params' is not params section, but wildcard name
 #    * is_accessible_in_rule_obj: False            | for things like rules.NAME.<section>
+#    * is_accessible_as_placeholder: False         | e.g. in `shell: "{<section>}"` and  other sections where placeholders not treated as wildcards
 #    * lambda_args: []                             | e.g. lambda args for 'params' and 'input' sections are different
 # =========================================
 changelog:
@@ -277,16 +278,19 @@ changelog:
         type: "rule-like"
         placeholders_resolved_as_wildcards: True
         is_accessible_in_rule_obj: True
+        is_accessible_as_placeholder: True
 
       - name: "log"
         type: "rule-like"
         placeholders_resolved_as_wildcards: True
         is_accessible_in_rule_obj: True
+        is_accessible_as_placeholder: True
 
       - name: "input"
         type: "rule-like"
         placeholders_resolved_as_wildcards: True
         is_accessible_in_rule_obj: True
+        is_accessible_as_placeholder: True
         lambda_args:
           - "wildcards"
 
@@ -294,6 +298,7 @@ changelog:
         type: "rule-like"
         placeholders_resolved_as_wildcards: True
         is_accessible_in_rule_obj: True
+        is_accessible_as_placeholder: True
         lambda_args:
           - "wildcards"
           - "input"
@@ -305,6 +310,7 @@ changelog:
         type: "rule-like"
         placeholders_resolved_as_wildcards: True
         is_accessible_in_rule_obj: True
+        is_accessible_as_placeholder: True
         lambda_args:
           - "wildcards"
           - "input"
@@ -330,6 +336,7 @@ changelog:
         multiple_args_allowed: False
         keyword_args_allowed: False
         placeholders_injection_allowed: False
+        is_accessible_as_placeholder: True
         lambda_args:
           - "wildcards"
           - "input"
@@ -354,6 +361,7 @@ changelog:
         keyword_args_allowed: False
         placeholders_injection_allowed: False
         is_accessible_in_rule_obj: True
+        is_accessible_as_placeholder: True
 
       - name: "benchmark"
         type: "rule-like"
