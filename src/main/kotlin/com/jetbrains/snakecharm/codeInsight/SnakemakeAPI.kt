@@ -258,18 +258,6 @@ object SnakemakeAPI {
     val SMK_API_VERS_6_1 = "6.1"
 }
 
-object SnakemakeAPICompanion {
-    /**
-     * For codeInsight
-     */
-    val RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED = setOf(
-        // hardcoded list missing in 'snakmake_api.yaml'
-        SECTION_OUTPUT, SECTION_INPUT, SECTION_PARAMS, SECTION_LOG, SECTION_RESOURCES,
-        SECTION_BENCHMARK, SECTION_MESSAGE, SECTION_SHELL, SECTION_THREADS,
-        SECTION_PRIORITY, SECTION_GROUP, SECTION_SHADOW,
-    )
-}
-
 @Service
 class SnakemakeAPIService {
     val RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS = SnakemakeFrameworkAPIProvider.getInstance()
