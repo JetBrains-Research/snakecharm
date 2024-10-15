@@ -15,7 +15,7 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_RULE
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
@@ -75,7 +75,9 @@ class SmkImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
             // * Do not add item if section exists (existing sections are in completion list as Named Elements)
             //   let's do not duplicate this
             // * If section in implicit provider => also avoid duplicated items
-            for (sectionName in SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS) {
+            val api = SnakemakeAPIProjectService.getInstance(project)
+            val contextKeyword = ruleOrCheckpoint.sectionKeyword
+            for (sectionName in api.getSubsectionAccessibleAsPlaceholder(contextKeyword)) {
                 if (cache.contains(SmkCodeInsightScope.RULELIKE_RUN_SECTION, sectionName)) {
                     // avoid duplicated items in completion list
                     continue

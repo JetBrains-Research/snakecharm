@@ -4,6 +4,7 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.inspections.smksl.SmkSLUndeclaredSectionInspectionUtil
 import com.jetbrains.snakecharm.lang.psi.impl.refs.SmkPyReferenceImpl
 
@@ -13,6 +14,7 @@ class SmkUndeclaredSectionInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+        val api = SnakemakeAPIProjectService.getInstance(holder.project)
 
         override fun visitPyReferenceExpression(expr: PyReferenceExpression) {
             val ref = expr.reference
@@ -24,10 +26,10 @@ class SmkUndeclaredSectionInspection : SnakemakeInspection() {
             if (!ref.inRunSection) {
                 return
             }
-
+            val contextKeyword = ref.containingRuleOrCheckpoint?.sectionKeyword
             @Suppress("UnstableApiUsage")
             val referencedName = expr.referencedName
-            if (!SmkSLUndeclaredSectionInspectionUtil.isSectionNameOfInterest(referencedName)) {
+            if (!SmkSLUndeclaredSectionInspectionUtil.isSectionNameOfInterest(referencedName, contextKeyword, api)) {
                 return
             }
 

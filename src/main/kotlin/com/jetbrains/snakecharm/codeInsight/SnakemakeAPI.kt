@@ -160,18 +160,6 @@ object SnakemakeAPI {
         USE_EXCLUDE_KEYWORD
     )
 
-    /**
-     * For type inference:
-     * In SnakemakeSL some sections are inaccessible in `shell: "{<section>}"` and other sections, which doesn't
-     * expand wildcards.
-     */
-    val SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS = setOf(
-        SECTION_INPUT,
-        SECTION_OUTPUT, SECTION_LOG,
-        SECTION_THREADS, SECTION_PARAMS,
-        SECTION_RESOURCES,
-        SECTION_VERSION
-    )
 
     /**
      * Ordered list of sections which defines wildcards
@@ -342,12 +330,36 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
             return (keywords != null) && (keyword in keywords)
         }
         return false
+    }
+
+    private val SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS = setOf(
+        SECTION_INPUT,
+        SECTION_OUTPUT, SECTION_LOG,
+        SECTION_THREADS, SECTION_PARAMS,
+        SECTION_RESOURCES,
+        SECTION_VERSION
+    )
+    /**
+     * For type inference:
+     * In SnakemakeSL some sections are inaccessible in `shell: "{<section>}"` and other sections, which doesn't
+     * expand wildcards.
+     */
+    fun isSubsectionAccessibleAsPlaceholder(keyword: String?, contextKeywordOrType: String?): Boolean   {
+        return keyword in SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS
 
 //        if (keyword != null && contextKeywordOrType != null) {
-//            val keywords = state.contextType2WildcardsExpandingKeywords[contextKeywordOrType]
+//            val keywords = state.contextType2AccessibleInRuleObjectSubsectionKeywords[contextKeywordOrType]
 //            return (keywords != null) && (keyword in keywords)
 //        }
         return false
+//        return false
+    }
+
+    fun getSubsectionAccessibleAsPlaceholder(contextKeywordOrType: String?): Set<String>   {
+        if (contextKeywordOrType == null){
+            return emptySet()
+        }
+        return SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS
     }
 
     private fun doRefresh(version: String?) {

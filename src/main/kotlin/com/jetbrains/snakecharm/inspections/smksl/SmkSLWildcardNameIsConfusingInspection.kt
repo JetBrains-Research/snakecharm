@@ -5,7 +5,7 @@ import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.inspections.quickfix.PyRenameElementQuickFix
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
@@ -16,6 +16,7 @@ class SmkSLWildcardNameIsConfusingInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SmkSLInspectionVisitor(holder, getContext(session)) {
+        val api = SnakemakeAPIProjectService.getInstance(holder.project)
 
         override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpression) {
             // expr.isQualified: 'wildcards' in 'wildcards.input'
@@ -23,9 +24,14 @@ class SmkSLWildcardNameIsConfusingInspection : SnakemakeInspection() {
             val ref = expr.reference
             if (ref is SmkSLWildcardReference) {
                 val wildcardName = ref.wildcardName()
-                if (wildcardName in SnakemakeAPI.SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS) {
+                val ruleOrCheckPoint = expr.containingSection()?.getParentRuleOrCheckPoint()
+                if (ruleOrCheckPoint == null) {
+                    return
+                }
+                val contextKeyword = ruleOrCheckPoint.sectionKeyword
+                if (api.isSubsectionAccessibleAsPlaceholder(wildcardName, contextKeyword)) {
                     // ensure in rule
-                    expr.containingSection()?.getParentRuleOrCheckPoint() ?: return
+                    ruleOrCheckPoint ?: return
 
                     registerProblem(
                         expr,

@@ -18,7 +18,6 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolUsageType
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
@@ -239,10 +238,12 @@ class SmkSLInitialReference(
             return emptySequence()
         }
 
+        val api = SnakemakeAPIProjectService.getInstance(parentDeclaration.project)
+        val contextKeyword = parentDeclaration.sectionKeyword
         return parentDeclaration.statementList.statements
             .asSequence()
             .filterIsInstance<SmkSection>()
-            .filter { it.sectionKeyword in SMK_SL_INITIAL_TYPE_ACCESSIBLE_SECTIONS }
+            .filter { api.isSubsectionAccessibleAsPlaceholder(it.sectionKeyword, contextKeyword) }
     }
 
     override fun getUnresolvedHighlightSeverity(context: TypeEvalContext?): HighlightSeverity? =
