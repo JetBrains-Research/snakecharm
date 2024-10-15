@@ -21,9 +21,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_SKIP_VALIDATION_KEYWO
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_SNAKEFILE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RULE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_BENCHMARK
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CONDA
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CWL
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_GROUP
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_LOG
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_MESSAGE
@@ -349,12 +347,11 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
      * @return true if the keyword is found within the set of wildcards expanding sections, false otherwise.
      */
     fun isWildcardsExpandingSection(keyword: String?, contextKeywordOrType: String?): Boolean   {
-        val WILDCARDS_EXPANDING_SECTIONS_KEYWORDS = setOf(
-            SECTION_INPUT, SECTION_OUTPUT, SECTION_CONDA,
-            SECTION_RESOURCES, SECTION_GROUP, SECTION_BENCHMARK,
-            SECTION_LOG, SECTION_PARAMS
-        )
-        return keyword in WILDCARDS_EXPANDING_SECTIONS_KEYWORDS
+        if (keyword != null && contextKeywordOrType != null) {
+            val keywords = state.contextType2WildcardsExpandingKeywords[contextKeywordOrType]
+            return (keywords != null) && (keyword in keywords)
+        }
+        return false
     }
 
     private fun doRefresh(version: String?) {
@@ -367,6 +364,7 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
             val contextType2PositionalOnlySectionKeywords = HashMap<String, MutableList<String>>()
             val contextTypeAndSection2LambdaArgs = HashMap<SmkAPISubsectionContextAndDirective, Array<String>>()
             val contextType2NotValidForInjectionKeywords = HashMap<String, MutableSet<String>>()
+            val contextType2WildcardsExpandingKeywords = HashMap<String, MutableSet<String>>()
 
             // add top-level data:
             val toplevelIntroductions = apiProvider.getToplevelIntroductions(SmkLanguageVersion(version))
@@ -412,6 +410,11 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
                     val keywords = contextType2NotValidForInjectionKeywords.getOrPut(context) { mutableSetOf<String>() }
                     keywords.add(ctxAndName.directiveKeyword)
                 }
+                if (params.isPlaceholderExpandedToWildcard) {
+                    val context = ctxAndName.contextType
+                    val keywords = contextType2WildcardsExpandingKeywords.getOrPut(context) { mutableSetOf<String>() }
+                    keywords.add(ctxAndName.directiveKeyword)
+                }
 
                 if (params.lambdaArgs.isNotEmpty()) {
                     val value = versAndParams.second.lambdaArgs.toTypedArray()
@@ -430,7 +433,8 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
                 contextType2SingleArgSectionKeywords = contextType2SingleArgSectionKeywords.toImmutableMap(),
                 contextType2PositionalOnlySectionKeywords = contextType2PositionalOnlySectionKeywords.toImmutableMap(),
                 contextTypeAndSection2LambdaArgs = contextTypeAndSection2LambdaArgs.toImmutableMap(),
-                contextType2NotValidForInjectionKeywords=contextType2NotValidForInjectionKeywords.toImmutableMap()
+                contextType2NotValidForInjectionKeywords=contextType2NotValidForInjectionKeywords.toImmutableMap(),
+                contextType2WildcardsExpandingKeywords=contextType2WildcardsExpandingKeywords.toImmutableMap()
             )
         }
         state = newState
@@ -483,10 +487,11 @@ internal data class SnakemakeAPIProjectState(
     val contextType2PositionalOnlySectionKeywords: Map<String, List<String>>,
     val contextTypeAndSection2LambdaArgs:  Map<SmkAPISubsectionContextAndDirective, Array<String>>,
     val contextType2NotValidForInjectionKeywords:  Map<String, Set<String>>,
+    val contextType2WildcardsExpandingKeywords:  Map<String, Set<String>>,
 ) {
     val subsectionsAllPossibleArgNames = contextTypeAndSection2LambdaArgs.values.flatMap { it.asIterable() }.toImmutableSet()
 
     companion object {
-        val EMPTY = SnakemakeAPIProjectState(emptyMap(), emptyMap(), emptyMap(), emptyMap())
+        val EMPTY = SnakemakeAPIProjectState(emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap())
     }
 }

@@ -22,6 +22,8 @@ defaultVersion: "7.32.4"
 #    * section: True
 #    * multiple_args_allowed: True
 #    * keyword_args_allowed: True
+#    * placeholders_resolved_as_wildcards: False
+#    * lambda_args: []
 # =========================================
 changelog:
   # ---------------------------------------
@@ -207,6 +209,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_resolved_as_wildcards: True
         lambda_args:
           - "wildcards"
           - "params"
@@ -270,17 +273,21 @@ changelog:
     introduced:
       - name: "output"
         type: "rule-like"
+        placeholders_resolved_as_wildcards: True
 
       - name: "log"
         type: "rule-like"
+        placeholders_resolved_as_wildcards: True
 
       - name: "input"
         type: "rule-like"
+        placeholders_resolved_as_wildcards: True
         lambda_args:
           - "wildcards"
 
       - name: "params"
         type: "rule-like"
+        placeholders_resolved_as_wildcards: True
         lambda_args:
           - "wildcards"
           - "input"
@@ -290,6 +297,7 @@ changelog:
 
       - name: "resources"
         type: "rule-like"
+        placeholders_resolved_as_wildcards: True
         lambda_args:
           - "wildcards"
           - "input"
@@ -306,6 +314,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_resolved_as_wildcards: True
         lambda_args:
           - "wildcards"
 
@@ -340,6 +349,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        placeholders_resolved_as_wildcards: True
 
       - name: "shell"
         type: "rule-like"
