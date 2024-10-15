@@ -1,5 +1,7 @@
 Feature: Completion for lambda parameter names in specific sections
 
+  #TODO: If lambda args need to be changed, please refactor all test here & move cases into mock Snakemake API YAML file
+
   Scenario Outline: Completion wildcards in all sections
     Given a snakemake project
     Given I open a file "foo.smk" with text

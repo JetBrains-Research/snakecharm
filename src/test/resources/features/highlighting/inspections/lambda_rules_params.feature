@@ -1,4 +1,5 @@
 Feature: Inspection checking lambda parameter names in various sections
+  #TODO: If lambda args need to be changed, please refactor all test here & move cases into mock Snakemake API YAML file
 
   Scenario Outline: Correct lambda parameters in section
     Given a snakemake project

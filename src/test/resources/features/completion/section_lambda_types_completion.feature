@@ -1,5 +1,7 @@
 Feature: Completion for section lambda params attrs
 
+  #TODO: If lambda args need to be changed, please refactor all test here & move cases into mock Snakemake API YAML file
+
   Scenario Outline: Completion attrs of params section
     Given a snakemake project
     Given I open a file "foo.smk" with text

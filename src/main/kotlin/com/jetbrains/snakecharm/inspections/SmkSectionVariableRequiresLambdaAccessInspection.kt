@@ -32,7 +32,7 @@ class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
             val varName = node.referencedName
             // Not allowed arg (e.g. wildcards, ..) and not section keyword (e.g. 'threads', 'version' etc)
             if (varName == null || (
-                        (varName !in apiProjectService.getPossibleLambdaParamNames()) &&
+                        (varName !in apiProjectService.getSubsectionPossibleLambdaParamNames()) &&
                                 ( varName !in apiService.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS))
                 ) {
                 // Not suitable case
@@ -49,9 +49,9 @@ class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
                     ?: return // Shouldn't happen
                 (lambdaOrSectionExpr as PyLambdaExpression) to sectionArg
             }
-
-            val supportedVarNames = apiProjectService.getLambdaArgsFor(containingArgsSection.sectionKeyword)
-            val varNameIsSupportedByLambda = supportedVarNames?.contains(varName) == true
+            val context = containingArgsSection.getParentRuleOrCheckPoint()?.sectionKeyword
+            val supportedVarNames = apiProjectService.getLambdaArgsForSubsection(containingArgsSection.sectionKeyword, context)
+            val varNameIsSupportedByLambda = supportedVarNames.contains(varName)
 
             val resolve = node.reference.resolve()
             if (resolve == null) {

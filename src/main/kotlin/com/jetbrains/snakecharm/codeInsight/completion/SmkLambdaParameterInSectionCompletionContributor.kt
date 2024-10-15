@@ -56,8 +56,10 @@ object SmkLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
                 )
             }
             else -> {
-                val args = SnakemakeAPIProjectService.getInstance(element.project).getLambdaArgsFor(sectionName)
-                if (args != null) {
+                val apiService = SnakemakeAPIProjectService.getInstance(element.project)
+                val context = section.getParentRuleOrCheckPoint().sectionKeyword
+                val args = apiService.getLambdaArgsForSubsection(sectionName, context)
+                if (args.isNotEmpty()) {
                     addCompletionResultsForSection(element, args, result)
                 }
             }

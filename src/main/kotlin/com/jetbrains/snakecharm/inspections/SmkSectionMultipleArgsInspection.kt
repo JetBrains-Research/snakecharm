@@ -64,7 +64,7 @@ class SmkSectionMultipleArgsInspection : SnakemakeInspection() {
                         registerProblem(
                             arg,
                             SnakemakeBundle.message(
-                                "INSP.NAME.section.multiple.args.message.in.lang.level.message", sectionName,
+                                "INSP.NAME.section.multiple.args.in.lang.level.message", sectionName,
                                 currentVersionString ?: "Unknown"
                             )
                         )

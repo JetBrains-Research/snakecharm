@@ -1,4 +1,5 @@
 Feature: Resolve for section lambda params attrs
+  #TODO: If lambda args need to be changed, please refactor all test here & move cases into mock Snakemake API YAML file
 
   Scenario Outline: Resolve attrs of params section
     Given a snakemake project

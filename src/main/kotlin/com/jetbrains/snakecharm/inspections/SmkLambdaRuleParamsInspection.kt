@@ -31,14 +31,19 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
             // for more info on which sections are allowed to use callables and why
 
             val sectionKeyword = st.sectionKeyword
-            val allowedArgs = apiService.getLambdaArgsFor(sectionKeyword)
-            if (allowedArgs != null) {
+            if (sectionKeyword == null) {
+                return
+            }
+
+            val context = st.getParentRuleOrCheckPoint().sectionKeyword
+            val allowedArgs = apiService.getLambdaArgsForSubsection(sectionKeyword, context)
+            if (allowedArgs.isNotEmpty()) {
                 registerParamsProblemsForLambdasWithWildcards(
                     allLambdas,
-                    sectionKeyword!!,
+                    sectionKeyword,
                     *allowedArgs
                 )
-            } else if (sectionKeyword != null) {
+            } else {
                 allLambdas.forEach {
                     registerProblem(
                         it,

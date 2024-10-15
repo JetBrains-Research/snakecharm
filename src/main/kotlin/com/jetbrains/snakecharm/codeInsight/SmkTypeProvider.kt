@@ -110,7 +110,10 @@ class SmkTypeProvider : PyTypeProviderBase() {
             lambda, SmkRuleOrCheckpointArgsSection::class.java, PyCallExpression::class.java
         ) ?: return null
 
-        val allowedArgs = SnakemakeAPIProjectService.getInstance(lambda.project).getLambdaArgsFor(parentSection.sectionKeyword) ?: emptyArray()
+        val apiService = SnakemakeAPIProjectService.getInstance(lambda.project)
+        val allowedArgs = apiService.getLambdaArgsForSubsection(
+            parentSection.sectionKeyword, ruleLike.sectionKeyword
+        )
         val paramName = referenceTarget.text
 
         @Suppress("UnstableApiUsage")

@@ -8,9 +8,9 @@ import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.types.PyFunctionType
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
-import com.jetbrains.snakecharm.lang.psi.SmkSubworkflowArgsSection
 
 class SmkSectionUnexpectedCallableArgsInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -22,18 +22,26 @@ class SmkSectionUnexpectedCallableArgsInspection : SnakemakeInspection() {
 
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
-            checkArgumentList(st.argumentList, st)
+            checkArgumentList(st.argumentList, st, st.getParentRuleOrCheckPoint().sectionKeyword)
         }
 
         private fun checkArgumentList(
             argumentList: PyArgumentList?,
             section: SmkArgsSection,
+            context: String?,
         ) {
-            if (apiService.getLambdaArgsFor(section.sectionKeyword) != null) {
+            if (apiService.getLambdaArgsForSubsection(section.sectionKeyword, context).isNotEmpty()) {
                 return
             }
 
             val args = argumentList?.arguments ?: emptyArray()
+            if (args.isEmpty()) {
+                return
+            }
+
+            val settings = SmkSupportProjectSettings.getInstance(argumentList!!.project)
+            val currentVersionString = settings.snakemakeLanguageVersion
+
             args.forEach { arg ->
                 if (arg is PyReferenceExpression && arg !is PyLambdaExpression) {
                     val childType = myTypeEvalContext.getType(arg)
@@ -42,8 +50,9 @@ class SmkSectionUnexpectedCallableArgsInspection : SnakemakeInspection() {
                         registerProblem(
                             arg,
                             SnakemakeBundle.message(
-                                "INSP.NAME.section.unexpected.callable.args.message",
-                                section.sectionKeyword!!
+                                "INSP.NAME.section.unexpected.callable.args.in.lang.level.message",
+                                section.sectionKeyword!!,
+                                currentVersionString ?: "Unknown"
                             )
                         )
                     }

@@ -1,6 +1,60 @@
 Feature: Rule section access requires lambda
 
-  Scenario Outline: Variable name matches declared section and not hidden by outer variable
+  #TODO: If lambda args need to be changed, please refactor all test here & move cases into mock Snakemake API YAML file
+
+  Scenario Outline: Variable name matches declared section and not hidden by outer variable, configured in YAML
+    Given a snakemake project
+    And snakemake framework api yaml descriptor is
+    """
+    changelog:
+      - version: "3.0.0"
+        override:
+        - name: "foobooo"
+          type: "rule-like"
+          lambda_args:
+            - "wildcards"
+            - "section_10"
+            - "section_11"
+
+      - version: "2.0.0"
+        introduced:
+        - name: "foobooo"
+          type: "rule-like"
+          lambda_args:
+            - "wildcards"
+            - "section_2"
+            - "section_3"
+    """
+    And I set snakemake language version to "<lang_version>"
+    Given I open a file "foo.smk" with text
+        """
+        rule all:
+          <var_name>: <ref_section_content>
+          foobooo: <section_context>
+          shell: "echo {<var_name>} {params.p}"
+        """
+    And SmkSectionVariableRequiresLambdaAccessInspection inspection is enabled
+    #noinspection CucumberUndefinedStep
+    Then I expect inspection error on <<var_name>> in <foobooo: <section_context>> with message
+       """
+       To access '<var_name>' section use lambda here, e.g. `lambda wildcards, <var_name>: <var_name>.foo`.
+       """
+    # Weak warning check includes error check, use `weak warning` because our inspection returns both types
+    When I check highlighting weak warnings
+    Examples:
+      | lang_version | section_context                 | var_name   | ref_section_content |
+      | 2.0.0        | p=section_2                     | section_2  | f="s"               |
+      | 2.0.0        | p=section_3                     | section_3  | 4                   |
+      | 2.0.0        | p=section_3                     | section_3  | f=1                 |
+      | 3.0.0        | p=section_10                    | section_10 | f=1                 |
+      | 3.0.0        | p=section_10[0]                 | section_10 | f=1                 |
+      | 3.0.0        | p=section_10.f                  | section_10 | f=1                 |
+      | 3.0.0        | p=section_10.f.boo              | section_10 | f=1                 |
+      | 2.0.0        | p=lambda wildcards: section_2   | section_2  | f=1                 |
+      | 2.0.0        | p=lambda wildcards: section_2.f | section_2  | f=1                 |
+      | 2.0.0        | p=lambda wildcards: section_3.f | section_3  | f=1                 |
+
+  Scenario Outline: Variable name matches declared section and not hidden by outer variable in latest language level
     Given a snakemake project
     Given I open a file "foo.smk" with text
         """
@@ -20,30 +74,11 @@ Feature: Rule section access requires lambda
     Examples:
       | section_context                      | var_name  | ref_section_content |
       | params: p=input                      | input     | f="s"               |
-      | params: p=output                     | output    | f="s"               |
-      | params: p=threads                    | threads   | 4                   |
       | params: p=resources                  | resources | f=1                 |
-      | resources: p=input                   | input     | f="s"               |
-      | resources: p=threads                 | threads   | 4                   |
-      | threads: p=input                     | input     | f="s"               |
-      | params: p=input[0]                   | input     | f="s"               |
-      | params: p=input.f                    | input     | f="s"               |
-      | params: p=input.f.boo                | input     | f="s"               |
-      | params: p=input[0]                   | input     | f="s"               |
-      | params: p=input.f.boo[0]             | input     | f="s"               |
-      | params: p=lambda wildcards: input    | input     | f="s"               |
       | params: p=lambda wildcards: input[1] | input     | f="s"               |
-      | params: p=lambda wildcards: output   | output    | f="s"               |
-      | conda: lambda wildcards: params      | params    | f="s"               |
       | conda: lambda wildcards: params.f    | params    | f="s"               |
-      | conda: lambda wildcards: input.f     | input     | f="s"               |
 
-#    TODO
-##      | input   | f.input      |        # ok
-#      | input   | input[0]      |
-#      | lambda wildcards: input   | input[0]      |
-
-  Scenario Outline: Variable name matches undeclared section and not hidden by outer variable
+  Scenario Outline: Variable name matches undeclared section and not hidden by outer variable in latest language level
     Given a snakemake project
     Given I open a file "foo.smk" with text
           """
@@ -68,7 +103,7 @@ Feature: Rule section access requires lambda
       | params: p=lambda wildcards: output | output    |
       | conda: params                      | params    |
 
-  Scenario Outline: Variable name matches undeclared section and hidden by outer variable
+  Scenario Outline: Variable name matches undeclared section and hidden by outer variable in latest language level
     Given a snakemake project
     Given I open a file "foo.smk" with text
           """
@@ -99,7 +134,7 @@ Feature: Rule section access requires lambda
       | params: p=lambda wildcards: output | output    | output = 2    |
       | conda: params                      | params    | params = 2    |
 
-  Scenario Outline: Variable name matches declared section and referenced section is hidden by outer variable (case1)
+  Scenario Outline: Variable name matches declared section and referenced section is hidden by outer variable (case1) in latest language level
     Given a snakemake project
     Given I open a file "foo.smk" with text
         """
@@ -130,7 +165,7 @@ Feature: Rule section access requires lambda
       | threads: p=input     | input     | input: f=""    |
       | conda: params        | params  | params: f=""   |
 
-  Scenario Outline: Variable name matches declared section and referenced section is hidden by outer variable (case 2)
+  Scenario Outline: Variable name matches declared section and referenced section is hidden by outer variable (case 2) in latest language level
     Given a snakemake project
     Given I open a file "foo.smk" with text
         """
@@ -154,7 +189,7 @@ Feature: Rule section access requires lambda
       | params: p=lambda wildcards: output | output   | output: f="" |
       | conda: p=lambda wildcards: params  | params   | params: f="" |
 
-  Scenario Outline: Variable not matches section and not hidden by outer variable
+  Scenario Outline: Variable not matches section and not hidden by outer variable in latest language level
     Given a snakemake project
     Given I open a file "foo.smk" with text
           """
@@ -185,7 +220,7 @@ Feature: Rule section access requires lambda
       | conda: params                        | params    | lambda wildcards,     |
       | conda: lambda wildcards: params      | params    | lambda wildcards,     |
 
-  Scenario Outline: Variable not matches section and hidden by outer variable
+  Scenario Outline: Variable not matches section and hidden by outer variable in latest language level
     Given a snakemake project
     Given I open a file "foo.smk" with text
         """
@@ -214,7 +249,7 @@ Feature: Rule section access requires lambda
       | threads: p=attempt                   | attempt   | attempt = 2   | lambda wildcards,     |
       | threads: p=lambda wildcards: attempt | attempt   | attempt = 2   | lambda wildcards,     |
 
-  Scenario Outline: No error
+  Scenario Outline: No error in latest language level
     Given a snakemake project
     Given I open a file "foo.smk" with text
           """
@@ -250,7 +285,7 @@ Feature: Rule section access requires lambda
       | params: p=lambda wildcards, input, output, threads, resources: output | resources |               |
       | group: p=lambda wildcards: output                                     | output    | output=1      |
 
-  Scenario Outline: Snakemake variable undefined and cannot be used in this context
+  Scenario Outline: Snakemake variable undefined and cannot be used in this context in latest language level
     Given a snakemake project
     Given I open a file "foo.smk" with text
           """

@@ -6,9 +6,9 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_ATTEMPT
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPICompanion.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS_HARDCODED
+import com.jetbrains.snakecharm.framework.SmkAPISubsectionContextAndDirective
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
 import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
@@ -79,6 +79,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD
 import com.jetbrains.snakecharm.lang.parser.SnakemakeLexer
 import io.ktor.util.*
 import kotlinx.collections.immutable.toImmutableMap
+import kotlinx.collections.immutable.toImmutableSet
 
 /**
  * Also see [ImplicitPySymbolsProvider] class
@@ -321,7 +322,7 @@ class SnakemakeAPIService {
 
 @Service(Service.Level.PROJECT)
 class SnakemakeAPIProjectService(val project: Project): Disposable {
-    private var state: SnakemakeAPIProjectState = SnakemakeAPIProjectState(emptyMap(), emptyMap())
+    private var state: SnakemakeAPIProjectState = SnakemakeAPIProjectState(emptyMap(), emptyMap(), emptyMap())
 
     /**
      * Checks if a given keyword requires only one argument
@@ -370,53 +371,28 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
         return SnakemakeLexer.KEYWORD_LIKE_SECTION_NAME_2_TOKEN_TYPE.keys.unmodifiable()
     }
 
-    private val ALLOWED_LAMBDA_OR_CALLABLE_ARGS = mapOf(
-        SECTION_INPUT to arrayOf(SMK_VARS_WILDCARDS),
-        SECTION_GROUP to arrayOf(SMK_VARS_WILDCARDS),
-        SECTION_PARAMS to arrayOf(
-            SMK_VARS_WILDCARDS,
-            SECTION_INPUT,
-            SECTION_OUTPUT,
-            SECTION_RESOURCES,
-            SECTION_THREADS
-        ),
-        SECTION_RESOURCES to arrayOf(
-            SMK_VARS_WILDCARDS,
-            SECTION_INPUT,
-            SECTION_THREADS,
-            SMK_VARS_ATTEMPT
-        ),
-        SECTION_THREADS to arrayOf(
-            SMK_VARS_WILDCARDS,
-            SECTION_INPUT,
-            SMK_VARS_ATTEMPT
-        ),
-        SECTION_CONDA to arrayOf(
-            SMK_VARS_WILDCARDS,
-            SECTION_PARAMS,
-            SECTION_INPUT,
-        ),
-    )
+    fun getSubsectionPossibleLambdaParamNames(): Set<String> = state.subsectionsAllPossibleArgNames
 
-    fun getPossibleLambdaParamNames(): Set<String> {
-        return ALLOWED_LAMBDA_OR_CALLABLE_ARGS.values.flatMap { it.asIterable() }.toSet()
-    }
-
-    fun getLambdaArgsFor(keyword: String?): Array<String>? {
-        /**
-         * Set of rule/checkpoint sections that supports lambdas/callable arguments
-         */
-        return ALLOWED_LAMBDA_OR_CALLABLE_ARGS[keyword]
+    /**
+     * Get set of lambda/function arguments for rule/checkpoint sections that supports support such access
+     */
+    fun getLambdaArgsForSubsection(keyword: String?, contextKeywordOrType: String?): Array<String> {
+        if (keyword != null && contextKeywordOrType != null) {
+            val key = SmkAPISubsectionContextAndDirective(contextKeywordOrType, keyword)
+            return state.contextTypeAndSection2LambdaArgs[key] ?: emptyArray<String>()
+        }
+        return emptyArray()
     }
 
     private fun doRefresh(version: String?) {
         val newState = if (version == null) {
-            SnakemakeAPIProjectState(emptyMap(), emptyMap())
+            SnakemakeAPIProjectState(emptyMap(), emptyMap(), emptyMap())
         } else {
             val apiProvider = SnakemakeFrameworkAPIProvider.getInstance()
 
             val contextType2SingleArgSectionKeywords = HashMap<String, MutableList<String>>()
             val contextType2PositionalOnlySectionKeywords = HashMap<String, MutableList<String>>()
+            val contextTypeAndSection2LambdaArgs = HashMap<SmkAPISubsectionContextAndDirective, Array<String>>()
 
             // add top-level data:
             val toplevelIntroductions = apiProvider.getToplevelIntroductions(SmkLanguageVersion(version))
@@ -445,22 +421,36 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
             // add subsections data:
             val subsectionIntroductions = apiProvider.getSubsectionsIntroductions(SmkLanguageVersion(version))
             subsectionIntroductions.forEach { (ctxAndName, versAndParams) ->
-                if (!versAndParams.second.multipleArgsAllowed) {
+                val (_, params) = versAndParams
+                if (!params.multipleArgsAllowed) {
                     val context = ctxAndName.contextType
                     val keywords = contextType2SingleArgSectionKeywords.getOrPut(context) { arrayListOf<String>() }
                     keywords.add(ctxAndName.directiveKeyword)
                 }
 
-                if (!versAndParams.second.keywordArgsAllowed) {
+                if (!params.keywordArgsAllowed) {
                     val context = ctxAndName.contextType
                     val keywords = contextType2PositionalOnlySectionKeywords.getOrPut(context) { arrayListOf<String>() }
                     keywords.add(ctxAndName.directiveKeyword)
+                }
+
+                if (params.lambdaArgs.isNotEmpty()) {
+                    val value = versAndParams.second.lambdaArgs.toTypedArray()
+                    require(value.isNotEmpty()) {
+                        "YAML format error: 'lambda_args' should not be empty for directive '${ctxAndName.directiveKeyword}'."
+                    }
+                    require(value[0] == SMK_VARS_WILDCARDS) {
+                        "YAML format error: first lambda argument for directive '${ctxAndName.directiveKeyword}' should be '${SMK_VARS_WILDCARDS}'. If not" +
+                                " then please file a feature request at https://github.com/JetBrains-Research/snakecharm/issues ."
+                    }
+                    contextTypeAndSection2LambdaArgs.put(ctxAndName, value)
                 }
             }
 
             SnakemakeAPIProjectState(
                 contextType2SingleArgSectionKeywords = contextType2SingleArgSectionKeywords.toImmutableMap(),
                 contextType2PositionalOnlySectionKeywords = contextType2PositionalOnlySectionKeywords.toImmutableMap(),
+                contextTypeAndSection2LambdaArgs = contextTypeAndSection2LambdaArgs.toImmutableMap()
             )
         }
         state = newState
@@ -511,4 +501,7 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
 internal data class SnakemakeAPIProjectState(
     val contextType2SingleArgSectionKeywords: Map<String, List<String>>,
     val contextType2PositionalOnlySectionKeywords: Map<String, List<String>>,
-)
+    val contextTypeAndSection2LambdaArgs:  Map<SmkAPISubsectionContextAndDirective, Array<String>>,
+) {
+    val subsectionsAllPossibleArgNames = contextTypeAndSection2LambdaArgs.values.flatMap { it.asIterable() }.toImmutableSet()
+}

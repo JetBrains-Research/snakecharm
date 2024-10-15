@@ -256,6 +256,28 @@ changelog:
   - version: "1.0.0"
 
     introduced:
+      - name: "input"
+        type: "rule-like"
+        lambda_args:
+          - "wildcards"
+
+      - name: "params"
+        type: "rule-like"
+        lambda_args:
+          - "wildcards"
+          - "input"
+          - "output"
+          - "resources"
+          - "threads"
+
+      - name: "resources"
+        type: "rule-like"
+        lambda_args:
+          - "wildcards"
+          - "input"
+          - "threads"
+          - "attempt"
+
       - name: "shadow"
         type: "rule-like"
         multiple_args_allowed: False
@@ -265,13 +287,19 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        lambda_args:
+          - "wildcards"
 
-      - name: "priority"
+      - name: "threads"
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        lambda_args:
+          - "wildcards"
+          - "input"
+          - "attempt"
 
-      - name: "threads"
+      - name: "priority"
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
