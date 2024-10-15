@@ -1,14 +1,19 @@
 package com.jetbrains.snakecharm.framework
 
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
+import com.intellij.codeInsight.hints.codeVision.ModificationStampUtil
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.*
+import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Disposer
+import com.intellij.psi.PsiManager
+import com.intellij.util.concurrency.ThreadingAssertions
 import com.intellij.util.messages.Topic
 import com.intellij.util.xmlb.annotations.Attribute
 import com.jetbrains.python.PyNames
@@ -166,6 +171,9 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
             val oldState = settings.stateSnapshot()
 
             settings.loadState(newState)
+            if (oldState == newState) {
+                return
+            }
 
             if (oldState.snakemakeSupportEnabled && !newState.snakemakeSupportEnabled) {
                 // disabled
@@ -178,7 +186,18 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
             }
 
             // no after* event in facets topic
-            DaemonCodeAnalyzer.getInstance(project).restart()
+            DumbService.getInstance(project).smartInvokeLater {
+                ApplicationManager.getApplication().runWriteAction {
+                    ThreadingAssertions.assertWriteAccess()
+
+                    PsiManager.getInstance(project).dropPsiCaches()
+                    PsiManager.getInstance(project).dropResolveCaches()
+                    for (editor in EditorFactory.getInstance().allEditors) {
+                        ModificationStampUtil.clearModificationStamp(editor)
+                    }
+                    DaemonCodeAnalyzer.getInstance(project).restart()
+                }
+            }
         }
 
         fun findPythonSdk(project: Project, sdkName: String?): Sdk? {
