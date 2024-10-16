@@ -23,6 +23,7 @@ data class SmkAPIAnnParsingIntroductionRecord(
     override val name: String = "",
     override val type: String = "",
     val advice: String = "",
+    // for sections:
     val lambda_args: List<String> = emptyList<String>(),
     val section: Boolean = true,
     val keyword_args_allowed: Boolean = true,
@@ -31,6 +32,8 @@ data class SmkAPIAnnParsingIntroductionRecord(
     val placeholders_resolved_as_wildcards: Boolean = false,
     val is_accessible_in_rule_obj: Boolean = false,
     val is_accessible_as_placeholder: Boolean = false,
+    // for functions:
+    val limit_to_sections: List<String> = emptyList<String>(),
 ): SmkAPIAnnParsingAbstractRecord
 
 data class SmkAPIAnnParsingConfig(

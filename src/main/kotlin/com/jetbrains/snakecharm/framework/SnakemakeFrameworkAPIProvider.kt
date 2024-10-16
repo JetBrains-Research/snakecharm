@@ -35,6 +35,8 @@ class SnakemakeFrameworkAPIProvider(
     private lateinit var functionShortName2Deprecations: Map<String, TreeMap<SmkLanguageVersion, SmkKeywordDeprecationParams>>
     private lateinit var subsectionName2Deprecations: Map<SmkAPISubsectionContextAndDirective, TreeMap<SmkLanguageVersion, SmkKeywordDeprecationParams>>
 
+    private lateinit var functionFqn2Introduction: Map<String, TreeMap<SmkLanguageVersion, SmkKeywordIntroductionParams>>
+    private lateinit var functionShortName2Introduction: Map<String, TreeMap<SmkLanguageVersion, SmkKeywordIntroductionParams>>
     private lateinit var topLevelName2Introduction: Map<String, TreeMap<SmkLanguageVersion, SmkKeywordIntroductionParams>>
     private lateinit var subsectionName2Introduction: Map<SmkAPISubsectionContextAndDirective, TreeMap<SmkLanguageVersion, SmkKeywordIntroductionParams>>
 
@@ -92,6 +94,8 @@ class SnakemakeFrameworkAPIProvider(
 
         // Introduction Data
         val topLevelIntroductionInfo = emptyMap<String, TreeMap<SmkLanguageVersion, SmkKeywordIntroductionParams>>().toMutableMap()
+        val funIntroductionByFqnInfo = emptyMap<String, TreeMap<SmkLanguageVersion, SmkKeywordIntroductionParams>>().toMutableMap()
+        val funFqnIntroductionByShortnameInfo = emptyMap<String, TreeMap<SmkLanguageVersion, SmkKeywordIntroductionParams>>().toMutableMap()
         val subsectionIntroductionInfo =
             emptyMap<SmkAPISubsectionContextAndDirective, TreeMap<SmkLanguageVersion, SmkKeywordIntroductionParams>>().toMutableMap()
 
@@ -100,7 +104,7 @@ class SnakemakeFrameworkAPIProvider(
             val languageVersion = SmkLanguageVersion(versionData.version)
 
             fillDeprecationInfo(languageVersion, versionData, functionDeprecationByFqnInfo, functionDeprecationByShortnameInfo, topLevelDeprecationInfo, subsectionDeprecationInfo)
-            filIntroductionData(languageVersion, versionData, topLevelIntroductionInfo, subsectionIntroductionInfo)
+            filIntroductionData(languageVersion, versionData, funIntroductionByFqnInfo, funFqnIntroductionByShortnameInfo, topLevelIntroductionInfo, subsectionIntroductionInfo)
         }
 
         topLevelName2Deprecations = topLevelDeprecationInfo
@@ -108,6 +112,8 @@ class SnakemakeFrameworkAPIProvider(
         functionShortName2Deprecations = functionDeprecationByShortnameInfo
         subsectionName2Deprecations = subsectionDeprecationInfo
 
+        functionFqn2Introduction = funIntroductionByFqnInfo
+        functionShortName2Introduction = funFqnIntroductionByShortnameInfo
         topLevelName2Introduction = topLevelIntroductionInfo
         subsectionName2Introduction = subsectionIntroductionInfo
     }
@@ -115,6 +121,8 @@ class SnakemakeFrameworkAPIProvider(
     private fun filIntroductionData(
         languageVersion: SmkLanguageVersion,
         versionChangeNotes: SmkAPIAnnParsingVersionRecord,
+        functionDeprecationByFqnInfo: MutableMap<String, TreeMap<SmkLanguageVersion, SmkKeywordIntroductionParams>>,
+        functionDeprecationByShortnameInfo: MutableMap<String, TreeMap<SmkLanguageVersion, SmkKeywordIntroductionParams>>,
         topLevelIntroductionData: MutableMap<String, TreeMap<SmkLanguageVersion, SmkKeywordIntroductionParams>>,
         subsectionIntroductionData: MutableMap<SmkAPISubsectionContextAndDirective, TreeMap<SmkLanguageVersion, SmkKeywordIntroductionParams>>,
     ) {
@@ -124,14 +132,14 @@ class SnakemakeFrameworkAPIProvider(
         for (record: SmkAPIAnnParsingIntroductionRecord in versionChangeNotes.introduced) {
             updateBasedOnRecContextType(
                 record, SmkKeywordIntroductionParams.createFrom(record),
-                languageVersion, null, null, topLevelIntroductionData, subsectionIntroductionData
+                languageVersion, functionDeprecationByFqnInfo, functionDeprecationByShortnameInfo, topLevelIntroductionData, subsectionIntroductionData
             )
         }
 
         for (record: SmkAPIAnnParsingIntroductionRecord in versionChangeNotes.override) {
             updateBasedOnRecContextType(
                 record, SmkKeywordIntroductionParams.createFrom(record),
-                languageVersion, null, null, topLevelIntroductionData, subsectionIntroductionData
+                languageVersion, functionDeprecationByFqnInfo, functionDeprecationByShortnameInfo, topLevelIntroductionData, subsectionIntroductionData
             )
         }
     }
@@ -313,6 +321,27 @@ class SnakemakeFrameworkAPIProvider(
     ): Map.Entry<SmkLanguageVersion, SmkKeywordIntroductionParams>? {
         val vers2ParamsTree = topLevelName2Introduction[name]
         return vers2ParamsTree?.floorEntry(version)
+    }
+
+    fun getFunctionIntroductionsByFqn(
+        version: SmkLanguageVersion
+    ): List<Pair<String, Map.Entry<SmkLanguageVersion, SmkKeywordIntroductionParams>>> = functionFqn2Introduction.mapNotNull { (directive, vers2ParamsTree) ->
+        val entry = vers2ParamsTree.floorEntry(version)
+        if (entry == null) null else (directive to entry)
+    }
+
+    fun getFunctionDeprecationsByFqn(
+        version: SmkLanguageVersion
+    ): List<Pair<String, Map.Entry<SmkLanguageVersion, SmkKeywordDeprecationParams>>> = functionFqn2Deprecations.mapNotNull { (directive, vers2ParamsTree) ->
+        val entry = vers2ParamsTree.floorEntry(version)
+        if (entry == null) null else (directive to entry)
+    }
+
+    fun getFunctionDeprecationsByShortName(
+        version: SmkLanguageVersion
+    ): List<Pair<String, Map.Entry<SmkLanguageVersion, SmkKeywordDeprecationParams>>> = functionShortName2Deprecations.mapNotNull { (directive, vers2ParamsTree) ->
+        val entry = vers2ParamsTree.floorEntry(version)
+        if (entry == null) null else (directive to entry)
     }
 
     fun getToplevelIntroductions(

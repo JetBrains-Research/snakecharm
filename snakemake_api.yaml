@@ -59,6 +59,10 @@ changelog:
         keyword_args_allowed: False
         placeholders_injection_allowed: False
 
+      - name: "snakemake.io.ensure"
+        type: "function"
+        limit_to_sections:
+          - "output"
   # ----------------------
   - version: "7.0.0"
 
@@ -193,7 +197,7 @@ changelog:
   - version: "5.4.0"
 
     deprecated:
-      - name: "dynamic"
+      - name: "snakemake.io.dynamic"
         type: "function"
         advice: "use checkpoints instead."
 
@@ -388,3 +392,58 @@ changelog:
         type: "subworkflow"
         multiple_args_allowed: False
         keyword_args_allowed: False
+
+      - name: "snakemake.io.ancient"
+        type: "function"
+        limit_to_sections:
+          - "input"
+
+      - name: "snakemake.io.protected"
+        type: "function"
+        limit_to_sections:
+          - "output"
+          - "log"
+          - "benchmark"
+
+      - name: "snakemake.io.directory"
+        type: "function"
+        limit_to_sections:
+          - "output"
+
+      - name: "snakemake.io.report"
+        type: "function"
+        limit_to_sections:
+          - "output"
+
+      - name: "snakemake.io.temp"
+        type: "function"
+        limit_to_sections:
+          - "input"
+          - "output"
+
+      - name: "snakemake.io.touch"
+        type: "function"
+        limit_to_sections:
+          - "output"
+          - "benchmark"
+          - "log"
+
+      - name: "snakemake.io.pipe"
+        type: "function"
+        limit_to_sections:
+          - "output"
+
+      - name: "snakemake.io.unpack"
+        type: "function"
+        limit_to_sections:
+          - "input"
+
+      - name: "snakemake.io.repeat"
+        type: "function"
+        limit_to_sections:
+          - "benchmark"
+
+      - name: "snakemake.io.dynamic"
+        type: "function"
+        limit_to_sections:
+          - "output"

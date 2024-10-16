@@ -8,6 +8,7 @@ import com.jetbrains.python.psi.PyClass
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
 import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkKeywordDeprecationParams
@@ -27,6 +28,8 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+        val apiService = SnakemakeAPIProjectService.getInstance(holder.project)
+        val deprecationProvider = SnakemakeFrameworkAPIProvider.getInstance()
         val snakemakeSettings = SmkSupportProjectSettings.getInstance(holder.project)
 
         override fun visitSmkRule(rule: SmkRule) {
@@ -95,15 +98,6 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
         }
 
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {
-            val currentVersionString = snakemakeSettings.snakemakeLanguageVersion
-            val currentVersion = if (currentVersionString == null) null else SmkLanguageVersion(currentVersionString)
-            if (currentVersion == null) {
-                // No info about version & deprecations
-                return
-            }
-
-            val deprecationProvider = SnakemakeFrameworkAPIProvider.getInstance()
-
             @Suppress("UnstableApiUsage") val callName = node.name ?: return
             val declaration = node.reference.resolve()
 
@@ -121,7 +115,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
                 if (fqn != null) {
 
                     // everything resolved OK
-                    val deprecationEntry = deprecationProvider.getFunctionDeprecationByFqn(fqn, currentVersion)
+                    val deprecationEntry = apiService.getFunctionDeprecationByFqn(fqn)
                     if (deprecationEntry != null) {
                         showPropblem(deprecationEntry, fqn, node, true)
                     }
@@ -130,7 +124,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
             }
 
             // * Unresolved
-            val deprecationEntry = deprecationProvider.getFunctionDeprecationByShortName(callName, currentVersion)
+            val deprecationEntry = apiService.getFunctionDeprecationByShortName(callName)
             if (deprecationEntry != null && deprecationEntry.second.itemRemoved) {
                 // XXX: only if removed we unexpected unresolved reference, let's ignore 'deprecated' case here
                 // to reduce false-positive errors
@@ -197,7 +191,6 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
                 return
             }
 
-            val deprecationProvider = SnakemakeFrameworkAPIProvider.getInstance()
             val lowestVersion = deprecationProvider.getTopLevelIntroductionVersion(name)
             val currentVersionString = snakemakeSettings.snakemakeLanguageVersion
             val currentVersion = if (currentVersionString == null) null else SmkLanguageVersion(currentVersionString)

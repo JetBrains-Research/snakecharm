@@ -12,6 +12,7 @@ import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
 import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
 import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkAPIAnnParsingContextType
+import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkKeywordDeprecationParams
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_CONFIG_KEYWORD
@@ -22,7 +23,6 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_SNAKEFILE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RULE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_BENCHMARK
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CWL
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_INPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_LOG
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_NOTEBOOK
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
@@ -34,17 +34,6 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_WRAPPER
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_AS_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_FROM_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_WITH_KEYWORD
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_ANCIENT
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_DIRECTORY
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_DYNAMIC
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_ENSURE
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_PIPE
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_PROTECTED
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_REPEAT
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_REPORT
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_TEMP
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_TOUCH
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_IO_METHOD_UNPACK
 import com.jetbrains.snakecharm.lang.SnakemakeNames.USE_EXCLUDE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINERIZED_KEYWORD
@@ -184,21 +173,6 @@ object SnakemakeAPI {
         PEPPY_CONFIG_SAMPLE_MODIFIERS, PEPPY_CONFIG_PROJECT_MODIFIERS
     )
 
-
-    val IO_FLAG_2_SUPPORTED_SECTION: HashMap<String, List<String>> = hashMapOf(
-        SNAKEMAKE_IO_METHOD_ANCIENT to listOf(SECTION_INPUT),
-        SNAKEMAKE_IO_METHOD_PROTECTED to listOf(SECTION_OUTPUT, SECTION_LOG, SECTION_BENCHMARK),
-        SNAKEMAKE_IO_METHOD_DIRECTORY to listOf(SECTION_OUTPUT),
-        SNAKEMAKE_IO_METHOD_REPORT to listOf(SECTION_OUTPUT),
-        SNAKEMAKE_IO_METHOD_TEMP to listOf(SECTION_INPUT, SECTION_OUTPUT),
-        SNAKEMAKE_IO_METHOD_TOUCH to listOf(SECTION_OUTPUT, SECTION_LOG, SECTION_BENCHMARK),
-        SNAKEMAKE_IO_METHOD_PIPE to listOf(SECTION_OUTPUT),
-        SNAKEMAKE_IO_METHOD_REPEAT to listOf(SECTION_BENCHMARK),
-        SNAKEMAKE_IO_METHOD_UNPACK to listOf(SECTION_INPUT),
-        SNAKEMAKE_IO_METHOD_DYNAMIC to listOf(SECTION_OUTPUT),
-        SNAKEMAKE_IO_METHOD_ENSURE to listOf(SECTION_OUTPUT)
-    )
-
     val SMK_API_PKG_NAME_SMK = "snakemake"
     val SMK_API_PKG_NAME_SMK_MINIMAL = "snakemake-minimal"
     val SMK_API_VERS_6_1 = "6.1"
@@ -299,6 +273,21 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
         return emptyArray()
     }
 
+    fun getFunctionSectionsRestrictionsByFqn(fqn: String): Array<String> {
+        return state.funFqnToSectionRestrictionList[fqn] ?: emptyArray<String>()
+    }
+
+    fun getFunctionDeprecationByFqn(fqn: String): Pair<SmkLanguageVersion, SmkKeywordDeprecationParams>? {
+        val entry = state.functionDeprecationsByFqn[fqn]
+        return if (entry == null) null else (entry.key to entry.value)
+    }
+
+    fun getFunctionDeprecationByShortName(fqn: String): Pair<SmkLanguageVersion, SmkKeywordDeprecationParams>? {
+        val entry = state.functionDeprecationsByShortName[fqn]
+        return if (entry == null) null else (entry.key to entry.value)
+    }
+
+
     /**
      * Determines if the given keyword is part of the wildcards expanding sections.
      * These sections consider all injection identifiers to be wildcards
@@ -364,9 +353,12 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
             val contextType2WildcardsExpandingSubsectionKeywords = HashMap<String, MutableSet<String>>()
             val contextType2AccessibleInRuleObjectSubsectionKeywords = HashMap<String, MutableSet<String>>()
             val contextType2AccessibleAccessibleAsPlaceholderSubsectionKeywords = HashMap<String, MutableSet<String>>()
+            val funFqnToSectionRestrictionList = HashMap<String, Array<String>>()
+
+            val smkLangVers = SmkLanguageVersion(version)
 
             // add top-level data:
-            val toplevelIntroductions = apiProvider.getToplevelIntroductions(SmkLanguageVersion(version))
+            val toplevelIntroductions = apiProvider.getToplevelIntroductions(smkLangVers)
             contextType2SingleArgSectionKeywords.put(
                 SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr,
                 toplevelIntroductions.mapNotNull { (name, e) ->
@@ -390,7 +382,7 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
             }
 
             // add subsections data:
-            val subsectionIntroductions = apiProvider.getSubsectionsIntroductions(SmkLanguageVersion(version))
+            val subsectionIntroductions = apiProvider.getSubsectionsIntroductions(smkLangVers)
             subsectionIntroductions.forEach { (ctxAndName, versAndParams) ->
                 val (_, params) = versAndParams
                 if (!params.multipleArgsAllowed) {
@@ -436,16 +428,33 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
                     }
                     contextTypeAndSubsection2LambdaArgs.put(ctxAndName, value)
                 }
+
+                // functions
+                val funcIntroductionsByFqn = apiProvider.getFunctionIntroductionsByFqn(smkLangVers)
+                funcIntroductionsByFqn.forEach { (fqn, versAndParams) ->
+                    val (_, params) = versAndParams
+                    if (params.limitToSections.isNotEmpty()) {
+                        val value = params.limitToSections.toTypedArray()
+                        require(value.isNotEmpty()) {
+                            "YAML format error: 'limitToSections' should not be empty for directive '${ctxAndName.directiveKeyword}'."
+                        }
+                        funFqnToSectionRestrictionList.put(fqn, value)
+                    }
+                }
             }
 
             SnakemakeAPIProjectState(
                 contextType2SingleArgSectionKeywords = contextType2SingleArgSectionKeywords.toImmutableMap(),
                 contextType2PositionalOnlySectionKeywords = contextType2PositionalOnlySectionKeywords.toImmutableMap(),
                 contextTypeAndSubsection2LambdaArgs = contextTypeAndSubsection2LambdaArgs.toImmutableMap(),
-                contextType2NotValidForInjectionSubsectionKeywords=contextType2NotValidForInjectionSubsectionKeywords.toImmutableMap(),
-                contextType2WildcardsExpandingSubsectionKeywords=contextType2WildcardsExpandingSubsectionKeywords.toImmutableMap(),
+                contextType2NotValidForInjectionSubsectionKeywords = contextType2NotValidForInjectionSubsectionKeywords.toImmutableMap(),
+                contextType2WildcardsExpandingSubsectionKeywords = contextType2WildcardsExpandingSubsectionKeywords.toImmutableMap(),
                 contextType2AccessibleInRuleObjectSubsectionKeywords = contextType2AccessibleInRuleObjectSubsectionKeywords.toImmutableMap(),
                 contextType2AccessibleAccessibleAsPlaceholderSubsectionKeywords = contextType2AccessibleAccessibleAsPlaceholderSubsectionKeywords.toImmutableMap(),
+                funFqnToSectionRestrictionList = funFqnToSectionRestrictionList.toImmutableMap(),
+
+                functionDeprecationsByShortName = apiProvider.getFunctionDeprecationsByShortName(smkLangVers).toMap().toImmutableMap(),
+                functionDeprecationsByFqn = apiProvider.getFunctionDeprecationsByFqn(smkLangVers).toMap().toImmutableMap(),
             )
         }
         state = newState
@@ -501,10 +510,16 @@ internal data class SnakemakeAPIProjectState(
     val contextType2WildcardsExpandingSubsectionKeywords:  Map<String, Set<String>>,
     val contextType2AccessibleInRuleObjectSubsectionKeywords:  Map<String, Set<String>>,
     val contextType2AccessibleAccessibleAsPlaceholderSubsectionKeywords:  Map<String, Set<String>>,
+    val funFqnToSectionRestrictionList: Map<String, Array<String>>,
+    val functionDeprecationsByShortName: Map<String, Map.Entry<SmkLanguageVersion, SmkKeywordDeprecationParams>>,
+    val functionDeprecationsByFqn: Map<String, Map.Entry<SmkLanguageVersion, SmkKeywordDeprecationParams>>,
 ) {
     val subsectionsAllPossibleArgNames = contextTypeAndSubsection2LambdaArgs.values.flatMap { it.asIterable() }.toImmutableSet()
 
     companion object {
-        val EMPTY = SnakemakeAPIProjectState(emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap())
+        val EMPTY = SnakemakeAPIProjectState(
+            emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(),
+            emptyMap(), emptyMap(),
+        )
     }
 }

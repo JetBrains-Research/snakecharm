@@ -23,10 +23,12 @@ data class SmkKeywordIntroductionParams(
     val isPlaceholderExpandedToWildcard: Boolean,
     val isAccessibleInRuleObj: Boolean,
     val isAccessibleAsPlaceholder: Boolean,
+    val limitToSections: List<String>,
 ) {
     companion object {
         fun createFrom(rec: SmkAPIAnnParsingIntroductionRecord) = SmkKeywordIntroductionParams(
             lambdaArgs = rec.lambda_args,
+            limitToSections = rec.limit_to_sections,
             keywordArgsAllowed = rec.keyword_args_allowed,
             multipleArgsAllowed = rec.multiple_args_allowed,
             isSection = rec.section,
