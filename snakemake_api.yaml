@@ -24,6 +24,7 @@ defaultVersion: "7.32.4"
 #    * placeholders_resolved_as_wildcards: False   | e.g. in output: "{params}" - 'params' is not params section, but wildcard name
 #    * is_accessible_in_rule_obj: False            | for things like rules.NAME.<section>
 #    * is_accessible_as_placeholder: False         | e.g. in `shell: "{<section>}"` and  other sections where placeholders not treated as wildcards
+#    * placeholders_injection_allowed: False (for function), True (else)  | if True, than snakemake expands placeholders before call, e.g. like in 'shell' sections in some flag functions from snakemake.io
 #    * lambda_args: []                             | e.g. lambda args for 'params' and 'input' sections are different
 # =========================================
 changelog:

@@ -32,7 +32,14 @@ data class SmkKeywordIntroductionParams(
             keywordArgsAllowed = rec.keyword_args_allowed,
             multipleArgsAllowed = rec.multiple_args_allowed,
             isSection = rec.section,
-            isPlaceholderInjectionAllowed = rec.placeholders_injection_allowed,
+            isPlaceholderInjectionAllowed = when (rec.placeholders_injection_allowed) {
+                true -> true
+                false -> false
+                else -> {
+                    // default: FALSE for functions, TRUE for sections
+                    rec.type != SmkAPIAnnParsingContextType.FUNCTION.typeStr
+                }
+            },
             isPlaceholderExpandedToWildcard = rec.placeholders_resolved_as_wildcards,
             isAccessibleInRuleObj = rec.is_accessible_in_rule_obj,
             isAccessibleAsPlaceholder = rec.is_accessible_as_placeholder,
