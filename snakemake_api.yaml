@@ -30,7 +30,7 @@ changelog:
   # ---------------------------------------
   - version: "8.0.0"
     removed:
-      - name: "dynamic"
+      - name: "snakemake.io.dynamic"
         type: "function"
         advice: "use checkpoints instead."
 

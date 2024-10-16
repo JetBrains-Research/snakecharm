@@ -438,6 +438,7 @@
     <localInspection
             language="Snakemake" shortName="SmkDepreciatedKeywordsInspection"
             enabledByDefault="true"
+            level="ERROR"
             suppressId="SmkDepreciatedKeywords"
             bundle="SnakemakeBundle"
             groupKey="INSP.GROUP.snakemake"

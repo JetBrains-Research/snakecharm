@@ -1,3 +1,4 @@
+@here2
 Feature: Inspection warns about depreciated/removed keywords, or keywords that were not introduced yet.
 
   Scenario Outline: Using deprecated subsection keyword
@@ -425,28 +426,59 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     changelog:
       - version: "<version>"
         deprecated:
-        - name: "expand"
+        - name: "<fqn>"
+          type: "function"
+    """
+    And I set snakemake language version to "<smk_version>"
+    And I open a file "foo.smk" with text
+    """
+    def fooboo_local_fun():
+        pass
+
+    rule foo:
+        params: "p"
+        output: <short_name>("")
+    """
+    When SmkDepreciatedKeywordsInspection inspection is enabled
+    Then I expect no inspection errors
+    When I check highlighting errors
+    Then I expect inspection weak warning on <<short_name>> in <<short_name>("")> with message
+    """
+    Function '<fqn>' was deprecated in version <version>
+    """
+    When I check highlighting weak warnings
+    Examples:
+      | version | smk_version | fqn                  | short_name       |
+      | 1.11.11 | 1.11.11     | snakemake.io.expand  | expand           |
+      | 1.10.01 | 1.10.21     | snakemake.io.expand  | expand           |
+      | 1.11.11 | 1.11.11     | foo.fooboo_local_fun | fooboo_local_fun |
+
+  Scenario Outline: Unresolved functions can be deprecated
+    Given a snakemake project
+    And snakemake framework api yaml descriptor is
+    """
+    changelog:
+      - version: "<version>"
+        removed:
+        - name: "<fqn>"
           type: "function"
     """
     And I set snakemake language version to "<smk_version>"
     And I open a file "foo.smk" with text
     """
     rule foo:
-        output: expand("")
+        output: <short_name>("")
     """
     When SmkDepreciatedKeywordsInspection inspection is enabled
-    Then I expect no inspection errors
+    Then I expect inspection error on <<short_name>> with message
+    """
+    Unresolved function '<short_name>' looks like '<fqn>' that was removed in version <version>
+    """
     When I check highlighting errors
-    Then I expect inspection weak warning on <expand> with message
-    """
-    Function 'expand' was deprecated in version <version>
-    """
-    When I check highlighting weak warnings
     Examples:
-      | version | smk_version |
-      | 1.11.11 | 1.11.11     |
-      | 1.10.01 | 1.10.21     |
-
+      | version | smk_version | fqn                 | short_name |
+      | 1.11.11 | 1.11.11     | snakemake.io.fooboo | fooboo     |
+      | 1.11.11 | 2.11.11     | snakemake.io.fooboo | fooboo     |
 
   Scenario Outline: Functions can be deprecated with advice
     Given a snakemake project
@@ -455,7 +487,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     changelog:
       - version: "<version>"
         deprecated:
-        - name: "expand"
+        - name: "snakemake.io.expand"
           type: "function"
           advice: "use 'expand2' instead"
 
@@ -469,7 +501,7 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
     When SmkDepreciatedKeywordsInspection inspection is enabled
     Then I expect inspection weak warning on <expand> with message
     """
-    Function 'expand' was deprecated in version <version> - you should use 'expand2' instead
+    Function 'snakemake.io.expand' was deprecated in version <version> - you should use 'expand2' instead
     """
     When I check highlighting weak warnings
     Examples:

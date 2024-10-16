@@ -1,11 +1,13 @@
 package com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations
 
 data class SmkKeywordDeprecationParams(
+    val name: String,
     val itemRemoved: Boolean,
     val advice: String?,
 ) {
     companion object {
         fun createFrom(itemRemoved: Boolean, record: SmkAPIAnnParsingDeprecationRecord) = SmkKeywordDeprecationParams(
+            name = record.name,
             itemRemoved = itemRemoved,
             advice = record.advice.ifEmpty { null },
         )
