@@ -1,4 +1,3 @@
-@here2
 Feature: Inspection warns about depreciated/removed keywords, or keywords that were not introduced yet.
 
   Scenario Outline: Using deprecated subsection keyword
