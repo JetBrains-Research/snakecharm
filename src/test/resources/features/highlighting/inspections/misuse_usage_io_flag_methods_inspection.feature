@@ -1,5 +1,23 @@
 Feature: Inspection for methods from snakemake library
 
+  Scenario Outline: Incorrect using ancient/protected/directory methods in 8.7.0
+    Given a snakemake project
+    And I set snakemake language version to "8.7.0"
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+       <section>: <method><arg_list>
+    """
+    And SmkMisuseUsageIOFlagMethodsInspection inspection is enabled
+    Then I expect inspection warning on <<method><arg_list>> in <<section>: <method><arg_list>> with message
+    """
+    '<method>' isn't supported in '<section>' section, expected in sections: <expected>.
+    """
+    When I check highlighting warnings
+    Examples:
+      | rule_like  | section | method    | arg_list | expected                     |
+      | rule       | input   | update    | ('')     | 'output'                     |
+
   Scenario Outline: Incorrect using ancient/protected/directory methods
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -18,7 +36,7 @@ Feature: Inspection for methods from snakemake library
       | rule       | input   | directory | ('')     | 'output'                     |
       | rule       | input   | pipe      | ('')     | 'output'                     |
       | rule       | input   | protected | ('')     | 'benchmark', 'log', 'output' |
-      | rule       | log     | temp      | ('')     | 'input', 'output'            |
+      | rule       | log     | temp      | ('')     | 'output'                     |
       | rule       | input   | touch     | ('')     | 'benchmark', 'log', 'output' |
       | rule       | input   | repeat    | ('')     | 'benchmark'                  |
       | rule       | input   | report    | ('')     | 'output'                     |
@@ -28,7 +46,7 @@ Feature: Inspection for methods from snakemake library
       | checkpoint | input   | directory | ('')     | 'output'                     |
       | checkpoint | input   | pipe      | ('')     | 'output'                     |
       | checkpoint | input   | protected | ('')     | 'benchmark', 'log', 'output' |
-      | checkpoint | log     | temp      | ('')     | 'input', 'output'            |
+      | checkpoint | log     | temp      | ('')     | 'output'                     |
       | checkpoint | input   | touch     | ('')     | 'benchmark', 'log', 'output' |
       | checkpoint | input   | repeat    | ('')     | 'benchmark'                  |
       | checkpoint | input   | report    | ('')     | 'output'                     |
@@ -71,7 +89,7 @@ Feature: Inspection for methods from snakemake library
     Examples:
       | rule_like  | section   | method        |
       | rule       | input     | ancient('')   |
-      | rule       | input     | temp('')      |
+      | rule       | output    | temp('')      |
       | rule       | input     | unpack('')    |
       | rule       | output    | directory('') |
       | rule       | output    | pipe('')      |
@@ -84,8 +102,9 @@ Feature: Inspection for methods from snakemake library
       | rule       | output    | report('')    |
       | rule       | benchmark | repeat('')    |
       | rule       | benchmark | protected('') |
+      | rule       | output    | update('')    |
       | checkpoint | input     | ancient('')   |
-      | checkpoint | input     | temp('')      |
+      | checkpoint | output    | temporary('') |
       | checkpoint | input     | unpack('')    |
       | checkpoint | output    | directory('') |
       | checkpoint | output    | pipe('')      |
