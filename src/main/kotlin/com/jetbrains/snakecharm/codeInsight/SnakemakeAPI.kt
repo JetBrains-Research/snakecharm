@@ -63,7 +63,6 @@ object SnakemakeAPI {
     const val SMK_VARS_CHECKPOINTS = "checkpoints"
     const val SMK_VARS_SCATTER = "scatter"
     const val SMK_VARS_GATHER = "gather"
-    const val SMK_VARS_ATTEMPT = "attempt"
     const val SMK_FUN_EXPAND = "expand"
 
     val FUNCTIONS_ALLOWING_SMKSL_INJECTION = setOf(
