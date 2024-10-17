@@ -68,4 +68,13 @@ object SnakemakeNames {
     const val RUN_SECTION_VARIABLE_JOBID = "jobid"
 
     const val SNAKEMAKE_METHOD_MULTIEXT = "multiext"
+
+    /**
+     * Constant that holds the module name for Snakemake input/output operations.
+     * It is used as part of the code insight and symbol resolution process within the Snakemake plugin.
+     *
+     * For more details, refer to the class `com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider`.
+     */
+    const val SNAKEMAKE_MODULE_NAME_IO = "snakemake.io"
+    const val SNAKEMAKE_FQN_FUN_MIN_VERSION = "snakemake.utils.min_version"
 }

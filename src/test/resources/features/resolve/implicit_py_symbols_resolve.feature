@@ -49,29 +49,31 @@ Feature: Resolve implicitly imported python names
     Then reference should resolve to "<symbol_name>" in "<file>"
 
     Examples:
-      | smk_vers      | ptn | text        | symbol_name | file         |
-      | snakemake:5x  | ru  | rules       | rules       | workflow.py  |
-      | snakemake:5x  | ru  | rules.foo   | rules       | workflow.py  |
-      | snakemake:6.1 | ru  | rules       | Rules       | common.py    |
-      | snakemake:6.1 | ru  | rules.foo   | Rules       | common.py    |
-      | snakemake:6.5 | ru  | rules       | Rules       | __init__.py  |
-      | snakemake:6.5 | ru  | rules.foo   | Rules       | __init__.py  |
-      | snakemake:6.1    | dyn | dynamic()   | dynamic     | io.py        |
-      | snakemake:7.32.4    | dyn | dynamic()   | dynamic     | io.py        |
-      | snakemake     | exp | expand()    | expand      | io.py        |
-      | snakemake     | tem | temp()      | temp        | io.py        |
-      | snakemake     | dir | directory() | directory   | io.py        |
-      | snakemake     | dir | directory() | directory   | io.py        |
-      | snakemake     | pro | protected() | protected   | io.py        |
-      | snakemake     | tou | touch()     | touch       | io.py        |
-      | snakemake     | un  | unpack()    | unpack      | io.py        |
-      | snakemake     | anc | ancient()   | ancient     | io.py        |
-      | snakemake     | ens | ensure()    | ensure      | io.py        |
-      | snakemake     | ru  | rules       | Rules       | __init__.py  |
-      | snakemake     | ru  | rules.foo   | Rules       | __init__.py  |
-      | snakemake     | inp | input       | input       | builtins.pyi |
-      | snakemake     | pe  | pep         | __init__    | project.py   |
-      | snakemake     | pe  | pep.config  | __init__    | project.py   |
+      | smk_vers         | ptn | text            | symbol_name   | file         |
+      | snakemake:5x     | ru  | rules           | rules         | workflow.py  |
+      | snakemake:5x     | ru  | rules.foo       | rules         | workflow.py  |
+      | snakemake:6.1    | ru  | rules           | Rules         | common.py    |
+      | snakemake:6.1    | ru  | rules.foo       | Rules         | common.py    |
+      | snakemake:6.5    | ru  | rules           | Rules         | __init__.py  |
+      | snakemake:6.5    | ru  | rules.foo       | Rules         | __init__.py  |
+      | snakemake:6.1    | dyn | dynamic()       | dynamic       | io.py        |
+      | snakemake:7.32.4 | dyn | dynamic()       | dynamic       | io.py        |
+      | snakemake        | exp | expand()        | expand        | io.py        |
+      | snakemake        | tem | temp()          | temp          | io.py        |
+      | snakemake        | dir | directory()     | directory     | io.py        |
+      | snakemake        | dir | directory()     | directory     | io.py        |
+      | snakemake        | pro | protected()     | protected     | io.py        |
+      | snakemake        | upd | update()        | update        | ioflags.py   |
+      | snakemake        | bef | before_update() | before_update | ioflags.py   |
+      | snakemake        | tou | touch()         | touch         | io.py        |
+      | snakemake        | un  | unpack()        | unpack        | io.py        |
+      | snakemake        | anc | ancient()       | ancient       | io.py        |
+      | snakemake        | ens | ensure()        | ensure        | io.py        |
+      | snakemake        | ru  | rules           | Rules         | __init__.py  |
+      | snakemake        | ru  | rules.foo       | Rules         | __init__.py  |
+      | snakemake        | inp | input           | input         | builtins.pyi |
+      | snakemake        | pe  | pep             | __init__      | project.py   |
+      | snakemake        | pe  | pep.config      | __init__      | project.py   |
 
   Scenario: Resolve at top-level: shell()
     Given a snakemake project

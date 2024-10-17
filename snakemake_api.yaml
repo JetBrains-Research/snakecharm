@@ -26,9 +26,36 @@ defaultVersion: "7.32.4"
 #    * is_accessible_as_placeholder: False         | e.g. in `shell: "{<section>}"` and  other sections where placeholders not treated as wildcards
 #    * placeholders_injection_allowed: False (for function), True (else)  | if True, than snakemake expands placeholders before call, e.g. like in 'shell' sections in some flag functions from snakemake.io
 #    * lambda_args: []                             | e.g. lambda args for 'params' and 'input' sections are different
+#    * limit_to_sections: []                       | some snakemake.io flag-functions could be used only in certain sections
+#    * docs_url: ''                                | Documentation URL
 # =========================================
 changelog:
+
   # ---------------------------------------
+  - version: "8.7.0"
+    introduced:
+      - name: "snakemake.ioflags.update"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#updating-existing-output-files
+        type: "function"
+        limit_to_sections:
+          - "output"
+
+      - name: "snakemake.ioflags.before_update"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#updating-existing-output-files
+        type: "function"
+        limit_to_sections:
+          - "input"
+
+  # ---------------------------------------
+  - version: "8.2.0"
+    introduced:
+      - name: "snakemake.io.from_queue"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#continuously-updated-input
+        type: "function"
+        limit_to_sections:
+          - "output"
+
+ # ---------------------------------------
   - version: "8.0.0"
     removed:
       - name: "snakemake.io.dynamic"
@@ -74,6 +101,11 @@ changelog:
         keyword_args_allowed: False
         placeholders_injection_allowed: False
 
+      - name: "snakemake.io.service"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#service-rules-jobs
+        type: "function"
+        limit_to_sections:
+          - "output"
   # ----------------------
   - version: "6.15.0"
 
@@ -201,6 +233,26 @@ changelog:
       - name: "snakemake.io.dynamic"
         type: "function"
         advice: "use checkpoints instead."
+
+  # ----------------------
+  - version: "5.1.0"
+
+    introduced:
+      - name: "snakemake.io.report"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/reporting.html#reports
+        limit_to_sections:
+          - "output"
+
+  # ----------------------
+  - version: "5.0.0"
+
+    introduced:
+      - name: "snakemake.io.pipe"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#piped-output
+        limit_to_sections:
+          - "output"
 
   # ----------------------
   - version: "4.8.0"
@@ -396,11 +448,14 @@ changelog:
 
       - name: "snakemake.io.ancient"
         type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#ignoring-timestamps
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "input"
 
       - name: "snakemake.io.protected"
         type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#protected-and-temporary-files
         limit_to_sections:
           - "output"
           - "log"
@@ -408,39 +463,39 @@ changelog:
 
       - name: "snakemake.io.directory"
         type: "function"
-        limit_to_sections:
-          - "output"
-
-      - name: "snakemake.io.report"
-        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#directories-as-outputs
         limit_to_sections:
           - "output"
 
       - name: "snakemake.io.temp"
         type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#protected-and-temporary-files
         limit_to_sections:
-          - "input"
+          - "output"
+
+      - name: "snakemake.io.temporary"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#protected-and-temporary-files
+        limit_to_sections:
           - "output"
 
       - name: "snakemake.io.touch"
         type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#flag-files
         limit_to_sections:
           - "output"
           - "benchmark"
           - "log"
 
-      - name: "snakemake.io.pipe"
-        type: "function"
-        limit_to_sections:
-          - "output"
-
       - name: "snakemake.io.unpack"
         type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#input-functions-and-unpack
         limit_to_sections:
           - "input"
 
       - name: "snakemake.io.repeat"
         type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/tutorial/additional_features.html#benchmarking
         limit_to_sections:
           - "benchmark"
 
@@ -448,3 +503,9 @@ changelog:
         type: "function"
         limit_to_sections:
           - "output"
+
+      - name: "snakemake.io.local"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/storage.html#local-input-output-files
+        limit_to_sections:
+          - "input"

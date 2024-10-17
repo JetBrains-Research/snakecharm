@@ -30,10 +30,12 @@ import com.jetbrains.python.psi.resolve.fromSdk
 import com.jetbrains.python.psi.resolve.resolveQualifiedName
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTION_ACCESSOR_CLASSES
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_API_VERS_6_1
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_MODULE_NAME_IO
 import java.util.*
 import javax.swing.SwingUtilities
 
@@ -132,7 +134,12 @@ class ImplicitPySymbolsProvider(
         ///////////////////////////////////////
         // E.g. expand, temp, .. from 'snakemake.io'
         collectTopLevelMethodsFrom(
-            "snakemake.io", SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache
+            SNAKEMAKE_MODULE_NAME_IO, SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache
+        )
+        progressIndicator?.checkCanceled()
+        // E.g. flags 'update',.. from 'snakemake.ioflags'
+        collectTopLevelMethodsFrom(
+            "snakemake.ioflags", SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache
         )
         progressIndicator?.checkCanceled()
 
@@ -177,15 +184,12 @@ class ImplicitPySymbolsProvider(
         // snakemake.io.Wildcards
         // snakemake.io.Resources
         collectTopLevelClassesInheretedFrom(
-            "snakemake.io",
+            SNAKEMAKE_MODULE_NAME_IO,
             "snakemake.io.Namedlist",
             SmkCodeInsightScope.RULELIKE_RUN_SECTION, usedFiles, sdk, elementsCache
-        ) { className ->
-            when (className) {
-                "InputFiles" -> "input"
-                "OutputFiles" -> "output"
-                else -> className.lowercase(Locale.getDefault())
-            }
+        ) { classFqn ->
+            val sectionName = SECTION_ACCESSOR_CLASSES[classFqn]
+            sectionName ?: classFqn.split('.').last().lowercase(Locale.getDefault())
         }
         progressIndicator?.checkCanceled()
 
@@ -467,7 +471,7 @@ class ImplicitPySymbolsProvider(
         usedFiles: MutableSet<VirtualFile>,
         sdk: Sdk,
         elementsCache: MutableList<ImplicitPySymbol>,
-        className2VarNameFun: (String) -> String
+        classFqn2VarNameFun: (String) -> String
     ) {
         val pyFiles = collectPyFiles(pyModuleFqn, usedFiles, sdk)
 
@@ -484,7 +488,8 @@ class ImplicitPySymbolsProvider(
                 )
 
                 if (parentClassRequirement == null || pyClass.inherits(typeEvalContext, parentClassRequirement)) {
-                    val varName = className2VarNameFun(pyClass.name!!)
+                    val fqn = pyClass.qualifiedName ?: pyClass.name!!
+                    val varName = classFqn2VarNameFun(fqn)
                     elementsCache.add(
                         ImplicitPySymbol(
                             varName,

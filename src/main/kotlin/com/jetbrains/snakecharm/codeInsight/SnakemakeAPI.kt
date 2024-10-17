@@ -89,8 +89,6 @@ object SnakemakeAPI {
         "snakemake.io.Log" to "log",
         "snakemake.io.Resources" to "resources"
     )
-    const val SNAKEMAKE_MODULE_NAME_IO_PY = "io.py"
-    const val SNAKEMAKE_MODULE_NAME_UTILS_PY = "utils.py"
 
     /**
      * Sections that execute external script with access to 'snakemake' object, i.e to 'snakemake.input',

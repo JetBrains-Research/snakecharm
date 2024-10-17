@@ -23,6 +23,8 @@ data class SmkAPIAnnParsingIntroductionRecord(
     override val name: String = "",
     override val type: String = "",
     val advice: String = "",
+    val docs_url: String = "",
+
     // for sections:
     val lambda_args: List<String> = emptyList<String>(),
     val section: Boolean = true,

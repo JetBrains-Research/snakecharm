@@ -3,14 +3,15 @@ package com.jetbrains.snakecharm.inspections.smksl
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiReference
+import com.jetbrains.python.extensions.getQName
 import com.jetbrains.python.psi.PyClass
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTION_ACCESSOR_CLASSES
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SNAKEMAKE_MODULE_NAME_IO_PY
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.inspections.smksl.SmkSLUndeclaredSectionInspectionUtil.checkIsSectionNameUnresolved
 import com.jetbrains.snakecharm.inspections.smksl.SmkSLUndeclaredSectionInspectionUtil.isSectionNameOfInterest
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_MODULE_NAME_IO
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLInitialReference
@@ -55,8 +56,8 @@ object SmkSLUndeclaredSectionInspectionUtil {
         return when (declaration) {
             null -> true
             is PyClass -> {
-                // is resolved to io.py
-                declaration.containingFile.name == SNAKEMAKE_MODULE_NAME_IO_PY
+                // is resolved to snakemake/io.py
+                declaration.containingFile.getQName()?.toString() == SNAKEMAKE_MODULE_NAME_IO
                         || declaration.qualifiedName in SECTION_ACCESSOR_CLASSES
             }
 

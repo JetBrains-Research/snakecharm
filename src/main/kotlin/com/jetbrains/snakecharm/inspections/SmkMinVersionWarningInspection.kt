@@ -7,9 +7,9 @@ import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SNAKEMAKE_MODULE_NAME_UTILS_PY
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_FQN_FUN_MIN_VERSION
 
 class SmkMinVersionWarningInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -18,7 +18,6 @@ class SmkMinVersionWarningInspection : SnakemakeInspection() {
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
 
-        @Suppress("UnstableApiUsage")
         override fun visitPyCallExpression(node: PyCallExpression) {
             val callee = node.callee
             if (callee?.name != "min_version") {
@@ -28,7 +27,7 @@ class SmkMinVersionWarningInspection : SnakemakeInspection() {
             val reference = callee.reference
             val resolveResult = reference?.resolve()
             val function = resolveResult as? PyFunction ?: return
-            if (function.name != "min_version" || function.containingFile.name != SNAKEMAKE_MODULE_NAME_UTILS_PY) {
+            if (function.qualifiedName != SNAKEMAKE_FQN_FUN_MIN_VERSION) {
                 return
             }
 
