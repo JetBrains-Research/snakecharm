@@ -6,7 +6,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.codeInsight.PyInjectionUtil.InjectionResult
 import com.jetbrains.python.codeInsight.PyInjectorBase
 import com.jetbrains.python.psi.*
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.FUNCTIONS_ALLOWING_SMKSL_INJECTION
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_FUN_EXPAND
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
@@ -44,8 +43,22 @@ open class SmkSLInjector : PyInjectorBase() {
     }
 
     private fun PsiElement.isInValidCallExpression(): Boolean {
+        val api = SnakemakeAPIProjectService.getInstance(project)
+
         val parentCallExpr = PsiTreeUtil.getParentOfType(this, PyCallExpression::class.java)
-        return parentCallExpr == null || parentCallExpr.callSimpleName() in FUNCTIONS_ALLOWING_SMKSL_INJECTION
+        val fqn = (parentCallExpr?.callee?.reference?.resolve() as? PyQualifiedNameOwner)?.qualifiedName
+
+        if (fqn != null) {
+            // resolved
+            return api.isFunctionFqnValidForInjection(fqn)
+        }
+
+        // not-resolved or else
+        val shortName = parentCallExpr?.callSimpleName()
+        if (shortName != null) {
+            return api.isFunctionShortNameValidForInjection(shortName)
+        }
+        return true
     }
 
     private fun PsiElement.isInValidArgsSection(): Boolean {

@@ -706,7 +706,7 @@ class CompletionResolveSteps {
             require(pos >= 0) {
                 "Marker <$marker> not found in <$text>"
             }
-            require(pos == text.lastIndexOf(marker)) { "Multiple marker entries" }
+            require(pos == text.lastIndexOf(marker)) { "Multiple marker entries: Marker found in ${text.lastIndexOf(marker)} instead of $pos" }
             return if (after) pos + marker.length else pos
         }
     }

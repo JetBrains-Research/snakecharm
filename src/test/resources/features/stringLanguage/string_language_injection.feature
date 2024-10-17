@@ -199,27 +199,98 @@ Feature: Tests on snakemake string language injection
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
+    <import_statement>
     rule NAME:
       input: <function>("{foo}")
     """
     When I put the caret after foo
     Then I expect language injection on "{foo}"
     Examples:
-    | function     |
-    | ancient      |
-    | directory    |
-    | temp         |
-    | pipe         |
-    | temporary    |
-    | protected    |
-    | dynamic      |
-    | touch        |
-    | repeat       |
-    | report       |
-    | local        |
-    | expand       |
-    | shell        |
-    | join         |
-    | path.join    |
-    | os.path.join |
-    | multiext     |
+      | function     | import_statement          |
+      | ancient      |                           |
+      | directory    |                           |
+      | temp         |                           |
+      | pipe         |                           |
+      | temporary    |                           |
+      | protected    |                           |
+      | touch        |                           |
+      | repeat       |                           |
+      | report       |                           |
+      | local        |                           |
+      | expand       |                           |
+      | shell        |                           |
+      | join         | from os.path import  join |
+      | path.join    | from os import  path      |
+      | os.path.join | import os                 |
+      | multiext     |                           |
+      # Unresolved
+      | dynamic      |                           |
+      | join         |                           |
+      | path.join    |                           |
+      | os.path.join |                           |
+
+  Scenario Outline: Inject in snakemake function calls configured by API-0
+    Given a snakemake project
+    And snakemake framework api yaml descriptor is
+    """
+    changelog:
+      - version: "2.0.0"
+
+        override:
+        - name: "my_functions.fooboodoo_allowed"
+          type: "function"
+          placeholders_injection_allowed: False
+
+        - name: "my_functions.fooboodoo_not"
+          type: "function"
+          placeholders_injection_allowed: True
+
+      - version: "1.0.0"
+
+        introduced:
+        - name: "input"
+          type: "rule-like"
+          is_accessible_as_placeholder: True
+
+        - name: "output"
+          type: "rule-like"
+          is_accessible_as_placeholder: True
+
+        - name: "my_functions.fooboodoo_allowed"
+          type: "function"
+          placeholders_injection_allowed: True
+
+        - name: "my_functions.fooboodoo_not"
+          type: "function"
+          placeholders_injection_allowed: False
+
+        - name: "my_functions.fooboodoo_default"
+          type: "function"
+    """
+    And I set snakemake language version to "<smk_version>"
+    Given a file "my_functions.py" with text
+    """
+    def <function1>(p):
+      pass
+    def <function2>(p):
+      pass
+    """
+    Given I open a file "foo.smk" with text
+    """
+    <import_statement>
+
+    rule NAME:
+      input: <function1>("{faa}")
+      output: <function2>("{baa}")
+    """
+    When I put the caret after faa
+    Then I expect language injection on "{faa}"
+    When I put the caret after baa
+    Then I expect no language injection
+    Examples:
+      | smk_version | function1         | function2         | import_statement           |
+      | 1.0.0       | fooboodoo_allowed | fooboodoo_not     |                            |
+      | 1.0.0       | fooboodoo_allowed | fooboodoo_not     | from my_functions import * |
+      | 1.0.0       | fooboodoo_allowed | fooboodoo_default |                            |
+      | 2.0.0       | fooboodoo_not     | fooboodoo_allowed |                            |
+      | 2.0.0       | fooboodoo_not     | fooboodoo_default |                            |

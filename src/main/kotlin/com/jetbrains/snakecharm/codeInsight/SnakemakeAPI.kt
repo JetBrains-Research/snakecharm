@@ -65,12 +65,6 @@ object SnakemakeAPI {
     const val SMK_VARS_GATHER = "gather"
     const val SMK_FUN_EXPAND = "expand"
 
-    val FUNCTIONS_ALLOWING_SMKSL_INJECTION = setOf(
-        "ancient", "directory", "temp", "pipe", "temporary", "protected",
-        "dynamic", "touch", "repeat", "report", "local", "expand", "shell",
-        "join", "multiext"
-    )
-
     val FUNCTIONS_BANNED_FOR_WILDCARDS = listOf(
         SMK_FUN_EXPAND
     )
@@ -238,6 +232,7 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
         return list?.contains(keyword) == true
     }
 
+    @Suppress("unused")
     fun isTopLevelArgsSectionKeyword(keyword: String): Boolean {
         // XXX: Used in parsing/lexing, cannot collect from YAML file
         return keyword in SnakemakeAPI.TOPLEVEL_ARGS_SECTION_KEYWORDS
@@ -248,6 +243,7 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
         return keyword in SnakemakeLexer.KEYWORD_LIKE_SECTION_NAME_2_TOKEN_TYPE
     }
 
+    @Suppress("unused")
     fun getTopLevelsKeywords(): Set<String> {
         // XXX: Used in parsing/lexing, cannot collect from YAML file
         return SnakemakeLexer.KEYWORD_LIKE_SECTION_NAME_2_TOKEN_TYPE.keys.unmodifiable()
@@ -255,9 +251,17 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
 
     fun getSubsectionPossibleLambdaParamNames(): Set<String> = state.subsectionsAllPossibleArgNames
 
+    fun isFunctionFqnValidForInjection(fqn: String) = fqn in state.funFqnValidForInjection
+
+    fun isFunctionShortNameValidForInjection(shortName: String) = shortName in state.funShortNamesValidForInjection
+
     fun isSubsectionValidForInjection(keyword: String, contextKeywordOrType: String): Boolean {
+        require(contextKeywordOrType != SmkAPIAnnParsingContextType.FUNCTION.typeStr)
+        require(contextKeywordOrType != SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr)
+
         val keywords = state.contextType2NotValidForInjectionSubsectionKeywords[contextKeywordOrType]
-        return (keywords != null) && (keyword !in keywords)
+        // our default is to allow injection in all sections => if section not registered, or event context type => true
+        return (keywords == null) || (keyword !in keywords)
     }
     /**
      * Get set of lambda/function arguments for rule/checkpoint sections that supports support such access
@@ -351,6 +355,7 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
             val contextType2AccessibleInRuleObjectSubsectionKeywords = HashMap<String, MutableSet<String>>()
             val contextType2AccessibleAccessibleAsPlaceholderSubsectionKeywords = HashMap<String, MutableSet<String>>()
             val funFqnToSectionRestrictionList = HashMap<String, Array<String>>()
+            val funFqnValidForInjection = mutableSetOf<String>()
 
             val smkLangVers = SmkLanguageVersion(version)
 
@@ -430,15 +435,13 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
                 val funcIntroductionsByFqn = apiProvider.getFunctionIntroductionsByFqn(smkLangVers)
                 funcIntroductionsByFqn.forEach { (fqn, versAndParams) ->
                     val (_, params) = versAndParams
-                    if (params.limitToSections.isNotEmpty()) {
-                        val value = params.limitToSections.toTypedArray()
-                        require(value.isNotEmpty()) {
-                            "YAML format error: 'limitToSections' should not be empty for directive '${ctxAndName.directiveKeyword}'."
-                        }
-                        funFqnToSectionRestrictionList.put(fqn, value)
+
+                    if (params.isPlaceholderInjectionAllowed) {
+                        funFqnValidForInjection.add(fqn)
                     }
                 }
             }
+            funFqnToSectionRestrictionList
 
             SnakemakeAPIProjectState(
                 contextType2SingleArgSectionKeywords = contextType2SingleArgSectionKeywords.toImmutableMap(),
@@ -452,6 +455,8 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
 
                 functionDeprecationsByShortName = apiProvider.getFunctionDeprecationsByShortName(smkLangVers).toMap().toImmutableMap(),
                 functionDeprecationsByFqn = apiProvider.getFunctionDeprecationsByFqn(smkLangVers).toMap().toImmutableMap(),
+                funFqnValidForInjection = funFqnValidForInjection.toImmutableSet(),
+                funShortNamesValidForInjection = funFqnValidForInjection.map() { fqn -> fqn.split(".").last()}.toImmutableSet(),
             )
         }
         state = newState
@@ -510,13 +515,15 @@ internal data class SnakemakeAPIProjectState(
     val funFqnToSectionRestrictionList: Map<String, Array<String>>,
     val functionDeprecationsByShortName: Map<String, Map.Entry<SmkLanguageVersion, SmkKeywordDeprecationParams>>,
     val functionDeprecationsByFqn: Map<String, Map.Entry<SmkLanguageVersion, SmkKeywordDeprecationParams>>,
+    val funFqnValidForInjection: Set<String>,
+    val funShortNamesValidForInjection: Set<String>,
 ) {
     val subsectionsAllPossibleArgNames = contextTypeAndSubsection2LambdaArgs.values.flatMap { it.asIterable() }.toImmutableSet()
 
     companion object {
         val EMPTY = SnakemakeAPIProjectState(
             emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(),
-            emptyMap(), emptyMap(),
+            emptyMap(), emptyMap(), emptySet(), emptySet()
         )
     }
 }

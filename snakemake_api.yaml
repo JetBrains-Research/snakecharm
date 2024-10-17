@@ -37,12 +37,14 @@ changelog:
       - name: "snakemake.ioflags.update"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#updating-existing-output-files
         type: "function"
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "output"
 
       - name: "snakemake.ioflags.before_update"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#updating-existing-output-files
         type: "function"
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "input"
 
@@ -52,6 +54,7 @@ changelog:
       - name: "snakemake.io.from_queue"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#continuously-updated-input
         type: "function"
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "output"
 
@@ -89,6 +92,7 @@ changelog:
 
       - name: "snakemake.io.ensure"
         type: "function"
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "output"
   # ----------------------
@@ -104,6 +108,7 @@ changelog:
       - name: "snakemake.io.service"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#service-rules-jobs
         type: "function"
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "output"
   # ----------------------
@@ -241,6 +246,7 @@ changelog:
       - name: "snakemake.io.report"
         type: "function"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/reporting.html#reports
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "output"
 
@@ -251,6 +257,7 @@ changelog:
       - name: "snakemake.io.pipe"
         type: "function"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#piped-output
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "output"
 
@@ -456,6 +463,7 @@ changelog:
       - name: "snakemake.io.protected"
         type: "function"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#protected-and-temporary-files
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "output"
           - "log"
@@ -464,24 +472,28 @@ changelog:
       - name: "snakemake.io.directory"
         type: "function"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#directories-as-outputs
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "output"
 
       - name: "snakemake.io.temp"
         type: "function"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#protected-and-temporary-files
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "output"
 
       - name: "snakemake.io.temporary"
         type: "function"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#protected-and-temporary-files
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "output"
 
       - name: "snakemake.io.touch"
         type: "function"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#flag-files
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "output"
           - "benchmark"
@@ -496,16 +508,42 @@ changelog:
       - name: "snakemake.io.repeat"
         type: "function"
         docs_url: https://snakemake.readthedocs.io/en/stable/tutorial/additional_features.html#benchmarking
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "benchmark"
 
       - name: "snakemake.io.dynamic"
         type: "function"
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "output"
 
       - name: "snakemake.io.local"
         type: "function"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/storage.html#local-input-output-files
+        placeholders_injection_allowed: True
         limit_to_sections:
           - "input"
+
+      - name: "snakemake.io.expand"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#the-expand-function
+        placeholders_injection_allowed: True
+
+      - name: "snakemake.io.multiext"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#the-multiext-function
+        placeholders_injection_allowed: True
+
+      - name: "posixpath.join"
+        type: "function"
+        placeholders_injection_allowed: True
+
+      - name: "os.path.join"
+        type: "function"
+        placeholders_injection_allowed: True
+
+      - name: "snakemake.shell.shell"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#snakefiles-and-rules
+        placeholders_injection_allowed: True
