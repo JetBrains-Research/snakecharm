@@ -21,7 +21,7 @@ import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.TOPLEVEL_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_DECLARATION_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
 import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkAPIAnnParsingContextType
@@ -187,7 +187,8 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
         result: CompletionResultSet
     ) {
         val element = parameters.position
-        val keywords = SnakemakeAPIService.getInstance().RULE_OR_CHECKPOINT_SECTION_KEYWORDS
+        val api = SnakemakeAPIProjectService.getInstance(element.project)
+        val keywords = api.getRuleOrCheckpointArgsSectionKeywords()
         filterByDeprecationAndAddLookupItems(element.project, keywords, result, priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY){
             val smkRuleOrCheckpoint = PsiTreeUtil.getParentOfType(element, SmkRuleOrCheckpoint::class.java)
             requireNotNull(smkRuleOrCheckpoint) {
@@ -240,7 +241,8 @@ object ModuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>(
         result: CompletionResultSet
     ) {
         val element = parameters.position
-        val keywords = SnakemakeAPIService.getInstance().MODULE_SECTIONS_KEYWORDS
+        val api = SnakemakeAPIProjectService.getInstance(element.project)
+        val keywords = api.getModuleSectionKeywords()
         filterByDeprecationAndAddLookupItems(element.project, keywords, result, priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY) {
             val smkModule = PsiTreeUtil.getParentOfType(element, SmkModule::class.java)
             requireNotNull(smkModule) {
@@ -277,7 +279,8 @@ object UseSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
             )
         }
 
-        val keywords = SnakemakeAPIService.getInstance().USE_SECTIONS_KEYWORDS
+        val api = SnakemakeAPIProjectService.getInstance(parameters.position.project)
+        val keywords = api.getUseSectionKeywords()
         filterByDeprecationAndAddLookupItems(
             parameters.position.project,
             keywords,

@@ -14,7 +14,7 @@ import com.jetbrains.python.psi.PyBinaryExpression
 import com.jetbrains.python.psi.PyStringElement
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
 
@@ -29,6 +29,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+        val api = SnakemakeAPIProjectService.getInstance(holder.project)
 
         override fun visitSmkUse(use: SmkUse) {
             val logSection = use.getSectionByName(SnakemakeNames.SECTION_LOG) ?: return
@@ -59,7 +60,7 @@ class SmkUnusedLogFileInspection : SnakemakeInspection() {
         ) {
             val ruleSections = rule.getSections()
             val skipValidation = ruleSections.any { section ->
-                section.sectionKeyword in EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE
+                section.sectionKeyword in api.getExecutionSectionsKeywordsThatAcceptsSnakemakeObj()
             }
             if (skipValidation) {
                 return

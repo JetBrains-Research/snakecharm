@@ -27,7 +27,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.FakeSnakemakeInjector
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperCrawler
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.inspections.SmkUnrecognizedSectionInspection
@@ -632,8 +632,9 @@ class ActionsSteps {
                 FileDocumentManager.getInstance().getDocument(it)!!.text
             } ?: ""
 
+            val api = SnakemakeAPIProjectService.getInstance(fixture.project)
             val info = SmkWrapperCrawler.collectWrapperInfo(
-                "wrapper", wrapperFileContent, ext, metaYamlContent, SnakemakeAPIService.getInstance().RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
+                "wrapper", wrapperFileContent, ext, metaYamlContent, api.getRuleOrCheckpointArgsSectionKeywords()
             )
 
             val args = info.args

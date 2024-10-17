@@ -13,7 +13,7 @@ import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.lang.psi.*
 
 class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
@@ -22,6 +22,7 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
+        val api = SnakemakeAPIProjectService.getInstance(holder.project)
 
         override fun visitSmkRule(rule: SmkRule) {
             visitSMKRuleLike(rule)
@@ -38,7 +39,7 @@ class SmkRuleSectionAfterExecutionInspection : SnakemakeInspection() {
             for (st in sections) {
                 if (st is SmkRuleOrCheckpointArgsSection) {
                     val sectionName = st.sectionKeyword ?: return
-                    val isExecutionSection = sectionName in EXECUTION_SECTIONS_KEYWORDS
+                    val isExecutionSection = sectionName in api.getExecutionSectionsKeyword()
                     if (isExecutionSection) {
                         executionSection = st
                     }

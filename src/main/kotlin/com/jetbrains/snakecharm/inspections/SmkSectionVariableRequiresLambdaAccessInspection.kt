@@ -10,7 +10,6 @@ import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIService
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 
 class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
@@ -19,8 +18,7 @@ class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
-        val apiService = SnakemakeAPIService.getInstance()
-        val apiProjectService = SnakemakeAPIProjectService.getInstance(holder.project)
+        val api = SnakemakeAPIProjectService.getInstance(holder.project)
 
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {
             @Suppress("UnstableApiUsage")
@@ -32,8 +30,8 @@ class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
             val varName = node.referencedName
             // Not allowed arg (e.g. wildcards, ..) and not section keyword (e.g. 'threads', 'version' etc)
             if (varName == null || (
-                        (varName !in apiProjectService.getSubsectionPossibleLambdaParamNames()) &&
-                                ( varName !in apiService.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS))
+                        (varName !in api.getSubsectionPossibleLambdaParamNames()) &&
+                                ( varName !in api.getRuleOrCheckpointSectionKeywords()))
                 ) {
                 // Not suitable case
                 return
@@ -50,7 +48,7 @@ class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
                 (lambdaOrSectionExpr as PyLambdaExpression) to sectionArg
             }
             val context = containingArgsSection.getParentRuleOrCheckPoint()?.sectionKeyword
-            val supportedVarNames = apiProjectService.getLambdaArgsForSubsection(containingArgsSection.sectionKeyword, context)
+            val supportedVarNames = api.getLambdaArgsForSubsection(containingArgsSection.sectionKeyword, context)
             val varNameIsSupportedByLambda = supportedVarNames.contains(varName)
 
             val resolve = node.reference.resolve()

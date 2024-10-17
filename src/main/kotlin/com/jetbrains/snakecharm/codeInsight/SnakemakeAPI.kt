@@ -1,11 +1,9 @@
 package com.jetbrains.snakecharm.codeInsight
 
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.framework.SmkAPISubsectionContextAndDirective
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
@@ -169,33 +167,6 @@ object SnakemakeAPI {
     val SMK_API_VERS_6_1 = "6.1"
 }
 
-@Service
-class SnakemakeAPIService {
-    val RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS = SnakemakeFrameworkAPIProvider.getInstance()
-        .collectAllPossibleRuleOrCheckpointSubsectionKeywords()
-
-    val RULE_OR_CHECKPOINT_SECTION_KEYWORDS = (RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS + setOf(SECTION_RUN))
-
-    val USE_SECTIONS_KEYWORDS = RULE_OR_CHECKPOINT_SECTION_KEYWORDS + SnakemakeFrameworkAPIProvider.getInstance()
-        .collectAllPossibleUseSubsectionKeywords() - EXECUTION_SECTIONS_KEYWORDS - SECTION_RUN
-
-    /**
-     * For modules codeInsight
-     */
-    val MODULE_SECTIONS_KEYWORDS = setOf(
-        MODULE_SNAKEFILE_KEYWORD,
-        MODULE_CONFIG_KEYWORD,
-        MODULE_SKIP_VALIDATION_KEYWORD,
-        MODULE_META_WRAPPER_KEYWORD,
-        MODULE_REPLACE_PREFIX_KEYWORD
-    ) + SnakemakeFrameworkAPIProvider.getInstance()
-        .collectAllPossibleModuleSubsectionKeywords()
-
-    companion object {
-        fun getInstance() = ApplicationManager.getApplication().getService(SnakemakeAPIService::class.java)!!
-    }
-}
-
 @Service(Service.Level.PROJECT)
 class SnakemakeAPIProjectService(val project: Project): Disposable {
     private var state: SnakemakeAPIProjectState = SnakemakeAPIProjectState.EMPTY
@@ -339,6 +310,60 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
             }
         }
         return emptySet()
+    }
+
+    fun getExecutionSectionsKeywordsThatAcceptsSnakemakeObj(): Set<String> {
+        /**
+         * Sections that execute external script with access to 'snakemake' object, i.e to 'snakemake.input',
+         * 'snakemake.params' etc settings. So we cannot verify that log section mentioned in rule is
+         * unused.
+         */
+        val EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE = setOf(
+            SECTION_WRAPPER, SECTION_NOTEBOOK, SECTION_SCRIPT, SECTION_CWL,
+            SECTION_TEMPLATE_ENGINE
+        )
+        return EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE
+    }
+
+    fun getExecutionSectionsKeyword(): Set<String> {
+        val EXECUTION_SECTIONS_KEYWORDS = setOf(
+            SECTION_SHELL,
+            *getExecutionSectionsKeywordsThatAcceptsSnakemakeObj().toTypedArray()
+        )
+        return EXECUTION_SECTIONS_KEYWORDS
+    }
+
+    fun getModuleSectionKeywords(): Set<String> {
+        /**
+         * For modules codeInsight
+         */
+        val MODULE_SECTIONS_KEYWORDS = setOf(
+            MODULE_SNAKEFILE_KEYWORD,
+            MODULE_CONFIG_KEYWORD,
+            MODULE_SKIP_VALIDATION_KEYWORD,
+            MODULE_META_WRAPPER_KEYWORD,
+            MODULE_REPLACE_PREFIX_KEYWORD
+        ) + SnakemakeFrameworkAPIProvider.getInstance()
+            .collectAllPossibleModuleSubsectionKeywords()
+        return MODULE_SECTIONS_KEYWORDS
+    }
+
+    fun getRuleOrCheckpointArgsSectionKeywords(): Set<String> {
+        val RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS = SnakemakeFrameworkAPIProvider.getInstance()
+            .collectAllPossibleRuleOrCheckpointSubsectionKeywords()
+        return RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
+    }
+
+    fun getRuleOrCheckpointSectionKeywords(): Set<String> {
+        val RULE_OR_CHECKPOINT_SECTION_KEYWORDS = (getRuleOrCheckpointArgsSectionKeywords() + setOf(SECTION_RUN))
+        return RULE_OR_CHECKPOINT_SECTION_KEYWORDS
+    }
+
+    fun getUseSectionKeywords(): Set<String> {
+        val USE_SECTIONS_KEYWORDS = getRuleOrCheckpointSectionKeywords() + SnakemakeFrameworkAPIProvider.getInstance()
+            .collectAllPossibleUseSubsectionKeywords() - getExecutionSectionsKeyword() - SECTION_RUN
+
+        return USE_SECTIONS_KEYWORDS
     }
 
     private fun doRefresh(version: String?) {

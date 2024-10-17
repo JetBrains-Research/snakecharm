@@ -5,9 +5,8 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.codeInspection.ui.ListEditForm
 import com.intellij.psi.util.elementType
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.EXECUTION_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
 import com.jetbrains.snakecharm.inspections.quickfix.AddIgnoredElementQuickFix
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RUN
 import com.jetbrains.snakecharm.lang.psi.*
@@ -23,7 +22,7 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
-        val snakeApiService = SnakemakeAPIService.getInstance()
+        val api = SnakemakeAPIProjectService.getInstance(holder.project)
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
             isSectionRecognized(st, SUBWORKFLOW_SECTIONS_KEYWORDS)
@@ -31,14 +30,14 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
             if (st.originalElement.elementType == SmkElementTypes.USE_ARGS_SECTION_STATEMENT) {
-                isSectionRecognized(st, snakeApiService.USE_SECTIONS_KEYWORDS)
+                isSectionRecognized(st, api.getUseSectionKeywords())
             } else {
-                isSectionRecognized(st, snakeApiService.RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS)
+                isSectionRecognized(st, api.getRuleOrCheckpointArgsSectionKeywords())
             }
         }
 
         override fun visitSmkModuleArgsSection(st: SmkModuleArgsSection) {
-            isSectionRecognized(st, snakeApiService.MODULE_SECTIONS_KEYWORDS)
+            isSectionRecognized(st, api.getModuleSectionKeywords())
         }
 
         /**
@@ -54,7 +53,7 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
 
             if (sectionNamePsi != null && sectionKeyword != null && sectionKeyword !in setOfValidNames
                 && sectionKeyword !in ignoredItems && !(argsSection.getParentRuleOrCheckPoint() is SmkUse
-                        && sectionKeyword in (EXECUTION_SECTIONS_KEYWORDS + SECTION_RUN))
+                        && sectionKeyword in (api.getExecutionSectionsKeyword() + SECTION_RUN))
             ) {
                 registerProblem(
                     sectionNamePsi,
