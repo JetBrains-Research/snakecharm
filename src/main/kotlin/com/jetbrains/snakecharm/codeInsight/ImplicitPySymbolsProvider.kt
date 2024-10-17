@@ -635,6 +635,9 @@ class ImplicitPySymbolsProvider(
         }
         globals["workflow"] = workflowFile?.findTopLevelClass("Workflow")
 
+        // XXX: for some reason cannot directly resolve here 'snakemake.common.Rules' using 'resolveQualifiedName()'
+        //   it sounds better to resolve required class FQN instead of looking for 1) file 2) then looking for class
+
         // Snakemake >= 6.5
         var commonFile = collectPyFiles("snakemake.common.__init__", usedFiles, sdk).firstOrNull()
         if (commonFile == null) {
