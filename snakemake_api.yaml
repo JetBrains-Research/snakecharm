@@ -24,6 +24,7 @@ defaultVersion: "7.32.4"
 #    * placeholders_resolved_as_wildcards: False   | e.g. in output: "{params}" - 'params' is not params section, but wildcard name
 #    * is_accessible_in_rule_obj: False            | for things like rules.NAME.<section>
 #    * is_accessible_as_placeholder: False         | e.g. in `shell: "{<section>}"` and  other sections where placeholders not treated as wildcards
+#    * execution_section: False                    | e.g. 'shell', 'notebook', 'wrapper',.. - sections that starts rule execution
 #    * placeholders_injection_allowed: False (for function), True (else)  | if True, than snakemake expands placeholders before call, e.g. like in 'shell' sections in some flag functions from snakemake.io
 #    * lambda_args: []                             | e.g. lambda args for 'params' and 'input' sections are different
 #    * limit_to_sections: []                       | some snakemake.io flag-functions could be used only in certain sections
@@ -104,6 +105,7 @@ changelog:
         multiple_args_allowed: False
         keyword_args_allowed: False
         placeholders_injection_allowed: False
+        execution_section: True
 
       - name: "snakemake.io.service"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#service-rules-jobs
@@ -269,6 +271,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        execution_section: True
 
       - name: "conda"
         type: "rule-like"
@@ -317,6 +320,7 @@ changelog:
         keyword_args_allowed: False
         placeholders_injection_allowed: False
         is_accessible_in_rule_obj: True
+        execution_section: True
 
   # ----------------------
   - version: "3.5.2"
@@ -326,12 +330,14 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        execution_section: True
 
       - name: "notebook"
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
         placeholders_injection_allowed: False
+        execution_section: True
 
   # ----------------------
   # Not sure when these sections were introduced, let's use `1.0` version
@@ -438,6 +444,7 @@ changelog:
         type: "rule-like"
         multiple_args_allowed: False
         keyword_args_allowed: False
+        execution_section: True
 
       - name: "workdir"
         type: "top-level"

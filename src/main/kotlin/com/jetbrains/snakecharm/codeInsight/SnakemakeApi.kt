@@ -13,6 +13,7 @@ import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkApiAnnotati
 import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkApiAnnotationParsingContextType
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import com.jetbrains.snakecharm.lang.SnakemakeNames
+import com.jetbrains.snakecharm.lang.SnakemakeNames.CHECKPOINT_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_CONFIG_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_META_WRAPPER_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_REPLACE_PREFIX_KEYWORD
@@ -20,15 +21,10 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_SKIP_VALIDATION_KEYWO
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_SNAKEFILE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RULE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_BENCHMARK
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_CWL
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_LOG
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_NOTEBOOK
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_OUTPUT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RUN
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_SCRIPT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_SHELL
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_TEMPLATE_ENGINE
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_WRAPPER
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_AS_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_FROM_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_WITH_KEYWORD
@@ -235,12 +231,12 @@ class SnakemakeApiService(val project: Project): Disposable {
     }
 
     fun getFunctionDeprecationByFqn(fqn: String): Pair<SmkLanguageVersion, SmkApiAnnotationKeywordDeprecationParams>? {
-        val entry = state.functionDeprecationsByFqn[fqn]
+        val entry = state.funFqnDeprecations[fqn]
         return if (entry == null) null else (entry.key to entry.value)
     }
 
     fun getFunctionDeprecationByShortName(fqn: String): Pair<SmkLanguageVersion, SmkApiAnnotationKeywordDeprecationParams>? {
-        val entry = state.functionDeprecationsByShortName[fqn]
+        val entry = state.funShortNameDeprecations[fqn]
         return if (entry == null) null else (entry.key to entry.value)
     }
 
@@ -297,25 +293,20 @@ class SnakemakeApiService(val project: Project): Disposable {
         return emptySet()
     }
 
-    fun getExecutionSectionsKeywordsThatAcceptsSnakemakeObj(): Set<String> {
-        /**
-         * Sections that execute external script with access to 'snakemake' object, i.e to 'snakemake.input',
-         * 'snakemake.params' etc settings. So we cannot verify that log section mentioned in rule is
-         * unused.
-         */
-        val EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE = setOf(
-            SECTION_WRAPPER, SECTION_NOTEBOOK, SECTION_SCRIPT, SECTION_CWL,
-            SECTION_TEMPLATE_ENGINE
-        )
-        return EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE
-    }
+    /**
+     * Sections that execute external script with access to 'snakemake' object, i.e to 'snakemake.input',
+     * 'snakemake.params' etc settings. So we cannot verify that log section mentioned in rule is
+     * unused.
+     */
+    fun getExecutionSectionsKeywordsThatAcceptsSnakemakeObj(): Set<String> =
+        getExecutionSectionsKeyword() - setOf(SECTION_SHELL)
 
     fun getExecutionSectionsKeyword(): Set<String> {
-        val EXECUTION_SECTIONS_KEYWORDS = setOf(
-            SECTION_SHELL,
-            *getExecutionSectionsKeywordsThatAcceptsSnakemakeObj().toTypedArray()
-        )
-        return EXECUTION_SECTIONS_KEYWORDS
+        val keywords = state.contextType2ExecutionSectionSubsectionKeywords[RULE_KEYWORD]
+        if (keywords != null) {
+            return keywords.toSet()
+        }
+        return emptySet()
     }
 
     fun getModuleSectionKeywords(): Set<String> {
@@ -364,6 +355,7 @@ class SnakemakeApiService(val project: Project): Disposable {
             val contextType2WildcardsExpandingSubsectionKeywords = HashMap<String, MutableSet<String>>()
             val contextType2AccessibleInRuleObjectSubsectionKeywords = HashMap<String, MutableSet<String>>()
             val contextType2AccessibleAccessibleAsPlaceholderSubsectionKeywords = HashMap<String, MutableSet<String>>()
+            val contextType2ExecutionSectionSubsectionKeywords = HashMap<String, MutableSet<String>>()
             val funFqnToSectionRestrictionList = HashMap<String, Array<String>>()
             val funFqnValidForInjection = mutableSetOf<String>()
 
@@ -448,6 +440,15 @@ class SnakemakeApiService(val project: Project): Disposable {
                     }
                     contextTypeAndSubsection2LambdaArgs.put(ctxAndName, value)
                 }
+                if (params.isExecutionSection) {
+                    val context = ctxAndName.contextType
+                    if (context == RULE_KEYWORD || context == CHECKPOINT_KEYWORD) {
+                        val keywords = contextType2ExecutionSectionSubsectionKeywords.getOrPut(context) {
+                            mutableSetOf<String>()
+                        }
+                        keywords.add(ctxAndName.directiveKeyword)
+                    }
+                }
             }
 
             // functions
@@ -476,10 +477,11 @@ class SnakemakeApiService(val project: Project): Disposable {
                 contextType2WildcardsExpandingSubsectionKeywords = contextType2WildcardsExpandingSubsectionKeywords.toImmutableMap(),
                 contextType2AccessibleInRuleObjectSubsectionKeywords = contextType2AccessibleInRuleObjectSubsectionKeywords.toImmutableMap(),
                 contextType2AccessibleAccessibleAsPlaceholderSubsectionKeywords = contextType2AccessibleAccessibleAsPlaceholderSubsectionKeywords.toImmutableMap(),
+                contextType2ExecutionSectionSubsectionKeywords = contextType2ExecutionSectionSubsectionKeywords.toImmutableMap(),
                 funFqnToSectionRestrictionList = funFqnToSectionRestrictionList.toImmutableMap(),
 
-                functionDeprecationsByShortName = apiProvider.getFunctionDeprecationsByShortName(smkLangVers).toMap().toImmutableMap(),
-                functionDeprecationsByFqn = apiProvider.getFunctionDeprecationsByFqn(smkLangVers).toMap().toImmutableMap(),
+                funShortNameDeprecations = apiProvider.getFunctionDeprecationsByShortName(smkLangVers).toMap().toImmutableMap(),
+                funFqnDeprecations = apiProvider.getFunctionDeprecationsByFqn(smkLangVers).toMap().toImmutableMap(),
                 funFqnValidForInjection = funFqnValidForInjection.toImmutableSet(),
                 funShortNamesValidForInjection = funFqnValidForInjection.map() { fqn -> fqn.split(".").last()}.toImmutableSet(),
             )
@@ -535,11 +537,12 @@ internal data class SnakemakeApiStateForLangLevel(
     val contextTypeAndSubsection2LambdaArgs:  Map<SmkAPISubsectionContextAndDirective, Array<String>>,
     val contextType2NotValidForInjectionSubsectionKeywords:  Map<String, Set<String>>,
     val contextType2WildcardsExpandingSubsectionKeywords:  Map<String, Set<String>>,
+    val contextType2ExecutionSectionSubsectionKeywords:  Map<String, Set<String>>,
     val contextType2AccessibleInRuleObjectSubsectionKeywords:  Map<String, Set<String>>,
     val contextType2AccessibleAccessibleAsPlaceholderSubsectionKeywords:  Map<String, Set<String>>,
     val funFqnToSectionRestrictionList: Map<String, Array<String>>,
-    val functionDeprecationsByShortName: Map<String, Map.Entry<SmkLanguageVersion, SmkApiAnnotationKeywordDeprecationParams>>,
-    val functionDeprecationsByFqn: Map<String, Map.Entry<SmkLanguageVersion, SmkApiAnnotationKeywordDeprecationParams>>,
+    val funShortNameDeprecations: Map<String, Map.Entry<SmkLanguageVersion, SmkApiAnnotationKeywordDeprecationParams>>,
+    val funFqnDeprecations: Map<String, Map.Entry<SmkLanguageVersion, SmkApiAnnotationKeywordDeprecationParams>>,
     val funFqnValidForInjection: Set<String>,
     val funShortNamesValidForInjection: Set<String>,
 ) {
@@ -548,7 +551,7 @@ internal data class SnakemakeApiStateForLangLevel(
     companion object {
         val EMPTY = SnakemakeApiStateForLangLevel(
             emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(),
-            emptyMap(), emptyMap(), emptySet(), emptySet()
+            emptyMap(), emptyMap(), emptyMap(), emptySet(), emptySet()
         )
     }
 }

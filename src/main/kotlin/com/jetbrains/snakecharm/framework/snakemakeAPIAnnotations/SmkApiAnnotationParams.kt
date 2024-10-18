@@ -25,6 +25,7 @@ data class SmkApiAnnotationKeywordIntroductionParams(
     val isAccessibleInRuleObj: Boolean,
     val isAccessibleAsPlaceholder: Boolean,
     val limitToSections: List<String>,
+    val isExecutionSection: Boolean,
 ) {
     companion object {
         fun createFrom(rec: SmkApiAnnotationParsingIntroductionRecord) = SmkApiAnnotationKeywordIntroductionParams(
@@ -45,6 +46,7 @@ data class SmkApiAnnotationKeywordIntroductionParams(
             isPlaceholderExpandedToWildcard = rec.placeholders_resolved_as_wildcards,
             isAccessibleInRuleObj = rec.is_accessible_in_rule_obj,
             isAccessibleAsPlaceholder = rec.is_accessible_as_placeholder,
+            isExecutionSection = rec.execution_section,
         )
     }
 }

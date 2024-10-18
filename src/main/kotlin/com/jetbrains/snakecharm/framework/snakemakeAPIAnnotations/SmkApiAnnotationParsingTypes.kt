@@ -34,6 +34,7 @@ data class SmkApiAnnotationParsingIntroductionRecord(
     val placeholders_resolved_as_wildcards: Boolean = false,
     val is_accessible_in_rule_obj: Boolean = false,
     val is_accessible_as_placeholder: Boolean = false,
+    val execution_section: Boolean = false,
     // for functions:
     val limit_to_sections: List<String> = emptyList<String>(),
 ): SmkApiAnnotationParsingAbstractRecord
