@@ -32,7 +32,7 @@ object SnakemakeNames {
     const val SUBWORKFLOW_CONFIGFILE_KEYWORD = WORKFLOW_CONFIGFILE_KEYWORD
     const val SUBWORKFLOW_SNAKEFILE_KEYWORD = "snakefile"
 
-    const val MODULE_KEYWORD = "module"
+    const val MODULE_KEYWORD = "module" // See: ./snakemake/modules.py, ./snakemake/parser.py::Module(GlobalKeywordState)
     const val MODULE_SNAKEFILE_KEYWORD = "snakefile"
     const val MODULE_CONFIG_KEYWORD = "config"
     const val MODULE_SKIP_VALIDATION_KEYWORD = "skip_validation"
