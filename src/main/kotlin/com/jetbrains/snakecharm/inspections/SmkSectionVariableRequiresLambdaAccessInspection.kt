@@ -31,7 +31,7 @@ class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
             // Not allowed arg (e.g. wildcards, ..) and not section keyword (e.g. 'threads', 'version' etc)
             if (varName == null || (
                         (varName !in api.getSubsectionPossibleLambdaParamNames()) &&
-                                ( varName !in api.getRuleOrCheckpointSectionKeywords()))
+                                ( varName !in api.getRuleOrCheckpointArgsSectionKeywords()))
                 ) {
                 // Not suitable case
                 return

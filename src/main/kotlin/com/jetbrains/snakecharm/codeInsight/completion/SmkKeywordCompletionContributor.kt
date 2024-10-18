@@ -188,7 +188,7 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
     ) {
         val element = parameters.position
         val api = SnakemakeAPIProjectService.getInstance(element.project)
-        val keywords = api.getRuleOrCheckpointArgsSectionKeywords()
+        val keywords = api.getRuleOrCheckpointSectionKeywords()
         filterByDeprecationAndAddLookupItems(element.project, keywords, result, priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY){
             val smkRuleOrCheckpoint = PsiTreeUtil.getParentOfType(element, SmkRuleOrCheckpoint::class.java)
             requireNotNull(smkRuleOrCheckpoint) {
