@@ -34,10 +34,6 @@ object SnakemakeNames {
 
     const val MODULE_KEYWORD = "module" // See: ./snakemake/modules.py, ./snakemake/parser.py::Module(GlobalKeywordState)
     const val MODULE_SNAKEFILE_KEYWORD = "snakefile"
-    const val MODULE_CONFIG_KEYWORD = "config"
-    const val MODULE_SKIP_VALIDATION_KEYWORD = "skip_validation"
-    const val MODULE_META_WRAPPER_KEYWORD = "meta_wrapper"
-    const val MODULE_REPLACE_PREFIX_KEYWORD = "replace_prefix"
 
     const val USE_KEYWORD = "use"
     const val USE_EXCLUDE_KEYWORD = "exclude"
@@ -57,7 +53,6 @@ object SnakemakeNames {
     const val SECTION_SHELL = "shell"
     const val SECTION_SCRIPT = "script"
     const val SECTION_WRAPPER = "wrapper"
-    const val SECTION_CWL = "cwl"
     const val SECTION_SHADOW = "shadow"
     const val SECTION_RUN = "run"
     const val SECTION_NOTEBOOK = "notebook"
