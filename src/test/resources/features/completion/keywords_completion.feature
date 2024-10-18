@@ -378,7 +378,7 @@ Feature: Completion for snakemake keyword-like things
       | rule_like  | rule_like_removed | lang_version | expected_item   | expected_item_type              | missing_item | deprecated_key | removed_key | introduced_key |
       | rule       | rule              | 1.0.0        | input           | deprecated 1.0.0, removed 2.0.0 | output       | input          | output      | log            |
       | rule       | checkpoint        | 1.0.0        | output          |                                 | xxx          | input          | output      | log            |
-      | rule       | module            | 1.0.0        | output          |                                 | xxx          | input          | output      | log            |
+      | rule       | module            | 1.0.0        | input          |         deprecated 1.0.0, removed 2.0.0                        | output          | input          | output      | log            |
       | checkpoint | checkpoint        | 1.0.0        | input           | deprecated 1.0.0, removed 2.0.0 | output       | input          | output      | log            |
       | rule       | rule              | 2.0.0        | log             | >=2.0.0                         | input        | input          | output      | log            |
       | rule       | rule              | 1.0.0        | threads         | >=0.0.1, deprecated 2.0.0       | xxx          | input          | output      | log            |

@@ -15,6 +15,7 @@ data class SmkKeywordDeprecationParams(
 }
 
 data class SmkKeywordIntroductionParams(
+    //val name: String,
     val lambdaArgs: List<String>,
     val keywordArgsAllowed: Boolean,
     val multipleArgsAllowed: Boolean,
@@ -27,6 +28,7 @@ data class SmkKeywordIntroductionParams(
 ) {
     companion object {
         fun createFrom(rec: SmkAPIAnnParsingIntroductionRecord) = SmkKeywordIntroductionParams(
+            //name = rec.name,
             lambdaArgs = rec.lambda_args,
             limitToSections = rec.limit_to_sections,
             keywordArgsAllowed = rec.keyword_args_allowed,

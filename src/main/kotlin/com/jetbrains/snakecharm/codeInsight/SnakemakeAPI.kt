@@ -455,18 +455,25 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
                     }
                     contextTypeAndSubsection2LambdaArgs.put(ctxAndName, value)
                 }
+            }
 
-                // functions
-                val funcIntroductionsByFqn = apiProvider.getFunctionIntroductionsByFqn(smkLangVers)
-                funcIntroductionsByFqn.forEach { (fqn, versAndParams) ->
-                    val (_, params) = versAndParams
+            // functions
+            val funcIntroductionsByFqn = apiProvider.getFunctionIntroductionsByFqn(smkLangVers)
+            funcIntroductionsByFqn.forEach { (fqn, versAndParams) ->
+                val (_, params) = versAndParams
 
-                    if (params.isPlaceholderInjectionAllowed) {
-                        funFqnValidForInjection.add(fqn)
+                if (params.limitToSections.isNotEmpty()) {
+                    val value = params.limitToSections.toTypedArray()
+                    require(value.isNotEmpty()) {
+                        "YAML format error: 'limitToSections' should not be empty for function '${fqn}'."
                     }
+                    funFqnToSectionRestrictionList.put(fqn, value)
+                }
+
+                if (params.isPlaceholderInjectionAllowed) {
+                    funFqnValidForInjection.add(fqn)
                 }
             }
-            funFqnToSectionRestrictionList
 
             SnakemakeAPIProjectState(
                 contextType2SingleArgSectionKeywords = contextType2SingleArgSectionKeywords.toImmutableMap(),
