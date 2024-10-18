@@ -329,6 +329,7 @@ Feature: Completion for snakemake keyword-like things
       | module     | m   | meta_wrapper         |
       | module     | s   | skip_validation      |
       | module     | r   | replace_prefix       |
+      | module     | p   | prefix               |
 
   Scenario Outline: Complete at rule/checkpoint/module level with respect to deprecations
     Given a snakemake project
