@@ -58,6 +58,7 @@ object SnakemakeApi {
     const val SMK_FUN_EXPAND = "expand"
 
     val FUNCTIONS_BANNED_FOR_WILDCARDS = listOf(
+        // TODO: Is possible to move into YAML
         SMK_FUN_EXPAND
     )
 
@@ -67,6 +68,7 @@ object SnakemakeApi {
     /**
      * Also see [SmkImplicitPySymbolsProvider], it also processes 'InputFiles', etc. symbols
      */
+    // TODO: Is possible to move into YAML
     val SECTION_ACCESSOR_CLASSES = mapOf(
         "snakemake.io.InputFiles" to "input",
         "snakemake.io.OutputFiles" to "output",
