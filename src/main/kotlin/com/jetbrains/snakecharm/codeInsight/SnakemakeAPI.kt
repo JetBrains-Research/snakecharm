@@ -425,22 +425,30 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
                 }
                 if (!params.isPlaceholderInjectionAllowed) {
                     val context = ctxAndName.contextType
-                    val keywords = contextType2NotValidForInjectionSubsectionKeywords.getOrPut(context) { mutableSetOf<String>() }
+                    val keywords = contextType2NotValidForInjectionSubsectionKeywords.getOrPut(context) {
+                        mutableSetOf<String>()
+                    }
                     keywords.add(ctxAndName.directiveKeyword)
                 }
                 if (params.isPlaceholderExpandedToWildcard) {
                     val context = ctxAndName.contextType
-                    val keywords = contextType2WildcardsExpandingSubsectionKeywords.getOrPut(context) { mutableSetOf<String>() }
+                    val keywords = contextType2WildcardsExpandingSubsectionKeywords.getOrPut(context) {
+                        mutableSetOf<String>()
+                    }
                     keywords.add(ctxAndName.directiveKeyword)
                 }
                 if (params.isAccessibleInRuleObj) {
                     val context = ctxAndName.contextType
-                    val keywords = contextType2AccessibleInRuleObjectSubsectionKeywords.getOrPut(context) { mutableSetOf<String>() }
+                    val keywords = contextType2AccessibleInRuleObjectSubsectionKeywords.getOrPut(context) {
+                        mutableSetOf<String>()
+                    }
                     keywords.add(ctxAndName.directiveKeyword)
                 }
                 if (params.isAccessibleAsPlaceholder) {
                     val context = ctxAndName.contextType
-                    val keywords = contextType2AccessibleAccessibleAsPlaceholderSubsectionKeywords.getOrPut(context) { mutableSetOf<String>() }
+                    val keywords = contextType2AccessibleAccessibleAsPlaceholderSubsectionKeywords.getOrPut(context) {
+                        mutableSetOf<String>()
+                    }
                     keywords.add(ctxAndName.directiveKeyword)
                 }
 
