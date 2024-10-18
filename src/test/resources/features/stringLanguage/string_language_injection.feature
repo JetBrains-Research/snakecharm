@@ -229,7 +229,7 @@ Feature: Tests on snakemake string language injection
       | path.join    |                           |
       | os.path.join |                           |
 
-  Scenario Outline: Inject in snakemake function calls configured by API-0
+  Scenario Outline: Inject in snakemake function calls configured by API
     Given a snakemake project
     And snakemake framework api yaml descriptor is
     """
