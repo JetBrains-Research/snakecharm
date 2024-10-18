@@ -1,7 +1,7 @@
 package com.jetbrains.snakecharm.lang.psi
 
 import com.jetbrains.python.psi.PyTypedElement
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.lang.psi.impl.SmkWildcardFakePsiElement
 
 interface SmkRuleOrCheckpoint : SmkRuleLike<SmkRuleOrCheckpointArgsSection>,

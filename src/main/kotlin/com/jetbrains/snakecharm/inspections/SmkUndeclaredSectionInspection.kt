@@ -4,7 +4,7 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.inspections.smksl.SmkSLUndeclaredSectionInspectionUtil
 import com.jetbrains.snakecharm.lang.psi.impl.refs.SmkPyReferenceImpl
 
@@ -14,7 +14,7 @@ class SmkUndeclaredSectionInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
-        val api = SnakemakeAPIProjectService.getInstance(holder.project)
+        val api = SnakemakeApiService.getInstance(holder.project)
 
         override fun visitPyReferenceExpression(expr: PyReferenceExpression) {
             val ref = expr.reference

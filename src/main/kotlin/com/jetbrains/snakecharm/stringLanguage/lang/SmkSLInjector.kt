@@ -6,8 +6,8 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.codeInsight.PyInjectionUtil.InjectionResult
 import com.jetbrains.python.codeInsight.PyInjectorBase
 import com.jetbrains.python.psi.*
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_FUN_EXPAND
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_FUN_EXPAND
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
@@ -43,7 +43,7 @@ open class SmkSLInjector : PyInjectorBase() {
     }
 
     private fun PsiElement.isInValidCallExpression(): Boolean {
-        val api = SnakemakeAPIProjectService.getInstance(project)
+        val api = SnakemakeApiService.getInstance(project)
 
         val parentCallExpr = PsiTreeUtil.getParentOfType(this, PyCallExpression::class.java)
         val fqn = (parentCallExpr?.callee?.reference?.resolve() as? PyQualifiedNameOwner)?.qualifiedName
@@ -67,7 +67,7 @@ open class SmkSLInjector : PyInjectorBase() {
             val context = parentSection.getParentRuleOrCheckPoint().sectionKeyword
             val sectionKeyword = parentSection.sectionKeyword
             if (context != null && sectionKeyword != null) {
-                val apiService = SnakemakeAPIProjectService.getInstance(project)
+                val apiService = SnakemakeApiService.getInstance(project)
                 return apiService.isSubsectionValidForInjection(sectionKeyword, context)
             }
         }

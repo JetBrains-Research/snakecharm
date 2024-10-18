@@ -12,10 +12,10 @@ import com.jetbrains.python.psi.PyClass
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.resolve.CompletionVariantsProcessor
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
+import com.jetbrains.snakecharm.codeInsight.SmkImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_RULE
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
@@ -56,7 +56,7 @@ class SmkImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
         val contextScope = SmkCodeInsightScope[contextElement]
 
         val project = parameters.originalFile.project
-        val cache = ImplicitPySymbolsProvider.instance(project).cache
+        val cache = SmkImplicitPySymbolsProvider.instance(project).cache
 
         if (contextScope == SmkCodeInsightScope.RULELIKE_RUN_SECTION) {
             val ruleOrCheckpoint = PsiTreeUtil.getParentOfType(contextElement, SmkRuleOrCheckpoint::class.java)!!
@@ -64,7 +64,7 @@ class SmkImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
             // wildcards
             result.addElement(
                 SmkCompletionUtil.createPrioritizedLookupElement(
-                    SnakemakeAPI.SMK_VARS_WILDCARDS,
+                    SnakemakeApi.SMK_VARS_WILDCARDS,
                     ruleOrCheckpoint.wildcardsElement,
                     typeText = SnakemakeBundle.message("TYPES.rule.wildcard.type.text"),
                     priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
@@ -75,7 +75,7 @@ class SmkImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
             // * Do not add item if section exists (existing sections are in completion list as Named Elements)
             //   let's do not duplicate this
             // * If section in implicit provider => also avoid duplicated items
-            val api = SnakemakeAPIProjectService.getInstance(project)
+            val api = SnakemakeApiService.getInstance(project)
             val contextKeyword = ruleOrCheckpoint.sectionKeyword
             for (sectionName in api.getSubsectionAccessibleAsPlaceholder(contextKeyword)) {
                 if (cache.contains(SmkCodeInsightScope.RULELIKE_RUN_SECTION, sectionName)) {

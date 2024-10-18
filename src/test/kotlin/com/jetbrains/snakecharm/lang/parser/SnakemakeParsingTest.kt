@@ -13,7 +13,7 @@ import com.jetbrains.python.psi.impl.PyPsiFacadeImpl
 import com.jetbrains.python.psi.impl.PythonASTFactory
 import com.jetbrains.python.psi.impl.PythonLanguageLevelPusher
 import com.jetbrains.snakecharm.SnakemakeTestUtil
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.SmkTokenSetContributor
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 
@@ -54,7 +54,7 @@ class SnakemakeParsingTest : ParsingTestCase(
             PyPsiFacadeImpl::class.java
         )
         project.registerService(
-            SnakemakeAPIProjectService::class.java,
+            SnakemakeApiService::class.java,
         )
         application.registerService<PyElementTypesFacade>(PyElementTypesFacade::class.java, PyElementTypesFacadeImpl::class.java)
         application.registerService(PyLanguageFacade::class.java, PyLanguageFacadeImpl::class.java)

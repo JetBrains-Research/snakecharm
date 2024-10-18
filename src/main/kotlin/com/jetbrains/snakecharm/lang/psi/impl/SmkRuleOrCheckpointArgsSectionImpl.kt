@@ -10,8 +10,8 @@ import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.python.psi.types.TypeEvalContext
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.types.SmkRuleLikeSectionArgsType
@@ -80,7 +80,7 @@ open class SmkRuleOrCheckpointArgsSectionImpl(node: ASTNode) : SmkArgsSectionImp
     }
 
     override val isWildcardsExpandingSection by lazy {
-        SnakemakeAPIProjectService.getInstance(this.project).isSubsectionWildcardsExpanding(
+        SnakemakeApiService.getInstance(this.project).isSubsectionWildcardsExpanding(
             sectionKeyword, getParentRuleOrCheckPoint().sectionKeyword
         )
     }

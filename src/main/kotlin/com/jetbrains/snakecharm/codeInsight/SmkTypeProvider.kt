@@ -11,12 +11,12 @@ import com.jetbrains.python.psi.resolve.resolveQualifiedName
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.PyTypeProviderBase
 import com.jetbrains.python.psi.types.TypeEvalContext
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTION_ACCESSOR_CLASSES
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_CHECKPOINTS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_PEP
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_RULES
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_ACCESSOR_CLASS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SECTION_ACCESSOR_CLASSES
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_VARS_CHECKPOINTS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_VARS_PEP
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_VARS_RULES
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_VARS_WILDCARDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.WILDCARDS_ACCESSOR_CLASS
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.*
@@ -110,7 +110,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
             lambda, SmkRuleOrCheckpointArgsSection::class.java, PyCallExpression::class.java
         ) ?: return null
 
-        val apiService = SnakemakeAPIProjectService.getInstance(lambda.project)
+        val apiService = SnakemakeApiService.getInstance(lambda.project)
         val allowedArgs = apiService.getLambdaArgsForSubsection(
             parentSection.sectionKeyword, ruleLike.sectionKeyword
         )

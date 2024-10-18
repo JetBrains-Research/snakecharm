@@ -14,9 +14,9 @@ import com.intellij.psi.impl.source.PostprocessReformattingAspect
 import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.codeInsight.editorActions.moveUpDown.PyStatementMover
 import com.jetbrains.python.psi.*
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.TOPLEVEL_ARGS_SECTION_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.TOPLEVEL_ARGS_SECTION_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.psi.*
 
 open class SmkStatementMover : PyStatementMover() {
@@ -73,7 +73,7 @@ open class SmkStatementMover : PyStatementMover() {
         elementToMove: PsiElement,
         down: Boolean
     ): LineRange? {
-        val api = SnakemakeAPIProjectService.getInstance(elementToMove.project)
+        val api = SnakemakeApiService.getInstance(elementToMove.project)
 
         val document = file.viewProvider.document ?: return null
         val offset = if (down) elementToMove.textRange.endOffset else elementToMove.textRange.startOffset
@@ -129,20 +129,20 @@ open class SmkStatementMover : PyStatementMover() {
     private fun isNotAvailableForMoveInto(
         elementToMove: PsiElement,
         destination: PsiElement?,
-        api: SnakemakeAPIProjectService
+        api: SnakemakeApiService
     ): Boolean {
         return (elementToMove is SmkSection && elementToMove !is SmkRunSection &&
                 ((destination is SmkRuleOrCheckpoint &&
                         elementToMove.sectionKeyword !in api.getRuleOrCheckpointArgsSectionKeywords()) ||
                         (destination is SmkSubworkflow &&
-                                elementToMove.sectionKeyword !in SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS) ||
+                                elementToMove.sectionKeyword !in SnakemakeApi.SUBWORKFLOW_SECTIONS_KEYWORDS) ||
                         (destination is SmkModule &&
                                 elementToMove.sectionKeyword !in api.getModuleSectionKeywords()) ||
                         (destination is SmkUse &&
                                 elementToMove.sectionKeyword !in api.getUseSectionKeywords())))
     }
 
-    private fun isAvailableForMoveOut(elementToMove: PsiElement, down: Boolean, api: SnakemakeAPIProjectService): Boolean {
+    private fun isAvailableForMoveOut(elementToMove: PsiElement, down: Boolean, api: SnakemakeApiService): Boolean {
         val useSectionsKeywords = api.getUseSectionKeywords()
 
         val statementList = getStatementList(elementToMove) ?: return true
@@ -234,7 +234,7 @@ open class SmkStatementMover : PyStatementMover() {
     /**
      *  modified version
      */
-    private fun moveOut(elementToMove: PsiElement, editor: Editor, down: Boolean, api: SnakemakeAPIProjectService): ScopeRange? {
+    private fun moveOut(elementToMove: PsiElement, editor: Editor, down: Boolean, api: SnakemakeApiService): ScopeRange? {
         val statementList = getStatementList(elementToMove) ?: return null
         val statements = statementList.statements
 
@@ -281,7 +281,7 @@ open class SmkStatementMover : PyStatementMover() {
         down: Boolean,
         statements: Array<PyStatement>,
         clazz: Class<T>,
-        api: SnakemakeAPIProjectService
+        api: SnakemakeApiService
     ): ScopeRange? {
         val useSectionsKeywords = api.getUseSectionKeywords()
 

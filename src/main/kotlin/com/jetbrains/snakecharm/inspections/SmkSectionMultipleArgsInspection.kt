@@ -4,9 +4,9 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
-import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkAPIAnnParsingContextType
+import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkApiAnnotationParsingContextType
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
 
@@ -16,7 +16,7 @@ class SmkSectionMultipleArgsInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
-        val apiService = SnakemakeAPIProjectService.getInstance(holder.project)
+        val apiService = SnakemakeApiService.getInstance(holder.project)
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
             processSubSection(st, SnakemakeNames.SUBWORKFLOW_KEYWORD)
@@ -40,7 +40,7 @@ class SmkSectionMultipleArgsInspection : SnakemakeInspection() {
 
         override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
             val keyword = st.sectionKeyword
-            val contextType = SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr
+            val contextType = SmkApiAnnotationParsingContextType.TOP_LEVEL.typeStr
             if (keyword != null && apiService.isSubsectionSingleArgumentOnly(keyword, contextType)) {
                 checkArgumentList(st.argumentList, keyword)
             }

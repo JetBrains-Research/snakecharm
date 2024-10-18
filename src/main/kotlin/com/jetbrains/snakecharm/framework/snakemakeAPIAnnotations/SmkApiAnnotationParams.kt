@@ -1,12 +1,12 @@
 package com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations
 
-data class SmkKeywordDeprecationParams(
+data class SmkApiAnnotationKeywordDeprecationParams(
     val name: String,
     val itemRemoved: Boolean,
     val advice: String?,
 ) {
     companion object {
-        fun createFrom(itemRemoved: Boolean, record: SmkAPIAnnParsingDeprecationRecord) = SmkKeywordDeprecationParams(
+        fun createFrom(itemRemoved: Boolean, record: SmkApiAnnotationParsingDeprecationRecord) = SmkApiAnnotationKeywordDeprecationParams(
             name = record.name,
             itemRemoved = itemRemoved,
             advice = record.advice.ifEmpty { null },
@@ -14,7 +14,7 @@ data class SmkKeywordDeprecationParams(
     }
 }
 
-data class SmkKeywordIntroductionParams(
+data class SmkApiAnnotationKeywordIntroductionParams(
     //val name: String,
     val lambdaArgs: List<String>,
     val keywordArgsAllowed: Boolean,
@@ -27,7 +27,7 @@ data class SmkKeywordIntroductionParams(
     val limitToSections: List<String>,
 ) {
     companion object {
-        fun createFrom(rec: SmkAPIAnnParsingIntroductionRecord) = SmkKeywordIntroductionParams(
+        fun createFrom(rec: SmkApiAnnotationParsingIntroductionRecord) = SmkApiAnnotationKeywordIntroductionParams(
             //name = rec.name,
             lambdaArgs = rec.lambda_args,
             limitToSections = rec.limit_to_sections,
@@ -39,7 +39,7 @@ data class SmkKeywordIntroductionParams(
                 false -> false
                 else -> {
                     // default: FALSE for functions, TRUE for sections
-                    rec.type != SmkAPIAnnParsingContextType.FUNCTION.typeStr
+                    rec.type != SmkApiAnnotationParsingContextType.FUNCTION.typeStr
                 }
             },
             isPlaceholderExpandedToWildcard = rec.placeholders_resolved_as_wildcards,

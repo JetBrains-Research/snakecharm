@@ -3,7 +3,7 @@
 //import com.intellij.psi.PsiElement
 //import com.intellij.psi.PsiFile
 //import com.jetbrains.rd.util.getOrCreate
-//import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+//import com.jetbrains.snakecharm.codeInsight.SnakemakeApi
 //import org.jetbrains.yaml.psi.YAMLFile
 //import org.jetbrains.yaml.psi.YAMLMapping
 //
@@ -22,8 +22,8 @@
 //        val resultKeys = keys.asSequence().filter { key ->
 //            val keyName = key.text
 //            val keyType = key.parent.lastChild
-//            !(keyName in SnakemakeAPI.PEPPY_CONFIG_TEXT_KEYS && keyType is YAMLMapping ||
-//                    keyName in SnakemakeAPI.PEPPY_CONFIG_MAPPING_KEYS && keyType !is YAMLMapping)
+//            !(keyName in SnakemakeApi.PEPPY_CONFIG_TEXT_KEYS && keyType is YAMLMapping ||
+//                    keyName in SnakemakeApi.PEPPY_CONFIG_MAPPING_KEYS && keyType !is YAMLMapping)
 //        }.toList()
 //        return yamlFile to resultKeys
 //    }

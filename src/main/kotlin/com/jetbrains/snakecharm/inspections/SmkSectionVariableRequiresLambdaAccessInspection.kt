@@ -8,8 +8,8 @@ import com.intellij.psi.util.parentOfTypes
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_VARS_WILDCARDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 
 class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
@@ -18,7 +18,7 @@ class SmkSectionVariableRequiresLambdaAccessInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
-        val api = SnakemakeAPIProjectService.getInstance(holder.project)
+        val api = SnakemakeApiService.getInstance(holder.project)
 
         override fun visitPyReferenceExpression(node: PyReferenceExpression) {
             @Suppress("UnstableApiUsage")

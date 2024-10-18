@@ -4,13 +4,13 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.framework.SmkAPISubsectionContextAndDirective
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
-import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
-import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkAPIAnnParsingContextType
-import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkKeywordDeprecationParams
+import com.jetbrains.snakecharm.framework.SnakemakeApiYamlAnnotationsService
+import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkApiAnnotationKeywordDeprecationParams
+import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkApiAnnotationParsingContextType
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_CONFIG_KEYWORD
@@ -50,9 +50,9 @@ import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.collections.immutable.toImmutableSet
 
 /**
- * Also see [ImplicitPySymbolsProvider] class
+ * Also see [SmkImplicitPySymbolsProvider] class
  */
-object SnakemakeAPI {
+object SnakemakeApi {
     const val UNPACK_FUNCTION = "unpack"
 
     const val SMK_VARS_CONFIG = "config"
@@ -71,7 +71,7 @@ object SnakemakeAPI {
     const val WILDCARDS_ACCESSOR_CLASS = "snakemake.io.Wildcards"
 
     /**
-     * Also see [ImplicitPySymbolsProvider], it also processes 'InputFiles', etc. symbols
+     * Also see [SmkImplicitPySymbolsProvider], it also processes 'InputFiles', etc. symbols
      */
     val SECTION_ACCESSOR_CLASSES = mapOf(
         "snakemake.io.InputFiles" to "input",
@@ -81,23 +81,8 @@ object SnakemakeAPI {
         "snakemake.io.Resources" to "resources"
     )
 
-    /**
-     * Sections that execute external script with access to 'snakemake' object, i.e to 'snakemake.input',
-     * 'snakemake.params' etc settings. So we cannot verify that log section mentioned in rule is
-     * unused.
-     */
-    val EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE = setOf(
-        SECTION_WRAPPER, SECTION_NOTEBOOK, SECTION_SCRIPT, SECTION_CWL,
-        SECTION_TEMPLATE_ENGINE
-    )
-
-    val EXECUTION_SECTIONS_KEYWORDS = setOf(
-        SECTION_SHELL,
-        *EXECUTION_SECTIONS_THAT_ACCEPTS_SNAKEMAKE_PARAMS_OBJ_FROM_RULE.toTypedArray()
-    )
-
     // List of top-level sections
-    // XXX: cannot move to SnakemakeAPIProjectService because it is used to create Lexer, Parser, WordScanner, Highlighter
+    // XXX: cannot move to SnakemakeApiService because it is used to create Lexer, Parser, WordScanner, Highlighter
     //      and not everywhere we could pass project instance
     val TOPLEVEL_ARGS_SECTION_KEYWORDS = setOf(
         WORKFLOW_CONFIGFILE_KEYWORD,
@@ -168,8 +153,8 @@ object SnakemakeAPI {
 }
 
 @Service(Service.Level.PROJECT)
-class SnakemakeAPIProjectService(val project: Project): Disposable {
-    private var state: SnakemakeAPIProjectState = SnakemakeAPIProjectState.EMPTY
+class SnakemakeApiService(val project: Project): Disposable {
+    private var state: SnakemakeApiStateForLangLevel = SnakemakeApiStateForLangLevel.EMPTY
 
     /**
      * Checks if a given keyword requires only one argument
@@ -179,8 +164,8 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
      * @return `true` if the keyword is a single argument section keyword within the given context, otherwise `false`.
      */
     fun isSubsectionSingleArgumentOnly(keyword: String, contextKeywordOrType: String): Boolean {
-        val list =  if (contextKeywordOrType == SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr) {
-            state.contextType2SingleArgSectionKeywords[SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr]
+        val list =  if (contextKeywordOrType == SmkApiAnnotationParsingContextType.TOP_LEVEL.typeStr) {
+            state.contextType2SingleArgSectionKeywords[SmkApiAnnotationParsingContextType.TOP_LEVEL.typeStr]
         } else {
             state.contextType2SingleArgSectionKeywords[contextKeywordOrType]
         }
@@ -195,8 +180,8 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
      * @return A Boolean indicating whether the given section only allows positional arguments.
      */
     fun isSubsectionWithOnlyPositionalArguments(keyword: String, contextKeywordOrType: String): Boolean {
-        val list =  if (contextKeywordOrType == SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr) {
-            state.contextType2PositionalOnlySectionKeywords[SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr]
+        val list =  if (contextKeywordOrType == SmkApiAnnotationParsingContextType.TOP_LEVEL.typeStr) {
+            state.contextType2PositionalOnlySectionKeywords[SmkApiAnnotationParsingContextType.TOP_LEVEL.typeStr]
         } else {
             state.contextType2PositionalOnlySectionKeywords[contextKeywordOrType]
         }
@@ -206,7 +191,7 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
     @Suppress("unused")
     fun isTopLevelArgsSectionKeyword(keyword: String): Boolean {
         // XXX: Used in parsing/lexing, cannot collect from YAML file
-        return keyword in SnakemakeAPI.TOPLEVEL_ARGS_SECTION_KEYWORDS
+        return keyword in SnakemakeApi.TOPLEVEL_ARGS_SECTION_KEYWORDS
     }
 
     fun isTopLevelKeyword(keyword: String): Boolean {
@@ -227,8 +212,8 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
     fun isFunctionShortNameValidForInjection(shortName: String) = shortName in state.funShortNamesValidForInjection
 
     fun isSubsectionValidForInjection(keyword: String, contextKeywordOrType: String): Boolean {
-        require(contextKeywordOrType != SmkAPIAnnParsingContextType.FUNCTION.typeStr)
-        require(contextKeywordOrType != SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr)
+        require(contextKeywordOrType != SmkApiAnnotationParsingContextType.FUNCTION.typeStr)
+        require(contextKeywordOrType != SmkApiAnnotationParsingContextType.TOP_LEVEL.typeStr)
 
         val keywords = state.contextType2NotValidForInjectionSubsectionKeywords[contextKeywordOrType]
         // our default is to allow injection in all sections => if section not registered, or event context type => true
@@ -249,12 +234,12 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
         return state.funFqnToSectionRestrictionList[fqn] ?: emptyArray<String>()
     }
 
-    fun getFunctionDeprecationByFqn(fqn: String): Pair<SmkLanguageVersion, SmkKeywordDeprecationParams>? {
+    fun getFunctionDeprecationByFqn(fqn: String): Pair<SmkLanguageVersion, SmkApiAnnotationKeywordDeprecationParams>? {
         val entry = state.functionDeprecationsByFqn[fqn]
         return if (entry == null) null else (entry.key to entry.value)
     }
 
-    fun getFunctionDeprecationByShortName(fqn: String): Pair<SmkLanguageVersion, SmkKeywordDeprecationParams>? {
+    fun getFunctionDeprecationByShortName(fqn: String): Pair<SmkLanguageVersion, SmkApiAnnotationKeywordDeprecationParams>? {
         val entry = state.functionDeprecationsByShortName[fqn]
         return if (entry == null) null else (entry.key to entry.value)
     }
@@ -343,24 +328,24 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
             MODULE_SKIP_VALIDATION_KEYWORD,
             MODULE_META_WRAPPER_KEYWORD,
             MODULE_REPLACE_PREFIX_KEYWORD
-        ) + SnakemakeFrameworkAPIProvider.getInstance()
+        ) + SnakemakeApiYamlAnnotationsService.getInstance()
             .collectAllPossibleModuleSubsectionKeywords()
         return MODULE_SECTIONS_KEYWORDS
     }
 
     fun getRuleOrCheckpointArgsSectionKeywords(): Set<String> {
-        val RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS = SnakemakeFrameworkAPIProvider.getInstance()
+        val RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS = SnakemakeApiYamlAnnotationsService.getInstance()
             .collectAllPossibleRuleOrCheckpointSubsectionKeywords()
         return RULE_OR_CHECKPOINT_ARGS_SECTION_KEYWORDS
     }
 
-    fun getRuleOrCheckpointSectionKeywords(): Set<String> {
+    fun getRuleOrCheckpointAllSectionTypesKeywords(): Set<String> {
         val RULE_OR_CHECKPOINT_SECTION_KEYWORDS = (getRuleOrCheckpointArgsSectionKeywords() + setOf(SECTION_RUN))
         return RULE_OR_CHECKPOINT_SECTION_KEYWORDS
     }
 
     fun getUseSectionKeywords(): Set<String> {
-        val USE_SECTIONS_KEYWORDS = getRuleOrCheckpointSectionKeywords() + SnakemakeFrameworkAPIProvider.getInstance()
+        val USE_SECTIONS_KEYWORDS = getRuleOrCheckpointAllSectionTypesKeywords() + SnakemakeApiYamlAnnotationsService.getInstance()
             .collectAllPossibleUseSubsectionKeywords() - getExecutionSectionsKeyword() - SECTION_RUN
 
         return USE_SECTIONS_KEYWORDS
@@ -368,9 +353,9 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
 
     private fun doRefresh(version: String?) {
         val newState = if (version == null) {
-            SnakemakeAPIProjectState.EMPTY
+            SnakemakeApiStateForLangLevel.EMPTY
         } else {
-            val apiProvider = SnakemakeFrameworkAPIProvider.getInstance()
+            val apiProvider = SnakemakeApiYamlAnnotationsService.getInstance()
 
             val contextType2SingleArgSectionKeywords = HashMap<String, MutableList<String>>()
             val contextType2PositionalOnlySectionKeywords = HashMap<String, MutableList<String>>()
@@ -387,13 +372,13 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
             // add top-level data:
             val toplevelIntroductions = apiProvider.getToplevelIntroductions(smkLangVers)
             contextType2SingleArgSectionKeywords.put(
-                SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr,
+                SmkApiAnnotationParsingContextType.TOP_LEVEL.typeStr,
                 toplevelIntroductions.mapNotNull { (name, e) ->
                     if (e.value.multipleArgsAllowed) null else name
                 }.toMutableList()
             )
             contextType2PositionalOnlySectionKeywords.put(
-                SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr,
+                SmkApiAnnotationParsingContextType.TOP_LEVEL.typeStr,
                 toplevelIntroductions.mapNotNull { (name, e) ->
                     if (e.value.keywordArgsAllowed) null else name
                 }.toMutableList()
@@ -483,7 +468,7 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
                 }
             }
 
-            SnakemakeAPIProjectState(
+            SnakemakeApiStateForLangLevel(
                 contextType2SingleArgSectionKeywords = contextType2SingleArgSectionKeywords.toImmutableMap(),
                 contextType2PositionalOnlySectionKeywords = contextType2PositionalOnlySectionKeywords.toImmutableMap(),
                 contextTypeAndSubsection2LambdaArgs = contextTypeAndSubsection2LambdaArgs.toImmutableMap(),
@@ -540,11 +525,11 @@ class SnakemakeAPIProjectService(val project: Project): Disposable {
     }
 
     companion object {
-        fun getInstance(project: Project) = project.getService(SnakemakeAPIProjectService::class.java)!!
+        fun getInstance(project: Project) = project.getService(SnakemakeApiService::class.java)!!
     }
 }
 
-internal data class SnakemakeAPIProjectState(
+internal data class SnakemakeApiStateForLangLevel(
     val contextType2SingleArgSectionKeywords: Map<String, List<String>>,
     val contextType2PositionalOnlySectionKeywords: Map<String, List<String>>,
     val contextTypeAndSubsection2LambdaArgs:  Map<SmkAPISubsectionContextAndDirective, Array<String>>,
@@ -553,15 +538,15 @@ internal data class SnakemakeAPIProjectState(
     val contextType2AccessibleInRuleObjectSubsectionKeywords:  Map<String, Set<String>>,
     val contextType2AccessibleAccessibleAsPlaceholderSubsectionKeywords:  Map<String, Set<String>>,
     val funFqnToSectionRestrictionList: Map<String, Array<String>>,
-    val functionDeprecationsByShortName: Map<String, Map.Entry<SmkLanguageVersion, SmkKeywordDeprecationParams>>,
-    val functionDeprecationsByFqn: Map<String, Map.Entry<SmkLanguageVersion, SmkKeywordDeprecationParams>>,
+    val functionDeprecationsByShortName: Map<String, Map.Entry<SmkLanguageVersion, SmkApiAnnotationKeywordDeprecationParams>>,
+    val functionDeprecationsByFqn: Map<String, Map.Entry<SmkLanguageVersion, SmkApiAnnotationKeywordDeprecationParams>>,
     val funFqnValidForInjection: Set<String>,
     val funShortNamesValidForInjection: Set<String>,
 ) {
     val subsectionsAllPossibleArgNames = contextTypeAndSubsection2LambdaArgs.values.flatMap { it.asIterable() }.toImmutableSet()
 
     companion object {
-        val EMPTY = SnakemakeAPIProjectState(
+        val EMPTY = SnakemakeApiStateForLangLevel(
             emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(), emptyMap(),
             emptyMap(), emptyMap(), emptySet(), emptySet()
         )

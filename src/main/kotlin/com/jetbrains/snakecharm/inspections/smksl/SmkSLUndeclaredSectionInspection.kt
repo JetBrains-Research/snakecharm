@@ -6,8 +6,8 @@ import com.intellij.psi.PsiReference
 import com.jetbrains.python.extensions.getQName
 import com.jetbrains.python.psi.PyClass
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTION_ACCESSOR_CLASSES
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SECTION_ACCESSOR_CLASSES
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.inspections.smksl.SmkSLUndeclaredSectionInspectionUtil.checkIsSectionNameUnresolved
 import com.jetbrains.snakecharm.inspections.smksl.SmkSLUndeclaredSectionInspectionUtil.isSectionNameOfInterest
@@ -22,7 +22,7 @@ class SmkSLUndeclaredSectionInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SmkSLInspectionVisitor(holder, getContext(session)) {
-        val api = SnakemakeAPIProjectService.getInstance(holder.project)
+        val api = SnakemakeApiService.getInstance(holder.project)
 
         override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpression) {
             val ref = expr.reference
@@ -66,6 +66,6 @@ object SmkSLUndeclaredSectionInspectionUtil {
         }
     }
 
-    fun isSectionNameOfInterest(referencedName: String?, contextKeyword: String?, api: SnakemakeAPIProjectService) =
+    fun isSectionNameOfInterest(referencedName: String?, contextKeyword: String?, api: SnakemakeApiService) =
         api.isSubsectionAccessibleAsPlaceholder(referencedName, contextKeyword)
 }

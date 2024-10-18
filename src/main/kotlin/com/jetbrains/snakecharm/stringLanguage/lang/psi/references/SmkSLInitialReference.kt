@@ -16,10 +16,10 @@ import com.jetbrains.python.psi.resolve.*
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolUsageType
-import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider
+import com.jetbrains.snakecharm.codeInsight.SmkImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_VARS_WILDCARDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_VARS_WILDCARDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionVariantsProcessor
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkImplicitPySymbolsResolveProviderCompanion
@@ -37,7 +37,7 @@ class SmkSLInitialReference(
     private val parentDeclaration: SmkRuleOrCheckpoint?,
     context: PyResolveContext?,
 ) : PyQualifiedReference(expr, context), SmkSLBaseReference {
-    val apiService = SnakemakeAPIProjectService.getInstance(expr.project)
+    val apiService = SnakemakeApiService.getInstance(expr.project)
 
     override fun getElement() = myElement as SmkSLReferenceExpression
 
@@ -77,7 +77,7 @@ class SmkSLInitialReference(
             // Implicit Symbols
             val contextScope = getSmkScopeForInjection(host)
 
-            val cache = ImplicitPySymbolsProvider.instance(element.project).cache
+            val cache = SmkImplicitPySymbolsProvider.instance(element.project).cache
 
             SmkImplicitPySymbolsResolveProviderCompanion.addSyntheticSymbols(contextScope, cache, referencedName, ret)
 
@@ -172,7 +172,7 @@ class SmkSLInitialReference(
             // perhaps processor should be from 'element', not clear
             val implicitsProcessor = SmkCompletionVariantsProcessor(host)
 
-            val cache = ImplicitPySymbolsProvider.instance(element.project).cache
+            val cache = SmkImplicitPySymbolsProvider.instance(element.project).cache
             SmkCodeInsightScope.entries.forEach { symbolScope ->
                 if (contextScope.includes(symbolScope)) {
                     variants.addAll(cache.getSynthetic(symbolScope))
@@ -238,7 +238,7 @@ class SmkSLInitialReference(
             return emptySequence()
         }
 
-        val api = SnakemakeAPIProjectService.getInstance(parentDeclaration.project)
+        val api = SnakemakeApiService.getInstance(parentDeclaration.project)
         val contextKeyword = parentDeclaration.sectionKeyword
         return parentDeclaration.statementList.statements
             .asSequence()

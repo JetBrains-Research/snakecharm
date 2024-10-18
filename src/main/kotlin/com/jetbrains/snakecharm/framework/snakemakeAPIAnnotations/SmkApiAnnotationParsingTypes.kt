@@ -1,25 +1,25 @@
 package com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations
 
-data class SmkAPIAnnParsingVersionRecord(
+data class SmkApiAnnotationParsingVersionRecord(
     val version: String = "",
-    val introduced: List<SmkAPIAnnParsingIntroductionRecord> = emptyList(),
-    val override: List<SmkAPIAnnParsingIntroductionRecord> = emptyList(),
-    val deprecated: List<SmkAPIAnnParsingDeprecationRecord> = emptyList(),
-    val removed: List<SmkAPIAnnParsingDeprecationRecord> = emptyList(),
+    val introduced: List<SmkApiAnnotationParsingIntroductionRecord> = emptyList(),
+    val override: List<SmkApiAnnotationParsingIntroductionRecord> = emptyList(),
+    val deprecated: List<SmkApiAnnotationParsingDeprecationRecord> = emptyList(),
+    val removed: List<SmkApiAnnotationParsingDeprecationRecord> = emptyList(),
 )
 
-interface SmkAPIAnnParsingAbstractRecord {
+interface SmkApiAnnotationParsingAbstractRecord {
     val name: String
     val type: String
 }
 
-data class SmkAPIAnnParsingDeprecationRecord(
+data class SmkApiAnnotationParsingDeprecationRecord(
     override val name: String = "",
     override val type: String = "",
     val advice: String = "",
-): SmkAPIAnnParsingAbstractRecord
+): SmkApiAnnotationParsingAbstractRecord
 
-data class SmkAPIAnnParsingIntroductionRecord(
+data class SmkApiAnnotationParsingIntroductionRecord(
     override val name: String = "",
     override val type: String = "",
     val advice: String = "",
@@ -36,15 +36,15 @@ data class SmkAPIAnnParsingIntroductionRecord(
     val is_accessible_as_placeholder: Boolean = false,
     // for functions:
     val limit_to_sections: List<String> = emptyList<String>(),
-): SmkAPIAnnParsingAbstractRecord
+): SmkApiAnnotationParsingAbstractRecord
 
-data class SmkAPIAnnParsingConfig(
-    val changelog: List<SmkAPIAnnParsingVersionRecord> = emptyList(),
+data class SmkApiAnnotationParsingConfig(
+    val changelog: List<SmkApiAnnotationParsingVersionRecord> = emptyList(),
     val defaultVersion: String = "0.0.0",
     val annotationsFormatVersion: Int = 0
 )
 
-enum class SmkAPIAnnParsingContextType(val typeStr: String) {
+enum class SmkApiAnnotationParsingContextType(val typeStr: String) {
     TOP_LEVEL("top-level"),
     RULE_LIKE("rule-like"),
     FUNCTION("function"),

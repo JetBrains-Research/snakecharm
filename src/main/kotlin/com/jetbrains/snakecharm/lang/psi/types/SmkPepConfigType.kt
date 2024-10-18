@@ -11,7 +11,7 @@
 //import com.jetbrains.python.psi.resolve.PyResolveContext
 //import com.jetbrains.python.psi.resolve.RatedResolveResult
 //import com.jetbrains.python.psi.types.PyStructuralType
-//import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+//import com.jetbrains.snakecharm.codeInsight.SnakemakeApi
 //import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 //import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 //import com.jetbrains.snakecharm.lang.psi.SmkFile
@@ -82,17 +82,17 @@
 //        val yamlParseResult = SmkPepConfigCollector.getYamlParseResult(smkFile)
 //        yamlParseResult.second.forEach { key ->
 //            val keyName = key.text
-//            if (keyName == SnakemakeAPI.PEPPY_CONFIG_PEP_VERSION) containPepVersion = true
+//            if (keyName == SnakemakeApi.PEPPY_CONFIG_PEP_VERSION) containPepVersion = true
 //            if (isSubscriptionForm ||
-//                keyName in SnakemakeAPI.PEPPY_CONFIG_TEXT_KEYS ||
-//                keyName in SnakemakeAPI.PEPPY_CONFIG_MAPPING_KEYS ||
+//                keyName in SnakemakeApi.PEPPY_CONFIG_TEXT_KEYS ||
+//                keyName in SnakemakeApi.PEPPY_CONFIG_MAPPING_KEYS ||
 //                KEY_NAME_PATTERN.matches(keyName)
 //            ) resultList.add(key to keyName)
 //        }
 //        if (!containPepVersion && yamlParseResult.first != null) {
 //            resultList.add(
 //                yamlParseResult.first!! to
-//                        SnakemakeAPI.PEPPY_CONFIG_PEP_VERSION
+//                        SnakemakeApi.PEPPY_CONFIG_PEP_VERSION
 //            )
 //        }
 //        return resultList

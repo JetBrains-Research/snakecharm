@@ -30,8 +30,8 @@ import com.jetbrains.python.psi.resolve.fromSdk
 import com.jetbrains.python.psi.resolve.resolveQualifiedName
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SECTION_ACCESSOR_CLASSES
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SMK_API_VERS_6_1
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SECTION_ACCESSOR_CLASSES
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_API_VERS_6_1
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
@@ -44,7 +44,7 @@ import javax.swing.SwingUtilities
  * @date 2019-05-07
  */
 @Suppress("UnstableApiUsage")
-class ImplicitPySymbolsProvider(
+class SmkImplicitPySymbolsProvider(
     val project: Project,
 ) : Disposable {
 
@@ -232,11 +232,11 @@ class ImplicitPySymbolsProvider(
 
         val packages = PythonPackageManager.forSdk(project, sdk).installedPackages
 
-        val pkgSnakemake = packages.firstOrNull { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK }
+        val pkgSnakemake = packages.firstOrNull { it.name == SnakemakeApi.SMK_API_PKG_NAME_SMK }
         if (pkgSnakemake != null) {
             return PyPackage(pkgSnakemake.name, pkgSnakemake.version).matches(requirementSnakemake)
         }
-        val pkgSnakemakeMinimal = packages.firstOrNull { it.name == SnakemakeAPI.SMK_API_PKG_NAME_SMK_MINIMAL }
+        val pkgSnakemakeMinimal = packages.firstOrNull { it.name == SnakemakeApi.SMK_API_PKG_NAME_SMK_MINIMAL }
         if (pkgSnakemakeMinimal != null) {
             return PyPackage(pkgSnakemakeMinimal.name, pkgSnakemakeMinimal.version).matches(requirementSnakemakeMinimal)
         }
@@ -648,11 +648,11 @@ class ImplicitPySymbolsProvider(
             usedFiles.add(commonFile.virtualFile)
         }
 
-        globals[SnakemakeAPI.SMK_VARS_CHECKPOINTS] = commonFile?.findTopLevelClass("Checkpoints")
-        globals[SnakemakeAPI.SMK_VARS_RULES] = commonFile?.findTopLevelClass("Rules")
-        globals[SnakemakeAPI.SMK_VARS_SCATTER] = commonFile?.findTopLevelClass("Scatter")
-        globals[SnakemakeAPI.SMK_VARS_GATHER] = commonFile?.findTopLevelClass("Gather")
-        globals[SnakemakeAPI.SMK_VARS_CONFIG] = null
+        globals[SnakemakeApi.SMK_VARS_CHECKPOINTS] = commonFile?.findTopLevelClass("Checkpoints")
+        globals[SnakemakeApi.SMK_VARS_RULES] = commonFile?.findTopLevelClass("Rules")
+        globals[SnakemakeApi.SMK_VARS_SCATTER] = commonFile?.findTopLevelClass("Scatter")
+        globals[SnakemakeApi.SMK_VARS_GATHER] = commonFile?.findTopLevelClass("Gather")
+        globals[SnakemakeApi.SMK_VARS_CONFIG] = null
 
         val checkpointsFile = collectPyFiles("snakemake.checkpoints", usedFiles, sdk).firstOrNull()
         if (checkpointsFile != null) {
@@ -684,7 +684,7 @@ class ImplicitPySymbolsProvider(
 
         elementsCache.add(
             SmkCodeInsightScope.TOP_LEVEL to SmkCompletionUtil.createPrioritizedLookupElement(
-                SnakemakeAPI.SMK_VARS_PEP,
+                SnakemakeApi.SMK_VARS_PEP,
                 pepObjectConstructor,
                 typeText = SnakemakeBundle.message("TYPES.rule.run.workflow.globals.type.text"),
                 priority = SmkCompletionUtil.WORKFLOW_GLOBALS_PRIORITY
@@ -693,8 +693,8 @@ class ImplicitPySymbolsProvider(
     }
 
     companion object {
-        private val LOG = logger<ImplicitPySymbolsProvider>() // TODO: cleanup
-        fun instance(project: Project) = project.service<ImplicitPySymbolsProvider>()
+        private val LOG = logger<SmkImplicitPySymbolsProvider>() // TODO: cleanup
+        fun instance(project: Project) = project.service<SmkImplicitPySymbolsProvider>()
     }
 
     override fun dispose() {
@@ -727,7 +727,7 @@ private class ImplicitPySymbolsCacheImpl(
     private fun validElements(elements: List<ImplicitPySymbol>): List<ImplicitPySymbol> {
         val validElements = elements.filter { it.psiDeclaration.isValid }
         if (validElements.size != elements.size) {
-            project.service<ImplicitPySymbolsProvider>().scheduleUpdate()
+            project.service<SmkImplicitPySymbolsProvider>().scheduleUpdate()
         }
         return validElements
     }

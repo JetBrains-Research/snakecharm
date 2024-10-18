@@ -5,7 +5,7 @@ import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.inspections.quickfix.PyRenameElementQuickFix
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLWildcardReference
@@ -16,7 +16,7 @@ class SmkSLWildcardNameIsConfusingInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SmkSLInspectionVisitor(holder, getContext(session)) {
-        val api = SnakemakeAPIProjectService.getInstance(holder.project)
+        val api = SnakemakeApiService.getInstance(holder.project)
 
         override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpression) {
             // expr.isQualified: 'wildcards' in 'wildcards.input'

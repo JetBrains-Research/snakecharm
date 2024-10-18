@@ -665,7 +665,7 @@
 
     <projectService serviceImplementation="com.jetbrains.snakecharm.codeInsight.completion.wrapper.SmkWrapperStorage"/>
 
-    <projectService serviceImplementation="com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider"/>
+    <projectService serviceImplementation="com.jetbrains.snakecharm.codeInsight.SmkImplicitPySymbolsProvider"/>
   </extensions>
 
 

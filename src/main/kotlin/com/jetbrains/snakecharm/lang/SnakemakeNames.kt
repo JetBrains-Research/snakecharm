@@ -73,7 +73,7 @@ object SnakemakeNames {
      * Constant that holds the module name for Snakemake input/output operations.
      * It is used as part of the code insight and symbol resolution process within the Snakemake plugin.
      *
-     * For more details, refer to the class `com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsProvider`.
+     * For more details, refer to the class `com.jetbrains.snakecharm.codeInsight.SmkImplicitPySymbolsProvider`.
      */
     const val SNAKEMAKE_MODULE_NAME_IO = "snakemake.io"
     const val SNAKEMAKE_FQN_FUN_MIN_VERSION = "snakemake.utils.min_version"

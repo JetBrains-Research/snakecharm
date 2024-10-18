@@ -16,7 +16,7 @@ import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi
 import com.jetbrains.snakecharm.codeInsight.completion.InUseSectionProvider.Companion.IN_USE_SECTION_PROVIDER_CAPTURE
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionAfterRulesAndCheckpointsObjectProvider.Companion.IN_SMK_RULES_OR_CHECKPOINTS_OBJECT
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionInLocalRulesAndRuleOrderSectionsProvider.Companion.IN_SMK_LOCALRULES_OR_RULEORDER_RULE_NAME_REFERENCE
@@ -100,8 +100,8 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
                     psiElement(PyReferenceExpression::class.java)
                         .withChild(
                             psiElement().andOr(
-                                psiElement().withText(SnakemakeAPI.SMK_VARS_CHECKPOINTS),
-                                psiElement().withText(SnakemakeAPI.SMK_VARS_RULES)
+                                psiElement().withText(SnakemakeApi.SMK_VARS_CHECKPOINTS),
+                                psiElement().withText(SnakemakeApi.SMK_VARS_RULES)
                             )
                         )
                 )
@@ -122,12 +122,12 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
 
         @Suppress("UnstableApiUsage")
         val variants = when (rulesOrCheckpointsObject.name) {
-            SnakemakeAPI.SMK_VARS_RULES -> collectVariantsForElement(
+            SnakemakeApi.SMK_VARS_RULES -> collectVariantsForElement(
                 parameters.position,
                 isCheckPoint = false
             ) + collectVariantsForElement(parameters.position, isCheckPoint = true)
 
-            SnakemakeAPI.SMK_VARS_CHECKPOINTS -> collectVariantsForElement(parameters.position, isCheckPoint = true)
+            SnakemakeApi.SMK_VARS_CHECKPOINTS -> collectVariantsForElement(parameters.position, isCheckPoint = true)
             else -> return
         }
 

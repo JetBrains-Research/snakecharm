@@ -9,7 +9,7 @@ import com.jetbrains.python.psi.PyStatement
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
@@ -54,7 +54,7 @@ class SmkRuleLikeSectionType(private val declaration: SmkRuleOrCheckpoint) : PyT
     }
 
     private fun getAccessibleStatements(): List<PyStatement> {
-        val api = SnakemakeAPIProjectService.getInstance(declaration.project)
+        val api = SnakemakeApiService.getInstance(declaration.project)
         val contextKeyword = declaration.sectionKeyword
 
         return declaration.statementList.statements.filter { st ->

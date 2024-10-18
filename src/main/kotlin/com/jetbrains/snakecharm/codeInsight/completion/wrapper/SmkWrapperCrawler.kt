@@ -2,7 +2,7 @@ package com.jetbrains.snakecharm.codeInsight.completion.wrapper
 
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.io.write
-import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
+import com.jetbrains.snakecharm.framework.SnakemakeApiYamlAnnotationsService
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.encodeToByteArray
@@ -53,7 +53,7 @@ object SmkWrapperCrawler {
         }
 
         println("Launching smk wrappers crawler...")
-        val provider = SnakemakeFrameworkAPIProvider(null)
+        val provider = SnakemakeApiYamlAnnotationsService(null)
         provider.reinitializeInTests(snakemakeAPIYamlPath.inputStream())
         val wrappers = localWrapperParser(wrappersFolder, provider=provider)
         wrappers.forEach { wrapper ->
@@ -113,7 +113,7 @@ object SmkWrapperCrawler {
 
     fun localWrapperParser(
         folder: String,
-        provider: SnakemakeFrameworkAPIProvider
+        provider: SnakemakeApiYamlAnnotationsService
     ): List<SmkWrapperStorage.WrapperInfo> {
         val wrappers = mutableListOf<SmkWrapperStorage.WrapperInfo>()
         val mainFolder = File(folder)

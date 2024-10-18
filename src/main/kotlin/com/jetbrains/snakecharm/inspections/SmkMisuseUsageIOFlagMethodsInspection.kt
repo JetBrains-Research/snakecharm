@@ -7,7 +7,7 @@ import com.jetbrains.python.psi.PyClass
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
@@ -26,7 +26,7 @@ class SmkMisuseUsageIOFlagMethodsInspection : SnakemakeInspection() {
 
             val argList = st.argumentList ?: return
 
-            val apiService = SnakemakeAPIProjectService.getInstance(holder.project)
+            val apiService = SnakemakeApiService.getInstance(holder.project)
 
             argList.arguments
                 .filterIsInstance<PyCallExpression>()

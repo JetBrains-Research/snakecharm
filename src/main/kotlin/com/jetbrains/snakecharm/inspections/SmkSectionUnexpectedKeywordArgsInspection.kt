@@ -5,9 +5,9 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
-import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkAPIAnnParsingContextType
+import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkApiAnnotationParsingContextType
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.*
 
@@ -17,7 +17,7 @@ class SmkSectionUnexpectedKeywordArgsInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
-        val apiService = SnakemakeAPIProjectService.getInstance(holder.project)
+        val apiService = SnakemakeApiService.getInstance(holder.project)
 
         override fun visitSmkSubworkflowArgsSection(st: SmkSubworkflowArgsSection) {
             processSubSection(st, SnakemakeNames.SUBWORKFLOW_KEYWORD)
@@ -29,7 +29,7 @@ class SmkSectionUnexpectedKeywordArgsInspection : SnakemakeInspection() {
         }
 
         override fun visitSmkWorkflowArgsSection(st: SmkWorkflowArgsSection) {
-            processSubSection(st, SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr)
+            processSubSection(st, SmkApiAnnotationParsingContextType.TOP_LEVEL.typeStr)
         }
 
         private fun processSubSection(st: SmkArgsSection, contextKeyword: String?) {

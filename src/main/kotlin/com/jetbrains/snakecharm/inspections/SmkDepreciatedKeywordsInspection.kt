@@ -8,10 +8,10 @@ import com.jetbrains.python.psi.PyClass
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
-import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
-import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkKeywordDeprecationParams
+import com.jetbrains.snakecharm.framework.SnakemakeApiYamlAnnotationsService
+import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkApiAnnotationKeywordDeprecationParams
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import com.jetbrains.snakecharm.lang.SnakemakeNames.CHECKPOINT_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.MODULE_KEYWORD
@@ -28,8 +28,8 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
-        val apiService = SnakemakeAPIProjectService.getInstance(holder.project)
-        val deprecationProvider = SnakemakeFrameworkAPIProvider.getInstance()
+        val apiService = SnakemakeApiService.getInstance(holder.project)
+        val deprecationProvider = SnakemakeApiYamlAnnotationsService.getInstance()
         val snakemakeSettings = SmkSupportProjectSettings.getInstance(holder.project)
 
         override fun visitSmkRule(rule: SmkRule) {
@@ -133,7 +133,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
         }
 
         fun showPropblem(
-            deprecationEntry: Pair<SmkLanguageVersion, SmkKeywordDeprecationParams>,
+            deprecationEntry: Pair<SmkLanguageVersion, SmkApiAnnotationKeywordDeprecationParams>,
             name: String,
             node: PsiElement,
             basedOnFqn: Boolean
@@ -255,7 +255,7 @@ class SmkDepreciatedKeywordsInspection : SnakemakeInspection() {
 
         private fun checkSubSectionDefinition(psiElement: PsiElement, name: String, parentName: String) {
             val settings = SmkSupportProjectSettings.getInstance(holder.project)
-            val deprecationProvider = SnakemakeFrameworkAPIProvider.getInstance()
+            val deprecationProvider = SnakemakeApiYamlAnnotationsService.getInstance()
             val lowestVersion = deprecationProvider.getSubSectionIntroductionVersion(name, parentName)
             val currentVersionString = settings.snakemakeLanguageVersion
             val currentVersion = if (currentVersionString == null) null else SmkLanguageVersion(currentVersionString)

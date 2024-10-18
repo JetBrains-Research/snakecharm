@@ -17,7 +17,7 @@ import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestUtil
-import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
+import com.jetbrains.snakecharm.framework.SnakemakeApiYamlAnnotationsService
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import io.cucumber.java.en.Given
 import javax.swing.SwingUtilities
@@ -135,7 +135,7 @@ class StepDefs {
         // XXX: reset Snakemake API settings if smth was overridden in other tests
         ApplicationManager.getApplication().invokeAndWait {
             ApplicationManager.getApplication().runWriteAction {
-                SnakemakeFrameworkAPIProvider.getInstance().reinitializeInTests()
+                SnakemakeApiYamlAnnotationsService.getInstance().reinitializeInTests()
             }
         }
         setProjectSdk("python with snakemake")

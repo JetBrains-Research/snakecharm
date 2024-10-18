@@ -18,13 +18,13 @@ import com.intellij.util.ProcessingContext
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.completion.PythonLookupElement
 import com.jetbrains.python.psi.*
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.SUBWORKFLOW_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.TOPLEVEL_ARGS_SECTION_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.USE_DECLARATION_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SUBWORKFLOW_SECTIONS_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.TOPLEVEL_ARGS_SECTION_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.USE_DECLARATION_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
-import com.jetbrains.snakecharm.framework.SnakemakeFrameworkAPIProvider
-import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkAPIAnnParsingContextType
+import com.jetbrains.snakecharm.framework.SnakemakeApiYamlAnnotationsService
+import com.jetbrains.snakecharm.framework.snakemakeAPIAnnotations.SmkApiAnnotationParsingContextType
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_LIKE
@@ -132,7 +132,7 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
                 customTailTypes = tokenSet.filter { it == SnakemakeNames.USE_KEYWORD}.associate { it to RuleKeywordTail},
                 defaultTailType = tail,
                 priority = SmkCompletionUtil.KEYWORDS_PRIORITY) {
-                SmkAPIAnnParsingContextType.TOP_LEVEL.typeStr
+                SmkApiAnnotationParsingContextType.TOP_LEVEL.typeStr
             }
         }
     }
@@ -187,8 +187,8 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
         result: CompletionResultSet
     ) {
         val element = parameters.position
-        val api = SnakemakeAPIProjectService.getInstance(element.project)
-        val keywords = api.getRuleOrCheckpointSectionKeywords()
+        val api = SnakemakeApiService.getInstance(element.project)
+        val keywords = api.getRuleOrCheckpointAllSectionTypesKeywords()
         filterByDeprecationAndAddLookupItems(element.project, keywords, result, priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY){
             val smkRuleOrCheckpoint = PsiTreeUtil.getParentOfType(element, SmkRuleOrCheckpoint::class.java)
             requireNotNull(smkRuleOrCheckpoint) {
@@ -241,7 +241,7 @@ object ModuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>(
         result: CompletionResultSet
     ) {
         val element = parameters.position
-        val api = SnakemakeAPIProjectService.getInstance(element.project)
+        val api = SnakemakeApiService.getInstance(element.project)
         val keywords = api.getModuleSectionKeywords()
         filterByDeprecationAndAddLookupItems(element.project, keywords, result, priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY) {
             val smkModule = PsiTreeUtil.getParentOfType(element, SmkModule::class.java)
@@ -279,7 +279,7 @@ object UseSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
             )
         }
 
-        val api = SnakemakeAPIProjectService.getInstance(parameters.position.project)
+        val api = SnakemakeApiService.getInstance(parameters.position.project)
         val keywords = api.getUseSectionKeywords()
         filterByDeprecationAndAddLookupItems(
             parameters.position.project,
@@ -302,7 +302,7 @@ private fun filterByDeprecationAndAddLookupItems(
     defaultTailType: TailType = ColonAndWhiteSpaceTail,
     parentContextProvider: () -> String?
 ) {
-    val deprecationProvider = SnakemakeFrameworkAPIProvider.getInstance()
+    val deprecationProvider = SnakemakeApiYamlAnnotationsService.getInstance()
     val settings = SmkSupportProjectSettings.getInstance(project)
     val contextName = parentContextProvider()
 

@@ -4,8 +4,8 @@ import com.intellij.lang.ASTNode
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.WILDCARDS_DEFINING_SECTIONS_KEYWORDS
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
@@ -28,7 +28,7 @@ class SmkUseArgsSectionImpl(node: ASTNode) : SmkArgsSectionImpl(node), SmkRuleOr
         SmkRuleLikeSectionArgsType(this)
 
     override val isWildcardsExpandingSection by lazy {
-        SnakemakeAPIProjectService.getInstance(this.project).isSubsectionWildcardsExpanding(
+        SnakemakeApiService.getInstance(this.project).isSubsectionWildcardsExpanding(
             sectionKeyword, SnakemakeNames.USE_KEYWORD
         )
     }

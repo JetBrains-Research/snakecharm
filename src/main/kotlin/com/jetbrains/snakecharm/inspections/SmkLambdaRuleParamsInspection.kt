@@ -7,8 +7,8 @@ import com.jetbrains.python.inspections.quickfix.RenameParameterQuickFix
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPIProjectService
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
 class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
@@ -17,7 +17,7 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
         isOnTheFly: Boolean,
         session: LocalInspectionToolSession,
     ) = object : SnakemakeInspectionVisitor(holder, getContext(session)) {
-        val apiService = SnakemakeAPIProjectService.getInstance(holder.project)
+        val apiService = SnakemakeApiService.getInstance(holder.project)
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
             val lambdas = st.argumentList?.arguments?.filterIsInstance<PyLambdaExpression>() ?: emptyList()
@@ -63,7 +63,7 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
         ) {
             lambdas.forEach { lambda ->
                 lambda.parameterList.parameters.forEachIndexed { index, pyParameter ->
-                    if (index == 0 && pyParameter.name != SnakemakeAPI.SMK_VARS_WILDCARDS) {
+                    if (index == 0 && pyParameter.name != SnakemakeApi.SMK_VARS_WILDCARDS) {
                         if (pyParameter.name in optionalParameters) {
                             registerProblem(
                                 pyParameter,
@@ -79,11 +79,11 @@ class SmkLambdaRuleParamsInspection : SnakemakeInspection() {
                                 SnakemakeBundle.message("INSP.NAME.wildcards.first.parameter.preferable"),
                                 ProblemHighlightType.WEAK_WARNING,
                                 null,
-                                RenameParameterQuickFix(SnakemakeAPI.SMK_VARS_WILDCARDS)
+                                RenameParameterQuickFix(SnakemakeApi.SMK_VARS_WILDCARDS)
                             )
                         }
                     }
-                    if (index != 0 && pyParameter.name == SnakemakeAPI.SMK_VARS_WILDCARDS) {
+                    if (index != 0 && pyParameter.name == SnakemakeApi.SMK_VARS_WILDCARDS) {
                         registerProblem(
                             pyParameter,
                             SnakemakeBundle.message("INSP.NAME.wildcards.first.parameter")

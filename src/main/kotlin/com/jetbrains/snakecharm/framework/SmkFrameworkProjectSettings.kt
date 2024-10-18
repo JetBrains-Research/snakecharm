@@ -132,7 +132,7 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
         var snakemakeSupportBannerEnabled by property(true)
 
         @get:Attribute("smk_language_version")
-        var snakemakeLanguageVersion by string(SnakemakeFrameworkAPIProvider.getInstance().getDefaultVersion())
+        var snakemakeLanguageVersion by string(SnakemakeApiYamlAnnotationsService.getInstance().getDefaultVersion())
     }
 
     companion object {

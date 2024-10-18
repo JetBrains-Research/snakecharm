@@ -6,7 +6,7 @@ import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyTypedElement
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
-import com.jetbrains.snakecharm.codeInsight.SnakemakeAPI
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkFakePsiElement
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes
 import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
@@ -43,7 +43,7 @@ class SmkRuleImpl
 }
 
 class SmkWildcardFakePsiElement(val element: SmkRuleOrCheckpoint): SmkFakePsiElement(
-        element, SnakemakeAPI.SMK_VARS_WILDCARDS, PlatformIcons.PARAMETER_ICON
+        element, SnakemakeApi.SMK_VARS_WILDCARDS, PlatformIcons.PARAMETER_ICON
 ), PyTypedElement {
     override fun getType(typeEvalContext: TypeEvalContext, key: TypeEvalContext.Key): PyType = SmkWildcardsType(element)
 }
