@@ -139,27 +139,45 @@ changelog:
     introduced:
       - name: "use"
         type: "top-level"
+        args_section: False
 
       - name: "module"
         type: "top-level"
+        args_section: False
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/modularization.html#modules
 
-      - name: "meta_wrapper"
+      - name: "meta_wrapper" # See: snakemake.parser.Module.subautomata
+        type: "module"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/modularization.html#meta-wrappers
+        multiple_args_allowed: False
+        keyword_args_allowed: False
+
+      - name: "skip_validation" # See: snakemake.parser.Module.subautomata
+        type: "module"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/modularization.html#modules
+        multiple_args_allowed: False
+        keyword_args_allowed: False
+
+      - name: "replace_prefix" # See: snakemake.parser.Module.subautomata
         type: "module"
         multiple_args_allowed: False
         keyword_args_allowed: False
 
-      - name: "skip_validation"
+      - name: "prefix" # See: snakemake.parser.Module.subautomata
         type: "module"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/modularization.html#modules
         multiple_args_allowed: False
         keyword_args_allowed: False
 
-      - name: "config"
+      - name: "config" # See: snakemake.parser.Module.subautomata
         type: "module"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/modularization.html#modules
         multiple_args_allowed: False
         keyword_args_allowed: False
 
-      - name: "snakefile"
+      - name: "snakefile" # See: snakemake.parser.Module.subautomata
         type: "module"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/modularization.html#modules
         multiple_args_allowed: False
         keyword_args_allowed: False
 
@@ -344,9 +362,14 @@ changelog:
   - version: "1.0.0"
 
     introduced:
+      - name: "run"
+        type: "rule-like"
+        placeholders_resolved_as_wildcards: False
+        args_section: False
+        execution_section: True
+
       - name: "output"
         type: "rule-like"
-        placeholders_resolved_as_wildcards: True
         is_accessible_in_rule_obj: True
         is_accessible_as_placeholder: True
 
@@ -449,6 +472,10 @@ changelog:
       - name: "workdir"
         type: "top-level"
         multiple_args_allowed: False
+
+      - name: "subworkflow"
+        type: "top-level"
+        args_section: False
 
       - name: "workdir"
         type: "subworkflow"

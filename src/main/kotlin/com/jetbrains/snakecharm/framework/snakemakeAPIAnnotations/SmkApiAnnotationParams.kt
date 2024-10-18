@@ -19,7 +19,7 @@ data class SmkApiAnnotationKeywordIntroductionParams(
     val lambdaArgs: List<String>,
     val keywordArgsAllowed: Boolean,
     val multipleArgsAllowed: Boolean,
-    val isSection: Boolean,
+    val isArgsSection: Boolean,
     val isPlaceholderInjectionAllowed: Boolean,
     val isPlaceholderExpandedToWildcard: Boolean,
     val isAccessibleInRuleObj: Boolean,
@@ -34,7 +34,7 @@ data class SmkApiAnnotationKeywordIntroductionParams(
             limitToSections = rec.limit_to_sections,
             keywordArgsAllowed = rec.keyword_args_allowed,
             multipleArgsAllowed = rec.multiple_args_allowed,
-            isSection = rec.section,
+            isArgsSection = rec.args_section,
             isPlaceholderInjectionAllowed = when (rec.placeholders_injection_allowed) {
                 true -> true
                 false -> false

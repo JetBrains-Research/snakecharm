@@ -696,3 +696,41 @@ Feature: Inspection warns about depreciated/removed keywords, or keywords that w
       | version | smk_version |
       | 1.11.11 | 1.11.10     |
       | 1.10.01 | 1.9.0       |
+
+    Scenario Outline: Show error when 'use' section contains non-available execution subsections configured using YAML
+      Given a snakemake project
+      And snakemake framework api yaml descriptor is
+    """
+    changelog:
+      - version: "3.0.0"
+        override:
+        - name: "foobooo"
+          type: "rule-like"
+          execution_section: False
+
+      - version: "2.0.0"
+        introduced:
+        - name: "foobooo"
+          type: "rule-like"
+          execution_section: True
+
+        - name: "threads"
+          type: "rule-like"
+    """
+    And I set snakemake language version to "<lang_version>"
+    Given I open a file "foo.smk" with text
+    """
+    use rule RULE as NEW_RULE with:
+        input: "file1"
+        output: "file2"
+        foobooo: "foo"
+    """
+    When SmkDepreciatedKeywordsInspection inspection is enabled
+    Then I expect inspection error on <foobooo> with message
+    """
+    Usage of 'foobooo' in 'use' was added in version 2.0.0, but selected Snakemake version is <lang_version>
+    """
+    When I check highlighting errors
+    Examples:
+        | lang_version |
+        | 1.0.0        |

@@ -543,11 +543,131 @@ Feature: Statement mover
         output: "file2"
     """
 
+  Scenario Outline: Move section up in rule works for run section before empty line
+    Given a snakemake project
+    Given I open a file "foo1.smk" with text
+    """
+    rule NAME:
+      <additional_content>
+      <section>:
+        file="file.txt"
+
+    use rule NAME2 as NAME3 with:
+      threads: 5
+    """
+    When I put the caret at <section>
+    And I invoke MoveStatementUp action
+    Then editor content will be
+    """
+    rule NAME:
+      <section>:
+        file="file.txt"
+      <additional_content>
+
+    use rule NAME2 as NAME3 with:
+      threads: 5
+    """
+    Examples:
+      | section | additional_content |
+      | run     |                    |
+
+  Scenario Outline: Move section up in rule works for execution sections
+    Given a snakemake project
+    Given I open a file "foo1.smk" with text
+    """
+    rule NAME:
+      <additional_content>
+      <section>:
+        file="file.txt"
+
+    use rule NAME2 as NAME3 with:
+      threads: 5
+    """
+    When I put the caret at <section>
+    And I invoke MoveStatementUp action
+    Then editor content will be
+    """
+    rule NAME:
+      <section>:
+        file="file.txt"
+      <additional_content>
+
+    use rule NAME2 as NAME3 with:
+      threads: 5
+    """
+    Examples:
+      | section | additional_content |
+      | run     |                    |
+      | shell   |                    |
+      | shell   | input: "foo"       |
+#      | shell   | #pass              |
+      | wrapper |                    |
+      | wrapper | input: "foo"       |
+
+  @ignore
+  Scenario Outline: IGNORED: Move section up in rule works for execution sections - merge with prev
+    Given a snakemake project
+    Given I open a file "foo1.smk" with text
+    """
+    rule NAME:
+      <additional_content>
+      <section>:
+        file="file.txt"
+
+    use rule NAME2 as NAME3 with:
+      threads: 5
+    """
+    When I put the caret at <section>
+    And I invoke MoveStatementUp action
+    Then editor content will be
+    """
+    rule NAME:
+      <section>:
+        file="file.txt"
+      <additional_content>
+
+    use rule NAME2 as NAME3 with:
+      threads: 5
+    """
+    Examples:
+      | section | additional_content |
+      | shell   | #pass              |
+    
+
+    Scenario Outline: Move section up in rule doesn't work if statement is run section
+      Given a snakemake project
+      Given I open a file "foo1.smk" with text
+    """
+    rule NAME:
+      <section_and_additional_content>:
+        file="file.txt"
+
+    use rule NAME2 as NAME3 with:
+      threads: 5
+    """
+      When I put the caret at <section>
+      And I invoke MoveStatementUp action
+      Then editor content will be
+    """
+    rule NAME:
+      <section_and_additional_content>:
+        file="file.txt"
+
+    use rule NAME2 as NAME3 with:
+      threads: 5
+    """
+      Examples:
+        | section | section_and_additional_content |
+        | run     | input: "foo"\n  run       |
+        | run     | run                            |
+        | run     | #pass\n  run                      |
+
   Scenario Outline: Move section out rule doesn't work if destination is use section and moving section is execution section
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
     rule NAME:
+      <additional_content>
       <section>:
         file="file.txt"
 
@@ -559,6 +679,7 @@ Feature: Statement mover
     Then editor content will be
     """
     rule NAME:
+      <additional_content>
       <section>:
         file="file.txt"
 
@@ -566,10 +687,51 @@ Feature: Statement mover
       threads: 5
     """
     Examples:
-      | section |
-      | shell   |
-      | run     |
-      | wrapper |
+      | section | additional_content |
+      | shell   |                    |
+      | shell   | input: "foo"       |
+      | run     |                    |
+      | run     | input: "foo"       |
+      | wrapper |                    |
+      | wrapper | input: "foo"       |
+
+  @ignore # TODO: BUG
+  Scenario Outline: Move section out run section doesn't work if statement is bound statement
+    Given a snakemake project
+    Given I open a file "foo1.smk" with text
+    """
+    rule NAME:
+      <additional_content_and_run>:
+        file1="file.txt"
+        file2="file.txt"
+
+    use rule NAME2 as NAME3 with:
+      threads: 5
+    """
+    When I put the caret at <signature>
+    And I invoke <action> action
+    Then editor content will be
+    """
+    rule NAME:
+      <additional_content_and_run>:
+        file1="file.txt"
+        file2="file.txt"
+
+    use rule NAME2 as NAME3 with:
+      threads: 5
+    """
+    Examples:
+      | action            | signature | additional_content_and_run |
+      | MoveStatementUp   | file1     | run                        |
+      | MoveStatementUp   | file1     | input: "foo"\n  run        |
+      | MoveStatementUp   | file1     | #pass\n  run               |
+      | MoveStatementUp   | file1     | \n  run                    |
+      | MoveStatementDown | file2     | run                        |
+      | MoveStatementDown | file2     | input: "foo"\n  run        |
+      | MoveStatementDown | file2     | #pass\n  run               |
+      | MoveStatementDown | file2     | \n  run                    |
+
+  # TODO: BUG - move 'output' section out of rule into toplevel - remains same PsiElemntType, should be reparsed..
 
   Scenario Outline: Move in/out if/else statement for rule like.
     Given a snakemake project
@@ -1001,7 +1163,7 @@ Feature: Statement mover
       | a: int    | b: int      |
       | s1 = "s"  | s2 = "s"    |
 
-#  Bug 1: do not move single section (wildcards:)
+# TODO Bug 1: do not move out single section (wildcards:)
 #  rule NAME2:
 #      input: ""
 #  rule NAME1:

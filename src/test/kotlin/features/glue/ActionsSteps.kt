@@ -634,7 +634,7 @@ class ActionsSteps {
 
             val api = SnakemakeApiService.getInstance(fixture.project)
             val info = SmkWrapperCrawler.collectWrapperInfo(
-                "wrapper", wrapperFileContent, ext, metaYamlContent, api.getRuleOrCheckpointArgsSectionKeywords()
+                "wrapper", wrapperFileContent, ext, metaYamlContent, api.getAllPossibleRuleOrCheckpointArgsSectionKeywords()
             )
 
             val args = info.args

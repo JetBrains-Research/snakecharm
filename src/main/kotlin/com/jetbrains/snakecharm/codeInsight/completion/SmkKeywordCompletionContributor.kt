@@ -187,8 +187,11 @@ object RuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>() 
         result: CompletionResultSet
     ) {
         val element = parameters.position
+
+        // use all possible keywords including deprecations and not yet introduced sections, will be filtered later
         val api = SnakemakeApiService.getInstance(element.project)
-        val keywords = api.getRuleOrCheckpointAllSectionTypesKeywords()
+        val keywords = api.getAllPossibleRuleOrCheckpointArgsSectionKeywords()
+
         filterByDeprecationAndAddLookupItems(element.project, keywords, result, priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY){
             val smkRuleOrCheckpoint = PsiTreeUtil.getParentOfType(element, SmkRuleOrCheckpoint::class.java)
             requireNotNull(smkRuleOrCheckpoint) {
@@ -241,8 +244,11 @@ object ModuleSectionKeywordsProvider : CompletionProvider<CompletionParameters>(
         result: CompletionResultSet
     ) {
         val element = parameters.position
+
+        // use all possible keywords including deprecations and not yet introduced sections, will be filtered later
         val api = SnakemakeApiService.getInstance(element.project)
-        val keywords = api.getModuleSectionKeywords()
+        val keywords = api.getAllPossibleModuleSectionKeywords()
+
         filterByDeprecationAndAddLookupItems(element.project, keywords, result, priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY) {
             val smkModule = PsiTreeUtil.getParentOfType(element, SmkModule::class.java)
             requireNotNull(smkModule) {
@@ -279,8 +285,10 @@ object UseSectionKeywordsProvider : CompletionProvider<CompletionParameters>() {
             )
         }
 
+        // use all possible keywords including deprecations and not yet introduced sections, will be filtered later
         val api = SnakemakeApiService.getInstance(parameters.position.project)
-        val keywords = api.getUseSectionKeywords()
+        val keywords = api.getAllPossibleUseSectionKeywordsIncludingExecSections() - api.getExecutionSectionsKeyword()
+
         filterByDeprecationAndAddLookupItems(
             parameters.position.project,
             keywords,

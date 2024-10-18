@@ -67,29 +67,16 @@ object SmkSyntaxErrorAnnotator : SmkAnnotator() {
         val api = SnakemakeApiService.getInstance(ruleOrCheckpoint.project)
         val sections = ruleOrCheckpoint.getSections()
         for (st in sections) {
-            when (st) {
-                is SmkRuleOrCheckpointArgsSection -> {
-                    val sectionName = st.sectionKeyword
-                    val isExecutionSection = sectionName in api.getExecutionSectionsKeyword()
+            val sectionName = st.sectionKeyword
+            val isExecutionSection = sectionName in api.getExecutionSectionsKeyword()
 
-                    if (isExecutionSection) {
-                        if (seenExecutionSection != null) {
-                            holder.newAnnotation(
-                                ERROR, SnakemakeBundle.message("ANN.multiple.execution.sections", seenExecutionSection)
-                            ).range(st).create()
-                        } else {
-                            seenExecutionSection = sectionName
-                        }
-                    }
-                }
-                is SmkRunSection -> {
-                    if (seenExecutionSection != null) {
-                        holder.newAnnotation(
-                            ERROR, SnakemakeBundle.message("ANN.multiple.execution.sections", seenExecutionSection)
-                        ).range(st).create()
-                    } else {
-                        seenExecutionSection = st.sectionKeyword!!
-                    }
+            if (isExecutionSection) {
+                if (seenExecutionSection != null) {
+                    holder.newAnnotation(
+                        ERROR, SnakemakeBundle.message("ANN.multiple.execution.sections", seenExecutionSection)
+                    ).range(st).create()
+                } else {
+                    seenExecutionSection = sectionName
                 }
             }
         }

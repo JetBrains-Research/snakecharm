@@ -56,6 +56,7 @@ open class SmkStatementMover : PyStatementMover() {
         elementToMove2 = getCommentOrStatement(document, elementToMove2)
 
         info.toMove = MyLineRange(elementToMove1, elementToMove2)
+        // set 'toMove2' to null to prohibit move
         info.toMove2 = getDestinationScope(file, editor, (if (down) elementToMove2 else elementToMove1), down)
 
         info.indentTarget = false
@@ -133,46 +134,51 @@ open class SmkStatementMover : PyStatementMover() {
     ): Boolean {
         return (elementToMove is SmkSection && elementToMove !is SmkRunSection &&
                 ((destination is SmkRuleOrCheckpoint &&
-                        elementToMove.sectionKeyword !in api.getRuleOrCheckpointArgsSectionKeywords()) ||
+                        elementToMove.sectionKeyword !in api.getAllPossibleRuleOrCheckpointArgsSectionKeywords()) ||
                         (destination is SmkSubworkflow &&
                                 elementToMove.sectionKeyword !in SnakemakeApi.SUBWORKFLOW_SECTIONS_KEYWORDS) ||
                         (destination is SmkModule &&
-                                elementToMove.sectionKeyword !in api.getModuleSectionKeywords()) ||
+                                elementToMove.sectionKeyword !in api.getAllPossibleModuleSectionKeywords()) ||
                         (destination is SmkUse &&
                                 elementToMove.sectionKeyword !in api.getUseSectionKeywords())))
     }
 
     private fun isAvailableForMoveOut(elementToMove: PsiElement, down: Boolean, api: SnakemakeApiService): Boolean {
-        val useSectionsKeywords = api.getUseSectionKeywords()
+        if (elementToMove is SmkRunSection){
+            return false
+        }
 
         val statementList = getStatementList(elementToMove) ?: return true
-        val statements: Array<out PyStatement> = statementList.statements
+        val children: List<PyStatement> = statementList.statements.toList()
+        // TODO: statements miss comments, but we could swap elements with comments, probably need smth like:
+        // val children = statementList.children.filter() { (it.node.elementType == PyTokenTypes.END_OF_LINE_COMMENT) || (it is PyStatement)}
 
         // if statement is a candidate for moving out of statement list:
-        if (statements.isEmpty()) return false
+        if (children.isEmpty()) return false
         val boundaryStatement = when {
-            down -> statements.last() == elementToMove
-            else -> statements.first() == elementToMove
+            down -> children.last() == elementToMove
+            else -> children.first() == elementToMove
         }
         if (!boundaryStatement) {
             return true
         }
 
         // do not remove the only one section from rule/checkpoint/subworkflow/..
-        if (statements.size == 1 && elementToMove is SmkArgsSection) {
+        if (children.size == 1 && elementToMove is SmkArgsSection) {
             return false
         }
 
+        val useSectionsKeywords = api.getUseSectionKeywords()
         if ((elementToMove is SmkRuleOrCheckpointArgsSection && searchForRuleLikeElement(
                 elementToMove,
                 down,
-                statements,
+                children,
                 SmkRuleOrCheckpoint::class.java,
                 useSectionsKeywords
             )) || (elementToMove is SmkModuleArgsSection && searchForRuleLikeElement(
                 elementToMove,
                 down,
-                statements,
+                children,
                 SmkModule::class.java,
                 useSectionsKeywords
             ))
@@ -201,7 +207,7 @@ open class SmkStatementMover : PyStatementMover() {
     private fun <T : SmkRuleLike<S>, S : SmkArgsSection> searchForRuleLikeElement(
         elementToMove: PsiElement,
         down: Boolean,
-        statements: Array<out PyStatement>,
+        statements: List<PsiElement>,
         clazz: Class<T>,
         useSectionsKeywords: Set<String>
     ): Boolean {

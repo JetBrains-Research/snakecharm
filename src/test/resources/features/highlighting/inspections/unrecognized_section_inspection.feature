@@ -78,6 +78,45 @@ Feature: Inspection if section isn't recognized by SnakeCharm
           output: "file2"
       """
     And SmkUnrecognizedSectionInspection inspection is enabled
-    And I emulate quick fix apply: ignore unresolved item 'unknown_section'
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
+
+
+  Scenario Outline: No weak warnings on execution sections in 'use rule' configured using YAML
+    Given a snakemake project
+    And snakemake framework api yaml descriptor is
+    """
+    changelog:
+      - version: "3.0.0"
+        override:
+        - name: "foobooo"
+          type: "rule-like"
+          execution_section: False
+
+      - version: "2.0.0"
+        introduced:
+        - name: "foobooo"
+          type: "rule-like"
+          execution_section: True
+
+        - name: "threads"
+          type: "rule-like"
+    """
+    And I set snakemake language version to "<lang_version>"
+    Given I open a file "foo.smk" with text
+      """
+      rule A:
+          threads: 4
+
+      use rule A as B with:
+          foobooo: ""
+      """
+    And SmkUnrecognizedSectionInspection inspection is enabled
+    Then I expect no inspection weak warnings
+    When I check highlighting weak warnings
+    Examples:
+      | lang_version |
+      | 0.0.0        |
+      | 1.0.0        |
+      | 2.0.0        |
+      | 3.0.0        |

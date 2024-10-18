@@ -8,7 +8,6 @@ import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SUBWORKFLOW_SECTIONS_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.inspections.quickfix.AddIgnoredElementQuickFix
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RUN
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import javax.swing.JComponent
@@ -30,14 +29,15 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
 
         override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
             if (st.originalElement.elementType == SmkElementTypes.USE_ARGS_SECTION_STATEMENT) {
-                isSectionRecognized(st, api.getUseSectionKeywords())
+                // add execution sections - just to show a better error for that, than just 'unrecognized' section
+                isSectionRecognized(st, api.getAllPossibleUseSectionKeywordsIncludingExecSections())
             } else {
-                isSectionRecognized(st, api.getRuleOrCheckpointArgsSectionKeywords())
+                isSectionRecognized(st, api.getAllPossibleRuleOrCheckpointArgsSectionKeywords())
             }
         }
 
         override fun visitSmkModuleArgsSection(st: SmkModuleArgsSection) {
-            isSectionRecognized(st, api.getModuleSectionKeywords())
+            isSectionRecognized(st, api.getAllPossibleModuleSectionKeywords())
         }
 
         /**
@@ -52,8 +52,11 @@ class SmkUnrecognizedSectionInspection : SnakemakeInspection() {
             val sectionKeyword = argsSection.sectionKeyword
 
             if (sectionNamePsi != null && sectionKeyword != null && sectionKeyword !in setOfValidNames
-                && sectionKeyword !in ignoredItems && !(argsSection.getParentRuleOrCheckPoint() is SmkUse
-                        && sectionKeyword in (api.getExecutionSectionsKeyword() + SECTION_RUN))
+                && sectionKeyword !in ignoredItems
+                && !(
+                        argsSection.getParentRuleOrCheckPoint() is SmkUse
+                                && sectionKeyword in api.getAllPossibleExecutionSectionsKeyword()
+                        )
             ) {
                 registerProblem(
                     sectionNamePsi,
