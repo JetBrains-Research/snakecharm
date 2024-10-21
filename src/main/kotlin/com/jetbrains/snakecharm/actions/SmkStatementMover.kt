@@ -15,7 +15,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.codeInsight.editorActions.moveUpDown.PyStatementMover
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApi
-import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.TOPLEVEL_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.psi.*
 
@@ -194,7 +193,7 @@ open class SmkStatementMover : PyStatementMover() {
         // do not move sections that cannot be toplevel:
         if (elementToMove is SmkArgsSection) {
             val keyword = elementToMove.sectionKeyword
-            val sectionCouldBeToplevel = keyword != null && keyword in TOPLEVEL_ARGS_SECTION_KEYWORDS
+            val sectionCouldBeToplevel = keyword != null && keyword in api.getAllPossibleToplevelArgsSectionKeywords()
             if (!sectionCouldBeToplevel) {
                 return false
             }

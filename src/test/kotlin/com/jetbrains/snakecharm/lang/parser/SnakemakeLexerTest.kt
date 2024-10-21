@@ -152,6 +152,25 @@ class SnakemakeLexerTest : PyLexerTestCase() {
         )
     }
 
+    fun testToplevelKeywordsUnrecognized_Singleline() {
+        doTest(
+            """
+            |fooo_booo_dooo: 1
+            |""".trimMargin().trimStart(),
+            "Py:IDENTIFIER", "Py:COLON", "Py:SPACE", "Py:INTEGER_LITERAL", "Py:STATEMENT_BREAK", "Py:LINE_BREAK", "Py:STATEMENT_BREAK"
+        )
+    }
+
+    fun testToplevelKeywordsUnrecognized_MultilpleLines() {
+        doTest(
+            """
+            |fooo_booo_dooo: 
+            |   a=1
+            |""".trimMargin().trimStart(),
+            "Py:IDENTIFIER", "Py:COLON", "Py:STATEMENT_BREAK", "Py:LINE_BREAK", "Py:INDENT", "Py:IDENTIFIER", "Py:EQ", "Py:INTEGER_LITERAL", "Py:STATEMENT_BREAK", "Py:DEDENT", "Py:LINE_BREAK", "Py:STATEMENT_BREAK"
+        )
+    }
+
 
     /*
 

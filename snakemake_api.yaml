@@ -473,6 +473,12 @@ changelog:
       - name: "workdir"
         type: "top-level"
         multiple_args_allowed: False
+        keyword_args_allowed: False
+
+      - name: "configfile"
+        type: "top-level"
+        multiple_args_allowed: False
+        keyword_args_allowed: False
 
       - name: "subworkflow"
         type: "top-level"

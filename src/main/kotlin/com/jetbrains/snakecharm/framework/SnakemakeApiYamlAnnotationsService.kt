@@ -285,6 +285,19 @@ class SnakemakeApiYamlAnnotationsService(
             latestDeprecated?.key
         }
 
+    @Suppress("unused")
+    fun collectAllPossibleTopLevelSectionsKeywords(): Set<String> = topLevelName2Introduction.keys
+
+    fun collectAllPossibleTopLevelArgsSectionsKeywords(): Set<String> {
+        val keywords = mutableSetOf<String>()
+        topLevelName2Introduction.forEach { keyword, tree ->
+            if (tree.values.any() {it.isArgsSection}) {
+                keywords.add(keyword)
+            }
+        }
+        return keywords
+    }
+
     fun collectAllPossibleUseSubsectionKeywordsIncludingExecutionSections(): Set<String> = collectAllPossibleSubsectionKeywords { type ->
         type == USE_KEYWORD
     }

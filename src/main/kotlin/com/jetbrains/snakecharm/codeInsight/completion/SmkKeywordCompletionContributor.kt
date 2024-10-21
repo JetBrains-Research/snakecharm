@@ -19,7 +19,6 @@ import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.completion.PythonLookupElement
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SUBWORKFLOW_SECTIONS_KEYWORDS
-import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.TOPLEVEL_ARGS_SECTION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.USE_DECLARATION_KEYWORDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
@@ -113,16 +112,20 @@ object WorkflowTopLevelKeywordsProvider : CompletionProvider<CompletionParameter
             return
         }
 
+        val project = parameters.position.project
+
+        // use all possible keywords including deprecations and not yet introduced sections, will be filtered later
+        val api = SnakemakeApiService.getInstance(project)
+
         val tokenType2Name = SnakemakeLexer.KEYWORD_LIKE_SECTION_TOKEN_TYPE_2_KEYWORD
         val colonAndWhiteSpaceTailKeys = WORKFLOW_TOPLEVEL_DECORATORS_WO_RULE_LIKE.types.mapNotNull { tt ->
             tokenType2Name[tt]
-        } + TOPLEVEL_ARGS_SECTION_KEYWORDS
+        } + api.getAllPossibleToplevelArgsSectionKeywords()
         val spaceTailKeys = RULE_LIKE.types.map { tt ->
             tokenType2Name[tt]!!
         }
 
         // top-level
-        val project = parameters.position.project
         listOf(
             colonAndWhiteSpaceTailKeys to ColonAndWhiteSpaceTail,
             spaceTailKeys to TailTypes.spaceType(),

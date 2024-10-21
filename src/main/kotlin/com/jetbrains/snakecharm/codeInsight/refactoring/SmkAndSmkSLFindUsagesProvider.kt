@@ -46,8 +46,8 @@ class SmkAndSmkSLFindUsagesProvider : PythonFindUsagesProvider() {
 class SmkWordsScanner : DefaultWordsScanner(
     SnakemakeLexer(),
     TokenSet.orSet(
-        WORKFLOW_TOPLEVEL_DECORATORS,
-        TokenSet.create(PyTokenTypes.IDENTIFIER)
+        WORKFLOW_TOPLEVEL_DECORATORS, // e.g. hardcoded sections
+        TokenSet.create(PyTokenTypes.IDENTIFIER) // e.g. unrecognized top-level sections, etc.
     ),
     TokenSet.create(PyTokenTypes.END_OF_LINE_COMMENT),
     PyTokenTypes.STRING_NODES

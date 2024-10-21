@@ -82,7 +82,7 @@ class SnakemakeLexer : PythonIndentingLexer() {
             .add(SnakemakeNames.WORKFLOW_ONERROR_KEYWORD)
             .build()
 
-        private val SPECIAL_KEYWORDS_2_TOKEN_TYPE = ImmutableMap.Builder<String, PyElementType>()
+        val SPECIAL_KEYWORDS_2_TOKEN_TYPE = ImmutableMap.Builder<String, PyElementType>()
             .put(SnakemakeNames.RULE_KEYWORD, SmkTokenTypes.RULE_KEYWORD)
             .put(SnakemakeNames.CHECKPOINT_KEYWORD, SmkTokenTypes.CHECKPOINT_KEYWORD)
             .put(SnakemakeNames.WORKFLOW_LOCALRULES_KEYWORD, SmkTokenTypes.WORKFLOW_LOCALRULES_KEYWORD)

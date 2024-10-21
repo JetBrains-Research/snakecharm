@@ -7,8 +7,10 @@ import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.parsing.StatementParsing
 import com.jetbrains.python.psi.PyElementType
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.RULE_OR_CHECKPOINT
+import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkStubElementTypes.*
 import java.util.*
@@ -21,6 +23,7 @@ import java.util.*
 class SmkStatementParsing(
     context: SmkParserContext,
 ) : StatementParsing(context) {
+    val api = SnakemakeApiService.getInstance(context.project) // optional
 
     private val ruleSectionParsingData = SectionParsingData(
         declaration = RULE_DECLARATION_STATEMENT,
@@ -75,7 +78,12 @@ class SmkStatementParsing(
         val scope = context.scope
 
         myBuilder.setDebugMode(false)
-        tryRemapCurrentToken(scope) {
+        // XXX: In order to support unrecognized top-level keywords Lexer return always Py:IDENTIFIER type
+        // Next we remap token to the appropriate token type if keyword is recognized or make a slower
+        // parsing as 'top-level' section attempt to check could it be parsed as top-level section
+        val toplevelArgsSectionsKeywords = api.getTopLevelArgsSectionsKeywords() // XXX: is optional, will work w/o it, but a bit slowly
+        tryRemapCurrentToken(scope, toplevelArgsSectionsKeywords) {
+            // try to parse as `section_name:` string and rollback to position before check
             checkIfAtToplevelDecoratorKeyword()
         }
         val tt = myBuilder.tokenType
@@ -348,13 +356,21 @@ class SmkStatementParsing(
         return false
     }
 
-    private inline fun tryRemapCurrentToken(scope: SmkParsingScope, checkToplevelFun: () -> Boolean) {
+    private inline fun tryRemapCurrentToken(
+        scope: SmkParsingScope,
+        toplevelArgsSectionsKeywords: Set<String>,
+        checkToplevelFun: () -> Boolean
+    ) {
         if (myBuilder.tokenType == PyTokenTypes.IDENTIFIER && !scope.inPythonicSection) {
-            val actualToken = SnakemakeLexer.KEYWORD_LIKE_SECTION_NAME_2_TOKEN_TYPE[myBuilder.tokenText!!]
+            val tokenText = myBuilder.tokenText!!
+            var actualToken = SnakemakeLexer.KEYWORD_LIKE_SECTION_NAME_2_TOKEN_TYPE[tokenText]
+            if (actualToken == null && tokenText in toplevelArgsSectionsKeywords) {
+                actualToken = WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD
+            }
             if (actualToken != null) {
                 myBuilder.remapCurrentToken(actualToken)
             } else if (checkToplevelFun()) {
-                myBuilder.remapCurrentToken(SmkTokenTypes.WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)
+                myBuilder.remapCurrentToken(WORKFLOW_TOPLEVEL_ARGS_SECTION_KEYWORD)
             }
         }
     }

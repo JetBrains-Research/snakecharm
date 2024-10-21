@@ -14,7 +14,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkFile
 class SmkParserDefinition: PythonParserDefinition() {
     override fun createLexer(project: Project) = SnakemakeLexer()
 
-    override fun createParser(project: Project): PsiParser = SnakemakeParser()
+    override fun createParser(project: Project): PsiParser = SnakemakeParser(project)
 
     override fun getFileNodeType() = SnakemakeLanguageDialect.fileElementType
 
