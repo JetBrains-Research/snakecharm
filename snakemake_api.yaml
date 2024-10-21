@@ -85,6 +85,14 @@ changelog:
   - version: "7.7.0"
 
     introduced:
+      - name: "resource_scopes"
+        type: "top-level"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#resources-and-remote-execution
+
+  # ----------------------
+  - version: "7.7.0"
+
+    introduced:
       - name: "retries"
         type: "rule-like"
         multiple_args_allowed: False

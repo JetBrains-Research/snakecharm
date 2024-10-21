@@ -26,6 +26,7 @@ object SnakemakeNames {
     const val WORKFLOW_ENVVARS_KEYWORD = "envvars"
     const val WORKFLOW_CONTAINER_KEYWORD = "container"
     const val WORKFLOW_CONTAINERIZED_KEYWORD = "containerized"  // => 6.0.0
+    const val WORKFLOW_RESOURCE_SCOPES_KEYWORD = "resource_scopes"  // => 7.11
 
     const val SUBWORKFLOW_KEYWORD = "subworkflow"
     const val SUBWORKFLOW_WORKDIR_KEYWORD = WORKFLOW_WORKDIR_KEYWORD
