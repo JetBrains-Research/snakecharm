@@ -65,6 +65,7 @@ Feature: Resolve implicitly imported python names
       | snakemake        | pro | protected()     | protected     | io.py        |
       | snakemake        | upd | update()        | update        | ioflags.py   |
       | snakemake        | bef | before_update() | before_update | ioflags.py   |
+      | snakemake        | fr  | from_queue()    | from_queue    | io.py        |
       | snakemake        | tou | touch()         | touch         | io.py        |
       | snakemake        | un  | unpack()        | unpack        | io.py        |
       | snakemake        | anc | ancient()       | ancient       | io.py        |

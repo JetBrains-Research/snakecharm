@@ -57,7 +57,7 @@ changelog:
         type: "function"
         placeholders_injection_allowed: True
         limit_to_sections:
-          - "output"
+          - "input"
 
  # ---------------------------------------
   - version: "8.0.0"

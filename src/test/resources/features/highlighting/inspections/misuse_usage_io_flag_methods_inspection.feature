@@ -1,6 +1,6 @@
 Feature: Inspection for methods from snakemake library
 
-  Scenario Outline: Incorrect using ancient/protected/directory methods in 8.7.0
+  Scenario Outline: Incorrect using flag methods in 8.7.0
     Given a snakemake project
     And I set snakemake language version to "8.7.0"
     Given I open a file "foo.smk" with text
@@ -15,10 +15,11 @@ Feature: Inspection for methods from snakemake library
     """
     When I check highlighting warnings
     Examples:
-      | rule_like  | section | method    | arg_list | expected                     |
-      | rule       | input   | update    | ('')     | 'output'                     |
+      | rule_like | section | method     | arg_list | expected |
+      | rule      | input   | update     | ('')     | 'output' |
+      | rule      | output  | from_queue | ('')     | 'input'  |
 
-  Scenario Outline: Incorrect using ancient/protected/directory methods
+  Scenario Outline: Incorrect using flag methods
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -56,7 +57,7 @@ Feature: Inspection for methods from snakemake library
       | rule       | input   | dynamic   | ('')     | 'output'                     |
       | checkpoint | input   | dynamic   | ('')     | 'output'                     |
 
-  Scenario Outline: Incorrect using ancient/protected/directory methods before 8.0
+  Scenario Outline: Incorrect using flag methods before 8.0
     # dynamic was removed in 8.0 and feature is based on resolve
 
     Given a snakemake:7.32.4 project
@@ -76,7 +77,7 @@ Feature: Inspection for methods from snakemake library
       | rule       | input   | dynamic   | ('')     | 'output'                     |
       | checkpoint | input   | dynamic   | ('')     | 'output'                     |
 
-  Scenario Outline: Correct using ancient/protected/directory methods
+  Scenario Outline: Correct using flag methods
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -87,33 +88,34 @@ Feature: Inspection for methods from snakemake library
     Then I expect no inspection warnings
     When I check highlighting warnings
     Examples:
-      | rule_like  | section   | method        |
-      | rule       | input     | ancient('')   |
-      | rule       | output    | temp('')      |
-      | rule       | input     | unpack('')    |
-      | rule       | output    | directory('') |
-      | rule       | output    | pipe('')      |
-      | rule       | output    | protected('') |
-      | rule       | output    | dynamic('')   |
-      | rule       | output    | touch('')     |
-      | rule       | output    | ensure('')    |
-      | rule       | log       | touch('')     |
-      | rule       | benchmark | touch('')     |
-      | rule       | output    | report('')    |
-      | rule       | benchmark | repeat('')    |
-      | rule       | benchmark | protected('') |
-      | rule       | output    | update('')    |
-      | checkpoint | input     | ancient('')   |
-      | checkpoint | output    | temporary('') |
-      | checkpoint | input     | unpack('')    |
-      | checkpoint | output    | directory('') |
-      | checkpoint | output    | pipe('')      |
-      | checkpoint | output    | protected('') |
-      | checkpoint | output    | dynamic('')   |
-      | checkpoint | output    | touch('')     |
-      | checkpoint | output    | report('')    |
-      | checkpoint | benchmark | repeat('')    |
-      | checkpoint | benchmark | protected('') |
+      | rule_like  | section   | method         |
+      | rule       | input     | ancient('')    |
+      | rule       | output    | temp('')       |
+      | rule       | input     | unpack('')     |
+      | rule       | input     | from_queue('') |
+      | rule       | output    | directory('')  |
+      | rule       | output    | pipe('')       |
+      | rule       | output    | protected('')  |
+      | rule       | output    | dynamic('')    |
+      | rule       | output    | touch('')      |
+      | rule       | output    | ensure('')     |
+      | rule       | log       | touch('')      |
+      | rule       | benchmark | touch('')      |
+      | rule       | output    | report('')     |
+      | rule       | benchmark | repeat('')     |
+      | rule       | benchmark | protected('')  |
+      | rule       | output    | update('')     |
+      | checkpoint | input     | ancient('')    |
+      | checkpoint | output    | temporary('')  |
+      | checkpoint | input     | unpack('')     |
+      | checkpoint | output    | directory('')  |
+      | checkpoint | output    | pipe('')       |
+      | checkpoint | output    | protected('')  |
+      | checkpoint | output    | dynamic('')    |
+      | checkpoint | output    | touch('')      |
+      | checkpoint | output    | report('')     |
+      | checkpoint | benchmark | repeat('')     |
+      | checkpoint | benchmark | protected('')  |
 
 
   Scenario Outline: Complex cases not be confused
