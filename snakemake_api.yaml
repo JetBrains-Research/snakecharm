@@ -50,7 +50,7 @@ changelog:
           - "input"
 
   # ---------------------------------------
-  - version: "8.2.0"
+  - version: "8.3.0"
     introduced:
       - name: "snakemake.io.from_queue"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#continuously-updated-input
