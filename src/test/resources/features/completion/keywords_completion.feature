@@ -313,8 +313,6 @@ Feature: Completion for snakemake keyword-like things
       | rule       | retr | retries        |
       | rule       | loc  | localrule      |
 
-
-    @here2
   Scenario Outline: Complete at rule/checkpoint level (single variant) with trailing ws
     Given a snakemake project
     Given I open a file "foo.smk" with text
