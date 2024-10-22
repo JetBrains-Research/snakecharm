@@ -249,6 +249,14 @@ changelog:
   - version: "5.12.0"
 
     introduced:
+      - name: "scattergather"
+        type: "top-level"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#defining-scatter-gather-processes
+
+  # ----------------------
+  - version: "5.12.0"
+
+    introduced:
       - name: "cache"
         type: "rule-like"
         multiple_args_allowed: False
