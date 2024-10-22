@@ -25,11 +25,15 @@ Feature: Completion in python part of snakemake file
       | rules         |
       | input         |
       | pep           |
-      | lookup |
-      | evaluate |
-      | branch |
-      | collect |
-      | exists |
+      | lookup        |
+      | evaluate      |
+      | branch        |
+      | collect       |
+      | exists        |
+      | storage       |
+      | github        |
+      | gitlab        |
+      | gitfile       |
 
   Scenario: Complete at top-level (GTE 6.1)
     Given a snakemake:6.1 project
@@ -141,6 +145,10 @@ Feature: Completion in python part of snakemake file
       | rule      |
       | jobid     |
       | pep       |
+      | storage   |
+      | github    |
+      | gitlab    |
+      | gitfile   |
 
   Scenario: Complete in run section  (GTE 6.1)
       Given a snakemake:6.1 project

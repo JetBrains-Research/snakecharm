@@ -16,6 +16,7 @@ import com.intellij.openapi.roots.ex.ProjectRootManagerEx
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.util.QualifiedName
 import com.intellij.util.SlowOperations
@@ -28,8 +29,10 @@ import com.jetbrains.python.packaging.requirement.PyRequirementRelation.LT
 import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.resolve.fromSdk
 import com.jetbrains.python.psi.resolve.resolveQualifiedName
+import com.jetbrains.python.psi.resolve.resolveTopLevelMember
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.GLOBAL_VARS_TO_CLASS_FQN
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SECTION_ACCESSOR_CLASSES
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_API_VERS_6_1
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
@@ -175,7 +178,7 @@ class SmkImplicitPySymbolsProvider(
         // in order to get properly working inspection on shell class constructor, e.g ignore first 'self' arg
         // let's resolve to class here:
         collectClasses(
-            listOf("snakemake.shell" to "shell"),
+            listOf("snakemake.shell.shell"),
             SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache, ImplicitPySymbolUsageType.METHOD
         )
         progressIndicator?.checkCanceled()
@@ -213,6 +216,17 @@ class SmkImplicitPySymbolsProvider(
         // peppy module: `pep` variable
         addPeppyGlobalVariables(usedFiles, sdk, syntheticElementsCache)
         progressIndicator?.checkCanceled()
+
+        ////////////////////////////////////////
+        // TODO: also all rules functions are accessible using `__{rule_name}`
+        //  workflow.py
+        //      ruleinfo.func.__name__ = f"__{rule.name}"
+        //      self.globals[ruleinfo.func.__name__] = ruleinfo.func
+
+        ////////////////////////////////////////
+        // TODO: all modules names acceible by name:
+        // modules.py
+        //      self.workflow.globals[self.namespace] = namespace
 
         ////////////////////////////////////////
         val contentVersion = usedFiles.sortedBy { it.path }.map { it.timeStamp }.hashCode()
@@ -395,14 +409,14 @@ class SmkImplicitPySymbolsProvider(
 
     @Suppress("unused")
     private fun collectClassInstanceMethods(
-        moduleAndClass: List<Pair<String, String>>,
+        classFQN: List<String>,
         scope: SmkCodeInsightScope,
         usedFiles: MutableSet<VirtualFile>,
         sdk: Sdk,
         elementsCache: MutableList<ImplicitPySymbol>,
         checkInheritedMethods: Boolean = false
     ) {
-        processClasses(moduleAndClass, usedFiles, sdk) { pyClass ->
+        processClasses(classFQN, usedFiles, sdk) { pyClass ->
             //val ctx = TypeEvalContext.userInitiated(
             //    pyClass.project,
             //    pyClass.originalElement.containingFile
@@ -419,14 +433,14 @@ class SmkImplicitPySymbolsProvider(
 
     @Suppress("unused")
     private fun collectClassConstructors(
-        moduleAndClass: List<Pair<String, String>>,
+        classFQN: List<String>,
         scope: SmkCodeInsightScope,
         usedFiles: MutableSet<VirtualFile>,
         sdk: Sdk,
         elementsCache: MutableList<ImplicitPySymbol>
     ) {
 
-        processClasses(moduleAndClass, usedFiles, sdk) { pyClass ->
+        processClasses(classFQN, usedFiles, sdk) { pyClass ->
             //val ctx = TypeEvalContext.userInitiated(
             //    pyClass.project,
             //    pyClass.originalElement.containingFile
@@ -449,35 +463,30 @@ class SmkImplicitPySymbolsProvider(
     }
 
     private fun collectClasses(
-        moduleAndClass: List<Pair<String, String>>,
+        classFQN: List<String>,
         scope: SmkCodeInsightScope,
         usedFiles: MutableSet<VirtualFile>,
         sdk: Sdk,
         elementsCache: MutableList<ImplicitPySymbol>,
         usageType: ImplicitPySymbolUsageType
     ) {
-        processClasses(moduleAndClass, usedFiles, sdk) { pyClass ->
+        processClasses(classFQN, usedFiles, sdk) { pyClass ->
             elementsCache.add(ImplicitPySymbol(pyClass.name!!, pyClass.qualifiedName, pyClass, scope, usageType))
         }
     }
 
     private fun processClasses(
-        moduleAndClass: List<Pair<String, String>>,
+        classFQN: List<String>,
         usedFiles: MutableSet<VirtualFile>,
         sdk: Sdk,
         processor: (PyClass) -> Unit
     ) {
-        moduleAndClass.forEach { (pyModuleFqn, className) ->
-            val pyFiles = collectPyFiles(pyModuleFqn, usedFiles, sdk)
-
-            pyFiles
-                .asSequence()
-                .filter { it.isValid }
-                .mapNotNull { it.findTopLevelClass(className) }
-                .filter { it.name != null }
-                .forEach { pyClass ->
-                    processor(pyClass)
-                }
+        val resolveContext = fromSdk(project, sdk)
+        classFQN.forEach { fqn ->
+            val pyElement = resolveTopLevelMember(QualifiedName.fromDottedString(fqn), resolveContext)
+            if (pyElement is PyClass) {
+                processor(pyElement)
+            }
         }
     }
 
@@ -638,48 +647,76 @@ class SmkImplicitPySymbolsProvider(
         //
         // Workflow.__init__()
         //     _globals = globals()
+        //
+        //     _globals["shell"] = shell
         //     _globals["workflow"] = self
-        //     _globals["cluster_config"] = copy.deepcopy(self.overwrite_clusterconfig)
-        //     _globals["rules"] = Rules()
         //     _globals["checkpoints"] = Checkpoints()
         //     _globals["scatter"] = Scatter()
         //     _globals["gather"] = Gather()
+        //     _globals["github"] = sourcecache.GithubFile
+        //      _globals["gitlab"] = sourcecache.GitlabFile
+        //      _globals["gitfile"] = sourcecache.LocalGitFile
+        //     _globals["storage"] = self._storage_registry
+        //     snakemake.ioutils.register_in_globals(_globals)
+        //     snakemake.ioflags.register_in_globals(_globals)
+        //     _globals["from_queue"] = from_queue
+
+        //     _globals["cluster_config"] = copy.deepcopy(self.overwrite_clusterconfig)
         //     ...
-        //     self.globals["config"]
-        val globals = HashMap<String, PyElement?>()
+        //     self.globals["config"] = copy.deepcopy(self.config_settings.overwrite_config)
+        //
+        // WorkflowModifier.__init__()
+        //      self.rule_proxies = rule_proxies or Rules()
+        //      self.globals["rules"] = self.rule_proxies
 
-        val workflowFile = collectPyFiles("snakemake.workflow", usedFiles, sdk).firstOrNull()
-        if (workflowFile != null) {
-            usedFiles.add(workflowFile.virtualFile)
-        }
-        globals["workflow"] = workflowFile?.findTopLevelClass("Workflow")
-
-        // XXX: for some reason cannot directly resolve here 'snakemake.common.Rules' using 'resolveQualifiedName()'
-        //   it sounds better to resolve required class FQN instead of looking for 1) file 2) then looking for class
-
-        // Snakemake >= 6.5
-        var commonFile = collectPyFiles("snakemake.common.__init__", usedFiles, sdk).firstOrNull()
-        if (commonFile == null) {
-            // Snakemake 6.1 .. 6.4.x
-            commonFile = collectPyFiles("snakemake.common", usedFiles, sdk).firstOrNull()
-        }
-        if (commonFile != null) {
-            usedFiles.add(commonFile.virtualFile)
+        val globals = HashMap<String, PsiElement?>()
+        val resolveContext = fromSdk(project, sdk)
+        GLOBAL_VARS_TO_CLASS_FQN.forEach { item, classFqn ->
+            // * resolve module (file):
+            // resolveQualifiedName(QualifiedName.fromDottedString("snakemake.common"), fromSdk(project, sdk))
+            // * resolve class:
+            // resolveTopLevelMember(QualifiedName.fromDottedString("snakemake.common.Rules"), fromSdk(project, sdk))
+            // (resolveQualifiedName(QualifiedName.fromDottedString("snakemake.common"), resolveContext)[0] as PyFile).findTopLevelClass("Rules")
+            val psiElement = classFqn?.let { resolveTopLevelMember(QualifiedName.fromDottedString(it), resolveContext) }
+            psiElement?.containingFile?.virtualFile?.let() { usedFiles.add(it)}
+            globals[item] = psiElement
         }
 
-        globals[SnakemakeNames.SMK_VARS_CHECKPOINTS] = commonFile?.findTopLevelClass("Checkpoints")
-        globals[SnakemakeNames.SMK_VARS_RULES] = commonFile?.findTopLevelClass("Rules")
-        globals[SnakemakeNames.SMK_VARS_SCATTER] = commonFile?.findTopLevelClass("Scatter")
-        globals[SnakemakeNames.SMK_VARS_GATHER] = commonFile?.findTopLevelClass("Gather")
-        globals[SnakemakeNames.SMK_VARS_CONFIG] = null
-
-        val checkpointsFile = collectPyFiles("snakemake.checkpoints", usedFiles, sdk).firstOrNull()
-        if (checkpointsFile != null) {
-            usedFiles.add(checkpointsFile.virtualFile)
+        // Storage - is an instance of StorageRegistry
+        val workflowClass = resolveTopLevelMember(
+            QualifiedName.fromDottedString("snakemake.workflow.Workflow"),
+            resolveContext
+        ) as? PyClass
+        if (workflowClass != null) {
+            val attr = workflowClass.findInstanceAttribute("_storage_registry", false)
+            if (attr != null) {
+                globals[SnakemakeNames.SMK_VARS_STORAGE] = attr
+            }
         }
-        // TODO: do we need this ?
-        globals["checkpoints"] = checkpointsFile?.findTopLevelClass("Checkpoints")
+        if (SnakemakeNames.SMK_VARS_STORAGE !in globals) {
+            // Fail safe:
+            globals[SnakemakeNames.SMK_VARS_STORAGE] = resolveTopLevelMember(
+                QualifiedName.fromDottedString("snakemake.storage.StorageRegistry"),
+                resolveContext
+            )
+        }
 
+        // Config
+        val configSettingsClass = resolveTopLevelMember(
+            QualifiedName.fromDottedString("snakemake.settings.types.ConfigSettings"),
+            resolveContext
+        ) as? PyClass
+        if (configSettingsClass != null) {
+            // ~8.0-8.1 feature
+            val attr = configSettingsClass.findInstanceAttribute("overwrite_config", false)
+            if (attr != null) {
+                globals[SnakemakeNames.SMK_VARS_CONFIG] = attr
+            }
+        } else {
+            globals[SnakemakeNames.SMK_VARS_CONFIG] = null
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
         globals.forEach { (name, psi) ->
             elementsCache.add(
                 SmkCodeInsightScope.TOP_LEVEL to SmkCompletionUtil.createPrioritizedLookupElement(

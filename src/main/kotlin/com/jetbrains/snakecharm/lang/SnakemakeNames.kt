@@ -75,12 +75,20 @@ object SnakemakeNames {
     const val SNAKEMAKE_FQN_FUN_MIN_VERSION = "snakemake.utils.min_version"
 
     const val UNPACK_FUNCTION = "unpack"
+
+    const val SMK_VARS_WORKFLOW = "workflow"
     const val SMK_VARS_CONFIG = "config"
+    const val SMK_VARS_CLUSTER_ONFIG = "cluster_config" // TODO seems removed in 8.x
     const val SMK_VARS_PEP = "pep"
     const val SMK_VARS_RULES = "rules"
     const val SMK_VARS_CHECKPOINTS = "checkpoints"
     const val SMK_VARS_SCATTER = "scatter"
     const val SMK_VARS_GATHER = "gather"
+    const val SMK_VARS_GITHUB = "github" // 6.8.1
+    const val SMK_VARS_GITLAB = "gitlab" // 6.8.1
+    const val SMK_VARS_GITFILE = "gitfile" // 7.13.0
+    const val SMK_VARS_STORAGE = "storage" // 8.0.0:
+
     const val SMK_FUN_EXPAND = "expand"
     const val SMK_FUN_EXPAND_ALIAS_COLLECT = "collect"
 

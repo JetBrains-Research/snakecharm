@@ -67,6 +67,18 @@ object SnakemakeApi {
         "snakemake.io.Log" to "log",
         "snakemake.io.Resources" to "resources"
     )
+    // TODO: Is possible to move into YAML
+    val GLOBAL_VARS_TO_CLASS_FQN = mapOf(
+        SnakemakeNames.SMK_VARS_WORKFLOW to "snakemake.workflow.Workflow",
+        SnakemakeNames.SMK_VARS_RULES to "snakemake.common.Rules",
+        SnakemakeNames.SMK_VARS_SCATTER to "snakemake.common.Scatter",
+        SnakemakeNames.SMK_VARS_GATHER to "snakemake.common.Gather",
+        SnakemakeNames.SMK_VARS_CLUSTER_ONFIG to null,
+        SnakemakeNames.SMK_VARS_CHECKPOINTS to "snakemake.checkpoints.Checkpoints",
+        SnakemakeNames.SMK_VARS_GITHUB to "snakemake.sourcecache.GithubFile",
+        SnakemakeNames.SMK_VARS_GITLAB to "snakemake.sourcecache.GitlabFile",
+        SnakemakeNames.SMK_VARS_GITFILE to "snakemake.sourcecache.LocalGitFile",
+    )
 
     // List of top-level sections.
     // XXX: cannot fully move to SnakemakeApiService because it is used to create Lexer, WordScanner, Highlighter
