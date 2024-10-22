@@ -19,6 +19,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.util.QualifiedName
+import com.intellij.util.PlatformIcons
 import com.intellij.util.SlowOperations
 import com.jetbrains.python.extensions.inherits
 import com.jetbrains.python.packaging.PyPackage
@@ -121,6 +122,49 @@ class SmkImplicitPySymbolsProvider(
 
         val elementsCache = ArrayList<ImplicitPySymbol>()
         val syntheticElementsCache = ArrayList<Pair<SmkCodeInsightScope, LookupElement>>()
+
+        ///////////////////////////////////////
+        // Implicit requires: e.g. 'os', 'sys'
+        val resolveContext = fromSdk(project, sdk)
+        listOf("os", "sys").forEach { moduleName ->
+            var module = resolveQualifiedName(QualifiedName.fromDottedString(moduleName), resolveContext).filterIsInstance<PyFile>().firstOrNull()
+            if (module == null) {
+                module =
+                    resolveQualifiedName(QualifiedName.fromDottedString("${moduleName}.__init__"), resolveContext).filterIsInstance<PyFile>()
+                        .firstOrNull()
+            }
+            if (module != null) {
+                usedFiles.add(module.virtualFile)
+
+                syntheticElementsCache.add(
+                    SmkCodeInsightScope.TOP_LEVEL to SmkCompletionUtil.createPrioritizedLookupElement(
+                        moduleName,
+                        module,
+                        icon = PlatformIcons.VARIABLE_ICON,
+                        typeText = moduleName,
+                        priority = SmkCompletionUtil.WORKFLOW_GLOBALS_PRIORITY
+                    )
+                )
+            }
+        }
+        // Add 'Path' from pathlib
+        listOf("pathlib.Path").forEach() { fqn ->
+            val qualifiedName = QualifiedName.fromDottedString(fqn)
+            val pyClass = resolveTopLevelMember(qualifiedName, resolveContext) as? PyClass
+            if (pyClass != null) {
+                usedFiles.add(pyClass.containingFile.virtualFile)
+
+                syntheticElementsCache.add(
+                    SmkCodeInsightScope.TOP_LEVEL to SmkCompletionUtil.createPrioritizedLookupElement(
+                        qualifiedName.lastComponent.toString(),
+                        pyClass,
+                        icon = PlatformIcons.CLASS_ICON,
+                        typeText = fqn,
+                        priority = SmkCompletionUtil.WORKFLOW_GLOBALS_PRIORITY
+                    )
+                )
+            }
+        }
 
         ///////////////////////////////////////
         // E.g. rules, config, ... defined in Workflow code as global variables
@@ -485,6 +529,7 @@ class SmkImplicitPySymbolsProvider(
         classFQN.forEach { fqn ->
             val pyElement = resolveTopLevelMember(QualifiedName.fromDottedString(fqn), resolveContext)
             if (pyElement is PyClass) {
+                usedFiles.add(pyElement.containingFile.virtualFile)
                 processor(pyElement)
             }
         }

@@ -81,6 +81,21 @@ Feature: Resolve implicitly imported python names
       | snakemake        | pe  | pep             | __init__      | project.py   |
       | snakemake        | pe  | pep.config      | __init__      | project.py   |
 
+  Scenario Outline: Resolve implicit python modules/classes at top-level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <text>
+    """
+    When I put the caret at <ptn>
+    Then reference should resolve to "<symbol_name>" in "<file>"
+
+    Examples:
+      | ptn | text | symbol_name | file            |
+      | os  | os   | [SKIP]      | os/__init__.pyi |
+      | sy  | sys  | [SKIP]      | sys.py          |
+      | Pat | Path | Path        | pathlib.pyi     |
+
   Scenario: Resolve at top-level: shell()
     Given a snakemake project
     Given I open a file "foo.smk" with text

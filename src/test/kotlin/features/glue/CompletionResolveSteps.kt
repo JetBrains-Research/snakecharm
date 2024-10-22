@@ -134,7 +134,7 @@ class CompletionResolveSteps {
         }
     }
 
-    @Then("^reference should resolve to \"(.+)\" in \"(.+)\"$")
+    @Then("^reference should resolve to \"(.+|[SKIP])\" in \"(.+)\"$")
     fun referenceShouldResolveToIn(targetPrefix: String, file: String) {
         DumbService.getInstance(SnakemakeWorld.fixture().project).waitForSmartMode()
         ApplicationManager.getApplication().runReadAction {
@@ -180,19 +180,21 @@ class CompletionResolveSteps {
         )
         assertEquals(file, actualSubString, msg)
 
-        assertTrue(
-            targetPrefix.length <= result.textLength,
-            "Expected result prefix <$targetPrefix> is longer than element <${result.text}>\n$msg"
-        )
+        if (targetPrefix != "[SKIP]") {
+            assertTrue(
+                targetPrefix.length <= result.textLength,
+                "Expected result prefix <$targetPrefix> is longer than element <${result.text}>\n$msg"
+            )
 
-        val elementText = TextRange.from(result.textOffset, targetPrefix.length).substring(result.containingFile.text)
+            val elementText =
+                TextRange.from(result.textOffset, targetPrefix.length).substring(result.containingFile.text)
 //        val elementText = TextRange.from(0, targetPrefix.length).substring(result.text)
-        assertEquals(targetPrefix, elementText, msg)
+            assertEquals(targetPrefix, elementText, msg)
 
-        val text =
-            TextRange.from(injectionStartOffset + result.textOffset, context.length).substring(containingFile.text)
-        assertEquals(context, text, msg)
-
+            val text =
+                TextRange.from(injectionStartOffset + result.textOffset, context.length).substring(containingFile.text)
+            assertEquals(context, text, msg)
+        }
     }
 
     @Then("^reference in injection should multi resolve to name, file in same order$")
