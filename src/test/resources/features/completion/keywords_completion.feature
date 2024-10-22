@@ -249,13 +249,13 @@ Feature: Completion for snakemake keyword-like things
     Given I open a file "foo.smk" with text
       """
       <rule_like> NAME:
-        <str>
+        <str>#here
       """
     When I put the caret after <str>
     Then I invoke autocompletion popup and see a text:
       """
       <rule_like> NAME:
-        <result>:
+        <result>: #here
       """
     Examples:
       | rule_like  | str  | result         |
