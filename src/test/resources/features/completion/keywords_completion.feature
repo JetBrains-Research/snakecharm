@@ -326,7 +326,7 @@ Feature: Completion for snakemake keyword-like things
     Then I invoke autocompletion popup and see a text:
       """
       <rule_like> NAME:
-        <result>:
+        <result>: 
       """
     Examples:
       | rule_like | str | result |
