@@ -18,6 +18,7 @@ Feature: Completion for snakemake keyword-like things
       | include              |
       | workdir              |
       | wildcard_constraints |
+      | scattergather        |
       | onsuccess            |
       | onstart              |
       | onerror              |

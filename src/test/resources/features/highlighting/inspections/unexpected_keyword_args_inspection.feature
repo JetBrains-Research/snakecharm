@@ -73,6 +73,19 @@ Feature: Inspection for unexpected keyword arguments in section
       | section_name  |
       | container     |
 
+  Scenario Outline: Expected keyword arguments on top-level in latest language level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    <section_name>: a="foo.bar"
+    """
+    And SmkSectionUnexpectedKeywordArgsInspection inspection is enabled
+    Then I expect no inspection errors
+    When I check highlighting errors
+    Examples:
+      | section_name  |
+      | scattergather |
+
   Scenario Outline: No warn on expected keyword arguments in subsections when API settings allow
     Given a snakemake project
     And snakemake framework api yaml descriptor is
