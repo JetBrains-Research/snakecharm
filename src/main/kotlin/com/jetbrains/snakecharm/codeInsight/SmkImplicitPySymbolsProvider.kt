@@ -642,6 +642,8 @@ class SmkImplicitPySymbolsProvider(
         sdk: Sdk,
         elementsCache: MutableList<Pair<SmkCodeInsightScope, LookupElement>>
     ) {
+        // TODO: take from api.getModuleArgsSectionKeywords() + help add into list + deprecation info
+
         // ====== snakemake module ========
         // See snakemake/workflow.py
         //

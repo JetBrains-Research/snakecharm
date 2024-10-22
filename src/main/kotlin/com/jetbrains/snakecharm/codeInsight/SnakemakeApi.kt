@@ -67,8 +67,8 @@ object SnakemakeApi {
         "snakemake.io.Log" to "log",
         "snakemake.io.Resources" to "resources"
     )
-    // TODO: Is possible to move into YAML
     val GLOBAL_VARS_TO_CLASS_FQN = mapOf(
+        // TODO: Is possible to move into YAML, but will be different cases, e.g. use class, some variable or instance obj
         SnakemakeNames.SMK_VARS_WORKFLOW to "snakemake.workflow.Workflow",
         SnakemakeNames.SMK_VARS_RULES to "snakemake.common.Rules",
         SnakemakeNames.SMK_VARS_SCATTER to "snakemake.common.Scatter",

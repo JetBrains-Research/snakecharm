@@ -76,6 +76,7 @@ object SnakemakeNames {
 
     const val UNPACK_FUNCTION = "unpack"
 
+    // TODO: move to YAML api
     const val SMK_VARS_WORKFLOW = "workflow"
     const val SMK_VARS_CONFIG = "config"
     const val SMK_VARS_CLUSTER_ONFIG = "cluster_config" // TODO seems removed in 8.x
