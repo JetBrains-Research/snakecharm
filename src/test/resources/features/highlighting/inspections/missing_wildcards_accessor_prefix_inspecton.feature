@@ -1,3 +1,4 @@
+@here3
 Feature: Inspection for missing 'wildcards.' prefix
 
   Scenario Outline: Wildcards prefix is missing
@@ -73,16 +74,17 @@ Feature: Inspection for missing 'wildcards.' prefix
     Given I open a file "foo.smk" with text
     """
     <rule_like> NAME:
-      <section>: expand("{sample}.txt", sample="")
+      <section>: <expand_alias>("{sample}.txt", sample="")
     """
     And SmkSLMissingWildcardsAccessorPrefixInspection inspection is enabled
     Then I expect no inspection warnings
     When I check highlighting warnings
     Examples:
-      | rule_like  | section |
-      | rule       | shell   |
-      | rule       | message |
-      | checkpoint | shell   |
+      | rule_like  | section | expand_alias |
+      | rule       | shell   | expand       |
+      | rule       | message | expand       |
+      | rule       | shell   | collect           |
+      | checkpoint | shell   | expand       |
 
   Scenario Outline: Do not show warning in lambda expression #249
     Given a snakemake project
@@ -99,12 +101,13 @@ Feature: Inspection for missing 'wildcards.' prefix
     Then I expect no inspection warnings
     When I check highlighting warnings
     Examples:
-      | rule_like  | section | text                              |
-      | rule       | input   | "{prefix}.txt"                    |
-      | rule       | params  | ancient("{prefix}.txt")           |
-      | rule       | input   | temp("{prefix}.txt")              |
-      | rule       | input   | foo("{prefix}.txt")               |
-      | checkpoint | input   | "{prefix}.txt"                    |
-      | checkpoint | params  | ancient("{prefix}.txt")           |
-      | checkpoint | input   | expand("{prefix}.txt", prefix="") |
+      | rule_like  | section | text                               |
+      | rule       | input   | "{prefix}.txt"                     |
+      | rule       | params  | ancient("{prefix}.txt")            |
+      | rule       | input   | temp("{prefix}.txt")               |
+      | rule       | input   | foo("{prefix}.txt")                |
+      | checkpoint | input   | "{prefix}.txt"                     |
+      | checkpoint | params  | ancient("{prefix}.txt")            |
+      | checkpoint | input   | expand("{prefix}.txt", prefix="")  |
+      | checkpoint | input   | collect("{prefix}.txt", prefix="") |
 

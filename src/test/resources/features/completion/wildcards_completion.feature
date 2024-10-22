@@ -254,6 +254,7 @@ Feature: Completion for wildcards
       | rule       |
       | checkpoint |
 
+@here3
   Scenario Outline: Expand injections not in wildcards
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -268,12 +269,14 @@ Feature: Completion for wildcards
     Then completion list shouldn't contain:
       | prefix |
     Examples:
-      | rule_like  | section | text                                      |
-      | rule       | output  | expand("{prefix}", prefix="p")            |
-      | rule       | input   | expand("{prefix}", prefix="p")            |
-      | rule       | input   | lambda wd: expand("{prefix}", prefix="p") |
-      | checkpoint | output  | expand("{prefix}", prefix="p")            |
-      | checkpoint | input   | lambda wd: expand("{prefix}", prefix="p") |
+      | rule_like  | section | text                                       |
+      | rule       | output  | expand("{prefix}", prefix="p")             |
+      | rule       | input   | expand("{prefix}", prefix="p")             |
+      | rule       | input   | collect("{prefix}", prefix="p")            |
+      | rule       | input   | lambda wd: expand("{prefix}", prefix="p")  |
+      | rule       | input   | lambda wd: collect("{prefix}", prefix="p") |
+      | checkpoint | output  | expand("{prefix}", prefix="p")             |
+      | checkpoint | input   | lambda wd: expand("{prefix}", prefix="p")  |
 
 
   Scenario Outline: Do not collect wildcard from lambdas (manual injection case)

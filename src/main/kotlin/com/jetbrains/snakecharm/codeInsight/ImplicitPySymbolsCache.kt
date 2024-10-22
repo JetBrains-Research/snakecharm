@@ -42,6 +42,7 @@ interface ImplicitPySymbolsCache {
 
 data class ImplicitPySymbol(
     val identifier: String,
+    val fqn: String?,
     val psiDeclaration: PyElement,
     val scope: SmkCodeInsightScope,
     val usageType: ImplicitPySymbolUsageType

@@ -58,10 +58,11 @@ object SnakemakeApi {
     const val SMK_VARS_SCATTER = "scatter"
     const val SMK_VARS_GATHER = "gather"
     const val SMK_FUN_EXPAND = "expand"
+    const val SMK_FUN_EXPAND_ALIAS_COLLECT = "collect"
 
     val FUNCTIONS_BANNED_FOR_WILDCARDS = listOf(
         // TODO: Is possible to move into YAML
-        SMK_FUN_EXPAND
+        SMK_FUN_EXPAND, SMK_FUN_EXPAND_ALIAS_COLLECT
     )
 
     const val SMK_VARS_WILDCARDS = "wildcards"

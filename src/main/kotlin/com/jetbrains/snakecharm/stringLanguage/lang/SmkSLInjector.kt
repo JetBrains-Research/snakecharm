@@ -7,6 +7,7 @@ import com.jetbrains.python.codeInsight.PyInjectionUtil.InjectionResult
 import com.jetbrains.python.codeInsight.PyInjectorBase
 import com.jetbrains.python.psi.*
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_FUN_EXPAND
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_FUN_EXPAND_ALIAS_COLLECT
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
@@ -87,7 +88,8 @@ open class SmkSLInjector : PyInjectorBase() {
 
 fun isInExpandCallExpression(element: PsiElement): Boolean {
     val parentCallExpr = PsiTreeUtil.getParentOfType(element, PyCallExpression::class.java)
-    return parentCallExpr?.callSimpleName() == SMK_FUN_EXPAND
+    val callSimpleName = parentCallExpr?.callSimpleName()
+    return (callSimpleName == SMK_FUN_EXPAND) || (callSimpleName == SMK_FUN_EXPAND_ALIAS_COLLECT)
 }
 
 fun PyCallExpression.callSimpleName() = this.callee.let { expression ->

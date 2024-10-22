@@ -39,6 +39,7 @@ Feature: Resolve implicitly imported python names
   Scenario: Do not resolve at top-level if no python sdk
   Scenario: Resolve at top-level if custom python sdk
 
+  @here3
   Scenario Outline: Resolve at top-level
     Given a <smk_vers> project
     Given I open a file "foo.smk" with text
@@ -65,6 +66,11 @@ Feature: Resolve implicitly imported python names
       | snakemake        | pro | protected()     | protected     | io.py        |
       | snakemake        | upd | update()        | update        | ioflags.py   |
       | snakemake        | bef | before_update() | before_update | ioflags.py   |
+      | snakemake        | lo  | lookup()        | lookup        | ioutils.py   |
+      | snakemake        | br  | branch()        | branch        | ioutils.py   |
+      | snakemake        | ev  | evaluate()      | evaluate      | ioutils.py   |
+      | snakemake        | col | collect()       | expand        | io.py        |
+      | snakemake        | ex  | exists()        | exists        | ioutils.py   |
       | snakemake        | fr  | from_queue()    | from_queue    | io.py        |
       | snakemake        | tou | touch()         | touch         | io.py        |
       | snakemake        | un  | unpack()        | unpack        | io.py        |

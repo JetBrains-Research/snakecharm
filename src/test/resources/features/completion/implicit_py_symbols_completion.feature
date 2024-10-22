@@ -1,6 +1,7 @@
 Feature: Completion in python part of snakemake file
   Auto-complete runtime magic from snakemake
 
+  @here3
   Scenario: Complete at top-level
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -25,6 +26,11 @@ Feature: Completion in python part of snakemake file
       | rules         |
       | input         |
       | pep           |
+      | lookup |
+      | evaluate |
+      | branch |
+      | collect |
+      | exists |
 
   Scenario: Complete at top-level (GTE 6.1)
     Given a snakemake:6.1 project
@@ -121,6 +127,7 @@ Feature: Completion in python part of snakemake file
     And I invoke autocompletion popup
     Then completion list should contain:
       | expand    |
+      | collect   |
       | config    |
       | rules     |
       | shell     |

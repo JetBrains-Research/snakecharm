@@ -52,6 +52,35 @@ changelog:
   # ---------------------------------------
   - version: "8.3.0"
     introduced:
+      - name: "snakemake.ioutils.exists"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#the-exists-function
+        placeholders_injection_allowed: True
+
+      - name: "snakemake.ioutils.evaluate"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#the-evaluate-function
+        placeholders_injection_allowed: True
+
+      - name: "snakemake.ioutils.branch"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#the-branch-function
+        placeholders_injection_allowed: True
+
+      - name: "snakemake.ioutils.lookup"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#the-lookup-function
+        placeholders_injection_allowed: True
+
+        # TODO: collect: snakemake.io.expand
+      - name: "snakemake.ioutils.collect"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#the-collect-function
+        placeholders_injection_allowed: True
+
+  # ---------------------------------------
+  - version: "8.3.0"
+    introduced:
       - name: "snakemake.io.from_queue"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#continuously-updated-input
         type: "function"

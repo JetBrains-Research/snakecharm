@@ -61,17 +61,21 @@ Feature: Tests on snakemake string language injection
     """
     When I put the caret after {output
     Then I expect no language injection
-
-   Scenario: Allow injection in lambdas in expand call
+@here3
+   Scenario Outline: Allow injection in lambdas in expand call
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
     rule:
       output: "foo"
-      log: lambda wd: expand("{output}.log", output="out.txt")
+      log: lambda wd: <expand_alias>("{output}.log", output="out.txt")
     """
     When I put the caret after {output
      Then I expect language injection on "{output}.log"
+     Examples:
+       | expand_alias |
+       | expand       |
+       | collect      |
 
   Scenario: Injection in split string literal
     Given a snakemake project
@@ -195,6 +199,25 @@ Feature: Tests on snakemake string language injection
       | default_target       |
       | retries              |
 
+  @here3
+  Scenario Outline: Inject in snakemake function calls in 8.7.0
+    # TODO: merge with : Scenario Outline: Inject in snakemake function calls
+
+    Given a snakemake project
+    And I set snakemake language version to "8.7.0"
+    Given I open a file "foo.smk" with text
+    """
+    <import_statement>
+    rule NAME:
+      input: <function>("{foo}")
+    """
+    When I put the caret after foo
+    Then I expect language injection on "{foo}"
+    Examples:
+      | function     | import_statement          |
+      | exists      |                           |
+
+  @here3
   Scenario Outline: Inject in snakemake function calls
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -218,11 +241,13 @@ Feature: Tests on snakemake string language injection
       | report       |                           |
       | local        |                           |
       | expand       |                           |
+      | collect      |                           |
       | shell        |                           |
       | join         | from os.path import  join |
       | path.join    | from os import  path      |
       | os.path.join | import os                 |
       | multiext     |                           |
+#      | exists     |                           |
       # Unresolved
       | dynamic      |                           |
       | join         |                           |

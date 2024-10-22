@@ -143,6 +143,20 @@ class SmkImplicitPySymbolsProvider(
         )
         progressIndicator?.checkCanceled()
 
+        // see 'ioutils.register_in_globals` function
+        // collect exists, etc
+        collectTopLevelMethodsFrom(
+            "snakemake.ioutils", SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache
+        )
+        elementsCache.firstOrNull() { it.fqn == "snakemake.io.expand"}?.let {
+            elementsCache.add(ImplicitPySymbol(
+                SnakemakeApi.SMK_FUN_EXPAND_ALIAS_COLLECT,"snakemake.ioutils.collect", it.psiDeclaration, it.scope, it.usageType
+                ))
+        }
+        // TODO add 'collect' as exapnd - snakemake.ioutils.collect
+        // elementsCache.add(ImplicitPySymbol(pyFun.name!!, pyFun, scope, ImplicitPySymbolUsageType.METHOD))
+
+
         ///////////////////////////////////////
         // Collect hardcoded methods
         collectMethods(
@@ -367,6 +381,7 @@ class SmkImplicitPySymbolsProvider(
                         elementsCache.add(
                             ImplicitPySymbol(
                                 attrib.name!!,
+                                attrib.qualifiedName,
                                 attrib,
                                 scope,
                                 ImplicitPySymbolUsageType.VARIABLE
@@ -395,7 +410,7 @@ class SmkImplicitPySymbolsProvider(
             // val ctx = TypeEvalContext.codeInsightFallback(pyClass.project)
             pyClass.methods.forEach { method ->
                 if (method != null) {
-                    elementsCache.add(ImplicitPySymbol(method.name!!, method, scope, ImplicitPySymbolUsageType.METHOD))
+                    elementsCache.add(ImplicitPySymbol(method.name!!, method.qualifiedName, method, scope, ImplicitPySymbolUsageType.METHOD))
                 }
             }
         }
@@ -422,6 +437,7 @@ class SmkImplicitPySymbolsProvider(
                 elementsCache.add(
                     ImplicitPySymbol(
                         pyClass.name!!,
+                        constructor.qualifiedName,
                         constructor,
                         scope,
                         ImplicitPySymbolUsageType.METHOD
@@ -440,7 +456,7 @@ class SmkImplicitPySymbolsProvider(
         usageType: ImplicitPySymbolUsageType
     ) {
         processClasses(moduleAndClass, usedFiles, sdk) { pyClass ->
-            elementsCache.add(ImplicitPySymbol(pyClass.name!!, pyClass, scope, usageType))
+            elementsCache.add(ImplicitPySymbol(pyClass.name!!, pyClass.qualifiedName, pyClass, scope, usageType))
         }
     }
 
@@ -492,7 +508,7 @@ class SmkImplicitPySymbolsProvider(
                     val varName = classFqn2VarNameFun(fqn)
                     elementsCache.add(
                         ImplicitPySymbol(
-                            varName,
+                            varName, fqn,
                             pyClass, scope, ImplicitPySymbolUsageType.VARIABLE
                         )
                     )
@@ -519,6 +535,7 @@ class SmkImplicitPySymbolsProvider(
                     elementsCache.add(
                         ImplicitPySymbol(
                             pyFun.name!!,
+                            pyFun.qualifiedName,
                             pyFun,
                             scope,
                             ImplicitPySymbolUsageType.METHOD
@@ -563,7 +580,7 @@ class SmkImplicitPySymbolsProvider(
             .flatMap { it.topLevelFunctions.asSequence() }
             .filter { it.name != null }
             .forEach { pyFun ->
-                elementsCache.add(ImplicitPySymbol(pyFun.name!!, pyFun, scope, ImplicitPySymbolUsageType.METHOD))
+                elementsCache.add(ImplicitPySymbol(pyFun.name!!, pyFun.qualifiedName, pyFun, scope, ImplicitPySymbolUsageType.METHOD))
             }
     }
 
@@ -598,6 +615,7 @@ class SmkImplicitPySymbolsProvider(
                 globals.forEach { (name, psi) ->
                     elementsCache.add(
                         ImplicitPySymbol(
+                            name,
                             name,
                             psi,
                             SmkCodeInsightScope.TOP_LEVEL,
