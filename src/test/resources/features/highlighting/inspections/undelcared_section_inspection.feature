@@ -69,6 +69,24 @@ Feature: Inspection if section isn't declared in rule
       | checkpoint | run: print(version[0])   | version   | [         | SmkUndeclaredSectionInspection   |
 
 
+  Scenario Outline: No error when section name is 'threads' variable
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like>:
+          run:
+            <text>
+      """
+    And <inspection> inspection is enabled
+    Then I expect no inspection errors
+    When I check highlighting errors
+
+    # not fully implemented
+    Examples:
+      | rule_like | text             | inspection                       |
+      | rule      | shell("{threads}") | SmkSLUndeclaredSectionInspection |
+      | rule      | print(threads[0])  | SmkUndeclaredSectionInspection   |
+
   Scenario Outline: No error when section name is other variable
     Given a snakemake project
     Given I open a file "foo.smk" with text

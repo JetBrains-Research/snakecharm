@@ -11,6 +11,7 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.inspections.smksl.SmkSLUndeclaredSectionInspectionUtil.checkIsSectionNameUnresolved
 import com.jetbrains.snakecharm.inspections.smksl.SmkSLUndeclaredSectionInspectionUtil.isSectionNameOfInterest
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_MODULE_NAME_IO
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
@@ -53,15 +54,18 @@ object SmkSLUndeclaredSectionInspectionUtil {
     fun checkIsSectionNameUnresolved(ref: PsiReference): Boolean {
         val declaration = ref.resolve()
 
-        return when (declaration) {
-            null -> true
-            is PyClass -> {
+        return when {
+            (declaration == null) || (declaration is SmkRuleOrCheckpoint) -> {
+                // 'thread' has a default value => allow unresolved
+                // Undeclared sections could be not resolved (SmkSL) or resolved into enire Rule (run sections)
+                ref.element.text != SnakemakeNames.SECTION_THREADS
+            }
+            declaration is PyClass -> {
                 // is resolved to snakemake/io.py
                 declaration.containingFile.getQName()?.toString() == SNAKEMAKE_MODULE_NAME_IO
                         || declaration.qualifiedName in SECTION_ACCESSOR_CLASSES
             }
 
-            is SmkRuleOrCheckpoint -> true
             else -> false
         }
     }

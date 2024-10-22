@@ -19,12 +19,13 @@ Released on <not released>
 - [7.25.0] Support for localrule directive (see [#524](https://github.com/JetBrains-Research/snakecharm/issues/524)
 - [7.11] Resource scopes support (see [#510](https://github.com/JetBrains-Research/snakecharm/issues/510)
 - Inspection False Positive: Unresolved reference 'log' (see [#549](https://github.com/JetBrains-Research/snakecharm/issues/549)
-- 
+
 ### Fixed
 - Improve parser error message when rule/module is declared with name but lacks ':' (see [#515](https://github.com/JetBrains-Research/snakecharm/issues/515))
 - Support for `update` and `before_update` flags. Update inspection that warns if flag functions from `snakemake.io` is used in a wrong section, added info for all flags up to 8.23.1 version (see [#537](https://github.com/JetBrains-Research/snakecharm/issues/537))
 - Inject some modules in Snakefile file resolve scope w/o import declaration, e.g. os, sys,.. (see [#553](https://github.com/JetBrains-Research/snakecharm/issues/553)
 - Do not warn about unresolved `snakemake` variable in the python files, because they could be used as scripts/wrappers for snakemake rules.  (see [#511](https://github.com/JetBrains-Research/snakecharm/issues/511))
+- Undeclared section `threads` warning should not be shown here (see [#539](https://github.com/JetBrains-Research/snakecharm/issues/539)
 
 ### Changed
 - TODO
