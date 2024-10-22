@@ -1,4 +1,4 @@
-Feature: Inspection: SmkUnresolvedReferenceInspectionExtension
+Feature: Inspection: SmkUnresolvedReferenceQuickFixProvider
 
   Scenario Outline: Quick fix fot missed files
     Given a snakemake project
