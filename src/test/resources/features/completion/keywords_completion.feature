@@ -267,13 +267,13 @@ Feature: Completion for snakemake keyword-like things
     Given I open a file "foo.smk" with text
       """
       <rule_like> NAME:
-        <str>
+        <str>#here
       """
     When I put the caret after <str>
     Then I invoke autocompletion popup and see a text:
       """
       <rule_like> NAME:
-        <result>:
+        <result>: #here
       """
     Examples:
       | rule_like  | str  | result         |
@@ -312,6 +312,25 @@ Feature: Completion for snakemake keyword-like things
       | rule       | retr | retries        |
       | rule       | retr | retries        |
       | rule       | loc  | localrule      |
+
+
+    @here2
+  Scenario Outline: Complete at rule/checkpoint level (single variant) with trailing ws
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        <str>
+      """
+    When I put the caret after <str>
+    Then I invoke autocompletion popup and see a text:
+      """
+      <rule_like> NAME:
+        <result>:
+      """
+    Examples:
+      | rule_like | str | result |
+      | rule      | inp | input  |
 
   Scenario Outline: Complete at rule/checkpoint/module level (multiple variants) before 8.0
     Given a snakemake:7.32.4 project
