@@ -214,7 +214,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
                     pepFile?.findTopLevelClass("Project")?.getType(TypeEvalContext.codeCompletion(project, pepFile))
                 }
             }
-
+            // TODO: TYPE FOR 'snakemake' var in run section & python scripts
             else -> null
         }
     }

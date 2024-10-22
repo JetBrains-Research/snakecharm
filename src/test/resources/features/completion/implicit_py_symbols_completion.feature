@@ -44,9 +44,10 @@ Feature: Completion in python part of snakemake file
     When I put the caret after foo = 1;
     And I invoke autocompletion popup
     Then completion list should contain:
-      | os   |
-      | sys  |
-      | Path |
+      | os        |
+      | sys       |
+      | snakemake |
+      | Path      |
 
   Scenario: Complete at top-level (GTE 6.1)
     Given a snakemake:6.1 project

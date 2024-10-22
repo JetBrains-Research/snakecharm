@@ -126,7 +126,7 @@ class SmkImplicitPySymbolsProvider(
         ///////////////////////////////////////
         // Implicit requires: e.g. 'os', 'sys'
         val resolveContext = fromSdk(project, sdk)
-        listOf("os", "sys").forEach { moduleName ->
+        listOf("os", "sys", "snakemake").forEach { moduleName ->
             var module = resolveQualifiedName(QualifiedName.fromDottedString(moduleName), resolveContext).filterIsInstance<PyFile>().firstOrNull()
             if (module == null) {
                 module =

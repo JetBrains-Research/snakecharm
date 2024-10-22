@@ -91,10 +91,11 @@ Feature: Resolve implicitly imported python names
     Then reference should resolve to "<symbol_name>" in "<file>"
 
     Examples:
-      | ptn | text | symbol_name | file            |
-      | os  | os   | [SKIP]      | os/__init__.pyi |
-      | sy  | sys  | [SKIP]      | sys.py          |
-      | Pat | Path | Path        | pathlib.pyi     |
+      | ptn | text      | symbol_name | file                  |
+      | os  | os        | [SKIP]      | os/__init__.pyi       |
+      | sy  | sys       | [SKIP]      | sys.py                |
+      | sn  | snakemake | [SKIP]      | snakemake/__init__.py |
+      | Pat | Path      | Path        | pathlib.pyi           |
 
   Scenario: Resolve at top-level: shell()
     Given a snakemake project
@@ -422,3 +423,19 @@ Feature: Resolve implicitly imported python names
       | rule       | input   | checkpoints |
       | rule       | input   | config      |
       | checkpoint | input   | rules       |
+
+  Scenario: Warn about unresolved snakemake variable in run section, behaviour differs from scripts
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+     """
+     rule a:
+         run:
+             # this becomes too much and should be migrated into a script directive
+             path = snakemake.input[0]
+     """
+    And PyUnresolvedReferencesInspection inspection is enabled
+    Then I expect inspection warning on <input> with message
+      """
+      Cannot find reference 'input' in '__init__.py'
+      """
+    When I check highlighting warnings

@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm.codeInsight.resolve
 
 import com.intellij.psi.util.PsiTreeUtil
+import com.jetbrains.python.PythonLanguage
 import com.jetbrains.python.psi.PyQualifiedExpression
 import com.jetbrains.python.psi.resolve.PyReferenceResolveProvider
 import com.jetbrains.python.psi.resolve.RatedResolveResult
@@ -10,10 +11,12 @@ import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
 import com.jetbrains.snakecharm.codeInsight.SmkImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkImplicitPySymbolsResolveProviderCompanion.addSyntheticSymbols
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil.RATE_IMPLICIT_SYMBOLS
+import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_JOBID
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_RULE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_THREADS
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_SNAKEMAKE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
@@ -22,6 +25,20 @@ class SmkImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
         element: PyQualifiedExpression,
         context: TypeEvalContext,
     ): List<RatedResolveResult> {
+        if (!SmkSupportProjectSettings.getInstance(element.project).snakemakeSupportEnabled) {
+            return emptyList()
+        }
+
+        if (context.origin?.language == PythonLanguage.getInstance()) {
+            // only ignore `snakemake`
+            @Suppress("UnstableApiUsage") val referencedName = element.referencedName
+
+            val items = mutableListOf<RatedResolveResult>()
+            if (referencedName == SMK_VARS_SNAKEMAKE) {
+                items.add(RatedResolveResult(RATE_IMPLICIT_SYMBOLS, null))
+            }
+            return items
+        }
         if (SnakemakeLanguageDialect.isInsideSmkFile(context.origin)) {
 
             val contextScope = SmkCodeInsightScope[element]
