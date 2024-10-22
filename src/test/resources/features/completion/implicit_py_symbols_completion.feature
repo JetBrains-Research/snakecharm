@@ -1,7 +1,6 @@
 Feature: Completion in python part of snakemake file
   Auto-complete runtime magic from snakemake
 
-  @here3
   Scenario: Complete at top-level
     Given a snakemake project
     Given I open a file "foo.smk" with text

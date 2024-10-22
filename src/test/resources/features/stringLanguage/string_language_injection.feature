@@ -61,7 +61,7 @@ Feature: Tests on snakemake string language injection
     """
     When I put the caret after {output
     Then I expect no language injection
-@here3
+
    Scenario Outline: Allow injection in lambdas in expand call
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -199,7 +199,6 @@ Feature: Tests on snakemake string language injection
       | default_target       |
       | retries              |
 
-  @here3
   Scenario Outline: Inject in snakemake function calls in 8.7.0
     # TODO: merge with : Scenario Outline: Inject in snakemake function calls
 
@@ -217,7 +216,6 @@ Feature: Tests on snakemake string language injection
       | function     | import_statement          |
       | exists      |                           |
 
-  @here3
   Scenario Outline: Inject in snakemake function calls
     Given a snakemake project
     Given I open a file "foo.smk" with text

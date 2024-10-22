@@ -254,7 +254,6 @@ Feature: Completion for wildcards
       | rule       |
       | checkpoint |
 
-@here3
   Scenario Outline: Expand injections not in wildcards
     Given a snakemake project
     Given I open a file "foo.smk" with text

@@ -1,4 +1,3 @@
-@here3
 Feature: Inspection for missing 'wildcards.' prefix
 
   Scenario Outline: Wildcards prefix is missing
