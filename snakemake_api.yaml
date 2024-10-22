@@ -1,7 +1,7 @@
 annotationsFormatVersion: 1
 
 # Default Language Level used for all projects:
-defaultVersion: "7.32.4"
+defaultVersion: "8.24.0"
 
 # supported types of sections in each version:
 # * 'introduced' - API was introduced
