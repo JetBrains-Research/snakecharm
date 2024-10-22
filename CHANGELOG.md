@@ -18,7 +18,8 @@ Released on <not released>
 - [8.0.0-6.8.1] Support for: 'storage', 'github', 'gitfile', 'gitlab' (see [#550](https://github.com/JetBrains-Research/snakecharm/issues/550)
 - [7.25.0] Support for localrule directive (see [#524](https://github.com/JetBrains-Research/snakecharm/issues/524)
 - [7.11] Resource scopes support (see [#510](https://github.com/JetBrains-Research/snakecharm/issues/510)
-
+- Inspection False Positive: Unresolved reference 'log' (see [#549](https://github.com/JetBrains-Research/snakecharm/issues/549)
+- 
 ### Fixed
 - Improve parser error message when rule/module is declared with name but lacks ':' (see [#515](https://github.com/JetBrains-Research/snakecharm/issues/515))
 - Support for `update` and `before_update` flags. Update inspection that warns if flag functions from `snakemake.io` is used in a wrong section, added info for all flags up to 8.23.1 version (see [#537](https://github.com/JetBrains-Research/snakecharm/issues/537))

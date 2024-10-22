@@ -76,6 +76,7 @@ object SnakemakeApi {
         SnakemakeNames.SMK_VARS_SCATTER to "snakemake.common.Scatter",
         SnakemakeNames.SMK_VARS_GATHER to "snakemake.common.Gather",
         SnakemakeNames.SMK_VARS_CLUSTER_ONFIG to null,
+        SnakemakeNames.SMK_VARS_LOG to null,
         SnakemakeNames.SMK_VARS_CHECKPOINTS to "snakemake.checkpoints.Checkpoints",
         SnakemakeNames.SMK_VARS_GITHUB to "snakemake.sourcecache.GithubFile",
         SnakemakeNames.SMK_VARS_GITLAB to "snakemake.sourcecache.GitlabFile",

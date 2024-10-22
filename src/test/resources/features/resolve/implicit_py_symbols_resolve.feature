@@ -36,8 +36,14 @@ Feature: Resolve implicitly imported python names
       | ptn | text        | symbol_name | file         |
       | exp | expand()    | expand      | io.py        |
 
+
+  @ignore
   Scenario: Do not resolve at top-level if no python sdk
+    # TODO
+
+  @ignore
   Scenario: Resolve at top-level if custom python sdk
+    # TODO
 
   Scenario Outline: Resolve at top-level
     Given a <smk_vers> project
@@ -139,6 +145,19 @@ Feature: Resolve implicitly imported python names
       | out | output.foo |
       | par | params     |
       | wil | wildcards  |
+
+  Scenario Outline: Not-resolved at top-level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+     """
+     <text>
+     """
+    When I put the caret at <ptn>
+    Then reference should resolve to NULL
+
+    Examples:
+      | ptn | text       |
+      | log | log        |
 
 
   Scenario Outline: Resolve inside rule parameters
@@ -423,6 +442,18 @@ Feature: Resolve implicitly imported python names
       | rule       | input   | checkpoints |
       | rule       | input   | config      |
       | checkpoint | input   | rules       |
+
+  Scenario: Do not warn about unresolved log variable on top-level
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+     """
+     onstart:
+        print("Log:")
+        print(log)
+     """
+    And PyUnresolvedReferencesInspection inspection is enabled
+    Then I expect no inspection warnings
+    When I check highlighting warnings
 
   Scenario: Warn about unresolved snakemake variable in run section, behaviour differs from scripts
     Given a snakemake project

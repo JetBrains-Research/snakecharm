@@ -55,6 +55,16 @@ class CompletionResolveSteps {
     }
 
 
+    @Then("^reference should resolve to NULL$")
+    fun reeferenceResolvedToNull() {
+        ApplicationManager.getApplication().invokeAndWait({
+            val ref = getReferenceAtOffset()
+            assertNotNull(ref)
+            assertReferenceResolvedToNull(ref)
+        }, ModalityState.nonModal())
+    }
+
+
     @Then("^reference in injection should not resolve$")
     fun referenceInInjectionShouldNotResolve() {
         ApplicationManager.getApplication().invokeAndWait({
@@ -591,6 +601,31 @@ class CompletionResolveSteps {
     private fun getCompletionListWithTypeText() = getCompletionItemsPresentation().map { it.itemText to it.typeText }
 
 
+    private fun assertReferenceResolvedToNull(ref: PsiReference) {
+        when (ref) {
+            is PsiPolyVariantReference -> {
+                val results = ref.multiResolve(false)
+                assertNotNull(results)
+                assertEquals(
+                    1, results.size.toLong(),
+                    "Unexpected results: ${
+                        results.joinToString(separator = "\n") {
+                            "${it.element?.javaClass?.simpleName}: [${it.element?.text}]"
+                        }
+                    }"
+                )
+                assertNull(
+                    results.first().element,
+                    "Unexpected results: ${
+                        results.joinToString(separator = "\n") {
+                            "${it.element?.javaClass?.simpleName}: [${it.element?.text}]"
+                        }
+                    }"
+                )
+            }
+            else -> TestCase.assertNull(ref.resolve())
+        }
+    }
     private fun assertUnresolvedReference(ref: PsiReference) {
         when (ref) {
             is PsiPolyVariantReference -> {

@@ -105,7 +105,12 @@ object SmkImplicitPySymbolsResolveProviderCompanion {
                 for (l in cache.getSynthetic(symbolScope)) {
                     // TODO: Introduce ImplicitLookupItem class
                     val psi = l.psiElement
-                    if (l.lookupString == referencedName && psi != null && psi.isValid) {
+                    // Allow to resolve to null - just do not show error, e.g. for object like top-level 'log'
+                    // that is just an implicit runtime string and nothing to resolve here
+                    //
+                    // XXX: NB: if some API is missing in SDK it is supposed not to added it in cache in order not to
+                    //      show ghosts in completion
+                    if (l.lookupString == referencedName && ((psi != null && psi.isValid) || (psi == null))) {
                         items.add(RatedResolveResult(RATE_IMPLICIT_SYMBOLS, psi))
                         break
                     }

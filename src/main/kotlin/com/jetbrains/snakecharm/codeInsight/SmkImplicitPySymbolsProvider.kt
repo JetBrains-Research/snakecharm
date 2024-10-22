@@ -268,7 +268,7 @@ class SmkImplicitPySymbolsProvider(
         //      self.globals[ruleinfo.func.__name__] = ruleinfo.func
 
         ////////////////////////////////////////
-        // TODO: all modules names acceible by name:
+        // TODO: all modules names accessible by name:
         // modules.py
         //      self.workflow.globals[self.namespace] = namespace
 

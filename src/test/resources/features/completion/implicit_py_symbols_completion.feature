@@ -34,6 +34,7 @@ Feature: Completion in python part of snakemake file
       | github        |
       | gitlab        |
       | gitfile       |
+      | log           |
 
   Scenario: Complete imported python modules/classes at top-level
     Given a snakemake project
