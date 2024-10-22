@@ -17,6 +17,7 @@ Feature: Inspection for unexpected keyword arguments in section
       | section    |
       | snakefile  |
 
+    @here3
   Scenario Outline: Unexpected keyword arguments in rule\checkpoint\module in latest language level
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -34,9 +35,9 @@ Feature: Inspection for unexpected keyword arguments in section
       | rule_like  | section   |
       | rule       | benchmark |
       | rule       | conda     |
+      | rule       | localrule |
       | checkpoint | message   |
       | module     | config    |
-      | module     | localrule |
 
 
   Scenario Outline: No warn on expected keyword arguments in rule\checkpoint in latest language level
