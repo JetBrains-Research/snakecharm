@@ -17,7 +17,6 @@ Feature: Inspection for unexpected keyword arguments in section
       | section    |
       | snakefile  |
 
-    @here3
   Scenario Outline: Unexpected keyword arguments in rule\checkpoint\module in latest language level
     Given a snakemake project
     Given I open a file "foo.smk" with text
