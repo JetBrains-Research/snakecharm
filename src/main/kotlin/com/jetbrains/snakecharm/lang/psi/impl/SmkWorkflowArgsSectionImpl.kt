@@ -6,6 +6,7 @@ import com.intellij.util.ArrayUtil
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.python.psi.impl.PyElementImpl
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.WORKFLOW_SECTIONS_WITH_FILE_REFERENCES
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes
 import com.jetbrains.snakecharm.lang.psi.*
@@ -15,16 +16,6 @@ import com.jetbrains.snakecharm.lang.psi.*
  * @date 2019-02-03
  */
 class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkflowArgsSection {
-    companion object {
-        val WORKFLOWS_WITH_FILE_REFERENCES = setOf(
-            SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD,
-            SnakemakeNames.WORKFLOW_PEPFILE_KEYWORD,
-            SnakemakeNames.WORKFLOW_PEPSCHEMA_KEYWORD,
-            SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD,
-            SnakemakeNames.WORKFLOW_REPORT_KEYWORD,
-            SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD
-        )
-    }
 
     override fun acceptPyVisitor(pyVisitor: PyElementVisitor) = when (pyVisitor) {
         is SmkElementVisitor -> pyVisitor.visitSmkWorkflowArgsSection(this)
@@ -58,6 +49,9 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
             SnakemakeNames.WORKFLOW_WORKDIR_KEYWORD -> SmkWorkDirReference(
                 this, textRange, strExpr, path
             )
+            SnakemakeNames.WORKFLOW_CONDA_KEYWORD -> SmkCondaEnvReference(
+                this, textRange, strExpr, path
+            )
             else -> SmkIncludeReference(
                 this, textRange, strExpr, path
             )
@@ -67,7 +61,7 @@ class SmkWorkflowArgsSectionImpl(node: ASTNode) : PyElementImpl(node), SmkWorkfl
     override fun getReference(): PsiReference? = ArrayUtil.getFirstElement(this.references)
 
     override fun getReferences(): Array<PsiReference> {
-        if (keywordName !in WORKFLOWS_WITH_FILE_REFERENCES) {
+        if (keywordName !in WORKFLOW_SECTIONS_WITH_FILE_REFERENCES) {
             return emptyArray()
         }
 

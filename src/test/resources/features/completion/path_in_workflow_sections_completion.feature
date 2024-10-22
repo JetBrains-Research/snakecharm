@@ -25,6 +25,7 @@ Feature: Complete file names in workflow sections
       | report     | html      |
       | pepfile    | yaml      |
       | pepschema  | yaml      |
+      | conda      | yaml      |
 
   Scenario: Completion list for directories in 'workdir' section
     Given a snakemake project
@@ -96,7 +97,8 @@ Feature: Complete file names in workflow sections
       | configfile | yml       |
       | report     | html      |
       | pepfile    | yaml      |
-      | pepschema   | yml       |
+      | pepschema  | yml       |
+      | config     | yaml      |
 
   Scenario: Completion list in 'workdir' section when there are no appropriate directories
     Given a snakemake project

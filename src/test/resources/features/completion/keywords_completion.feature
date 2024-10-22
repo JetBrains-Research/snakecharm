@@ -27,6 +27,7 @@ Feature: Completion for snakemake keyword-like things
       | pepfile              |
       | pepschema            |
       | resource_scopes      |
+      | conda                |
 
   Scenario Outline: Complete at top-level with respect to deprecations
     Given a snakemake project

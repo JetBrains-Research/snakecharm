@@ -19,6 +19,7 @@ Feature: Resolve workflow file names to their corresponding files
       | report     | html      |
       | pepfile    | yaml      |
       | pepschema  | yml       |
+      | conda      | yaml      |
 
   Scenario Outline: Reference doesn't resolve to inappropriate file
     Given a snakemake project
@@ -37,7 +38,8 @@ Feature: Resolve workflow file names to their corresponding files
       | configfile | yaml      |
       | report     | html      |
       | pepfile    | yaml      |
-      | pepschema   | yml       |
+      | pepschema  | yml       |
+      | conda      | yaml      |
 
   Scenario: Reference doesn't resolve to inappropriate Directory
     Given a snakemake project
@@ -67,7 +69,8 @@ Feature: Resolve workflow file names to their corresponding files
       | configfile | yaml      |
       | report     | html      |
       | pepfile    | yaml      |
-      | pepschema   | yml       |
+      | pepschema  | yml       |
+      | conda      | yaml      |
 
   Scenario Outline: Resolve for multiple files
     Given a snakemake project

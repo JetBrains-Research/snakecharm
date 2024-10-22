@@ -31,6 +31,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_WITH_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.USE_EXCLUDE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.USE_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONDA_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONFIGFILE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINERIZED_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD
@@ -108,7 +109,19 @@ object SnakemakeApi {
         WORKFLOW_PEPSCHEMA_KEYWORD,
         WORKFLOW_PEPFILE_KEYWORD,
         WORKFLOW_RESOURCE_SCOPES_KEYWORD,
-        WORKFLOW_SCATTERGATHER_KEYWORD
+        WORKFLOW_SCATTERGATHER_KEYWORD,
+        WORKFLOW_CONDA_KEYWORD
+    )
+
+    // TODO Move to YAML
+    val WORKFLOW_SECTIONS_WITH_FILE_REFERENCES = setOf(
+        WORKFLOW_CONFIGFILE_KEYWORD,
+        WORKFLOW_PEPFILE_KEYWORD,
+        WORKFLOW_PEPSCHEMA_KEYWORD,
+        WORKFLOW_INCLUDE_KEYWORD,
+        WORKFLOW_REPORT_KEYWORD,
+        WORKFLOW_WORKDIR_KEYWORD,
+        WORKFLOW_CONDA_KEYWORD
     )
 
     /**

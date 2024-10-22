@@ -14,6 +14,7 @@ Released on <not released>
 - Code completion: For section keywords show 'since' version and deprecation notice in the completion list. Do not suggest already removed keywords (see [#535](https://github.com/JetBrains-Research/snakecharm/issues/535)
 - Set default project Snakemake language level in Snakemake support settings to 8.24.0
 - [8.3.0] Support for: lookup, evaluate, branch, collect, exists (see [#548](https://github.com/JetBrains-Research/snakecharm/issues/548)
+- [8.0.0] Support for Global workflow dependencies [8.0.0] syntax (see [#555](https://github.com/JetBrains-Research/snakecharm/issues/555)
 - [8.0.0-6.8.1] Support for: 'storage', 'github', 'gitfile', 'gitlab' (see [#550](https://github.com/JetBrains-Research/snakecharm/issues/550)
 - [7.25.0] Support for localrule directive (see [#524](https://github.com/JetBrains-Research/snakecharm/issues/524)
 - [7.11] Resource scopes support (see [#510](https://github.com/JetBrains-Research/snakecharm/issues/510)

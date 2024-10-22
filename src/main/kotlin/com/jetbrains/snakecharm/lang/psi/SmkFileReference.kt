@@ -281,7 +281,7 @@ class SmkPepschemaReference(
 
 /**
  * The path must built from directory with current snakefile
- * version 6.5.1
+ * version 6.5.1 (rule) + 8.0.0 (workfklow)
  */
 class SmkCondaEnvReference(
     element: SmkArgsSection,

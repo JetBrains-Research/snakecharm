@@ -90,6 +90,13 @@ changelog:
 
  # ---------------------------------------
   - version: "8.0.0"
+    introduced:
+      - name: "conda"
+        type: "top-level"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/deployment.html#global-workflow-dependencies
+        multiple_args_allowed: False
+        keyword_args_allowed: False
+
     removed:
       - name: "snakemake.io.dynamic"
         type: "function"

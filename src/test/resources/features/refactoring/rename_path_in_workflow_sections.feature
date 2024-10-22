@@ -45,6 +45,7 @@ Feature: Rename files in workflow sections
       | section    | file_type |
       | include    | smk       |
       | configfile | yaml      |
+      | conda      | yaml      |
       | configfile | yml       |
       | report     | html      |
 
@@ -63,20 +64,25 @@ Feature: Rename files in workflow sections
     """
     And reference should resolve to "Folder" directory
 
-  Scenario: Rename for directories in 'workdir' section
+  Scenario Outline: Rename for directories in 'workdir/conda' section
     Given a snakemake project
     Given a directory "Dir"
     Given I open a file "foo.smk" with text
     """
-    workdir: "Dir"
+    <section>: "Dir"
     """
     When I put the caret after Dir
     When I invoke rename with name "Folder"
     Then the file "foo.smk" should have text
     """
-    workdir: "Folder"
+    <section>: "Folder"
     """
     And reference should resolve to "Folder" directory
+    Examples:
+      | section |
+      | workdir |
+      | conda   |
+
 
   Scenario Outline: Rename in conda/scripts/etc section
     Given a snakemake project
