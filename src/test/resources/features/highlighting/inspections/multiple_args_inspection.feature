@@ -40,10 +40,11 @@ Feature: Inspection for multiple arguments in various sections
     """
     When I check highlighting errors
     Examples:
-      | section         |
-      | shell           |
-      | threads         |
-      | shadow          |
+      | section   |
+      | shell     |
+      | threads   |
+      | shadow    |
+      | localrule |
 
   Scenario Outline: Multiple arguments in workflow section in latest language level
     Given a snakemake project

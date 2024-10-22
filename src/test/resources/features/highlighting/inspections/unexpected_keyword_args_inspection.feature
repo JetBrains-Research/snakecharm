@@ -31,11 +31,12 @@ Feature: Inspection for unexpected keyword arguments in section
     """
     When I check highlighting errors
     Examples:
-      | rule_like  | section         |
-      | rule       | benchmark       |
-      | rule       | conda           |
-      | checkpoint | message         |
-      | module     | config          |
+      | rule_like  | section   |
+      | rule       | benchmark |
+      | rule       | conda     |
+      | checkpoint | message   |
+      | module     | config    |
+      | module     | localrule |
 
 
   Scenario Outline: No warn on expected keyword arguments in rule\checkpoint in latest language level

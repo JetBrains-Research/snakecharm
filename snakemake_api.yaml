@@ -80,6 +80,9 @@ changelog:
     introduced:
       - name: "localrule"
         type: "rule-like"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#local-rules
+        multiple_args_allowed: False
+        keyword_args_allowed: False
 
   # ----------------------
   - version: "7.7.0"
