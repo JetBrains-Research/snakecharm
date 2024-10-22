@@ -1,6 +1,6 @@
 package com.jetbrains.snakecharm.lang.psi.types
 
-import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_VARS_RULES
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_RULES
 import com.jetbrains.snakecharm.lang.psi.SmkFile
 import com.jetbrains.snakecharm.lang.psi.SmkRule
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndexCompanion.KEY

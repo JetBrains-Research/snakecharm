@@ -6,10 +6,10 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.jetbrains.python.codeInsight.PyInjectionUtil.InjectionResult
 import com.jetbrains.python.codeInsight.PyInjectorBase
 import com.jetbrains.python.psi.*
-import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_FUN_EXPAND
-import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_FUN_EXPAND_ALIAS_COLLECT
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_FUN_EXPAND
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_FUN_EXPAND_ALIAS_COLLECT
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRunSection
 import com.jetbrains.snakecharm.stringLanguage.SmkSLanguage

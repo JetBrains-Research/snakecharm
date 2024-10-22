@@ -22,9 +22,9 @@ import com.jetbrains.python.psi.PyExpression
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.PyType
-import com.jetbrains.snakecharm.codeInsight.SnakemakeApi
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_RULES
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndexCompanion
@@ -71,7 +71,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
             location.originalElement, name, indexKey, clazz
         ) { currentFileDeclarations }
 
-        if (location.text == SnakemakeApi.SMK_VARS_RULES) {
+        if (location.text == SMK_VARS_RULES) {
             results += findAvailableRuleLikeElementByName(
                 location.originalElement,
                 name,

@@ -73,4 +73,17 @@ object SnakemakeNames {
      */
     const val SNAKEMAKE_MODULE_NAME_IO = "snakemake.io"
     const val SNAKEMAKE_FQN_FUN_MIN_VERSION = "snakemake.utils.min_version"
+
+    const val UNPACK_FUNCTION = "unpack"
+    const val SMK_VARS_CONFIG = "config"
+    const val SMK_VARS_PEP = "pep"
+    const val SMK_VARS_RULES = "rules"
+    const val SMK_VARS_CHECKPOINTS = "checkpoints"
+    const val SMK_VARS_SCATTER = "scatter"
+    const val SMK_VARS_GATHER = "gather"
+    const val SMK_FUN_EXPAND = "expand"
+    const val SMK_FUN_EXPAND_ALIAS_COLLECT = "collect"
+
+    const val SMK_VARS_WILDCARDS = "wildcards"
+    const val WILDCARDS_ACCESSOR_CLASS = "snakemake.io.Wildcards"
 }

@@ -9,7 +9,7 @@ import com.jetbrains.python.psi.PyElement
 import com.jetbrains.python.psi.PyQualifiedExpression
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.TypeEvalContext
-import com.jetbrains.snakecharm.codeInsight.SnakemakeApi
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkModule
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkUse
@@ -56,8 +56,8 @@ class SmkIgnorePyInspectionExtension : PyInspectionExtension() {
             // Maybe referenceName is better here?
             //val referencedName = node.referencedName
             //return "config".equals(referencedName)
-            return node.textMatches(SnakemakeApi.SMK_VARS_CONFIG) ||
-                    node.textMatches(SnakemakeApi.SMK_VARS_PEP)
+            return node.textMatches(SnakemakeNames.SMK_VARS_CONFIG) ||
+                    node.textMatches(SnakemakeNames.SMK_VARS_PEP)
         }
         return false
     }

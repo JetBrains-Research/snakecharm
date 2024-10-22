@@ -35,6 +35,7 @@ import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_API_VERS_6_1
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionUtil
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
+import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_MODULE_NAME_IO
 import java.util.*
 import javax.swing.SwingUtilities
@@ -150,7 +151,7 @@ class SmkImplicitPySymbolsProvider(
         )
         elementsCache.firstOrNull() { it.fqn == "snakemake.io.expand"}?.let {
             elementsCache.add(ImplicitPySymbol(
-                SnakemakeApi.SMK_FUN_EXPAND_ALIAS_COLLECT,"snakemake.ioutils.collect", it.psiDeclaration, it.scope, it.usageType
+                SnakemakeNames.SMK_FUN_EXPAND_ALIAS_COLLECT,"snakemake.ioutils.collect", it.psiDeclaration, it.scope, it.usageType
                 ))
         }
         // TODO add 'collect' as exapnd - snakemake.ioutils.collect
@@ -666,11 +667,11 @@ class SmkImplicitPySymbolsProvider(
             usedFiles.add(commonFile.virtualFile)
         }
 
-        globals[SnakemakeApi.SMK_VARS_CHECKPOINTS] = commonFile?.findTopLevelClass("Checkpoints")
-        globals[SnakemakeApi.SMK_VARS_RULES] = commonFile?.findTopLevelClass("Rules")
-        globals[SnakemakeApi.SMK_VARS_SCATTER] = commonFile?.findTopLevelClass("Scatter")
-        globals[SnakemakeApi.SMK_VARS_GATHER] = commonFile?.findTopLevelClass("Gather")
-        globals[SnakemakeApi.SMK_VARS_CONFIG] = null
+        globals[SnakemakeNames.SMK_VARS_CHECKPOINTS] = commonFile?.findTopLevelClass("Checkpoints")
+        globals[SnakemakeNames.SMK_VARS_RULES] = commonFile?.findTopLevelClass("Rules")
+        globals[SnakemakeNames.SMK_VARS_SCATTER] = commonFile?.findTopLevelClass("Scatter")
+        globals[SnakemakeNames.SMK_VARS_GATHER] = commonFile?.findTopLevelClass("Gather")
+        globals[SnakemakeNames.SMK_VARS_CONFIG] = null
 
         val checkpointsFile = collectPyFiles("snakemake.checkpoints", usedFiles, sdk).firstOrNull()
         if (checkpointsFile != null) {
@@ -702,7 +703,7 @@ class SmkImplicitPySymbolsProvider(
 
         elementsCache.add(
             SmkCodeInsightScope.TOP_LEVEL to SmkCompletionUtil.createPrioritizedLookupElement(
-                SnakemakeApi.SMK_VARS_PEP,
+                SnakemakeNames.SMK_VARS_PEP,
                 pepObjectConstructor,
                 typeText = SnakemakeBundle.message("TYPES.rule.run.workflow.globals.type.text"),
                 priority = SmkCompletionUtil.WORKFLOW_GLOBALS_PRIORITY

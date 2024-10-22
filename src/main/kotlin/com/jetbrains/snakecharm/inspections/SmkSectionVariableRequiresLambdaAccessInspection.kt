@@ -8,7 +8,7 @@ import com.intellij.psi.util.parentOfTypes
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_VARS_WILDCARDS
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 

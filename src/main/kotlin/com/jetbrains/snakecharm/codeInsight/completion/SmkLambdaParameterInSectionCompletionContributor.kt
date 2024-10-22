@@ -12,7 +12,6 @@ import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyCallExpression
 import com.jetbrains.python.psi.PyLambdaExpression
 import com.jetbrains.python.psi.PyParameterList
-import com.jetbrains.snakecharm.codeInsight.SnakemakeApi
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
@@ -49,7 +48,7 @@ object SmkLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
             SnakemakeNames.SECTION_INPUT, SnakemakeNames.SECTION_GROUP -> {
                 result.addElement(
                         TailTypeDecorator.withTail(
-                                LookupElementBuilder.create(SnakemakeApi.SMK_VARS_WILDCARDS)
+                                LookupElementBuilder.create(SnakemakeNames.SMK_VARS_WILDCARDS)
                                         .withIcon(PlatformIcons.PARAMETER_ICON),
                                 ColonAndWhiteSpaceTail
                         )
@@ -73,11 +72,11 @@ object SmkLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
     ) {
         val lambdaExpression = PsiTreeUtil.getParentOfType(element, PyLambdaExpression::class.java)!!
         val presentParameters = lambdaExpression.parameterList.parameters.map { it.name }
-        if (SnakemakeApi.SMK_VARS_WILDCARDS !in presentParameters) {
+        if (SnakemakeNames.SMK_VARS_WILDCARDS !in presentParameters) {
             result.addElement(
                     PrioritizedLookupElement.withPriority(
                             LookupElementBuilder
-                                    .create(SnakemakeApi.SMK_VARS_WILDCARDS)
+                                    .create(SnakemakeNames.SMK_VARS_WILDCARDS)
                                     .withIcon(PlatformIcons.PARAMETER_ICON)
                             , SmkCompletionUtil.WILDCARDS_LAMBDA_PARAMETER_PRIORITY
 
@@ -86,7 +85,7 @@ object SmkLambdaParameterInSectionCompletionProvider : CompletionProvider<Comple
         }
 
         val variants = allowedVariants
-                .filterNot { it == SnakemakeApi.SMK_VARS_WILDCARDS }
+                .filterNot { it == SnakemakeNames.SMK_VARS_WILDCARDS }
                 .filterNot { it in presentParameters }
         if (variants.size == 1) {
             result.addElement(TailTypeDecorator.withTail(

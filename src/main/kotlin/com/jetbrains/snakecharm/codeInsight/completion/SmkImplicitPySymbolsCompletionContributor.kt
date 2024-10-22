@@ -12,12 +12,12 @@ import com.jetbrains.python.psi.PyClass
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.resolve.CompletionVariantsProcessor
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SmkImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
-import com.jetbrains.snakecharm.codeInsight.SnakemakeApi
+import com.jetbrains.snakecharm.codeInsight.SmkImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_RULE
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 
@@ -64,7 +64,7 @@ class SmkImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
             // wildcards
             result.addElement(
                 SmkCompletionUtil.createPrioritizedLookupElement(
-                    SnakemakeApi.SMK_VARS_WILDCARDS,
+                    SMK_VARS_WILDCARDS,
                     ruleOrCheckpoint.wildcardsElement,
                     typeText = SnakemakeBundle.message("TYPES.rule.wildcard.type.text"),
                     priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY

@@ -16,12 +16,13 @@ import com.intellij.util.ProcessingContext
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.PyStatementList
 import com.jetbrains.snakecharm.SnakemakeBundle
-import com.jetbrains.snakecharm.codeInsight.SnakemakeApi
 import com.jetbrains.snakecharm.codeInsight.completion.InUseSectionProvider.Companion.IN_USE_SECTION_PROVIDER_CAPTURE
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionAfterRulesAndCheckpointsObjectProvider.Companion.IN_SMK_RULES_OR_CHECKPOINTS_OBJECT
 import com.jetbrains.snakecharm.codeInsight.completion.SmkCompletionInLocalRulesAndRuleOrderSectionsProvider.Companion.IN_SMK_LOCALRULES_OR_RULEORDER_RULE_NAME_REFERENCE
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_CHECKPOINTS
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_RULES
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkCheckpointNameIndexCompanion
 import com.jetbrains.snakecharm.lang.psi.stubs.SmkRuleNameIndexCompanion
@@ -100,8 +101,8 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
                     psiElement(PyReferenceExpression::class.java)
                         .withChild(
                             psiElement().andOr(
-                                psiElement().withText(SnakemakeApi.SMK_VARS_CHECKPOINTS),
-                                psiElement().withText(SnakemakeApi.SMK_VARS_RULES)
+                                psiElement().withText(SMK_VARS_CHECKPOINTS),
+                                psiElement().withText(SMK_VARS_RULES)
                             )
                         )
                 )
@@ -122,12 +123,12 @@ private class SmkCompletionAfterRulesAndCheckpointsObjectProvider : CompletionPr
 
         @Suppress("UnstableApiUsage")
         val variants = when (rulesOrCheckpointsObject.name) {
-            SnakemakeApi.SMK_VARS_RULES -> collectVariantsForElement(
+            SMK_VARS_RULES -> collectVariantsForElement(
                 parameters.position,
                 isCheckPoint = false
             ) + collectVariantsForElement(parameters.position, isCheckPoint = true)
 
-            SnakemakeApi.SMK_VARS_CHECKPOINTS -> collectVariantsForElement(parameters.position, isCheckPoint = true)
+            SMK_VARS_CHECKPOINTS -> collectVariantsForElement(parameters.position, isCheckPoint = true)
             else -> return
         }
 

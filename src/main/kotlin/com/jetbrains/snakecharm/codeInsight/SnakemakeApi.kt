@@ -5,7 +5,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.framework.SmkApiSubsectionContextAndDirective
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
@@ -26,6 +25,9 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_RUN
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_SHELL
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_AS_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_FROM_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_FUN_EXPAND
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_FUN_EXPAND_ALIAS_COLLECT
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_WITH_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.USE_EXCLUDE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.USE_KEYWORD
@@ -49,24 +51,10 @@ import kotlinx.collections.immutable.toImmutableSet
  * Also see [SmkImplicitPySymbolsProvider] class
  */
 object SnakemakeApi {
-    const val UNPACK_FUNCTION = "unpack"
-
-    const val SMK_VARS_CONFIG = "config"
-    const val SMK_VARS_PEP = "pep"
-    const val SMK_VARS_RULES = "rules"
-    const val SMK_VARS_CHECKPOINTS = "checkpoints"
-    const val SMK_VARS_SCATTER = "scatter"
-    const val SMK_VARS_GATHER = "gather"
-    const val SMK_FUN_EXPAND = "expand"
-    const val SMK_FUN_EXPAND_ALIAS_COLLECT = "collect"
-
     val FUNCTIONS_BANNED_FOR_WILDCARDS = listOf(
         // TODO: Is possible to move into YAML
         SMK_FUN_EXPAND, SMK_FUN_EXPAND_ALIAS_COLLECT
     )
-
-    const val SMK_VARS_WILDCARDS = "wildcards"
-    const val WILDCARDS_ACCESSOR_CLASS = "snakemake.io.Wildcards"
 
     /**
      * Also see [SmkImplicitPySymbolsProvider], it also processes 'InputFiles', etc. symbols

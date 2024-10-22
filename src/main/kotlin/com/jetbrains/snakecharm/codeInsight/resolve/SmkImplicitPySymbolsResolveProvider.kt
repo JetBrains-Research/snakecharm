@@ -6,15 +6,15 @@ import com.jetbrains.python.psi.resolve.PyReferenceResolveProvider
 import com.jetbrains.python.psi.resolve.RatedResolveResult
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.codeInsight.ImplicitPySymbolsCache
-import com.jetbrains.snakecharm.codeInsight.SmkImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SmkCodeInsightScope
-import com.jetbrains.snakecharm.codeInsight.SnakemakeApi.SMK_VARS_WILDCARDS
+import com.jetbrains.snakecharm.codeInsight.SmkImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkImplicitPySymbolsResolveProviderCompanion.addSyntheticSymbols
 import com.jetbrains.snakecharm.codeInsight.resolve.SmkResolveUtil.RATE_IMPLICIT_SYMBOLS
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_JOBID
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_RULE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_THREADS
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 
 class SmkImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
