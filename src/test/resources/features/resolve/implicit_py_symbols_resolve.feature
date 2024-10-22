@@ -333,7 +333,6 @@ Feature: Resolve implicitly imported python names
       | exp | expand      | py  |
       | exp | expand      | pyi |
 
-    @here2_
   Scenario Outline: Resolve in injections
     Given a <smk_vers> project
     Given I open a file "foo.smk" with text
