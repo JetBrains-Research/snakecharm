@@ -243,6 +243,25 @@ Feature: Completion for snakemake keyword-like things
       | subworkflow |
       | rule        |
 
+  Scenario Outline: Complete at rule/checkpoint level (single variant) before 8.0
+    Given a snakemake:7.32.4 project
+    And I set snakemake language version to "7.35.0"
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        <str>
+      """
+    When I put the caret after <str>
+    Then I invoke autocompletion popup and see a text:
+      """
+      <rule_like> NAME:
+        <result>:
+      """
+    Examples:
+      | rule_like  | str  | result         |
+      | rule       | vers | version        |
+      | checkpoint | vers | version        |
+
   Scenario Outline: Complete at rule/checkpoint level (single variant)
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -254,7 +273,7 @@ Feature: Completion for snakemake keyword-like things
     Then I invoke autocompletion popup and see a text:
       """
       <rule_like> NAME:
-        <result>: 
+        <result>:
       """
     Examples:
       | rule_like  | str  | result         |
@@ -266,8 +285,6 @@ Feature: Completion for snakemake keyword-like things
       | checkpoint | par  | params         |
       | rule       | be   | benchmark      |
       | checkpoint | be   | benchmark      |
-      | rule       | vers | version        |
-      | checkpoint | vers | version        |
       | rule       | cac  | cache          |
       | checkpoint | cac  | cache          |
       | rule       | mes  | message        |
@@ -296,6 +313,25 @@ Feature: Completion for snakemake keyword-like things
       | rule       | retr | retries        |
       | rule       | loc  | localrule      |
 
+  Scenario Outline: Complete at rule/checkpoint/module level (multiple variants) before 8.0
+    Given a snakemake:7.32.4 project
+    And I set snakemake language version to "7.35.0"
+    Given I open a file "foo.smk" with text
+      """
+      <rule_like> NAME:
+        <str>#here
+      """
+    When I put the caret at #here
+    Then I invoke autocompletion popup, select "<result>" lookup item and see a text:
+      """
+      <rule_like> NAME:
+        <result>: #here
+      """
+    Examples:
+      | rule_like  | str | result               |
+      | rule       | si  | singularity          |
+      | checkpoint | si  | singularity          |
+
   Scenario Outline: Complete at rule/checkpoint/module level (multiple variants)
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -315,8 +351,6 @@ Feature: Completion for snakemake keyword-like things
       | checkpoint | re  | resources            |
       | rule       | th  | threads              |
       | checkpoint | th  | threads              |
-      | rule       | si  | singularity          |
-      | checkpoint | si  | singularity          |
       | rule       | wi  | wildcard_constraints |
       | checkpoint | wi  | wildcard_constraints |
       | rule       | sh  | shadow               |

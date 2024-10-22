@@ -199,11 +199,10 @@ Feature: Tests on snakemake string language injection
       | default_target       |
       | retries              |
 
-  Scenario Outline: Inject in snakemake function calls in 8.7.0
-    # TODO: merge with : Scenario Outline: Inject in snakemake function calls
+  Scenario Outline: Inject in snakemake function calls in 7.35.0
 
-    Given a snakemake project
-    And I set snakemake language version to "8.7.0"
+    Given a snakemake:7.32.4 project
+    And I set snakemake language version to "7.35.0"
     Given I open a file "foo.smk" with text
     """
     <import_statement>
@@ -214,7 +213,7 @@ Feature: Tests on snakemake string language injection
     Then I expect language injection on "{foo}"
     Examples:
       | function     | import_statement          |
-      | exists      |                           |
+      | dynamic      |                           |
 
   Scenario Outline: Inject in snakemake function calls
     Given a snakemake project
@@ -245,7 +244,7 @@ Feature: Tests on snakemake string language injection
       | path.join    | from os import  path      |
       | os.path.join | import os                 |
       | multiext     |                           |
-#      | exists     |                           |
+      | exists     |                           |
       # Unresolved
       | dynamic      |                           |
       | join         |                           |
