@@ -92,7 +92,7 @@ object SnakemakeNames {
     const val SMK_VARS_GITLAB = "gitlab" // 6.8.1
     const val SMK_VARS_GITFILE = "gitfile" // 7.13.0
     const val SMK_VARS_STORAGE = "storage" // 8.0.0:
-    const val SMK_VARS_LOG = "log"
+    const val SMK_VARS_LOG = SECTION_LOG
 
     const val SMK_FUN_EXPAND = "expand"
     const val SMK_FUN_EXPAND_ALIAS_COLLECT = "collect"
