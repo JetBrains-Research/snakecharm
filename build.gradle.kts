@@ -236,17 +236,18 @@ qodana {}
 
 tasks {
 
-//    runIde {
+    runIde {
 //        // Test plugin dynamic unload:
 //        // See https://plugins.jetbrains.com/docs/intellij/dynamic-plugins.html#diagnosing-leaks
 //        // * Set to true registry property: ide.plugins.snapshot.on.unload.fail
 //        // * uncomment
 //        jvmArgs = listOf("-XX:+UnlockDiagnosticVMOptions")
 //
-//        jvmArgumentProviders += CommandLineArgumentProvider {
-//            listOf("-Dname=value")
-//        }
-//    }
+        jvmArgumentProviders += CommandLineArgumentProvider {
+            // listOf("-Dname=value")
+            listOf("-Dfus.internal.test.mode=true", "-Didea.is.internal=true")
+        }
+    }
 
     withType<KotlinCompile> {
         kotlinOptions {
