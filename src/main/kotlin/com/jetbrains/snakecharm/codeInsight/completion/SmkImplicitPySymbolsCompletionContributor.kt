@@ -58,6 +58,8 @@ class SmkImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
         val project = parameters.originalFile.project
         val cache = SmkImplicitPySymbolsProvider.instance(project).cache
 
+        // TODO: new scope for onstart/onsuccess/onerror handlers (3.6.0)
+
         if (contextScope == SmkCodeInsightScope.RULELIKE_RUN_SECTION) {
             val ruleOrCheckpoint = PsiTreeUtil.getParentOfType(contextElement, SmkRuleOrCheckpoint::class.java)!!
 

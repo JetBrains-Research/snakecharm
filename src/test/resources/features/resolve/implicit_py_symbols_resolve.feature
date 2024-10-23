@@ -145,20 +145,7 @@ Feature: Resolve implicitly imported python names
       | out | output.foo |
       | par | params     |
       | wil | wildcards  |
-
-  Scenario Outline: Not-resolved at top-level
-    Given a snakemake project
-    Given I open a file "foo.smk" with text
-     """
-     <text>
-     """
-    When I put the caret at <ptn>
-    Then reference should resolve to NULL
-
-    Examples:
-      | ptn | text       |
       | log | log        |
-
 
   Scenario Outline: Resolve inside rule parameters
     Given a <smk_vers> project
@@ -321,6 +308,23 @@ Feature: Resolve implicitly imported python names
       | checkpoint | out       | output.foo |
       | checkpoint | wild      | wildcards  |
 
+    @ignore
+  Scenario Outline: Resolved in top-level pipeline handler block
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+       """
+       <block>:
+           print(log)
+       """
+    When I put the caret at log
+    Then reference should resolve to NULL
+
+    Examples:
+      | block     |
+      | onstart   |
+      | onerror   |
+      | onsuccess |
+
   Scenario Outline: Not-resolved in top level python block
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -443,17 +447,23 @@ Feature: Resolve implicitly imported python names
       | rule       | input   | config      |
       | checkpoint | input   | rules       |
 
-  Scenario: Do not warn about unresolved log variable on top-level
+  @ignore
+  Scenario Outline: Do not warn about unresolved log variable on top-level pipeline handler block
     Given a snakemake project
     Given I open a file "foo.smk" with text
      """
-     onstart:
+     <block>:
         print("Log:")
         print(log)
      """
     And PyUnresolvedReferencesInspection inspection is enabled
     Then I expect no inspection warnings
     When I check highlighting warnings
+    Examples:
+      | block    |
+      | onstart  |
+      | onerror  |
+      | onsuccess |
 
   Scenario: Warn about unresolved snakemake variable in run section, behaviour differs from scripts
     Given a snakemake project

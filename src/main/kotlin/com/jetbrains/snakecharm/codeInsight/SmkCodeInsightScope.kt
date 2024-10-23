@@ -7,6 +7,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkRunSection
 enum class SmkCodeInsightScope {
     TOP_LEVEL,
     RULELIKE_RUN_SECTION;
+    // TODO: new scope for onstart/onsuccess/onerror handlers (3.6.0) ? or just implement
 
     fun includes(second: SmkCodeInsightScope) = when (this) {
         TOP_LEVEL -> second == TOP_LEVEL

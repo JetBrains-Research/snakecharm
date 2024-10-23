@@ -748,6 +748,9 @@ class SmkImplicitPySymbolsProvider(
             )
         }
 
+        // log in onstart/onsuccess/onerror
+        // TODO: 'log' var only in these sections, not on top-level, need new contxt for that?
+
         // Config
         val configSettingsClass = resolveTopLevelMember(
             QualifiedName.fromDottedString("snakemake.settings.types.ConfigSettings"),

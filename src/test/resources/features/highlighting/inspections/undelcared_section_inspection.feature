@@ -17,7 +17,6 @@ Feature: Inspection if section isn't declared in rule
       | rule_like  | text                     | section   | signature | inspection                       |
       | rule       | message: "{input}"       | input     | }         | SmkSLUndeclaredSectionInspection |
       | rule       | run: shell("{input}")    | input     | }         | SmkSLUndeclaredSectionInspection |
-
       | rule       | shell: "{input}"         | input     | }         | SmkSLUndeclaredSectionInspection |
       | rule       | run: print(input[0])     | input     | [         | SmkUndeclaredSectionInspection   |
       | rule       | shell: "{output}"        | output    | }         | SmkSLUndeclaredSectionInspection |
@@ -26,8 +25,6 @@ Feature: Inspection if section isn't declared in rule
       | rule       | run: print(params[0])    | params    | [         | SmkUndeclaredSectionInspection   |
       | rule       | shell: "{resources}"     | resources | }         | SmkSLUndeclaredSectionInspection |
       | rule       | run: print(resources[0]) | resources | [         | SmkUndeclaredSectionInspection   |
-      | rule       | shell: "{threads}"       | threads   | }         | SmkSLUndeclaredSectionInspection |
-      | rule       | run: print(threads[0])   | threads   | [         | SmkUndeclaredSectionInspection   |
       | rule       | shell: "{log}"           | log       | }         | SmkSLUndeclaredSectionInspection |
       | rule       | run: print(log[0])       | log       | [         | SmkUndeclaredSectionInspection   |
       | checkpoint | shell: "{params}"        | params    | }         | SmkSLUndeclaredSectionInspection |

@@ -47,6 +47,8 @@ class SmkImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
             val referencedName = element.referencedName
             val items = arrayListOf<RatedResolveResult>()
 
+            // TODO: new scope for onstart/onsuccess/onerror handlers (3.6.0)
+
             if (contextScope == SmkCodeInsightScope.RULELIKE_RUN_SECTION) {
                 val ruleOrCheckpoint = PsiTreeUtil.getParentOfType(element, SmkRuleOrCheckpoint::class.java)!!
 

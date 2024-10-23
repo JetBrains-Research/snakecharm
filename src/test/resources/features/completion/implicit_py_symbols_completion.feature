@@ -34,7 +34,6 @@ Feature: Completion in python part of snakemake file
       | github        |
       | gitlab        |
       | gitfile       |
-      | log           |
 
   Scenario: Complete imported python modules/classes at top-level
     Given a snakemake project
@@ -83,9 +82,10 @@ Feature: Completion in python part of snakemake file
     When I put the caret after foo = 1;
     And I invoke autocompletion popup
     Then completion list shouldn't contain:
-    | output    |
-    | params    |
-    | wildcards |
+      | output    |
+      | params    |
+      | wildcards |
+      | log         |
 
   Scenario: Not-completed after dot
     Given a snakemake project
@@ -221,6 +221,24 @@ Feature: Completion in python part of snakemake file
       | version   |
       | rule      |
       | jobid     |
+    Examples:
+      | block     |
+      | onstart   |
+      | onerror   |
+      | onsuccess |
+
+  @ignore
+  Scenario Outline: Completed in top-level pipeline handler block
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+      """
+      <block>:
+         foo = 1
+      """
+    When I put the caret at foo = 1
+    And I invoke autocompletion popup
+    Then completion list should contain:
+      | log |
     Examples:
       | block     |
       | onstart   |
