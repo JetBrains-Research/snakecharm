@@ -5,7 +5,7 @@
 
 
 ## [2024.2.2]
-Released on <not released>
+Released on 24 October 2024
 
 ### Features
 - Inspection: Warn about deprecated or not yet available features based on snakemake language level (see [#508](https://github.com/JetBrains-Research/snakecharm/issues/508)
@@ -26,8 +26,6 @@ Released on <not released>
 - Do not warn about unresolved `snakemake` variable in the python files, because they could be used as scripts/wrappers for snakemake rules.  (see [#511](https://github.com/JetBrains-Research/snakecharm/issues/511))
 - Undeclared section `threads` warning should not be shown here (see [#539](https://github.com/JetBrains-Research/snakecharm/issues/539)
 
-### Changed
-- TODO
 
 ## [2024.2.1]
 Released on 9 October 2024
