@@ -3,6 +3,19 @@
 
 # SnakeCharm Plugin Changelog
 
+## [2024.2.3]
+Released on <not released>
+
+
+### Features
+- TODO
+
+### Fixed
+- TODO
+
+### Changed
+- TODO
+
 
 ## [2024.2.2]
 Released on 24 October 2024
@@ -27,7 +40,6 @@ NB: Please configure/ensure the desired snakemake language level in the plugin s
 - Inject some modules in Snakefile file resolve scope w/o import declaration, e.g. os, sys,.. (see [#553](https://github.com/JetBrains-Research/snakecharm/issues/553)
 - Do not warn about unresolved `snakemake` variable in the python files, because they could be used as scripts/wrappers for snakemake rules.  (see [#511](https://github.com/JetBrains-Research/snakecharm/issues/511))
 - Undeclared section `threads` warning should not be shown here (see [#539](https://github.com/JetBrains-Research/snakecharm/issues/539)
-
 
 ## [2024.2.1]
 Released on 9 October 2024
