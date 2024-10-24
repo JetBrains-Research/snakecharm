@@ -7,6 +7,8 @@
 ## [2024.2.2]
 Released on 24 October 2024
 
+NB: Please configure/ensure the desired snakemake language level in the plugin settings, by default, it will be 8.24.0 in this release. Language level setting is required to show Snakemake API that is deprecated in the desired Snakemake version or not yet available. See example screenshots in [#508](https://github.com/JetBrains-Research/snakecharm/issues/508).
+
 ### Features
 - Inspection: Warn about deprecated or not yet available features based on snakemake language level (see [#508](https://github.com/JetBrains-Research/snakecharm/issues/508)
 - Move snakemake API addition/removal info from JAR into `extra/snakemake_api.yaml` in plugin directory
