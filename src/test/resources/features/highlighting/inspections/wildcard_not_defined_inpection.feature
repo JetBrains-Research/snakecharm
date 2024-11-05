@@ -174,6 +174,35 @@ Feature: Inspection: SmkWildcardNotDefinedInspection
       | checkpoint |
       | checkpoint |
 
+  Scenario: Correctly hide error on typing output section
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule foo:
+        input: "foo/{sample}"
+        # formatter hack
+    """
+    And I put the caret after "foo/{sample}"
+    And SmkWildcardNotDefinedInspection inspection is enabled
+    Then I expect inspection error on <sample> with message
+    """
+    Wildcard 'sample' isn't properly defined.
+    """
+    When I check highlighting errors
+    When I type multiline text '\noutput: ' at the caret position
+    When I type multiline text '"boo/{sampl}"' at the caret position
+    And I put the caret after "boo/{sampl
+    When I type multiline text 'e' at the caret position
+    Then I expect text in current file:
+    """
+    rule foo:
+        input: "foo/{sample}"
+        output: "boo/{sample}"
+        # formatter hack
+    """
+    Then I expect no inspection errors
+    When I check highlighting errors
+
   Scenario Outline: Undefined wildcard if it is was defined in sections, which is overridden
     Given a snakemake project
     Given I open a file "foo.smk" with text

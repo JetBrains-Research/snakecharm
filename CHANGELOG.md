@@ -4,17 +4,10 @@
 # SnakeCharm Plugin Changelog
 
 ## [2024.2.3]
-Released on <not released>
-
-
-### Features
-- TODO
+Released on 5 November 2024
 
 ### Fixed
-- TODO
-
-### Changed
-- TODO
+- Wildcard is not properly defined false positive warning when typing first input, then output section (see [#557](https://github.com/JetBrains-Research/snakecharm/issues/557)
 
 
 ## [2024.2.2]

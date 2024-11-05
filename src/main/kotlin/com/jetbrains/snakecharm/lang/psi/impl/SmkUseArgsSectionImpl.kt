@@ -33,5 +33,7 @@ class SmkUseArgsSectionImpl(node: ASTNode) : SmkArgsSectionImpl(node), SmkRuleOr
         )
     }
 
-    override val isWildcardsDefiningSection = sectionKeyword in WILDCARDS_DEFINING_SECTIONS_KEYWORDS
+    override val isWildcardsDefiningSection by lazy {
+        sectionKeyword in WILDCARDS_DEFINING_SECTIONS_KEYWORDS
+    }
 }
