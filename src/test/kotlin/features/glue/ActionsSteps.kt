@@ -52,6 +52,16 @@ import kotlin.test.*
 
 
 class ActionsSteps {
+    @When("^I type multiline text '(.+)' at the caret position$")
+    fun iTypeTextAtCaret(text: String) {
+        val application = ApplicationManager.getApplication()
+        application.invokeAndWait({
+            SnakemakeWorld.fixture().type(
+                text.replace("\\n\\r", "\n").replace("\\n", "\n")
+            )
+        }, ModalityState.nonModal())
+    }
+
     @When("^I expect inspection (error|warning|info|TYPO|weak warning) on <([^>]+)> with message$")
     fun iExpectInspectionOn(level: String, signature: String, message: String) {
         iExpectInspectionOnIn(level, signature, signature, message)

@@ -35,6 +35,15 @@ class FilesSteps {
         createAndAddFile(name, text)
     }
 
+    @Given("^I expect text in current file:$")
+    fun iExpectTextInCurrentFile(text: String) {
+        ApplicationManager.getApplication().invokeAndWait({
+            val actualText = SnakemakeWorld.fixture().editor.document.text
+            assertEquals(text, actualText)
+        })
+    }
+
+
     @Given("snakemake framework api yaml descriptor is$")
     fun snakemakeFrameworkApiInfoContent(text: String) {
         ApplicationManager.getApplication().invokeAndWait({
