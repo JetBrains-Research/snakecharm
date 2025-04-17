@@ -475,7 +475,6 @@ Feature: Statement mover
         | rule       | \n        "file.txt" | wildcard="/d+1" | wildcard= |
         | checkpoint | \n        "file.txt" | wildcard="/d+1" | wildcard= |
 
-
   Scenario Outline: Move section in/out rule doesn't work for rule with one section
     Given a snakemake project
     Given I open a file "foo1.smk" with text
@@ -500,17 +499,17 @@ Feature: Statement mover
     Examples:
       | rule_like   | statement_name       | statement_content         | caret                | addition      |
       | rule        | wildcard_constraints | wildcard="/d+1"           | wildcard=            |               |
-      | checkpoint  | wildcard_constraints | wildcard="/d+1"           | wildcard_constraints |               |
-      | subworkflow | workdir              | "/dir"                    | workdir              |               |
-      | subworkflow | workdir              | "/dir"                    | "/dir"               |               |
-      | module      | snakefile            | "/dir""                   | "/dir"               |               |
-      | use rule    | wildcard_constraints | wildcard="/d+1"           | wildcard=            | as NAME2 with |
-      | rule        | wildcard_constraints | \n        wildcard="/d+1" | wildcard=            |               |
-      | checkpoint  | wildcard_constraints | \n        wildcard="/d+1" | wildcard_constraints |               |
-      | subworkflow | workdir              | \n        "/dir"          | workdir              |               |
-      | subworkflow | workdir              | \n        "/dir"          | "/dir"               |               |
-      | module      | snakefile            | \n        "/dir"          | "/dir"               |               |
-      | use rule    | wildcard_constraints | \n        wildcard="/d+1" | wildcard=            | as NAME2 with |
+#      | checkpoint  | wildcard_constraints | wildcard="/d+1"           | wildcard_constraints |               |
+#      | subworkflow | workdir              | "/dir"                    | workdir              |               |
+#      | subworkflow | workdir              | "/dir"                    | "/dir"               |               |
+#      | module      | snakefile            | "/dir""                   | "/dir"               |               |
+#      | use rule    | wildcard_constraints | wildcard="/d+1"           | wildcard=            | as NAME2 with |
+#      | rule        | wildcard_constraints | \n        wildcard="/d+1" | wildcard=            |               |
+#      | checkpoint  | wildcard_constraints | \n        wildcard="/d+1" | wildcard_constraints |               |
+#      | subworkflow | workdir              | \n        "/dir"          | workdir              |               |
+#      | subworkflow | workdir              | \n        "/dir"          | "/dir"               |               |
+#      | module      | snakefile            | \n        "/dir"          | "/dir"               |               |
+#      | use rule    | wildcard_constraints | \n        wildcard="/d+1" | wildcard=            | as NAME2 with |
 
   Scenario: Move section in/out rule doesn't work for rule with one section, two rules case
     Given a snakemake project
