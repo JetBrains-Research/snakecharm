@@ -44,6 +44,11 @@ If you get `Unimplemented substep definition` in all `*.feature` files, ensure:
   * Not installed or disabled: `Substeps IntelliJ Plugin` 
   * Plugins installed: `Cucumber Java`, `Gherkin`
 
+**Update to new Platform API:**
+* Inspect libs version in `gradle/libs.versions.toml`, especially `intelliJPlatform` and `kotlin` version. Also `javaVersion` and `gradleVersion` in `gradle.properties`
+  * See [GitHub:intellij-platform-gradle-plugin](https://github.com/JetBrains/intellij-platform-gradle-plugin) documentation and [GitHub:intellij-platform-plugin-template](https://github.com/JetBrains/intellij-platform-plugin-template) as plugin example
+* Update platform API version in `gradle.properties`, see `pluginVersion`, `pluginSinceBuild`, `pluginUntilBuild`, `platformVersion`
+  * `pluginVersion` version should be also mentioned in changelog `CHANGELOG.md`
  
 **Release plugin:**
 * Fix version in `build.gradle`

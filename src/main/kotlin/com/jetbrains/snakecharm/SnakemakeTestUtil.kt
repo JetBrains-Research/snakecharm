@@ -24,6 +24,13 @@ object SnakemakeTestUtil {
         return when (rootPath) {
             null -> null
             else -> {
+                // XXX: Starting from 2025.x:
+                if (rootPath.endsWith(".jar")) {
+                    // E.g.: ~/snakecharm/.sandbox_pycharm/PC-2025.1/plugins-test/snakecharm/lib/snakecharm-2025.1.1-eap.SNAPSHOT.jar
+                    return File(rootPath).toPath().parent.parent.parent.parent.parent.parent
+                }
+
+                // XXX Before 2025.x :
                 val subDir = File(rootPath).toPath().parent.parent
                 when {
                     subDir.fileName.toString() == "out" -> subDir.parent

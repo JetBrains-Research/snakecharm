@@ -6,11 +6,11 @@ cbor = "1.4.1"
 opentest4j = "1.3.0"
 
 # plugins
-kotlin = "1.9.25"
-intelliJPlatform = "2.1.0"
+kotlin = "2.1.20"
+intelliJPlatform = "2.5.0"
 changelog = "2.2.1"
-kover = "0.8.3"
-qodana = "2024.2.3"
+kover = "0.9.1"
+qodana = "2024.3.4"
 
 [libraries]
 junit = { group = "org.junit", name = "junit-bom", version.ref = "junit" }
