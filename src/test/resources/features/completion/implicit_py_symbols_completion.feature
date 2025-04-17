@@ -270,13 +270,19 @@ Feature: Completion in python part of snakemake file
      Given a snakemake project
      Given I open a file "foo.smk" with text
      """
-     expan
+     def expand_1111():
+       pass
+
+     expan#here
      """
-     When I put the caret after expan
+     When I put the caret at #here
       # Several 'expand' are in completion
      Then I invoke autocompletion popup, select "expand" lookup item with type text "snakemake.io" and see a text:
      """
-     expand()
+     def expand_1111():
+       pass
+
+     expand()#here
      """
 
 
