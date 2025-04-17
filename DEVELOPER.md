@@ -144,3 +144,13 @@ Workflows examples: https://github.com/snakemake-workflows/docs
       * Token types: `SmkSLTokenTypes`
     * Parser: `SmkSLParsingTest`, testdata: `testData/stringLanguagePsi`
       * AST node types: `SmkSLElementTypes`
+
+## Testdata
+
+### Custom snakemake version
+
+* Create mock directory for custom snakemake version, e.g. for 8.20.6: `./testData/MockPackages3_smk_8.20.6/snakemake`
+* Copy only required files (e.g. with canged API) into mock directory
+* Use in Cucumber steps, e.g. `Given a snakemake:8.20.6 project`
+
+NB: To run tests locally it is important to delete VFS cache for test instance on any change in mock directories, e.g. `.sandbox_pycharm/PC-2025.1/system-test`

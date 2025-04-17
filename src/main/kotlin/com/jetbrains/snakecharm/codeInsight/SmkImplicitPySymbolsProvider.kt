@@ -16,6 +16,7 @@ import com.intellij.openapi.roots.ex.ProjectRootManagerEx
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.util.QualifiedName
@@ -180,7 +181,7 @@ class SmkImplicitPySymbolsProvider(
         // xxx: maybe  properties from 'Workflow'
 
         ///////////////////////////////////////
-        // E.g. expand, temp, .. from 'snakemake.io'
+        // E.g. expand, temp, .. from 'snakemake.io' (snakemake.io.py before 9.0.0 and snakemake.io.__init__.py after)
         collectTopLevelMethodsFrom(
             SNAKEMAKE_MODULE_NAME_IO, SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache
         )
@@ -193,9 +194,15 @@ class SmkImplicitPySymbolsProvider(
 
         // see 'ioutils.register_in_globals` function
         // collect exists, etc
+        // * XXX: before 9.0.0 syntax
         collectTopLevelMethodsFrom(
             "snakemake.ioutils", SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache
         )
+        // * XXX: starting from 9.0.0 syntax
+        collectTopLevelMethodsMatchingModuleFromPackage(
+            "snakemake.ioutils", SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache
+        )
+
         elementsCache.firstOrNull() { it.fqn == "snakemake.io.expand"}?.let {
             elementsCache.add(ImplicitPySymbol(
                 SnakemakeNames.SMK_FUN_EXPAND_ALIAS_COLLECT,"snakemake.ioutils.collect", it.psiDeclaration, it.scope, it.usageType
@@ -245,7 +252,7 @@ class SmkImplicitPySymbolsProvider(
         // snakemake.io.Log
         // snakemake.io.Wildcards
         // snakemake.io.Resources
-        collectTopLevelClassesInheretedFrom(
+        collectTopLevelClassesInheritedFrom(
             SNAKEMAKE_MODULE_NAME_IO,
             "snakemake.io.Namedlist",
             SmkCodeInsightScope.RULELIKE_RUN_SECTION, usedFiles, sdk, elementsCache
@@ -535,7 +542,20 @@ class SmkImplicitPySymbolsProvider(
         }
     }
 
-    private fun collectTopLevelClassesInheretedFrom(
+    /**
+     * Find module related file using 2 approaches:
+     *      - Snakemake API, v < 9.0.0: e.g 'snakemake.io' -> 'snakemake/io.py'
+     *      - Snakemake API, v >= 9.0.0: e.g 'snakemake.io' -> 'snakemake/io/__init__.py'
+     *
+     * @param project
+     *          the project
+     * @param scope
+     *          the code insight scope
+     * @param usedFiles
+     *          the set of already processed files (to avoid processing the same file twice)
+     * @param sdk
+     */
+    private fun collectTopLevelClassesInheritedFrom(
         pyModuleFqn: String,
         parentClassRequirement: String?,
         scope: SmkCodeInsightScope,
@@ -544,7 +564,7 @@ class SmkImplicitPySymbolsProvider(
         elementsCache: MutableList<ImplicitPySymbol>,
         classFqn2VarNameFun: (String) -> String
     ) {
-        val pyFiles = collectPyFiles(pyModuleFqn, usedFiles, sdk)
+        val pyFiles = collectFilesFromModulePyFileOrInitFile(pyModuleFqn, usedFiles, sdk)
 
         // collect top level classes inherited from [parentClassRequirement]:
         pyFiles
@@ -606,8 +626,6 @@ class SmkImplicitPySymbolsProvider(
         sdk: Sdk
     ): List<PyFile> {
         val resolveContext = fromSdk(project, sdk)
-        ////////////////
-
 
         val pyFiles = resolveQualifiedName(
             QualifiedName.fromDottedString(pyModuleFqn),
@@ -617,6 +635,43 @@ class SmkImplicitPySymbolsProvider(
         return pyFiles
     }
 
+    private fun collectPyFilesFromPsiDirectory(
+        pyModuleFqn: String,
+        usedFiles: MutableSet<VirtualFile>,
+        sdk: Sdk
+    ): List<PyFile> {
+        val resolveContext = fromSdk(project, sdk)
+
+        val pyFiles = resolveQualifiedName(
+            QualifiedName.fromDottedString(pyModuleFqn),
+            resolveContext
+        ).filterIsInstance<PsiDirectory>().flatMap {
+            it.files.filterIsInstance<PyFile>()
+        }
+        pyFiles.forEach { usedFiles.add(it.virtualFile) }
+        return pyFiles
+    }
+
+    private fun collectTopLevelMethodsMatchingModuleFromPackage(
+        pyModuleFqn: String,
+        scope: SmkCodeInsightScope,
+        usedFiles: MutableSet<VirtualFile>,
+        sdk: Sdk,
+        elementsCache: MutableList<ImplicitPySymbol>
+    ) {
+        val pyFiles = collectPyFilesFromPsiDirectory(pyModuleFqn, usedFiles, sdk)
+
+        // collect top level methods matching file names
+        pyFiles
+            .asSequence()
+            .filter { it.isValid }
+            .mapNotNull { pyFile -> pyFile.findTopLevelFunction(pyFile.virtualFile.nameWithoutExtension) }
+            .filter { it.name != null }
+            .forEach { pyFun ->
+                elementsCache.add(ImplicitPySymbol(pyFun.name!!, pyFun.qualifiedName, pyFun, scope, ImplicitPySymbolUsageType.METHOD))
+            }
+    }
+
     private fun collectTopLevelMethodsFrom(
         pyModuleFqn: String,
         scope: SmkCodeInsightScope,
@@ -624,7 +679,7 @@ class SmkImplicitPySymbolsProvider(
         sdk: Sdk,
         elementsCache: MutableList<ImplicitPySymbol>
     ) {
-        val pyFiles = collectPyFiles(pyModuleFqn, usedFiles, sdk)
+        val pyFiles = collectFilesFromModulePyFileOrInitFile(pyModuleFqn, usedFiles, sdk)
 
         // collect top level methods:
 
@@ -637,6 +692,19 @@ class SmkImplicitPySymbolsProvider(
             .forEach { pyFun ->
                 elementsCache.add(ImplicitPySymbol(pyFun.name!!, pyFun.qualifiedName, pyFun, scope, ImplicitPySymbolUsageType.METHOD))
             }
+    }
+
+    private fun collectFilesFromModulePyFileOrInitFile(
+        pyModuleFqn: String,
+        usedFiles: MutableSet<VirtualFile>,
+        sdk: Sdk
+    ): List<PyFile> {
+        val pyFilesByModulePyFile = collectPyFiles(pyModuleFqn, usedFiles, sdk)
+
+        return when {
+            pyModuleFqn.endsWith("__init__") -> pyFilesByModulePyFile
+            else -> pyFilesByModulePyFile + collectPyFiles("$pyModuleFqn.__init__", usedFiles, sdk)
+        }
     }
 
     private fun collectWorkflowGlobalVariables(

@@ -29,7 +29,7 @@ import kotlin.test.fail
  * @date 2019-04-28
  */
 class StepDefs {
-    @Given("^a (snakemake|snakemake:5x|snakemake:6.1|snakemake:6.5|snakemake:7.32.4|snakemake with disabled framework|python) project$")
+    @Given("^a (snakemake|snakemake:.*|snakemake with disabled framework|python) project$")
     @Throws(Exception::class)
     fun configureSnakemakeProject(projectType: String) {
         // Launched from 'Test worker' thread

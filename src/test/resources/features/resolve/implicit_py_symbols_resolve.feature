@@ -34,7 +34,7 @@ Feature: Resolve implicitly imported python names
 
     Examples:
       | ptn | text        | symbol_name | file         |
-      | exp | expand()    | expand      | io.py        |
+      | exp | expand()    | expand      | __init__.py        |
 
 
   @ignore
@@ -64,23 +64,36 @@ Feature: Resolve implicitly imported python names
       | snakemake:6.5    | ru  | rules.foo       | Rules         | __init__.py  |
       | snakemake:6.1    | dyn | dynamic()       | dynamic       | io.py        |
       | snakemake:7.32.4 | dyn | dynamic()       | dynamic       | io.py        |
-      | snakemake        | exp | expand()        | expand        | io.py        |
-      | snakemake        | tem | temp()          | temp          | io.py        |
-      | snakemake        | dir | directory()     | directory     | io.py        |
-      | snakemake        | dir | directory()     | directory     | io.py        |
-      | snakemake        | pro | protected()     | protected     | io.py        |
+      | snakemake:8.20.6 | exp | expand()        | expand        | io.py        |
+      | snakemake:9.3.0  | exp | expand()        | expand        | __init__.py  |
+      | snakemake        | exp | expand()        | expand        | __init__.py  |
+      | snakemake:8.20.6 | tem | temp()          | temp          | io.py        |
+      | snakemake:9.3.0  | tem | temp()          | temp          | __init__.py  |
+      | snakemake        | tem | temp()          | temp          | __init__.py  |
+      | snakemake:8.20.6 | dir | directory()     | directory     | io.py        |
+      | snakemake        | dir | directory()     | directory     | __init__.py  |
+      | snakemake        | pro | protected()     | protected     | __init__.py  |
       | snakemake        | upd | update()        | update        | ioflags.py   |
       | snakemake        | bef | before_update() | before_update | ioflags.py   |
-      | snakemake        | lo  | lookup()        | lookup        | ioutils.py   |
-      | snakemake        | br  | branch()        | branch        | ioutils.py   |
-      | snakemake        | ev  | evaluate()      | evaluate      | ioutils.py   |
-      | snakemake        | col | collect()       | expand        | io.py        |
-      | snakemake        | ex  | exists()        | exists        | ioutils.py   |
-      | snakemake        | fr  | from_queue()    | from_queue    | io.py        |
-      | snakemake        | tou | touch()         | touch         | io.py        |
-      | snakemake        | un  | unpack()        | unpack        | io.py        |
-      | snakemake        | anc | ancient()       | ancient       | io.py        |
-      | snakemake        | ens | ensure()        | ensure        | io.py        |
+      | snakemake:8.20.6 | br  | branch()        | branch        | ioutils.py   |
+      | snakemake:9.3.0  | br  | branch()        | branch        | branch.py    |
+      | snakemake:8.20.6 | ex  | exists()        | exists        | ioutils.py   |
+      | snakemake:9.3.0  | ex  | exists()        | exists        | exists.py    |
+      | snakemake        | ex  | exists()        | exists        | exists.py    |
+      | snakemake        | lo  | lookup()        | lookup        | lookup.py    |
+      | snakemake        | br  | branch()        | branch        | branch.py    |
+      | snakemake        | ev  | evaluate()      | evaluate      | evaluate.py  |
+      | snakemake        | su  | subpath()       | subpath       | subpath.py   |
+      | snakemake:8.20.6 | col | collect()       | expand        | io.py        |
+      | snakemake:9.3.0  | col | collect()       | expand        | __init__.py  |
+      | snakemake        | col | collect()       | expand        | __init__.py  |
+      | snakemake        | fr  | from_queue()    | from_queue    | __init__.py  |
+      | snakemake:8.20.6 | tou | touch()         | touch         | io.py        |
+      | snakemake        | tou | touch()         | touch         | __init__.py  |
+      | snakemake        | un  | unpack()        | unpack        | __init__.py  |
+      | snakemake        | anc | ancient()       | ancient       | __init__.py  |
+      | snakemake:8.20.6 | anc | ancient()       | ancient       | io.py        |
+      | snakemake        | ens | ensure()        | ensure        | __init__.py  |
       | snakemake        | ru  | rules           | Rules         | __init__.py  |
       | snakemake        | ru  | rules.foo       | Rules         | __init__.py  |
       | snakemake        | inp | input           | input         | builtins.pyi |
@@ -159,16 +172,18 @@ Feature: Resolve implicitly imported python names
 
     Examples:
       | smk_vers      | ptn   | text       | symbol_name       | file           |
-      | snakemake:5x  | rules | rules.foo  | rules             | workflow.py    |
-      | snakemake:6.1 | rules | rules.foo  | Rules             | common.py      |
-      | snakemake:6.5 | rules | rules.foo  | Rules             | __init__.py    |
-      | snakemake     | exp   | expand()   | expand            | io.py          |
-      | snakemake     | rules | rules.foo  | Rules             | __init__.py    |
-      | snakemake     | pep   | pep.config | __init__          | project.py     |
-      | snakemake     | sto   | storage    | _storage_registry | workflow.py    |
-      | snakemake     | git   | github     | GithubFile        | sourcecache.py |
-      | snakemake     | git   | gitfile    | LocalGitFile      | sourcecache.py |
-      | snakemake     | con   | config     | overwrite_config  | types.py       |
+      | snakemake:5x     | rules | rules.foo  | rules             | workflow.py    |
+      | snakemake:6.1    | rules | rules.foo  | Rules             | common.py      |
+      | snakemake:6.5    | rules | rules.foo  | Rules             | __init__.py    |
+      | snakemake:8.20.6 | exp   | expand()   | expand            | io.py          |
+      | snakemake:9.3.0  | exp   | expand()   | expand            | __init__.py    |
+      | snakemake        | exp   | expand()   | expand            | __init__.py    |
+      | snakemake        | rules | rules.foo  | Rules             | __init__.py    |
+      | snakemake        | pep   | pep.config | __init__          | project.py     |
+      | snakemake        | sto   | storage    | _storage_registry | workflow.py    |
+      | snakemake        | git   | github     | GithubFile        | sourcecache.py |
+      | snakemake        | git   | gitfile    | LocalGitFile      | sourcecache.py |
+      | snakemake        | con   | config     | overwrite_config  | types.py       |
 
   Scenario: Resolve inside rule parameters: shell()
     Given a snakemake project
@@ -194,23 +209,31 @@ Feature: Resolve implicitly imported python names
       | <symbol_name> | <file> | <times> |
 
     Examples:
-      | smk_vers      | ptn         | text        | symbol_name | file           | times |
-      | snakemake:5x  | checkpoints | checkpoints | checkpoints | workflow.py    | 1     |
-      | snakemake:5x  | rules       | rules.foo   | rules       | workflow.py    | 1     |
-      | snakemake:6.1 | checkpoints | checkpoints | Checkpoints | checkpoints.py | 1     |
-      | snakemake:6.1 | rules       | rules.foo   | Rules       | common.py      | 1     |
-      | snakemake:6.5 | rules       | rules.foo   | Rules       | __init__.py    | 1     |
-      | snakemake     | exp         | expand()    | expand      | io.py          | 1     |
-      | snakemake     | she         | shell()     | shell       | shell.py       | 1     |
-      | snakemake     | rules       | rules.foo   | Rules       | __init__.py    | 1     |
-      | snakemake     | checkpoints | checkpoints | Checkpoints | checkpoints.py | 1     |
-      | snakemake     | inp         | input[0]    | InputFiles  | io.py          | 1     |
-      | snakemake     | output.foo  | output.foo  | OutputFiles | io.py          | 1     |
-      | snakemake     | par         | params      | Params      | io.py          | 1     |
-      | snakemake     | wil         | wildcards   | Wildcards   | io.py          | 1     |
-      | snakemake     | res         | resources   | Resources   | io.py          | 1     |
-      | snakemake     | lo          | log         | Log         | io.py          | 1     |
-      | snakemake     | pep         | pep.config  | __init__     | project.py     | 1     |
+      | smk_vers         | ptn         | text        | symbol_name | file           | times |
+      | snakemake:5x     | checkpoints | checkpoints | checkpoints | workflow.py    | 1     |
+      | snakemake:5x     | rules       | rules.foo   | rules       | workflow.py    | 1     |
+      | snakemake:6.1    | checkpoints | checkpoints | Checkpoints | checkpoints.py | 1     |
+      | snakemake:6.1    | rules       | rules.foo   | Rules       | common.py      | 1     |
+      | snakemake:6.5    | rules       | rules.foo   | Rules       | __init__.py    | 1     |
+      | snakemake:8.20.6 | exp         | expand()    | expand      | io.py          | 1     |
+      | snakemake:9.3.0  | exp         | expand()    | expand      | __init__.py    | 1     |
+      | snakemake        | exp         | expand()    | expand      | __init__.py    | 1     |
+      | snakemake        | she         | shell()     | shell       | shell.py       | 1     |
+      | snakemake        | rules       | rules.foo   | Rules       | __init__.py    | 1     |
+      | snakemake        | checkpoints | checkpoints | Checkpoints | checkpoints.py | 1     |
+      | snakemake:8.20.6 | inp         | input[0]    | InputFiles  | io.py          | 1     |
+      | snakemake:9.3.0  | inp         | input[0]    | InputFiles  | __init__.py    | 1     |
+      | snakemake        | inp         | input[0]    | InputFiles  | __init__.py    | 1     |
+      | snakemake        | output.foo  | output.foo  | OutputFiles | __init__.py    | 1     |
+      | snakemake        | par         | params      | Params      | __init__.py    | 1     |
+      | snakemake:8.20.6 | wil         | wildcards   | Wildcards   | io.py          | 1     |
+      | snakemake:9.3.0  | wil         | wildcards   | Wildcards   | __init__.py    | 1     |
+      | snakemake        | wil         | wildcards   | Wildcards   | __init__.py    | 1     |
+      | snakemake:8.20.6 | res         | resources   | Resources   | io.py          | 1     |
+      | snakemake:9.3.0  | res         | resources   | Resources   | __init__.py    | 1     |
+      | snakemake        | res         | resources   | Resources   | __init__.py    | 1     |
+      | snakemake        | lo          | log         | Log         | __init__.py    | 1     |
+      | snakemake        | pep         | pep.config  | __init__    | project.py     | 1     |
 
   Scenario: Resolve results priority
     Given a snakemake project
@@ -223,7 +246,7 @@ Feature: Resolve implicitly imported python names
       """
     When I put the caret at input #here
     Then reference should multi resolve to name, file in same order
-      | InputFiles | io.py        |
+      | InputFiles | __init__.py  |
       | input      | builtins.pyi |
 
   Scenario Outline: Resolve section name inside run section (threads is fake implicit symbol)
@@ -348,15 +371,20 @@ Feature: Resolve implicitly imported python names
       | onerror   | wil         | wildcards  |
       | onsuccess | wil         | wildcards  |
 
-  Scenario: Resolve also works inside call args
-    Given a snakemake project
+  Scenario Outline: Resolve also works inside call args
+    Given a <smk_vers> project
     Given I open a file "foo.smk" with text
     """
     rule all:
       input: directory(expand("{dataset}/dir", dataset=[]))
     """
     When I put the caret at exp
-    Then reference should resolve to "expand" in "io.py"
+    Then reference should resolve to "expand" in "<file>"
+    Examples:
+      | smk_vers         | file        |
+      | snakemake:8.20.6 | io.py       |
+      | snakemake:9.3.0  | __init__.py |
+      | snakemake        | __init__.py |
 
   Scenario Outline: Implicit resolve is off in python dialects files
     Given a snakemake project

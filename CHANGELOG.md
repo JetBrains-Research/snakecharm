@@ -7,7 +7,8 @@
 Released on <not released>
 
 ### Fixed
-- Compatibility with PyCharm 2025.1
+- Compatibility with PyCharm 2025.1 (see [#560](https://github.com/JetBrains-Research/snakecharm/issues/560)
+- Some code insight features stopped working with Snakemake 9.x release (see [#559](https://github.com/JetBrains-Research/snakecharm/issues/559)
 
 
 ## [2024.2.3]

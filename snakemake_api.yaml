@@ -1,7 +1,7 @@
 annotationsFormatVersion: 1
 
 # Default Language Level used for all projects:
-defaultVersion: "8.24.0"
+defaultVersion: "9.3.0"
 
 # supported types of sections in each version:
 # * 'introduced' - API was introduced
@@ -31,6 +31,14 @@ defaultVersion: "8.24.0"
 #    * docs_url: ''                                | Documentation URL
 # =========================================
 changelog:
+
+  # ---------------------------------------
+  - version: "8.27.0"
+    introduced:
+      - name: "snakemake.ioutils.subpath"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#snakefiles-subpath
+        placeholders_injection_allowed: True
 
   # ---------------------------------------
   - version: "8.7.0"

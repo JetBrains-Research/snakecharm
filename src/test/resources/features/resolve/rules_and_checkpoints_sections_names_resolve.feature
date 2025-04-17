@@ -150,7 +150,7 @@ Feature: Resolve for section names in rules and checkpoints
       | checkpoint | utput.out | there should be no reference |
 
   Scenario Outline: Resolve section to snakemake library if section undeclared
-    Given a snakemake project
+    Given a <smk_vers> project
     Given I open a file "foo.smk" with text
      """
      rule foo:
@@ -163,10 +163,12 @@ Feature: Resolve for section names in rules and checkpoints
     When I put the caret at <section> #here
     Then reference should resolve to "<target>" in "<file>"
     Examples:
-      | rule_like  | text          | section   | target      | file  |
-      | rule       | output: ""    | output    | OutputFiles | io.py |
-      | rule       | input: ""     | input     | InputFiles  | io.py |
-      | rule       | params: ""    | params    | Params      | io.py |
-      | rule       | log: ""       | log       | Log         | io.py |
-      | rule       | resources: "" | resources | Resources   | io.py |
-      | checkpoint | output: ""    | output    | OutputFiles | io.py |
+      | smk_vers         | rule_like  | text          | section   | target      | file        |
+      | snakemake:8.20.6 | rule       | output: ""    | output    | OutputFiles | io.py       |
+      | snakemake:9.3.0  | rule       | output: ""    | output    | OutputFiles | __init__.py |
+      | snakemake        | rule       | output: ""    | output    | OutputFiles | __init__.py |
+      | snakemake        | rule       | input: ""     | input     | InputFiles  | __init__.py |
+      | snakemake        | rule       | params: ""    | params    | Params      | __init__.py |
+      | snakemake        | rule       | log: ""       | log       | Log         | __init__.py |
+      | snakemake        | rule       | resources: "" | resources | Resources   | __init__.py |
+      | snakemake        | checkpoint | output: ""    | output    | OutputFiles | __init__.py |
