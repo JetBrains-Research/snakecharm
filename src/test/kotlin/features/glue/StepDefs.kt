@@ -6,6 +6,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Disposer
+import com.intellij.python.community.helpersLocator.PythonHelpersLocator
 import com.intellij.testFramework.TestApplicationManager
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
@@ -17,8 +18,8 @@ import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFile
 import com.jetbrains.snakecharm.SnakemakeTestUtil
-import com.jetbrains.snakecharm.framework.SnakemakeApiYamlAnnotationsService
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
+import com.jetbrains.snakecharm.framework.SnakemakeApiYamlAnnotationsService
 import io.cucumber.java.en.Given
 import javax.swing.SwingUtilities
 import kotlin.test.fail
@@ -67,6 +68,10 @@ class StepDefs {
         // Write code here that turns the phrase above into concrete actions
         val testDataRoot = SnakemakeTestUtil.getTestDataPath().toString()
         val projectDescriptor = PyLightProjectDescriptor(level, testDataRoot, *additionalRoots)
+
+        // XXX: Explicitly call EP which will result in Missing extension point: com.jetbrains.python.pythonHelpersLocator.
+        //      or commient to let if fail later from PythonMockSdk internals
+        print(PythonHelpersLocator.getHelpersRoots())
 
         SnakemakeWorld.myPythonOnlySdk = PythonMockSdk.create(
             testDataRoot, level, sdkNameSuffix = "_wo_snakemake"

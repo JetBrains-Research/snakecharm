@@ -1,5 +1,5 @@
 Feature: Documentation for wrapper section
-
+  @here
   Scenario Outline: Documentation links for default settings
     Given a snakemake project
     Given I open a file "foo.smk" with text
