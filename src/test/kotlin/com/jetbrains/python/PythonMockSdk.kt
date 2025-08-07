@@ -27,7 +27,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.containers.MultiMap
 import com.jetbrains.python.codeInsight.typing.PyTypeShed.findAllRootsForLanguageLevel
-import com.jetbrains.python.codeInsight.userSkeletons.PyUserSkeletonsUtil
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.sdk.PythonSdkType.MOCK_PY_MARKER_KEY
 import com.jetbrains.python.sdk.PythonSdkUtil
@@ -104,7 +103,6 @@ object PythonMockSdk {
             result,
             localFS.refreshAndFindFileByIoFile(File(mockSdkPath, PythonSdkUtil.SKELETON_DIR_NAME))
         )
-        ContainerUtil.addIfNotNull(result, PyUserSkeletonsUtil.getUserSkeletonsDirectory())
         result.addAll(findAllRootsForLanguageLevel(level))
         return result
     }
