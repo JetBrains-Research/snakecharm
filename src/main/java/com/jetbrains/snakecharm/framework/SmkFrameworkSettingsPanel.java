@@ -190,9 +190,8 @@ public class SmkFrameworkSettingsPanel extends JPanel implements Disposable {
     ) {
         final FileChooserDescriptor folderChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
         folderChooserDescriptor.setTitle(title);
-        // TODO: deprecated in 2024.3 and not yet available in 2024.2.x
-        // textField.addBrowseFolderListener(project, folderChooserDescriptor.withTitle(title));
-        textField.addBrowseFolderListener(title, null, project, folderChooserDescriptor);
+
+        textField.addBrowseFolderListener(project, folderChooserDescriptor.withTitle(title));
     }
 
     public void applyTo(@NotNull SmkSupportProjectSettings.State state) {
