@@ -310,7 +310,7 @@ class SmkImplicitPySymbolsProvider(
             return false
         }
 
-        val packages = PythonPackageManager.forSdk(project, sdk).installedPackages
+        val packages = PythonPackageManager.forSdk(project, sdk).listInstalledPackagesSnapshot()
 
         val pkgSnakemake = packages.firstOrNull { it.name == SnakemakeApi.SMK_API_PKG_NAME_SMK }
         if (pkgSnakemake != null) {

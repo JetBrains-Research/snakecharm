@@ -21,7 +21,7 @@ exclude:
       - .qodana
       - src/main/java/com/jetbrains/snakecharm/stringLanguage/lang/parser/_SmkSLLexer.java
 
-projectJDK: 17 #(Applied in CI/CD pipeline)
+projectJDK: 21 #(Applied in CI/CD pipeline)
 
 #Execute shell command before Qodana execution (Applied in CI/CD pipeline)
 #bootstrap: sh ./prepare-qodana.sh
@@ -31,4 +31,4 @@ projectJDK: 17 #(Applied in CI/CD pipeline)
 #  - id: <plugin.id> #(plugin id can be found at https://plugins.jetbrains.com)
 
 #Specify Qodana linter for analysis (Applied in CI/CD pipeline)
-linter: jetbrains/qodana-jvm-community:2024.2
+linter: jetbrains/qodana-jvm-community:2025.1.1

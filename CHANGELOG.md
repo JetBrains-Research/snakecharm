@@ -3,6 +3,13 @@
 
 # SnakeCharm Plugin Changelog
 
+## [2025.2.1]
+Released on <Unreleased>
+
+### Fixed
+- Compatibility with PyCharm 2025.2 (see [#563](https://github.com/JetBrains-Research/snakecharm/issues/563)
+- Bundled snakemake wrappers list updated to `v7.2.0`
+
 ## [2025.1.1]
 Released on 18 April 2025
 
