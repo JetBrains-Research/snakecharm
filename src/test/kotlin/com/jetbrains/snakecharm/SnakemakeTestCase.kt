@@ -51,7 +51,8 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
             testRootDisposable,
             "/usr/local/bin/python3.10",
             "/usr/local/bin/python3",
-            "/usr/bin/python3"
+            "/usr/bin/python3",
+            "/usr/bin/python3.10"
         )
 
         val fixtureBuilder = factory.createLightFixtureBuilder(
