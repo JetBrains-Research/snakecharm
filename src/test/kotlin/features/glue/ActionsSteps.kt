@@ -350,6 +350,10 @@ class ActionsSteps {
         }
 
         val fixture = fixture()
+
+        DumbService.getInstance(fixture.project).waitForSmartMode()
+        CodeInsightTestFixtureImpl.instantiateAndRun(fixture.file, fixture.editor, ArrayUtilRt.EMPTY_INT_ARRAY, true)
+
         ApplicationManager.getApplication().invokeAndWait {
             when (level) {
                 "error" -> fixture.checkHighlighting(false, false, false, ignoreExtra)
