@@ -3,6 +3,7 @@ package com.jetbrains.snakecharm
 import com.intellij.application.options.CodeStyle
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.roots.impl.FilePropertyPusher
+import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.intellij.testFramework.TestApplicationManager
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
@@ -43,6 +44,16 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
         super.setUp()
         TestApplicationManager.getInstance()
         val factory = IdeaTestFixtureFactory.getFixtureFactory()
+
+        // It is ok to access these pythons
+        //  Fix for: ERROR: File accessed outside allowed roots: file:///usr/local/bin/python3;
+        VfsRootAccess.allowRootAccess(
+            testRootDisposable,
+            "/usr/local/bin/python3.10",
+            "/usr/local/bin/python3",
+            "/usr/bin/python3"
+        )
+
         val fixtureBuilder = factory.createLightFixtureBuilder(
             projectDescriptor, getTestName(false)
         )
@@ -51,6 +62,8 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
                 createTempDirFixture()
         )
         fixture!!.testDataPath = SnakemakeTestUtil.getTestDataPath().toString()
+        VfsRootAccess.allowRootAccess(testRootDisposable, fixture!!.testDataPath)
+
         // TODO() replace with: runInEdtAndWait
         if (SwingUtilities.isEventDispatchThread()) {
             fixture!!.setUp()
