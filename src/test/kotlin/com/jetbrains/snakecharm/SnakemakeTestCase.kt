@@ -1,6 +1,7 @@
 package com.jetbrains.snakecharm
 
 import com.intellij.application.options.CodeStyle
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.roots.impl.FilePropertyPusher
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
@@ -45,15 +46,7 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
         TestApplicationManager.getInstance()
         val factory = IdeaTestFixtureFactory.getFixtureFactory()
 
-        // It is ok to access these pythons
-        //  Fix for: ERROR: File accessed outside allowed roots: file:///usr/local/bin/python3;
-        VfsRootAccess.allowRootAccess(
-            testRootDisposable,
-            "/usr/local/bin/python3.10",
-            "/usr/local/bin/python3",
-            "/usr/bin/python3",
-            "/usr/bin/python3.10"
-        )
+        allowPythonRootsAccess(testRootDisposable)
 
         val fixtureBuilder = factory.createLightFixtureBuilder(
             projectDescriptor, getTestName(false)
@@ -141,4 +134,18 @@ abstract class SnakemakeTestCase : UsefulTestCase() {
 
     protected open fun getIndentOptions() = getCommonCodeStyleSettings().indentOptions
 
+    companion object {
+        fun allowPythonRootsAccess(disposable: Disposable) {
+            // It is ok to access these pythons
+            //  Fix for: ERROR: File accessed outside allowed roots: file:///usr/local/bin/python3;
+
+            VfsRootAccess.allowRootAccess(
+                disposable,
+                "/usr/local/bin/python3.10",
+                "/usr/local/bin/python3",
+                "/usr/bin/python3",
+                "/usr/bin/python3.10"
+            )
+        }
+    }
 }
