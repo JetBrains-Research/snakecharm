@@ -13,10 +13,12 @@ import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.CommandProcessor
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.CaretModel
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Disposer
@@ -24,6 +26,9 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl
+import com.intellij.testFramework.runInEdtAndWait
+import com.intellij.util.ArrayUtilRt
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.FakeSnakemakeInjector
