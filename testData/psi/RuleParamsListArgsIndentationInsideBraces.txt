@@ -23,7 +23,7 @@ SnakemakeFile: RuleParamsListArgsIndentationInsideBraces.smk
               PyKeywordArgumentImpl: covariate
                 PsiElement(Py:IDENTIFIER)('covariate')
                 PsiElement(Py:EQ)('=')
-                PySliceExpression
+                PySubscriptionExpression
                   PyReferenceExpression: columns
                     PyReferenceExpression: cells
                       PsiElement(Py:IDENTIFIER)('cells')
@@ -34,8 +34,6 @@ SnakemakeFile: RuleParamsListArgsIndentationInsideBraces.smk
                     PyNumericLiteralExpression
                       PsiElement(Py:INTEGER_LITERAL)('1')
                     PsiElement(Py:COLON)(':')
-                    PyEmptyExpression
-                      <empty list>
                   PsiElement(Py:RBRACKET)(']')
               PsiElement(Py:RPAR)(')')
           PsiElement(Py:COMMA)(',')
