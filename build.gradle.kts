@@ -118,6 +118,11 @@ dependencies {
         pluginVerifier()
         zipSigner()
         testFramework(TestFrameworkType.Platform)
+        // See
+        // * https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-types.html#TestFrameworkType-Plugin
+        // * https://youtrack.jetbrains.com/issue/PY-83223/Python-Plugin-Test-Framework
+        //  E.g.: testFramework(TestFrameworkType.Plugin.Ruby)
+        //testFramework(TestFrameworkType.JUnit5)
     }
 }
 
