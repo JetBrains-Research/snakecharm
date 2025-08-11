@@ -244,7 +244,8 @@ Feature: Tests on snakemake string language injection
       | path.join    | from os import  path      |
       | os.path.join | import os                 |
       | multiext     |                           |
-      | exists     |                           |
+      | exists       |                           |
+      | evaluate     |                           |
       # Unresolved
       | dynamic      |                           |
       | join         |                           |

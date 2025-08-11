@@ -35,7 +35,7 @@ changelog:
   # ---------------------------------------
   - version: "8.27.0"
     introduced:
-      - name: "snakemake.ioutils.subpath"
+      - name: "snakemake.ioutils.subpath.subpath"
         type: "function"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#snakefiles-subpath
         placeholders_injection_allowed: True
@@ -60,28 +60,29 @@ changelog:
   # ---------------------------------------
   - version: "8.3.0"
     introduced:
-      - name: "snakemake.ioutils.exists"
+      - name: "snakemake.ioutils.exists.exists"
         type: "function"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#the-exists-function
         placeholders_injection_allowed: True
 
-      - name: "snakemake.ioutils.evaluate"
+      - name: "snakemake.ioutils.evaluate.evaluate"
         type: "function"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#the-evaluate-function
         placeholders_injection_allowed: True
 
-      - name: "snakemake.ioutils.branch"
+      - name: "snakemake.ioutils.branch.branch"
         type: "function"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#the-branch-function
         placeholders_injection_allowed: True
 
-      - name: "snakemake.ioutils.lookup"
+      - name: "snakemake.ioutils.lookup.lookup"
         type: "function"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#the-lookup-function
         placeholders_injection_allowed: True
 
-        # TODO: collect: snakemake.io.expand
-      - name: "snakemake.ioutils.collect"
+        # XXX: PyCharm resolves it actually to: snakemake.io.expand
+        #      this declaration doesn't make effect, it is for documentation purposes only
+      - name: "snakemake.ioutils.collect.collect"
         type: "function"
         docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#the-collect-function
         placeholders_injection_allowed: True
@@ -148,6 +149,7 @@ changelog:
 
       - name: "snakemake.io.ensure"
         type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#ensuring-output-file-properties-like-non-emptyness-or-checksum-compliance
         placeholders_injection_allowed: True
         limit_to_sections:
           - "output"
