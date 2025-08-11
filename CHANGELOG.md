@@ -11,6 +11,10 @@ Released on <Unreleased>
 - Bundled snakemake wrappers list updated to `v7.2.0`
 - Wrappers docs url is invalid for wrappers version >= 6.x  (see [#564](https://github.com/JetBrains-Research/snakecharm/issues/564)
 
+### Changed
+- Inspections:
+    - For snakemake language level >= 9.5.0 allow wildcards/callable functions fo `container:` section
+
 ## [2025.1.1]
 Released on 18 April 2025
 

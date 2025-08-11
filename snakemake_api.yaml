@@ -1,7 +1,7 @@
 annotationsFormatVersion: 1
 
 # Default Language Level used for all projects:
-defaultVersion: "9.3.0"
+defaultVersion: "9.5.0"
 
 # supported types of sections in each version:
 # * 'introduced' - API was introduced
@@ -31,6 +31,17 @@ defaultVersion: "9.3.0"
 #    * docs_url: ''                                | Documentation URL
 # =========================================
 changelog:
+
+  # ---------------------------------------
+  - version: "9.5.0"
+    override:
+      - name: "container"
+        type: "rule-like"
+        multiple_args_allowed: False
+        keyword_args_allowed: False
+        placeholders_resolved_as_wildcards: True
+        lambda_args:
+          - "wildcards"
 
   # ---------------------------------------
   - version: "8.27.0"
