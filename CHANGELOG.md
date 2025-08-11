@@ -6,12 +6,15 @@
 ## [2025.2.1]
 Released on <Unreleased>
 
-### Fixed
+### Plugin
 - Compatibility with PyCharm 2025.2 (see [#563](https://github.com/JetBrains-Research/snakecharm/issues/563)
-- Bundled snakemake wrappers list updated to `v7.2.0`
+- Tests fail on CI with error: File accessed outside allowed roots error for project testdata (see [#565](https://github.com/JetBrains-Research/snakecharm/issues/565)
+
+### Fixed
 - Wrappers docs url is invalid for wrappers version >= 6.x  (see [#564](https://github.com/JetBrains-Research/snakecharm/issues/564)
 
 ### Changed
+- Bundled snakemake wrappers list updated to `v7.2.0`
 - Revised snakemake language level support up to the 9.9.0 release
 - Inspections:
     - For snakemake language level >= 9.5.0 allow wildcards/callable functions fo `container:` section
