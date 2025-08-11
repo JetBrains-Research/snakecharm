@@ -12,6 +12,7 @@ Released on <Unreleased>
 - Wrappers docs url is invalid for wrappers version >= 6.x  (see [#564](https://github.com/JetBrains-Research/snakecharm/issues/564)
 
 ### Changed
+- Revised snakemake language level support up to the 9.9.0 release
 - Inspections:
     - For snakemake language level >= 9.5.0 allow wildcards/callable functions fo `container:` section
 
