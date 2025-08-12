@@ -6,8 +6,6 @@ import org.jetbrains.intellij.platform.gradle.Constants.Configurations
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
-import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil.exists
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 fun gradlePropertyOptional(key: String) = project.findProperty(key)?.toString()
 fun gradleProperty(key: String) = providers.gradleProperty(key)
@@ -84,7 +82,7 @@ dependencies {
 
         val platformLocalPath = gradlePropertyOptional("platformLocalPath")
         if (platformLocalPath != null) {
-            if (!exists(platformLocalPath)) {
+            if (!file(platformLocalPath).exists()) {
                 logger.error("Custom platfrom path not exist: $platformLocalPath")
             } else {
                 logger.warn("Using custom platfrom path: $platformLocalPath")
@@ -120,6 +118,11 @@ dependencies {
         pluginVerifier()
         zipSigner()
         testFramework(TestFrameworkType.Platform)
+        // See
+        // * https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-types.html#TestFrameworkType-Plugin
+        // * https://youtrack.jetbrains.com/issue/PY-83223/Python-Plugin-Test-Framework
+        //  E.g.: testFramework(TestFrameworkType.Plugin.Ruby)
+        //testFramework(TestFrameworkType.JUnit5)
     }
 }
 
@@ -233,6 +236,13 @@ kover {
 
 qodana {}
 
+kotlin {
+    // Extension level
+    compilerOptions {
+        freeCompilerArgs.add("-Xjvm-default=all")
+    }
+}
+
 tasks {
 
     runIde {
@@ -245,12 +255,6 @@ tasks {
         jvmArgumentProviders += CommandLineArgumentProvider {
             // listOf("-Dname=value")
             listOf("-Dfus.internal.test.mode=true", "-Didea.is.internal=true")
-        }
-    }
-
-    withType<KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs = listOf("-Xjvm-default=all")
         }
     }
 

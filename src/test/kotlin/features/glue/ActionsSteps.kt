@@ -13,10 +13,12 @@ import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.CommandProcessor
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.CaretModel
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Disposer
@@ -24,6 +26,9 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl
+import com.intellij.testFramework.runInEdtAndWait
+import com.intellij.util.ArrayUtilRt
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
 import com.jetbrains.snakecharm.FakeSnakemakeInjector
@@ -283,18 +288,26 @@ class ActionsSteps {
         }
 
         updatedInspectionProblemsCounter(highlightingLevel)
-        ApplicationManager.getApplication().invokeAndWait {
-            var annotation = newText
-            val smkLangLevel = SmkSupportProjectSettings.getInstance(fixture.project).snakemakeLanguageVersion
-            if (smkLangLevel != null) {
-                annotation = annotation.replace("CURR_SMK_LANG_VERS", smkLangLevel)
-            }
-            performAction(project) {
+        runInEdtAndWait {
+            WriteCommandAction.runWriteCommandAction(project) {
+                var annotation = newText
+                val smkLangLevel = SmkSupportProjectSettings.getInstance(fixture.project).snakemakeLanguageVersion
+                if (smkLangLevel != null) {
+                    annotation = annotation.replace("CURR_SMK_LANG_VERS", smkLangLevel)
+                }
                 fixture.editor.document.replaceString(
                     startPos, startPos + text.length, annotation
                 )
             }
+
         }
+        ApplicationManager.getApplication().invokeAndWait {
+            PsiDocumentManager.getInstance(project).commitAllDocuments()
+        }
+        ApplicationManager.getApplication().invokeAndWait {
+            FileDocumentManager.getInstance().saveAllDocuments()
+        }
+        DumbService.getInstance(project).waitForSmartMode()
     }
 
     private fun findTextPositionInsideTags(
@@ -350,6 +363,10 @@ class ActionsSteps {
         }
 
         val fixture = fixture()
+
+        DumbService.getInstance(fixture.project).waitForSmartMode()
+        CodeInsightTestFixtureImpl.instantiateAndRun(fixture.file, fixture.editor, ArrayUtilRt.EMPTY_INT_ARRAY, true)
+
         ApplicationManager.getApplication().invokeAndWait {
             when (level) {
                 "error" -> fixture.checkHighlighting(false, false, false, ignoreExtra)
@@ -662,15 +679,5 @@ class ActionsSteps {
         Assert.assertTrue(el in (LocalInspectionEP.LOCAL_INSPECTION.extensionList
             .first { it.shortName == "SmkUnrecognizedSectionInspection" }
             .instance as SmkUnrecognizedSectionInspection).ignoredItems)
-    }
-
-    companion object {
-        fun performAction(project: Project, action: Runnable) {
-            ApplicationManager.getApplication().runWriteAction {
-                CommandProcessor.getInstance().executeCommand(
-                    project, action, "SnakeCharmTestCmd", null
-                )
-            }
-        }
     }
 }

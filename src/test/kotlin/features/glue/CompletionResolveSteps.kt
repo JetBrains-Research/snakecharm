@@ -23,7 +23,9 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.TestLookupElementPresentation
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.ui.UIUtil
+import com.jetbrains.python.psi.PyQualifiedNameOwner
 import com.jetbrains.python.psi.PyStringLiteralExpression
+import com.jetbrains.python.psi.resolve.ImplicitResolveResult
 import features.glue.SnakemakeWorld.getOffsetUnderCaret
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
@@ -141,6 +143,20 @@ class CompletionResolveSteps {
         DumbService.getInstance(SnakemakeWorld.fixture().project).waitForSmartMode()
         ApplicationManager.getApplication().runReadAction {
             tryToResolveRef(resultSubstr, context, file, getReferenceAtOffset())
+        }
+    }
+
+    @Then("^reference should resolve to FQN \"(.+)\"$")
+    fun referenceShouldResolveToFQN(fqn: String) {
+        DumbService.getInstance(SnakemakeWorld.fixture().project).waitForSmartMode()
+        ApplicationManager.getApplication().runReadAction {
+            val ref = getReferenceAtOffset()
+            assertNotNull(ref, message = "No reference at offset ${getOffsetUnderCaret()}")
+
+            val result = resolve(ref)
+            assertNotNull(result, message = "Reference unresolved")
+            assertTrue(result is PyQualifiedNameOwner, message = "Only qualified name owners are supported, got ${result.javaClass.canonicalName}")
+            assertEquals(result.qualifiedName, fqn)
         }
     }
 
@@ -629,7 +645,7 @@ class CompletionResolveSteps {
     private fun assertUnresolvedReference(ref: PsiReference) {
         when (ref) {
             is PsiPolyVariantReference -> {
-                val results = ref.multiResolve(false)
+                val results = ref.multiResolve(false).filter { it !is ImplicitResolveResult }
                 assertNotNull(results)
                 assertEquals(
                     0, results.size.toLong(),

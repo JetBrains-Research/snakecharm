@@ -172,7 +172,7 @@ Feature: Tests on snakemake string language injection
     When I put the caret after foo
     Then I expect language injection on "{foo}"
 
-  Scenario Outline: No injection in some sections
+  Scenario Outline: No injection in some sections in latest lang level
     Given a snakemake project
     Given I open a file "foo.smk" with text
     """
@@ -191,7 +191,6 @@ Feature: Tests on snakemake string language injection
       | threads              |
       | priority             |
       | singularity          |
-      | container            |
       | template_engine      |
       | containerized        |
       | notebook             |
@@ -199,10 +198,9 @@ Feature: Tests on snakemake string language injection
       | default_target       |
       | retries              |
 
-  Scenario Outline: Inject in snakemake function calls in 7.35.0
-
-    Given a snakemake:7.32.4 project
-    And I set snakemake language version to "7.35.0"
+  Scenario Outline: Inject in snakemake function calls in custom snakemake version
+    Given a <smk_library> project
+    And I set snakemake language version to "<smk_lang_level>"
     Given I open a file "foo.smk" with text
     """
     <import_statement>
@@ -212,8 +210,22 @@ Feature: Tests on snakemake string language injection
     When I put the caret after foo
     Then I expect language injection on "{foo}"
     Examples:
-      | function     | import_statement          |
-      | dynamic      |                           |
+      | function | import_statement | smk_library      | smk_lang_level |
+      | dynamic  |                  | snakemake:7.32.4 | 7.35.0         |
+
+  Scenario Outline: Inject in snakemake sections in custom snakemake version
+    Given a <smk_library> project
+    And I set snakemake language version to "<smk_lang_level>"
+    Given I open a file "foo.smk" with text
+    """
+    rule NAME:
+      <section>: "{foo}"
+    """
+    When I put the caret after foo
+    Then I expect language injection on "{foo}"
+    Examples:
+      | section   | smk_library | smk_lang_level |
+      | container | snakemake   | 9.5.0          |
 
   Scenario Outline: Inject in snakemake function calls
     Given a snakemake project
@@ -244,7 +256,8 @@ Feature: Tests on snakemake string language injection
       | path.join    | from os import  path      |
       | os.path.join | import os                 |
       | multiext     |                           |
-      | exists     |                           |
+      | exists       |                           |
+      | evaluate     |                           |
       # Unresolved
       | dynamic      |                           |
       | join         |                           |

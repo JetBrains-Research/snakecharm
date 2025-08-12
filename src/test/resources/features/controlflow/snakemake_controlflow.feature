@@ -1,4 +1,5 @@
-Feature: Documentation for 'shadow' settings
+@ignore
+Feature: Controlflow issue 14
 
   # TODO: Required for https://github.com/JetBrains-Research/snakecharm/issues/14
 #  Scenario: Control flow for onerror

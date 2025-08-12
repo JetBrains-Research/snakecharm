@@ -11,7 +11,7 @@
 
   <!-- PyCharm / Python plugin dependency -->
   <depends>com.intellij.modules.lang</depends>
-  <depends>com.intellij.modules.python</depends>
+  <depends>PythonCore</depends> <!--- see https://youtrack.jetbrains.com/articles/PY-A-233538243 -->
   <depends>org.toml.lang</depends>
   <depends>org.jetbrains.plugins.yaml</depends>
 

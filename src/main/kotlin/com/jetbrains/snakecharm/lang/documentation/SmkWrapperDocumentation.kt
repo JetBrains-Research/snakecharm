@@ -35,8 +35,10 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
         val wrappers = SmkWrapperStorage.getInstance(node.navigationElement.project).wrappers
         val filterWrappers =  wrappers.filter { wrapper -> wrapper.path == result }
         require(filterWrappers.size <= 1) { "Found multiple wrappers (${filterWrappers.size}) for path: $result" }
+
         val wrapper = filterWrappers.firstOrNull()
         require(wrapper == null || wrapper.path == result) { "Found wrapper with different path: ${wrapper!!.path} != $result" }
+
         if (text.startsWith("file://")) {
             return if (wrapper != null)
                 """
@@ -48,22 +50,61 @@ class SmkWrapperDocumentation : AbstractDocumentationProvider() {
                 <p><a href="$text">Folder</a></p>
                 """.trimIndent()
         } else {
-            val urlDocs = "https://snakemake-wrappers.readthedocs.io/en/${text}"
-                    .replace("/master/", "/latest/")
-                    .replace("/bio/", "/wrappers/")
-                    .replace("/utils/", "/wrappers/") + ".html"
-            val urlCode = "https://github.com/snakemake/snakemake-wrappers/tree/${text}"
+            val urlDocsAndCodeCode = if (text.startsWith("https://github.com/snakemake/snakemake-wrappers/raw/")) {
+                val textWoPrefix = text.replace(
+                    "https://github.com/snakemake/snakemake-wrappers/raw/", ""
+                )
+                snakemakeWrapperRelativeNameToDocsUrl(textWoPrefix) to text
+            } else if (text.startsWith("http")) {
+                null
+            } else {
+                val urlCode = "https://github.com/snakemake/snakemake-wrappers/tree/${text}"
                     .replace("/latest/", "/master/")
-            return if (wrapper != null)
-                """
-                <p><a href="$urlDocs">Documentation</a>, <a href="$urlCode">Source Code</a></p>
-                ${wrapper.description.lineSequence().map { "<p>$it</p>"  }.joinToString(System.lineSeparator())}
+                snakemakeWrapperRelativeNameToDocsUrl(text) to urlCode
+            }
+
+            if (urlDocsAndCodeCode == null) {
+                return """
+                <p>Unknow documentation and source link</p>
                 """.trimIndent()
-            else
-                """
+            }
+
+            val urlDocs = urlDocsAndCodeCode.first
+            val urlCode = urlDocsAndCodeCode.second
+
+            if (wrapper != null) {
+                return """
+                <p><a href="$urlDocs">Documentation</a>, <a href="$urlCode">Source Code</a></p>
+                ${wrapper.description.lineSequence().map { "<p>$it</p>" }.joinToString(System.lineSeparator())}
+                """.trimIndent()
+            }
+            return """
                 <p><a href="$urlDocs">Documentation</a>, <a href="$urlCode">Source Code</a></p>
                 """.trimIndent()
         }
+    }
+
+    private fun snakemakeWrapperRelativeNameToDocsUrl(text: String): String {
+        val isLegacyDocsUrl = when {
+            !text.startsWith('v') -> true
+            else -> {
+                val major = text.drop(1).substringBefore('.').toIntOrNull()
+                major != null && major in 0..5
+            }
+        }
+
+        val base = "https://snakemake-wrappers.readthedocs.io/en/"
+        val sections = listOf("bio", "utils", "geo", "phys")
+        val sectionPattern = Regex("/(${sections.joinToString("|")})/")
+
+        val normalizedPath = sectionPattern.replace(
+            "$base$text".replace("/master/", "/latest/")
+        ) { match ->
+            val section = match.groupValues[1]
+            if (isLegacyDocsUrl) "/wrappers/" else "/wrappers/$section/"
+        }
+
+        return "$normalizedPath.html"
     }
 
     override fun getCustomDocumentationElement(

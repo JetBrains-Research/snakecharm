@@ -27,10 +27,13 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.containers.MultiMap
 import com.jetbrains.python.codeInsight.typing.PyTypeShed.findAllRootsForLanguageLevel
-import com.jetbrains.python.codeInsight.userSkeletons.PyUserSkeletonsUtil
 import com.jetbrains.python.psi.LanguageLevel
+import com.jetbrains.python.sdk.PythonSdkAdditionalData
 import com.jetbrains.python.sdk.PythonSdkType.MOCK_PY_MARKER_KEY
 import com.jetbrains.python.sdk.PythonSdkUtil
+import com.jetbrains.python.sdk.flavors.PyFlavorAndData
+import com.jetbrains.python.sdk.flavors.PyFlavorData
+import com.jetbrains.python.sdk.flavors.VirtualEnvSdkFlavor
 import java.io.File
 
 
@@ -69,6 +72,8 @@ object PythonMockSdk {
         val sdk = ProjectJdkTable.getInstance().createSdk(sdkName, sdkType)
         val sdkModificator = sdk.sdkModificator
         sdkModificator.homePath = "$mockSdkPath/bin/python${level.toPythonVersion()}"
+        sdkModificator.sdkAdditionalData =
+            PythonSdkAdditionalData(PyFlavorAndData(PyFlavorData.Empty, VirtualEnvSdkFlavor.getInstance()))
         sdkModificator.setVersionString(toVersionString(level))
 
         createRoots(mockSdkPath, level).forEach { vFile: VirtualFile? ->
@@ -104,7 +109,6 @@ object PythonMockSdk {
             result,
             localFS.refreshAndFindFileByIoFile(File(mockSdkPath, PythonSdkUtil.SKELETON_DIR_NAME))
         )
-        ContainerUtil.addIfNotNull(result, PyUserSkeletonsUtil.getUserSkeletonsDirectory())
         result.addAll(findAllRootsForLanguageLevel(level))
         return result
     }

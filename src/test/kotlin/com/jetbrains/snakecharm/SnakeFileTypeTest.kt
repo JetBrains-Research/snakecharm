@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm
 
 import com.jetbrains.snakecharm.lang.psi.SmkFile
-import junit.framework.TestCase
 
 /**
  * @author Roman.Chernyatchik
@@ -25,7 +24,7 @@ class SnakeFileTypeTest : SnakemakeTestCase() {
         fixture!!.configureByFile(fileName)
         val psiFile = fixture!!.file
         requireNotNull(psiFile)
-        TestCase.assertTrue(psiFile is SmkFile)
+        assertTrue(psiFile is SmkFile)
 
         val virtualFile = psiFile.virtualFile
         assertEquals(SmkFileType, virtualFile.fileType)

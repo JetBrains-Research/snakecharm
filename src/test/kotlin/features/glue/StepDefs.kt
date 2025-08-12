@@ -16,9 +16,10 @@ import com.jetbrains.python.codeInsight.controlflow.ControlFlowCache
 import com.jetbrains.python.fixtures.PyLightProjectDescriptor
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.psi.PyFile
+import com.jetbrains.snakecharm.SnakemakeTestCase.Companion.allowPythonRootsAccess
 import com.jetbrains.snakecharm.SnakemakeTestUtil
-import com.jetbrains.snakecharm.framework.SnakemakeApiYamlAnnotationsService
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
+import com.jetbrains.snakecharm.framework.SnakemakeApiYamlAnnotationsService
 import io.cucumber.java.en.Given
 import javax.swing.SwingUtilities
 import kotlin.test.fail
@@ -73,6 +74,8 @@ class StepDefs {
         )
 
         val factory = IdeaTestFixtureFactory.getFixtureFactory()
+        allowPythonRootsAccess(SnakemakeWorld.myTestRootDisposable!!)
+
         val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor, SnakemakeWorld.myScenarioName)
         val tmpDirFixture = LightTempDirTestFixtureImpl(true) // "tmp://" dir by default
 

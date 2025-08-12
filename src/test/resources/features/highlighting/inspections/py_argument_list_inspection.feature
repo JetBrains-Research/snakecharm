@@ -12,7 +12,7 @@ Feature: Fixes PyArgumentListInspection related false positives
       And PyArgumentListInspection inspection is enabled
       Then I expect inspection warning on <**1> in <expand(" ", **1)> with message
       """
-      Expected a dictionary, got int
+      Expected a mapping, got int
       """
       When I check highlighting warnings
 
