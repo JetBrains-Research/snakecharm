@@ -70,14 +70,7 @@ class FilesSteps {
     }
 
     private fun createAndAddFile(name: String, text: String) {
-        ApplicationManager.getApplication().invokeAndWait({
-            ApplicationManager.getApplication().runWriteAction {
-                val file = SnakemakeWorld.fixture().addFileToProject(
-                        name, StringUtil.convertLineSeparators(text)
-                )
-                SnakemakeWorld.fixture().configureFromExistingVirtualFile(file.virtualFile)
-            }
-        }, ModalityState.nonModal())
+        SnakemakeWorld.fixture().configureByText(name, StringUtil.convertLineSeparators(text))
     }
 
 }
