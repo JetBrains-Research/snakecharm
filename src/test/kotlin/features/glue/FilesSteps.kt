@@ -70,7 +70,17 @@ class FilesSteps {
     }
 
     private fun createAndAddFile(name: String, text: String) {
-        SnakemakeWorld.fixture().configureByText(name, StringUtil.convertLineSeparators(text))
+        // XXX: Cannot simplify to:
+        //      SnakemakeWorld.fixture().configureByText(name, StringUtil.convertLineSeparators(text))
+        // because it doesn't support relative paths, e.g. like "rules/foo.smk"
+        ApplicationManager.getApplication().invokeAndWait({
+            ApplicationManager.getApplication().runWriteAction {
+                val file = SnakemakeWorld.fixture().addFileToProject(
+                    name, StringUtil.convertLineSeparators(text)
+                )
+                SnakemakeWorld.fixture().configureFromExistingVirtualFile(file.virtualFile)
+            }
+        }, ModalityState.nonModal())
     }
 
 }
