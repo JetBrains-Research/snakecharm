@@ -4,7 +4,7 @@
 # SnakeCharm Plugin Changelog
 
 ## [2025.2.1]
-Released on <Unreleased>
+Released on 12 August 2025
 
 ### Plugin
 - Compatibility with PyCharm 2025.2 (see [#563](https://github.com/JetBrains-Research/snakecharm/issues/563)
