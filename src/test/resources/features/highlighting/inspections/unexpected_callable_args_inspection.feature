@@ -58,7 +58,6 @@ Feature: Inspection for unexpected callable arguments in rulelike sections
       | rule       | benchmark     |
       | rule       | cache         |
       | rule       | output        |
-      | rule       | container     |
       | rule       | containerized |
       | rule       | cwl           |
       | rule       | log           |
@@ -70,6 +69,29 @@ Feature: Inspection for unexpected callable arguments in rulelike sections
       | checkpoint | shadow        |
       | checkpoint | shell         |
       | checkpoint | wrapper       |
+
+  Scenario Outline: Report Unexpected callable arguments in some language level
+    Given a snakemake project
+    Given I set snakemake language version to "<smk_lang_level>"
+    Given I open a file "foo.smk" with text
+    """
+    def bar():
+        return "text"
+
+    <rule_like> NAME:
+        <section>: bar
+    """
+    And SmkSectionUnexpectedCallableArgsInspection inspection is enabled
+    Then I expect inspection error on <bar> in <<section>: bar> with message
+    """
+    Section '<section>' does not support callable arguments in Snakemake 'CURR_SMK_LANG_VERS'.
+    """
+    When I check highlighting errors
+    Examples:
+      | rule_like  | section   | smk_lang_level |
+      # container: < 9.5.0
+      | rule       | container | 9.4.0          |
+      | checkpoint | container | 9.4.0          |
 
   Scenario Outline: No warn on expected callable arguments in mock YAML API
     Given a snakemake project
@@ -125,6 +147,7 @@ Feature: Inspection for unexpected callable arguments in rulelike sections
       | rule       | threads   |
       | rule       | conda     |
       | rule       | resources |
+      | rule       | container |
       | checkpoint | resources |
       | checkpoint | group     |
 
