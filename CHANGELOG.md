@@ -9,6 +9,7 @@ Released <Unreleased>
 ### Plugin
 - Plugin title changed from `snakecharm` to `SnakeCharm`
 - Fixed `IllegalStateException: This method requires read access` error from `SmartModeScheduler.runWhenSmart(...)`
+- Fixed `ClassCastException: SmkSLFile cannot be cast to class SmkFile` error from `AbstractSmkRuleOrCheckpointType.getUseSections(...)`
 
 ## [2025.2.1]
 Released on 12 August 2025
