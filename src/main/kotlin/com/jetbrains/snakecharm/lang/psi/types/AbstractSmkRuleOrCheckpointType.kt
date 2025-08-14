@@ -107,10 +107,17 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
         )
         val useToIgnore = (useExcludedNamesList as? SmkExcludedRulesNamesList)?.getParentUse()
         when {
-            (module == null) || DumbService.isDumb(location.project) -> (location.containingFile.originalFile as SmkFile)
-                .filterUsePsi()
-                .map { it.second }
-            else -> getVariantsFromIndex(SmkUseNameIndexCompanion.KEY, module, SmkUse::class.java)
+            (module == null) || DumbService.isDumb(location.project) -> {
+                val originalFile = location.containingFile.originalFile
+                if (originalFile !is SmkFile) {
+                    return result
+                }
+
+                originalFile.filterUsePsi().map { it.second }
+            }
+            else -> {
+                getVariantsFromIndex(SmkUseNameIndexCompanion.KEY, module, SmkUse::class.java)
+            }
         }.forEach { use ->
             val candidates = if (use == useToIgnore) {
                 use.collectImportedRuleNameAndPsi(mutableSetOf(), false)
