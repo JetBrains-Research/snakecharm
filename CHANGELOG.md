@@ -3,6 +3,12 @@
 
 # SnakeCharm Plugin Changelog
 
+## [2025.2.2]
+Released <Unreleased>
+
+### Plugin
+- Plugin title changed from `SnakeCharm` to `SnakeCharm`
+
 ## [2025.2.1]
 Released on 12 August 2025
 

@@ -1,6 +1,5 @@
 <idea-plugin require-restart="false">
     <id>SnakeCharm</id>
-    <name>SnakeCharm</name>
     <vendor email="roman.chernyatchik@jetbrains.com"
             url="https://jetbrains-research.github.io/snakecharm/">
         JetBrains
