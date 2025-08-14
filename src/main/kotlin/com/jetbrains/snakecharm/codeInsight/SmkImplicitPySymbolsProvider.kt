@@ -93,7 +93,11 @@ class SmkImplicitPySymbolsProvider(
 
                 // TODO: 1) should be in background 2) note that it requires some read actions to access PSI
                 // See: https://github.com/JetBrains-Research/snakecharm/issues/513
-                doRefreshCache(project, sdk, forceClear, null)
+                
+                // Ensure read access when accessing PSI elements
+                ApplicationManager.getApplication().runReadAction {
+                    doRefreshCache(project, sdk, forceClear, null)
+                }
             }
         }
     }

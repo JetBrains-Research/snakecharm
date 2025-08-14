@@ -7,7 +7,8 @@
 Released <Unreleased>
 
 ### Plugin
-- Plugin title changed from `SnakeCharm` to `SnakeCharm`
+- Plugin title changed from `snakecharm` to `SnakeCharm`
+- Fixed `IllegalStateException: This method requires read access` error from `SmartModeScheduler.runWhenSmart(...)`
 
 ## [2025.2.1]
 Released on 12 August 2025
