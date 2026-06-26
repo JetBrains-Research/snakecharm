@@ -275,8 +275,25 @@ tasks {
                 configurations[Configurations.INTELLIJ_PLATFORM_TEST_CLASSPATH]
         enableAssertions = true
 
+        // The production wrappers bundle needs a local snakemake-wrappers checkout (see DEVELOPER.md);
+        // CI provides one. When it's unset/missing, skip with a warning instead of failing
+        // buildPlugin/verifyPlugin for contributors who don't have it. See issue #571.
+        val wrappersRepoPath = gradlePropertyOptional("snakemakeWrappersRepoPath")
+        val wrappersRepoDir = wrappersRepoPath?.takeIf { it.isNotBlank() }?.let { project.file(it) }
+        onlyIf {
+            val exists = wrappersRepoDir?.exists() == true
+            if (!exists) {
+                logger.warn(
+                    "buildWrappersBundle: snakemakeWrappersRepoPath '${wrappersRepoPath ?: ""}' not found; " +
+                        "skipping wrappers bundle (the built plugin will omit bundled wrappers). " +
+                        "Pass -PsnakemakeWrappersRepoPath=<snakemake-wrappers checkout> to include them. See #571."
+                )
+            }
+            exists
+        }
+
         args(
-            gradleProperty("snakemakeWrappersRepoPath").get(),
+            wrappersRepoPath ?: "",
             gradleProperty("snakemakeWrappersRepoVersion").get(),
             layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage-bundled.cbor").get(),
             layout.projectDirectory.file("snakemake_api.yaml")
