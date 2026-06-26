@@ -3,6 +3,12 @@
 
 # SnakeCharm Plugin Changelog
 
+## [2025.2.3]
+Released <Unreleased>
+
+### Plugin
+- Declared compatibility with PyCharm / IntelliJ Platform 2026.1 (build `261`) by raising `pluginUntilBuild` to `261.*` (built against PyCharm Community 2025.2, the last standalone Community release)
+
 ## [2025.2.2]
 Released <Unreleased>
 
