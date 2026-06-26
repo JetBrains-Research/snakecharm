@@ -98,6 +98,14 @@ If you get `Unimplemented substep definition` in all `*.feature` files, ensure:
   * Check available IDE versions with
     `./gradlew printProductsReleases`, or query
     `https://data.services.jetbrains.com/products/releases?code=PY&type=release` (`PY`=PyCharm).
+  * **`./gradlew verifyPlugin` and `pluginUntilBuild`.** The `pluginVerification` block in
+    `build.gradle.kts` uses `recommended()`, which resolves the set of IDEs spanning
+    `pluginSinceBuild`..`pluginUntilBuild`. Once `pluginUntilBuild` is raised past `252`,
+    `recommended()` asks for PyCharm **Community** releases above 2025.2 (e.g.
+    `pycharm-community:2025.3`) that **do not exist** — Community ended at 2025.2 — so the task
+    fails at dependency resolution (`Could not find python:pycharm-community:2025.3`) before any
+    verification runs. To verify against 2026.1+, pin explicit Professional IDEs instead, e.g.
+    `ide(IntelliJPlatformType.PyCharmProfessional, "2026.1")`, and drop `recommended()`.
 * Update `snakemakeWrappersRepoVersion` to up-to-date, need to be updated on TeamCity CI as well.
  
 **Release plugin:**
