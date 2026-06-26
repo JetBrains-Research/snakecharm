@@ -56,14 +56,20 @@ If Gradle can't auto-detect the JDK, pass it explicitly:
       -Didea.config.path=$PROJECT_DIR$/.sandbox_pycharm/config-test -Didea.system.path=$PROJECT_DIR$/.sandbox_pycharm/system-test -Didea.plugins.path=$PROJECT_DIR$/.sandbox_pycharm/plugins-test -Didea.force.use.core.classloader=true
       ```
 
-2. Checkout `snakemake` project sources and configure as test data:
+2. Checkout `snakemake` project sources and configure as test data. Use the version that
+   matches `defaultVersion` in `snakemake_api.yaml` (currently **9.9.0**) — otherwise the
+   `snakemake_api.yaml` FQN-resolution and completion/resolve feature tests fail. Modern
+   snakemake (9.x) uses a `src/` layout, so the symlink must point at `src/snakemake`:
     ```shell
     cd ~
     git clone https://github.com/snakemake/snakemake.git
+    git -C ~/snakemake checkout v9.9.0   # match snakemake_api.yaml defaultVersion
 
-    cd ./testData/MockPackages3
-    ln -s ~/snakemake/snakemake snakemake
+    cd <snakecharm>/testData/MockPackages3
+    ln -s ~/snakemake/src/snakemake snakemake   # 9.x src/ layout (older releases: ~/snakemake/snakemake)
     ```
+   After changing anything under the mock directories, delete the sandbox VFS cache before
+   re-running tests (e.g. `rm -rf .sandbox_pycharm`), per the note at the bottom of this file.
 
 Tests are written in [Gherkin](https://cucumber.io/docs/gherkin). You could run tests:
 * Using gradle `test` task
