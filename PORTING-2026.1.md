@@ -4,7 +4,9 @@
 build to target the 2026.1 platform, but the plugin **does not yet compile** against it —
 the Python plugin API changed substantially. The minimal "just make it load" change
 (raising `pluginUntilBuild` to `261.*` while still building against PyCharm Community
-2025.2) lives on a separate branch and is the one intended for an upstream PR.
+2025.2) was tried on a separate branch (#569) and has now been **validated as non-viable**
+— see [Why not just raise `pluginUntilBuild`?](#why-not-just-raise-pluginuntilbuild-validated-569)
+below. So this source port is the only path to real 2026.1 support.
 
 ## Background: PyCharm was unified
 
@@ -14,6 +16,40 @@ the Python plugin API changed substantially. The minimal "just make it load" cha
 - The 2026.1 IDE is distributed only under the **Professional artifact** (`platformType = PY`,
   build `261.x`). There is no `pycharm-community:2026.1`, so building against 2026.1 requires
   switching `platformType` from `PC` to `PY`.
+
+## Why not just raise `pluginUntilBuild`? (validated, #569)
+
+The tempting shortcut is to ship the unchanged 2025.2 binary and just widen
+`pluginUntilBuild` to `261.*` so 2026.1 lets it load (PR #569). **This was tested with the
+IntelliJ Plugin Verifier and it does not work** — the plugin would install on 2026.1 and
+then crash at runtime, which is strictly worse than the current honest "incompatible"
+rejection.
+
+Verified against **`PY-261.22158.340`** (PyCharm Professional 2026.1):
+
+```
+Plugin SnakeCharm:2025.2.3-eap.SNAPSHOT against PY-261.22158.340: 4 compatibility problems
+#Access to unresolved class com.jetbrains.python.validation.ReturnAnnotator
+  - SnakemakeVisitorFilter.<init>()                → NoSuchClassError
+  - SmkReturnAnnotator.visitPyReturnStatement(...) → NoSuchClassError
+  - SmkReturnAnnotator (class)                     → NoSuchClassError
+  - SmkReturnAnnotator.<init>()                    → NoSuchClassError
+(+ 7 scheduled-for-removal, 4 deprecated incl. PyAnnotator, 155 experimental, 8 internal — not blockers)
+```
+
+All 4 hard problems are the removed `ReturnAnnotator` (see item 2 below): a metadata-only
+widening cannot satisfy them — they require the source changes on this branch. This is the
+concrete proof that #569's approach is a dead end.
+
+To reproduce on the #569 branch (`compat-pycharm-2026.1`), pin the verifier to a Professional
+IDE — `recommended()` cannot be used once `pluginUntilBuild > 252`, because it resolves
+nonexistent `pycharm-community` releases above 2025.2 and aborts before verifying:
+
+```shell
+# in build.gradle.kts: pluginVerification { ides { ide(IntelliJPlatformType.PyCharmProfessional, "2026.1") } }
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+./gradlew verifyPlugin -PsnakemakeWrappersRepoPath=testData/wrappers_storage   # -P override per #571
+```
 
 ## What this branch already does (build infrastructure)
 
