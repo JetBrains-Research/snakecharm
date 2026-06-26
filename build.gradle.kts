@@ -188,15 +188,19 @@ intellijPlatform {
 
     pluginVerification {
         ides {
-            // releases based on since/until builds
-            recommended()
-            // EAP snapshots
-            select {
-                types = listOf(IntelliJPlatformType.PyCharmProfessional)
-                channels = listOf(ProductRelease.Channel.EAP, ProductRelease.Channel.RELEASE)
-                sinceBuild = "242"
-                untilBuild = "301.*"
-            }
+            // TEMP (local, do not commit): pin to 2026.1 Professional to get the 261 verdict.
+            // recommended() resolves pycharm-community:2025.3, which does not exist (Community
+            // ended at 2025.2), and aborts the whole task once pluginUntilBuild = 261.*.
+            ide(IntelliJPlatformType.PyCharmProfessional, "2026.1")
+//            // releases based on since/until builds
+//            recommended()
+//            // EAP snapshots
+//            select {
+//                types = listOf(IntelliJPlatformType.PyCharmProfessional)
+//                channels = listOf(ProductRelease.Channel.EAP, ProductRelease.Channel.RELEASE)
+//                sinceBuild = "242"
+//                untilBuild = "301.*"
+//            }
         }
     }
 }
