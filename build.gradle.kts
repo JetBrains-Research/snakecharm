@@ -93,7 +93,9 @@ dependencies {
             val platformVersion = gradlePropertyWithPriorityToSystemProperty("platformVersion")
             val isSnapshot = platformVersion.endsWith("-SNAPSHOT")
             logger.warn("Use IntelliJ Platform Version: ${platformType}-${platformVersion}. SNAPSHOT: $isSnapshot")
-            create(platformType, platformVersion, useInstaller = !isSnapshot)
+            create(platformType, platformVersion) {
+                useInstaller = !isSnapshot
+            }
         }
 
         // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
@@ -321,13 +323,11 @@ tasks {
     }
 
     test {
-        val test by getting(Test::class) {
-            isScanForTestClasses = false
-            // Only run tests from classes that end with "Test"
-            include("**/*Test.class")
-//            include("**/SnakeFileTypeTest.class")  // Uncomment to disable gradle tests
-//            include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
-        }
+        isScanForTestClasses = false
+        // Only run tests from classes that end with "Test"
+        include("**/*Test.class")
+//        include("**/SnakeFileTypeTest.class")  // Uncomment to disable gradle tests
+//        include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
 
         dependsOn("buildTestWrappersBundle")
         reports {
