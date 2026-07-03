@@ -37,7 +37,7 @@ class SmkMakeFoldingBuilder : PythonFoldingBuilder() {
 //    }
 
     override fun buildLanguageFoldRegions(
-            descriptors: MutableList<FoldingDescriptor>,
+            descriptors: MutableList<FoldingDescriptor?>,
             root: PsiElement,
             document: Document,
             quick: Boolean
@@ -47,7 +47,7 @@ class SmkMakeFoldingBuilder : PythonFoldingBuilder() {
         }
     }
 
-    private fun collectDescriptors(node: ASTNode, descriptors: MutableList<FoldingDescriptor>) {
+    private fun collectDescriptors(node: ASTNode, descriptors: MutableList<FoldingDescriptor?>) {
         val type = node.elementType
         if (type == SmkElementTypes.RULE_OR_CHECKPOINT_ARGS_SECTION_STATEMENT ) {
             val argumentList = (node.psi as SmkRuleOrCheckpointArgsSection).argumentList

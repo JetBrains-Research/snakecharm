@@ -50,7 +50,7 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
             .toList()
     }
 
-    override fun getName() = typeName
+    override val name: String? get() = typeName
 
     override fun assertValid(message: String?) {
         if (!ruleOrCheckpoint.isValid) {
@@ -167,7 +167,7 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
     override fun getCompletionVariants(
         completionPrefix: String?,
         location: PsiElement,
-        context: ProcessingContext?
+        context: ProcessingContext
     ): Array<out Any> {
         if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location) || wildcardsDeclarations == null) {
             return emptyArray()
@@ -191,5 +191,5 @@ class SmkWildcardsType(private val ruleOrCheckpoint: SmkRuleOrCheckpoint) : PySt
         completionPrefix: String?, location: PsiElement, context: ProcessingContext?
     ) = emptyList<LookupElementBuilder>() to 0.0
 
-    override fun isBuiltin() = false
+    override val isBuiltin: Boolean get() = false
 }
