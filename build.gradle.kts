@@ -348,6 +348,19 @@ tasks {
 //        include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
 
         dependsOn("buildTestWrappersBundle")
+
+        // The 2026.1 Python plugin ships its code as v2 content modules under
+        // plugins/python-ce/lib/modules/. That breaks PythonHelpersLocator's jar-path lookup for the
+        // Python helpers root (it expects the jar directly under `lib/`, and throws
+        // "IllegalStateException: .../python-ce/lib/modules should be lib directory"), which crashes
+        // PyTypeShed's lazy init and therefore every test that infers Python types. The locator
+        // consults the `idea.python.helpers.path` system property first, so point it at the bundled
+        // helpers directory explicitly.
+        jvmArgumentProviders += CommandLineArgumentProvider {
+            val pythonHelpersPath = intellijPlatform.platformPath.resolve("plugins/python-ce/helpers")
+            listOf("-Didea.python.helpers.path=$pythonHelpersPath")
+        }
+
         reports {
             // turn off html reports... windows can't handle certain cucumber test name characters.
             junitXml.required.set(true)
