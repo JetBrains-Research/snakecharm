@@ -153,19 +153,36 @@ non-cucumber failures dropped **129 → ~23**; the two open buckets:
      `dialectsTokenSetContributor`, `pyReferenceResolveProvider`, …) are declared by **`PythonCore`**
      via `qualifiedName="Pythonid.…"` (not by the Pro `Pythonid` plugin), and snakecharm only
      `<depends>PythonCore</depends>` — so the Pro plugin is not actually required by snakecharm.
-   - **Tried and rejected:** `-Didea.required.plugins.id=SnakeCharm` to load only snakecharm+deps and
-     exclude the Pro plugin. It made things **worse** (25 → 94 failed): the allowlist is too blunt and
-     drops other bundled plugins the tests need. Do **not** repeat this verbatim.
-   - **Next ideas to try (in order):**
-     1. Disable *only* the Pro `Pythonid` plugin (not an allowlist) — e.g. write a
-        `disabled_plugins.txt` containing `Pythonid` into the test sandbox `config-test/` dir before
-        the app starts, or find a per-plugin disable hook in the test framework. Verify snakecharm
-        still loads (its EPs are `PythonCore`'s, so it should).
-     2. Bump the IntelliJ Platform Gradle Plugin `2.16.0 → 2.17.0` (the build already nags about
-        this) and/or try a newer `2026.1.x` platform build — `getPluginDistDirByClass` / the helpers
-        locators may have been fixed for the `lib/modules` layout upstream.
-     3. If neither works, this is a genuine JetBrains platform bug for plugin devs testing against
-        2026.1 **Professional**; file it and/or gate the affected cucumber features.
+   - **Known upstream issue (no fix yet):**
+     <https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/2070> — "The `lib/modules`
+     should be lib directory Exception". Same crash, reported for the 2025.3 platform (same v2-module
+     layout), **open with no maintainer fix**. So there is no blessed workaround; the notes below are
+     ours.
+   - **Root cause (important — this is TEST-ONLY, not a real-user bug):** decompiling
+     `PluginManagerCoreKt.getPluginDistDirByClass` shows it returns the plugin path **directly** when
+     the class is loaded by a `PluginAwareClassLoader`, and only does the broken "parent dir must be
+     named `lib`" walk otherwise. In a real IDE install the Python plugins load via proper plugin
+     classloaders, so this never fires. It only fires in the **flattened gradle test sandbox
+     classpath**, where the python plugin classes aren't under a `PluginAwareClassLoader`. Do **not**
+     do anything user-visible about this (e.g. don't suppress Pro Python at runtime — that would break
+     real users who use Pro Python + SnakeCharm).
+   - **Most promising fix to try next — declare the Python plugins as bundled deps so they get proper
+     classloaders in tests.** In `build.gradle.kts` the `when (platformType)` block currently declares
+     only `bundledPlugin("Pythonid")` for `"PY"/"PD"` (and `com.intellij.platform.images`) — it does
+     **not** declare `bundledPlugin("PythonCore")`, yet `PythonCore` is where the *community* helpers
+     locator lives. Try adding `bundledPlugin("PythonCore")` alongside `Pythonid` for `PY/PD`. If both
+     python plugins are declared as bundled dependencies, their classes should load via
+     `PluginAwareClassLoader` in the test sandbox and `getPluginDistDirByClass` takes the safe branch —
+     fixing **both** locators with no suppression and no `idea.python.helpers.path` hack. (Verify; the
+     `idea.python.helpers.path` jvmArg from item 8 may then become unnecessary.)
+   - **Fallback (test-only, smelly — last resort):** `-Didea.suppressed.plugins.id=Pythonid` on the
+     `test` JVM disables *only* the Pro plugin in tests (via `DisabledPluginsState`, which reads that
+     comma-separated id list). Experimentally this **removed the `lib/modules` crash** (0 occurrences
+     in the sandbox log). But it changes what we test (no Pro Python) and is a smell — prefer the
+     bundled-dep fix above. Note the earlier `-Didea.required.plugins.id=SnakeCharm` *allowlist* is the
+     wrong tool: it made things **worse** (25 → 94 failed) by dropping other needed bundled plugins.
+   - Also worth a shot: bump the IntelliJ Platform Gradle Plugin `2.16.0 → 2.17.0` (the build nags
+     about it) and/or a newer `2026.1.x` platform build, in case #2070 gets fixed upstream.
 
 2. **`SnakemakeParsingTest` / `SmkSLParsingTest` (~23 tests) — golden-file drift.** No longer
    `FileNotFoundException` (that was bucket 7); now `FileComparisonFailedError` — the PSI tree
