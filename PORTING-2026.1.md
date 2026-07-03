@@ -1,11 +1,13 @@
 # Porting SnakeCharm to PyCharm / IntelliJ Platform 2026.1 (build 261)
 
 **Status: source port complete; the plugin compiles and loads against 2026.1. Test-suite
-triage is in progress.** This branch (`compat-pycharm-2026.1`) targets the unified 2026.1
+triage is in progress.** This branch (`update-for-intellij-2026.1`) targets the unified 2026.1
 platform. All ~37 source-level API breaks are fixed, `compileKotlin` and `compileTestKotlin`
-both succeed, and two major test-runtime blockers have been resolved (Kotlin stdlib alignment
-and the test-data-path layout). The remaining work is triaging the feature-test suite — see
-[Remaining test-suite fallout](#remaining-test-suite-fallout).
+both succeed, and three test-runtime blockers have been resolved (Kotlin stdlib alignment, the
+test-data-path layout, and the community `PyTypeShed` helpers lookup). Non-cucumber test
+failures are down from 129 → ~23. Two buckets remain — an obfuscated Pro helpers-locator crash
+that blocks the cucumber suite, and ~23 parser golden-file diffs. **If you are picking this up,
+jump to [Remaining test-suite fallout — START HERE NEXT TIME](#remaining-test-suite-fallout--start-here-next-time).**
 
 The minimal "just make it load" change (raising `pluginUntilBuild` to `261.*` while still
 building against PyCharm Community 2025.2) was tried on #569 and **validated as non-viable** —
@@ -124,28 +126,51 @@ concrete proof that #569's approach is a dead end.
    `MockPackages3` NPE, and the cucumber `snakemake_api.yaml` `PluginException`
    (`SnakemakeApiYamlAnnotationsService`/`SmkWrapperStorage` derive paths from it).
 
-## Remaining test-suite fallout
+8. **`PyTypeShed` helpers-root lookup crashed every type-inferring test — PARTIALLY fixed.**
+   `PyTypeShed.getDirectory` → `PythonHelpersLocator.getHelpersRoots` iterates the registered
+   helpers locators; each does `findRootByJarPath` → `PluginManagerCoreKt.getPluginDistDirByClass`,
+   which throws `IllegalStateException: .../python-ce/lib/modules should be lib directory` because
+   the Python plugin's v2 content modules live in `lib/modules/*.jar` (the locator expects the jar
+   directly under `lib/`). The **community** locator (`PythonHelpersLocator` from `PythonCore`)
+   checks the `idea.python.helpers.path` system property first, so we set
+   `-Didea.python.helpers.path=<platformPath>/plugins/python-ce/helpers` on the `test` JVM via a
+   `jvmArgumentProvider` (`intellijPlatform.platformPath` gives the path). That silenced the
+   `python-ce` crash. **See the still-open Pro-locator variant in the next section.**
 
-Run `./gradlew test -PsnakemakeWrappersRepoPath=testData/wrappers_storage`. After the fixes
-above the counts dropped from **129 → then localized to two buckets**:
+## Remaining test-suite fallout — START HERE NEXT TIME
 
-1. **Cucumber suite (~all scenarios) — PLATFORM test-framework packaging issue.**
-   `PyTypeShed` → `PythonHelpersLocator.findRootByJarPath` → `PluginManagerCoreKt.getPluginDistDirByClass`
-   throws `IllegalStateException: .../plugins/python-ce/lib/modules should be lib directory`.
-   The Python plugin's v2 content modules live in `lib/modules/*.jar`, but the helpers-root
-   locator expects the jar directly under `lib/`.
-   - **Likely fix (untested):** `getCommunityHelpersRootPath` checks the `idea.python.helpers.path`
-     system property *first* and only falls back to the broken jar-path walk if it is unset
-     (verified in bytecode). Set `-Didea.python.helpers.path=<platformPath>/plugins/python-ce/helpers`
-     on the `test` task JVM (that helpers dir exists in the resolved platform). Needs the platform
-     path from the IntelliJ Platform Gradle Plugin (e.g. an `intellijPlatform` path provider) wired
-     into a `jvmArgumentProvider`.
+Run `./gradlew test -PsnakemakeWrappersRepoPath=testData/wrappers_storage`. After all fixes above,
+non-cucumber failures dropped **129 → ~23**; the two open buckets:
+
+1. **Cucumber suite (~all scenarios) — obfuscated Pro helpers locator, same `lib/modules` bug.**
+   With the community locator fixed (item 8), the crash now comes from **`PythonProHelpersLocator`**
+   (the Pro `Pythonid` plugin, jar `plugins/python/lib/modules/intellij.python.core.impl.jar`):
+   `PythonProHelpersLocator.getRoot → PythonHelpersLocator.findRootByJarPath → getPluginDistDirByClass`,
+   throwing `.../plugins/python/lib/modules should be lib directory`. This class is **obfuscated**
+   (methods `f`/`a`, string constants encoded as longs) and, unlike the community locator, does
+   **not** read any `idea.*.helpers.path` property, so the same trick doesn't apply.
+   - Established: snakecharm's `defaultExtensionNs="Pythonid"` EPs (`typeProvider`,
+     `dialectsTokenSetContributor`, `pyReferenceResolveProvider`, …) are declared by **`PythonCore`**
+     via `qualifiedName="Pythonid.…"` (not by the Pro `Pythonid` plugin), and snakecharm only
+     `<depends>PythonCore</depends>` — so the Pro plugin is not actually required by snakecharm.
+   - **Tried and rejected:** `-Didea.required.plugins.id=SnakeCharm` to load only snakecharm+deps and
+     exclude the Pro plugin. It made things **worse** (25 → 94 failed): the allowlist is too blunt and
+     drops other bundled plugins the tests need. Do **not** repeat this verbatim.
+   - **Next ideas to try (in order):**
+     1. Disable *only* the Pro `Pythonid` plugin (not an allowlist) — e.g. write a
+        `disabled_plugins.txt` containing `Pythonid` into the test sandbox `config-test/` dir before
+        the app starts, or find a per-plugin disable hook in the test framework. Verify snakecharm
+        still loads (its EPs are `PythonCore`'s, so it should).
+     2. Bump the IntelliJ Platform Gradle Plugin `2.16.0 → 2.17.0` (the build already nags about
+        this) and/or try a newer `2026.1.x` platform build — `getPluginDistDirByClass` / the helpers
+        locators may have been fixed for the `lib/modules` layout upstream.
+     3. If neither works, this is a genuine JetBrains platform bug for plugin devs testing against
+        2026.1 **Professional**; file it and/or gate the affected cucumber features.
 
 2. **`SnakemakeParsingTest` / `SmkSLParsingTest` (~23 tests) — golden-file drift.** No longer
-   `FileNotFoundException` (that was bucket 7 above); now `FileComparisonFailedError` — the PSI
-   tree printed by the 2026.1 Python parser differs from the committed `psi/*.txt` expectations.
-   Needs a per-file diff review; regenerate the goldens where the differences are benign platform
-   changes.
+   `FileNotFoundException` (that was bucket 7); now `FileComparisonFailedError` — the PSI tree
+   printed by the 2026.1 Python parser differs from the committed `psi/*.txt` expectations. Review
+   the diffs per file and regenerate the goldens where the differences are benign platform changes.
 
 ## Reproducing
 
@@ -156,5 +181,5 @@ above the counts dropped from **129 → then localized to two buckets**:
 ./gradlew test -PsnakemakeWrappersRepoPath=testData/wrappers_storage               # two buckets above
 
 # To run one feature only: add `@here` to the .feature and set the runner's
-# tags = "not @ignore and @here" in AllCucumberFeaturesTest.
+# tags = "not @ignore and @here" in AllCucumberFeaturesTest (remember to revert both).
 ```
