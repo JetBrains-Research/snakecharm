@@ -64,6 +64,24 @@ repositories {
     }
 }
 
+// Align the *runtime* Kotlin standard library with the one bundled in the target IntelliJ Platform
+// (2026.1 / build 261 ships Kotlin 2.3.20). Our build compiles with an older Kotlin, and its
+// kotlin-stdlib is otherwise pulled onto the runtime/test classpath (via `kotlinStdlibJdk8`,
+// `kotlin-reflect`, `kotlin-test-junit`). That older stdlib's coroutine stack-trace recovery cannot
+// read the v2 `@DebugMetadata` emitted by the platform's 2.3.20-compiled classes and throws
+// "Debug metadata version mismatch. Expected: 1, got 2", which crashes the coroutine machinery and
+// hangs the test IDE during project setup. Forcing the newer stdlib (which understands both metadata
+// versions) fixes it. We deliberately scope this to *RuntimeClasspath configurations only: putting a
+// stdlib newer than the compiler on the compile classpath would trip Kotlin's metadata-version check.
+configurations.matching { it.name.endsWith("RuntimeClasspath") }.configureEach {
+    val kotlinPlatformVersion = libs.versions.kotlinPlatform.get()
+    resolutionStrategy {
+        force("org.jetbrains.kotlin:kotlin-stdlib:$kotlinPlatformVersion")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinPlatformVersion")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinPlatformVersion")
+    }
+}
+
 
 dependencies {
     implementation(libs.kotlinStdlibJdk8)
