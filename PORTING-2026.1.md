@@ -1,12 +1,16 @@
 # Porting SnakeCharm to PyCharm / IntelliJ Platform 2026.1 (build 261)
 
-**Status: work in progress.** This branch (`update-for-intellij-2026.1`) modernizes the
-build to target the 2026.1 platform, but the plugin **does not yet compile** against it —
-the Python plugin API changed substantially. The minimal "just make it load" change
-(raising `pluginUntilBuild` to `261.*` while still building against PyCharm Community
-2025.2) was tried on a separate branch (#569) and has now been **validated as non-viable**
-— see [Why not just raise `pluginUntilBuild`?](#why-not-just-raise-pluginuntilbuild-validated-569)
-below. So this source port is the only path to real 2026.1 support.
+**Status: source port complete; the plugin compiles and loads against 2026.1. Test-suite
+triage is in progress.** This branch (`compat-pycharm-2026.1`) targets the unified 2026.1
+platform. All ~37 source-level API breaks are fixed, `compileKotlin` and `compileTestKotlin`
+both succeed, and two major test-runtime blockers have been resolved (Kotlin stdlib alignment
+and the test-data-path layout). The remaining work is triaging the feature-test suite — see
+[Remaining test-suite fallout](#remaining-test-suite-fallout).
+
+The minimal "just make it load" change (raising `pluginUntilBuild` to `261.*` while still
+building against PyCharm Community 2025.2) was tried on #569 and **validated as non-viable** —
+see [Why not just raise `pluginUntilBuild`?](#why-not-just-raise-pluginuntilbuild-validated-569).
+So this source port is the only path to real 2026.1 support.
 
 ## Background: PyCharm was unified
 
@@ -16,6 +20,12 @@ below. So this source port is the only path to real 2026.1 support.
 - The 2026.1 IDE is distributed only under the **Professional artifact** (`platformType = PY`,
   build `261.x`). There is no `pycharm-community:2026.1`, so building against 2026.1 requires
   switching `platformType` from `PC` to `PY`.
+
+Because the source changes below bind the Python plugin API in 2026.1-only shapes (e.g. `PyType`
+as a Kotlin interface), **the built plugin runs only on 2026.1+**. `pluginSinceBuild` was raised
+`252 → 261` and the plugin version set to `2026.1.0` accordingly (versioning scheme:
+`YEAR.MAJOR` = minimal compatible platform). Advertising 2025.2 support that the binary cannot
+honor would reproduce exactly the "installs then crashes" failure mode #569 was rejected for.
 
 ## Why not just raise `pluginUntilBuild`? (validated, #569)
 
@@ -41,72 +51,110 @@ All 4 hard problems are the removed `ReturnAnnotator` (see item 2 below): a meta
 widening cannot satisfy them — they require the source changes on this branch. This is the
 concrete proof that #569's approach is a dead end.
 
-To reproduce on the #569 branch (`compat-pycharm-2026.1`), pin the verifier to a Professional
-IDE — `recommended()` cannot be used once `pluginUntilBuild > 252`, because it resolves
-nonexistent `pycharm-community` releases above 2025.2 and aborts before verifying:
+## What this branch does (build infrastructure)
 
-```shell
-# in build.gradle.kts: pluginVerification { ides { ide(IntelliJPlatformType.PyCharmProfessional, "2026.1") } }
-export JAVA_HOME=$(/usr/libexec/java_home -v 21)
-./gradlew verifyPlugin -PsnakemakeWrappersRepoPath=testData/wrappers_storage   # -P override per #571
-```
-
-## What this branch already does (build infrastructure)
-
-- `gradle/wrapper/gradle-wrapper.properties` + `gradleVersion`: **Gradle 8.13 → 9.6.0**
-  (required by the newer IntelliJ Platform Gradle Plugin).
-- `gradle/libs.versions.toml`: **IntelliJ Platform Gradle Plugin 2.7.0 → 2.16.0** (2.7.0
-  could not resolve the 2026.1 Python plugin's v2 content modules; it also requires Gradle 9+).
+- `gradle/wrapper/gradle-wrapper.properties` + `gradleVersion`: **Gradle 8.13 → 9.6.0**.
+- `gradle/libs.versions.toml`: **IntelliJ Platform Gradle Plugin 2.7.0 → 2.16.0**; added a
+  `kotlinPlatform = "2.3.20"` version (the Kotlin bundled in the target platform — see item 6).
 - `gradle.properties`: `platformType = PY`, `platformVersion = 2026.1.3`,
-  `pluginUntilBuild = 261.*`.
-- `build.gradle.kts`: adapted to plugin-2.16.0 / Gradle-9.6 API changes:
-  - `create(type, version, useInstaller = ...)` → `create(type, version) { useInstaller = ... }`
-    (`useInstaller` is now a `Property<Boolean>` inside a configuration block).
-  - Removed the deprecated `val test by getting(Test::class) { ... }` nesting in the `test`
-    task (now a hard error under the Gradle 9.6 Kotlin DSL).
+  `pluginSinceBuild = 261`, `pluginUntilBuild = 261.*`, `pluginVersion = 2026.1.0`.
+- `build.gradle.kts`: adapted to plugin-2.16.0 / Gradle-9.6 API changes, plus a runtime-only
+  `resolutionStrategy` forcing kotlin-stdlib to the platform version (item 6).
+- `CHANGELOG.md`: added a `[2026.1.0]` section (the changelog plugin's `changeNotes` lookup
+  requires a section matching `pluginVersion`, else `patchPluginXml` fails).
 
-With the above, dependency resolution succeeds and the build gets as far as `compileKotlin`.
+## Source-level API breaks — FIXED
 
-## What remains: ~37 source-level API breaks
-
-Run `./gradlew compileKotlin` against PY-2026.1.3 to reproduce. The Python plugin was
-restructured into **v2 content modules** (e.g. `com.jetbrains.python.psi.*` now lives in
-`python-ce/lib/modules/intellij.python.psi.jar`), and several APIs changed shape:
-
-1. **`PyType` is now a Kotlin interface.** Implementations must change:
-   - `override fun getName(): String` → `override val name: String?` (now nullable).
+1. **`PyType` is now a Kotlin interface** (verified by decompiling
+   `intellij.python.psi.jar!/com/jetbrains/python/psi/types/PyType.class`; `getName()` carries
+   `@Nullable`). Implementations changed:
+   - `override fun getName(): String` → `override val name: String?`.
    - `override fun isBuiltin(): Boolean` → `override val isBuiltin: Boolean`.
-   - `getCompletionVariants(completionPrefix: String?, location, context): Array<out Any>`
-     (prefix now nullable, return type covariant).
-   - Affects: `AbstractSmkRuleOrCheckpointType`, `SmkRuleLikeSectionArgsType`,
-     `SmkRuleLikeSectionType`, `SmkWildcardsType` (+ the abstract subclasses
-     `SmkCheckpointType`, `SmkRulesType`) and
-     `SmkSectionNameArgInPySubscriptionLikeReference` (return-type covariance).
+   - `getCompletionVariants(completionPrefix: String?, location, context: ProcessingContext)`:
+     `context` is now non-null; return type `Array<out Any>`.
+   - Fixed in: `AbstractSmkRuleOrCheckpointType`, `SmkRuleLikeSectionArgsType`,
+     `SmkRuleLikeSectionType`, `SmkWildcardsType`, and `SmkSectionNameArgInPySubscriptionLikeReference`
+     (`getVariants()` return-type covariance). `PyStructuralType` is still a Java class but its
+     `getName`/`isBuiltin` are now seen through the Kotlin `PyType` as properties, so subclasses
+     must use `override val` too.
 
-2. **`com.jetbrains.python.validation.ReturnAnnotator` was removed.** *(design decision needed)*
-   The "return outside a function" check moved into the `final` `PySyntaxAnnotator`, which
-   dispatches to an internal, non-extensible `PyReturnYieldAnnotatorVisitor`. SnakeCharm used
-   to subclass `ReturnAnnotator` (to allow `return` inside snakemake `run:` / python blocks)
-   and disable the stock one via `PythonVisitorFilter`. That hook no longer exists. A new
-   approach is required to suppress the false positive for run/python blocks.
-   - Affects: `SmkReturnAnnotator`, `SnakemakeVisitorFilter`, `SmkAnnotatorManager`.
-   - Note: the `PyUnreachableCodeInspection` / `PyUnboundLocalVariableInspection` /
-     `PyShadowingBuiltinsInspection` errors in `SnakemakeVisitorFilter` are a cascade from
-     the unresolved `ReturnAnnotator` in the same `listOf(...)`; those inspections still exist.
+2. **`com.jetbrains.python.validation.ReturnAnnotator` was removed.** The "return outside of
+   function" check moved into the `final` `PySyntaxAnnotator`, which batches ~16 internal
+   visitors (incl. `PyReturnYieldAnnotatorVisitor`) and is run by `PyCompositeAnnotator`
+   **without consulting `PythonVisitorFilter`** (verified in bytecode). So neither the old
+   subclass-`ReturnAnnotator` trick nor the `PythonVisitorFilter` suppression works anymore.
+   - **New approach:** a `daemon.highlightInfoFilter` — `SmkReturnHighlightInfoFilter` — vetoes
+     the `HighlightInfo` for the `ANN.return.outside.of.function` error when the `return` sits
+     inside a snakemake `run:` / `onstart` / `onerror` / `onsuccess` block
+     (`SmkRunSection` / `SmkWorkflowPythonBlockSection`). `HighlightInfoHolder.add()` consults
+     these filters for annotation-produced infos, so this is the correct surgical hook. Top-level
+     `return`s in a `.smk` file are still flagged, matching the old behaviour exactly.
+   - `SmkReturnAnnotator` deleted; removed from `SmkStandardAnnotatorManager`. The
+     `ReturnAnnotator` entry removed from `SnakemakeVisitorFilter` (its 3 inspection entries are
+     still gated via `PyFileImpl.isAcceptedFor` and were kept).
 
-3. **`CustomFoldingBuilder.buildLanguageFoldRegions`** signature now takes
-   `MutableList<FoldingDescriptor?>` (nullable element). Affects: `SmkMakeFoldingBuilder`.
+3. **`CustomFoldingBuilder.buildLanguageFoldRegions`** now takes `MutableList<FoldingDescriptor?>`
+   (nullable element). Fixed in `SmkMakeFoldingBuilder` (+ its private `collectDescriptors`).
 
-4. **`super` disambiguation**: `SmkSLReferenceExpressionImpl` has multiple supertypes
-   exposing the same member; the `super` call needs `super<Type>` qualification.
+4. **`super` disambiguation** in `SmkSLReferenceExpressionImpl.getType` → `super<PyReferenceExpressionImpl>`.
 
-## Reproducing / next steps
+## Test-infrastructure breaks
+
+5. **`com.intellij.testFramework.PlatformLiteFixture` was removed.** `PyLexerTestCase` (base of
+   `SnakemakeLexerTest`, `SmkSLLexerTest`) now extends `BasePlatformTestCase`; the full test
+   application already registers the Python token-set contributors, so the manual
+   `initApplication()` / `registerExtensionPoint(...)` bootstrapping is gone.
+
+6. **Kotlin coroutines "Debug metadata version mismatch. Expected: 1, got 2"** crashed the test
+   IDE during project setup. The 2026.1 platform bundles **Kotlin 2.3.20**, but our build's older
+   kotlin-stdlib was pulled onto the runtime/test classpath (via `kotlinStdlibJdk8`,
+   `kotlin-reflect`, `kotlin-test-junit`) and its coroutine stack-trace recovery cannot read the
+   v2 `@DebugMetadata` the platform's classes emit. Fixed with a **runtime-only**
+   `resolutionStrategy.force` (build.gradle.kts) pinning `kotlin-stdlib{,-jdk7,-jdk8}` to
+   `kotlinPlatform` (2.3.20). Scoped to `*RuntimeClasspath` only — forcing it on the compile
+   classpath would trip the compiler's metadata-version check.
+
+7. **Test data path resolution broke** (`SnakemakeTestUtil.getTestDataPath()`). It walked a fixed
+   number of parent dirs up from the plugin jar to find the project home. The 2026.1 IntelliJ
+   Platform Gradle Plugin sandbox added an extra directory level
+   (`.sandbox_pycharm/<projectName>/PY-2026.1.3/...` vs `.sandbox_pycharm/PC-2025.2/...`), so it
+   resolved to `.sandbox_pycharm/testData` (nonexistent). Rewritten to walk up to the nearest
+   ancestor that actually contains `testData` — layout-independent. This one fix cleared three
+   symptoms: the `FileNotFoundException` parsing failures, the `PyLightProjectDescriptor.kt:45`
+   `MockPackages3` NPE, and the cucumber `snakemake_api.yaml` `PluginException`
+   (`SnakemakeApiYamlAnnotationsService`/`SmkWrapperStorage` derive paths from it).
+
+## Remaining test-suite fallout
+
+Run `./gradlew test -PsnakemakeWrappersRepoPath=testData/wrappers_storage`. After the fixes
+above the counts dropped from **129 → then localized to two buckets**:
+
+1. **Cucumber suite (~all scenarios) — PLATFORM test-framework packaging issue.**
+   `PyTypeShed` → `PythonHelpersLocator.findRootByJarPath` → `PluginManagerCoreKt.getPluginDistDirByClass`
+   throws `IllegalStateException: .../plugins/python-ce/lib/modules should be lib directory`.
+   The Python plugin's v2 content modules live in `lib/modules/*.jar`, but the helpers-root
+   locator expects the jar directly under `lib/`.
+   - **Likely fix (untested):** `getCommunityHelpersRootPath` checks the `idea.python.helpers.path`
+     system property *first* and only falls back to the broken jar-path walk if it is unset
+     (verified in bytecode). Set `-Didea.python.helpers.path=<platformPath>/plugins/python-ce/helpers`
+     on the `test` task JVM (that helpers dir exists in the resolved platform). Needs the platform
+     path from the IntelliJ Platform Gradle Plugin (e.g. an `intellijPlatform` path provider) wired
+     into a `jvmArgumentProvider`.
+
+2. **`SnakemakeParsingTest` / `SmkSLParsingTest` (~23 tests) — golden-file drift.** No longer
+   `FileNotFoundException` (that was bucket 7 above); now `FileComparisonFailedError` — the PSI
+   tree printed by the 2026.1 Python parser differs from the committed `psi/*.txt` expectations.
+   Needs a per-file diff review; regenerate the goldens where the differences are benign platform
+   changes.
+
+## Reproducing
 
 ```shell
-export JAVA_HOME=$(/usr/libexec/java_home -v 21)
-./gradlew compileKotlin            # ~37 errors, grouped as above
-```
+# JDK 21 (jenv picks it up from .java-version in this repo, or set JAVA_HOME manually)
+./gradlew compileKotlin -PsnakemakeWrappersRepoPath=testData/wrappers_storage      # OK
+./gradlew compileTestKotlin -PsnakemakeWrappersRepoPath=testData/wrappers_storage  # OK
+./gradlew test -PsnakemakeWrappersRepoPath=testData/wrappers_storage               # two buckets above
 
-Suggested order: fix (1), (3), (4) (mechanical), resolve the cascade in (2) by deciding the
-new annotator strategy, then run `./gradlew test` and triage feature-test fallout (there are
-likely `findUsages`/`highlighting`/`resolve` Cucumber features that exercise these paths).
+# To run one feature only: add `@here` to the .feature and set the runner's
+# tags = "not @ignore and @here" in AllCucumberFeaturesTest.
+```
