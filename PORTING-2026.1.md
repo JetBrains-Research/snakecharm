@@ -68,32 +68,51 @@ Bucketed by root cause:
 | Bucket | ≈count | Root cause | Confidence |
 |---|---|---|---|
 | stdlib resolve goldens (`Path`→`pathlib.pyi`, `sys`) | ~6 | **typeshed upgrade**: single-file stubs became *package* stubs (`pathlib.pyi` → `pathlib/__init__.pyi`, `sys.py` → `sys/__init__.pyi`) | **Confirmed** — verified on disk in the bundled `python-ce/helpers/typeshed/stdlib` |
-| implicit-symbol resolve/completion (`expand`, `temp`, section vars, SmkSL injections) | ~80 | snakecharm's `elementsCache` symbols vanish while the parallel `getSynthetic()` symbols survive (see below) | **Hypothesis** — asymmetry confirmed in the data; mechanism needs one diagnostic run |
+| implicit-symbol resolve/completion (`expand`, `temp`, section vars, SmkSL injections) | ~80 | the `SmkImplicitPySymbolsProvider` cache is **empty at resolve time** — its rebuild races the resolve check (see below) | **Confirmed** by instrumented diagnostic run |
 | `min_version` inspection + `snakemake_api.yaml` fqn resolution | ~36 | snakemake version / package detection via `PythonPackageManager.forSdk(sdk).listInstalledPackagesSnapshot()` — one of the **most-rewritten 2026.1 APIs** (new packaging/uv model) | **Plausible** — unverified |
 | spellchecker + misc | ~10 | separate, not yet triaged | Unknown |
 
-**The implicit-symbol hypothesis is concrete and testable.** In `SmkImplicitPySymbolsResolveProvider`
-two lookup paths feed off the same cache:
-- `cache.getSynthetic(scope)` returns its `LookupElement`s **raw** → `os`, `sys`, `snakemake`, `Path`,
-  `rules`, `config` all still resolve.
-- `cache.filter(scope, name)` → `ImplicitPySymbolsCacheImpl.get()` → `validElements()`, which
-  **drops any `ImplicitPySymbol` whose `psiDeclaration.isValid` is false** and fires an *async*
-  `scheduleUpdate()` that never completes inside the synchronous test window.
+**The implicit-symbol cause is confirmed to be a cache-population race — NOT PSI invalidation.** An
+instrumented `@here` run of `implicit_py_symbols_resolve.feature` settled it (the earlier
+"`validElements` drops invalidated PSI" theory was **disproven** — invalid count was 0 in every
+sample). What the diagnostic showed:
 
-So if the library `PyFunction` PSI collected from the mock SDK (by `collectTopLevelMethodsFrom(
-"snakemake.io", …)`) gets invalidated — a very plausible consequence of a 2026.1 PSI-lifecycle
-change — every `elementsCache` symbol silently disappears, while the synthetic ones are unaffected.
-That asymmetry is *exactly* what the failures show (`os` resolves, `expand` returns 0). **If this
-holds, one fix in the cache lifecycle clears ~80 failures.** It still has to be distinguished from
-the simpler "the cache was never populated" (submodule `resolveQualifiedName("snakemake.io")` or
-`.topLevelFunctions` returning empty) — both produce the same 0-result symptom; a single diagnostic
-run (log `elementsCache` size + `isValid` in the resolver) tells them apart.
+- The resolution *logic* is fine. `SmkImplicitPySymbolsResolveProvider.resolveName` resolves `expand`,
+  `rules`, `wildcards`, … **correctly when the cache is populated** (`elementsInScope=46 hit=true`) and
+  fails **only** when the cache is empty at that instant (`elementsInScope=0 hit=false`). Same code,
+  two outcomes — so it is not a resolver bug and not a goldens problem.
+- The break is on the **population side**. `SmkImplicitPySymbolsProvider.doRefreshCache` produced
+  `elements=0` in ~121 of ~160 invocations even with a valid `sdk=Mock` and `dumb=false`; only ~39
+  produced the full `elements≈50`. Many of the empties are *legitimate* (the scenario deliberately
+  switches to the `_wo_snakemake` / none / invalid SDK and asserts non-resolution) — but the failing
+  asserts are the cases where a **with-snakemake SDK is active yet the cache is still empty**.
+- Root mechanism: cache rebuild is **async and smart-mode-gated**. An SDK/settings change fires an
+  event → `doRefresh` → `onChange` → `DumbService.runWhenSmart { runReadAction { doRefreshCache } }`
+  (and `scheduleUpdate` always goes through `SwingUtilities.invokeLater`). The cucumber
+  `reference should resolve` step gates only on `DumbService.waitForSmartMode()`, which does **not**
+  wait for that queued rebuild. In 2026.1, changing the project SDK triggers a re-index (dumb episode),
+  so the rebuild is deferred behind smart-mode and the resolve check wins the race against a
+  not-yet-repopulated cache. (The `elements=50 io=[io.py]` vs `elements=52 io=[]` split in the logs is
+  a red herring — just the two snakemake layouts, `snakemake/io.py` pre-9.0 vs `snakemake/io/__init__.py`
+  for 9.0+ — not non-determinism.)
+
+**Fix direction (one fix, ~80 failures — NOT yet implemented; surface before doing):** make the
+implicit-symbol cache deterministic relative to the resolve check. Options, cheapest first:
+1. In the cucumber `reference should resolve` / `should not resolve` steps, after `waitForSmartMode()`
+   also **drain the pending cache rebuild** (e.g. dispatch queued EDT events, or force a synchronous
+   `SmkImplicitPySymbolsProvider` refresh) before asserting. Test-only, smallest blast radius.
+2. Make `doRefresh`/`scheduleUpdate` run **synchronously in unit-test mode** (there is already an
+   `isUnitTestMode` fast-path in `doRefresh` and `refreshAfterSymbolCachesUpdated`; `scheduleUpdate`'s
+   `SwingUtilities.invokeLater` and `onChange`'s `runWhenSmart` are the two spots that still defer).
+3. Product-side: have the resolver trigger a synchronous rebuild when the cache is empty but a
+   snakemake SDK is active. Largest change; only if the race is also user-visible (flicker on SDK
+   switch), which it may well be.
 
 **Why this matters for review.** The honest framing for the PR is: *the crashes are fixed and are
-platform-structural; the residual failures are a small number of behavioural root causes, each
-likely a single fix, not a pile of golden-file rubber-stamping.* Do not "just regenerate goldens" for
-the ~80 resolve failures — that would bake a real regression into the expectations. The ~6 typeshed
-goldens *are* legitimate expectation updates.
+platform-structural; the residual failures are a small number of behavioural root causes, each a
+single fix, not a pile of golden-file rubber-stamping.* Do **not** "just regenerate goldens" for the
+~80 resolve failures — the expectations are correct; the cache is simply empty when asserted. Only the
+~6 typeshed goldens (`Path`→`pathlib/__init__.pyi`, `sys`) are legitimate expectation updates.
 
 ## Why not just raise `pluginUntilBuild`? (validated, #569)
 
@@ -279,16 +298,17 @@ Top failing features by count:
  …  (implicit-symbol resolution/completion dominates)
 ```
 
-**Next step (fast, do this first):** confirm the implicit-symbol hypothesis with **one `@here`
-diagnostic run** of `implicit_py_symbols_resolve.feature` — add a temporary log in
-`SmkImplicitPySymbolsResolveProvider.resolveName` printing `cache.get(scope).size` and each
-`ImplicitPySymbol.psiDeclaration.isValid`. If the cache has the symbols but they're `isValid == false`,
-the fix is in the cache lifecycle (`ImplicitPySymbolsCacheImpl.validElements` drops them + fires an
-async `scheduleUpdate` that never runs in the sync test window). If the cache is **empty**, the break
-is upstream in `collectTopLevelMethodsFrom` / `resolveQualifiedName("snakemake.io")` /
-`.topLevelFunctions` under the mock SDK. Either way it's a *single* fix for ~80 failures, not per-test
-triage. Only the ~6 typeshed goldens (`Path`→`pathlib/__init__.pyi`, `sys`) are legitimate expectation
-updates.
+**Diagnosis DONE (see the systemic-cause section):** an instrumented `@here` run of
+`implicit_py_symbols_resolve.feature` confirmed the ~80 implicit-symbol failures are a
+**cache-population race**, not resolver logic, not PSI invalidation, not goldens. `expand`/`rules`/…
+resolve correctly whenever `SmkImplicitPySymbolsProvider`'s cache is populated and return 0 only when
+it is empty at resolve time; the cache rebuild is async + smart-mode-gated and the cucumber
+`reference should resolve` step doesn't wait for it, so 2026.1's SDK-change→re-index episode lets the
+resolve win the race. **Next step is the fix, not more diagnosis** — start with option 1 (drain the
+pending rebuild in the resolve/non-resolve cucumber steps after `waitForSmartMode()`); options 2–3 are
+in the systemic-cause section. One fix should clear ~80 failures. Only the ~6 typeshed goldens
+(`Path`→`pathlib/__init__.pyi`, `sys`) are legitimate expectation updates. The `min_version` /
+`snakemake_api.yaml` (~36) and spellchecker (~10) buckets are still unverified.
 
 Also worth a shot: bump the IntelliJ Platform Gradle Plugin `2.16.0 → 2.17.0` (the build nags about
 it) and/or a newer `2026.1.x` platform build, in case #2070 gets fixed upstream (would let us drop the
