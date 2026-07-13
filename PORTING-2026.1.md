@@ -41,9 +41,13 @@ diff for the *whole* suite so `min_version` / `snakemake_api.yaml` / spellchecke
 are enumerated as pre-existing (expected) or port-caused (fix or file separately). Recipe below.
 
 **Environment gotchas (these cost real time to discover — do not rediscover them):**
-- **Running `master` (2025.2) needs JDK 21.** Its Gradle 8.13 crashes under the system JDK 24 with
-  `Type T not present`. Use `JAVA_HOME=/opt/homebrew/Cellar/openjdk@21/21.0.11` (jenv `21.0.11`).
-  This branch uses Gradle 9.6 and is fine on 24, but `.java-version` pins 21 via jenv anyway.
+- **Running `master` (2025.2) needs JDK 21** (any JDK 21; the exact path is machine-specific). Its
+  Gradle 8.13 crashes under a too-new system JDK (seen with JDK 24: `Type T not present`). Point
+  `JAVA_HOME` at a JDK 21 for the master run — find one via `/usr/libexec/java_home -v 21` (macOS),
+  `jenv versions` / `jenv prefix 21`, `sdk home java 21...` (SDKMAN), or install one
+  (`brew install openjdk@21`). This branch uses Gradle 9.6 and is fine on newer JDKs; `.java-version`
+  pins 21 anyway. NB: the first `master` build re-downloads the PC-2025.2 platform if the Gradle cache
+  is cold.
 - **Switching branches can OOM the Kotlin compiler** (`git checkout` bumps mtimes → full main
   recompile; the box is memory-tight). If you hit `OutOfMemoryError ... Fir2IrPipeline`, run
   `./gradlew --stop` then `GRADLE_OPTS="-Xmx6g" ./gradlew … -Pkotlin.daemon.jvmargs="-Xmx4g"`.
