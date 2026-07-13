@@ -22,6 +22,52 @@ building against PyCharm Community 2025.2) was tried on #569 and **validated as 
 see [Why not just raise `pluginUntilBuild`?](#why-not-just-raise-pluginuntilbuild-validated-569).
 So this source port is the only path to real 2026.1 support.
 
+## ▶️ RESUME HERE (next-session checklist — nothing below needs redoing)
+
+Everything through "crash blockers fixed + failures categorized" is **done and committed** on
+`update-for-intellij-2026.1`. Two tasks remain to finish the port; do them in this order.
+
+**Task A — regenerate the ~6 typeshed goldens (the ONLY confirmed port-caused test debt).**
+The bundled typeshed upgraded single-file stubs to package stubs, so a handful of resolve/goldens
+expect the old paths. Known-affected expectations: `os` → `os/__init__.pyi` (was `os.py`), `sys` →
+`sys/__init__.pyi`, `Path` → `pathlib/__init__.pyi` (was `pathlib.pyi`). Update the expectations in
+`src/test/resources/features/resolve/implicit_py_symbols_resolve.feature` (the `Resolve implicit python
+modules/classes at top-level` Examples) and any sibling features that assert stub file paths. These are
+legitimate updates — the platform genuinely reorganized the stubs.
+
+**Task B — full-suite master diff, to prove the other buckets are pre-existing too (then nothing else
+is owed by this PR).** We proved 57/59 of the biggest feature are pre-existing on 2025.2; repeat the
+diff for the *whole* suite so `min_version` / `snakemake_api.yaml` / spellchecker / section-name buckets
+are enumerated as pre-existing (expected) or port-caused (fix or file separately). Recipe below.
+
+**Environment gotchas (these cost real time to discover — do not rediscover them):**
+- **Running `master` (2025.2) needs JDK 21.** Its Gradle 8.13 crashes under the system JDK 24 with
+  `Type T not present`. Use `JAVA_HOME=/opt/homebrew/Cellar/openjdk@21/21.0.11` (jenv `21.0.11`).
+  This branch uses Gradle 9.6 and is fine on 24, but `.java-version` pins 21 via jenv anyway.
+- **Switching branches can OOM the Kotlin compiler** (`git checkout` bumps mtimes → full main
+  recompile; the box is memory-tight). If you hit `OutOfMemoryError ... Fir2IrPipeline`, run
+  `./gradlew --stop` then `GRADLE_OPTS="-Xmx6g" ./gradlew … -Pkotlin.daemon.jvmargs="-Xmx4g"`.
+- **`testData` is NOT a declared input to the `test` task** — editing it does not invalidate the task.
+  Always use `cleanTest test` when a testData change must take effect (else you get stale cached
+  results — this silently wasted two runs).
+- **Run one cucumber feature:** add `@here` above the `Feature:` line and set
+  `tags = "not @ignore and @here"` in `AllCucumberFeaturesTest.kt`; revert both after. The
+  `PC-2025.2` and `PY-2026.1.3` sandboxes coexist under `.sandbox_pycharm/`, so switching branches
+  does not clobber the other platform's build.
+- **Diff two failing sets** with a tiny Python snippet that walks `build/test-results/test/TEST-*.xml`
+  and collects `testcase` elements containing a `failure`/`error` child (that is how the 57-vs-2 split
+  was produced). Save each branch's set to a file and `comm` them.
+
+**Do NOT redo (already disproven, with evidence in this doc):** the "cache-population race" test-wait
+fix (`IndexingTestUtil.waitUntilIndexesAreReady` + forced `scheduleUpdate` + EDT drain), the
+`validElements` PSI-invalidation theory, and supplying the gitignored `MockPackages3/snakemake` fixture
+(symlink or copy). Each had **zero effect** because those ~57 failures are pre-existing environmental
+gaps, not port bugs — see the RESOLVED box in the systemic-cause section.
+
+**Commit state:** the sole code fix is `5ab1ce62` (EP-unregister for the cucumber crash, in
+`StepDefs.configureSnakemakeProject`); everything else on-branch since is documentation. Working tree
+is clean.
+
 ## Background: PyCharm was unified
 
 - PyCharm Community and Professional were merged into a single product in 2025.1.
@@ -345,7 +391,7 @@ EP-unregister workaround entirely).
 # JDK 21 (jenv picks it up from .java-version in this repo, or set JAVA_HOME manually)
 ./gradlew compileKotlin -PsnakemakeWrappersRepoPath=testData/wrappers_storage      # OK
 ./gradlew compileTestKotlin -PsnakemakeWrappersRepoPath=testData/wrappers_storage  # OK
-./gradlew test -PsnakemakeWrappersRepoPath=testData/wrappers_storage               # runs; ~147 assertion failures (one open bucket)
+./gradlew test -PsnakemakeWrappersRepoPath=testData/wrappers_storage               # runs; ~147 assertion failures, ~57/59 of the biggest feature PROVEN pre-existing on 2025.2 (see RESUME HERE)
 
 # To run one feature only: add `@here` to the .feature and set the runner's
 # tags = "not @ignore and @here" in AllCucumberFeaturesTest (remember to revert both).
