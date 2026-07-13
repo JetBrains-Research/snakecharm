@@ -108,6 +108,20 @@ implicit-symbol cache deterministic relative to the resolve check. Options, chea
    snakemake SDK is active. Largest change; only if the race is also user-visible (flicker on SDK
    switch), which it may well be.
 
+**Decision pending — is this a real-user bug or only a test artifact?** This is the crux for choosing
+between the options. On 2025.2 the race stayed hidden; 2026.1's more aggressive re-index-on-SDK-change
+is what surfaced it. If a user who switches their project interpreter (or opens a project before
+indexing finishes) sees implicit snakemake symbols (`expand`, `temp`, `rules`, …) briefly go
+**unresolved / red** until the next daemon pass, then this is a genuine regression and option 3
+(product-side) is the right fix — option 1 alone would be papering over a real bug by making only the
+tests wait. If it is provably test-only (the async rebuild always completes before any user-observable
+resolve in a real IDE), option 1 is the lazy-correct choice and option 3 is over-engineering.
+**Current lean: option 3 (widest)**, on the theory that the same event that broke the tests (SDK
+change → dumb episode → deferred rebuild) is exactly what a user hits when switching interpreters —
+but confirm against upstream author behaviour and other plugins' handling of the same
+`runWhenSmart`-cache pattern before committing to it. The simpler options are documented here so a
+future maintainer can fall back if option 3 proves unnecessary.
+
 **Why this matters for review.** The honest framing for the PR is: *the crashes are fixed and are
 platform-structural; the residual failures are a small number of behavioural root causes, each a
 single fix, not a pile of golden-file rubber-stamping.* Do **not** "just regenerate goldens" for the
