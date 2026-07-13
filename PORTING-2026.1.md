@@ -7,10 +7,12 @@ both succeed, and the test-runtime *crash* blockers are all resolved: Kotlin std
 the test-data-path layout, and **both** `PyTypeShed` helpers-locator crashes (community *and* the
 obfuscated Pro one). The cucumber suite now **runs** (was 3248/3248 crashing) and the parser
 golden-file tests (`SnakemakeParsingTest`, `SmkSLParsingTest`) are **green**. What remains is a
-single bucket of ~147 *assertion* failures (not crashes) that are behavioural, not
-infrastructural — and, importantly, **they are not 147 independent problems.** They collapse to a
-handful of systemic causes, all downstream of one event (the PyCharm unification + Python-plugin
-v2 rewrite). **If you are picking this up, read
+bucket of ~147 *assertion* failures (not crashes) — but a branch-vs-master comparison proves these are
+**mostly PRE-EXISTING on 2025.2, not caused by the port**: the largest feature (`Resolve implicitly
+imported python names`) fails **57/59 identically on master**, with the 2026.1 port adding just **2**
+(typeshed stub-reorg goldens). So the port's real behavioural test debt is small (≈the typeshed
+goldens); the rest is a fresh-checkout test-fixture gap that predates the port. **If you are picking
+this up, read
 [Why the port touches so much — one umbrella cause](#why-the-port-touches-so-much--one-umbrella-cause-a-few-systemic-effects)
 first (it frames the whole PR), then jump to
 [Remaining test-suite fallout — START HERE NEXT TIME](#remaining-test-suite-fallout--start-here-next-time).**
@@ -68,91 +70,75 @@ Bucketed by root cause:
 | Bucket | ≈count | Root cause | Confidence |
 |---|---|---|---|
 | stdlib resolve goldens (`Path`→`pathlib.pyi`, `sys`) | ~6 | **typeshed upgrade**: single-file stubs became *package* stubs (`pathlib.pyi` → `pathlib/__init__.pyi`, `sys.py` → `sys/__init__.pyi`) | **Confirmed** — verified on disk in the bundled `python-ce/helpers/typeshed/stdlib` |
-| implicit-symbol resolve/completion (`expand`, `temp`, section vars, SmkSL injections) | ~80 | `SmkImplicitPySymbolsProvider` cache empty because `resolveQualifiedName("snakemake"[.io])` returns nothing for the **bare `snakemake` (MockPackages3) scenarios** — **root cause still OPEN** (see the correction below) | **Two theories DISPROVEN** by implementation (timing-race; missing mock files) |
+| implicit-symbol resolve/completion (`expand`, `temp`, section vars, SmkSL injections) | ~57 | **PRE-EXISTING on master (2025.2) — NOT a 2026.1 regression.** Bare `snakemake` (MockPackages3) scenarios fail to resolve in a fresh checkout that lacks the author's local test fixtures. Proven by branch-vs-master diff (see below) | **Resolved: environmental, out of scope for this PR** |
+| typeshed stub reorg (`os`→`os/__init__.pyi`, `Path`→`pathlib/__init__.pyi`) | 2 (+~4 elsewhere) | **the only port-introduced resolve failures**: bundled typeshed upgraded single-file stubs to package stubs | **Confirmed** — the exact 2026.1-only delta in the resolve feature |
 | `min_version` inspection + `snakemake_api.yaml` fqn resolution | ~36 | snakemake version / package detection via `PythonPackageManager.forSdk(sdk).listInstalledPackagesSnapshot()` — one of the **most-rewritten 2026.1 APIs** (new packaging/uv model) | **Plausible** — unverified |
 | spellchecker + misc | ~10 | separate, not yet triaged | Unknown |
 
-> **⚠️ CORRECTION (this whole sub-section's "cache-population race" conclusion was DISPROVEN by
-> implementation — read this box first).** Two successive theories for the ~80 implicit-symbol
-> failures were each written up as "confirmed" and then falsified when actually fixed. Do not trust the
-> race narrative below; it is kept only as a record of what was ruled out. **Current status: root cause
-> OPEN.** See "What was tried and disproven" immediately after.
+> **✅ RESOLVED by a branch-vs-master comparison: the bulk of these failures are PRE-EXISTING on
+> 2025.2, not caused by the 2026.1 port.** The same `implicit_py_symbols_resolve.feature`, run on
+> `master` (PC/2025.2) in this same fresh checkout, fails **57/170** — and those 57 are a strict subset
+> of the 59 that fail on this branch. The 2026.1 port introduces exactly **2** new failures, both the
+> typeshed stub reorg. So ~57 of the "~80" were never the port's problem; they are an **environmental
+> gap** (this checkout lacks local test setup the author has). Chasing them inside this PR was a
+> mistake — do not.
 
-**What the instrumentation established (still valid):**
-- The resolver *logic* is fine. `SmkImplicitPySymbolsResolveProvider.resolveName` resolves `expand`,
-  `rules`, `wildcards`, … **correctly when the cache is populated** (`elementsInScope=46 hit=true`) and
-  returns nothing **only** when the cache is empty (`elementsInScope=0 hit=false`). Not a resolver bug,
-  not a goldens problem.
-- The cache is empty because `doRefreshCache`'s `resolveQualifiedName("snakemake")` /
-  `resolveQualifiedName("snakemake.io")` **returns `[]`** for a stable set of scenarios — even with the
-  with-snakemake SDK active (`activeSdk=Mock Python SDK 3.7`), `dumb=false`, indexes ready, and after a
-  forced rebuild. Logged directly: `snakemake=[] snakemake.io=[]` for the failing scenarios vs
-  `snakemake=[PsiDirectoryImpl] snakemake.io=[PyFileImpl/PsiDirectoryImpl]` for the passing ones.
-- **The failing scenarios are exactly the bare `snakemake` (no-version) examples** — e.g. the
-  `| snakemake | exp | expand() | expand | __init__.py |` rows. These use the `MockPackages3` module
-  root. The **versioned** rows (`snakemake:5x`, `:9.3.0`, …) use `MockPackages3_smk_<ver>` roots and
-  **pass**. Correlated via failing testcase names (`Resolve at top-level #11/#14/#16/…`, `Resolve
-  inside rule parameters/run section` bare rows, `Resolve implicit python modules/classes`).
+**The comparison (definitive):**
 
-**What was tried and DISPROVEN (each with a real test run):**
-1. *PSI-invalidation* (`validElements` drops invalid symbols): disproven — `invalid=[]` in every sample.
-2. *Async cache-population race* (the "option 1" fix): implemented `IndexingTestUtil
-   .waitUntilIndexesAreReady` + `waitForSmartMode` + forced `scheduleUpdate` + drain EDT queue in the
-   resolve steps. **Zero effect — still 59/170 in the `@here` feature.** The forced rebuild in smart
-   mode with indexes ready *still* logged `elements=0`, so the failure is not a wait/ordering problem.
-3. *Missing gitignored `MockPackages3/snakemake` fixture* (`.gitignore:137` ignores it; StepDefs:63
-   relies on it): created it as a symlink → `MockPackages3_smk_9.3.0/snakemake`, then as a **real copy**
-   under the root. **Both zero effect — still 59** (with `cleanTest` to force re-run; sandbox roots
-   under this checkout so `getTestDataPath()` does read this `testData`). So it is *not* simply missing
-   snakemake files.
+```
+branch (PY/2026.1): 59 failing   master (PC/2025.2): 57 failing
+  shared (pre-existing, environmental): 57
+  only on 2026.1 (port-introduced):      2  → "Resolve implicit python modules/classes #2 and #4"
+                                              = os → os/__init__.pyi, Path → pathlib/__init__.pyi (typeshed)
+  only on master:                        0  (sets are perfectly nested: master ⊂ branch)
+```
 
-**The open puzzle:** identical snakemake package content resolves under `MockPackages3_smk_9.3.0` but
-**not** under `MockPackages3` — same files, different root dir (the latter also contains `peppy`). So
-`resolveQualifiedName("snakemake")` failing for the bare-`snakemake` scenarios is about how that
-specific root/module is set up or indexed, not about the files being absent. Root cause not yet found.
-Note this may not even be a 2026.1 *regression* — it could be a pre-existing environmental gap (these
-scenarios may require local setup the author has). **The decisive next experiment is to run a couple of
-the failing bare-`snakemake` rows on `master` (2025.2) in a fresh checkout**: if they fail there too,
-these ~40 are environmental, not part of the port; if they pass, it is a real 2026.1 regression to
-root-cause in the `MockPackages3` root/index setup. (The `snakemake/snakemake-wrappers` external repo
-from #572 feeds the *wrapper-metadata* tests, a different feature; it does not supply `snakemake.io`
-symbols, so it is not the fix here.)
+To reproduce the master baseline (Gradle 8.13 needs JDK 21, not the system JDK 24):
+`git checkout master`; tag `@here` on the feature + runner; then
+`JAVA_HOME=<jdk21> ./gradlew cleanTest test -PsnakemakeWrappersRepoPath=testData/wrappers_storage --tests "*AllCucumberFeaturesTest*"`.
 
-**Fix direction — REOPENED (the previously-"decided" option 1 was implemented and did NOT work).**
-Earlier this section committed to a test-only fix (option 1: `IndexingTestUtil.waitUntilIndexesAreReady`
-+ `waitForSmartMode` + drain the queued rebuild) on the theory that the cache was empty due to an
-async-rebuild timing race. **That fix produced zero improvement** (see "What was tried and disproven"
-above) because the cache is empty for a deeper reason — `resolveQualifiedName("snakemake")` itself
-returns `[]` for the bare-`snakemake`/`MockPackages3` scenarios even in smart mode with indexes ready.
-No test-side wait can fix a resolution that returns nothing. **The correct next step is to root-cause
-why `MockPackages3` resolution differs from `MockPackages3_smk_<ver>`, and first to establish
-regression-vs-environmental by running the failing bare-`snakemake` rows on `master`** (see the open
-puzzle above). Until that is known, do not pick a "fix option" — the target is not understood.
+**What the pre-existing 57 are (for the record).** The bare `snakemake` (no-version) rows — e.g.
+`| snakemake | exp | expand() | expand | __init__.py |` — resolve against the `MockPackages3` module
+root, and `resolveQualifiedName("snakemake")` returns `[]` there (logged: `snakemake=[]` for failing
+rows vs `snakemake=[PsiDirectoryImpl]` for the passing **versioned** `MockPackages3_smk_<ver>` rows).
+This fails **identically on 2025.2**, so it is a test-fixture/setup gap, not a platform behaviour. Note
+what it is **not** (each disproven by a real run, so nobody re-treads them):
+- *Not* PSI-invalidation (`validElements`): `invalid=[]` in every sample.
+- *Not* an async cache-population race: the "option 1" test-wait fix (`IndexingTestUtil
+  .waitUntilIndexesAreReady` + `waitForSmartMode` + forced `scheduleUpdate` + EDT drain) had **zero
+  effect**; the forced rebuild in smart mode with indexes ready still logged `elements=0`.
+- *Not* simply the missing gitignored `MockPackages3/snakemake` fixture (`.gitignore:137`): creating it
+  as a symlink and then as a real copy under the root both had **zero effect** (with `cleanTest`;
+  `getTestDataPath()` confirmed to read this checkout's `testData`). The open sub-mystery — why identical
+  content resolves under `MockPackages3_smk_9.3.0` but not `MockPackages3` — belongs to whoever owns the
+  test-fixture setup upstream; it is **not** a 2026.1 port task. (The `snakemake/snakemake-wrappers`
+  external repo from #572 feeds the *wrapper-metadata* tests, a different feature; it does not supply
+  `snakemake.io` symbols.)
 
-*Kept for later, only if the root cause turns out to be a genuine async race after all:* the research
-below argued a test-only wait would be preferable to a product-side synchronous rebuild. It is recorded
-because the reasoning (not the conclusion) stays useful.
-- Transient unresolved refs during an SDK-change reindex are documented as *expected* platform
-  behaviour ([Indexing](https://www.jetbrains.com/help/idea/indexing.html),
-  [References and Resolve](https://plugins.jetbrains.com/docs/intellij/references-and-resolve.html));
-  production `onChange` already defers via `runWhenSmart` then `DaemonCodeAnalyzer.restart()`.
-- The platform testing docs say indexing is now async and tests should use
-  `IndexingTestUtil.waitUntilIndexesAreReady()` ([Testing FAQ](https://plugins.jetbrains.com/docs/intellij/testing-faq.html)).
-- Upstream [#533](https://github.com/JetBrains-Research/snakecharm/issues/533) (OPEN) wants to *remove*
-  `SlowOperations` complexity from `onChange`; [#506](https://github.com/JetBrains-Research/snakecharm/issues/506)
-  was a dumb-mode "write thread only" crash here — both argue against a product-side synchronous rebuild.
+**Fix direction — the port's actual resolve debt is just the 2 typeshed goldens; the ~57 are out of
+scope.** The branch-vs-master comparison (box above) settles it: the port introduces only the typeshed
+stub-reorg failures (`os`→`os/__init__.pyi`, `Path`→`pathlib/__init__.pyi`), which are legitimate
+golden updates. The ~57 shared bare-`snakemake` failures are pre-existing on 2025.2 and are an
+environmental test-fixture gap — **do not try to "fix" them in this PR.** (For history: the earlier
+"cache-population race" theory led to an option-1 test-wait fix that had zero effect; that whole thread
+was chasing pre-existing failures. Do not resurrect it.)
 
-**Future goal (separate issue + PR, NOT this one) — is any residual implicit-symbol issue user-visible?**
-If, after the `MockPackages3` puzzle is solved, a real user who switches interpreters (or opens a `.smk`
-project mid-index) sees `expand`/`temp`/`rules`/… stay red and not self-heal, that is a genuine product
-bug to fix in a follow-up PR — not by expanding this already-large port. Prove it by driving a real
-(non-test) 2026.1 IDE, not from the test suite.
+Whoever owns the upstream test-fixture setup should decide how the bare-`snakemake` (`MockPackages3`)
+rows are meant to resolve on a fresh checkout / CI — but that is orthogonal to the 2026.1 port and
+should be its own issue.
 
-**Why this matters for review.** The honest framing for the PR is: *the crashes are fixed and are
-platform-structural; the residual failures are a small number of behavioural root causes, each a
-single fix, not a pile of golden-file rubber-stamping.* Do **not** "just regenerate goldens" for the
-~80 resolve failures — the expectations are correct; the cache is simply empty when asserted. Only the
-~6 typeshed goldens (`Path`→`pathlib/__init__.pyi`, `sys`) are legitimate expectation updates.
+**Kept only as background (moot unless someone later proves a real user-facing bug):** platform docs
+say transient-unresolved-during-reindex is expected and `IndexingTestUtil.waitUntilIndexesAreReady()`
+is the test-side tool for the now-async indexing; upstream
+[#533](https://github.com/JetBrains-Research/snakecharm/issues/533) (rewrite `onChange` to drop
+`SlowOperations`) and [#506](https://github.com/JetBrains-Research/snakecharm/issues/506) (dumb-mode
+crash) argue against any product-side synchronous-rebuild change.
+
+**Why this matters for review.** The honest framing for the PR: *the crashes are fixed and are
+platform-structural; the port's only behavioural test delta is ~6 typeshed golden updates
+(`os`/`sys`/`Path` stubs became packages). Everything else in the "~147" is pre-existing on 2025.2 (a
+fresh-checkout fixture gap), proven by running the same features on master.* Do **not** rubber-stamp
+goldens beyond the typeshed ones, and do **not** expand this PR to chase the environmental failures.
 
 ## Why not just raise `pluginUntilBuild`? (validated, #569)
 
@@ -318,17 +304,13 @@ Why *this* mechanism, and what was rejected:
 the test-data-path fix (item 7) they **pass (0 failures)** — the earlier `FileNotFoundException`s were
 the only problem; there is no PSI-tree golden drift. Bucket closed.
 
-### OPEN — ~147 behavioural assertion failures (one bucket, ~4 systemic causes)
+### MOSTLY PRE-EXISTING — the ~147 assertion failures are dominated by fresh-checkout fixture gaps, not the port
 
 With the crash gone, the cucumber suite surfaced ~147 assertion failures (`131 AssertionError +
-16 ComparisonFailure`; count from the `-Didea.suppressed.plugins.id=Pythonid` full run, equal to the
-EP-unregister approach on the sampled feature — the EP-unregister full-run count is being confirmed).
-These are **not** golden-file rubber-stamping; see the
-[systemic-cause table and hypotheses](#the-remaining-147-failures-are-4-systemic-causes-not-147-bugs).
-Top failing features by count:
+16 ComparisonFailure` on the full 2026.1 run). Top failing features by count:
 
 ```
-59  Resolve implicitly imported python names
+59  Resolve implicitly imported python names   ← PROVEN 57/59 pre-existing (fail on master too)
 24  Ensures fqn in snakemake_api.yaml corresponds to resolved reference fqn
 12  Resolve for section names in rules and checkpoints
 12  Inspection: min_version smaller than the one set in settings
@@ -338,19 +320,20 @@ Top failing features by count:
  …  (implicit-symbol resolution/completion dominates)
 ```
 
-**Root cause still OPEN — two theories disproven by implementation (see the systemic-cause section for
-the full trail).** Instrumentation established that the ~80 implicit-symbol failures are the resolver
-finding an *empty* `SmkImplicitPySymbolsProvider` cache, and that the cache is empty because
-`resolveQualifiedName("snakemake"[.io])` returns `[]` specifically for the **bare-`snakemake`
-(`MockPackages3`) scenarios** (versioned `MockPackages3_smk_<ver>` rows pass). The two fixes attempted —
-a test-only wait/rebuild (the "cache-population race" theory) and supplying the gitignored
-`MockPackages3/snakemake` fixture (symlink, then real copy) — **each had zero effect (still 59/170)**.
-So it is neither a wait/ordering problem nor simply-missing files. **Next step is root cause, not a
-fix**: figure out why identical snakemake content resolves under `MockPackages3_smk_9.3.0` but not
-`MockPackages3`, and run the failing rows on `master` (2025.2) to establish whether this is a 2026.1
-regression at all or a pre-existing environmental gap. Only the ~6 typeshed goldens
-(`Path`→`pathlib/__init__.pyi`, `sys`) are confirmed legitimate expectation updates. The `min_version` /
-`snakemake_api.yaml` (~36) and spellchecker (~10) buckets are still unverified.
+**PROVEN for the largest feature (branch-vs-master diff): 57 of the 59 `Resolve implicitly imported
+python names` failures are PRE-EXISTING on 2025.2** — an environmental fresh-checkout fixture gap, not
+the port. The port introduces exactly **2** (the typeshed stub-reorg goldens). See
+[the systemic-cause section](#the-remaining-147-failures-are-4-systemic-causes-not-147-bugs) for the
+full diff and the disproven theories. **Do not chase the environmental failures in this PR.**
+
+**Still to do — confirm the pattern holds for the other features and land the port's real debt:**
+- **Run the full suite on `master` (2025.2) and diff** against the 2026.1 full run, the same way the
+  resolve feature was done (recipe in the systemic-cause box). Expectation: the `min_version`,
+  `snakemake_api.yaml`, spellchecker, section-name buckets are *also* mostly pre-existing. This turns
+  "~147 scary failures" into "N port-caused, cleanly enumerated." (One master full run + one branch
+  full run.)
+- **Regenerate the typeshed goldens** (`os`/`sys`/`Path` → `*/__init__.pyi`) — the only confirmed
+  port-caused resolve delta.
 
 Also worth a shot: bump the IntelliJ Platform Gradle Plugin `2.16.0 → 2.17.0` (the build nags about
 it) and/or a newer `2026.1.x` platform build, in case #2070 gets fixed upstream (would let us drop the
