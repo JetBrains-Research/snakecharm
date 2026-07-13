@@ -68,98 +68,85 @@ Bucketed by root cause:
 | Bucket | ≈count | Root cause | Confidence |
 |---|---|---|---|
 | stdlib resolve goldens (`Path`→`pathlib.pyi`, `sys`) | ~6 | **typeshed upgrade**: single-file stubs became *package* stubs (`pathlib.pyi` → `pathlib/__init__.pyi`, `sys.py` → `sys/__init__.pyi`) | **Confirmed** — verified on disk in the bundled `python-ce/helpers/typeshed/stdlib` |
-| implicit-symbol resolve/completion (`expand`, `temp`, section vars, SmkSL injections) | ~80 | the `SmkImplicitPySymbolsProvider` cache is **empty at resolve time** — its rebuild races the resolve check (see below) | **Confirmed** by instrumented diagnostic run |
+| implicit-symbol resolve/completion (`expand`, `temp`, section vars, SmkSL injections) | ~80 | `SmkImplicitPySymbolsProvider` cache empty because `resolveQualifiedName("snakemake"[.io])` returns nothing for the **bare `snakemake` (MockPackages3) scenarios** — **root cause still OPEN** (see the correction below) | **Two theories DISPROVEN** by implementation (timing-race; missing mock files) |
 | `min_version` inspection + `snakemake_api.yaml` fqn resolution | ~36 | snakemake version / package detection via `PythonPackageManager.forSdk(sdk).listInstalledPackagesSnapshot()` — one of the **most-rewritten 2026.1 APIs** (new packaging/uv model) | **Plausible** — unverified |
 | spellchecker + misc | ~10 | separate, not yet triaged | Unknown |
 
-**The implicit-symbol cause is confirmed to be a cache-population race — NOT PSI invalidation.** An
-instrumented `@here` run of `implicit_py_symbols_resolve.feature` settled it (the earlier
-"`validElements` drops invalidated PSI" theory was **disproven** — invalid count was 0 in every
-sample). What the diagnostic showed:
+> **⚠️ CORRECTION (this whole sub-section's "cache-population race" conclusion was DISPROVEN by
+> implementation — read this box first).** Two successive theories for the ~80 implicit-symbol
+> failures were each written up as "confirmed" and then falsified when actually fixed. Do not trust the
+> race narrative below; it is kept only as a record of what was ruled out. **Current status: root cause
+> OPEN.** See "What was tried and disproven" immediately after.
 
-- The resolution *logic* is fine. `SmkImplicitPySymbolsResolveProvider.resolveName` resolves `expand`,
+**What the instrumentation established (still valid):**
+- The resolver *logic* is fine. `SmkImplicitPySymbolsResolveProvider.resolveName` resolves `expand`,
   `rules`, `wildcards`, … **correctly when the cache is populated** (`elementsInScope=46 hit=true`) and
-  fails **only** when the cache is empty at that instant (`elementsInScope=0 hit=false`). Same code,
-  two outcomes — so it is not a resolver bug and not a goldens problem.
-- The break is on the **population side**. `SmkImplicitPySymbolsProvider.doRefreshCache` produced
-  `elements=0` in ~121 of ~160 invocations even with a valid `sdk=Mock` and `dumb=false`; only ~39
-  produced the full `elements≈50`. Many of the empties are *legitimate* (the scenario deliberately
-  switches to the `_wo_snakemake` / none / invalid SDK and asserts non-resolution) — but the failing
-  asserts are the cases where a **with-snakemake SDK is active yet the cache is still empty**.
-- Root mechanism: cache rebuild is **async and smart-mode-gated**. An SDK/settings change fires an
-  event → `doRefresh` → `onChange` → `DumbService.runWhenSmart { runReadAction { doRefreshCache } }`
-  (and `scheduleUpdate` always goes through `SwingUtilities.invokeLater`). The cucumber
-  `reference should resolve` step gates only on `DumbService.waitForSmartMode()`, which does **not**
-  wait for that queued rebuild. In 2026.1, changing the project SDK triggers a re-index (dumb episode),
-  so the rebuild is deferred behind smart-mode and the resolve check wins the race against a
-  not-yet-repopulated cache. (The `elements=50 io=[io.py]` vs `elements=52 io=[]` split in the logs is
-  a red herring — just the two snakemake layouts, `snakemake/io.py` pre-9.0 vs `snakemake/io/__init__.py`
-  for 9.0+ — not non-determinism.)
+  returns nothing **only** when the cache is empty (`elementsInScope=0 hit=false`). Not a resolver bug,
+  not a goldens problem.
+- The cache is empty because `doRefreshCache`'s `resolveQualifiedName("snakemake")` /
+  `resolveQualifiedName("snakemake.io")` **returns `[]`** for a stable set of scenarios — even with the
+  with-snakemake SDK active (`activeSdk=Mock Python SDK 3.7`), `dumb=false`, indexes ready, and after a
+  forced rebuild. Logged directly: `snakemake=[] snakemake.io=[]` for the failing scenarios vs
+  `snakemake=[PsiDirectoryImpl] snakemake.io=[PyFileImpl/PsiDirectoryImpl]` for the passing ones.
+- **The failing scenarios are exactly the bare `snakemake` (no-version) examples** — e.g. the
+  `| snakemake | exp | expand() | expand | __init__.py |` rows. These use the `MockPackages3` module
+  root. The **versioned** rows (`snakemake:5x`, `:9.3.0`, …) use `MockPackages3_smk_<ver>` roots and
+  **pass**. Correlated via failing testcase names (`Resolve at top-level #11/#14/#16/…`, `Resolve
+  inside rule parameters/run section` bare rows, `Resolve implicit python modules/classes`).
 
-**Fix direction (one fix, ~80 failures — decided: option 1, see the Decision note below):** make the
-implicit-symbol cache deterministic relative to the resolve check. Options, cheapest first:
-1. In the cucumber `reference should resolve` / `should not resolve` steps, after `waitForSmartMode()`
-   also **drain the pending cache rebuild** (e.g. dispatch queued EDT events, or force a synchronous
-   `SmkImplicitPySymbolsProvider` refresh) before asserting. Test-only, smallest blast radius.
-2. Make `doRefresh`/`scheduleUpdate` run **synchronously in unit-test mode** (there is already an
-   `isUnitTestMode` fast-path in `doRefresh` and `refreshAfterSymbolCachesUpdated`; `scheduleUpdate`'s
-   `SwingUtilities.invokeLater` and `onChange`'s `runWhenSmart` are the two spots that still defer).
-3. Product-side: have the resolver trigger a synchronous rebuild when the cache is empty but a
-   snakemake SDK is active. Largest change; only if the race is also user-visible (flicker on SDK
-   switch), which it may well be.
+**What was tried and DISPROVEN (each with a real test run):**
+1. *PSI-invalidation* (`validElements` drops invalid symbols): disproven — `invalid=[]` in every sample.
+2. *Async cache-population race* (the "option 1" fix): implemented `IndexingTestUtil
+   .waitUntilIndexesAreReady` + `waitForSmartMode` + forced `scheduleUpdate` + drain EDT queue in the
+   resolve steps. **Zero effect — still 59/170 in the `@here` feature.** The forced rebuild in smart
+   mode with indexes ready *still* logged `elements=0`, so the failure is not a wait/ordering problem.
+3. *Missing gitignored `MockPackages3/snakemake` fixture* (`.gitignore:137` ignores it; StepDefs:63
+   relies on it): created it as a symlink → `MockPackages3_smk_9.3.0/snakemake`, then as a **real copy**
+   under the root. **Both zero effect — still 59** (with `cleanTest` to force re-run; sandbox roots
+   under this checkout so `getTestDataPath()` does read this `testData`). So it is *not* simply missing
+   snakemake files.
 
-**Decision — RESOLVED to a test-only fix (option 1 family), NOT the product-side option 3.** The
-initial lean was option 3 (widest), on the theory that the SDK-change→deferred-rebuild race a user
-hits when switching interpreters is a real regression. Investigation of upstream history and platform
-docs reversed that. Evidence:
+**The open puzzle:** identical snakemake package content resolves under `MockPackages3_smk_9.3.0` but
+**not** under `MockPackages3` — same files, different root dir (the latter also contains `peppy`). So
+`resolveQualifiedName("snakemake")` failing for the bare-`snakemake` scenarios is about how that
+specific root/module is set up or indexed, not about the files being absent. Root cause not yet found.
+Note this may not even be a 2026.1 *regression* — it could be a pre-existing environmental gap (these
+scenarios may require local setup the author has). **The decisive next experiment is to run a couple of
+the failing bare-`snakemake` rows on `master` (2025.2) in a fresh checkout**: if they fail there too,
+these ~40 are environmental, not part of the port; if they pass, it is a real 2026.1 regression to
+root-cause in the `MockPackages3` root/index setup. (The `snakemake/snakemake-wrappers` external repo
+from #572 feeds the *wrapper-metadata* tests, a different feature; it does not supply `snakemake.io`
+symbols, so it is not the fix here.)
 
-- **Transient unresolved refs during an SDK-change reindex are documented as *expected* platform
-  behaviour**, not a bug ([JetBrains: Indexing](https://www.jetbrains.com/help/idea/indexing.html),
-  [References and Resolve](https://plugins.jetbrains.com/docs/intellij/references-and-resolve.html)).
-  The production path already handles it correctly: `onChange` defers the rebuild via
-  `DumbService.runWhenSmart` until indexing completes, then `refreshAfterSymbolCachesUpdated` calls
-  `DaemonCodeAnalyzer.restart()` to re-highlight. A real user gets correct results once indexing
-  finishes — exactly the platform norm.
-- **The 2026.1 change that actually broke the tests is named in the platform testing docs**:
-  *"Indexing is now run asynchronously in a background thread … use
-  `IndexingTestUtil.waitUntilIndexesAreReady()` / `suspendUntilIndexesAreReady()` to wait for fully
-  populated indexes."* ([Testing FAQ](https://plugins.jetbrains.com/docs/intellij/testing-faq.html)).
-  So the old `DumbService.waitForSmartMode()` the cucumber steps rely on is simply **no longer
-  sufficient** on 2026.1 — the fix belongs in the *test* wait, not in production.
-- **Upstream author intent points the same way.** Issue
-  [#533](https://github.com/JetBrains-Research/snakecharm/issues/533) (OPEN) is the author wanting to
-  **rewrite `onChange()` to remove** the `SlowOperations` workaround, and
-  [#506](https://github.com/JetBrains-Research/snakecharm/issues/506) was a dumb-mode
-  "write thread only" crash in this same area. Option 3 would push heavy PSI resolution back onto the
-  resolve path the platform deliberately moved to background, re-introducing exactly those
-  threading/slow-op hazards and fighting the author's own cleanup direction. The author already added
-  `isUnitTestMode` synchronous fast-paths in `doRefresh` / `refreshAfterSymbolCachesUpdated`
-  (commit `c994cd0f`); the missing piece is only that the *test* doesn't wait for the now-async
-  index+rebuild.
+**Fix direction — REOPENED (the previously-"decided" option 1 was implemented and did NOT work).**
+Earlier this section committed to a test-only fix (option 1: `IndexingTestUtil.waitUntilIndexesAreReady`
++ `waitForSmartMode` + drain the queued rebuild) on the theory that the cache was empty due to an
+async-rebuild timing race. **That fix produced zero improvement** (see "What was tried and disproven"
+above) because the cache is empty for a deeper reason — `resolveQualifiedName("snakemake")` itself
+returns `[]` for the bare-`snakemake`/`MockPackages3` scenarios even in smart mode with indexes ready.
+No test-side wait can fix a resolution that returns nothing. **The correct next step is to root-cause
+why `MockPackages3` resolution differs from `MockPackages3_smk_<ver>`, and first to establish
+regression-vs-environmental by running the failing bare-`snakemake` rows on `master`** (see the open
+puzzle above). Until that is known, do not pick a "fix option" — the target is not understood.
 
-**So the fix (option 1, refined):** in the cucumber resolve / non-resolve / SDK-change steps, after
-`waitForSmartMode()` also wait for indexes to be ready (`IndexingTestUtil.waitUntilIndexesAreReady()`
-if present on the test classpath) **and drain the queued cache rebuild** (dispatch pending EDT events,
-or force a synchronous `SmkImplicitPySymbolsProvider` refresh) before asserting. Test-only, no
-production change, consistent with the author's existing test-mode-sync pattern and with #533's
-direction. Leave production `onChange` alone (its async+daemon-restart behaviour is correct and is
-what #533 will clean up separately). Options 2 and 3 above are kept only as documented fallbacks.
+*Kept for later, only if the root cause turns out to be a genuine async race after all:* the research
+below argued a test-only wait would be preferable to a product-side synchronous rebuild. It is recorded
+because the reasoning (not the conclusion) stays useful.
+- Transient unresolved refs during an SDK-change reindex are documented as *expected* platform
+  behaviour ([Indexing](https://www.jetbrains.com/help/idea/indexing.html),
+  [References and Resolve](https://plugins.jetbrains.com/docs/intellij/references-and-resolve.html));
+  production `onChange` already defers via `runWhenSmart` then `DaemonCodeAnalyzer.restart()`.
+- The platform testing docs say indexing is now async and tests should use
+  `IndexingTestUtil.waitUntilIndexesAreReady()` ([Testing FAQ](https://plugins.jetbrains.com/docs/intellij/testing-faq.html)).
+- Upstream [#533](https://github.com/JetBrains-Research/snakecharm/issues/533) (OPEN) wants to *remove*
+  `SlowOperations` complexity from `onChange`; [#506](https://github.com/JetBrains-Research/snakecharm/issues/506)
+  was a dumb-mode "write thread only" crash here — both argue against a product-side synchronous rebuild.
 
-**Future goal — DISPROVE the "expected behaviour" assumption (separate issue + PR, NOT this one).**
-The decision above rests on the platform-documented claim that transient-unresolved-during-reindex is
-normal *and* that snakecharm's `runWhenSmart` + `DaemonCodeAnalyzer.restart()` chain always converges
-to correct highlighting for a real user. That is the author's/platform's position — but it may be
-wrong for *this* cache specifically. The open question worth proving before we fully trust option 1
-as the permanent answer: **does a real user who switches the project interpreter (or opens a
-`.smk` project before indexing finishes) actually see `expand`/`temp`/`rules`/… stay red longer than
-platform-normal, or fail to recover without an extra edit/daemon kick?** How to prove it (out of scope
-here — this PR is already large): drive a real (non-test) 2026.1 IDE, switch interpreters on a
-snakemake project, and observe whether implicit symbols recover on their own. **If the flicker is real
-and does not self-heal, that is a genuine product bug → file a new upstream issue and fix it in a
-separate follow-up PR (option 3 territory), not by expanding this port PR.** If it self-heals as the
-docs claim, option 1 stands as the complete answer. Either way, this PR ships option 1; this note is
-only to keep us honest that "the author/platform says it's expected" is an assumption we chose not to
-re-litigate inside an already-complicated port.
+**Future goal (separate issue + PR, NOT this one) — is any residual implicit-symbol issue user-visible?**
+If, after the `MockPackages3` puzzle is solved, a real user who switches interpreters (or opens a `.smk`
+project mid-index) sees `expand`/`temp`/`rules`/… stay red and not self-heal, that is a genuine product
+bug to fix in a follow-up PR — not by expanding this already-large port. Prove it by driving a real
+(non-test) 2026.1 IDE, not from the test suite.
 
 **Why this matters for review.** The honest framing for the PR is: *the crashes are fixed and are
 platform-structural; the residual failures are a small number of behavioural root causes, each a
@@ -351,18 +338,18 @@ Top failing features by count:
  …  (implicit-symbol resolution/completion dominates)
 ```
 
-**Diagnosis DONE (see the systemic-cause section):** an instrumented `@here` run of
-`implicit_py_symbols_resolve.feature` confirmed the ~80 implicit-symbol failures are a
-**cache-population race**, not resolver logic, not PSI invalidation, not goldens. `expand`/`rules`/…
-resolve correctly whenever `SmkImplicitPySymbolsProvider`'s cache is populated and return 0 only when
-it is empty at resolve time; the cache rebuild is async + smart-mode-gated and the cucumber
-`reference should resolve` step doesn't wait for it, so 2026.1's SDK-change→re-index episode lets the
-resolve win the race. **Next step is the fix, not more diagnosis** — decided (see the Decision note in
-the systemic-cause section): **option 1**, a test-only wait for the now-async index + queued cache
-rebuild after `waitForSmartMode()` (`IndexingTestUtil.waitUntilIndexesAreReady()` + drain the pending
-rebuild). Production `onChange` is left alone — its async+daemon-restart behaviour is correct and is
-what upstream #533 will clean up separately. One fix should clear ~80 failures. Only the ~6 typeshed goldens
-(`Path`→`pathlib/__init__.pyi`, `sys`) are legitimate expectation updates. The `min_version` /
+**Root cause still OPEN — two theories disproven by implementation (see the systemic-cause section for
+the full trail).** Instrumentation established that the ~80 implicit-symbol failures are the resolver
+finding an *empty* `SmkImplicitPySymbolsProvider` cache, and that the cache is empty because
+`resolveQualifiedName("snakemake"[.io])` returns `[]` specifically for the **bare-`snakemake`
+(`MockPackages3`) scenarios** (versioned `MockPackages3_smk_<ver>` rows pass). The two fixes attempted —
+a test-only wait/rebuild (the "cache-population race" theory) and supplying the gitignored
+`MockPackages3/snakemake` fixture (symlink, then real copy) — **each had zero effect (still 59/170)**.
+So it is neither a wait/ordering problem nor simply-missing files. **Next step is root cause, not a
+fix**: figure out why identical snakemake content resolves under `MockPackages3_smk_9.3.0` but not
+`MockPackages3`, and run the failing rows on `master` (2025.2) to establish whether this is a 2026.1
+regression at all or a pre-existing environmental gap. Only the ~6 typeshed goldens
+(`Path`→`pathlib/__init__.pyi`, `sys`) are confirmed legitimate expectation updates. The `min_version` /
 `snakemake_api.yaml` (~36) and spellchecker (~10) buckets are still unverified.
 
 Also worth a shot: bump the IntelliJ Platform Gradle Plugin `2.16.0 → 2.17.0` (the build nags about
