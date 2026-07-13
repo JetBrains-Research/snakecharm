@@ -3,11 +3,17 @@
 **Status: source port complete; the plugin compiles and loads against 2026.1. Test-suite
 triage is in progress.** This branch (`update-for-intellij-2026.1`) targets the unified 2026.1
 platform. All ~37 source-level API breaks are fixed, `compileKotlin` and `compileTestKotlin`
-both succeed, and three test-runtime blockers have been resolved (Kotlin stdlib alignment, the
-test-data-path layout, and the community `PyTypeShed` helpers lookup). Non-cucumber test
-failures are down from 129 → ~23. Two buckets remain — an obfuscated Pro helpers-locator crash
-that blocks the cucumber suite, and ~23 parser golden-file diffs. **If you are picking this up,
-jump to [Remaining test-suite fallout — START HERE NEXT TIME](#remaining-test-suite-fallout--start-here-next-time).**
+both succeed, and the test-runtime *crash* blockers are all resolved: Kotlin stdlib alignment,
+the test-data-path layout, and **both** `PyTypeShed` helpers-locator crashes (community *and* the
+obfuscated Pro one). The cucumber suite now **runs** (was 3248/3248 crashing) and the parser
+golden-file tests (`SnakemakeParsingTest`, `SmkSLParsingTest`) are **green**. What remains is a
+single bucket of ~147 *assertion* failures (not crashes) that are behavioural, not
+infrastructural — and, importantly, **they are not 147 independent problems.** They collapse to a
+handful of systemic causes, all downstream of one event (the PyCharm unification + Python-plugin
+v2 rewrite). **If you are picking this up, read
+[Why the port touches so much — one umbrella cause](#why-the-port-touches-so-much--one-umbrella-cause-a-few-systemic-effects)
+first (it frames the whole PR), then jump to
+[Remaining test-suite fallout — START HERE NEXT TIME](#remaining-test-suite-fallout--start-here-next-time).**
 
 The minimal "just make it load" change (raising `pluginUntilBuild` to `261.*` while still
 building against PyCharm Community 2025.2) was tried on #569 and **validated as non-viable** —
@@ -28,6 +34,66 @@ as a Kotlin interface), **the built plugin runs only on 2026.1+**. `pluginSinceB
 `252 → 261` and the plugin version set to `2026.1.0` accordingly (versioning scheme:
 `YEAR.MAJOR` = minimal compatible platform). Advertising 2025.2 support that the binary cannot
 honor would reproduce exactly the "installs then crashes" failure mode #569 was rejected for.
+
+## Why the port touches so much — one umbrella cause, a few systemic effects
+
+This PR is large, and at first glance the change set (≈37 source breaks, a build overhaul, several
+test-infra fixes, and ~147 remaining test failures) looks like unexplained churn. It is not. **Every
+change traces back to a single event**: between 2025.1 and 2026.1 JetBrains did not merely bump a
+version — they *restructured the product and rewrote the Python plugin*. Three concrete structural
+moves happened at once, and each change on this branch is downstream of one of them:
+
+1. **The product was unified** (2025.1 merged Community + Professional; 2025.3 was the *last*
+   standalone PyCharm Community — see the Background section). This forced `platformType` `PC → PY`
+   and re-shaped the Python plugin API surface: `PyType` became a Kotlin interface, the standalone
+   `ReturnAnnotator` was folded into the `final` `PySyntaxAnnotator`, `CustomFoldingBuilder`'s
+   signature gained nullability, etc. → **the ~37 source-level breaks in "Source-level API breaks"
+   below.** These aren't gratuitous; they're the minimum needed to bind the new API shapes.
+
+2. **The Python plugin was repackaged as v2 content modules** — its code now lives in
+   `.../python-ce/lib/modules/*.jar` and `.../python/lib/modules/*.jar` rather than as jars directly
+   under `lib/`. → **the `PlatformLiteFixture` removal, the test-data-path extra directory level, and
+   both `PyTypeShed` helpers-locator crashes (`lib/modules should be lib directory`, upstream #2070).**
+   This one packaging change is responsible for most of the *test-infrastructure* section.
+
+3. **The bundled toolchain was upgraded**: Kotlin `2.3.20` (coroutine `@DebugMetadata` v2, item 6)
+   and — critically for the remaining failures — **a newer bundled typeshed**.
+
+### The remaining ~147 failures are ~4 systemic causes, not 147 bugs
+
+Once the crashes were fixed, the cucumber suite ran and exposed ~147 *assertion* failures. They were
+previously invisible because the Pro-locator crash aborted every scenario before any assertion ran.
+Bucketed by root cause:
+
+| Bucket | ≈count | Root cause | Confidence |
+|---|---|---|---|
+| stdlib resolve goldens (`Path`→`pathlib.pyi`, `sys`) | ~6 | **typeshed upgrade**: single-file stubs became *package* stubs (`pathlib.pyi` → `pathlib/__init__.pyi`, `sys.py` → `sys/__init__.pyi`) | **Confirmed** — verified on disk in the bundled `python-ce/helpers/typeshed/stdlib` |
+| implicit-symbol resolve/completion (`expand`, `temp`, section vars, SmkSL injections) | ~80 | snakecharm's `elementsCache` symbols vanish while the parallel `getSynthetic()` symbols survive (see below) | **Hypothesis** — asymmetry confirmed in the data; mechanism needs one diagnostic run |
+| `min_version` inspection + `snakemake_api.yaml` fqn resolution | ~36 | snakemake version / package detection via `PythonPackageManager.forSdk(sdk).listInstalledPackagesSnapshot()` — one of the **most-rewritten 2026.1 APIs** (new packaging/uv model) | **Plausible** — unverified |
+| spellchecker + misc | ~10 | separate, not yet triaged | Unknown |
+
+**The implicit-symbol hypothesis is concrete and testable.** In `SmkImplicitPySymbolsResolveProvider`
+two lookup paths feed off the same cache:
+- `cache.getSynthetic(scope)` returns its `LookupElement`s **raw** → `os`, `sys`, `snakemake`, `Path`,
+  `rules`, `config` all still resolve.
+- `cache.filter(scope, name)` → `ImplicitPySymbolsCacheImpl.get()` → `validElements()`, which
+  **drops any `ImplicitPySymbol` whose `psiDeclaration.isValid` is false** and fires an *async*
+  `scheduleUpdate()` that never completes inside the synchronous test window.
+
+So if the library `PyFunction` PSI collected from the mock SDK (by `collectTopLevelMethodsFrom(
+"snakemake.io", …)`) gets invalidated — a very plausible consequence of a 2026.1 PSI-lifecycle
+change — every `elementsCache` symbol silently disappears, while the synthetic ones are unaffected.
+That asymmetry is *exactly* what the failures show (`os` resolves, `expand` returns 0). **If this
+holds, one fix in the cache lifecycle clears ~80 failures.** It still has to be distinguished from
+the simpler "the cache was never populated" (submodule `resolveQualifiedName("snakemake.io")` or
+`.topLevelFunctions` returning empty) — both produce the same 0-result symptom; a single diagnostic
+run (log `elementsCache` size + `isValid` in the resolver) tells them apart.
+
+**Why this matters for review.** The honest framing for the PR is: *the crashes are fixed and are
+platform-structural; the residual failures are a small number of behavioural root causes, each
+likely a single fix, not a pile of golden-file rubber-stamping.* Do not "just regenerate goldens" for
+the ~80 resolve failures — that would bake a real regression into the expectations. The ~6 typeshed
+goldens *are* legitimate expectation updates.
 
 ## Why not just raise `pluginUntilBuild`? (validated, #569)
 
@@ -126,68 +192,107 @@ concrete proof that #569's approach is a dead end.
    `MockPackages3` NPE, and the cucumber `snakemake_api.yaml` `PluginException`
    (`SnakemakeApiYamlAnnotationsService`/`SmkWrapperStorage` derive paths from it).
 
-8. **`PyTypeShed` helpers-root lookup crashed every type-inferring test — PARTIALLY fixed.**
-   `PyTypeShed.getDirectory` → `PythonHelpersLocator.getHelpersRoots` iterates the registered
-   helpers locators; each does `findRootByJarPath` → `PluginManagerCoreKt.getPluginDistDirByClass`,
-   which throws `IllegalStateException: .../python-ce/lib/modules should be lib directory` because
-   the Python plugin's v2 content modules live in `lib/modules/*.jar` (the locator expects the jar
-   directly under `lib/`). The **community** locator (`PythonHelpersLocator` from `PythonCore`)
-   checks the `idea.python.helpers.path` system property first, so we set
-   `-Didea.python.helpers.path=<platformPath>/plugins/python-ce/helpers` on the `test` JVM via a
-   `jvmArgumentProvider` (`intellijPlatform.platformPath` gives the path). That silenced the
-   `python-ce` crash. **See the still-open Pro-locator variant in the next section.**
+8. **`PyTypeShed` helpers-root lookup crashed every type-inferring test — NOW FULLY fixed (two
+   locators, two mechanisms).** `PyTypeShed.getDirectory` → `PythonHelpersLocator.getHelpersRoots`
+   iterates **every** registered helpers locator (via the `com.jetbrains.python.pythonHelpersLocator`
+   EP) with **no exception guard**, so any one throwing locator kills the whole lookup and thus every
+   type-inferring test. Each locator does `findRootByJarPath` → `PluginManagerCoreKt
+   .getPluginDistDirByClass`, which throws `IllegalStateException: .../lib/modules should be lib
+   directory` because the v2 content modules live in `lib/modules/*.jar` (the locator expects the jar
+   directly under `lib/`). There are **two** such locators, fixed separately:
+   - **Community** (`PythonHelpersLocatorDefault` from `PythonCore`, jar
+     `python-ce/lib/modules/intellij.python.community.helpersLocator.jar`) checks the
+     `idea.python.helpers.path` system property *first*, so we set
+     `-Didea.python.helpers.path=<platformPath>/plugins/python-ce/helpers` on the `test` JVM via a
+     `jvmArgumentProvider` (`intellijPlatform.platformPath` gives the path).
+   - **Pro** (`PythonProHelpersLocator` from the Pro `Pythonid` plugin, jar
+     `python/lib/modules/intellij.python.core.impl.jar`) is **obfuscated** (methods `f`/`a`, string
+     constants encoded as long-XOR) and reads **no** helpers-path property, so it can't be pointed at
+     a valid root. Fixed by **unregistering just that one locator from the EP in the test JVM only** —
+     see "Remaining fallout" bucket 1 for the how and the alternatives considered.
 
 ## Remaining test-suite fallout — START HERE NEXT TIME
 
-Run `./gradlew test -PsnakemakeWrappersRepoPath=testData/wrappers_storage`. After all fixes above,
-non-cucumber failures dropped **129 → ~23**; the two open buckets:
+Run `./gradlew test -PsnakemakeWrappersRepoPath=testData/wrappers_storage`. All **crash** blockers
+are fixed; the cucumber suite runs and the parser goldens are green. What's left is one bucket of
+behavioural assertion failures — read
+[Why the port touches so much](#why-the-port-touches-so-much--one-umbrella-cause-a-few-systemic-effects)
+for the systemic-cause breakdown before diving in.
 
-1. **Cucumber suite (~all scenarios) — obfuscated Pro helpers locator, same `lib/modules` bug.**
-   With the community locator fixed (item 8), the crash now comes from **`PythonProHelpersLocator`**
-   (the Pro `Pythonid` plugin, jar `plugins/python/lib/modules/intellij.python.core.impl.jar`):
-   `PythonProHelpersLocator.getRoot → PythonHelpersLocator.findRootByJarPath → getPluginDistDirByClass`,
-   throwing `.../plugins/python/lib/modules should be lib directory`. This class is **obfuscated**
-   (methods `f`/`a`, string constants encoded as longs) and, unlike the community locator, does
-   **not** read any `idea.*.helpers.path` property, so the same trick doesn't apply.
-   - Established: snakecharm's `defaultExtensionNs="Pythonid"` EPs (`typeProvider`,
-     `dialectsTokenSetContributor`, `pyReferenceResolveProvider`, …) are declared by **`PythonCore`**
-     via `qualifiedName="Pythonid.…"` (not by the Pro `Pythonid` plugin), and snakecharm only
-     `<depends>PythonCore</depends>` — so the Pro plugin is not actually required by snakecharm.
-   - **Known upstream issue (no fix yet):**
-     <https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/2070> — "The `lib/modules`
-     should be lib directory Exception". Same crash, reported for the 2025.3 platform (same v2-module
-     layout), **open with no maintainer fix**. So there is no blessed workaround; the notes below are
-     ours.
-   - **Root cause (important — this is TEST-ONLY, not a real-user bug):** decompiling
-     `PluginManagerCoreKt.getPluginDistDirByClass` shows it returns the plugin path **directly** when
-     the class is loaded by a `PluginAwareClassLoader`, and only does the broken "parent dir must be
-     named `lib`" walk otherwise. In a real IDE install the Python plugins load via proper plugin
-     classloaders, so this never fires. It only fires in the **flattened gradle test sandbox
-     classpath**, where the python plugin classes aren't under a `PluginAwareClassLoader`. Do **not**
-     do anything user-visible about this (e.g. don't suppress Pro Python at runtime — that would break
-     real users who use Pro Python + SnakeCharm).
-   - **Most promising fix to try next — declare the Python plugins as bundled deps so they get proper
-     classloaders in tests.** In `build.gradle.kts` the `when (platformType)` block currently declares
-     only `bundledPlugin("Pythonid")` for `"PY"/"PD"` (and `com.intellij.platform.images`) — it does
-     **not** declare `bundledPlugin("PythonCore")`, yet `PythonCore` is where the *community* helpers
-     locator lives. Try adding `bundledPlugin("PythonCore")` alongside `Pythonid` for `PY/PD`. If both
-     python plugins are declared as bundled dependencies, their classes should load via
-     `PluginAwareClassLoader` in the test sandbox and `getPluginDistDirByClass` takes the safe branch —
-     fixing **both** locators with no suppression and no `idea.python.helpers.path` hack. (Verify; the
-     `idea.python.helpers.path` jvmArg from item 8 may then become unnecessary.)
-   - **Fallback (test-only, smelly — last resort):** `-Didea.suppressed.plugins.id=Pythonid` on the
-     `test` JVM disables *only* the Pro plugin in tests (via `DisabledPluginsState`, which reads that
-     comma-separated id list). Experimentally this **removed the `lib/modules` crash** (0 occurrences
-     in the sandbox log). But it changes what we test (no Pro Python) and is a smell — prefer the
-     bundled-dep fix above. Note the earlier `-Didea.required.plugins.id=SnakeCharm` *allowlist* is the
-     wrong tool: it made things **worse** (25 → 94 failed) by dropping other needed bundled plugins.
-   - Also worth a shot: bump the IntelliJ Platform Gradle Plugin `2.16.0 → 2.17.0` (the build nags
-     about it) and/or a newer `2026.1.x` platform build, in case #2070 gets fixed upstream.
+### FIXED this pass — cucumber Pro-helpers-locator crash
 
-2. **`SnakemakeParsingTest` / `SmkSLParsingTest` (~23 tests) — golden-file drift.** No longer
-   `FileNotFoundException` (that was bucket 7); now `FileComparisonFailedError` — the PSI tree
-   printed by the 2026.1 Python parser differs from the committed `psi/*.txt` expectations. Review
-   the diffs per file and regenerate the goldens where the differences are benign platform changes.
+The obfuscated **`PythonProHelpersLocator`** crash (`.../python/lib/modules should be lib directory`,
+upstream #2070) blocked *every* cucumber scenario (3248/3248). It is now fixed by **unregistering just
+that one locator from the `com.jetbrains.python.pythonHelpersLocator` EP in the test JVM**, in
+`StepDefs.configureSnakemakeProject` right after `TestApplicationManager.getInstance()` and before
+`PythonMockSdk.create` (which triggers `PyTypeShed`'s lazy init). The EP is `dynamic="true"`, so
+`ExtensionPoint.unregisterExtensions { className, _ -> className != "…PythonProHelpersLocator" }` is a
+clean removal. This leaves the community locator (fed by the `idea.python.helpers.path` jvmArg,
+item 8) and the **rest of the Pro Python plugin intact**, so Python resolution still works in tests.
+It only touches the test JVM — runtime is unaffected.
+
+Why *this* mechanism, and what was rejected:
+- **`getHelpersRoots()` has no exception guard** (verified by decompiling the community locator: it
+  iterates the EP list and calls `getRoot()` on each, no try/catch), so one throwing locator kills the
+  whole lookup. Removing the single crashing contribution is the minimal surgical fix.
+- **This is a TEST-ONLY artifact, not a real-user bug.** `getPluginDistDirByClass` returns the plugin
+  path directly when the class is loaded by a `PluginAwareClassLoader`, and only does the broken
+  "parent dir must be named `lib`" walk otherwise. In a real IDE install the Python plugins load via
+  proper plugin classloaders, so this never fires. It only fires in the **flattened gradle test
+  sandbox classpath**. So do **not** do anything user-visible (e.g. don't suppress Pro Python at
+  runtime — that would break real Pro-Python + SnakeCharm users).
+- **Rejected: `bundledPlugin("PythonCore")`** (the previous "most promising" idea). Tried it — it does
+  **nothing**. The doc's assumption was that declaring the python plugins as bundled deps would make
+  them load via `PluginAwareClassLoader` in the sandbox. It doesn't: the IntelliJ Platform Gradle
+  Plugin puts `bundledPlugin(...)` jars on the **flat test classpath**, so they never get a plugin
+  classloader — that is the entire essence of #2070. (Reverted.)
+- **Rejected: `-Didea.suppressed.plugins.id=Pythonid`.** This *works* (0 crashes) but disables the
+  whole Pro plugin in tests. On the one feature measured it gave an **identical** failure count to the
+  EP-unregister approach (59/59), i.e. no behavioural benefit — so the EP-unregister is strictly
+  better (keeps Pro Python live, touches only the one broken locator). Kept as a documented fallback
+  only. Note the earlier `-Didea.required.plugins.id=SnakeCharm` *allowlist* is the wrong tool: it made
+  things **worse** by dropping other needed bundled plugins.
+
+### FIXED this pass — parser goldens are green
+
+`SnakemakeParsingTest` / `SmkSLParsingTest` were previously feared to be ~23 golden-file diffs. After
+the test-data-path fix (item 7) they **pass (0 failures)** — the earlier `FileNotFoundException`s were
+the only problem; there is no PSI-tree golden drift. Bucket closed.
+
+### OPEN — ~147 behavioural assertion failures (one bucket, ~4 systemic causes)
+
+With the crash gone, the cucumber suite surfaced ~147 assertion failures (`131 AssertionError +
+16 ComparisonFailure`; count from the `-Didea.suppressed.plugins.id=Pythonid` full run, equal to the
+EP-unregister approach on the sampled feature — the EP-unregister full-run count is being confirmed).
+These are **not** golden-file rubber-stamping; see the
+[systemic-cause table and hypotheses](#the-remaining-147-failures-are-4-systemic-causes-not-147-bugs).
+Top failing features by count:
+
+```
+59  Resolve implicitly imported python names
+24  Ensures fqn in snakemake_api.yaml corresponds to resolved reference fqn
+12  Resolve for section names in rules and checkpoints
+12  Inspection: min_version smaller than the one set in settings
+ 8  Spellchecker for snakemake-exclusive psi elements
+ 7  Completion in python part of snakemake file
+ 6  Resolve/Completion for section variables in SmkSL injections (x2)
+ …  (implicit-symbol resolution/completion dominates)
+```
+
+**Next step (fast, do this first):** confirm the implicit-symbol hypothesis with **one `@here`
+diagnostic run** of `implicit_py_symbols_resolve.feature` — add a temporary log in
+`SmkImplicitPySymbolsResolveProvider.resolveName` printing `cache.get(scope).size` and each
+`ImplicitPySymbol.psiDeclaration.isValid`. If the cache has the symbols but they're `isValid == false`,
+the fix is in the cache lifecycle (`ImplicitPySymbolsCacheImpl.validElements` drops them + fires an
+async `scheduleUpdate` that never runs in the sync test window). If the cache is **empty**, the break
+is upstream in `collectTopLevelMethodsFrom` / `resolveQualifiedName("snakemake.io")` /
+`.topLevelFunctions` under the mock SDK. Either way it's a *single* fix for ~80 failures, not per-test
+triage. Only the ~6 typeshed goldens (`Path`→`pathlib/__init__.pyi`, `sys`) are legitimate expectation
+updates.
+
+Also worth a shot: bump the IntelliJ Platform Gradle Plugin `2.16.0 → 2.17.0` (the build nags about
+it) and/or a newer `2026.1.x` platform build, in case #2070 gets fixed upstream (would let us drop the
+EP-unregister workaround entirely).
 
 ## Reproducing
 
@@ -195,7 +300,7 @@ non-cucumber failures dropped **129 → ~23**; the two open buckets:
 # JDK 21 (jenv picks it up from .java-version in this repo, or set JAVA_HOME manually)
 ./gradlew compileKotlin -PsnakemakeWrappersRepoPath=testData/wrappers_storage      # OK
 ./gradlew compileTestKotlin -PsnakemakeWrappersRepoPath=testData/wrappers_storage  # OK
-./gradlew test -PsnakemakeWrappersRepoPath=testData/wrappers_storage               # two buckets above
+./gradlew test -PsnakemakeWrappersRepoPath=testData/wrappers_storage               # runs; ~147 assertion failures (one open bucket)
 
 # To run one feature only: add `@here` to the .feature and set the runner's
 # tags = "not @ignore and @here" in AllCucumberFeaturesTest (remember to revert both).
