@@ -145,6 +145,22 @@ production change, consistent with the author's existing test-mode-sync pattern 
 direction. Leave production `onChange` alone (its async+daemon-restart behaviour is correct and is
 what #533 will clean up separately). Options 2 and 3 above are kept only as documented fallbacks.
 
+**Future goal — DISPROVE the "expected behaviour" assumption (separate issue + PR, NOT this one).**
+The decision above rests on the platform-documented claim that transient-unresolved-during-reindex is
+normal *and* that snakecharm's `runWhenSmart` + `DaemonCodeAnalyzer.restart()` chain always converges
+to correct highlighting for a real user. That is the author's/platform's position — but it may be
+wrong for *this* cache specifically. The open question worth proving before we fully trust option 1
+as the permanent answer: **does a real user who switches the project interpreter (or opens a
+`.smk` project before indexing finishes) actually see `expand`/`temp`/`rules`/… stay red longer than
+platform-normal, or fail to recover without an extra edit/daemon kick?** How to prove it (out of scope
+here — this PR is already large): drive a real (non-test) 2026.1 IDE, switch interpreters on a
+snakemake project, and observe whether implicit symbols recover on their own. **If the flicker is real
+and does not self-heal, that is a genuine product bug → file a new upstream issue and fix it in a
+separate follow-up PR (option 3 territory), not by expanding this port PR.** If it self-heals as the
+docs claim, option 1 stands as the complete answer. Either way, this PR ships option 1; this note is
+only to keep us honest that "the author/platform says it's expected" is an assumption we chose not to
+re-litigate inside an already-complicated port.
+
 **Why this matters for review.** The honest framing for the PR is: *the crashes are fixed and are
 platform-structural; the residual failures are a small number of behavioural root causes, each a
 single fix, not a pile of golden-file rubber-stamping.* Do **not** "just regenerate goldens" for the
