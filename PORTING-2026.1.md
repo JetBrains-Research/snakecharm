@@ -96,7 +96,7 @@ sample). What the diagnostic showed:
   a red herring — just the two snakemake layouts, `snakemake/io.py` pre-9.0 vs `snakemake/io/__init__.py`
   for 9.0+ — not non-determinism.)
 
-**Fix direction (one fix, ~80 failures — NOT yet implemented; surface before doing):** make the
+**Fix direction (one fix, ~80 failures — decided: option 1, see the Decision note below):** make the
 implicit-symbol cache deterministic relative to the resolve check. Options, cheapest first:
 1. In the cucumber `reference should resolve` / `should not resolve` steps, after `waitForSmartMode()`
    also **drain the pending cache rebuild** (e.g. dispatch queued EDT events, or force a synchronous
@@ -108,19 +108,42 @@ implicit-symbol cache deterministic relative to the resolve check. Options, chea
    snakemake SDK is active. Largest change; only if the race is also user-visible (flicker on SDK
    switch), which it may well be.
 
-**Decision pending — is this a real-user bug or only a test artifact?** This is the crux for choosing
-between the options. On 2025.2 the race stayed hidden; 2026.1's more aggressive re-index-on-SDK-change
-is what surfaced it. If a user who switches their project interpreter (or opens a project before
-indexing finishes) sees implicit snakemake symbols (`expand`, `temp`, `rules`, …) briefly go
-**unresolved / red** until the next daemon pass, then this is a genuine regression and option 3
-(product-side) is the right fix — option 1 alone would be papering over a real bug by making only the
-tests wait. If it is provably test-only (the async rebuild always completes before any user-observable
-resolve in a real IDE), option 1 is the lazy-correct choice and option 3 is over-engineering.
-**Current lean: option 3 (widest)**, on the theory that the same event that broke the tests (SDK
-change → dumb episode → deferred rebuild) is exactly what a user hits when switching interpreters —
-but confirm against upstream author behaviour and other plugins' handling of the same
-`runWhenSmart`-cache pattern before committing to it. The simpler options are documented here so a
-future maintainer can fall back if option 3 proves unnecessary.
+**Decision — RESOLVED to a test-only fix (option 1 family), NOT the product-side option 3.** The
+initial lean was option 3 (widest), on the theory that the SDK-change→deferred-rebuild race a user
+hits when switching interpreters is a real regression. Investigation of upstream history and platform
+docs reversed that. Evidence:
+
+- **Transient unresolved refs during an SDK-change reindex are documented as *expected* platform
+  behaviour**, not a bug ([JetBrains: Indexing](https://www.jetbrains.com/help/idea/indexing.html),
+  [References and Resolve](https://plugins.jetbrains.com/docs/intellij/references-and-resolve.html)).
+  The production path already handles it correctly: `onChange` defers the rebuild via
+  `DumbService.runWhenSmart` until indexing completes, then `refreshAfterSymbolCachesUpdated` calls
+  `DaemonCodeAnalyzer.restart()` to re-highlight. A real user gets correct results once indexing
+  finishes — exactly the platform norm.
+- **The 2026.1 change that actually broke the tests is named in the platform testing docs**:
+  *"Indexing is now run asynchronously in a background thread … use
+  `IndexingTestUtil.waitUntilIndexesAreReady()` / `suspendUntilIndexesAreReady()` to wait for fully
+  populated indexes."* ([Testing FAQ](https://plugins.jetbrains.com/docs/intellij/testing-faq.html)).
+  So the old `DumbService.waitForSmartMode()` the cucumber steps rely on is simply **no longer
+  sufficient** on 2026.1 — the fix belongs in the *test* wait, not in production.
+- **Upstream author intent points the same way.** Issue
+  [#533](https://github.com/JetBrains-Research/snakecharm/issues/533) (OPEN) is the author wanting to
+  **rewrite `onChange()` to remove** the `SlowOperations` workaround, and
+  [#506](https://github.com/JetBrains-Research/snakecharm/issues/506) was a dumb-mode
+  "write thread only" crash in this same area. Option 3 would push heavy PSI resolution back onto the
+  resolve path the platform deliberately moved to background, re-introducing exactly those
+  threading/slow-op hazards and fighting the author's own cleanup direction. The author already added
+  `isUnitTestMode` synchronous fast-paths in `doRefresh` / `refreshAfterSymbolCachesUpdated`
+  (commit `c994cd0f`); the missing piece is only that the *test* doesn't wait for the now-async
+  index+rebuild.
+
+**So the fix (option 1, refined):** in the cucumber resolve / non-resolve / SDK-change steps, after
+`waitForSmartMode()` also wait for indexes to be ready (`IndexingTestUtil.waitUntilIndexesAreReady()`
+if present on the test classpath) **and drain the queued cache rebuild** (dispatch pending EDT events,
+or force a synchronous `SmkImplicitPySymbolsProvider` refresh) before asserting. Test-only, no
+production change, consistent with the author's existing test-mode-sync pattern and with #533's
+direction. Leave production `onChange` alone (its async+daemon-restart behaviour is correct and is
+what #533 will clean up separately). Options 2 and 3 above are kept only as documented fallbacks.
 
 **Why this matters for review.** The honest framing for the PR is: *the crashes are fixed and are
 platform-structural; the residual failures are a small number of behavioural root causes, each a
@@ -318,9 +341,11 @@ Top failing features by count:
 resolve correctly whenever `SmkImplicitPySymbolsProvider`'s cache is populated and return 0 only when
 it is empty at resolve time; the cache rebuild is async + smart-mode-gated and the cucumber
 `reference should resolve` step doesn't wait for it, so 2026.1's SDK-change→re-index episode lets the
-resolve win the race. **Next step is the fix, not more diagnosis** — start with option 1 (drain the
-pending rebuild in the resolve/non-resolve cucumber steps after `waitForSmartMode()`); options 2–3 are
-in the systemic-cause section. One fix should clear ~80 failures. Only the ~6 typeshed goldens
+resolve win the race. **Next step is the fix, not more diagnosis** — decided (see the Decision note in
+the systemic-cause section): **option 1**, a test-only wait for the now-async index + queued cache
+rebuild after `waitForSmartMode()` (`IndexingTestUtil.waitUntilIndexesAreReady()` + drain the pending
+rebuild). Production `onChange` is left alone — its async+daemon-restart behaviour is correct and is
+what upstream #533 will clean up separately. One fix should clear ~80 failures. Only the ~6 typeshed goldens
 (`Path`→`pathlib/__init__.pyi`, `sys`) are legitimate expectation updates. The `min_version` /
 `snakemake_api.yaml` (~36) and spellchecker (~10) buckets are still unverified.
 
