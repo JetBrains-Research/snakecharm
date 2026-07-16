@@ -70,6 +70,12 @@ Tests are written in [Gherkin](https://cucumber.io/docs/gherkin). You could run 
 * From IDEA context menu via `Cucumber Java` run configuration
   * Before running first test launch `buildTestWrappersBundle` task  
 
+To run a **single cucumber feature** from the command line, add a `@here` tag above its
+`Feature:` line and set `tags = "not @ignore and @here"` in `AllCucumberFeaturesTest.kt`
+(revert both afterwards). Note that `testData` is **not** a declared input of the `test`
+task, so after editing any feature/test-data file run `./gradlew cleanTest test` — plain
+`test` may serve stale cached results.
+
 If you get `Unimplemented substep definition` in all `*.feature` files, ensure:
   * Not installed or disabled: `Substeps IntelliJ Plugin` 
   * Plugins installed: `Cucumber Java`, `Gherkin`
