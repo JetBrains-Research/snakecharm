@@ -132,6 +132,16 @@ dependencies {
         // Plugin Dependencies. Uses `platformBundledPlugins` property from the gradle.properties file for bundled IntelliJ Platform plugins.
         bundledPlugins(gradleProperty("platformBundledPlugins").get().split(',').map(String::trim).filter(String::isNotEmpty))
 
+        // Spellchecker was extracted from the platform core into a separate module (with its own
+        // classloader) in 2025.2+. We directly use its API (spellchecker.bundledDictionaryProvider),
+        // so declare it explicitly.
+        // https://plugins.jetbrains.com/docs/intellij/api-changes-list-2025.html
+        bundledModule("intellij.spellchecker")
+        // In the unified 2026.1 platform the `SpellCheckingInspection` tool itself is provided by the
+        // Grazie ("Natural Languages") plugin, not core. Needed so spellchecker-integration tests can
+        // enable that inspection in the sandbox.
+        bundledPlugin("tanvd.grazi")
+
         // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file for plugin from JetBrains Marketplace.
         plugins(gradleProperty("platformPlugins").map { it.split(',') })
 
