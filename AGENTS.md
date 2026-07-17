@@ -15,8 +15,11 @@ than defining a language from scratch.
 ## Build & test
 
 The Gradle build uses a **JDK 21 toolchain** (`javaVersion` in `gradle.properties`) and the Gradle
-version pinned there (`gradleVersion`). Ensure a JDK 21 is visible to Gradle before building from
-the CLI (e.g. `export JAVA_HOME=$(/usr/libexec/java_home -v 21)`, or a jenv/asdf/SDKMAN shim).
+version pinned there (`gradleVersion`). **Launch Gradle itself with JDK 21**, not just as an
+available toolchain — the pinned Gradle can crash under a much newer JVM with a cryptic error
+(Gradle 8.x on JDK 24 fails with `Type T not present`). Set `JAVA_HOME` to a JDK 21 before building
+from the CLI (e.g. `export JAVA_HOME=$(/usr/libexec/java_home -v 21)`, or a jenv/asdf/SDKMAN shim);
+`.java-version` also pins 21.
 
 ```shell
 ./gradlew buildPlugin      # -> build/distributions/snakecharm-*.zip
