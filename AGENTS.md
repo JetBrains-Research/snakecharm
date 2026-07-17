@@ -46,6 +46,17 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
   `testData/MockPackages3_smk_<version>/snakemake` (and a bare `testData/MockPackages3/snakemake`);
   cucumber steps select one via `Given a snakemake:<version> project`. Only the API files that
   differ between versions are copied into each mock (see `DEVELOPER.md` → Testdata).
+- **Fresh-checkout gotcha (saves hours):** `testData/MockPackages3/snakemake` is **gitignored** and
+  absent on a clean checkout — you must clone the snakemake repo and symlink it there (see
+  `DEVELOPER.md` → Configure Tests, step 2). Without it, a large batch (~100+) of resolve/completion
+  scenarios for the *unversioned* `snakemake` project fail — `resolveQualifiedName("snakemake")`
+  returns `[]` — while the checked-in per-version mocks (`MockPackages3_smk_<ver>`) still resolve. If
+  you see a wall of `snakemake`-resolution failures on a fresh checkout, suspect this missing
+  fixture, **not** your change.
+- **Analyzing results:** the full suite is large (~3200 scenarios; a full `test` run takes a while —
+  prefer the single-feature `@here` recipe while iterating). To triage or diff failures, parse
+  `build/test-results/test/TEST-*.xml`: each `<testcase>` with a `<failure>`/`<error>` child is a
+  failing scenario (name = `<feature> > <scenario> [#example]`).
 
 ## Architecture
 
@@ -89,3 +100,10 @@ the entry class for any feature is to grep that file.
   [build-number-ranges](https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html)
   (`2025.2`=`252`, `2026.1`=`261`, …). `DEVELOPER.md` → "Update to new Platform API" is the
   checklist for a platform bump.
+- **Platform-bump gotcha:** since 2025.2+ the platform is modular — APIs, inspections, and extension
+  points that used to live in *core* have been split into separate modules / bundled plugins with
+  their own classloaders. If a class or EP that worked before goes missing after a bump (often only
+  visible in tests), declare it explicitly with `bundledModule("…")` / `bundledPlugin("…")` in
+  `build.gradle.kts` and consult the
+  [API changes list](https://plugins.jetbrains.com/docs/intellij/api-changes-list-2025.html). (E.g.
+  `SpellCheckingInspection` moved from core to the Grazie plugin, `tanvd.grazi`.)
