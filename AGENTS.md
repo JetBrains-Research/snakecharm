@@ -35,6 +35,10 @@ PyCharm Professional.
 Many test tasks need the wrappers repo path: append
 `-PsnakemakeWrappersRepoPath=testData/wrappers_storage`.
 
+**CLI build memory:** if `:compileKotlin` dies with `OutOfMemoryError: GC overhead limit exceeded`,
+give the Kotlin daemon more heap — append `-Pkotlin.daemon.jvmargs=-Xmx4g` (transforming some large
+generated methods can exhaust the default heap).
+
 ### Running tests
 
 Tests are **Cucumber/Gherkin** feature files under `src/test/resources/features/**`, executed
@@ -86,7 +90,10 @@ Feature areas (each maps to a source package and a `features/` test dir):
 - `lang/highlighter/`, `lang/validation/` — syntax highlighting + annotators (registered against
   Python; some run through `SmkStandardAnnotatorManager` / `SmkDumbAwareAnnotatorManager`).
 - `codeInsight/` — completion contributors and resolve for Snakemake magic (`config`, `rules`,
-  `rules.<name>.<section>`, wildcards, api methods like `expand`/`temp`, wrapper names).
+  `rules.<name>.<section>`, wildcards, api methods like `expand`/`temp`, wrapper names). The implicit
+  "runtime magic" symbols (`expand`, `temp`, `config`, `rules`, …) are built by
+  `SmkImplicitPySymbolsProvider`, which resolves them by qualified name against the project SDK's
+  snakemake package.
 - `inspections/` — ~56 local inspections for common Snakemake mistakes.
 - `framework/` — Snakemake framework detection: locating the `snakemake` package via the project
   SDK / package manager, which gates most features and drives version-specific behaviour.
