@@ -26,14 +26,29 @@
       -Didea.config.path=$PROJECT_DIR$/.sandbox_pycharm/config-test -Didea.system.path=$PROJECT_DIR$/.sandbox_pycharm/system-test -Didea.plugins.path=$PROJECT_DIR$/.sandbox_pycharm/plugins-test -Didea.force.use.core.classloader=true
       ```
 
-2. Checkout `snakemake` project sources and configure as test data:
+2. Checkout `snakemake` project sources and configure as test data.
+
+   The unversioned `Given a snakemake project` cucumber scenarios resolve the snakemake API against
+   `testData/MockPackages3/snakemake` (gitignored, absent on a fresh checkout). Provide it by
+   symlinking the snakemake package source. Two details matter:
+   * **Version:** use snakemake **9.9.0** — it must match `defaultVersion` in `snakemake_api.yaml`,
+     which the FQN tests assert against (e.g. `snakemake.ioutils.subpath.subpath`).
+   * **Layout:** modern snakemake keeps its package under `src/`, so the symlink target is
+     `src/snakemake` (older releases had it at the repo root).
+
     ```shell
     cd ~
-    git clone https://github.com/snakemake/snakemake.git
+    git clone --branch v9.9.0 https://github.com/snakemake/snakemake.git
 
-    cd ./testData/MockPackages3
-    ln -s ~/snakemake/snakemake snakemake
+    cd -   # back to the project
+    ln -s ~/snakemake/src/snakemake testData/MockPackages3/snakemake
     ```
+
+   **Gotcha — "zero effect":** the test IDE sandbox persists a VFS/index under
+   `.sandbox_pycharm/<ide>/system-test/` that **`cleanTest` does not clear**. If you add this fixture
+   *after* having already run the tests once, the stale VFS won't see the new files and the failures
+   persist unchanged. Fix by clearing it once: `rm -rf .sandbox_pycharm/*/system-test`. (On a fresh
+   checkout / clean CI the sandbox is built with the fixture already present, so this isn't needed.)
 
 Tests are written in [Gherkin](https://cucumber.io/docs/gherkin). You could run tests:
 * Using gradle `test` task
