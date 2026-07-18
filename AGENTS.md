@@ -50,12 +50,16 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
   cucumber steps select one via `Given a snakemake:<version> project`. Only the API files that
   differ between versions are copied into each mock (see `DEVELOPER.md` → Testdata).
 - **Fresh-checkout gotcha (saves hours):** `testData/MockPackages3/snakemake` is **gitignored** and
-  absent on a clean checkout — you must clone the snakemake repo and symlink it there (see
-  `DEVELOPER.md` → Configure Tests, step 2). Without it, a large batch (~100+) of resolve/completion
-  scenarios for the *unversioned* `snakemake` project fail — `resolveQualifiedName("snakemake")`
-  returns `[]` — while the checked-in per-version mocks (`MockPackages3_smk_<ver>`) still resolve. If
-  you see a wall of `snakemake`-resolution failures on a fresh checkout, suspect this missing
-  fixture, **not** your change.
+  absent on a clean checkout — the *unversioned* `Given a snakemake project` scenarios (~135) then
+  fail because `resolveQualifiedName("snakemake")` returns `[]`, while the checked-in per-version
+  mocks (`MockPackages3_smk_<ver>`) still resolve. Provision it (see `DEVELOPER.md` → Configure Tests,
+  step 2): symlink snakemake **9.9.0**'s **`src/snakemake`** (modern `src/` layout) to
+  `testData/MockPackages3/snakemake`. **Two traps that make a correct fixture look like it does
+  nothing:** the version must match `snakemake_api.yaml`'s `defaultVersion` (9.9.0), and the test IDE
+  sandbox persists a VFS/index under `.sandbox_pycharm/<ide>/system-test/` that **`cleanTest` doesn't
+  clear** — if you add the fixture after a prior run, `rm -rf .sandbox_pycharm/*/system-test` once. If
+  you see a wall of `snakemake`-resolution failures on a fresh checkout, suspect this fixture, **not**
+  your change. (Full write-up: PR #574.)
 - **Analyzing results:** the full suite is large (~3200 scenarios; a full `test` run takes a while —
   prefer the single-feature `@here` recipe while iterating). To triage or diff failures, parse
   `build/test-results/test/TEST-*.xml`: each `<testcase>` with a `<failure>`/`<error>` child is a
