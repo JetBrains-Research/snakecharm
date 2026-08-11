@@ -102,3 +102,17 @@ maintainers want it — no workflow is included here.
 - Fixture (9.9.0 `src/snakemake`) + cleared sandbox: `failing: 0` (full suite, all 135 recovered).
 - Key code: `StepDefs.kt:56-63`, `SmkImplicitPySymbolsProvider.kt`, `CompletionResolveSteps.kt`,
   `snakemake_api.yaml` (`defaultVersion: 9.9.0`), `.gitignore:137`.
+
+## Links
+
+- [Issue #575](https://github.com/JetBrains-Research/snakecharm/issues/575) — the problem report.
+- [PR #574](https://github.com/JetBrains-Research/snakecharm/pull/574) — the `DEVELOPER.md` fix and
+  this record.
+- [PR #570](https://github.com/JetBrains-Research/snakecharm/pull/570) — the 2026.1 port, where these
+  135 failures appear too and are easy to mistake for port regressions. They are not.
+- [Issue #571](https://github.com/JetBrains-Research/snakecharm/issues/571) /
+  [PR #572](https://github.com/JetBrains-Research/snakecharm/pull/572) — the hardcoded
+  `snakemakeWrappersRepoPath` that the `-P…` flag in the reproduce recipe works around. Unrelated to
+  these failures, but you hit it first on a fresh checkout.
+- [PR #573](https://github.com/JetBrains-Research/snakecharm/pull/573) — `AGENTS.md`, which summarises
+  this gotcha for anyone (or anything) reading the repo cold.
