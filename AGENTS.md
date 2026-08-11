@@ -18,8 +18,7 @@ The Gradle build uses a **JDK 21 toolchain** (`javaVersion` in `gradle.propertie
 version pinned there (`gradleVersion`). **Launch Gradle itself with JDK 21**, not just as an
 available toolchain — the pinned Gradle can crash under a much newer JVM with a cryptic error
 (Gradle 8.x on JDK 24 fails with `Type T not present`). Set `JAVA_HOME` to a JDK 21 before building
-from the CLI (e.g. `export JAVA_HOME=$(/usr/libexec/java_home -v 21)`, or a jenv/asdf/SDKMAN shim);
-`.java-version` also pins 21.
+from the CLI (e.g. `export JAVA_HOME=$(/usr/libexec/java_home -v 21)`, or a jenv/asdf/SDKMAN shim).
 
 ```shell
 ./gradlew buildPlugin      # -> build/distributions/snakecharm-*.zip
@@ -30,10 +29,17 @@ from the CLI (e.g. `export JAVA_HOME=$(/usr/libexec/java_home -v 21)`, or a jenv
 
 The target IDE (`platformType`/`platformVersion` in `gradle.properties`) is downloaded
 automatically on first build (hundreds of MB). `platformType = PC` is PyCharm Community, `PY` is
-PyCharm Professional.
+PyCharm Professional. Note that **2025.2 is the last standalone PyCharm Community release** — from
+2026.1 (build 261) the unified PyCharm ships only under the `PY` artifact.
 
-Many test tasks need the wrappers repo path: append
-`-PsnakemakeWrappersRepoPath=testData/wrappers_storage`.
+**Wrappers bundle:** `:buildWrappersBundle` reads `snakemakeWrappersRepoPath` (a local
+[snakemake-wrappers](https://github.com/snakemake/snakemake-wrappers) checkout) and runs as part of
+`prepareSandbox`, so it sits in front of `buildPlugin`, `runIde` **and** the test tasks. The property
+is hardcoded to a JetBrains developer's absolute path in `gradle.properties`, so on any other machine
+those tasks fail until you override it — pointing it at the test fixture works:
+`-PsnakemakeWrappersRepoPath=testData/wrappers_storage` (issue #571 / PR #572 makes the task skip
+itself instead). The test-only bundle (`:buildTestWrappersBundle`, what `test` actually consumes)
+always reads `testData/wrappers_storage` and needs no property.
 
 **CLI build memory:** if `:compileKotlin` dies with `OutOfMemoryError: GC overhead limit exceeded`,
 give the Kotlin daemon more heap — append `-Pkotlin.daemon.jvmargs=-Xmx4g` (transforming some large
