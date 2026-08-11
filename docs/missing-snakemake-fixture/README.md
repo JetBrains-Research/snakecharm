@@ -1,8 +1,10 @@
 # 135 test failures on a fresh checkout: cause and fix
 
 *A record of one diagnosis, kept so the next person who hits these failures doesn't repeat it.
-Self-contained: this directory is safe to delete once it stops being useful. The fix it describes
-lives in `DEVELOPER.md`; the triage helper it uses lives in `scripts/extract_failures.py`.*
+Reported as [issue #575](https://github.com/JetBrains-Research/snakecharm/issues/575), fixed by
+[PR #574](https://github.com/JetBrains-Research/snakecharm/pull/574). Self-contained: this directory
+is safe to delete once it stops being useful. The fix it describes lives in `DEVELOPER.md`; the
+triage helper it uses lives in `scripts/extract_failures.py`.*
 
 ## Problem
 
@@ -10,7 +12,8 @@ On a clean checkout of `master`, `./gradlew test` reports **135 failing Cucumber
 3419). They are not code bugs — they are a **missing test fixture**, and they fail identically on
 `master` and on the 2026.1 port branch
 ([PR #570](https://github.com/JetBrains-Research/snakecharm/pull/570)). This documents the cause and
-a verified fix.
+a verified fix; the problem report is
+[issue #575](https://github.com/JetBrains-Research/snakecharm/issues/575).
 
 Reproduce:
 
