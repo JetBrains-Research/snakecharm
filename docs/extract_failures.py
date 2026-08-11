@@ -4,9 +4,13 @@ every testcase with a failure/error child. Usage: extract_failures.py <results_d
 import glob, os, sys, xml.etree.ElementTree as ET
 
 results_dir = sys.argv[1] if len(sys.argv) > 1 else "build/test-results/test"
+files = glob.glob(os.path.join(results_dir, "TEST-*.xml"))
+if not files:
+    # Without this, an aborted build or a typo'd path reports "failing: 0" — a green run.
+    sys.exit(f"error: no TEST-*.xml under {results_dir!r}; did the test task run?")
 rows = []
 total = 0
-for f in glob.glob(os.path.join(results_dir, "TEST-*.xml")):
+for f in files:
     root = ET.parse(f).getroot()
     for tc in root.iter("testcase"):
         total += 1
