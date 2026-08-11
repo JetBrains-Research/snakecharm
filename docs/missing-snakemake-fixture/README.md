@@ -1,5 +1,9 @@
 # 135 test failures on a fresh checkout: cause and fix
 
+*A record of one diagnosis, kept so the next person who hits these failures doesn't repeat it.
+Self-contained: this directory is safe to delete once it stops being useful. The fix it describes
+lives in `DEVELOPER.md`; the triage helper it uses lives in `scripts/extract_failures.py`.*
+
 ## Problem
 
 On a clean checkout of `master`, `./gradlew test` reports **135 failing Cucumber scenarios** (of
@@ -21,7 +25,7 @@ export JAVA_HOME=/path/to/jdk-21          # e.g. `jenv prefix 21`, or an asdf/SD
 # :buildWrappersBundle fails on any other machine). PR #572 makes that task skip itself;
 # once it lands the flag is redundant here. Unrelated to the 135 failures below.
 ./gradlew cleanTest test -PsnakemakeWrappersRepoPath=testData/wrappers_storage
-python3 docs/extract_failures.py build/test-results/test   # -> 135 failing
+python3 scripts/extract_failures.py build/test-results/test   # -> 135 failing
 ```
 
 All 135 use the unversioned `Given a snakemake project` step and fail because the `snakemake` API
