@@ -3,11 +3,12 @@ package com.jetbrains.snakecharm.stringLanguage.lang.highlighter
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.project.DumbService
 import com.jetbrains.python.psi.types.TypeEvalContext
+import com.jetbrains.python.validation.PyAnnotationHolder
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLSyntaxHighlighter.Companion.HIGHLIGHTING_WILDCARDS_KEY
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 
-object SmkSLWildcardsAnnotator : AbstractSmkSLAnnotator() {
+class SmkSLWildcardsAnnotator(holder: PyAnnotationHolder) : AbstractSmkSLAnnotator(holder) {
 
     override fun visitSmkSLReferenceExpression(expr: SmkSLReferenceExpression) {
         val exprIdentifier = expr.nameIdentifier
