@@ -22,7 +22,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.exists
-import kotlin.system.exitProcess
 
 class SmkWrapperStorage(val project: Project) : Disposable {
     var version = ""
@@ -185,11 +184,12 @@ class SmkWrapperStorage(val project: Project) : Disposable {
                 .resolve("build/bundledWrappers/smk-wrapper-storage.test.cbor")
 
             if (!wrappersInfoBundlerForTests.exists()) {
-                System.err.println(
-                    "Generate test data 'build/bundledWrappers/smk-wrapper-storage.test.cbor'" +
-                            " using `buildTestWrappersBundle` gradle task"
+                // Fail this test, not the whole JVM: exitProcess() here killed the Gradle test worker,
+                // so the run ended with a worker-crash message instead of naming the missing test data.
+                error(
+                    "Missing test wrappers bundle: '$wrappersInfoBundlerForTests'." +
+                            " Generate it using the `buildTestWrappersBundle` gradle task."
                 )
-                exitProcess(1)
             }
 
             val (repoVersion, wrappers) = deserializeWrappers(wrappersInfoBundlerForTests)
