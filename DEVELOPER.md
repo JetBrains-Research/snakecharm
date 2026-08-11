@@ -31,16 +31,22 @@
    The unversioned `Given a snakemake project` cucumber scenarios resolve the snakemake API against
    `testData/MockPackages3/snakemake` (gitignored, absent on a fresh checkout). Provide it by
    symlinking the snakemake package source. Two details matter:
-   * **Version:** use snakemake **9.9.0** — it must match `defaultVersion` in `snakemake_api.yaml`,
-     which the FQN tests assert against (e.g. `snakemake.ioutils.subpath.subpath`).
+   * **Version:** it must match `defaultVersion` in `snakemake_api.yaml`, which the FQN tests assert
+     against (e.g. `snakemake.ioutils.subpath.subpath`). Read the version from that file rather than
+     hardcoding one, so the fixture follows `defaultVersion` when it is bumped.
    * **Layout:** modern snakemake keeps its package under `src/`, so the symlink target is
      `src/snakemake` (older releases had it at the repo root).
 
     ```shell
-    git clone --branch v9.9.0 https://github.com/snakemake/snakemake.git ~/snakemake
-    # run from the project root; -fn replaces the broken symlink left by the old recipe
+    # run from the project root
+    VER=$(awk '/^defaultVersion:/{gsub(/[":]/,"",$2); print $2}' snakemake_api.yaml)
+    git clone --branch "v$VER" https://github.com/snakemake/snakemake.git ~/snakemake
+    # -fn replaces the broken symlink left by the old recipe
     ln -sfn ~/snakemake/src/snakemake testData/MockPackages3/snakemake
     ```
+
+   If `defaultVersion` changes later, re-point the fixture the same way — the FQN tests will fail
+   against a stale checkout.
 
    **Gotcha — "zero effect":** the test IDE sandbox persists a VFS/index under `.sandbox_pycharm`
    that **`cleanTest` does not clear**. If you add this fixture *after* having already run the tests

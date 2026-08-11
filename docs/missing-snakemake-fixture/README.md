@@ -54,13 +54,18 @@ Verified end-to-end: the full suite goes from **135 failures to 0** (`3419/3419`
 skipping the second is why provisioning the fixture can appear to have **no effect**:
 
 1. **Provision the fixture at the right version and layout.** Modern snakemake keeps its package
-   under `src/`, and the tests expect version **9.9.0** (it must match `snakemake_api.yaml`'s
-   `defaultVersion`; the FQN tests assert exact 9.9.0 names like `snakemake.ioutils.subpath.subpath`):
+   under `src/`, and the version must match `snakemake_api.yaml`'s `defaultVersion`, which the FQN
+   tests assert exact names against (e.g. `snakemake.ioutils.subpath.subpath`). **At the time of this
+   diagnosis `defaultVersion` was `9.9.0`**, so that is the version these numbers were produced with:
 
    ```shell
    git clone --branch v9.9.0 https://github.com/snakemake/snakemake.git ~/snakemake
    ln -sfn ~/snakemake/src/snakemake testData/MockPackages3/snakemake
    ```
+
+   `DEVELOPER.md` deliberately reads the version out of `snakemake_api.yaml` instead of hardcoding it,
+   so the setup instructions keep working after a `defaultVersion` bump. This record hardcodes 9.9.0
+   on purpose: it documents what was actually run, and should not silently change meaning later.
 
    Use `-fn`: anyone who followed the old recipe already has a **broken** symlink at that path, and
    a plain `ln -s` aborts with "File exists" and leaves it in place.
@@ -85,8 +90,9 @@ skipping the second is why provisioning the fixture can appear to have **no effe
 ## Recommended repository changes
 
 - **`DEVELOPER.md` → Configure Tests, step 2** — fixed in this branch: correct the symlink to
-  `src/snakemake`, pin snakemake 9.9.0, and document the sandbox-cache gotcha. This is the root of
-  the confusion behind PR #570 and PR #573.
+  `src/snakemake`, take the snakemake version from `snakemake_api.yaml`'s `defaultVersion` rather
+  than hardcoding it, and document the sandbox-cache gotcha. This is the root of the confusion behind
+  PR #570 and PR #573.
 - **Optional (green-by-default):** to make a bare `git clone && ./gradlew test` (and clean CI) pass
   with no manual setup, either vendor a trimmed `MockPackages3/snakemake` fixture (it is gitignored
   today because the full source is large) or automate the clone/symlink in the build. This is a
