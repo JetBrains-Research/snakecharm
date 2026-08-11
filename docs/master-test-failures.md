@@ -17,6 +17,9 @@ Reproduce:
 export JAVA_HOME=/path/to/jdk-21          # e.g. `jenv prefix 21`, or an asdf/SDKMAN path
 "$JAVA_HOME/bin/java" -version            # must print 21.x
 
+# -P... works around #571 (gradle.properties hardcodes an absolute developer path, so
+# :buildWrappersBundle fails on any other machine). PR #572 makes that task skip itself;
+# once it lands the flag is redundant here. Unrelated to the 135 failures below.
 ./gradlew cleanTest test -PsnakemakeWrappersRepoPath=testData/wrappers_storage
 python3 docs/extract_failures.py build/test-results/test   # -> 135 failing
 ```
