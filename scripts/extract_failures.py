@@ -1,13 +1,26 @@
 #!/usr/bin/env python3
-"""Walk build/test-results/test/TEST-*.xml, print sorted 'classname :: name' for
-every testcase with a failure/error child. Usage: extract_failures.py <results_dir>"""
-import glob, os, sys, xml.etree.ElementTree as ET
+"""List the failing scenarios from a Gradle test run.
 
-results_dir = sys.argv[1] if len(sys.argv) > 1 else "build/test-results/test"
-files = glob.glob(os.path.join(results_dir, "TEST-*.xml"))
+Walks TEST-*.xml in a JUnit results directory and prints 'classname :: name' for every
+testcase with a <failure> or <error> child, sorted. The count goes to stderr, so the list
+can be redirected to a file or diffed between two runs.
+"""
+import argparse, glob, os, sys, xml.etree.ElementTree as ET
+
+parser = argparse.ArgumentParser(
+    description=__doc__,
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+)
+parser.add_argument(
+    "results_dir", nargs="?", default="build/test-results/test",
+    help="directory holding the JUnit TEST-*.xml files (default: %(default)s)",
+)
+args = parser.parse_args()
+
+files = glob.glob(os.path.join(args.results_dir, "TEST-*.xml"))
 if not files:
     # Without this, an aborted build or a typo'd path reports "failing: 0" — a green run.
-    sys.exit(f"error: no TEST-*.xml under {results_dir!r}; did the test task run?")
+    sys.exit(f"error: no TEST-*.xml under {args.results_dir!r}; did the test task run?")
 rows = []
 total = 0
 for f in files:
@@ -19,4 +32,5 @@ for f in files:
             rows.append(f"{cls} :: {tc.get('name','')}")
 rows.sort()
 sys.stderr.write(f"total testcases: {total}, failing: {len(rows)}\n")
-print("\n".join(rows))
+if rows:  # else print() would emit a blank line, so a green run wouldn't diff as an empty file
+    print("\n".join(rows))
