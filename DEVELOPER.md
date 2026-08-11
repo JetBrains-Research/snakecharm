@@ -37,18 +37,25 @@
      `src/snakemake` (older releases had it at the repo root).
 
     ```shell
-    cd ~
-    git clone --branch v9.9.0 https://github.com/snakemake/snakemake.git
-
-    cd -   # back to the project
-    ln -s ~/snakemake/src/snakemake testData/MockPackages3/snakemake
+    git clone --branch v9.9.0 https://github.com/snakemake/snakemake.git ~/snakemake
+    # run from the project root; -fn replaces the broken symlink left by the old recipe
+    ln -sfn ~/snakemake/src/snakemake testData/MockPackages3/snakemake
     ```
 
-   **Gotcha — "zero effect":** the test IDE sandbox persists a VFS/index under
-   `.sandbox_pycharm/<ide>/system-test/` that **`cleanTest` does not clear**. If you add this fixture
-   *after* having already run the tests once, the stale VFS won't see the new files and the failures
-   persist unchanged. Fix by clearing it once: `rm -rf .sandbox_pycharm/*/system-test`. (On a fresh
-   checkout / clean CI the sandbox is built with the fixture already present, so this isn't needed.)
+   **Gotcha — "zero effect":** the test IDE sandbox persists a VFS/index under `.sandbox_pycharm`
+   that **`cleanTest` does not clear**. If you add this fixture *after* having already run the tests
+   once, the stale VFS won't see the new files and the failures persist unchanged. Always clear it
+   after provisioning the fixture:
+
+    ```shell
+    find .sandbox_pycharm -maxdepth 3 -name system-test -exec rm -rf {} +
+    ```
+
+   Use `find`, not `rm -rf .sandbox_pycharm/*/system-test`: the sandbox sits at a different depth
+   depending on how tests were launched (`.sandbox_pycharm/system-test` for the run configuration in
+   step 1, `.sandbox_pycharm/<ide>/system-test` and `.sandbox_pycharm/<project>/<ide>/system-test`
+   for the gradle task, varying by platform-plugin version), and a glob that misses simply deletes
+   nothing while looking like it worked.
 
 Tests are written in [Gherkin](https://cucumber.io/docs/gherkin). You could run tests:
 * Using gradle `test` task

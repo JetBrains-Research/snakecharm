@@ -11,9 +11,13 @@ a verified fix.
 Reproduce:
 
 ```shell
-# JDK 21 is required (the pinned Gradle 8.13 crashes under newer JDKs).
-JAVA_HOME=$(/usr/libexec/java_home -v 21) \
-  ./gradlew cleanTest test -PsnakemakeWrappersRepoPath=testData/wrappers_storage
+# JDK 21 is required: the pinned Gradle 8.13 crashes under newer JDKs ("Type T not present").
+# Point JAVA_HOME at a real JDK 21 and verify — do NOT trust `/usr/libexec/java_home -v 21`,
+# which treats 21 as a *minimum* and silently returns a newer JDK when 21 isn't installed.
+export JAVA_HOME=/path/to/jdk-21          # e.g. `jenv prefix 21`, or an asdf/SDKMAN path
+"$JAVA_HOME/bin/java" -version            # must print 21.x
+
+./gradlew cleanTest test -PsnakemakeWrappersRepoPath=testData/wrappers_storage
 python3 docs/extract_failures.py build/test-results/test   # -> 135 failing
 ```
 
@@ -45,23 +49,28 @@ skipping the second is why provisioning the fixture can appear to have **no effe
 
    ```shell
    git clone --branch v9.9.0 https://github.com/snakemake/snakemake.git ~/snakemake
-   ln -s ~/snakemake/src/snakemake testData/MockPackages3/snakemake
+   ln -sfn ~/snakemake/src/snakemake testData/MockPackages3/snakemake
    ```
+
+   Use `-fn`: anyone who followed the old recipe already has a **broken** symlink at that path, and
+   a plain `ln -s` aborts with "File exists" and leaves it in place.
 
    `DEVELOPER.md`'s current recipe (`ln -s ~/snakemake/snakemake …`) predates the `src/` move and
    creates a broken symlink.
 
 2. **Let the test sandbox see it.** The IDE test sandbox persists a VFS/index under
-   `.sandbox_pycharm/<ide>/system-test/` that **`cleanTest` does not clear**. If you add the fixture
-   *after* running the tests once, that stale index keeps reporting the directory's old contents and
-   the failures persist unchanged. Clear it once:
+   `.sandbox_pycharm` that **`cleanTest` does not clear**. If you add the fixture *after* running the
+   tests once — which includes anyone who ran the reproduce command above — that stale index keeps
+   reporting the directory's old contents and the failures persist unchanged. Always clear it:
 
    ```shell
-   rm -rf .sandbox_pycharm/*/system-test
+   find .sandbox_pycharm -maxdepth 3 -name system-test -exec rm -rf {} +
    ```
 
-   On a fresh checkout or clean CI this is unnecessary — the sandbox is built with the fixture
-   already present.
+   `find` rather than `rm -rf .sandbox_pycharm/*/system-test`, because the sandbox depth varies with
+   how tests were launched and with the platform-plugin version (`.sandbox_pycharm/system-test`,
+   `.sandbox_pycharm/<ide>/system-test`, `.sandbox_pycharm/<project>/<ide>/system-test` all occur) —
+   a glob that misses deletes nothing while appearing to succeed.
 
 ## Recommended repository changes
 
