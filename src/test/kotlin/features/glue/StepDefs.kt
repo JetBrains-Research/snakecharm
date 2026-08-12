@@ -3,9 +3,12 @@ package features.glue
 import com.intellij.codeInspection.LocalInspectionEP
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.extensions.ExtensionPoint
+import com.intellij.openapi.extensions.impl.ExtensionsAreaImpl
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Disposer
+import com.intellij.python.community.helpersLocator.PythonHelpersLocator
 import com.intellij.testFramework.TestApplicationManager
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
@@ -21,6 +24,7 @@ import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SnakemakeApiYamlAnnotationsService
 import io.cucumber.java.en.Given
+import java.nio.file.Path
 import javax.swing.SwingUtilities
 import kotlin.test.fail
 
@@ -42,7 +46,7 @@ class StepDefs {
 
         TestApplicationManager.getInstance()
 
-        removeCrashingProHelpersLocator()
+        configurePythonHelpersLocator()
 
         // From UsefulTestCase
         Disposer.setDebugMode(true)
@@ -69,11 +73,22 @@ class StepDefs {
 
         // Write code here that turns the phrase above into concrete actions
         val testDataRoot = SnakemakeTestUtil.getTestDataPath().toString()
-        val projectDescriptor = PyLightProjectDescriptor(level, testDataRoot, *additionalRoots)
 
-        SnakemakeWorld.myPythonOnlySdk = PythonMockSdk.create(
-            testDataRoot, level, sdkNameSuffix = "_wo_snakemake"
-        )
+        // Reuse the descriptor (and therefore its SDK) across scenarios with the same roots. Each
+        // descriptor builds a mock SDK named "Mock Python SDK <level>", and since 2026.2 SDKs are
+        // workspace-model entities: adding a second one with the same symbolic id logs
+        // "addEntity: symbolic id already exists", which TestLoggerFactory turns into a test failure.
+        // A per-scenario descriptor therefore failed ~1070 otherwise-unrelated scenarios. Caching is
+        // also the standard light-test pattern (a static LightProjectDescriptor), and lets the light
+        // fixture reuse the project instead of rebuilding it per scenario.
+        val descriptorKey = listOf(level.toString(), testDataRoot) + additionalRoots.map { it.toString() }
+        val projectDescriptor = projectDescriptors.getOrPut(descriptorKey) {
+            PyLightProjectDescriptor(level, testDataRoot, *additionalRoots)
+        }
+
+        SnakemakeWorld.myPythonOnlySdk = pythonOnlySdks.getOrPut(listOf(level.toString(), testDataRoot)) {
+            PythonMockSdk.create(testDataRoot, level, sdkNameSuffix = "_wo_snakemake")
+        }
 
         val factory = IdeaTestFixtureFactory.getFixtureFactory()
         allowPythonRootsAccess(SnakemakeWorld.myTestRootDisposable!!)
@@ -236,8 +251,8 @@ class StepDefs {
     }
 
     /**
-     * Unregister the Pro `PythonProHelpersLocator` from the `com.jetbrains.python.pythonHelpersLocator`
-     * extension point (test JVM only).
+     * Make `com.jetbrains.python.pythonHelpersLocator` usable in the test JVM: prune the crashing Pro
+     * locator when the EP exists (2026.1), and register the EP outright when it does not (2026.2).
      *
      * `PythonMockSdk.create` below triggers `PyTypeShed`'s lazy init, which calls
      * `PythonHelpersLocator.getHelpersRoots()` — that iterates every registered locator with no
@@ -253,16 +268,50 @@ class StepDefs {
      * `-Didea.python.helpers.path` jvmArg) and the rest of the Pro Python plugin intact, so Python
      * resolution still works. Idempotent — safe to call before every scenario. Runtime is unaffected.
      */
-    private fun removeCrashingProHelpersLocator() {
-        val ep = ApplicationManager.getApplication().extensionArea
-            .getExtensionPointIfRegistered<Any>("com.jetbrains.python.pythonHelpersLocator") ?: return
-        ep.unregisterExtensions(
-            { className, _ -> className != "com.jetbrains.python.PythonProHelpersLocator" },
-            false,
+    private fun configurePythonHelpersLocator() {
+        val area = ApplicationManager.getApplication().extensionArea
+
+        val ep = area.getExtensionPointIfRegistered<Any>(PYTHON_HELPERS_LOCATOR_EP)
+        if (ep != null) {
+            ep.unregisterExtensions(
+                { className, _ -> className != "com.jetbrains.python.PythonProHelpersLocator" },
+                false,
+            )
+            return
+        }
+
+        // Since 2026.2 the EP itself is declared by the `intellij.python.community.helpersLocator`
+        // content module, which the flat test classpath never loads (same #2070 cause as above), so
+        // there is nothing to prune -- `PythonHelpersLocator.getHelpersRoots()` instead dies with
+        // "Missing extension point: com.jetbrains.python.pythonHelpersLocator". Register the EP and a
+        // locator pointing at the helpers directory the `-Didea.python.helpers.path` jvmArg already
+        // supplies. We register our own rather than PythonHelpersLocatorDefault because the default
+        // resolves through the plugin dist dir, which is exactly what #2070 breaks here.
+        val helpersPath = requireNotNull(System.getProperty(PYTHON_HELPERS_PATH_PROPERTY)) {
+            "'$PYTHON_HELPERS_PATH_PROPERTY' is not set; see the test task's jvmArgumentProviders in build.gradle.kts"
+        }
+        (area as ExtensionsAreaImpl).registerExtensionPoint(
+            PYTHON_HELPERS_LOCATOR_EP,
+            PythonHelpersLocator::class.java.name,
+            ExtensionPoint.Kind.INTERFACE,
+            true,
+        )
+        area.getExtensionPoint<PythonHelpersLocator>(PYTHON_HELPERS_LOCATOR_EP).registerExtension(
+            object : PythonHelpersLocator {
+                override fun getRoot(): Path = Path.of(helpersPath)
+            },
+            ApplicationManager.getApplication(),
         )
     }
 
     companion object {
+        private const val PYTHON_HELPERS_LOCATOR_EP = "com.jetbrains.python.pythonHelpersLocator"
+        private const val PYTHON_HELPERS_PATH_PROPERTY = "idea.python.helpers.path"
+
+        /** Cached per JVM so the same mock SDK entity isn't added once per scenario -- see the use site. */
+        private val projectDescriptors = HashMap<List<String>, PyLightProjectDescriptor>()
+        private val pythonOnlySdks = HashMap<List<String>, com.intellij.openapi.projectRoots.Sdk>()
+
         fun waitEDTEventsDispatching() {
             ApplicationManager.getApplication().invokeAndWait() {
                 // Do nothing, wait for events in EDT
@@ -270,3 +319,4 @@ class StepDefs {
         }
     }
 }
+

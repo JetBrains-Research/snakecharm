@@ -15,7 +15,7 @@ kotlin = "2.3.21"
 # the platform's Kotlin-compiled classes (see the resolutionStrategy in build.gradle.kts). Keep in sync
 # with the `platformVersion` in gradle.properties.
 kotlinPlatform = "2.4.10"
-intelliJPlatform = "2.16.0" # https://github.com/JetBrains/intellij-platform-gradle-plugin
+intelliJPlatform = "2.18.1" # https://github.com/JetBrains/intellij-platform-gradle-plugin
 changelog = "2.4.0"
 kover = "0.9.1"
 qodana = "2025.1.1"

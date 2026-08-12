@@ -142,6 +142,13 @@ dependencies {
         // enable that inspection in the sandbox.
         bundledPlugin("tanvd.grazi")
 
+        // 2026.2 moved PythonHelpersLocator into its own content module and made it resolve helpers
+        // through the `com.jetbrains.python.pythonHelpersLocator` extension point, whose only
+        // implementation (PythonHelpersLocatorDefault) is registered by that module. Without it the
+        // EP is absent in the test application and PyTypeShed init dies with "Missing extension
+        // point: com.jetbrains.python.pythonHelpersLocator", taking the whole cucumber suite with it.
+        bundledModule("intellij.python.community.helpersLocator")
+
         // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file for plugin from JetBrains Marketplace.
         plugins(gradleProperty("platformPlugins").map { it.split(',') })
 
