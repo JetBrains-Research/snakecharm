@@ -123,6 +123,18 @@ the entry class for any feature is to grep that file.
   [build-number-ranges](https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html)
   (`2025.2`=`252`, `2026.1`=`261`, …). `DEVELOPER.md` → "Update to new Platform API" is the
   checklist for a platform bump.
+- **A platform bump moves more than `platformVersion`.** Three toolchain baselines can move with it,
+  and each fails *before* your source is even considered, with an error that doesn't name the cause:
+  the **Kotlin compiler** must be new enough to read the platform's metadata (a compiler reads
+  metadata at most one minor above itself — 2026.2 ships metadata 2.4, so Kotlin 2.2 fails with
+  "compiled with an incompatible version of Kotlin"); the **Java toolchain** must match the
+  platform's bytecode target (2026.2 emits Java 25, so javac 21 reports "bad class file … wrong
+  version 69.0"); and the **`intelliJPlatform` gradle-plugin version** decides whether the Python
+  plugin's v2 content modules load *in tests* at all (2.16.0 → 2.18.1 took one port from 3361 failing
+  scenarios to 1153). Check all three before debugging your own code.
+- **Logged errors are test failures.** `TestLoggerFactory` promotes anything logged at error level to
+  a failed scenario, so one benign platform log can fail hundreds of unrelated tests. When triaging a
+  wall of failures, group by exception message first — it is usually one cause, not many.
 - **Platform-bump gotcha:** since 2025.2+ the platform is modular — APIs, inspections, and extension
   points that used to live in *core* have been split into separate modules / bundled plugins with
   their own classloaders. If a class or EP that worked before goes missing after a bump (often only
