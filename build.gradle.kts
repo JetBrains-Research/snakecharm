@@ -6,6 +6,7 @@ import org.jetbrains.intellij.platform.gradle.Constants.Configurations
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
+import kotlin.io.path.isDirectory
 
 fun gradlePropertyOptional(key: String) = project.findProperty(key)?.toString()
 fun gradleProperty(key: String) = providers.gradleProperty(key)
@@ -368,9 +369,17 @@ tasks {
         // PyTypeShed's lazy init and therefore every test that infers Python types. The locator
         // consults the `idea.python.helpers.path` system property first, so point it at the bundled
         // helpers directory explicitly.
+        // Only PyCharm distributions bundle the helpers there; on other platform types (IDEA + the
+        // external Python plugin) that directory doesn't exist, and setting the property to a bogus
+        // path is worse than not setting it — the locator takes it verbatim, skipping the layout
+        // check that would otherwise report the problem.
         jvmArgumentProviders += CommandLineArgumentProvider {
             val pythonHelpersPath = intellijPlatform.platformPath.resolve("plugins/python-ce/helpers")
-            listOf("-Didea.python.helpers.path=$pythonHelpersPath")
+            if (pythonHelpersPath.isDirectory()) {
+                listOf("-Didea.python.helpers.path=$pythonHelpersPath")
+            } else {
+                emptyList()
+            }
         }
 
         reports {
