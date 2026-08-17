@@ -3,12 +3,9 @@ package features.glue
 import com.intellij.codeInspection.LocalInspectionEP
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.extensions.ExtensionPoint
-import com.intellij.openapi.extensions.impl.ExtensionsAreaImpl
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Disposer
-import com.intellij.python.community.helpersLocator.PythonHelpersLocator
 import com.intellij.testFramework.TestApplicationManager
 import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
@@ -24,7 +21,6 @@ import com.jetbrains.snakecharm.SnakemakeTestUtil
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SnakemakeApiYamlAnnotationsService
 import io.cucumber.java.en.Given
-import java.nio.file.Path
 import javax.swing.SwingUtilities
 import kotlin.test.fail
 
@@ -45,8 +41,6 @@ class StepDefs {
         }
 
         TestApplicationManager.getInstance()
-
-        configurePythonHelpersLocator()
 
         // From UsefulTestCase
         Disposer.setDebugMode(true)
@@ -250,64 +244,7 @@ class StepDefs {
         TODO()
     }
 
-    /**
-     * Make `com.jetbrains.python.pythonHelpersLocator` usable in the test JVM: prune the crashing Pro
-     * locator when the EP exists (2026.1), and register the EP outright when it does not (2026.2).
-     *
-     * `PythonMockSdk.create` below triggers `PyTypeShed`'s lazy init, which calls
-     * `PythonHelpersLocator.getHelpersRoots()` — that iterates every registered locator with no
-     * exception guard. The obfuscated Pro locator's `getRoot()` calls `getPluginDistDirByClass`, which
-     * throws `IllegalStateException: .../plugins/python/lib/modules should be lib directory` because the
-     * unified 2026.1 Python plugin ships its code as v2 content modules under `lib/modules/` rather than
-     * directly under `lib/`. That is purely a gradle-test-sandbox artifact (the flattened test classpath
-     * means the plugin classes aren't under a `PluginAwareClassLoader`, so the safe branch of
-     * `getPluginDistDirByClass` isn't taken; upstream
-     * https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/2070, unfixed). Unlike the
-     * community locator it reads no `idea.python.helpers.path` property, so it can't be pointed at a
-     * valid root. Removing just this one dynamic EP leaves the community locator (fed by the
-     * `-Didea.python.helpers.path` jvmArg) and the rest of the Pro Python plugin intact, so Python
-     * resolution still works. Idempotent — safe to call before every scenario. Runtime is unaffected.
-     */
-    private fun configurePythonHelpersLocator() {
-        val area = ApplicationManager.getApplication().extensionArea
-
-        val ep = area.getExtensionPointIfRegistered<Any>(PYTHON_HELPERS_LOCATOR_EP)
-        if (ep != null) {
-            ep.unregisterExtensions(
-                { className, _ -> className != "com.jetbrains.python.PythonProHelpersLocator" },
-                false,
-            )
-            return
-        }
-
-        // Since 2026.2 the EP itself is declared by the `intellij.python.community.helpersLocator`
-        // content module, which the flat test classpath never loads (same #2070 cause as above), so
-        // there is nothing to prune -- `PythonHelpersLocator.getHelpersRoots()` instead dies with
-        // "Missing extension point: com.jetbrains.python.pythonHelpersLocator". Register the EP and a
-        // locator pointing at the helpers directory the `-Didea.python.helpers.path` jvmArg already
-        // supplies. We register our own rather than PythonHelpersLocatorDefault because the default
-        // resolves through the plugin dist dir, which is exactly what #2070 breaks here.
-        val helpersPath = requireNotNull(System.getProperty(PYTHON_HELPERS_PATH_PROPERTY)) {
-            "'$PYTHON_HELPERS_PATH_PROPERTY' is not set; see the test task's jvmArgumentProviders in build.gradle.kts"
-        }
-        (area as ExtensionsAreaImpl).registerExtensionPoint(
-            PYTHON_HELPERS_LOCATOR_EP,
-            PythonHelpersLocator::class.java.name,
-            ExtensionPoint.Kind.INTERFACE,
-            true,
-        )
-        area.getExtensionPoint<PythonHelpersLocator>(PYTHON_HELPERS_LOCATOR_EP).registerExtension(
-            object : PythonHelpersLocator {
-                override fun getRoot(): Path = Path.of(helpersPath)
-            },
-            ApplicationManager.getApplication(),
-        )
-    }
-
     companion object {
-        private const val PYTHON_HELPERS_LOCATOR_EP = "com.jetbrains.python.pythonHelpersLocator"
-        private const val PYTHON_HELPERS_PATH_PROPERTY = "idea.python.helpers.path"
-
         /** Cached per JVM so the same mock SDK entity isn't added once per scenario -- see the use site. */
         private val projectDescriptors = HashMap<List<String>, PyLightProjectDescriptor>()
         private val pythonOnlySdks = HashMap<List<String>, com.intellij.openapi.projectRoots.Sdk>()

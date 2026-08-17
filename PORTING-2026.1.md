@@ -127,8 +127,10 @@ structural moves:
    kotlin-stdlib was pulled onto the runtime/test classpath and its coroutine stack-trace recovery
    cannot read the v2 `@DebugMetadata` the platform emits. Fixed with a **runtime-only**
    `resolutionStrategy.force` (build.gradle.kts) pinning `kotlin-stdlib{,-jdk7,-jdk8}` to
-   `kotlinPlatform` (2.3.20). Scoped to `*RuntimeClasspath` only — forcing it on the compile
-   classpath would trip the compiler's metadata-version check.
+   `kotlinPlatform` (2.3.20). Scoped to runtime classpaths only (matched case-insensitively, so it
+   covers the production `runtimeClasspath` as well as `testRuntimeClasspath` — the shipped plugin
+   must not bundle the old stdlib either) — forcing it on the compile classpath would trip the
+   compiler's metadata-version check.
 
 7. **Test data path resolution broke** (`SnakemakeTestUtil.getTestDataPath()`). It walked a fixed
    number of parent dirs up from the plugin jar to find the project home; the 2026.1 sandbox added
@@ -147,13 +149,16 @@ structural moves:
    live in `lib/modules/*.jar`. Two such locators, fixed separately:
    - **Community** (`PythonHelpersLocatorDefault`) checks `idea.python.helpers.path` first, so we
      set `-Didea.python.helpers.path=<platformPath>/plugins/python-ce/helpers` on the `test` JVM via
-     a `jvmArgumentProvider`.
+     a `jvmArgumentProvider` — but only when that directory actually exists. Only PyCharm
+     distributions bundle it; on other platform types (IDEA + the external Python plugin) pointing
+     the property at a nonexistent path is worse than leaving it unset, because the locator takes
+     the value verbatim and skips the layout check that would otherwise report the problem.
    - **Pro** (`PythonProHelpersLocator`, obfuscated, reads no helpers-path property) is fixed by
      **unregistering just that one locator from the `com.jetbrains.python.pythonHelpersLocator` EP
-     in the test JVM only** — in `StepDefs.configureSnakemakeProject`, after
-     `TestApplicationManager.getInstance()` and before `PythonMockSdk.create`. The EP is
-     `dynamic="true"`, so removal is clean; the rest of the Pro Python plugin stays intact, so
-     Python resolution still works.
+     in the test JVM only** — at the top of `PythonMockSdk.create`, which is the single point every
+     test path funnels through (the cucumber glue calls it directly; `SnakemakeTestCase` reaches it
+     via `PyLightProjectDescriptor.getSdk()`). The EP is `dynamic="true"`, so removal is clean; the
+     rest of the Pro Python plugin stays intact, so Python resolution still works.
 
    This is a **test-only** artifact, not a real-user bug: `getPluginDistDirByClass` returns the
    plugin path directly when the class loads via a `PluginAwareClassLoader` (the real IDE case), and

@@ -6,6 +6,7 @@ import org.jetbrains.intellij.platform.gradle.Constants.Configurations
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
+import kotlin.io.path.isDirectory
 
 fun gradlePropertyOptional(key: String) = project.findProperty(key)?.toString()
 fun gradleProperty(key: String) = providers.gradleProperty(key)
@@ -71,9 +72,11 @@ repositories {
 // read the v2 `@DebugMetadata` emitted by the platform's 2.3.20-compiled classes and throws
 // "Debug metadata version mismatch. Expected: 1, got 2", which crashes the coroutine machinery and
 // hangs the test IDE during project setup. Forcing the newer stdlib (which understands both metadata
-// versions) fixes it. We deliberately scope this to *RuntimeClasspath configurations only: putting a
-// stdlib newer than the compiler on the compile classpath would trip Kotlin's metadata-version check.
-configurations.matching { it.name.endsWith("RuntimeClasspath") }.configureEach {
+// versions) fixes it. We deliberately scope this to runtime classpath configurations only (matched
+// case-insensitively so that both the production `runtimeClasspath` and `testRuntimeClasspath` are
+// covered): putting a stdlib newer than the compiler on the compile classpath would trip Kotlin's
+// metadata-version check.
+configurations.matching { it.name.endsWith("RuntimeClasspath", ignoreCase = true) }.configureEach {
     val kotlinPlatformVersion = libs.versions.kotlinPlatform.get()
     resolutionStrategy {
         force("org.jetbrains.kotlin:kotlin-stdlib:$kotlinPlatformVersion")
@@ -373,9 +376,17 @@ tasks {
         // PyTypeShed's lazy init and therefore every test that infers Python types. The locator
         // consults the `idea.python.helpers.path` system property first, so point it at the bundled
         // helpers directory explicitly.
+        // Only PyCharm distributions bundle the helpers there; on other platform types (IDEA + the
+        // external Python plugin) that directory doesn't exist, and setting the property to a bogus
+        // path is worse than not setting it — the locator takes it verbatim, skipping the layout
+        // check that would otherwise report the problem.
         jvmArgumentProviders += CommandLineArgumentProvider {
             val pythonHelpersPath = intellijPlatform.platformPath.resolve("plugins/python-ce/helpers")
-            listOf("-Didea.python.helpers.path=$pythonHelpersPath")
+            if (pythonHelpersPath.isDirectory()) {
+                listOf("-Didea.python.helpers.path=$pythonHelpersPath")
+            } else {
+                emptyList()
+            }
         }
 
         reports {
