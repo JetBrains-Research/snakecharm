@@ -42,8 +42,6 @@ class StepDefs {
 
         TestApplicationManager.getInstance()
 
-        removeCrashingProHelpersLocator()
-
         // From UsefulTestCase
         Disposer.setDebugMode(true)
 
@@ -233,33 +231,6 @@ class StepDefs {
     @Given("^TODO")
     fun todo() {
         TODO()
-    }
-
-    /**
-     * Unregister the Pro `PythonProHelpersLocator` from the `com.jetbrains.python.pythonHelpersLocator`
-     * extension point (test JVM only).
-     *
-     * `PythonMockSdk.create` below triggers `PyTypeShed`'s lazy init, which calls
-     * `PythonHelpersLocator.getHelpersRoots()` — that iterates every registered locator with no
-     * exception guard. The obfuscated Pro locator's `getRoot()` calls `getPluginDistDirByClass`, which
-     * throws `IllegalStateException: .../plugins/python/lib/modules should be lib directory` because the
-     * unified 2026.1 Python plugin ships its code as v2 content modules under `lib/modules/` rather than
-     * directly under `lib/`. That is purely a gradle-test-sandbox artifact (the flattened test classpath
-     * means the plugin classes aren't under a `PluginAwareClassLoader`, so the safe branch of
-     * `getPluginDistDirByClass` isn't taken; upstream
-     * https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/2070, unfixed). Unlike the
-     * community locator it reads no `idea.python.helpers.path` property, so it can't be pointed at a
-     * valid root. Removing just this one dynamic EP leaves the community locator (fed by the
-     * `-Didea.python.helpers.path` jvmArg) and the rest of the Pro Python plugin intact, so Python
-     * resolution still works. Idempotent — safe to call before every scenario. Runtime is unaffected.
-     */
-    private fun removeCrashingProHelpersLocator() {
-        val ep = ApplicationManager.getApplication().extensionArea
-            .getExtensionPointIfRegistered<Any>("com.jetbrains.python.pythonHelpersLocator") ?: return
-        ep.unregisterExtensions(
-            { className, _ -> className != "com.jetbrains.python.PythonProHelpersLocator" },
-            false,
-        )
     }
 
     companion object {
