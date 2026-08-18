@@ -38,11 +38,11 @@ PyCharm Professional. Note that **2025.2 is the last standalone PyCharm Communit
 **Wrappers bundle:** `:buildWrappersBundle` reads `snakemakeWrappersRepoPath` (a local
 [snakemake-wrappers](https://github.com/snakemake/snakemake-wrappers) checkout) and runs as part of
 `prepareSandbox`, so it sits in front of `buildPlugin`, `runIde` **and** the test tasks. The property
-is hardcoded to a JetBrains developer's absolute path in `gradle.properties`, so on any other machine
-those tasks fail until you override it — pointing it at the test fixture works:
-`-PsnakemakeWrappersRepoPath=testData/wrappers_storage` (issue #571 / PR #572 makes the task skip
-itself instead). The test-only bundle (`:buildTestWrappersBundle`, what `test` actually consumes)
-always reads `testData/wrappers_storage` and needs no property.
+`snakemakeWrappersRepoPath` is unset by default in `gradle.properties` so the plugin bundle and local IDE
+run will not provide wrappers related completion and other features until the variable is set in properties
+or using cmdline like `./gradlew buildPlugin -PsnakemakeWrappersRepoPath=/path/to/snakemake-wrappers`. 
+The test-only bundle (`:buildTestWrappersBundle`, what `test` actually consumes) reads by default
+`testData/wrappers_storage` and needs no property. 
 
 **CLI build memory:** if `:compileKotlin` dies with `OutOfMemoryError: GC overhead limit exceeded`,
 give the Kotlin daemon more heap — append `-Pkotlin.daemon.jvmargs=-Xmx4g` (transforming some large
@@ -66,9 +66,10 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
   absent on a clean checkout — the *unversioned* `Given a snakemake project` scenarios (~135) then
   fail because `resolveQualifiedName("snakemake")` returns `[]`, while the checked-in per-version
   mocks (`MockPackages3_smk_<ver>`) still resolve. Provision it (see `DEVELOPER.md` → Configure Tests,
-  step 2): symlink snakemake **9.9.0**'s **`src/snakemake`** (modern `src/` layout) to
-  `testData/MockPackages3/snakemake`. **Two traps that make a correct fixture look like it does
-  nothing:** the version must match `snakemake_api.yaml`'s `defaultVersion` (9.9.0), and the test IDE
+  step 2): symlink` snakemake` to **`src/snakemake`** (https://github.com/snakemake/snakemake, checkout
+  desired version using repo tags) to `testData/MockPackages3/snakemake`. 
+  **Two traps that make a correct fixture look like it does nothing:** the version must match
+  `snakemake_api.yaml`'s `defaultVersion` (e.g. 9.9.0), and the test IDE
   sandbox persists a VFS/index under `.sandbox_pycharm/<ide>/system-test/` that **`cleanTest` doesn't
   clear** — if you add the fixture after a prior run, `rm -rf .sandbox_pycharm/*/system-test` once. If
   you see a wall of `snakemake`-resolution failures on a fresh checkout, suspect this fixture, **not**
@@ -93,6 +94,16 @@ Two languages, both layered onto the Python plugin:
 2. **SmkSL** — the Snakemake String Language embedded in strings like
    `"results/sample_{genome}.bam"`. Lives under `stringLanguage/`, lexer generated from
    `stringLanguage/lang/parser/smk_sl.flex` (JFlex), injected into Python string literals.
+
+SnakemCharm plugin features are based on the sources of the snakemake project 
+(https://github.com/snakemake/snakemake) so the plugin tries to do maximum static analysis of the underlying 
+snakemake python code. Due to the highly dynamic implementation of a snakemake framework the SnakeCharm 
+provides API descriptions of the implicit python api available in different blocks of Snakemake DSL. 
+Additionally, API changes among different snakemake versions, so snakemake version is considered 
+as `language level`. File `snakemake_api.yaml` (loaded by SnakemakeApiYamlAnnotationsService into project level
+`com.jetbrains.snakecharm.codeInsight.SnakemakeApiService` service class) describes API changes among 
+different snakemake versions. Key `defaultVersion` (e.g. 9.9.0) sets the default language level for the new 
+ projects, and it is the latest language level officially supported by the plugin.
 
 Feature areas (each maps to a source package and a `features/` test dir):
 
