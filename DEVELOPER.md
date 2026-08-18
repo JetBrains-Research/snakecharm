@@ -13,8 +13,17 @@
 
 **Build plugin from sources:**
 * Run `./gradlew buildPlugin`
-* Plugin bundle is located in ` build/distributions/snakecharm-*.zip`
-
+* Plugin bundle is located in `build/distributions/snakecharm-*.zip`
+* The bundled snakemake-wrappers metadata is optional for a local build: if
+  `snakemakeWrappersRepoPath` is unset (the default), the `:buildWrappersBundle` task is
+  skipped with a warning and the plugin is built without bundled wrappers — it runs normally,
+  but wrapper name completion has nothing to offer. If the property *is* set and does not point
+  at a wrappers checkout, the build still fails loudly rather than quietly shipping without them.
+  To include them, point it at a local [snakemake-wrappers](https://github.com/snakemake/snakemake-wrappers)
+  checkout whose content matches `snakemakeWrappersRepoVersion`:
+  `./gradlew buildPlugin -PsnakemakeWrappersRepoPath=/path/to/snakemake-wrappers`.
+  As an alternative, you could locally set `snakemakeWrappersRepoPath` to existing wrappers folder in 
+  `gradle.properties` file.
 
 **Configure Tests:**
         
