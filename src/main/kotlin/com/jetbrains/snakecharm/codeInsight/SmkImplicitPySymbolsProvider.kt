@@ -335,8 +335,19 @@ class SmkImplicitPySymbolsProvider(
         }
 
         if (ApplicationManager.getApplication().isUnitTestMode) {
-            // Do now
-            action()
+            // Do now -- but never restart the daemon from inside a highlighting pass. Since 2026.2 the
+            // platform asserts on that ("PSI/document/model changes are not allowed during highlighting",
+            // FileStatusMap.assertAllowModifications), and because the cache refresh can be triggered *by*
+            // resolution during highlighting, the synchronous restart took out 67 otherwise-unrelated
+            // inspection scenarios. Clearing the resolve cache is still done immediately, since tests rely
+            // on the refreshed symbols being visible; only the daemon restart is deferred -- which is what
+            // the production path below has always done anyway.
+            // Deferring via invokeLater does NOT help here: in unit-test mode the platform pumps the
+            // queue synchronously inside the same operation, so the restart still lands mid-pass.
+            // The resolve cache clear is what tests actually depend on -- it is what makes the refreshed
+            // symbols visible. The daemon restart exists to re-highlight open editors after a background
+            // cache update, which has no meaning in a test that drives highlighting explicitly.
+            ResolveCache.getInstance(project).clearCache(true)
             return
         }
 

@@ -357,7 +357,7 @@ tasks {
             layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage-bundled.cbor").get(),
             layout.projectDirectory.file("snakemake_api.yaml")
         )
-        maxHeapSize = "1024m" // Not much RAM is available on TC agents
+        maxHeapSize = System.getenv("SNAKECHARM_TEST_HEAP") ?: "1024m" // TC agents are small; override locally, e.g. SNAKECHARM_TEST_HEAP=8g
     }
 
     register<JavaExec>("buildTestWrappersBundle") {
@@ -380,7 +380,7 @@ tasks {
             layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage.test.cbor").get(),
             layout.projectDirectory.file("snakemake_api.yaml")
         )
-        maxHeapSize = "1024m" // Not much RAM is available on TC agents
+        maxHeapSize = System.getenv("SNAKECHARM_TEST_HEAP") ?: "1024m" // TC agents are small; override locally, e.g. SNAKECHARM_TEST_HEAP=8g
     }
 
 
