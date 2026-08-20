@@ -316,13 +316,20 @@ Provisioned per #574 (clone at `snakemake_api.yaml`'s `defaultVersion`, symlink 
 then clear the sandbox VFS — `cleanTest` does **not** clear it):
 
 ```
-2026.1 + fixture: 3248 scenarios,   3 failing   (2 injected-string + 1 pre-existing on master)
-2026.2 + fixture: 3248 scenarios, 246 failing
+2026.1 + fixture:                       3248 scenarios,   3 failing   (2 injected-string + 1 pre-existing on master)
+2026.2 + fixture, before item 9's fix:  3248 scenarios, 246 failing
+2026.2 + fixture, after  item 9's fix:  3248 scenarios, 145 failing   <-- current
 ```
 
 On 2026.1 the fixture resolves **134 of the 135** environmental failures, so #574's "135 → 0" is
-really 135 → 1. On 2026.2 it is net −1 (247 → 246), fixing 65 and breaking 64 — which is how we know
-those 64 belong to the 2026.2 harness rather than to the fixture.
+really 135 → 1. On 2026.2 it was net −1 at the time of measurement (247 → 246), fixing 65 and
+breaking 64 — which is how we knew those 64 belonged to the 2026.2 harness rather than to the
+fixture. The serialization fix has since cleared most of that harness damage; 3 of the current 145
+are the same 3 that 2026.1 fails, so **142 are 2026.2-specific and still to triage.**
+
+Current top families in the 145: `Inspection for methods from snakemake library` (24),
+`snakemake_api.yaml` fqn checks (24), `Resolve implicitly imported python names` (23),
+`Rule section access requires lambda` (20).
 
 Measurement note: **"3419" is not the scenario count.** It is cucumber (3248) + the 171 non-cucumber
 tests. The fixture never changes the scenario count, only how many pass.
