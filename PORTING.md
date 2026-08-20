@@ -1,17 +1,25 @@
-# Porting SnakeCharm to PyCharm / IntelliJ Platform 2026.1 (build 261)
+# Porting SnakeCharm across IntelliJ Platform releases
 
-This document is the engineering rationale for the 2026.1 port (PR #570): **what changed and
-why**, so the diff can be reviewed as a set of deliberate, traceable responses to platform changes
-rather than churn. It targets the unified 2026.1 platform on branch `update-for-intellij-2026.1`.
+One document per port, newest last. Each release section is the engineering rationale for that
+port — **what changed and why** — so the diff can be reviewed as a set of deliberate, traceable
+responses to platform changes rather than churn.
+
+| release | branch | PR |
+|---|---|---|
+| [2026.1 (build 261)](#20261--unified-pycharm-build-261) | `update-for-intellij-2026.1` | [#570](https://github.com/JetBrains-Research/snakecharm/pull/570) |
+
+## 2026.1 — unified PyCharm (build 261)
+
+Branch `update-for-intellij-2026.1`, PR #570.
 
 **Status.** The source port is complete: the plugin compiles and loads against 2026.1, all ~37
 source-level API breaks are fixed, `compileKotlin`/`compileTestKotlin` both succeed, and every
 test-runtime *crash* blocker is resolved (Kotlin stdlib alignment, the test-data-path layout, and
 both `PyTypeShed` helpers-locator crashes). The cucumber suite now **runs** (was 3248/3248
 crashing) and the parser golden tests are **green**. The remaining cucumber assertion failures are
-**mostly pre-existing on 2025.2, not caused by this port** — see [Test state](#test-state-for-review).
+**mostly pre-existing on 2025.2, not caused by this port** — see [Test state](#test-state-for-review) below.
 
-## Background: PyCharm was unified
+### Background: PyCharm was unified
 
 - PyCharm Community and Professional were merged into a single product in 2025.1.
 - **2025.2 was the last standalone PyCharm Community release.** From 2025.3 on there is one unified
@@ -26,7 +34,7 @@ as a Kotlin interface), **the built plugin runs only on 2026.1+**. `pluginSinceB
 Advertising 2025.2 support the binary cannot honour would reproduce the "installs then crashes"
 failure mode #569 was rejected for.
 
-## Why not just raise `pluginUntilBuild`? (validated dead end, #569)
+### Why not just raise `pluginUntilBuild`? (validated dead end, #569)
 
 The tempting shortcut is to ship the unchanged 2025.2 binary and widen `pluginUntilBuild` to
 `261.*` so 2026.1 lets it load (PR #569). **The IntelliJ Plugin Verifier proves this does not
@@ -45,7 +53,7 @@ Plugin SnakeCharm:2025.2.3-eap.SNAPSHOT against PY-261.22158.340: 4 compatibilit
 All 4 hard problems are the removed `ReturnAnnotator` (see source break 2). A metadata-only
 widening cannot satisfy them — they require the source changes on this branch.
 
-## Why the port touches so much — one umbrella cause
+### Why the port touches so much — one umbrella cause
 
 Between 2025.1 and 2026.1 JetBrains didn't merely bump a version — they **restructured the product
 and rewrote the Python plugin**. Every change on this branch is downstream of one of three
@@ -63,7 +71,7 @@ structural moves:
 3. **The bundled toolchain was upgraded**: Kotlin `2.3.20` (coroutine `@DebugMetadata` v2) and a
    newer bundled typeshed (single-file stubs became *package* stubs).
 
-## What this branch does (build infrastructure)
+### What this branch does (build infrastructure)
 
 - `gradle/wrapper/gradle-wrapper.properties` + `gradleVersion`: **Gradle 8.13 → 9.6.0**.
 - `gradle/libs.versions.toml`: **IntelliJ Platform Gradle Plugin 2.7.0 → 2.16.0**; added a
@@ -80,7 +88,7 @@ structural moves:
 - `DEVELOPER.md`: added a JDK-21 command-line build/test quickstart and `platformType`/build-number
   notes for the next platform bump.
 
-## Source-level API breaks — FIXED
+### Source-level API breaks — FIXED
 
 1. **`PyType` is now a Kotlin interface** (verified by decompiling
    `intellij.python.psi.jar!/com/jetbrains/python/psi/types/PyType.class`; `getName()` carries
@@ -115,7 +123,7 @@ structural moves:
 4. **`super` disambiguation** in `SmkSLReferenceExpressionImpl.getType` →
    `super<PyReferenceExpressionImpl>`.
 
-## Test-infrastructure breaks — FIXED
+### Test-infrastructure breaks — FIXED
 
 5. **`com.intellij.testFramework.PlatformLiteFixture` was removed.** `PyLexerTestCase` (base of
    `SnakemakeLexerTest`, `SmkSLLexerTest`) now extends `BasePlatformTestCase`; the full test
@@ -165,7 +173,7 @@ structural moves:
    only does the broken "parent dir must be named `lib`" walk on the flattened gradle test
    classpath. So nothing user-visible is (or should be) changed at runtime.
 
-## Test state (for review)
+### Test state (for review)
 
 With the crashes gone, the cucumber suite runs (3248 tests) and surfaces the remaining assertion
 failures. A **full-suite branch-vs-master diff** (the same `AllCucumberFeaturesTest` on PY/2026.1 vs
@@ -220,7 +228,7 @@ and it corrects that PR's figure: it is 135 → 1, not 135 → 0.
 **Measurement note:** "3419" is not the scenario count — it is cucumber (3248) plus the 171
 non-cucumber tests. The fixture never changes the scenario count, only how many pass.
 
-## Related work & open items
+### Related work & open items
 
 - **Upstream gradle-plugin [#2070](https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/2070)** —
   the root cause of the helpers-locator crashes (v2 content-module jars on a flat test classpath).
@@ -247,7 +255,7 @@ non-cucumber tests. The fixture never changes the scenario count, only how many 
   `SlowOperations`) and [#506](https://github.com/JetBrains-Research/snakecharm/issues/506)
   (dumb-mode crash).
 
-## Reproducing
+### Reproducing
 
 ```shell
 # JDK 21 (jenv picks it up from .java-version, or set JAVA_HOME manually)
