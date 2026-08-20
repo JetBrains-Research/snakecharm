@@ -78,10 +78,22 @@ repositories {
 // metadata-version check.
 configurations.matching { it.name.endsWith("RuntimeClasspath", ignoreCase = true) }.configureEach {
     val kotlinPlatformVersion = libs.versions.kotlinPlatform.get()
+    val kotlinxSerializationPlatformVersion = libs.versions.kotlinxSerializationPlatform.get()
     resolutionStrategy {
         force("org.jetbrains.kotlin:kotlin-stdlib:$kotlinPlatformVersion")
         force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinPlatformVersion")
         force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinPlatformVersion")
+
+        // Same class of problem as the stdlib above, different library. The platform bundles
+        // kotlinx-serialization-core 1.9.0 (lib/intellij.libraries.kotlinx.serialization.core.jar) and
+        // its classes carry serializers generated against that ABI; our `kotlinxCbor` dependency drags
+        // core 1.4.1 onto the runtime/test classpath, where it wins. Platform-generated serializers then
+        // call methods that do not exist in 1.4.1 and die with
+        // "AbstractMethodError at PluginGeneratedSerialDescriptor.kt", which TestLoggerFactory turns
+        // into a test failure. Forcing core (and cbor, so the pair stays consistent) to the platform's
+        // version fixes the direction of the skew: newer core runs older generated code fine.
+        force("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationPlatformVersion")
+        force("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$kotlinxSerializationPlatformVersion")
     }
 }
 

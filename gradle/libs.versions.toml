@@ -15,6 +15,9 @@ kotlin = "2.3.21"
 # the platform's Kotlin-compiled classes (see the resolutionStrategy in build.gradle.kts). Keep in sync
 # with the `platformVersion` in gradle.properties.
 kotlinPlatform = "2.4.10"
+# kotlinx-serialization bundled in the target platform (lib/intellij.libraries.kotlinx.serialization.core.jar).
+# Forced onto runtime classpaths for the same ABI reason as kotlinPlatform -- see build.gradle.kts.
+kotlinxSerializationPlatform = "1.9.0"
 intelliJPlatform = "2.18.1" # https://github.com/JetBrains/intellij-platform-gradle-plugin
 changelog = "2.4.0"
 kover = "0.9.1"
