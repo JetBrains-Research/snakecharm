@@ -179,7 +179,7 @@ branch (PY/2026.1): 145 failing   master (PC/2025.2): 135 failing
 ```
 
 So the port breaks **nothing** that passed on 2025.2. The **10 port-caused** failures are
-enumerated and mostly already fixed:
+enumerated and **8 are now fixed**, taking the branch from 145 to **137**:
 
 - **2 typeshed golden updates** (`sys.py` → `sys/__init__.pyi`, `pathlib.pyi` →
   `pathlib/__init__.pyi`, from the bundled-typeshed package-stub reorg) — **fixed** in
@@ -198,15 +198,47 @@ The **135 shared** failures are a **fresh-checkout test-fixture gap**: bare-`sna
 orthogonal to the port. **Please don't rubber-stamp goldens beyond the typeshed ones, and please
 don't expand this PR to chase the environmental failures.**
 
+### With the fixture provisioned this branch is 3245/3248
+
+The numbers above were measured without `testData/MockPackages3/snakemake`. Provisioning it per
+[#574](https://github.com/JetBrains-Research/snakecharm/pull/574) — clone snakemake at
+`snakemake_api.yaml`'s `defaultVersion` (9.9.0), symlink its `src/snakemake`, then clear the sandbox
+VFS, which `cleanTest` does **not** do — gives:
+
+```
+branch (PY/2026.1), fixture present: 3248 scenarios, 3 failing
+  Unresolved variable in injection                                             <- port-caused (open)
+  Unresolved conda path (complex string)                                       <- port-caused (open)
+  Warn about unresolved snakemake variable in run section, behaviour differs
+    from scripts                                                               <- pre-existing, also in the master baseline
+```
+
+So the fixture resolves **134 of the 135** shared failures, leaving exactly the 2 open port-caused
+ones plus 1 that master fails too. This is measured on this branch rather than inherited from #574,
+and it corrects that PR's figure: it is 135 → 1, not 135 → 0.
+
+**Measurement note:** "3419" is not the scenario count — it is cucumber (3248) plus the 171
+non-cucumber tests. The fixture never changes the scenario count, only how many pass.
+
 ## Related work & open items
 
 - **Upstream gradle-plugin [#2070](https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/2070)** —
   the root cause of the helpers-locator crashes (v2 content-module jars on a flat test classpath).
   If fixed upstream, the EP-unregister workaround (break 8) could be dropped. Worth retrying with a
   newer IntelliJ Platform Gradle Plugin (`2.16 → 2.17`, the build nags) and/or a newer `2026.1.x`.
-- **The pre-existing bare-`snakemake`/`MockPackages3` fixture gap** — out of scope here. A separate
-  branch off `master` will first reproduce/surface it (in CI or local testing) and then attempt a
-  fix; issues will be filed once it's understood.
+- **The pre-existing bare-`snakemake`/`MockPackages3` fixture gap — understood and handled
+  elsewhere.** Filed as [#575](https://github.com/JetBrains-Research/snakecharm/issues/575) with the
+  documentation fix in [#574](https://github.com/JetBrains-Research/snakecharm/pull/574). Still out
+  of scope for this PR; see the measured effect in [Test state](#test-state-for-review) above.
+- **We ship a redundant `kotlinx-serialization-core-jvm-1.4.1.jar`** in the plugin distribution
+  while the platform bundles 1.9.0 (`lib/intellij.libraries.kotlinx.serialization.core.jar`). On the
+  **flat gradle test classpath** that skew is a real bug — it shadows the platform's copy and
+  platform-generated serializers die with `AbstractMethodError at PluginGeneratedSerialDescriptor.kt`
+  — and it is fixed on the 2026.2 branch by extending the runtime `resolutionStrategy` (see the
+  2026.2 addendum, item 9). In a **real IDE** the plugin has its own classloader, so a consistently
+  bundled 1.4.1 is probably harmless; that has not been verified. Deliberately **not** changed on
+  this branch: it costs a full re-verification run and fixes nothing observable here (this branch is
+  at 3 failures). Worth doing as a follow-up, or here if a reviewer prefers.
 - **Full-suite master diff — done** (result in [Test state](#test-state-for-review)): 135/145
   failures are pre-existing on 2025.2; the 10 port-caused are enumerated (typeshed + spellchecker
   fixed; 2 highlighting edge cases tracked as PR TODOs).
@@ -219,7 +251,17 @@ don't expand this PR to chase the environmental failures.**
 
 ```shell
 # JDK 21 (jenv picks it up from .java-version, or set JAVA_HOME manually)
-./gradlew compileKotlin -PsnakemakeWrappersRepoPath=testData/wrappers_storage      # OK
-./gradlew compileTestKotlin -PsnakemakeWrappersRepoPath=testData/wrappers_storage  # OK
-./gradlew test -PsnakemakeWrappersRepoPath=testData/wrappers_storage               # runs; 135/145 failures proven pre-existing on 2025.2 (full-suite master diff), 8 more fixed here, 2 highlighting TODOs remain
+./gradlew compileKotlin       # OK
+./gradlew compileTestKotlin   # OK
+./gradlew test                # 137 failing without the test fixture, 3 with it -- see Test state
+./gradlew prepareSandbox      # builds .sandbox_pycharm/<project>/PY-2026.1.3/plugins/snakecharm/
 ```
+
+`-PsnakemakeWrappersRepoPath=...` is **no longer required**: since
+[#572](https://github.com/JetBrains-Research/snakecharm/pull/572) the wrappers bundle is skipped
+with a warning when the property is unset. Passing it is still how you build *with* bundled wrappers.
+
+Verified via `prepareSandbox` that the shipped plugin now bundles the platform's Kotlin
+(`kotlin-stdlib{,-jdk7,-jdk8}-2.3.20.jar`) rather than the older build stdlib — the production half
+of break 6, which could not be checked before #572 made that task runnable without a local wrappers
+checkout.
