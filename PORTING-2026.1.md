@@ -223,3 +223,80 @@ don't expand this PR to chase the environmental failures.**
 ./gradlew compileTestKotlin -PsnakemakeWrappersRepoPath=testData/wrappers_storage  # OK
 ./gradlew test -PsnakemakeWrappersRepoPath=testData/wrappers_storage               # runs; 135/145 failures proven pre-existing on 2025.2 (full-suite master diff), 8 more fixed here, 2 highlighting TODOs remain
 ```
+
+---
+
+# Addendum: 2026.2 (present on `update-for-intellij-2026.2` only)
+
+> This file still carries its 2026.1 name. The 2026.2 work (PR #577) is appended here rather than
+> duplicated into a second document; renaming it to `PORTING.md` with per-release sections is a
+> cleanup for review. **Everything above describes 2026.1 and is unchanged.**
+>
+> This section is a working log kept deliberately blunt: it records **avenues tried and rejected**
+> as well as fixes, so the same ground isn't covered twice. Expect it to be tidied before merge.
+
+## 9. kotlinx-serialization ABI skew — FIXED
+
+Exactly the same shape as break 6 (kotlin-stdlib), different library, and worth stating as a general
+lesson: **anything the platform both bundles *and* generates code against must be pinned to the
+platform's version on runtime classpaths, not just kotlin-stdlib.**
+
+- The platform bundles **kotlinx-serialization-core 1.9.0**
+  (`Implementation-Version` in `lib/intellij.libraries.kotlinx.serialization.core.jar`).
+- Our `kotlinxCbor` dependency pulled **1.4.1** onto the runtime/test classpath, where it won.
+- Platform classes carry serializers generated against the 1.9.0 ABI, so they call methods absent
+  from 1.4.1 → `java.lang.AbstractMethodError at PluginGeneratedSerialDescriptor.kt:40`, which
+  `TestLoggerFactory` promotes to a test failure.
+
+Fixed by extending the existing runtime-only `resolutionStrategy` block to force
+`kotlinx-serialization-core` and `-cbor` to a new `kotlinxSerializationPlatform` version
+(`libs.versions.toml`), mirroring how `kotlinPlatform` is handled. Verified via
+`gradlew dependencies --configuration testRuntimeClasspath`: `1.4.1 -> 1.9.0`.
+
+This is almost certainly the previously-unexplained textmate failure mode recorded in #577
+(`textmate.bundles.VSCodeExtension$$serializer` throwing `AbstractMethodError`, 3.2 GB of log
+events, no test results written).
+
+## Avenues tried and REJECTED — do not retry without new evidence
+
+1. **"The descriptor/SDK caching is the cause of the 2026.2 failures; revert it."** — **Wrong, and
+   expensively so.** The caching added in `11fdec6a` is **load-bearing**. Reverting it took the
+   suite from **246 → 2235 failures**, and the run exhausted the 2 GB test heap
+   (`OutOfMemoryError: Java heap space`, 625 MB dump). Without caching each of 3248 scenarios
+   builds its own project and mock SDK and nothing is released.
+
+   The subtlety worth keeping: **the caching's stated justification is stale, but the caching is
+   still required.** It was introduced to stop `SdkId` "symbolic id already exists" collisions —
+   and those now appear **0 times in every current run**. So it is right to be suspicious of the
+   comment, wrong to remove the code. Note also that the failing run's dominant exception was the
+   serialization `AbstractMethodError` above; that lead came *out of* this rejected experiment,
+   which is the only reason it was worth running.
+
+2. **"Version-specific scenarios are cross-contaminated by the shared descriptor cache."** —
+   Rejected. Only **7** scenarios in the entire suite use `Given a snakemake:<version> project`, far
+   too few to explain 64 failures, and the failing `Incorrect using flag methods` scenarios use the
+   plain unversioned `Given a snakemake project`.
+
+3. **"Bumping to a newer patch release will fix some of this."** — Rejected as a fix, kept as a
+   target. `2026.2.0.1 → 2026.2.1` fixed **0** tests and broke **46**, all refactoring
+   (`Rename elements in SnakemakeSL`, `Rename files in workflow sections`, one rename-lambda quick
+   fix), all `TestLoggerAssertionError` from a logged `LOG.error` in the rename path. The bump was
+   taken anyway — those 46 are inherited the moment anyone moves to 2026.2.1, and finding them
+   deliberately beats a maintainer finding them. Root cause not yet known.
+
+## The `MockPackages3/snakemake` fixture behaves differently per branch
+
+Provisioned per #574 (clone at `snakemake_api.yaml`'s `defaultVersion`, symlink `src/snakemake`,
+then clear the sandbox VFS — `cleanTest` does **not** clear it):
+
+```
+2026.1 + fixture: 3248 scenarios,   3 failing   (2 injected-string + 1 pre-existing on master)
+2026.2 + fixture: 3248 scenarios, 246 failing
+```
+
+On 2026.1 the fixture resolves **134 of the 135** environmental failures, so #574's "135 → 0" is
+really 135 → 1. On 2026.2 it is net −1 (247 → 246), fixing 65 and breaking 64 — which is how we know
+those 64 belong to the 2026.2 harness rather than to the fixture.
+
+Measurement note: **"3419" is not the scenario count.** It is cucumber (3248) + the 171 non-cucumber
+tests. The fixture never changes the scenario count, only how many pass.
