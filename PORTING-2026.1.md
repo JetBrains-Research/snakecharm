@@ -257,6 +257,26 @@ This is almost certainly the previously-unexplained textmate failure mode record
 (`textmate.bundles.VSCodeExtension$$serializer` throwing `AbstractMethodError`, 3.2 GB of log
 events, no test results written).
 
+**Measured effect — this one fix removed 101 of 246 failures:**
+
+```
+2026.2.1 + fixture, before: 3248 scenarios, 246 failing   (90 TestLoggerAssertionError)
+2026.2.1 + fixture, after:  3248 scenarios, 145 failing   (0  TestLoggerAssertionError)
+  fixed: 102    newly failing: 1
+```
+
+Every `TestLoggerAssertionError` is gone; what remains is real assertion mismatches
+(140 `AssertionError`, 5 `ComparisonFailure`). Whole families cleared: all 46 rename failures
+(`Rename files in workflow sections`, `Rename elements in SnakemakeSL`, `Rename rules/checkpoints`,
+`Rename Sections`), 24 `Resolve implicitly imported python names`, 9 conda/notebook file resolution,
+8 conda file-name completion.
+
+**Note for 2026.1 (PR #570):** `2026.1.3` bundles the *same* kotlinx-serialization-core 1.9.0, so
+this skew exists there too — it is simply latent, because that branch sits at 3 failures and nothing
+exercises the affected path hard enough to surface it. Porting the force upstream is defensible on
+correctness grounds, but it would perturb #570's measured baseline for no observed gain, so it is
+deliberately **not** done there yet.
+
 ## Avenues tried and REJECTED — do not retry without new evidence
 
 1. **"The descriptor/SDK caching is the cause of the 2026.2 failures; revert it."** — **Wrong, and
@@ -278,11 +298,17 @@ events, no test results written).
    plain unversioned `Given a snakemake project`.
 
 3. **"Bumping to a newer patch release will fix some of this."** — Rejected as a fix, kept as a
-   target. `2026.2.0.1 → 2026.2.1` fixed **0** tests and broke **46**, all refactoring
-   (`Rename elements in SnakemakeSL`, `Rename files in workflow sections`, one rename-lambda quick
-   fix), all `TestLoggerAssertionError` from a logged `LOG.error` in the rename path. The bump was
-   taken anyway — those 46 are inherited the moment anyone moves to 2026.2.1, and finding them
-   deliberately beats a maintainer finding them. Root cause not yet known.
+   target, and then **partly overturned**. The first measurement said `2026.2.0.1 → 2026.2.1` fixed
+   **0** tests and broke **46**, all refactoring (`Rename elements in SnakemakeSL`,
+   `Rename files in workflow sections`, one rename-lambda quick fix). Those 46 were **not** a
+   2026.2.1 regression: they were the serialization ABI skew (item 9) surfacing in the rename path,
+   and **all of them pass** once core is pinned to the platform's 1.9.0. With the fix applied,
+   2026.2.1 (145 failing) is now *better* than the 2026.2.0.1 baseline it replaced (201 failing),
+   so the bump is justified on its own merits.
+
+   **Lesson:** attributing a failure set to the thing you just changed is the obvious inference and
+   was the wrong one here. The 46 correlated perfectly with the bump and still had a different
+   cause. A like-for-like A/B tells you *that* something changed, never *what*.
 
 ## The `MockPackages3/snakemake` fixture behaves differently per branch
 
