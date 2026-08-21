@@ -12,6 +12,8 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.roots.ModuleRootEvent
+import com.intellij.openapi.roots.ModuleRootListener
 import com.intellij.openapi.roots.ex.ProjectRootManagerEx
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VfsUtil
@@ -425,6 +427,26 @@ class SmkImplicitPySymbolsProvider(
                         // This events is submitted on module settings closing even if no modifications
                         doRefresh(false)
                     }
+                }
+            }
+        })
+
+        // Listen for roots changes, e.g. the interpreter's paths being reconfigured.
+        //
+        // The settings listeners above only refresh when the configured SDK *name* changes, which used
+        // to be enough: the PSI elements held in the cache survived a roots change, so a cache built
+        // for the same SDK name stayed usable. Since 2026.2 the platform invalidates library PSI on
+        // every roots change, so such a cache is left holding entirely dead PSI -- `validElements`
+        // then filters all of it away and every implicit symbol silently fails to resolve until some
+        // unrelated event happens to rebuild the cache. Rebuild it when the roots change instead.
+        connection.subscribe(ModuleRootListener.TOPIC, object : ModuleRootListener {
+            override fun rootsChanged(event: ModuleRootEvent) {
+                // Only when the roots change actually killed what we cached. An empty or still-valid
+                // cache is left alone: rebuilding it unconditionally would repopulate symbols at
+                // moments the settings listeners had deliberately cleared them, e.g. while the
+                // configured interpreter is being switched away from a snakemake one.
+                if (cache.hasDeadPsi()) {
+                    doRefresh(true)
                 }
             }
         })
@@ -911,6 +933,8 @@ private class ImplicitPySymbolsCacheImpl(
     private val scope2SyntheticSymbols = syntheticSymbols.groupBy({ it.first }, { it.second })
 
     override operator fun get(scope: SmkCodeInsightScope) = validElements(scope2Symbols[scope] ?: emptyList())
+
+    override fun hasDeadPsi() = scope2Symbols.values.any { symbols -> symbols.any { !it.psiDeclaration.isValid } }
     override fun getSynthetic(scope: SmkCodeInsightScope) = scope2SyntheticSymbols[scope] ?: emptyList()
 
     private fun validElements(elements: List<ImplicitPySymbol>): List<ImplicitPySymbol> {
