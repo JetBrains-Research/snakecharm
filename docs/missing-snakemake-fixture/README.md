@@ -24,10 +24,11 @@ Reproduce:
 export JAVA_HOME=/path/to/jdk-21          # e.g. `jenv prefix 21`, or an asdf/SDKMAN path
 "$JAVA_HOME/bin/java" -version            # must print 21.x
 
-# -P... works around #571 (gradle.properties hardcodes an absolute developer path, so
-# :buildWrappersBundle fails on any other machine). PR #572 makes that task skip itself;
-# once it lands the flag is redundant here. Unrelated to the 135 failures below.
-./gradlew cleanTest test -PsnakemakeWrappersRepoPath=testData/wrappers_storage
+# PR #572 (merged) makes :buildWrappersBundle skip itself when snakemakeWrappersRepoPath is unset.
+# On a checkout without it, #571 bites and you need
+#   -PsnakemakeWrappersRepoPath=testData/wrappers_storage
+# which is how the numbers below were captured. Unrelated to the 135 failures either way.
+./gradlew cleanTest test
 python3 scripts/extract_failures.py build/test-results/test   # -> 135 failing
 ```
 
@@ -124,7 +125,7 @@ maintainers want it — no workflow is included here.
   135 failures appear too and are easy to mistake for port regressions. They are not.
 - [Issue #571](https://github.com/JetBrains-Research/snakecharm/issues/571) /
   [PR #572](https://github.com/JetBrains-Research/snakecharm/pull/572) — the hardcoded
-  `snakemakeWrappersRepoPath` that the `-P…` flag in the reproduce recipe works around. Unrelated to
-  these failures, but you hit it first on a fresh checkout.
+  `snakemakeWrappersRepoPath`, now fixed upstream. Unrelated to these failures, but on a checkout
+  predating #572 you hit it first.
 - [PR #573](https://github.com/JetBrains-Research/snakecharm/pull/573) — `AGENTS.md`, which summarises
   this gotcha for anyone (or anything) reading the repo cold.
