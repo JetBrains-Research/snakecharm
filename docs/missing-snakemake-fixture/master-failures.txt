@@ -1,0 +1,135 @@
+Completion for sections/variables in SmkSL injections :: Complete python specific variables for sections w/o arguments #1
+Completion for sections/variables in SmkSL injections :: Complete python specific variables for sections w/o arguments #2
+Completion for sections/variables in SmkSL injections :: Completion list contains supported sections even not available yet (except fake threads, version) #1
+Completion for sections/variables in SmkSL injections :: Completion list contains supported sections even not available yet (except fake threads, version) #2
+Completion for sections/variables in SmkSL injections :: Completion list contains supported sections even not available yet (except fake threads, version) #3
+Completion for sections/variables in SmkSL injections :: Completion list contains supported sections even not available yet (except fake threads, version) #4
+Completion in python part of snakemake file #1 :: Complete at top-level
+Completion in python part of snakemake file #1 :: Complete imported python modules/classes at top-level
+Completion in python part of snakemake file #1 :: Complete in not-empty context and select by type text
+Completion in python part of snakemake file #1 :: Complete in rules params section
+Completion in python part of snakemake file #1 :: Complete in run section
+Completion in python part of snakemake file #1 :: Parenthesis inserted after method completion #1
+Completion in python part of snakemake file #1 :: Parenthesis inserted after method completion #3
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - ancient
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - before_update
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - branch
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - collect
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - directory
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - ensure
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - evaluate
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - exists
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - expand
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - from_queue
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - local
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - lookup
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - multiext
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - pipe
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - protected
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - repeat
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - report
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - service
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - subpath
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - temp
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - temporary
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - touch
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - unpack
+Ensures that fqn used in snakemake_api.yaml corresponds to actual resolved reference fqn :: Function - update
+Inspection for methods from snakemake library :: Incorrect using flag methods in 8.7.0 #1
+Inspection if section isn't declared in rule :: When section isn't defined #4
+Inspection warns about depreciated/removed keywords, or keywords that were not introduced yet. :: Functions can be deprecated #1
+Inspection warns about depreciated/removed keywords, or keywords that were not introduced yet. :: Functions can be deprecated #2
+Inspection warns about depreciated/removed keywords, or keywords that were not introduced yet. :: Functions can be deprecated with advice #1
+Inspection warns about depreciated/removed keywords, or keywords that were not introduced yet. :: Functions can be deprecated with advice #2
+Inspection warns min_version specifying version smaller than the one set in settings. :: Setting version earlier than one set in min_version causes warning #1
+Inspection warns min_version specifying version smaller than the one set in settings. :: Setting version earlier than one set in min_version causes warning #2
+Inspection warns min_version specifying version smaller than the one set in settings. :: Setting version earlier than one set in min_version causes warning #3
+Inspection warns min_version specifying version smaller than the one set in settings. :: Setting version earlier than one set in min_version causes warning #4
+Inspection warns min_version specifying version smaller than the one set in settings. :: Setting version later than one set in min_version causes no warning #1
+Inspection warns min_version specifying version smaller than the one set in settings. :: Setting version later than one set in min_version causes no warning #2
+Inspection warns min_version specifying version smaller than the one set in settings. :: Setting version later than one set in min_version causes no warning #3
+Inspection warns min_version specifying version smaller than the one set in settings. :: Setting version later than one set in min_version causes no warning #4
+Inspection warns min_version specifying version smaller than the one set in settings. :: Version without patch number or minor version can be specified #1
+Inspection warns min_version specifying version smaller than the one set in settings. :: Version without patch number or minor version can be specified #2
+Inspection warns min_version specifying version smaller than the one set in settings. :: Version without patch number or minor version can be specified #3
+Inspection warns min_version specifying version smaller than the one set in settings. :: Version without patch number or minor version can be specified #4
+Resolve for section names in rules and checkpoints :: Do not resolve to section in another rule, part1 (correct filters in SmkPyReferenceImpl) #1
+Resolve for section names in rules and checkpoints :: Do not resolve to section in another rule, part1 (correct filters in SmkPyReferenceImpl) #2
+Resolve for section names in rules and checkpoints :: Do not resolve to section in another rule, part1 (correct filters in SmkPyReferenceImpl) #3
+Resolve for section names in rules and checkpoints :: Do not resolve to section in another rule, part1 (correct filters in SmkPyReferenceImpl) #4
+Resolve for section names in rules and checkpoints :: Do not resolve to section in another rule, part1 (correct filters in SmkPyReferenceImpl) #5
+Resolve for section names in rules and checkpoints :: Do not resolve to section in another rule, part1 (correct filters in SmkPyReferenceImpl) #6
+Resolve for section names in rules and checkpoints :: Resolve section to snakemake library if section undeclared #3
+Resolve for section names in rules and checkpoints :: Resolve section to snakemake library if section undeclared #4
+Resolve for section names in rules and checkpoints :: Resolve section to snakemake library if section undeclared #5
+Resolve for section names in rules and checkpoints :: Resolve section to snakemake library if section undeclared #6
+Resolve for section names in rules and checkpoints :: Resolve section to snakemake library if section undeclared #7
+Resolve for section names in rules and checkpoints :: Resolve section to snakemake library if section undeclared #8
+Resolve for sections/variables in SmkSL injections :: Resolve for python specific variables for sections w/o arguments #11
+Resolve for sections/variables in SmkSL injections :: Resolve for python specific variables for sections w/o arguments #14
+Resolve for sections/variables in SmkSL injections :: Resolve for python specific variables for sections w/o arguments #17
+Resolve for sections/variables in SmkSL injections :: Resolve for python specific variables for sections w/o arguments #20
+Resolve for sections/variables in SmkSL injections :: Resolve for python specific variables for sections w/o arguments #4
+Resolve for sections/variables in SmkSL injections :: Resolve for python specific variables for sections w/o arguments #8
+Resolve implicitly imported python names :: Also available on top-level at runtime, but not API #3
+Resolve implicitly imported python names :: Also available on top-level at runtime, but not API #4
+Resolve implicitly imported python names :: Also available on top-level at runtime, but not API #5
+Resolve implicitly imported python names :: Also available on top-level at runtime, but not API #6
+Resolve implicitly imported python names :: Check different SDK settings
+Resolve implicitly imported python names :: Not-resolved fake variables if part of reference #2
+Resolve implicitly imported python names :: Not-resolved fake variables if part of reference #3
+Resolve implicitly imported python names :: Resolve also works inside call args #3
+Resolve implicitly imported python names :: Resolve at top-level #11
+Resolve implicitly imported python names :: Resolve at top-level #14
+Resolve implicitly imported python names :: Resolve at top-level #16
+Resolve implicitly imported python names :: Resolve at top-level #17
+Resolve implicitly imported python names :: Resolve at top-level #18
+Resolve implicitly imported python names :: Resolve at top-level #19
+Resolve implicitly imported python names :: Resolve at top-level #24
+Resolve implicitly imported python names :: Resolve at top-level #25
+Resolve implicitly imported python names :: Resolve at top-level #26
+Resolve implicitly imported python names :: Resolve at top-level #27
+Resolve implicitly imported python names :: Resolve at top-level #28
+Resolve implicitly imported python names :: Resolve at top-level #31
+Resolve implicitly imported python names :: Resolve at top-level #32
+Resolve implicitly imported python names :: Resolve at top-level #34
+Resolve implicitly imported python names :: Resolve at top-level #35
+Resolve implicitly imported python names :: Resolve at top-level #36
+Resolve implicitly imported python names :: Resolve at top-level #38
+Resolve implicitly imported python names :: Resolve at top-level #39
+Resolve implicitly imported python names :: Resolve at top-level #40
+Resolve implicitly imported python names :: Resolve at top-level: shell()
+Resolve implicitly imported python names :: Resolve implicit python modules/classes at top-level #3
+Resolve implicitly imported python names :: Resolve in injections #16
+Resolve implicitly imported python names :: Resolve in injections #17
+Resolve implicitly imported python names :: Resolve in injections #18
+Resolve implicitly imported python names :: Resolve in injections #19
+Resolve implicitly imported python names :: Resolve in injections #20
+Resolve implicitly imported python names :: Resolve in injections #21
+Resolve implicitly imported python names :: Resolve in injections #25
+Resolve implicitly imported python names :: Resolve in injections #26
+Resolve implicitly imported python names :: Resolve in injections #27
+Resolve implicitly imported python names :: Resolve inside rule parameters #10
+Resolve implicitly imported python names :: Resolve inside rule parameters #11
+Resolve implicitly imported python names :: Resolve inside rule parameters #12
+Resolve implicitly imported python names :: Resolve inside rule parameters #6
+Resolve implicitly imported python names :: Resolve inside rule parameters #7
+Resolve implicitly imported python names :: Resolve inside rule parameters #9
+Resolve implicitly imported python names :: Resolve inside rule parameters: shell()
+Resolve implicitly imported python names :: Resolve inside run section #10
+Resolve implicitly imported python names :: Resolve inside run section #11
+Resolve implicitly imported python names :: Resolve inside run section #14
+Resolve implicitly imported python names :: Resolve inside run section #15
+Resolve implicitly imported python names :: Resolve inside run section #16
+Resolve implicitly imported python names :: Resolve inside run section #19
+Resolve implicitly imported python names :: Resolve inside run section #22
+Resolve implicitly imported python names :: Resolve inside run section #23
+Resolve implicitly imported python names :: Resolve inside run section #8
+Resolve implicitly imported python names :: Resolve inside run section #9
+Resolve implicitly imported python names :: Resolve results priority
+Resolve implicitly imported python names :: Warn about unresolved snakemake variable in run section, behaviour differs from scripts
+Resolve in python part of snakemake file :: Do not warn about unresolved snakemake variable in python scripts and wrappers
+This feature is tests for errors/warnings related to implicit symbols :: Cannot find __getitem__ in section types #2
+This feature is tests for errors/warnings related to implicit symbols :: Cannot find __getitem__ in section types #4
+This feature is tests for errors/warnings related to implicit symbols :: Cannot find get in section types #2
+This feature is tests for errors/warnings related to implicit symbols :: Cannot find get in section types #4

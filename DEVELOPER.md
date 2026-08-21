@@ -35,14 +35,46 @@
       -Didea.config.path=$PROJECT_DIR$/.sandbox_pycharm/config-test -Didea.system.path=$PROJECT_DIR$/.sandbox_pycharm/system-test -Didea.plugins.path=$PROJECT_DIR$/.sandbox_pycharm/plugins-test -Didea.force.use.core.classloader=true
       ```
 
-2. Checkout `snakemake` project sources and configure as test data:
-    ```shell
-    cd ~
-    git clone https://github.com/snakemake/snakemake.git
+2. Checkout `snakemake` project sources and configure as test data.
 
-    cd ./testData/MockPackages3
-    ln -s ~/snakemake/snakemake snakemake
+   The unversioned `Given a snakemake project` cucumber scenarios resolve the snakemake API against
+   `testData/MockPackages3/snakemake` (gitignored, absent on a fresh checkout). Provide it by
+   symlinking the snakemake package source. Two details matter:
+   * **Version:** it must match `defaultVersion` in `snakemake_api.yaml`, which the FQN tests assert
+     against (e.g. `snakemake.ioutils.subpath.subpath`). Read the version from that file rather than
+     hardcoding one, so the fixture follows `defaultVersion` when it is bumped.
+   * **Layout:** modern snakemake keeps its package under `src/`, so the symlink target is
+     `src/snakemake` (older releases had it at the repo root).
+
+    ```shell
+    # run from the project root
+    VER=$(awk '/^defaultVersion:/{gsub(/[":]/,"",$2); print $2}' snakemake_api.yaml)
+    # works whether or not you already cloned snakemake for an earlier version of this recipe
+    [ -d ~/snakemake ] || git clone https://github.com/snakemake/snakemake.git ~/snakemake
+    # chained: a bad version must not leave the symlink pointing at the wrong revision
+    # -fn replaces the broken symlink left by the old recipe
+    git -C ~/snakemake fetch --tags && git -C ~/snakemake checkout "v$VER" &&
+      ln -sfn ~/snakemake/src/snakemake testData/MockPackages3/snakemake
     ```
+
+   If `defaultVersion` changes later, re-point the fixture the same way — the FQN tests will fail
+   against a stale checkout.
+
+   **Gotcha — "zero effect":** the test IDE sandbox persists a VFS/index under `.sandbox_pycharm`
+   that **`cleanTest` does not clear**. If you add this fixture *after* having already run the tests
+   once, the stale VFS won't see the new files and the failures persist unchanged. Always clear it
+   after provisioning the fixture:
+
+    ```shell
+    # 2>/dev/null: the sandbox does not exist yet if you have not run the tests
+    find .sandbox_pycharm -maxdepth 3 -name system-test -exec rm -rf {} + 2>/dev/null
+    ```
+
+   Use `find`, not `rm -rf .sandbox_pycharm/*/system-test`: the sandbox sits at a different depth
+   depending on how tests were launched (`.sandbox_pycharm/system-test` for the run configuration in
+   step 1, `.sandbox_pycharm/<ide>/system-test` and `.sandbox_pycharm/<project>/<ide>/system-test`
+   for the gradle task, varying by platform-plugin version), and a glob that misses simply deletes
+   nothing while looking like it worked.
 
 Tests are written in [Gherkin](https://cucumber.io/docs/gherkin). You could run tests:
 * Using gradle `test` task
