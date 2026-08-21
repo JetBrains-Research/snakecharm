@@ -50,7 +50,7 @@ Cucumber scenarios attach a snakemake library root in `configureSnakemakeProject
 
 ## Fix
 
-Verified end-to-end: the full suite goes from **135 failures to 0** (`3419/3419` green). Two steps —
+Verified end-to-end: the full suite goes from **135 failures to 1**. Two steps —
 skipping the second is why provisioning the fixture can appear to have **no effect**:
 
 1. **Provision the fixture at the right version and layout.** Modern snakemake keeps its package
@@ -108,7 +108,10 @@ maintainers want it — no workflow is included here.
 ## Evidence
 
 - Clean checkout: `failing: 135` ([`master-failures.txt`](master-failures.txt)).
-- Fixture (9.9.0 `src/snakemake`) + cleared sandbox: `failing: 0` (full suite, all 135 recovered).
+- Fixture (9.9.0 `src/snakemake`) + cleared sandbox: `failing: 1` (134 of the 135 recovered). The
+  survivor is `Resolve implicitly imported python names > Warn about unresolved snakemake variable in
+  run section, behaviour differs from scripts`, which the fixture does not address; it is a genuine
+  pre-existing failure, not an environmental one.
 - Key code: `StepDefs.kt:56-63`, `SmkImplicitPySymbolsProvider.kt`, `CompletionResolveSteps.kt`,
   `snakemake_api.yaml` (`defaultVersion: 9.9.0`), `.gitignore:137`.
 
