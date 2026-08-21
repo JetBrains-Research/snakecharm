@@ -25,6 +25,37 @@
   As an alternative, you could locally set `snakemakeWrappersRepoPath` to existing wrappers folder in 
   `gradle.properties` file.
 
+**Command-line build & test (no IDE required):**
+
+The Gradle build uses a **JDK 21 toolchain** (`javaVersion` in `gradle.properties`) and the
+Gradle version pinned in `gradle.properties` (`gradleVersion`). Make sure a JDK 21 is
+installed and visible to Gradle before building from the command line. For example:
+
+```shell
+# macOS (Homebrew): install a JDK 21
+brew install openjdk@21
+
+# Point Gradle at it for this build (or manage per-directory with jenv/asdf/SDKMAN):
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+
+./gradlew clean buildPlugin        # builds build/distributions/snakecharm-*.zip
+./gradlew test                     # runs the JUnit + Cucumber test suite
+./gradlew verifyPlugin             # runs the IntelliJ Plugin Verifier
+./gradlew runIde                   # launches a sandbox IDE with the plugin installed
+```
+
+If Gradle can't auto-detect the JDK, pass it explicitly:
+`-Dorg.gradle.java.installations.paths=$JAVA_HOME`.
+
+> **Note on the target IDE.** `platformType`/`platformVersion` in `gradle.properties` select
+> the IDE the plugin is built and tested against; it is downloaded automatically on first
+> build (a multi-hundred-MB to ~1 GB download). Since PyCharm was unified in 2025.1 and the
+> standalone Community Edition ended at 2025.2/2025.3, releases from 2026.1 (build `261`) on
+> are distributed under the Professional artifact, so `platformType = PY` is required to
+> build against them. The free/Pro split is a runtime license state and does not affect the
+> downloaded SDK or building the plugin.
+
+
 **Configure Tests:**
         
 1. Configure tests to use `$PROJECT_DIR$/.sandbox_pycharm` as sandbox directory when running tests  from the IDEA context menu. 
@@ -49,6 +80,12 @@ Tests are written in [Gherkin](https://cucumber.io/docs/gherkin). You could run 
 * From IDEA context menu via `Cucumber Java` run configuration
   * Before running first test launch `buildTestWrappersBundle` task  
 
+To run a **single cucumber feature** from the command line, add a `@here` tag above its
+`Feature:` line and set `tags = "not @ignore and @here"` in `AllCucumberFeaturesTest.kt`
+(revert both afterwards). Note that `testData` is **not** a declared input of the `test`
+task, so after editing any feature/test-data file run `./gradlew cleanTest test` — plain
+`test` may serve stale cached results.
+
 If you get `Unimplemented substep definition` in all `*.feature` files, ensure:
   * Not installed or disabled: `Substeps IntelliJ Plugin` 
   * Plugins installed: `Cucumber Java`, `Gherkin`
@@ -61,6 +98,16 @@ If you get `Unimplemented substep definition` in all `*.feature` files, ensure:
   * 
 * Update platform API and this plugin versions in `gradle.properties`, see `pluginVersion`, `pluginSinceBuild`, `pluginUntilBuild`, `platformVersion`
   * `pluginVersion` version should be also mentioned in changelog `CHANGELOG.md`
+  * Build numbers map to IDE versions per
+    [build-number-ranges](https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html),
+    e.g. `2025.2`=`252`, `2025.3`=`253`, `2026.1`=`261`. Set `pluginUntilBuild` to the
+    branch of the newest IDE you actually built/tested against (e.g. `261.*`).
+  * `platformType`: PyCharm Community (`PC`) ended at 2025.2/2025.3. From 2026.1 (`261`) on,
+    the unified PyCharm ships under the Professional artifact, so use `platformType = PY`
+    (the build wires `Pythonid` for `PY`/`PD` and `PythonCore` for `PC`).
+  * Check available IDE versions with
+    `./gradlew printProductsReleases`, or query
+    `https://data.services.jetbrains.com/products/releases?code=PY&type=release` (`PY`=PyCharm).
 * Update `snakemakeWrappersRepoVersion` to up-to-date, need to be updated on TeamCity CI as well.
  
 **Release plugin:**

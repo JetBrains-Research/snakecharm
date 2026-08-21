@@ -16,7 +16,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 
 class SmkRuleLikeSectionType(private val declaration: SmkRuleOrCheckpoint) : PyType {
-    override fun getName() = "${declaration.sectionTokenType}${declaration.name?.let { " $it" } ?: ""}"
+    override val name: String? get() = "${declaration.sectionTokenType}${declaration.name?.let { " $it" } ?: ""}"
 
     override fun assertValid(message: String?) {
         if (!declaration.isValid) {
@@ -42,7 +42,7 @@ class SmkRuleLikeSectionType(private val declaration: SmkRuleOrCheckpoint) : PyT
     override fun getCompletionVariants(
             completionPrefix: String?,
             location: PsiElement,
-            context: ProcessingContext?
+            context: ProcessingContext
     ): Array<out Any> {
         if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(location)) {
             return emptyArray()
@@ -62,5 +62,5 @@ class SmkRuleLikeSectionType(private val declaration: SmkRuleOrCheckpoint) : PyT
         }
     }
 
-    override fun isBuiltin() = false
+    override val isBuiltin: Boolean get() = false
 }

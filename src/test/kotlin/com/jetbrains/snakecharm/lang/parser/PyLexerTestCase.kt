@@ -1,24 +1,20 @@
 package com.jetbrains.snakecharm.lang.parser
 
 import com.intellij.lexer.Lexer
-import com.intellij.testFramework.PlatformLiteFixture
-import com.jetbrains.python.PythonDialectsTokenSetContributor
-import com.jetbrains.python.PythonTokenSetContributor
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import junit.framework.TestCase
 
 /**
  * @author Roman.Chernyatchik
  * @date 2018-12-31
  *
- * TODO: Ask for API
+ * Historically this extended the platform's `PlatformLiteFixture` and manually registered the
+ * `PythonDialectsTokenSetContributor` extension point on a mock application. That fixture was removed
+ * in the 2026.1 (build 261) test framework, so we now run on the full [BasePlatformTestCase] instead:
+ * the Python plugin loaded by the test application already registers its token-set contributors, so
+ * the snakemake lexer tokenizes exactly as it does at runtime.
  */
-abstract class PyLexerTestCase  : PlatformLiteFixture() {
-    override fun setUp() {
-        super.setUp()
-        initApplication()
-        registerExtensionPoint(PythonDialectsTokenSetContributor.EP_NAME, PythonDialectsTokenSetContributor::class.java)
-        registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
-    }
+abstract class PyLexerTestCase : BasePlatformTestCase() {
 
     fun doLexerTest(text: String, lexer: Lexer, vararg expectedTokens: String) {
         doLexerTest(text, lexer, false, *expectedTokens)

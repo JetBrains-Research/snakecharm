@@ -40,13 +40,13 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
 
     abstract val currentFileDeclarations: List<T>
 
-    override fun getName() = typeName
+    override val name: String? get() = typeName
 
     override fun getCompletionVariants(
         completionPrefix: String?,
         location: PsiElement,
-        context: ProcessingContext?
-    ): Array<Any> = emptyArray()
+        context: ProcessingContext
+    ): Array<out Any> = emptyArray()
 
     override fun assertValid(message: String?) {
         // [romeo] Not sure is our type always valid or check whether any element is invalid
@@ -86,7 +86,7 @@ abstract class AbstractSmkRuleOrCheckpointType<T : SmkRuleOrCheckpoint>(
         } + getUseSections(name, location)
     }
 
-    override fun isBuiltin() = false
+    override val isBuiltin: Boolean get() = false
 
     protected open fun getUseSections(name: String, location: PyExpression): List<RatedResolveResult> {
         val result = mutableListOf<RatedResolveResult>()
