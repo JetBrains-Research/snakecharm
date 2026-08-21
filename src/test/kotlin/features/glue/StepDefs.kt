@@ -156,6 +156,18 @@ class StepDefs {
 
         if (projectType != "snakemake with disabled framework") {
             withSnakemakeFacet("without")
+        } else {
+            // Disable it explicitly rather than just skipping the enable above. Scenarios share one
+            // project (the descriptor, and with it the fixture's project, is cached), so
+            // SmkSupportProjectSettings survives into the next scenario: without this, a "disabled
+            // framework" project silently inherits whatever the previous scenario enabled.
+            waitEDTEventsDispatching()
+            ApplicationManager.getApplication().invokeAndWait {
+                SmkSupportProjectSettings.updateStateAndFireEvent(
+                    SnakemakeWorld.fixture().project, SmkSupportProjectSettings.State()
+                )
+            }
+            waitEDTEventsDispatching()
         }
     }
 
