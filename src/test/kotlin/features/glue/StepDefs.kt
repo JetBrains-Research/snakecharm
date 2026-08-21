@@ -67,11 +67,22 @@ class StepDefs {
 
         // Write code here that turns the phrase above into concrete actions
         val testDataRoot = SnakemakeTestUtil.getTestDataPath().toString()
-        val projectDescriptor = PyLightProjectDescriptor(level, testDataRoot, *additionalRoots)
 
-        SnakemakeWorld.myPythonOnlySdk = PythonMockSdk.create(
-            testDataRoot, level, sdkNameSuffix = "_wo_snakemake"
-        )
+        // Reuse the descriptor (and therefore its SDK) across scenarios with the same roots. Each
+        // descriptor builds a mock SDK named "Mock Python SDK <level>", and since 2026.2 SDKs are
+        // workspace-model entities: adding a second one with the same symbolic id logs
+        // "addEntity: symbolic id already exists", which TestLoggerFactory turns into a test failure.
+        // A per-scenario descriptor therefore failed ~1070 otherwise-unrelated scenarios. Caching is
+        // also the standard light-test pattern (a static LightProjectDescriptor), and lets the light
+        // fixture reuse the project instead of rebuilding it per scenario.
+        val descriptorKey = listOf(level.toString(), testDataRoot) + additionalRoots.map { it.toString() }
+        val projectDescriptor = projectDescriptors.getOrPut(descriptorKey) {
+            PyLightProjectDescriptor(level, testDataRoot, *additionalRoots)
+        }
+
+        SnakemakeWorld.myPythonOnlySdk = pythonOnlySdks.getOrPut(listOf(level.toString(), testDataRoot)) {
+            PythonMockSdk.create(testDataRoot, level, sdkNameSuffix = "_wo_snakemake")
+        }
 
         val factory = IdeaTestFixtureFactory.getFixtureFactory()
         allowPythonRootsAccess(SnakemakeWorld.myTestRootDisposable!!)
@@ -145,6 +156,18 @@ class StepDefs {
 
         if (projectType != "snakemake with disabled framework") {
             withSnakemakeFacet("without")
+        } else {
+            // Disable it explicitly rather than just skipping the enable above. Scenarios share one
+            // project (the descriptor, and with it the fixture's project, is cached), so
+            // SmkSupportProjectSettings survives into the next scenario: without this, a "disabled
+            // framework" project silently inherits whatever the previous scenario enabled.
+            waitEDTEventsDispatching()
+            ApplicationManager.getApplication().invokeAndWait {
+                SmkSupportProjectSettings.updateStateAndFireEvent(
+                    SnakemakeWorld.fixture().project, SmkSupportProjectSettings.State()
+                )
+            }
+            waitEDTEventsDispatching()
         }
     }
 
@@ -234,6 +257,10 @@ class StepDefs {
     }
 
     companion object {
+        /** Cached per JVM so the same mock SDK entity isn't added once per scenario -- see the use site. */
+        private val projectDescriptors = HashMap<List<String>, PyLightProjectDescriptor>()
+        private val pythonOnlySdks = HashMap<List<String>, com.intellij.openapi.projectRoots.Sdk>()
+
         fun waitEDTEventsDispatching() {
             ApplicationManager.getApplication().invokeAndWait() {
                 // Do nothing, wait for events in EDT
@@ -241,3 +268,4 @@ class StepDefs {
         }
     }
 }
+

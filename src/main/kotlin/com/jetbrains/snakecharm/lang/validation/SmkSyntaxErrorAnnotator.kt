@@ -3,13 +3,14 @@ package com.jetbrains.snakecharm.lang.validation
 import com.intellij.lang.annotation.HighlightSeverity.ERROR
 import com.jetbrains.python.psi.PyKeywordArgument
 import com.jetbrains.python.psi.PyStarArgument
+import com.jetbrains.python.validation.PyAnnotationHolder
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.inspections.quickfix.IntroduceKeywordArgument
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.*
 
-object SmkSyntaxErrorAnnotator : SmkAnnotator() {
+class SmkSyntaxErrorAnnotator(holder: PyAnnotationHolder) : SmkAnnotator(holder) {
     override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
         findAndHighlightIncorrectArguments(st)
     }

@@ -6,7 +6,7 @@ Feature: Inspection: Unused local Inspection suppressing
     def foo_385():
         a = 1
     """
-    And PyUnusedLocalInspection inspection is enabled
+    And PyUnusedLocalVariableInspection inspection is enabled
     Then I expect inspection weak warning on <a> with message
     """
     Local variable 'a' value is not used
@@ -22,7 +22,7 @@ Feature: Inspection: Unused local Inspection suppressing
             <section>: "a"
         pass
     """
-    And PyUnusedLocalInspection inspection is enabled
+    And PyUnusedLocalVariableInspection inspection is enabled
     Then I expect no inspection weak warnings
     When I check highlighting weak warnings
     Examples:
