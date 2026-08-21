@@ -2,6 +2,7 @@ package com.jetbrains.snakecharm.codeInsight.completion.wrapper
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -22,7 +23,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.exists
-import kotlin.system.exitProcess
 
 class SmkWrapperStorage(val project: Project) : Disposable {
     var version = ""
@@ -134,6 +134,8 @@ class SmkWrapperStorage(val project: Project) : Disposable {
     )
 
     companion object {
+        private val LOGGER = Logger.getInstance(SmkWrapperStorage::class.java)
+
         fun getInstance(project: Project) = project.getService(SmkWrapperStorage::class.java)!!
 
         @ExperimentalSerializationApi
@@ -185,11 +187,12 @@ class SmkWrapperStorage(val project: Project) : Disposable {
                 .resolve("build/bundledWrappers/smk-wrapper-storage.test.cbor")
 
             if (!wrappersInfoBundlerForTests.exists()) {
-                System.err.println(
-                    "Generate test data 'build/bundledWrappers/smk-wrapper-storage.test.cbor'" +
-                            " using `buildTestWrappersBundle` gradle task"
+                // Fail this test, not the whole JVM: exitProcess() here killed the Gradle test worker,
+                // so the run ended with a worker-crash message instead of naming the missing test data.
+                error(
+                    "Missing test wrappers bundle: '$wrappersInfoBundlerForTests'." +
+                            " Generate it using the `buildTestWrappersBundle` gradle task."
                 )
-                exitProcess(1)
             }
 
             val (repoVersion, wrappers) = deserializeWrappers(wrappersInfoBundlerForTests)
@@ -200,8 +203,16 @@ class SmkWrapperStorage(val project: Project) : Disposable {
         private fun loadBundledWrappers(storage: SmkWrapperStorage) {
             val pluginSandboxPath = SnakemakePluginUtil.getPluginSandboxPath(SmkWrapperStorage::class.java)
             val wrappersBundlePath = pluginSandboxPath.resolve("extra/smk-wrapper-storage-bundled.cbor")
-            requireNotNull(!wrappersBundlePath.exists()) {
-                "Missing wrappers bundle in plugin bundle: '$wrappersBundlePath' doesn't exist"
+            if (!wrappersBundlePath.exists()) {
+                // A plugin built without `-PsnakemakeWrappersRepoPath` has no bundle (see #571), which is
+                // now the default for a local build. Degrade to "no wrappers known" instead of throwing
+                // out of the background wrapper-collection task.
+                LOGGER.warn(
+                    "Missing wrappers bundle in plugin bundle: '$wrappersBundlePath' doesn't exist. " +
+                            "Wrapper name completion will be unavailable."
+                )
+                storage.initFrom("", emptyList())
+                return
             }
             val (repoVersion, wrappers) = deserializeWrappers(wrappersBundlePath)
             storage.initFrom(repoVersion, wrappers)
