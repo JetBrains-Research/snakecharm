@@ -360,6 +360,84 @@ Plausibly the same underlying issue as
 real platform change before touching the feature file: 2026.1.3 registers the old name, 2026.2.1 the
 new one, both in `intellij.python.psi.impl.jar` and `python-ce.jar`.
 
+### 12. Implicit-symbol cache left holding invalidated PSI — FIXED (76 → TBD)
+
+The biggest remaining cluster (58 of 76) was one cause: `SmkImplicitPySymbolsProvider`'s cache is a
+list of `ImplicitPySymbol`s that hold **hard references to library PSI**, and `validElements` drops
+any whose `psiDeclaration.isValid` is false. Since 2026.2 the platform invalidates library PSI on
+every roots change, so the whole cache dies at once — `invalid 54/54` — and every implicit symbol
+resolves to nothing.
+
+Nothing rebuilt it in time. The provider refreshed on two settings events, and `stateChanged`
+returns early unless the configured SDK **name** changed:
+
+```kotlin
+val sdkNameNotChanged = sdkRenamed || (oldState.pythonSdkName == newSettings.sdkName)
+if (sdkNameNotChanged && !sdkRemoved) return
+```
+
+`validElements` does call `scheduleUpdate()` when it notices dead PSI, but that is
+`SwingUtilities.invokeLater` — the rebuild lands *after* the assertion has already failed.
+
+**Fix:** subscribe to `ModuleRootListener.rootsChanged` and rebuild — but only when
+`cache.hasDeadPsi()`, i.e. when the roots change actually killed what we cached. Roots changing is
+the one event that fires before the resolve, and dead PSI is the precise condition.
+
+The guard is not cosmetic. Rebuilding on *every* roots change also fixed the 58, but broke
+`Check different SDK settings`, which walks the interpreter through none/invalid/python-without-
+snakemake and asserts `expand` does *not* resolve at each step: the settings listeners clear the
+cache, then a roots change fires and `getActiveSdk()` still hands back a usable SDK, so the symbols
+come back. An empty or still-valid cache must be left alone.
+
+**How the pattern gave it away.** In `Resolve implicitly imported python names > Resolve at
+top-level` (43 rows), exactly rows 2, 17-19, 25-28, 32, 35-36 failed, in every run since 2026.2.0.1.
+That set looks arbitrary until you line it up against the *previous* row: **a row fails iff its
+snakemake version is the same as the row before it.** A different version changes the SDK name,
+fires the settings event, rebuilds the cache; the same version fires nothing and inherits the dead
+one. It is not a property of the symbols — `protected` and `ancient` fail while `directory` and
+`temp`, defined 20 lines away in the same file, pass.
+
+Chasing "which symbols are broken" was therefore a dead end for an hour. What settled it in one run
+was printing three things: what the cache contained at build time (everything), what
+`cache[TOP_LEVEL]` returned at resolve time (nothing), and which events fired in between
+(`rootsChanged` always, `enabled` only on the passing rows).
+
+**Debug loop.** `AllCucumberFeaturesTest` has a commented-out `tags="not @ignore and @here"`. Rather
+than editing two source files per iteration, the `test` task now forwards an env var:
+
+```shell
+CUCUMBER_TAGS='@here' SNAKECHARM_TEST_HEAP=8g ./gradlew test --tests "features.AllCucumberFeaturesTest"
+```
+
+Tag one scenario or outline `@here` and the 24-minute suite becomes a 60-second one. Cucumber's
+`cucumber.filter.tags` property overrides the `@CucumberOptions` annotation, so the runner itself
+needs no edit.
+
+### 13. `snakemake with disabled framework` did not disable it — FIXED
+
+Fixing item 12 exposed this, which the staleness had been hiding. `Given a snakemake with disabled
+framework project` never disables anything — it only *skips* the `withSnakemakeFacet(...)` call, on
+the assumption that a fresh project starts with the framework off:
+
+```kotlin
+if (projectType != "snakemake with disabled framework") {
+    withSnakemakeFacet("without")
+}
+```
+
+That assumption died with the descriptor cache (`11fdec6a`, needed on 2026.2 — see the rejected
+avenue above): scenarios sharing a descriptor share the fixture's project, and
+`SmkSupportProjectSettings` is a project service, so the setting survives into the next scenario. A
+"disabled framework" project therefore inherits whatever the previous scenario enabled.
+
+`Check different SDK settings` asserts `expand` does not resolve there. It passed only because the
+implicit-symbol cache was full of dead PSI; with item 12 fixed the cache is live, the framework is
+in fact enabled, and `expand` resolves. **The scenario was green for the wrong reason.** The step now
+pushes a default (disabled) state explicitly.
+
+Worth remembering when the next test starts failing "because of" a fix: a shared-project test suite
+can hold assertions that only hold while something else is broken.
+
 ### Method note: cluster failure *messages*, not test names
 
 Grouping the 145 failures by feature made them look like one big resolve problem. Grouping by the
