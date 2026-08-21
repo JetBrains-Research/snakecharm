@@ -34,4 +34,6 @@ were shown to be identical on `master` and on the 2026.1 port branch, rather tha
 introduced by the port.
 
 It exits non-zero if the results directory contains no `TEST-*.xml`, rather than reporting zero
-failures — an aborted build or a mistyped path should not look like a green suite.
+failures — a mistyped path, or a run that never started, should not look like a green suite. It
+cannot tell a *partially* completed run from a finished one; the `total testcases:` line on stderr is
+the check for that.

@@ -40,9 +40,12 @@
     ```shell
     # run from the project root
     VER=$(awk '/^defaultVersion:/{gsub(/[":]/,"",$2); print $2}' snakemake_api.yaml)
-    git clone --branch "v$VER" https://github.com/snakemake/snakemake.git ~/snakemake
+    # works whether or not you already cloned snakemake for an earlier version of this recipe
+    [ -d ~/snakemake ] || git clone https://github.com/snakemake/snakemake.git ~/snakemake
+    # chained: a bad version must not leave the symlink pointing at the wrong revision
     # -fn replaces the broken symlink left by the old recipe
-    ln -sfn ~/snakemake/src/snakemake testData/MockPackages3/snakemake
+    git -C ~/snakemake fetch --tags && git -C ~/snakemake checkout "v$VER" &&
+      ln -sfn ~/snakemake/src/snakemake testData/MockPackages3/snakemake
     ```
 
    If `defaultVersion` changes later, re-point the fixture the same way — the FQN tests will fail
@@ -54,7 +57,8 @@
    after provisioning the fixture:
 
     ```shell
-    find .sandbox_pycharm -maxdepth 3 -name system-test -exec rm -rf {} +
+    # 2>/dev/null: the sandbox does not exist yet if you have not run the tests
+    find .sandbox_pycharm -maxdepth 3 -name system-test -exec rm -rf {} + 2>/dev/null
     ```
 
    Use `find`, not `rm -rf .sandbox_pycharm/*/system-test`: the sandbox sits at a different depth

@@ -70,8 +70,8 @@ skipping the second is why provisioning the fixture can appear to have **no effe
    Use `-fn`: anyone who followed the old recipe already has a **broken** symlink at that path, and
    a plain `ln -s` aborts with "File exists" and leaves it in place.
 
-   `DEVELOPER.md`'s current recipe (`ln -s ~/snakemake/snakemake …`) predates the `src/` move and
-   creates a broken symlink.
+   The recipe `DEVELOPER.md` carried before this fix (`ln -s ~/snakemake/snakemake …`) predated the
+   `src/` move and creates a broken symlink there.
 
 2. **Let the test sandbox see it.** The IDE test sandbox persists a VFS/index under
    `.sandbox_pycharm` that **`cleanTest` does not clear**. If you add the fixture *after* running the
@@ -79,7 +79,7 @@ skipping the second is why provisioning the fixture can appear to have **no effe
    reporting the directory's old contents and the failures persist unchanged. Always clear it:
 
    ```shell
-   find .sandbox_pycharm -maxdepth 3 -name system-test -exec rm -rf {} +
+   find .sandbox_pycharm -maxdepth 3 -name system-test -exec rm -rf {} + 2>/dev/null
    ```
 
    `find` rather than `rm -rf .sandbox_pycharm/*/system-test`, because the sandbox depth varies with
