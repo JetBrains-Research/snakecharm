@@ -54,8 +54,17 @@ Tests are **Cucumber/Gherkin** feature files under `src/test/resources/features/
 through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions in
 `src/test/kotlin/features/glue/`). There is no per-feature test class.
 
-- **Run one feature:** add a `@here` tag above its `Feature:` line and set
-  `tags = "not @ignore and @here"` in `AllCucumberFeaturesTest.kt`; revert both afterwards.
+- **Run one feature:** add a `@here` tag above its `Feature:` line (or above a single `Scenario:` /
+  `Scenario Outline:`) and set `tags = "not @ignore and @here"` in `AllCucumberFeaturesTest.kt`;
+  revert both afterwards. Once #577 lands, the runner edit is unnecessary — `test` forwards
+  `CUCUMBER_TAGS='@here'` to cucumber's `cucumber.filter.tags`, which overrides the annotation. Worth
+  the trouble either way: it turns a 25-minute suite into a ~60-second one.
+- **Scenarios share one project.** The light fixture's descriptor is cached (it has to be on 2026.2 —
+  a per-scenario mock SDK collides on symbolic id), so project *services* survive into the next
+  scenario. A step that wants project state — framework enabled/disabled, settings, SDK — must set it
+  explicitly; it cannot rely on a fresh project's defaults. `Given a snakemake with disabled framework
+  project` broke exactly this way, and the scenario that depended on it stayed green for years only
+  because a second bug happened to cancel it out.
 - **`testData` is NOT a declared input of the `test` task.** After editing any feature or
   test-data file, run `./gradlew cleanTest test` — plain `test` may serve stale cached results.
 - Test data lives in `testData/`. Snakemake API is mocked per-version under
