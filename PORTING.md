@@ -360,7 +360,7 @@ Plausibly the same underlying issue as
 real platform change before touching the feature file: 2026.1.3 registers the old name, 2026.2.1 the
 new one, both in `intellij.python.psi.impl.jar` and `python-ce.jar`.
 
-### 12. Implicit-symbol cache left holding invalidated PSI — FIXED (76 → TBD)
+### 12. Implicit-symbol cache left holding invalidated PSI — FIXED (76 → 5)
 
 The biggest remaining cluster (58 of 76) was one cause: `SmkImplicitPySymbolsProvider`'s cache is a
 list of `ImplicitPySymbol`s that hold **hard references to library PSI**, and `validElements` drops
@@ -515,7 +515,8 @@ then clear the sandbox VFS — `cleanTest` does **not** clear it):
 2026.2 + fixture, before item 9's fix:  3248 scenarios, 246 failing
 2026.2 + fixture, after  item 9  (serialization):  145 failing
 2026.2 + fixture, after  item 10 (daemon restart):  82 failing
-2026.2 + fixture, after  item 11 (inspection name): 76 failing   <-- current
+2026.2 + fixture, after  item 11 (inspection name): 76 failing
+2026.2 + fixture, after  item 12 (symbol cache) + 13:  5 failing   <-- current
 ```
 
 On 2026.1 the fixture resolves **134 of the 135** environmental failures, so #574's "135 → 0" is
@@ -524,13 +525,24 @@ breaking 64 — which is how we knew those 64 belonged to the 2026.2 harness rat
 fixture. The serialization fix has since cleared most of that harness damage; 3 of the current 145
 are the same 3 that 2026.1 fails, so **142 are 2026.2-specific and still to triage.**
 
-**The remaining 76 are now overwhelmingly one shape — resolve returning nothing.** 43 of them are
-literally `expected:<1> but was:<0>`, concentrated in `snakemake_api.yaml` fqn checks (24),
-`Resolve implicitly imported python names` (23) and `Resolve for section names in rules and
-checkpoints` (11) — 58 of 76 between them. That count was *unchanged* across the item 9/10/11 fixes,
-so it is an independent cause and the obvious next thread: implicit symbols from
-`SmkImplicitPySymbolsProvider` appear not to resolve on 2026.2, even with the fixture attached.
-Two of the 76 are the injected-string cases shared with 2026.1.
+That prediction held: 58 of the 76 were `resolve returning nothing` in three clusters
+(`snakemake_api.yaml` fqn checks 24, `Resolve implicitly imported python names` 23, section names
+11), and they were all the one cause in item 12 — the implicit-symbol cache holding dead PSI.
+
+**The 5 that remain:**
+
+| failure | shared with 2026.1? |
+| --- | --- |
+| `Inspection: Unresolved element > Unresolved variable in injection` | yes |
+| `Inspection: Unresolved element > Unresolved conda path (complex string)` | yes |
+| `Resolve implicitly imported python names > Warn about unresolved snakemake variable in run section` | yes, and on master |
+| `Fixes PyArgumentListInspection related false positives > PyArgumentListInspection works in snakemake files` | **no — 2026.2 only, untriaged** |
+| `Fixes for PyTypeCheckerInspection related false positives > PyTypeCheckerInspection works in snakemake files` | **no — 2026.2 only, untriaged** |
+
+The first three are the same three 2026.1 fails, so **only two failures are now 2026.2-specific.**
+Both are `ExpectedHighlightingData` mismatches where an expected warning is missing, e.g.
+`expand(" ", [<warning descr="Expected a mapping, got int">**1</warning>])` highlighted as plain
+`**1` — a type-inference difference, not a resolve one. That is the next thread.
 
 Measurement note: **"3419" is not the scenario count.** It is cucumber (3248) + the 171 non-cucumber
 tests. The fixture never changes the scenario count, only how many pass.
