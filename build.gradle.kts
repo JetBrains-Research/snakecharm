@@ -405,6 +405,10 @@ tasks {
 
         dependsOn("buildTestWrappersBundle")
 
+        // Narrow a local run to tagged scenarios without editing AllCucumberFeaturesTest:
+        // CUCUMBER_TAGS='@here' ./gradlew test --tests "features.AllCucumberFeaturesTest"
+        System.getenv("CUCUMBER_TAGS")?.let { systemProperty("cucumber.filter.tags", it) }
+
         // The 2026.1 Python plugin ships its code as v2 content modules under
         // plugins/python-ce/lib/modules/. That breaks PythonHelpersLocator's jar-path lookup for the
         // Python helpers root (it expects the jar directly under `lib/`, and throws
