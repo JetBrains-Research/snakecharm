@@ -20,7 +20,7 @@ interface SmkAvailableForSubscriptionType : PyType {
     fun getCompletionVariantsAndPriority(
             completionPrefix: String?,
             location: PsiElement,
-            context: ProcessingContext?
+            context: ProcessingContext
     ): Pair<List<LookupElementBuilder>, Double>
 
     fun resolveMemberByIndex(

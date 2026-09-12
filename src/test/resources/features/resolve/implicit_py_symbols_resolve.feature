@@ -112,9 +112,9 @@ Feature: Resolve implicitly imported python names
     Examples:
       | ptn | text      | symbol_name | file                  |
       | os  | os        | [SKIP]      | os/__init__.pyi       |
-      | sy  | sys       | [SKIP]      | sys.py                |
+      | sy  | sys       | [SKIP]      | sys/__init__.pyi      |
       | sn  | snakemake | [SKIP]      | snakemake/__init__.py |
-      | Pat | Path      | Path        | pathlib.pyi           |
+      | Pat | Path      | Path        | pathlib/__init__.pyi  |
 
   Scenario: Resolve at top-level: shell()
     Given a snakemake project
@@ -503,8 +503,11 @@ Feature: Resolve implicitly imported python names
              path = snakemake.input[0]
      """
     And PyUnresolvedReferencesInspection inspection is enabled
+    # 2026.1 names the containing package where 2025.2 named the file it resolved to:
+    # "in 'snakemake'" rather than "in '__init__.py'". Same inspection, same WARNING severity, same
+    # anchor -- only the message text moved. See #589.
     Then I expect inspection warning on <input> with message
       """
-      Cannot find reference 'input' in '__init__.py'
+      Cannot find reference 'input' in 'snakemake'
       """
     When I check highlighting warnings

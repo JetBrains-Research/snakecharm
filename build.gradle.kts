@@ -1,11 +1,13 @@
 @file:Suppress("SpellCheckingInspection", "UnstableApiUsage")
 
+import org.gradle.api.logging.Logging
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.Constants.Configurations
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
+import kotlin.io.path.isDirectory
 
 fun gradlePropertyOptional(key: String) = project.findProperty(key)?.toString()
 fun gradleProperty(key: String) = providers.gradleProperty(key)
@@ -64,6 +66,57 @@ repositories {
     }
 }
 
+// Align the *runtime* Kotlin standard library with the one bundled in the target IntelliJ Platform
+// (2026.1 / build 261 ships Kotlin 2.3.20). Our build compiles with an older Kotlin, and its
+// kotlin-stdlib is otherwise pulled onto the runtime/test classpath (via `kotlinStdlibJdk8`,
+// `kotlin-reflect`, `kotlin-test-junit`). That older stdlib's coroutine stack-trace recovery cannot
+// read the v2 `@DebugMetadata` emitted by the platform's 2.3.20-compiled classes and throws
+// "Debug metadata version mismatch. Expected: 1, got 2", which crashes the coroutine machinery and
+// hangs the test IDE during project setup. Forcing the newer stdlib (which understands both metadata
+// versions) fixes it. We deliberately scope this to runtime classpath configurations only (matched
+// case-insensitively so that both the production `runtimeClasspath` and `testRuntimeClasspath` are
+// covered): putting a stdlib newer than the compiler on the compile classpath would trip Kotlin's
+// metadata-version check.
+configurations.matching { it.name.endsWith("RuntimeClasspath", ignoreCase = true) }.configureEach {
+    val kotlinPlatformVersion = libs.versions.kotlinPlatform.get()
+    val kotlinxSerializationPlatformVersion = libs.versions.kotlinxSerializationPlatform.get()
+    resolutionStrategy {
+        force("org.jetbrains.kotlin:kotlin-stdlib:$kotlinPlatformVersion")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinPlatformVersion")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinPlatformVersion")
+
+        // Same class of problem as the stdlib above, different library. The platform bundles
+        // kotlinx-serialization-core 1.9.0 (lib/intellij.libraries.kotlinx.serialization.core.jar) and
+        // its classes carry serializers generated against that ABI; our `kotlinxCbor` dependency drags
+        // core onto the runtime/test classpath, where -- the Gradle test classpath being flat rather
+        // than plugin-classloader-scoped -- ours wins. Platform-generated serializers then call methods
+        // that do not exist in the older core and die with
+        // "AbstractMethodError at PluginGeneratedSerialDescriptor.kt", which TestLoggerFactory turns
+        // into a test failure, across whole swathes of otherwise unrelated scenarios. Forcing core (and
+        // cbor, so the pair stays consistent) to the platform's version fixes the direction of the
+        // skew: a newer core runs older generated code fine.
+        //
+        // Our own `kotlinxCbor` already resolves to this version (the catalog points it at the same
+        // key), so today these forces are a no-op; they are what keeps a transitive dependency from
+        // dragging a different serialization version in and reintroducing the skew.
+        // Measured on #577 (2026.2), where the same skew was live: forcing this removed 101 failures.
+        // See #587.
+        force("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationPlatformVersion")
+        force("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$kotlinxSerializationPlatformVersion")
+    }
+}
+
+
+// The platform types whose IDE *is* a Python IDE, i.e. the ones that bundle the Python plugin (and
+// therefore its `helpers` directory) as part of the distribution. Anything else (IDEA + the external
+// Python plugin) is laid out differently. Goes through the plugin's own enum rather than re-listing
+// the codes, so a typo in `platformType` fails loudly here instead of silently picking "not PyCharm".
+val isPyCharmPlatform = IntelliJPlatformType.fromCode(gradlePropertyWithPriorityToSystemProperty("platformType")) in
+        setOf(
+            IntelliJPlatformType.PyCharmCommunity,
+            IntelliJPlatformType.PyCharmProfessional,
+            IntelliJPlatformType.DataSpell,
+        )
 
 dependencies {
     implementation(libs.kotlinStdlibJdk8)
@@ -93,10 +146,20 @@ dependencies {
             val platformVersion = gradlePropertyWithPriorityToSystemProperty("platformVersion")
             val isSnapshot = platformVersion.endsWith("-SNAPSHOT")
             logger.warn("Use IntelliJ Platform Version: ${platformType}-${platformVersion}. SNAPSHOT: $isSnapshot")
-            create(platformType, platformVersion, useInstaller = !isSnapshot)
+            create(platformType, platformVersion) {
+                useInstaller = !isSnapshot
+            }
         }
 
         // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
+        //
+        // NB: on "PY"/"PD" the compile classpath is `Pythonid` (Python Professional), while
+        // plugin.xml declares only `<depends>PythonCore</depends>` and the `else ->` branch still
+        // targets IDEA + the community Python plugin. So the compiler no longer rejects a
+        // Professional-only Python API used from `src/main`: it compiles, and the tests pass (their
+        // classpath is flat), but it would throw NoClassDefFoundError for users on IDEA + PythonCore.
+        // Since 2026.1 there is no community PyCharm artifact to build against, so keep that
+        // restriction in mind by hand -- everything in `src/main` must stay within PythonCore's API.
         when (platformType) {
             "PC" -> bundledPlugin("PythonCore")
             "PY", "PD" -> {
@@ -111,6 +174,16 @@ dependencies {
         }
         // Plugin Dependencies. Uses `platformBundledPlugins` property from the gradle.properties file for bundled IntelliJ Platform plugins.
         bundledPlugins(gradleProperty("platformBundledPlugins").get().split(',').map(String::trim).filter(String::isNotEmpty))
+
+        // Spellchecker was extracted from the platform core into a separate module (with its own
+        // classloader) in 2025.2+. We directly use its API (spellchecker.bundledDictionaryProvider),
+        // so declare it explicitly.
+        // https://plugins.jetbrains.com/docs/intellij/api-changes-list-2025.html
+        bundledModule("intellij.spellchecker")
+        // In the unified 2026.1 platform the `SpellCheckingInspection` tool itself is provided by the
+        // Grazie ("Natural Languages") plugin, not core. Needed so spellchecker-integration tests can
+        // enable that inspection in the sandbox.
+        bundledPlugin("tanvd.grazi")
 
         // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file for plugin from JetBrains Marketplace.
         plugins(gradleProperty("platformPlugins").map { it.split(',') })
@@ -133,9 +206,7 @@ intellijPlatform {
     instrumentCode = true
     projectName = project.name
 
-    val platformType = gradlePropertyWithPriorityToSystemProperty("platformType")
-    val isPyCharm = platformType == "PC" || platformType == "PY" || platformType == "PD"
-    sandboxContainer = file("${project.rootDir}/.sandbox${if (isPyCharm) "_pycharm" else ""}")
+    sandboxContainer = file("${project.rootDir}/.sandbox${if (isPyCharmPlatform) "_pycharm" else ""}")
 
     pluginConfiguration {
         name = gradleProperty("pluginName")
@@ -190,12 +261,14 @@ intellijPlatform {
         ides {
             // releases based on since/until builds
             recommended()
-            // EAP snapshots
+            // EAP snapshots, over the same range the manifest claims. Hardcoding a wider range here
+            // makes `verifyPlugin` fail against IDEs that could never install the plugin: the verifier
+            // honours this list, not pluginSinceBuild/pluginUntilBuild.
             select {
                 types = listOf(IntelliJPlatformType.PyCharmProfessional)
                 channels = listOf(ProductRelease.Channel.EAP, ProductRelease.Channel.RELEASE)
-                sinceBuild = "242"
-                untilBuild = "301.*"
+                sinceBuild = gradleProperty("pluginSinceBuild")
+                untilBuild = gradleProperty("pluginUntilBuild")
             }
         }
     }
@@ -243,6 +316,11 @@ kotlin {
     }
 }
 
+// The production wrappers bundle needs a local snakemake-wrappers checkout (see DEVELOPER.md); CI
+// provides one. See #571.
+val wrappersRepoPath = gradlePropertyOptional("snakemakeWrappersRepoPath")?.takeIf { it.isNotBlank() }
+val wrappersBundleFile = layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage-bundled.cbor")
+
 tasks {
 
     runIde {
@@ -275,15 +353,12 @@ tasks {
                 configurations[Configurations.INTELLIJ_PLATFORM_TEST_CLASSPATH]
         enableAssertions = true
 
-        // The production wrappers bundle needs a local snakemake-wrappers checkout (see DEVELOPER.md);
-        // CI provides one. When the property is unset, skip with a warning instead of failing
-        // buildPlugin/verifyPlugin for contributors who don't have it. See issue #571.
+        // When the property is unset, skip with a warning instead of failing buildPlugin/verifyPlugin
+        // for contributors who don't have a snakemake-wrappers checkout. See issue #571.
         //
         // Skip only when it is *unset*. If it is set but wrong (a typo, or a renamed CI checkout) the
         // task still runs and SmkWrapperCrawler fails loudly, as before -- silently publishing a plugin
         // with no wrapper metadata is a much worse outcome than a broken build.
-        val wrappersRepoPath = gradlePropertyOptional("snakemakeWrappersRepoPath")?.takeIf { it.isNotBlank() }
-        val wrappersBundleFile = layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage-bundled.cbor")
         onlyIf {
             if (wrappersRepoPath == null) {
                 logger.warn(
@@ -299,10 +374,17 @@ tasks {
             wrappersRepoPath != null
         }
 
+        // Declared so `prepareSandbox` can wire itself to this task by its output (which carries the
+        // task dependency) instead of a hand-written `dependsOn` plus a literal path. The crawler
+        // reads a whole external repo, so there is nothing cheap to hash as an input -- never claim
+        // to be up to date rather than risk shipping a silently stale bundle.
+        outputs.file(wrappersBundleFile)
+        outputs.upToDateWhen { false }
+
         args(
             wrappersRepoPath ?: "",
             gradleProperty("snakemakeWrappersRepoVersion").get(),
-            layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage-bundled.cbor").get(),
+            wrappersBundleFile.get(),
             layout.projectDirectory.file("snakemake_api.yaml")
         )
         maxHeapSize = "1024m" // Not much RAM is available on TC agents
@@ -333,10 +415,11 @@ tasks {
 
 
     prepareSandbox {
-        // Pack wrappers bundle into plugin:
-        dependsOn("buildWrappersBundle")
-
-        from(layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage-bundled.cbor")) {
+        // Pack the wrappers bundle into the plugin. Wiring to the *task* rather than to a path carries
+        // the task dependency, keeps buildWrappersBundle in the graph so its `onlyIf` still logs the
+        // "no wrappers bundled" warning, and packs nothing when that `onlyIf` skipped it -- the skip
+        // deletes any bundle an earlier run left behind, so there is no stale file to pick up.
+        from(named("buildWrappersBundle")) {
             into(pluginName.map { "$it/extra" })
         }
         from(layout.projectDirectory.file("snakemake_api.yaml")) {
@@ -345,15 +428,44 @@ tasks {
     }
 
     test {
-        val test by getting(Test::class) {
-            isScanForTestClasses = false
-            // Only run tests from classes that end with "Test"
-            include("**/*Test.class")
-//            include("**/SnakeFileTypeTest.class")  // Uncomment to disable gradle tests
-//            include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
-        }
+        isScanForTestClasses = false
+        // Only run tests from classes that end with "Test"
+        include("**/*Test.class")
+//        include("**/SnakeFileTypeTest.class")  // Uncomment to disable gradle tests
+//        include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
 
         dependsOn("buildTestWrappersBundle")
+
+        // The 2026.1 Python plugin ships its code as v2 content modules under
+        // plugins/python-ce/lib/modules/. That breaks PythonHelpersLocator's jar-path lookup for the
+        // Python helpers root (it expects the jar directly under `lib/`, and throws
+        // "IllegalStateException: .../python-ce/lib/modules should be lib directory"), which crashes
+        // PyTypeShed's lazy init and therefore every test that infers Python types. The locator
+        // consults the `idea.python.helpers.path` system property first, so point it at the bundled
+        // helpers directory explicitly.
+        // Only PyCharm distributions bundle the helpers there; on other platform types (IDEA + the
+        // external Python plugin) that directory doesn't exist, and setting the property to a bogus
+        // path is worse than not setting it — the locator takes it verbatim, skipping the layout
+        // check that would otherwise report the problem.
+        // On a PyCharm platform the directory is expected to exist, so a miss there means the layout
+        // moved (e.g. a `platformLocalPath` install, or a future repackaging). Say so — otherwise the
+        // run just dies with the "should be lib directory" IllegalStateException above and nothing
+        // hints that the jvmArg was silently skipped.
+        jvmArgumentProviders += CommandLineArgumentProvider {
+            val pythonHelpersPath = intellijPlatform.platformPath.resolve("plugins/python-ce/helpers")
+            if (pythonHelpersPath.isDirectory()) {
+                return@CommandLineArgumentProvider listOf("-Didea.python.helpers.path=$pythonHelpersPath")
+            }
+            if (isPyCharmPlatform) {
+                Logging.getLogger("snakecharm").warn(
+                    "Python helpers not found at $pythonHelpersPath, so -Didea.python.helpers.path is not set. " +
+                            "Tests that infer Python types will fail with " +
+                            "\"IllegalStateException: ... should be lib directory\"."
+                )
+            }
+            emptyList()
+        }
+
         reports {
             // turn off html reports... windows can't handle certain cucumber test name characters.
             junitXml.required.set(true)
@@ -363,11 +475,10 @@ tasks {
 
     printProductsReleases {
         channels = listOf(ProductRelease.Channel.EAP)
-        types = listOf(IntelliJPlatformType.PyCharmCommunity)
+        // Follow `platformType` rather than hardcoding one: PyCharm Community (`PC`) publishes
+        // nothing from 2025.3 on, so a hardcoded `PyCharmCommunity` would report "no newer release"
+        // forever instead of listing the platform we actually build against.
+        types = listOf(IntelliJPlatformType.fromCode(gradlePropertyWithPriorityToSystemProperty("platformType")))
         untilBuild = provider { null }
-
-        doLast {
-            val latestEap = productsReleases.get().max()
-        }
     }
 }

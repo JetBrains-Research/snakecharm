@@ -95,6 +95,10 @@ Feature: Inspection: Unresolved element
       | rule       |
       | checkpoint |
 
+  # PyUnresolvedReferencesInspection reports unqualified injected references with
+  # ProblemHighlightType.LIKE_UNKNOWN_SYMBOL, which maps to HighlightInfoType.INFO -- weak-warning
+  # severity with INFO_ATTRIBUTES. It was plain WARNING severity up to 2025.2; the highlight itself
+  # is unchanged, only how prominently the platform renders it. See #584.
   Scenario: Unresolved variable in injection
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -103,11 +107,11 @@ Feature: Inspection: Unresolved element
       shell: "{dooooo}"
     """
     And PyUnresolvedReferencesInspection inspection is enabled
-    Then I expect inspection warning on <dooooo> with message
+    Then I expect inspection weak warning on <dooooo> with message
     """
     Unresolved reference 'dooooo'
     """
-    When I check highlighting warnings ignoring extra highlighting
+    When I check highlighting weak warnings ignoring extra highlighting
 
   Scenario: Unresolved variable in run section
     Given a snakemake project
@@ -147,12 +151,13 @@ Feature: Inspection: Unresolved element
        conda: f"{2}/boo.yaml"
      """
     And PyUnresolvedReferencesInspection inspection is enabled
-    # PyUnresolvedReferencesInspection replaces it with: LIKE_UNKNOWN_SYMBOL severity
-    Then I expect inspection warning on <{2}/boo.yaml> with message
+    # PyUnresolvedReferencesInspection replaces it with: LIKE_UNKNOWN_SYMBOL, i.e.
+    # HighlightInfoType.INFO -- weak-warning severity since 2026.1, plain WARNING before. See #584.
+    Then I expect inspection weak warning on <{2}/boo.yaml> with message
      """
      Unresolved reference '{2}/boo.yaml'
      """
-    When I check highlighting warnings
+    When I check highlighting warnings and weak warnings
 
   Scenario Outline: Implicit variables not marked as unresolved
     Given a snakemake project
