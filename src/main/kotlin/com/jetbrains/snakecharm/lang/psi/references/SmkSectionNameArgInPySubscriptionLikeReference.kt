@@ -37,10 +37,8 @@ class SmkSectionNameArgInPySubscriptionLikeReference(
         return resolveResults.toTypedArray()
     }
 
-    override fun getVariants(): Array<Any> {
-        val variants = type.getCompletionVariants(canonicalText, element, ProcessingContext())
-        return variants ?: emptyArray()
-    }
+    override fun getVariants(): Array<out Any> =
+        type.getCompletionVariants(canonicalText, element, ProcessingContext())
 
     override fun getUnresolvedDescription(): String =
         SmkSLSubscriptionKeyReference.unresolvedErrorMsg(element)

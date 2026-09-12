@@ -67,11 +67,38 @@ class StepDefs {
 
         // Write code here that turns the phrase above into concrete actions
         val testDataRoot = SnakemakeTestUtil.getTestDataPath().toString()
-        val projectDescriptor = PyLightProjectDescriptor(level, testDataRoot, *additionalRoots)
 
-        SnakemakeWorld.myPythonOnlySdk = PythonMockSdk.create(
-            testDataRoot, level, sdkNameSuffix = "_wo_snakemake"
-        )
+        // Reuse the descriptor across scenarios with the same roots. The light fixture hands back the
+        // same project as long as it is given the same descriptor and rebuilds it whenever the
+        // descriptor changes, and each rebuild registers a mock SDK named "Mock Python SDK <level>";
+        // since 2026.2 SDKs are workspace-model entities, so a second one with the same symbolic id
+        // logs "addEntity: symbolic id already exists", which TestLoggerFactory turns into a test
+        // failure. A per-scenario descriptor therefore failed ~1070 otherwise-unrelated scenarios.
+        // Caching is also the standard light-test pattern (a static LightProjectDescriptor).
+        //
+        // What is cached is the descriptor, NOT the SDK: PyLightProjectDescriptor.getSdk() is a
+        // function and builds a fresh Sdk on every call, which is deliberate. Memoising it looks like
+        // the obvious follow-up and is not -- the light fixture disposes the SDK along with the
+        // project it was attached to, so the next scenario to reuse the instance dies with
+        // "AlreadyDisposedException: Requesting a package manager for an already disposed SDK"
+        // (measured: 14 failures across the resolve/implicit-symbol features, 0 without).
+        // myPythonOnlySdk below is cached under a weaker guarantee, so treat it with the same
+        // suspicion: `set project sdk as python only interpreter` (see setProjectSdk) DOES attach it
+        // to the shared project, which puts it in that project's workspace model and therefore in
+        // the blast radius of the project's disposal. Exactly one scenario does that today
+        // (resolve/implicit_py_symbols_resolve.feature), and it is the last step of that scenario,
+        // so nothing has yet come back to a cached SDK that a descriptor change disposed underneath
+        // it. That is a property of the feature files, not of this cache -- if AlreadyDisposedException
+        // ever shows up here, key it by the project instance (or build the SDK where it is attached)
+        // rather than by level + testDataRoot.
+        val descriptorKey = listOf(level.toString(), testDataRoot) + additionalRoots.map { it.toString() }
+        val projectDescriptor = projectDescriptors.getOrPut(descriptorKey) {
+            PyLightProjectDescriptor(level, testDataRoot, *additionalRoots)
+        }
+
+        SnakemakeWorld.myPythonOnlySdk = pythonOnlySdks.getOrPut(listOf(level.toString(), testDataRoot)) {
+            PythonMockSdk.create(testDataRoot, level, sdkNameSuffix = "_wo_snakemake")
+        }
 
         val factory = IdeaTestFixtureFactory.getFixtureFactory()
         allowPythonRootsAccess(SnakemakeWorld.myTestRootDisposable!!)
@@ -145,6 +172,18 @@ class StepDefs {
 
         if (projectType != "snakemake with disabled framework") {
             withSnakemakeFacet("without")
+        } else {
+            // Disable it explicitly rather than just skipping the enable above. Scenarios share one
+            // project (the descriptor, and with it the fixture's project, is cached), so
+            // SmkSupportProjectSettings survives into the next scenario: without this, a "disabled
+            // framework" project silently inherits whatever the previous scenario enabled.
+            waitEDTEventsDispatching()
+            ApplicationManager.getApplication().invokeAndWait {
+                SmkSupportProjectSettings.updateStateAndFireEvent(
+                    SnakemakeWorld.fixture().project, SmkSupportProjectSettings.State()
+                )
+            }
+            waitEDTEventsDispatching()
         }
     }
 
@@ -234,6 +273,10 @@ class StepDefs {
     }
 
     companion object {
+        /** Cached per JVM so the same mock SDK entity isn't added once per scenario -- see the use site. */
+        private val projectDescriptors = HashMap<List<String>, PyLightProjectDescriptor>()
+        private val pythonOnlySdks = HashMap<List<String>, com.intellij.openapi.projectRoots.Sdk>()
+
         fun waitEDTEventsDispatching() {
             ApplicationManager.getApplication().invokeAndWait() {
                 // Do nothing, wait for events in EDT
@@ -241,3 +284,4 @@ class StepDefs {
         }
     }
 }
+
