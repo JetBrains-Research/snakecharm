@@ -6,15 +6,18 @@ import com.jetbrains.python.inspections.PyUnboundLocalVariableInspection
 import com.jetbrains.python.inspections.PyUnreachableCodeInspection
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PythonVisitorFilter
-import com.jetbrains.python.validation.ReturnAnnotator
 
 /**
  * See also: [com.jetbrains.snakecharm.inspections.SmkIgnorePyInspectionExtension]
+ *
+ * Note: the "'return' outside of function" check used to be a standalone, filterable
+ * `com.jetbrains.python.validation.ReturnAnnotator`. Since 2026.1 (build 261) it is folded into the
+ * final `PySyntaxAnnotator`, which is run by `PyCompositeAnnotator` without consulting this filter,
+ * so it can no longer be suppressed here. The false positive for snakemake `run:` / python blocks is
+ * now handled by [com.jetbrains.snakecharm.lang.highlighter.SmkReturnHighlightInfoFilter] instead.
  */
 class SnakemakeVisitorFilter : PythonVisitorFilter {
     private val unsupportedClasses = listOf(
-        /** Instead use [com.jetbrains.snakecharm.lang.validation.SmkReturnAnnotator] **/
-        ReturnAnnotator::class.java,
         // [HACK] See https://github.com/JetBrains-Research/snakecharm/issues/14
         PyUnreachableCodeInspection::class.java,
         // TODO: Need API for: e.g. EP in PyResolveUtil.allowForwardReferences(node)

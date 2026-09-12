@@ -337,17 +337,17 @@ class ActionsSteps {
         return pos + posInSignature
     }
 
-    @When("^I check highlighting (error|warning|info|weak warning)s$")
-    fun iCheckHighlighting(level: String) {
-        checkHighlighting(level, false)
+    /**
+     * Several severities can be asked for at once ("warnings and weak warnings"): `checkHighlighting`
+     * reports only the severities asked for, so a scenario whose highlight the platform demoted to weak
+     * warning (see #584) but which must stay sensitive to stray plain warnings has to request both.
+     */
+    @When("^I check highlighting ((?:error|warning|info|weak warning)s(?: and (?:error|warning|info|weak warning)s)*)( ignoring extra highlighting)?$")
+    fun iCheckHighlighting(levels: String, ignoreExtra: String?) {
+        checkHighlighting(levels.split(" and ").map { it.removeSuffix("s") }.toSet(), ignoreExtra != null)
     }
 
-    @When("^I check highlighting (error|warning|info|weak warning)s ignoring extra highlighting$")
-    fun iCheckHighlightingIgnoreExtra(type: String) {
-        checkHighlighting(type, true)
-    }
-
-    private fun checkHighlighting(level: String, ignoreExtra: Boolean) {
+    private fun checkHighlighting(levels: Set<String>, ignoreExtra: Boolean) {
         val problemsCounts = SnakemakeWorld.myInspectionProblemsCounts
         SnakemakeWorld.myInspectionProblemsCounts =
             null // reset counter after check in order to validate in teardown that assertion step was called
@@ -356,9 +356,10 @@ class ActionsSteps {
             "No expected inspections steps in test. Add 'I expect no inspection ..' step if no inspection" +
                     " should be triggered."
         }
-        val acceptedLevels = setOf(level, "error", "TYPO").sorted()
+        val acceptedLevels = (levels + setOf("error", "TYPO")).sorted()
         require(acceptedLevels.mapNotNull { problemsCounts[it] }.isNotEmpty()) {
-            "Noting to check for severity level '$level'. Expected at least 1 inspection with severity: $acceptedLevels." +
+            "Noting to check for severity level '${levels.joinToString("/")}'." +
+                    " Expected at least 1 inspection with severity: $acceptedLevels." +
                     " Test expects inspections problems: ${problemsCounts.entries}. "
         }
 
@@ -368,13 +369,10 @@ class ActionsSteps {
         CodeInsightTestFixtureImpl.instantiateAndRun(fixture.file, fixture.editor, ArrayUtilRt.EMPTY_INT_ARRAY, true)
 
         ApplicationManager.getApplication().invokeAndWait {
-            when (level) {
-                "error" -> fixture.checkHighlighting(false, false, false, ignoreExtra)
-                "warning" -> fixture.checkHighlighting(true, false, false, ignoreExtra)
-                "info" -> fixture.checkHighlighting(false, true, false, ignoreExtra)
-                "weak warning" -> fixture.checkHighlighting(false, false, true, ignoreExtra)
-                else -> fail("Unknown highlighting type: $level")
-            }
+            // Errors are always checked by `checkHighlighting`, the flags add severities on top.
+            fixture.checkHighlighting(
+                "warning" in levels, "info" in levels, "weak warning" in levels, ignoreExtra
+            )
         }
         SnakemakeWorld.myInspectionChecked = true
     }

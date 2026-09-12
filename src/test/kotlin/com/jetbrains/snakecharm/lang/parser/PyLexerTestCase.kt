@@ -1,23 +1,44 @@
 package com.jetbrains.snakecharm.lang.parser
 
 import com.intellij.lexer.Lexer
-import com.intellij.testFramework.PlatformLiteFixture
-import com.jetbrains.python.PythonDialectsTokenSetContributor
-import com.jetbrains.python.PythonTokenSetContributor
+import com.intellij.testFramework.UsefulTestCase
+import com.intellij.testFramework.fixtures.BareTestFixture
+import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import junit.framework.TestCase
 
 /**
  * @author Roman.Chernyatchik
  * @date 2018-12-31
  *
- * TODO: Ask for API
+ * Historically this extended the platform's `PlatformLiteFixture` and manually registered the
+ * `PythonDialectsTokenSetContributor` extension point on a mock application. That fixture was removed
+ * in the 2026.1 (build 261) test framework, so we now stand up a real test *application* via
+ * [BareTestFixture]: the Python plugin it loads already registers its token-set contributors, so the
+ * snakemake lexer tokenizes exactly as it does at runtime.
+ *
+ * Deliberately **not** [com.intellij.testFramework.fixtures.BasePlatformTestCase]: [doLexerTest] never
+ * touches a `CodeInsightTestFixture`, and lexing needs nothing project-scoped. Asking for a project
+ * would build one light project per class off `LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR`,
+ * which differs from the Python descriptors the Cucumber suite uses — the light-fixture framework
+ * would then tear down and rebuild the shared project around these tests (see docs/testing.md →
+ * "Scenario isolation is thinner than it looks").
  */
-abstract class PyLexerTestCase  : PlatformLiteFixture() {
+abstract class PyLexerTestCase : UsefulTestCase() {
+    private val bareFixture: BareTestFixture = IdeaTestFixtureFactory.getFixtureFactory().createBareFixture()
+
     override fun setUp() {
         super.setUp()
-        initApplication()
-        registerExtensionPoint(PythonDialectsTokenSetContributor.EP_NAME, PythonDialectsTokenSetContributor::class.java)
-        registerExtension(PythonDialectsTokenSetContributor.EP_NAME, PythonTokenSetContributor())
+        bareFixture.setUp()
+    }
+
+    override fun tearDown() {
+        try {
+            bareFixture.tearDown()
+        } catch (e: Throwable) {
+            addSuppressedException(e)
+        } finally {
+            super.tearDown()
+        }
     }
 
     fun doLexerTest(text: String, lexer: Lexer, vararg expectedTokens: String) {

@@ -79,6 +79,9 @@
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkStandardAnnotatorManager"/>
     <annotator language="RegExp" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLRegExpHighlightingAnnotator"/>
     <annotator language="Python" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLAnnotatingVisitor"/>
+    <!-- Suppresses the platform's false "'return' outside of function" error inside snakemake run/python blocks.
+         See SmkReturnHighlightInfoFilter (replaces the removed SmkReturnAnnotator since PyCharm 2026.1 / build 261). -->
+    <daemon.highlightInfoFilter implementation="com.jetbrains.snakecharm.lang.highlighter.SmkReturnHighlightInfoFilter"/>
     <lang.foldingBuilder language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkMakeFoldingBuilder"/>
     <lang.braceMatcher language="SnakemakeSL" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.SmkSLBraceMatcher"/>
     <lang.findUsagesProvider
