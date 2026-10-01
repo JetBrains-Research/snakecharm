@@ -146,10 +146,16 @@ structural moves:
 
 ### Test-infrastructure breaks — FIXED
 
-5. **`com.intellij.testFramework.PlatformLiteFixture` was removed.** `PyLexerTestCase` (base of
-   `SnakemakeLexerTest`, `SmkSLLexerTest`) now extends `BasePlatformTestCase`; the full test
+5. **`com.intellij.testFramework.PlatformLiteFixture` was removed.**
+    `com.jetbrains.snakecharm.lang.parser.PyLexerTestCase` (base of `SnakemakeLexerTest`,
+   `SmkSLLexerTest`) now extends `BasePlatformTestCase`; the full test
    application already registers the Python token-set contributors, so the manual
    `initApplication()` / `registerExtensionPoint(...)` bootstrapping is gone.
+   Previously `PyLexerTestCase` extended `PlatformLiteFixture` manually registered the
+   `PythonDialectsTokenSetContributor` extension point on a mock application. That fixture was removed
+   in the 2026.1 (build 261) test framework, so we now stand up a real test *application* via
+   [BareTestFixture]: the Python plugin it loads already registers its token-set contributors, so the
+   snakemake lexer tokenizes exactly as it does at runtime.
 
 6. **Kotlin coroutines "Debug metadata version mismatch. Expected: 1, got 2"** crashed the test IDE
    during project setup. The 2026.1 platform bundles **Kotlin 2.3.20**, but our build's older
