@@ -120,6 +120,14 @@ structural moves:
    and is run by `PyCompositeAnnotator` **without consulting `PythonVisitorFilter`** (verified in
    bytecode). So neither the old subclass-`ReturnAnnotator` trick nor `PythonVisitorFilter`
    suppression works anymore.
+
+   **Previous approach:**  `SmkReturnAnnotator` suppresses the platform's "'return' outside   
+   of function" error for `return` statements that live inside a snakemake `run:` section or a top-level
+   python block. Those blocks are compiled by snakemake into the body of a generated function,
+   so `return` is legal there even though the PSI has no enclosing [com.jetbrains.python.psi.PyFunction]. 
+   Because of above-mentioned ReturnAnnotator changes `SmkReturnAnnotator` cannot work anymore even if
+   registered in `SmkStandardAnnotatorManager` and `SnakemakeVisitorFilter`.
+
    - **New approach:** a `daemon.highlightInfoFilter` — `SmkReturnHighlightInfoFilter` — vetoes the
      `HighlightInfo` for `ANN.return.outside.of.function` when the `return` sits inside a snakemake
      `run:` / `onstart` / `onerror` / `onsuccess` block (`SmkRunSection` /
