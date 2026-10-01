@@ -42,6 +42,7 @@ Gradle failure described below. Everyone else sets `JAVA_HOME` by hand:
 ```shell
 # Read the version this branch needs rather than hardcoding it; .java-version tracks `javaVersion`
 JDK=$(cat .java-version)
+echo "Required JDK version: JDK"
 
 # macOS (Homebrew): install it
 brew install openjdk@$JDK
@@ -96,6 +97,7 @@ If Gradle can't auto-detect the JDK, pass it explicitly:
     ```shell
     # run from the project root
     VER=$(awk '/^defaultVersion:/{gsub(/[":]/,"",$2); print $2}' snakemake_api.yaml)
+    echo "Snakemake version: $VER"
     # works whether or not you already cloned snakemake for an earlier version of this recipe
     [ -d ~/snakemake ] || git clone https://github.com/snakemake/snakemake.git ~/snakemake
     # chained: a bad version must not leave the symlink pointing at the wrong revision
