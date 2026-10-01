@@ -59,3 +59,21 @@ Feature: Annotate if return out of function or run/onstart/onerror/onsuccess blo
       'yield' outside of function
       """
       When I check highlighting errors
+
+  Scenario Outline: Yield out of snakemake blocks is still reported
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+        """
+        <block>:
+            yield 1
+        """
+    Then I expect inspection error on <yield 1> with message
+      """
+      'yield' outside of function
+      """
+    When I check highlighting errors
+    Examples:
+      | block     |
+      | onstart   |
+      | onerror   |
+      | onsuccess |
