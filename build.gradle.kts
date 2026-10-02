@@ -243,6 +243,10 @@ kotlin {
     }
 }
 
+// A local snakemake-wrappers checkout (see DEVELOPER.md); CI provides one. Unset for most
+// contributors, in which case the plugin is built without bundled wrappers -- see buildWrappersBundle.
+val wrappersRepoPath = gradlePropertyOptional("snakemakeWrappersRepoPath")
+
 tasks {
 
     runIde {
@@ -279,11 +283,26 @@ tasks {
         // CI provides one. When the property is unset, skip with a warning instead of failing
         // buildPlugin/verifyPlugin for contributors who don't have it. See issue #571.
         //
-        // Skip only when it is *unset*. If it is set but wrong (a typo, or a renamed CI checkout) the
-        // task still runs and SmkWrapperCrawler fails loudly, as before -- silently publishing a plugin
-        // with no wrapper metadata is a much worse outcome than a broken build.
-        val wrappersRepoPath = gradlePropertyOptional("snakemakeWrappersRepoPath")?.takeIf { it.isNotBlank() }
-        val wrappersBundleFile = layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage-bundled.cbor")
+        // Skip only when it is *unset*. If it is set but wrong -- a typo, an empty value, or a renamed
+        // CI checkout -- the task still runs and SmkWrapperCrawler fails loudly, as before: silently
+        // publishing a plugin with no wrapper metadata is a much worse outcome than a broken build.
+        //
+        // On CI the property is mandatory. A dropped TeamCity parameter would otherwise publish a
+        // wrapper-less plugin from a green build, with nothing but a warning in the log. Checked when
+        // the task graph is ready, not in onlyIf: Gradle hides the message of an onlyIf failure. Blank
+        // counts as unset here: an unresolved TeamCity parameter arrives as an empty string, and an empty
+        // path resolves to the daemon working directory, which the crawler may well accept.
+        if (providers.environmentVariable("TEAMCITY_VERSION").isPresent && wrappersRepoPath.isNullOrBlank()) {
+            gradle.taskGraph.whenReady {
+                if (hasTask(":buildWrappersBundle")) {
+                    throw GradleException(
+                        "snakemakeWrappersRepoPath is not set on CI. Refusing to build a plugin without " +
+                            "bundled wrappers -- check the snakemake-wrappers VCS root and the parameter " +
+                            "that passes its path to Gradle. See #571."
+                    )
+                }
+            }
+        }
         onlyIf {
             if (wrappersRepoPath == null) {
                 logger.warn(
@@ -292,9 +311,6 @@ tasks {
                         "name completion will be unavailable). " +
                         "Pass -PsnakemakeWrappersRepoPath=<snakemake-wrappers checkout> to include them. See #571."
                 )
-                // Drop a bundle left by an earlier run that did have the property, so prepareSandbox
-                // cannot pack a stale one whose embedded repo version disagrees with gradle.properties.
-                wrappersBundleFile.get().asFile.delete()
             }
             wrappersRepoPath != null
         }
@@ -311,7 +327,8 @@ tasks {
     register<JavaExec>("buildTestWrappersBundle") {
         // XXX: we could re-use wrappers bundle task for production here and just pass:
         //  `-PsnakemakeWrappersRepoPath=testData/wrappers_storage' gradle arg
-        // P.S: Wrappers bundle task for production always executed before tests in order to get JAR file
+        // P.S: tests never run the production bundle task -- the `test` task depends on this one directly,
+        // and tests read the .cbor from build/bundledWrappers.
 
         // Builds storage based on test data
         dependsOn("compileKotlin", "compileJava")
@@ -336,8 +353,12 @@ tasks {
         // Pack wrappers bundle into plugin:
         dependsOn("buildWrappersBundle")
 
-        from(layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage-bundled.cbor")) {
-            into(pluginName.map { "$it/extra" })
+        // Only when one is actually built. Otherwise a bundle left in build/ by an earlier run that did
+        // have the property gets packed, and its embedded repo version disagrees with gradle.properties.
+        if (wrappersRepoPath != null) {
+            from(layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage-bundled.cbor")) {
+                into(pluginName.map { "$it/extra" })
+            }
         }
         from(layout.projectDirectory.file("snakemake_api.yaml")) {
             into(pluginName.map { "$it/extra" })
