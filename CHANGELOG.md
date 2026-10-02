@@ -6,6 +6,9 @@
 ## [2026.1.0]
 Released <Unreleased>
 
+We gratefully acknowledge external contributor Gaurav Vaidya (@gaurav) for his work porting the plugin to 2026.1.x 
+platform API and improving developer documentation.
+
 ### Plugin
 - Compatibility with the unified PyCharm / IntelliJ Platform 2026.1.x (build 261) only. PyCharm
   Community and Professional were merged, so the plugin now builds against the `PY` platform type
