@@ -75,9 +75,15 @@ repositories {
 // hangs the test IDE during project setup. Forcing the newer stdlib (which understands both metadata
 // versions) fixes it. We deliberately scope this to runtime classpath configurations only (matched
 // case-insensitively so that both the production `runtimeClasspath` and `testRuntimeClasspath` are
-// covered): putting a stdlib newer than the compiler on the compile classpath would trip Kotlin's
-// metadata-version check.
-configurations.matching { it.name.endsWith("RuntimeClasspath", ignoreCase = true) }.configureEach {
+// covered): the plugin runs on the IDE's bundled stdlib, so production code must not compile against
+// a newer one than that (see `kotlin` in libs.versions.toml).
+// `testCompileClasspath` is the exception, and it is there for IDE run configurations rather than for
+// the compiler: the IDE builds a test classpath from the compile *and* runtime configurations, compile
+// first, so leaving 2.2.0 there puts it ahead of 2.3.20 and a `Cucumber Java` run hangs with the
+// error above. Test code never ships, and 2.2.0 reads 2.3 metadata, so this costs nothing.
+configurations.matching {
+    it.name.endsWith("RuntimeClasspath", ignoreCase = true) || it.name == "testCompileClasspath"
+}.configureEach {
     val kotlinPlatformVersion = libs.versions.kotlinPlatform.get()
     val kotlinxSerializationPlatformVersion = libs.versions.kotlinxSerializationPlatform.get()
     resolutionStrategy {
@@ -129,6 +135,19 @@ dependencies {
     testImplementation(libs.kotlinTestJunit)
     testImplementation(libs.kotlinReflect)
     testImplementation(libs.opentest4j)
+    // The IntelliJ Platform Gradle Plugin adds the jars needed at test runtime -- ~360 IDE jars such
+    // as `lib/intellij.platform.settings.local.jar`, plus the test framework's own dependencies such
+    // as `java-rt` -- to the `test` task's classpath directly, from configurations the IDE's Gradle
+    // import doesn't map. Without these, `Cucumber Java` run configurations die at startup with
+    // "ClassNotFoundException: com.intellij.platform.settings.local.SettingsControllerMediator", then
+    // "...: com.intellij.rt.execution.junit.FileComparisonData".
+    // Only during IDE sync: the `test` task already has these jars, in an order the plugin chooses
+    // with care, and adding them here reorders it -- the Gradle run then fails every scenario with
+    // "Could not find installation home path".
+    if (System.getProperty("idea.sync.active").toBoolean()) {
+        testRuntimeOnly(files(configurations.named(Configurations.INTELLIJ_PLATFORM_TEST_RUNTIME_FIX_CLASSPATH)))
+        testRuntimeOnly(files(configurations.named(Configurations.INTELLIJ_PLATFORM_TEST_CLASSPATH)))
+    }
 
     intellijPlatform {
         val platformType = gradlePropertyWithPriorityToSystemProperty("platformType")
@@ -470,6 +489,39 @@ tasks {
             // turn off html reports... windows can't handle certain cucumber test name characters.
             junitXml.required.set(true)
             html.required.set(false)
+        }
+    }
+
+    // IDE (non-Gradle) Cucumber/JUnit run configurations don't get the JVM arguments the IntelliJ
+    // Platform Gradle Plugin attaches to `test`: the `--add-opens` list, the sandbox paths,
+    // `java.system.class.loader`, `idea.python.helpers.path`, ... Without them the test application
+    // dies at startup with "IllegalAccessError: ... module java.desktop does not export sun.awt".
+    // This task dumps those arguments into a Java argfile, so a run configuration only needs
+    // `@$PROJECT_DIR$/build/tmp/ideTestRun/jvm.args` in its VM options plus this task as a
+    // "Before launch" step -- which is what `.run/Template Cucumber Java.run.xml` sets. See
+    // DEVELOPER.md -> "Configure Tests" -> "Running Cucumber features from the IDE".
+    register("prepareIdeTestRun") {
+        group = "verification"
+        description = "Prepares the test sandbox and writes the test JVM arguments for IDE run configurations."
+        dependsOn("buildTestWrappersBundle", prepareTestSandbox)
+        notCompatibleWithConfigurationCache("Reads the JVM arguments of the `test` task at execution time")
+
+        val testTask = named<Test>("test")
+        val argsFile = layout.buildDirectory.file("tmp/ideTestRun/jvm.args")
+        outputs.file(argsFile)
+        outputs.upToDateWhen { false }
+
+        doLast {
+            val args = testTask.get().allJvmArgs
+                // Coverage agent only makes sense for the Gradle run, whose kover report reads it.
+                .filterNot { it.startsWith("-javaagent:") && "kover" in it }
+            // Argfile syntax: quote every argument, escaping `\` and `"` (paths may contain spaces,
+            // and e.g. `-Djdk.http.auth.tunneling.disabledSchemes=""` carries literal quotes).
+            val text = args.joinToString("\n") { "\"" + it.replace("\\", "\\\\").replace("\"", "\\\"") + "\"" }
+            argsFile.get().asFile.apply {
+                parentFile.mkdirs()
+                writeText(text + "\n")
+            }
         }
     }
 

@@ -75,13 +75,39 @@ If Gradle can't auto-detect the JDK, pass it explicitly:
 
 **Configure Tests:**
         
-1. Configure tests to use `$PROJECT_DIR$/.sandbox_pycharm` as sandbox directory when running tests  from the IDEA context menu. 
-   Change template settings for cucumber test:
-   1. Open `Run | Edit Configurations... | Edit configuration templates...| Cucumber Java`
-   2. Append to `VM optiopns`: 
-       ```
-      -Didea.config.path=$PROJECT_DIR$/.sandbox_pycharm/config-test -Didea.system.path=$PROJECT_DIR$/.sandbox_pycharm/system-test -Didea.plugins.path=$PROJECT_DIR$/.sandbox_pycharm/plugins-test -Didea.force.use.core.classloader=true
-      ```
+1. <a name="running-cucumber-features-from-the-ide"></a>**Running Cucumber features from the IDE.**
+   A `Cucumber Java` run configuration (gutter icon / context menu on a `.feature` file) launches the
+   JVM itself, not through Gradle, so it gets none of the JVM arguments the IntelliJ Platform Gradle
+   Plugin attaches to the `test` task: ~50 `--add-opens`, `java.system.class.loader`, the test
+   sandbox paths, `idea.python.helpers.path`, ... Without them the test application dies at startup
+   with `IllegalAccessError: ... module java.desktop does not export sun.awt`. The
+   `prepareIdeTestRun` task writes exactly those arguments into a Java argfile (and builds the test
+   sandbox and test wrappers bundle).
+
+   **The `Cucumber Java` run configuration template is already checked in** as
+   `.run/Template Cucumber Java.run.xml`, and the IDE picks it up on project open — nothing to set
+   up. Every `Feature: …` / `Scenario: …` configuration created from a `.feature` file inherits it.
+   What it sets, for reference:
+   * `VM options`: `@$PROJECT_DIR$/build/tmp/ideTestRun/jvm.args` — the argfile above, and nothing
+     else (no hand-written `-Didea.*` paths, which would point at the wrong sandbox);
+   * `Before launch`: `Build`, then the Gradle task `prepareIdeTestRun` (project `snakecharm`), so
+     the argfile, the test sandbox and the test wrappers bundle are fresh for every run;
+   * module `snakecharm.test`, program arguments `--plugin teamcity`, shorten command line: none.
+
+   Two things the shared template does not do for you:
+   * Configurations created *before* you got it (e.g. from an older hand-edited template, with
+     `-Didea.config.path=…` VM options) keep their old settings — delete them and let the IDE
+     re-create them from the template.
+   * If the IDE does not pick the file up, or you prefer a per-user setup, apply the same settings by
+     hand as a fallback: `Run | Edit Configurations... | Edit configuration templates... |
+     Cucumber Java`, then set `VM options` and add `Before launch` → `+` → `Run Gradle task` →
+     `prepareIdeTestRun` as listed above.
+
+   `Glue` may stay empty: `src/test/resources/cucumber.properties` sets `cucumber.glue`. Re-import
+   the Gradle project after pulling this: the IDE's test classpath needs the forced `kotlin-stdlib`
+   (an older one first on it hangs project setup with "Debug metadata version mismatch") and the
+   platform's test-runtime jars, which `build.gradle.kts` adds only during IDE sync (otherwise:
+   `ClassNotFoundException: com.intellij.platform.settings.local.SettingsControllerMediator`).
 
 2. Checkout `snakemake` project sources and configure as test data.
 
@@ -129,15 +155,15 @@ If Gradle can't auto-detect the JDK, pass it explicitly:
     ```
 
    Use `find`, not `rm -rf .sandbox_pycharm/*/system-test`: the sandbox sits at a different depth
-   depending on how tests were launched (`.sandbox_pycharm/system-test` for the run configuration in
-   step 1, `.sandbox_pycharm/<ide>/system-test` and `.sandbox_pycharm/<project>/<ide>/system-test`
+   depending on how tests were launched (`.sandbox_pycharm/system-test` for run configurations made
+   from the old hand-written template, `.sandbox_pycharm/<ide>/system-test` and `.sandbox_pycharm/<project>/<ide>/system-test`
    for the gradle task, varying by platform-plugin version), and a glob that misses simply deletes
    nothing while looking like it worked.
 
 Tests are written in [Gherkin](https://cucumber.io/docs/gherkin). You could run tests:
 * Using gradle `test` task
-* From IDEA context menu via `Cucumber Java` run configuration
-  * Before running first test launch `buildTestWrappersBundle` task  
+* From IDEA context menu via `Cucumber Java` run configuration (the shared template in `.run/`
+  configures it, see "Configure Tests" step 1)
 
 To run a **single cucumber feature** from the command line, add a `@here` tag above its
 `Feature:` line and set `tags = "not @ignore and @here"` in `AllCucumberFeaturesTest.kt`

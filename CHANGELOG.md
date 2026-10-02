@@ -7,15 +7,14 @@
 Released <Unreleased>
 
 ### Plugin
-- Compatibility with the unified PyCharm / IntelliJ Platform 2026.1 (build 261). PyCharm Community and
-  Professional were merged, so the plugin now builds against the `PY` platform type (see
-  [#570](https://github.com/JetBrains-Research/snakecharm/pull/570)).
-- **This release requires 2026.1 (build 261), and only 2026.1.** The Python plugin API changes below
-  are not source- or binary-compatible with earlier IDEs, so `pluginSinceBuild` was raised from `252`
-  to `261`. Unlike previous releases, `pluginUntilBuild` stays on the *same* branch (`261.*`) rather
-  than opening up the next one, so the plugin will not install on a 2026.2 EAP — that platform needs
-  its own port ([#577](https://github.com/JetBrains-Research/snakecharm/pull/577)).
-- Plugin title changed from `snakecharm` to `SnakeCharm`
+- Compatibility with the unified PyCharm / IntelliJ Platform 2026.1.x (build 261) only. PyCharm
+  Community and Professional were merged, so the plugin now builds against the `PY` platform type
+  (see [#570](https://github.com/JetBrains-Research/snakecharm/pull/570)).
+- Plugin title changed from `snakecharm` to `SnakeCharm`.
+- Restored the ability to run Cucumber tests from the IDE via the `Cucumber Java` run configuration
+  (context menu / gutter icons).
+- `DEVELOPER.md` updated, includes instructions on how to build the plugin from sources using the
+  command line only.
 
 ### Changed
 - Adapted to the restructured Python plugin API in 2026.1: `PyType` is now a Kotlin interface (`name`
