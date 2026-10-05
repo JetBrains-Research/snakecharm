@@ -3,7 +3,7 @@
 
 # SnakeCharm Plugin Changelog
 
-## [2026.1.0]
+## [2026.1.1]
 Released <Unreleased>
 
 We gratefully acknowledge external contributor Gaurav Vaidya (@gaurav) for his work porting the plugin to 2026.1.x 
