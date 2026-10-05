@@ -24,8 +24,6 @@ import com.intellij.openapi.projectRoots.SdkTypeId
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.util.containers.ContainerUtil
-import com.intellij.util.containers.MultiMap
 import com.jetbrains.python.codeInsight.typing.PyTypeShed.findAllRootsForLanguageLevel
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.sdk.PythonSdkAdditionalData
@@ -34,8 +32,8 @@ import com.jetbrains.python.sdk.PythonSdkUtil
 import com.jetbrains.python.sdk.flavors.PyFlavorAndData
 import com.jetbrains.python.sdk.flavors.PyFlavorData
 import com.jetbrains.python.sdk.flavors.VirtualEnvSdkFlavor
+import com.jetbrains.snakecharm.SmkTestPythonHelpersLocatorFix
 import java.io.File
-
 
 /**
  * We cannot re-use PythonMockSdk because api not available in Platform artifacts
@@ -49,6 +47,12 @@ object PythonMockSdk {
         sdkNameSuffix: String = "",
         vararg additionalRoots: VirtualFile
     ): Sdk {
+        // Unregister the Pro Python helpers locator: creating the SDK below triggers PyTypeShed's
+        // lazy init, which walks every registered locator, and the Pro one throws under the Gradle
+        // test sandbox -- failing the whole suite. Done here because this is the one point every
+        // test path funnels through: the cucumber glue calls it directly, and SnakemakeTestCase
+        // reaches it via `PyLightProjectDescriptor.getSdk()`.
+        SmkTestPythonHelpersLocatorFix.removeCrashingProHelpersLocator()
         return create(
             "Mock ${PyNames.PYTHON_SDK_ID_NAME} ${level.toPythonVersion()}$sdkNameSuffix",
             "$testDataRoot/MockSdk${level.toPythonVersion()}",
@@ -65,10 +69,6 @@ object PythonMockSdk {
          level: LanguageLevel,
         vararg additionalRoots:  VirtualFile
     ): Sdk {
-        val roots = MultiMap.create<OrderRootType, VirtualFile>()
-        roots.putValues(OrderRootType.CLASSES, createRoots(mockSdkPath, level))
-        roots.putValues(OrderRootType.CLASSES, listOf(*additionalRoots))
-
         val sdk = ProjectJdkTable.getInstance().createSdk(sdkName, sdkType)
         val sdkModificator = sdk.sdkModificator
         sdkModificator.homePath = "$mockSdkPath/bin/python${level.toPythonVersion()}"
@@ -100,17 +100,11 @@ object PythonMockSdk {
     private fun toVersionString( level: LanguageLevel) = "Python ${level.toPythonVersion()}"
 
     private fun createRoots( mockSdkPath: String,  level: LanguageLevel): List<VirtualFile> {
-        val result = ArrayList<VirtualFile>()
         val localFS = LocalFileSystem.getInstance()
-        ContainerUtil.addIfNotNull(
-            result, localFS.refreshAndFindFileByIoFile(File(mockSdkPath, "Lib"))
-        )
-        ContainerUtil.addIfNotNull(
-            result,
+        return listOfNotNull(
+            localFS.refreshAndFindFileByIoFile(File(mockSdkPath, "Lib")),
             localFS.refreshAndFindFileByIoFile(File(mockSdkPath, PythonSdkUtil.SKELETON_DIR_NAME))
-        )
-        result.addAll(findAllRootsForLanguageLevel(level))
-        return result
+        ) + findAllRootsForLanguageLevel(level)
     }
 
     private class PyMockSdkType(

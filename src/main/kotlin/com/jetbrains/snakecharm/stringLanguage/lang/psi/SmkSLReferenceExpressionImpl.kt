@@ -30,7 +30,7 @@ class SmkSLReferenceExpressionImpl(node: ASTNode) : PyReferenceExpressionImpl(no
         // Use host file for resolve & type inference
         val hostTypeEvalContext =
             TypeEvalContext.codeAnalysis(project, injectionHost()?.containingFile) // or *.codeCompletion()
-        return super.getType(hostTypeEvalContext, key)
+        return super<PyReferenceExpressionImpl>.getType(hostTypeEvalContext, key)
     }
 
     override fun getName() = referencedName

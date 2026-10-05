@@ -3,13 +3,41 @@
 
 # SnakeCharm Plugin Changelog
 
-## [2025.2.2]
+## [2026.1.0]
 Released <Unreleased>
 
+We gratefully acknowledge external contributor Gaurav Vaidya (@gaurav) for his work porting the plugin to 2026.1.x 
+platform API and improving developer documentation.
+
 ### Plugin
-- Plugin title changed from `snakecharm` to `SnakeCharm`
-- Fixed `IllegalStateException: This method requires read access` error from `SmartModeScheduler.runWhenSmart(...)`
-- Fixed `ClassCastException: SmkSLFile cannot be cast to class SmkFile` error from `AbstractSmkRuleOrCheckpointType.getUseSections(...)`
+- Compatibility with the unified PyCharm / IntelliJ Platform 2026.1.x (build 261) only. PyCharm
+  Community and Professional were merged, so the plugin now builds against the `PY` platform type
+  (see [#570](https://github.com/JetBrains-Research/snakecharm/pull/570)).
+- Plugin title changed from `snakecharm` to `SnakeCharm`.
+- Restored the ability to run Cucumber tests from the IDE via the `Cucumber Java` run configuration
+  (context menu / gutter icons).
+- `DEVELOPER.md` updated, includes instructions on how to build the plugin from sources using the
+  command line only.
+
+### Changed
+- Adapted to the restructured Python plugin API in 2026.1: `PyType` is now a Kotlin interface (`name`
+  and `isBuiltin` are properties, `name` is nullable, and `getCompletionVariants` takes a non-null
+  `ProcessingContext` and returns `Array<out Any>`), and `CustomFoldingBuilder.buildLanguageFoldRegions`
+  now takes a nullable-element descriptor list.
+- The `com.jetbrains.python.validation.ReturnAnnotator` extension point was removed; its
+  "return outside of function" check moved into the final `PySyntaxAnnotator`. The false positive for
+  `return` inside snakemake `run:` / `onstart` / `onerror` / `onsuccess` blocks is now suppressed by a
+  new `daemon.highlightInfoFilter` (`SmkReturnHighlightInfoFilter`) instead of a custom annotator.
+- Unresolved references inside SmkSL string injections (e.g. `shell: "{dooooo}"`,
+  `conda: f"{2}/boo.yaml"`) are now shown as a weak warning instead of a warning. Nothing in the
+  plugin changed: any reference reported with `ProblemHighlightType.LIKE_UNKNOWN_SYMBOL` — which is
+  what `PyUnresolvedReferencesInspection` uses here — is rendered through `HighlightInfoType.INFO` in
+  2026.1, where 2025.2 gave it plain warning severity
+  ([#584](https://github.com/JetBrains-Research/snakecharm/issues/584)).
+
+### Fixed
+- `IllegalStateException: This method requires read access` error from `SmartModeScheduler.runWhenSmart(...)`
+- `ClassCastException: SmkSLFile cannot be cast to class SmkFile` error from `AbstractSmkRuleOrCheckpointType.getUseSections(...)`
 
 ## [2025.2.1]
 Released on 12 August 2025

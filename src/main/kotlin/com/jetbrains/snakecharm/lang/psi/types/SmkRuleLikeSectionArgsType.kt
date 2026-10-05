@@ -40,7 +40,7 @@ class SmkRuleLikeSectionArgsType(
     private val typeName: String = section.sectionKeyword ?: "section"
     private val sectionArgs: Array<out PyExpression>? = getSectionArgs(section)
 
-    override fun getName() = typeName
+    override val name: String? get() = typeName
 
     override fun assertValid(message: String?) {
         if (!section.isValid) {
@@ -106,7 +106,7 @@ class SmkRuleLikeSectionArgsType(
     override fun getCompletionVariants(
         completionPrefix: String?,
         location: PsiElement,
-        context: ProcessingContext?,
+        context: ProcessingContext,
     ): Array<LookupElement> {
         val (list, priority) = getCompletionVariantsAndPriority(completionPrefix, location, context)
 
@@ -121,7 +121,7 @@ class SmkRuleLikeSectionArgsType(
     override fun getCompletionVariantsAndPriority(
         completionPrefix: String?,
         location: PsiElement,
-        context: ProcessingContext?,
+        context: ProcessingContext,
     ): Pair<List<LookupElementBuilder>, Double> {
         val priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
 
@@ -231,5 +231,5 @@ class SmkRuleLikeSectionArgsType(
         && exp.isCalleeText(SnakemakeNames.SNAKEMAKE_METHOD_MULTIEXT)
     ) exp.arguments[ind + 1] else exp
 
-    override fun isBuiltin() = false
+    override val isBuiltin: Boolean get() = false
 }

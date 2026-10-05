@@ -15,25 +15,99 @@
 * Run `./gradlew buildPlugin`
 * Plugin bundle is located in `build/distributions/snakecharm-*.zip`
 * The bundled snakemake-wrappers metadata is optional for a local build: if
-  `snakemakeWrappersRepoPath` is unset (the default), the `:buildWrappersBundle` task is
-  skipped with a warning and the plugin is built without bundled wrappers — it runs normally,
-  but wrapper name completion has nothing to offer. If the property *is* set and does not point
-  at a wrappers checkout, the build still fails loudly rather than quietly shipping without them.
+  `snakemakeWrappersRepoPath` is unset (the default), `:buildWrappersBundle` does not run and the
+  plugin is built without bundled wrappers — it runs normally, but wrapper name completion has
+  nothing to offer. If the property *is* set and does not point at a wrappers checkout, the build
+  still fails loudly rather than quietly shipping without them.
   To include them, point it at a local [snakemake-wrappers](https://github.com/snakemake/snakemake-wrappers)
   checkout whose content matches `snakemakeWrappersRepoVersion`:
   `./gradlew buildPlugin -PsnakemakeWrappersRepoPath=/path/to/snakemake-wrappers`.
   As an alternative, you could locally set `snakemakeWrappersRepoPath` to existing wrappers folder in 
   `gradle.properties` file.
 
+**Command-line build & test (no IDE required):**
+
+The Gradle build uses the JDK toolchain `javaVersion` names in `gradle.properties` — the same number
+`.java-version` in the repo root carries — and the Gradle version pinned there (`gradleVersion`).
+Make sure that JDK is installed and visible to Gradle before building from the command line.
+
+**If you use jenv, `.java-version` in the repo root already does this** — it selects the
+JDK for you as soon as you `cd` here, so you only need that JDK installed. The version it names
+tracks the platform and therefore differs per branch (21 for 2026.1, 25 for 2026.2), so re-check
+`java -version` after switching branches rather than assuming the shell followed you. **asdf ignores
+`.java-version` unless you set `legacy_version_file = yes` in `~/.asdfrc`** — without it asdf reads
+only `.tool-versions`, silently leaves your global JDK active, and you land in exactly the cryptic
+Gradle failure described below. Everyone else sets `JAVA_HOME` by hand:
+
+```shell
+# Read the version this branch needs rather than hardcoding it; .java-version tracks `javaVersion`
+JDK=$(cat .java-version)
+echo "Required JDK version: JDK"
+
+# macOS (Homebrew): install it
+brew install openjdk@$JDK
+
+# Point Gradle at it for this build. Use a path that pins that version exactly -- jenv/asdf/SDKMAN,
+# or the install path itself. Do NOT use `/usr/libexec/java_home -v $JDK`: it treats the version as
+# a *minimum*, so on a machine without it you get a newer JDK and exit 0 -- and then a failure that
+# names neither the JDK nor the version (`Type T not present` from the pinned Gradle if it is too
+# new, `UnsupportedClassVersionError` out of instrumentCode if it is too old).
+export JAVA_HOME=$(jenv prefix $JDK)    # or e.g. /opt/homebrew/opt/openjdk@$JDK
+"$JAVA_HOME/bin/java" -version          # verify it really says $JDK
+
+./gradlew clean buildPlugin        # builds build/distributions/snakecharm-*.zip
+./gradlew test                     # runs the JUnit + Cucumber test suite
+./gradlew verifyPlugin             # runs the IntelliJ Plugin Verifier
+./gradlew runIde                   # launches a sandbox IDE with the plugin installed
+```
+
+If Gradle can't auto-detect the JDK, pass it explicitly:
+`-Dorg.gradle.java.installations.paths=$JAVA_HOME`.
+
+> **Note on the target IDE.** `platformType`/`platformVersion` in `gradle.properties` select
+> the IDE the plugin is built and tested against; it is downloaded automatically on first
+> build (a multi-hundred-MB to ~1 GB download). Since PyCharm was unified in 2025.1 and
+> [2025.2 was the last release of the standalone Community Edition](https://www.jetbrains.com/pycharm/whatsnew/2025-3/),
+> releases from 2025.3 on are distributed only under the Professional (`PY`) artifact, so
+> `platformType = PY` is required to build against them. The free/Pro split is a runtime
+> license state and does not affect the downloaded SDK or building the plugin.
+
+
 **Configure Tests:**
         
-1. Configure tests to use `$PROJECT_DIR$/.sandbox_pycharm` as sandbox directory when running tests  from the IDEA context menu. 
-   Change template settings for cucumber test:
-   1. Open `Run | Edit Configurations... | Edit configuration templates...| Cucumber Java`
-   2. Append to `VM optiopns`: 
-       ```
-      -Didea.config.path=$PROJECT_DIR$/.sandbox_pycharm/config-test -Didea.system.path=$PROJECT_DIR$/.sandbox_pycharm/system-test -Didea.plugins.path=$PROJECT_DIR$/.sandbox_pycharm/plugins-test -Didea.force.use.core.classloader=true
-      ```
+1. <a name="running-cucumber-features-from-the-ide"></a>**Running Cucumber features from the IDE.**
+   A `Cucumber Java` run configuration (gutter icon / context menu on a `.feature` file) launches the
+   JVM itself, not through Gradle, so it gets none of the JVM arguments the IntelliJ Platform Gradle
+   Plugin attaches to the `test` task: ~50 `--add-opens`, `java.system.class.loader`, the test
+   sandbox paths, `idea.python.helpers.path`, ... Without them the test application dies at startup
+   with `IllegalAccessError: ... module java.desktop does not export sun.awt`. The
+   `prepareIdeTestRun` task writes exactly those arguments into a Java argfile (and builds the test
+   sandbox and test wrappers bundle).
+
+   **The `Cucumber Java` run configuration template is already checked in** as
+   `.run/Template Cucumber Java.run.xml`, and the IDE picks it up on project open — nothing to set
+   up. Every `Feature: …` / `Scenario: …` configuration created from a `.feature` file inherits it.
+   What it sets, for reference:
+   * `VM options`: `@$PROJECT_DIR$/build/tmp/ideTestRun/jvm.args` — the argfile above, and nothing
+     else (no hand-written `-Didea.*` paths, which would point at the wrong sandbox);
+   * `Before launch`: `Build`, then the Gradle task `prepareIdeTestRun` (project `snakecharm`), so
+     the argfile, the test sandbox and the test wrappers bundle are fresh for every run;
+   * module `snakecharm.test`, program arguments `--plugin teamcity`, shorten command line: none.
+
+   Two things the shared template does not do for you:
+   * Configurations created *before* you got it (e.g. from an older hand-edited template, with
+     `-Didea.config.path=…` VM options) keep their old settings — delete them and let the IDE
+     re-create them from the template.
+   * If the IDE does not pick the file up, or you prefer a per-user setup, apply the same settings by
+     hand as a fallback: `Run | Edit Configurations... | Edit configuration templates... |
+     Cucumber Java`, then set `VM options` and add `Before launch` → `+` → `Run Gradle task` →
+     `prepareIdeTestRun` as listed above.
+
+   `Glue` may stay empty: `src/test/resources/cucumber.properties` sets `cucumber.glue`. Re-import
+   the Gradle project after pulling this: the IDE's test classpath needs the forced `kotlin-stdlib`
+   (an older one first on it hangs project setup with "Debug metadata version mismatch") and the
+   platform's test-runtime jars, which `build.gradle.kts` adds only during IDE sync (otherwise:
+   `ClassNotFoundException: com.intellij.platform.settings.local.SettingsControllerMediator`).
 
 2. Checkout `snakemake` project sources and configure as test data.
 
@@ -49,6 +123,7 @@
     ```shell
     # run from the project root
     VER=$(awk '/^defaultVersion:/{gsub(/[":]/,"",$2); print $2}' snakemake_api.yaml)
+    echo "Snakemake version: $VER"
     # works whether or not you already cloned snakemake for an earlier version of this recipe
     [ -d ~/snakemake ] || git clone https://github.com/snakemake/snakemake.git ~/snakemake
     # chained: a bad version must not leave the symlink pointing at the wrong revision
@@ -80,15 +155,21 @@
     ```
 
    Use `find`, not `rm -rf .sandbox_pycharm/*/system-test`: the sandbox sits at a different depth
-   depending on how tests were launched (`.sandbox_pycharm/system-test` for the run configuration in
-   step 1, `.sandbox_pycharm/<ide>/system-test` and `.sandbox_pycharm/<project>/<ide>/system-test`
+   depending on how tests were launched (`.sandbox_pycharm/system-test` for run configurations made
+   from the old hand-written template, `.sandbox_pycharm/<ide>/system-test` and `.sandbox_pycharm/<project>/<ide>/system-test`
    for the gradle task, varying by platform-plugin version), and a glob that misses simply deletes
    nothing while looking like it worked.
 
 Tests are written in [Gherkin](https://cucumber.io/docs/gherkin). You could run tests:
 * Using gradle `test` task
-* From IDEA context menu via `Cucumber Java` run configuration
-  * Before running first test launch `buildTestWrappersBundle` task  
+* From IDEA context menu via `Cucumber Java` run configuration (the shared template in `.run/`
+  configures it, see "Configure Tests" step 1)
+
+To run a **single cucumber feature** from the command line, add a `@here` tag above its
+`Feature:` line and set `tags = "not @ignore and @here"` in `AllCucumberFeaturesTest.kt`
+(revert both afterwards). Note that `testData` is **not** a declared input of the `test`
+task, so after editing any feature/test-data file run `./gradlew cleanTest test` — plain
+`test` may serve stale cached results.
 
 If you get `Unimplemented substep definition` in all `*.feature` files, ensure:
   * Not installed or disabled: `Substeps IntelliJ Plugin` 
@@ -116,13 +197,42 @@ If you get `Unimplemented substep definition` in all `*.feature` files, ensure:
   empty file that reads as "everything got fixed".
 
 **Update to new Platform API:**
-* Inspect libs version in `gradle/libs.versions.toml`, especially `intelliJPlatform` and `kotlin` version. Also `javaVersion` and `gradleVersion` in `gradle.properties`
+
+`PORTING.md` records the previous ports release by release — what broke, why, and how it was fixed
+— which is usually the fastest way to see what a bump costs before starting one.
+
+* Inspect libs version in `gradle/libs.versions.toml`, especially `intelliJPlatform` and `kotlin` version. Also `javaVersion` and `gradleVersion` in `gradle.properties`, and `.java-version` in the repo root (the jenv pin — asdf honours it only with `legacy_version_file = yes` — which has to move with `javaVersion` or jenv users silently keep building on the old JDK)
   * See [GitHub:intellij-platform-gradle-plugin](https://github.com/JetBrains/intellij-platform-gradle-plugin) documentation and [GitHub:intellij-platform-plugin-template](https://github.com/JetBrains/intellij-platform-plugin-template) as plugin example
   * `intelliJPlatform` is intellij-platform-gradle-plugin version, not Intellij Platform itself
   * `qodana` update as well
+  * `kotlinPlatform` and `kotlinxSerializationPlatform` are **not our versions to choose** — they
+    record what the target platform bundles, and `build.gradle.kts` forces them onto the runtime
+    classpaths. Re-read both from the new IDE rather than guessing:
+    ```shell
+    unzip -p <ide>/lib/intellij.libraries.kotlinx.serialization.core.jar META-INF/MANIFEST.MF | grep Implementation-Version
+    # kotlin-stdlib ships merged into lib/util-8.jar, not as its own jar, and carries no manifest
+    # version -- read the three ints KotlinVersion is constructed from (e.g. 2 / 3 / 20 -> 2.3.20):
+    javap -p -c -cp <ide>/lib/util-8.jar kotlin.KotlinVersionCurrentValue | sed -n '/KotlinVersion get/,/areturn/p'
+    ```
+    Leaving them stale does not fail the build; it fails at *runtime*, in tests, with an error that
+    names neither this plugin nor the library — a `@DebugMetadata` version mismatch for the stdlib,
+    or `AbstractMethodError` in `PluginGeneratedSerialDescriptor.kt` for serialization. Because the
+    Gradle test classpath is flat, our copy shadows the platform's, and one such error becomes
+    hundreds of failed scenarios. Issue
+    [#587](https://github.com/JetBrains-Research/snakecharm/issues/587) is the worked example.
   * 
 * Update platform API and this plugin versions in `gradle.properties`, see `pluginVersion`, `pluginSinceBuild`, `pluginUntilBuild`, `platformVersion`
   * `pluginVersion` version should be also mentioned in changelog `CHANGELOG.md`
+  * Build numbers map to IDE versions per
+    [build-number-ranges](https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html),
+    e.g. `2025.2`=`252`, `2025.3`=`253`, `2026.1`=`261`. Set `pluginUntilBuild` to the
+    branch of the newest IDE you actually built/tested against (e.g. `261.*`).
+  * `platformType`: 2025.2 was the last release of standalone PyCharm Community (`PC`). From
+    2025.3 on only the unified PyCharm ships, under the Professional artifact, so use
+    `platformType = PY` (the build wires `Pythonid` for `PY`/`PD` and `PythonCore` for `PC`).
+  * Check available IDE versions with
+    `./gradlew printProductsReleases`, or query
+    `https://data.services.jetbrains.com/products/releases?code=PY&type=release` (`PY`=PyCharm).
 * Update `snakemakeWrappersRepoVersion` to up-to-date, need to be updated on TeamCity CI as well.
  
 **Release plugin:**
