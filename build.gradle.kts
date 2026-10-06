@@ -1,6 +1,5 @@
 @file:Suppress("SpellCheckingInspection", "UnstableApiUsage")
 
-import org.gradle.api.logging.Logging
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.Constants.Configurations
@@ -60,6 +59,11 @@ java {
 
 // Configure project's dependencies
 repositories {
+    // On CI, route through JetBrains' cache-redirector to avoid Maven Central 429 rate limits.
+    // Skipped locally so IDE Gradle sync isn't slowed by the extra hop.
+    if (System.getenv("TEAMCITY_VERSION") != null) {
+        maven("https://cache-redirector.jetbrains.com/repo1.maven.org/maven2")
+    }
     mavenCentral()
     intellijPlatform {
         defaultRepositories()
