@@ -59,22 +59,65 @@ java {
 
 // Configure project's dependencies
 repositories {
-    // Declared first and ahead of mavenCentral() because its repos are content-filtered to
-    // IntelliJ Platform groups (e.g. `python:pycharm-professional`), while mavenCentral() below is
-    // not. Repositories are searched in declaration order for every dependency, so with
-    // mavenCentral() first, Gradle asked it about `python:pycharm-professional` before ever trying
-    // this one -- normally a harmless 404 that falls through, but on a rate-limited CI run Maven
-    // Central returned 429 instead, which Gradle treats as fatal rather than falling through,
-    // aborting resolution before the correctly-scoped repo below was ever tried (TeamCity build #996).
     intellijPlatform {
         defaultRepositories()
     }
+
+    // The IntelliJ Platform Gradle Plugin resolves our PyCharm platform dependency as a plain Maven
+    // module -- e.g. `python:pycharm-professional:2026.1.3` -- and that module is content-filtered
+    // INTO the repos above (jetbrainsIdeInstallers()/releases(), via `defaultRepositories()`), but
+    // that filtering is one-directional: it restricts what those repos will serve, it does NOT stop
+    // mavenCentral() below from also being asked about the same module, since mavenCentral() carries
+    // no filter of its own. Declaration order only decides which repo's answer wins when more than one
+    // responds -- it does NOT stop Gradle from querying mavenCentral() too (confirmed locally with
+    // `--info`: a `pycharm-professional` resolution that succeeds via the cached download.jetbrains.com
+    // artifact still issues a GET for
+    // repo.maven.apache.org/maven2/python/pycharm-professional/.../*.pom, which 404s harmlessly here).
+    // On a rate-limited CI run that same always-issued GET gets a 429 instead of a 404, and Gradle
+    // treats a 429 from ANY queried repo as fatal -- even though the real repo above already had the
+    // artifact (TeamCity builds #996/#997; reordering the repos in #996 didn't fix this because order
+    // was never what determined whether mavenCentral() got asked).
+    //
+    // So exclude these modules from mavenCentral()/its mirror below, so they never get asked about them
+    // at all. `IntelliJPlatformType` (see `org.jetbrains.intellij.platform.gradle.IntelliJPlatformType`)
+    // exposes each IDE under two *different* Maven coordinates -- not a "python" vs. some unrelated
+    // thing, just two separate JetBrains-chosen groupIds for the same product, picked depending on how
+    // the dependency is resolved:
+    //   - `installer` coordinates, groupId "python" -- used when `useInstaller = true` (our case: see
+    //     `useInstaller = !isSnapshot` below), resolving from the Ivy-pattern jetbrainsIdeInstallers()
+    //     repo (download.jetbrains.com), e.g. `python:pycharm-professional`.
+    //   - `maven` coordinates, groupId "com.jetbrains.intellij.pycharm" -- used when `useInstaller =
+    //     false`, resolving from the Maven-style releases()/snapshots() repos, e.g.
+    //     `com.jetbrains.intellij.pycharm:pycharmPY`.
+    // Only the first is exercised today, but both are excluded defensively: if `useInstaller` is ever
+    // flipped (e.g. by building a SNAPSHOT platform version), resolution silently switches to the
+    // second coordinate, which would reopen this exact failure mode there instead.
+    // Listed as explicit modules, not a blanket `excludeGroup`, so it's obvious which four IDEs this
+    // plugin can target rather than excluding the whole (oddly-named, but IntelliJ-owned, not a real
+    // Python-ecosystem groupId) "python" group wholesale.
+    fun RepositoryContentDescriptor.excludeIntelliJPlatformGroups() {
+        // installer coordinates (groupId "python")
+        excludeModule("python", "pycharm")             // IntelliJPlatformType.PyCharm
+        excludeModule("python", "pycharm-professional") // IntelliJPlatformType.PyCharmProfessional
+        excludeModule("python", "pycharm-community")    // IntelliJPlatformType.PyCharmCommunity
+        excludeModule("python", "dataspell")            // IntelliJPlatformType.DataSpell
+
+        // maven coordinates (groupId "com.jetbrains.intellij.pycharm"); DataSpell has no maven channel
+        excludeModule("com.jetbrains.intellij.pycharm", "pycharm")   // IntelliJPlatformType.PyCharm
+        excludeModule("com.jetbrains.intellij.pycharm", "pycharmPY") // IntelliJPlatformType.PyCharmProfessional
+        excludeModule("com.jetbrains.intellij.pycharm", "pycharmPC") // IntelliJPlatformType.PyCharmCommunity
+    }
+
     // On CI, route through JetBrains' cache-redirector to avoid Maven Central 429 rate limits.
     // Skipped locally so IDE Gradle sync isn't slowed by the extra hop.
     if (System.getenv("TEAMCITY_VERSION") != null) {
-        maven("https://cache-redirector.jetbrains.com/repo1.maven.org/maven2")
+        maven("https://cache-redirector.jetbrains.com/repo1.maven.org/maven2") {
+            content { excludeIntelliJPlatformGroups() }
+        }
     }
-    mavenCentral()
+    mavenCentral {
+        content { excludeIntelliJPlatformGroups() }
+    }
 }
 
 // Align the *runtime* Kotlin standard library with the one bundled in the target IntelliJ Platform
