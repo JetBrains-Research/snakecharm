@@ -106,6 +106,16 @@ repositories {
         excludeModule("com.jetbrains.intellij.pycharm", "pycharm")   // IntelliJPlatformType.PyCharm
         excludeModule("com.jetbrains.intellij.pycharm", "pycharmPY") // IntelliJPlatformType.PyCharmProfessional
         excludeModule("com.jetbrains.intellij.pycharm", "pycharmPC") // IntelliJPlatformType.PyCharmCommunity
+
+        // `testFramework(TestFrameworkType.Platform)` below resolves `com.jetbrains.intellij.platform:
+        // test-framework` (and friends) from the Maven-style releases()/snapshots() repos via
+        // `defaultRepositories()`, same as the pycharm maven coordinates above -- but unlike "python" /
+        // "com.jetbrains.intellij.pycharm", this group is unambiguously JetBrains-owned and never
+        // published to Maven Central, so a blanket exclude is safe and covers every current and future
+        // artifact under it (test-framework is just the one `intellijPlatformTestClasspath` happens to
+        // need) instead of needing a new `excludeModule` line each time one more shows up here (TeamCity
+        // build #998: 429 resolving `com.jetbrains.intellij.platform:test-framework`'s maven-metadata.xml).
+        excludeGroup("com.jetbrains.intellij.platform")
     }
 
     // On CI, route through JetBrains' cache-redirector to avoid Maven Central 429 rate limits.
