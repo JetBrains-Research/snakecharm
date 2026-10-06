@@ -59,15 +59,22 @@ java {
 
 // Configure project's dependencies
 repositories {
+    // Declared first and ahead of mavenCentral() because its repos are content-filtered to
+    // IntelliJ Platform groups (e.g. `python:pycharm-professional`), while mavenCentral() below is
+    // not. Repositories are searched in declaration order for every dependency, so with
+    // mavenCentral() first, Gradle asked it about `python:pycharm-professional` before ever trying
+    // this one -- normally a harmless 404 that falls through, but on a rate-limited CI run Maven
+    // Central returned 429 instead, which Gradle treats as fatal rather than falling through,
+    // aborting resolution before the correctly-scoped repo below was ever tried (TeamCity build #996).
+    intellijPlatform {
+        defaultRepositories()
+    }
     // On CI, route through JetBrains' cache-redirector to avoid Maven Central 429 rate limits.
     // Skipped locally so IDE Gradle sync isn't slowed by the extra hop.
     if (System.getenv("TEAMCITY_VERSION") != null) {
         maven("https://cache-redirector.jetbrains.com/repo1.maven.org/maven2")
     }
     mavenCentral()
-    intellijPlatform {
-        defaultRepositories()
-    }
 }
 
 // Align the *runtime* Kotlin standard library with the one bundled in the target IntelliJ Platform
