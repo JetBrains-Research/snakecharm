@@ -4,7 +4,7 @@
 # SnakeCharm Plugin Changelog
 
 ## [2026.1.1]
-Released <Unreleased>
+Released on 6 October 2026
 
 We gratefully acknowledge external contributor Gaurav Vaidya (@gaurav) for his work porting the plugin to 2026.1.x 
 platform API and improving developer documentation.
