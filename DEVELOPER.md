@@ -80,12 +80,27 @@ If Gradle can't auto-detect the JDK, pass it explicitly:
         
 1. <a name="running-cucumber-features-from-the-ide"></a>**Running Cucumber features from the IDE.**
    A `Cucumber Java` run configuration (gutter icon / context menu on a `.feature` file) launches the
-   JVM itself, not through Gradle, so it gets none of the JVM arguments the IntelliJ Platform Gradle
-   Plugin attaches to the `test` task: ~50 `--add-opens`, `java.system.class.loader`, the test
-   sandbox paths, `idea.python.helpers.path`, ... Without them the test application dies at startup
-   with `IllegalAccessError: ... module java.desktop does not export sun.awt`. The
-   `prepareIdeTestRun` task writes exactly those arguments into a Java argfile (and builds the test
-   sandbox and test wrappers bundle).
+   JVM itself, not through Gradle, so it gets nothing the IntelliJ Platform Gradle Plugin attaches to
+   the `test` task. That is two separate things, and the IDE takes each from a different place:
+
+   ```
+   java  <VM options>                         -classpath <jars>               <main> <args>
+         from the run configuration            always built by the IDE from
+         = @build/tmp/ideTestRun/jvm.args      the module dependencies (.iml)
+   ```
+
+   * **JVM options** — ~50 `--add-opens`, `java.system.class.loader`, the test sandbox paths,
+     `idea.python.helpers.path`, ... Without them: `IllegalAccessError: ... module java.desktop does
+     not export sun.awt`. The `prepareIdeTestRun` task writes them into a Java argfile (and builds
+     the test sandbox and test wrappers bundle).
+   * **Classpath** — the IDE builds `-classpath` from the module dependencies, which a Gradle sync
+     imports. `build.gradle.kts` adds the jars only `test` has to `testRuntimeOnly`, during sync only
+     (see the end of this step).
+
+   Neither can replace the other: a Gradle sync never imports a task's JVM options, and a `-cp` in
+   the argfile is overridden by the `-classpath` the IDE appends after the VM options. Using Gradle's
+   classpath instead would also drop the IDE's own runner jars (Cucumber/JUnit support, `idea_rt`)
+   and run Gradle's packaged sandbox jar instead of the classes the IDE just compiled.
 
    **The `Cucumber Java` run configuration template is already checked in** as
    `.run/Template Cucumber Java.run.xml`, and the IDE picks it up on project open — nothing to set
@@ -112,9 +127,12 @@ If Gradle can't auto-detect the JDK, pass it explicitly:
    platform's test-runtime jars and the jars of all bundled plugins, which `build.gradle.kts` adds
    only during IDE sync (otherwise: `ClassNotFoundException:
    com.intellij.platform.settings.local.SettingsControllerMediator`, or `Missing extension point:
-   Pythonid.pythonSdkFlavor`). "Only during sync" means the `idea.sync.active` system property, which
-   the IDE sets to `true` for a Gradle sync only — never for `./gradlew test` or for Gradle tasks the
-   IDE runs. So after changing that part of the build script, **re-sync**; a rebuild is not enough.
+   Pythonid.pythonSdkFlavor`). The bundled-plugin jars are taken from the `test` task's own classpath
+   (its jars inside the IDE distribution), so they follow whatever the gradle plugin puts there.
+   "Only during sync" means the `idea.sync.active` system property, which the IDE sets to `true` for
+   a Gradle sync only — never for `./gradlew test` or for Gradle tasks the IDE runs. Adding the jars
+   outside sync would reorder `test`'s classpath and break it. So after changing that part of the
+   build script, **re-sync**; a rebuild is not enough.
 
 2. Checkout `snakemake` project sources and configure as test data.
 

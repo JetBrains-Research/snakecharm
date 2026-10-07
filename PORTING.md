@@ -562,11 +562,19 @@ IntelliJ Platform Gradle Plugin 2.19.0 appends the jars of every bundled IDE plu
 configuration, so the IDE's Gradle import never saw them. The IDE classpath (649 entries) was a
 strict subset of Gradle's (1477).
 
-Fix: `ideBundledPluginsTestClasspath()` in `build.gradle.kts` rebuilds that list from
-`product-info.json` (bundled plugins minus the plugin's default excludes), and the sync-only
-(`idea.sync.active`) block adds it as `testRuntimeOnly`. It matches the `test` task's list exactly
-(926/926). Re-check it on a gradle-plugin bump by diffing against `tasks.test.get().classpath`. No new
-`bundledModule`s were needed.
+Fix: the sync-only (`idea.sync.active`) block adds, as `testRuntimeOnly`, every jar of the
+`test` task's own classpath that lives in the IDE distribution. Taken from the task rather than
+re-derived, so it follows whatever the gradle plugin computes. `test.classpath` contains
+`testRuntimeClasspath`, so the collection is a `files(Callable)` with a re-entry guard; a
+`provider {}` fails with "Circular evaluation detected". No new `bundledModule`s were needed.
+
+**Why an IDE run needs both this and `prepareIdeTestRun`.** The IDE starts the JVM from two inputs
+taken from different places: VM options from the run configuration, and `-classpath` built from the
+module dependencies. `prepareIdeTestRun`'s argfile (`jvm.args`) covers the first: `--add-opens`,
+sandbox paths and so on. Without it the run fails with `IllegalAccessError … sun.awt` even with the
+classpath fixed (verified). The sync block covers the second. Putting Gradle's classpath into
+`jvm.args` does not work: the IDE appends its own `-classpath` after the VM options, and replacing it
+would drop the IDE's runner jars and run Gradle's sandbox jar instead of the IDE-compiled classes.
 
 ### Method note: cluster failure *messages*, not test names
 

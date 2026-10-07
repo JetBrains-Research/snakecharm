@@ -7,6 +7,7 @@ import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.io.path.isDirectory
 
 fun gradlePropertyOptional(key: String) = project.findProperty(key)?.toString()
@@ -26,40 +27,6 @@ fun gradlePropertyWithPriorityToSystemProperty(key: String): String {
     val gradleProperty = providers.gradleProperty(key).get()
     logger.warn("Using gradle property for '$key': $gradleProperty (env variable '$envVarName' and system property for '$key' not found)")
     return gradleProperty
-}
-
-// The jars IntelliJ Platform Gradle Plugin's TestIdeTask adds to `test` for the target IDE's bundled
-// plugins (see `org.jetbrains.intellij.platform.testIdeBundledPluginsClasspath*` properties): every
-// bundled plugin from product-info.json except the excluded ones, as the jars of its `lib/` and
-// `lib/modules/` directories. Matches the `test` task's list exactly on PY-2026.2.2; re-check it after
-// a gradle plugin bump by diffing against `tasks.test.get().classpath`.
-@Suppress("UNCHECKED_CAST")
-fun ideBundledPluginsTestClasspath(platformPath: java.nio.file.Path): List<File> {
-    if (!(findProperty("org.jetbrains.intellij.platform.testIdeBundledPluginsClasspathEnabled")?.toString()?.toBoolean() ?: true)) {
-        return emptyList()
-    }
-    val excludes = (findProperty("org.jetbrains.intellij.platform.testIdeBundledPluginsClasspathExcludes")?.toString()
-        ?: "com.intellij.openRewrite,com.intellij.ja,com.intellij.ko,com.intellij.zh,org.jetbrains.plugins.vue")
-        .split(',').map(String::trim).filter(String::isNotEmpty).toSet()
-    val productInfoFile = listOf("Resources/product-info.json", "product-info.json")
-        .map { platformPath.resolve(it).toFile() }
-        .firstOrNull { it.isFile } ?: return emptyList()
-
-    val productInfo = groovy.json.JsonSlurper().parse(productInfoFile) as Map<String, Any?>
-    val bundledPlugins = (productInfo["bundledPlugins"] as List<String>) - excludes
-    val pluginLayouts = (productInfo["layout"] as List<Map<String, Any?>>)
-        .filter { it["kind"] == "plugin" }
-        .associateBy { it["name"] as String }
-    return bundledPlugins
-        .flatMap { id -> (pluginLayouts[id]?.get("classPath") as? List<String>).orEmpty() }
-        .map { it.split('/').take(2).joinToString("/") } // "plugins/<dir>"
-        .distinct()
-        .flatMap { dir ->
-            listOf("lib", "lib/modules").flatMap { sub ->
-                platformPath.resolve("$dir/$sub").toFile().listFiles { f -> f.isFile && f.extension == "jar" }
-                    .orEmpty().sortedBy { it.name }
-            }
-        }
 }
 
 plugins {
@@ -210,17 +177,29 @@ dependencies {
     // for Gradle tasks the IDE runs). The IDE stores the synced classpath in `.idea/modules/*.iml`,
     // which `Cucumber Java`/JUnit run configurations use, so edits here need a re-sync to take effect.
     // Simulate a sync from the CLI with `-Didea.sync.active=true`.
+    // This covers only the IDE run's *classpath*; its JVM options come from `prepareIdeTestRun`'s
+    // argfile. Both are needed, see DEVELOPER.md -> "Running Cucumber features from the IDE".
     if (System.getProperty("idea.sync.active").toBoolean()) {
         testRuntimeOnly(files(configurations.named(Configurations.INTELLIJ_PLATFORM_TEST_RUNTIME_FIX_CLASSPATH)))
         testRuntimeOnly(files(configurations.named(Configurations.INTELLIJ_PLATFORM_TEST_CLASSPATH)))
-        // The plugin (2.19.0) also appends the jars of *every* bundled plugin of the target IDE
-        // to `test` (~900 jars: DatabaseTools, libraries-misc-plugin, ...), computed inside
-        // TestIdeTask rather than kept in a configuration. The v2 plugin model needs them: without
-        // `libraries-misc-plugin.jar` the content module `intellij.libraries.lucene.common` is not
-        // resolved, which excludes spellchecker -> JSON -> YAML -> PythonCore -> Pythonid and
-        // SnakeCharm itself, and a `Cucumber Java` run dies with "Missing extension point:
-        // Pythonid.pythonSdkFlavor". Mirror that list here.
-        testRuntimeOnly(files(provider { ideBundledPluginsTestClasspath(project.intellijPlatform.platformPath) }))
+        // The plugin (2.19.0) also appends the jars of *every* bundled plugin of the target IDE to
+        // `test` (~900, e.g. `libraries-misc-plugin.jar`), computed inside TestIdeTask, not in a
+        // configuration. Without them the v2 plugin model can't resolve `intellij.libraries.lucene.common`,
+        // which excludes spellchecker -> JSON -> YAML -> PythonCore -> Pythonid -> SnakeCharm, and a
+        // `Cucumber Java` run dies with "Missing extension point: Pythonid.pythonSdkFlavor".
+        // So take the IDE-distribution jars straight from `test`'s classpath. That classpath contains
+        // `testRuntimeClasspath`, i.e. this very collection: the guard returns nothing on re-entry
+        // (a `provider {}` here fails with "Circular evaluation detected").
+        val resolvingTestClasspath = AtomicBoolean(false)
+        testRuntimeOnly(files(Callable {
+            if (!resolvingTestClasspath.compareAndSet(false, true)) return@Callable emptyList<File>()
+            try {
+                val home = project.intellijPlatform.platformPath
+                tasks.named<Test>("test").get().classpath.filter { it.toPath().startsWith(home) }.files.toList()
+            } finally {
+                resolvingTestClasspath.set(false)
+            }
+        }))
     }
 
     intellijPlatform {
@@ -635,6 +614,8 @@ tasks {
     // `@$PROJECT_DIR$/build/tmp/ideTestRun/jvm.args` in its VM options plus this task as a
     // "Before launch" step -- which is what `.run/Template Cucumber Java.run.xml` sets. See
     // DEVELOPER.md -> "Configure Tests" -> "Running Cucumber features from the IDE".
+    // No classpath here: the IDE always builds `-classpath` itself from the module dependencies (see
+    // the `idea.sync.active` block in `dependencies`), and a `-cp` in this file would be overridden.
     register("prepareIdeTestRun") {
         group = "verification"
         description = "Prepares the test sandbox and writes the test JVM arguments for IDE run configurations."
