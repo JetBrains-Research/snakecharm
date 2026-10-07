@@ -10,12 +10,6 @@ import junit.framework.TestCase
  * @author Roman.Chernyatchik
  * @date 2018-12-31
  *
- * Historically this extended the platform's `PlatformLiteFixture` and manually registered the
- * `PythonDialectsTokenSetContributor` extension point on a mock application. That fixture was removed
- * in the 2026.1 (build 261) test framework, so we now stand up a real test *application* via
- * [BareTestFixture]: the Python plugin it loads already registers its token-set contributors, so the
- * snakemake lexer tokenizes exactly as it does at runtime.
- *
  * Deliberately **not** [com.intellij.testFramework.fixtures.BasePlatformTestCase]: [doLexerTest] never
  * touches a `CodeInsightTestFixture`, and lexing needs nothing project-scoped. Asking for a project
  * would build one light project per class off `LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR`,

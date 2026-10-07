@@ -46,9 +46,6 @@ abstract class SmkAnnotatorManager : Annotator, DumbAware {
 
 class SmkStandardAnnotatorManager : SmkAnnotatorManager() {
     override fun createAnnotators(holder: PyAnnotationHolder): List<PyElementVisitor> = listOf(
-        // NB: the "'return' outside of function" check that SmkReturnAnnotator used to permit inside
-        // snakemake run/python blocks now lives in the platform's final PySyntaxAnnotator; the false
-        // positive is suppressed by SmkReturnHighlightInfoFilter (a daemon.highlightInfoFilter) instead.
         SmkWildcardsAnnotator(holder) // requires resolve, that based on indexes access
     )
 }
