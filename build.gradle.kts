@@ -363,7 +363,8 @@ kotlin {
 }
 
 // The production wrappers bundle needs a local snakemake-wrappers checkout (see DEVELOPER.md); CI
-// provides one. See #571.
+// provides one. See #571. Blank counts as unset: a TeamCity parameter left empty passes an empty string,
+// and an empty path resolves to the daemon working directory, which the crawler may well accept.
 val wrappersRepoPath = gradlePropertyOptional("snakemakeWrappersRepoPath")?.takeIf { it.isNotBlank() }
 val wrappersBundleFile = layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage-bundled.cbor")
 
@@ -405,6 +406,22 @@ tasks {
         // Skip only when it is *unset*. If it is set but wrong (a typo, or a renamed CI checkout) the
         // task still runs and SmkWrapperCrawler fails loudly, as before -- silently publishing a plugin
         // with no wrapper metadata is a much worse outcome than a broken build.
+        //
+        // On CI the property is mandatory. A dropped or empty TeamCity parameter would otherwise
+        // publish a wrapper-less plugin from a green build, with nothing but a warning in the log.
+        // Checked when the task graph is ready, not in onlyIf: Gradle hides the message of an onlyIf
+        // failure.
+        if (providers.environmentVariable("TEAMCITY_VERSION").isPresent && wrappersRepoPath == null) {
+            gradle.taskGraph.whenReady {
+                if (hasTask(":buildWrappersBundle")) {
+                    throw GradleException(
+                        "snakemakeWrappersRepoPath is not set on CI. Refusing to build a plugin without " +
+                            "bundled wrappers -- check the snakemake-wrappers VCS root and the parameter " +
+                            "that passes its path to Gradle. See #571."
+                    )
+                }
+            }
+        }
         onlyIf {
             if (wrappersRepoPath == null) {
                 logger.warn(
@@ -439,7 +456,8 @@ tasks {
     register<JavaExec>("buildTestWrappersBundle") {
         // XXX: we could re-use wrappers bundle task for production here and just pass:
         //  `-PsnakemakeWrappersRepoPath=testData/wrappers_storage' gradle arg
-        // P.S: Wrappers bundle task for production always executed before tests in order to get JAR file
+        // P.S: tests never run the production bundle task -- the `test` task depends on this one directly,
+        // and tests read the .cbor from build/bundledWrappers.
 
         // Builds storage based on test data
         dependsOn("compileKotlin", "compileJava")
