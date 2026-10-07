@@ -263,9 +263,9 @@ class CompletionResolveSteps {
                     message = "Variant [${key.first}, ${key.second}] is missing in:\n$actualRefsInfo"
                 )
                 if (prev != null) {
-                    val prevKey = prev!!.second
+                    val prevKey = prev.second
                     assertTrue(
-                        prev!!.first < idx,
+                        prev.first < idx,
                         message = "Variant [${prevKey.first}, ${prevKey.second}] should be before" +
                                 " [${key.first}, ${key.second}] in:\n$actualRefsInfo"
                     )
