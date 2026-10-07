@@ -7,7 +7,7 @@
 Released on <Unreleased>
 
 ### Changed
-- TODO
+- Bundled snakemake wrappers list updated to `v9.19.0`
 
 ## [2026.2.1]
 Released on 7.10.2026
