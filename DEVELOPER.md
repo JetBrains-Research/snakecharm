@@ -109,8 +109,12 @@ If Gradle can't auto-detect the JDK, pass it explicitly:
    `Glue` may stay empty: `src/test/resources/cucumber.properties` sets `cucumber.glue`. Re-import
    the Gradle project after pulling this: the IDE's test classpath needs the forced `kotlin-stdlib`
    (an older one first on it hangs project setup with "Debug metadata version mismatch") and the
-   platform's test-runtime jars, which `build.gradle.kts` adds only during IDE sync (otherwise:
-   `ClassNotFoundException: com.intellij.platform.settings.local.SettingsControllerMediator`).
+   platform's test-runtime jars and the jars of all bundled plugins, which `build.gradle.kts` adds
+   only during IDE sync (otherwise: `ClassNotFoundException:
+   com.intellij.platform.settings.local.SettingsControllerMediator`, or `Missing extension point:
+   Pythonid.pythonSdkFlavor`). "Only during sync" means the `idea.sync.active` system property, which
+   the IDE sets to `true` for a Gradle sync only — never for `./gradlew test` or for Gradle tasks the
+   IDE runs. So after changing that part of the build script, **re-sync**; a rebuild is not enough.
 
 2. Checkout `snakemake` project sources and configure as test data.
 

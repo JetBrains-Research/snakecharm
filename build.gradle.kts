@@ -28,6 +28,40 @@ fun gradlePropertyWithPriorityToSystemProperty(key: String): String {
     return gradleProperty
 }
 
+// The jars IntelliJ Platform Gradle Plugin's TestIdeTask adds to `test` for the target IDE's bundled
+// plugins (see `org.jetbrains.intellij.platform.testIdeBundledPluginsClasspath*` properties): every
+// bundled plugin from product-info.json except the excluded ones, as the jars of its `lib/` and
+// `lib/modules/` directories. Matches the `test` task's list exactly on PY-2026.2.2; re-check it after
+// a gradle plugin bump by diffing against `tasks.test.get().classpath`.
+@Suppress("UNCHECKED_CAST")
+fun ideBundledPluginsTestClasspath(platformPath: java.nio.file.Path): List<File> {
+    if (!(findProperty("org.jetbrains.intellij.platform.testIdeBundledPluginsClasspathEnabled")?.toString()?.toBoolean() ?: true)) {
+        return emptyList()
+    }
+    val excludes = (findProperty("org.jetbrains.intellij.platform.testIdeBundledPluginsClasspathExcludes")?.toString()
+        ?: "com.intellij.openRewrite,com.intellij.ja,com.intellij.ko,com.intellij.zh,org.jetbrains.plugins.vue")
+        .split(',').map(String::trim).filter(String::isNotEmpty).toSet()
+    val productInfoFile = listOf("Resources/product-info.json", "product-info.json")
+        .map { platformPath.resolve(it).toFile() }
+        .firstOrNull { it.isFile } ?: return emptyList()
+
+    val productInfo = groovy.json.JsonSlurper().parse(productInfoFile) as Map<String, Any?>
+    val bundledPlugins = (productInfo["bundledPlugins"] as List<String>) - excludes
+    val pluginLayouts = (productInfo["layout"] as List<Map<String, Any?>>)
+        .filter { it["kind"] == "plugin" }
+        .associateBy { it["name"] as String }
+    return bundledPlugins
+        .flatMap { id -> (pluginLayouts[id]?.get("classPath") as? List<String>).orEmpty() }
+        .map { it.split('/').take(2).joinToString("/") } // "plugins/<dir>"
+        .distinct()
+        .flatMap { dir ->
+            listOf("lib", "lib/modules").flatMap { sub ->
+                platformPath.resolve("$dir/$sub").toFile().listFiles { f -> f.isFile && f.extension == "jar" }
+                    .orEmpty().sortedBy { it.name }
+            }
+        }
+}
+
 plugins {
     // Java support
     id("java")
@@ -172,9 +206,21 @@ dependencies {
     // Only during IDE sync: the `test` task already has these jars, in an order the plugin chooses
     // with care, and adding them here reorders it -- the Gradle run then fails every scenario with
     // "Could not find installation home path".
+    // `idea.sync.active` is set to `true` by the IDE for a Gradle sync only (not for `./gradlew`, nor
+    // for Gradle tasks the IDE runs). The IDE stores the synced classpath in `.idea/modules/*.iml`,
+    // which `Cucumber Java`/JUnit run configurations use, so edits here need a re-sync to take effect.
+    // Simulate a sync from the CLI with `-Didea.sync.active=true`.
     if (System.getProperty("idea.sync.active").toBoolean()) {
         testRuntimeOnly(files(configurations.named(Configurations.INTELLIJ_PLATFORM_TEST_RUNTIME_FIX_CLASSPATH)))
         testRuntimeOnly(files(configurations.named(Configurations.INTELLIJ_PLATFORM_TEST_CLASSPATH)))
+        // The plugin (2.19.0) also appends the jars of *every* bundled plugin of the target IDE
+        // to `test` (~900 jars: DatabaseTools, libraries-misc-plugin, ...), computed inside
+        // TestIdeTask rather than kept in a configuration. The v2 plugin model needs them: without
+        // `libraries-misc-plugin.jar` the content module `intellij.libraries.lucene.common` is not
+        // resolved, which excludes spellchecker -> JSON -> YAML -> PythonCore -> Pythonid and
+        // SnakeCharm itself, and a `Cucumber Java` run dies with "Missing extension point:
+        // Pythonid.pythonSdkFlavor". Mirror that list here.
+        testRuntimeOnly(files(provider { ideBundledPluginsTestClasspath(project.intellijPlatform.platformPath) }))
     }
 
     intellijPlatform {

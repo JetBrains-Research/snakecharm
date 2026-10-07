@@ -551,6 +551,23 @@ task name) still excludes `prepareTestSandbox`/`prepareTestIdePerformanceSandbox
 reading `snakemake_api.yaml` from the project directory and the version-pinned test wrapper bundle,
 not the production one. Not yet verified against a full test run.
 
+### 17. `Cucumber Java` runs from the IDE: `Missing extension point: Pythonid.pythonSdkFlavor` — FIXED
+
+`./gradlew test` passed, but a `.feature` run from the gutter died in `PythonMockSdk.create`. The
+SDK-flavor error is a symptom. `log-test/idea.log` shows the real cause: `intellij.libraries.lucene.common`
+is not resolved, which excludes spellchecker → JSON → YAML → PythonCore → Pythonid and SnakeCharm.
+
+IntelliJ Platform Gradle Plugin 2.19.0 appends the jars of every bundled IDE plugin to `test`
+(~900 jars, e.g. `libraries-misc-plugin.jar`). It computes them inside `TestIdeTask`, not in a
+configuration, so the IDE's Gradle import never saw them. The IDE classpath (649 entries) was a
+strict subset of Gradle's (1477).
+
+Fix: `ideBundledPluginsTestClasspath()` in `build.gradle.kts` rebuilds that list from
+`product-info.json` (bundled plugins minus the plugin's default excludes), and the sync-only
+(`idea.sync.active`) block adds it as `testRuntimeOnly`. It matches the `test` task's list exactly
+(926/926). Re-check it on a gradle-plugin bump by diffing against `tasks.test.get().classpath`. No new
+`bundledModule`s were needed.
+
 ### Method note: cluster failure *messages*, not test names
 
 Grouping the 145 failures by feature made them look like one big resolve problem. Grouping by the
