@@ -363,8 +363,8 @@ kotlin {
 }
 
 // The production wrappers bundle needs a local snakemake-wrappers checkout (see DEVELOPER.md); CI
-// provides one. See #571. Blank counts as unset: an unresolved TeamCity parameter arrives as an empty
-// string, and an empty path resolves to the daemon working directory, which the crawler may well accept.
+// provides one. See #571. Blank counts as unset: a TeamCity parameter left empty passes an empty string,
+// and an empty path resolves to the daemon working directory, which the crawler may well accept.
 val wrappersRepoPath = gradlePropertyOptional("snakemakeWrappersRepoPath")?.takeIf { it.isNotBlank() }
 val wrappersBundleFile = layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage-bundled.cbor")
 
@@ -407,9 +407,10 @@ tasks {
         // task still runs and SmkWrapperCrawler fails loudly, as before -- silently publishing a plugin
         // with no wrapper metadata is a much worse outcome than a broken build.
         //
-        // On CI the property is mandatory. A dropped TeamCity parameter would otherwise publish a
-        // wrapper-less plugin from a green build, with nothing but a warning in the log. Checked when
-        // the task graph is ready, not in onlyIf: Gradle hides the message of an onlyIf failure.
+        // On CI the property is mandatory. A dropped or empty TeamCity parameter would otherwise
+        // publish a wrapper-less plugin from a green build, with nothing but a warning in the log.
+        // Checked when the task graph is ready, not in onlyIf: Gradle hides the message of an onlyIf
+        // failure.
         if (providers.environmentVariable("TEAMCITY_VERSION").isPresent && wrappersRepoPath == null) {
             gradle.taskGraph.whenReady {
                 if (hasTask(":buildWrappersBundle")) {
