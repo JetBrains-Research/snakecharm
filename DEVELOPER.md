@@ -44,7 +44,7 @@ Gradle failure described below. Everyone else sets `JAVA_HOME` by hand:
 ```shell
 # Read the version this branch needs rather than hardcoding it; .java-version tracks `javaVersion`
 JDK=$(cat .java-version)
-echo "Required JDK version: JDK"
+echo "Required JDK version: $JDK"
 
 # macOS (Homebrew): install it
 brew install openjdk@$JDK
@@ -57,6 +57,7 @@ brew install openjdk@$JDK
 export JAVA_HOME=$(jenv prefix $JDK)    # or e.g. /opt/homebrew/opt/openjdk@$JDK
 "$JAVA_HOME/bin/java" -version          # verify it really says $JDK
 
+# Optionally increase the Gradle daemon heap size to avoid OOMs with the additional argument: -Pkotlin.daemon.jvmargs=-Xmx4g
 ./gradlew clean buildPlugin        # builds build/distributions/snakecharm-*.zip
 ./gradlew test                     # runs the JUnit + Cucumber test suite
 ./gradlew verifyPlugin             # runs the IntelliJ Plugin Verifier
