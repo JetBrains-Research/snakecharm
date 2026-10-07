@@ -51,9 +51,10 @@ TeamCity it is meant to come from the snakemake-wrappers VCS root — see issue 
 runs on TeamCity (detected by `TEAMCITY_VERSION`) it treats the property as **mandatory**: unset or
 blank fails any build whose task graph includes `:buildWrappersBundle`, instead of publishing a
 wrapper-less plugin from a green build. Every TeamCity configuration that builds the plugin must
-therefore pass it; those configurations live on JetBrains' TeamCity server, not in this repo. A
-blank value counts as unset everywhere, because that is what a TeamCity parameter left empty
-passes. The test-only bundle
+therefore pass it via `-PsnakemakeWrappersRepoPath=...` (snakemake wrappers repo checkout directory
+to build plugin bundle or `testData/wrappers_storage` for test configurations); those configurations
+live on JetBrains' TeamCity server, not in this repo. A blank value counts as unset everywhere,
+because that is what a TeamCity parameter left empty passes. The test-only bundle
 (`:buildTestWrappersBundle`, what `test` actually consumes) defaults to `testData/wrappers_storage`
 and needs no property.
 
