@@ -5,9 +5,9 @@ import com.jetbrains.snakecharm.lang.parser.SmkTokenTypes.KEYWORD_LIKE_TOKENS_FO
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes
 import com.jetbrains.python.validation.PyAnnotationHolder
-import com.jetbrains.snakecharm.lang.validation.SmkAnnotator
+import com.jetbrains.snakecharm.lang.validation.SmkElementAnnotatorVisitorBase
 
-class SmkSyntaxAnnotator(holder: PyAnnotationHolder) : SmkAnnotator(holder) {
+class SmkSyntaxAnnotatorVisitor(holder: PyAnnotationHolder) : SmkElementAnnotatorVisitorBase(holder) {
     override fun visitSmkRule(rule: SmkRule) {
         highlightSmkRuleLike(rule)
     }

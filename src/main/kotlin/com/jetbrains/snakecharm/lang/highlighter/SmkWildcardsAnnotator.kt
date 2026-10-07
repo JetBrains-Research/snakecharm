@@ -1,18 +1,36 @@
 package com.jetbrains.snakecharm.lang.highlighter
 
+import com.intellij.lang.annotation.AnnotationHolder
+import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.openapi.project.DumbAware
+import com.intellij.psi.PsiElement
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.python.psi.types.TypeEvalContext
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.types.SmkWildcardsType
 import com.jetbrains.python.validation.PyAnnotationHolder
-import com.jetbrains.snakecharm.lang.validation.SmkAnnotator
+import com.jetbrains.snakecharm.lang.psi.SmkFile
+import com.jetbrains.snakecharm.lang.validation.SmkElementAnnotatorVisitorBase
 import com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLSyntaxHighlighter.Companion.HIGHLIGHTING_WILDCARDS_KEY
+import com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLWildcardsAnnotatorVisitor
 
 /**
  * Annotator to add syntax highlighting for wildcard references within Snakemake or SmkSL files.
  */
-class SmkWildcardsAnnotator(holder: PyAnnotationHolder) : SmkAnnotator(holder) {
+class SmkWildcardsAnnotator(): Annotator, DumbAware {
+    override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+        // Registered against `language="Python"`, so this runs for every element of every Python
+        // file. Since 2026.2 the annotator is built per call rather than being a shared singleton,
+        // so check the file before allocating anything
+        if (element.containingFile !is SmkFile) {
+            return
+        }
+        element.accept(SmkWildcardsAnnotatorVisitor(PyAnnotationHolder(holder)))
+    }
+}
+
+class SmkWildcardsAnnotatorVisitor(holder: PyAnnotationHolder) : SmkElementAnnotatorVisitorBase(holder) {
     @Suppress("UnstableApiUsage")
     override fun visitPyReferenceExpression(expr: PyReferenceExpression) {
         if (!SmkPsiUtil.isInsideSnakemakeOrSmkSLFile(expr)) {

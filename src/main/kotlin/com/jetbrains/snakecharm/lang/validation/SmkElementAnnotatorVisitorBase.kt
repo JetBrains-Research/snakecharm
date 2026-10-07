@@ -17,7 +17,7 @@ import com.jetbrains.snakecharm.lang.psi.SmkElementVisitor
  * The `addHighlightingAnnotation` helpers below are the ones `PyAnnotator` used to provide, kept so
  * that annotator subclasses read as before.
  */
-abstract class SmkAnnotatorBase(protected val holder: PyAnnotationHolder) : PyElementVisitor() {
+abstract class SnakemakeAnnotatorVisitorBase(protected val holder: PyAnnotationHolder) : PyElementVisitor() {
     @Suppress("UnstableApiUsage")
     protected fun addHighlightingAnnotation(target: PsiElement, key: TextAttributesKey) =
         holder.addHighlightingAnnotation(target, key)
@@ -38,7 +38,7 @@ abstract class SmkAnnotatorBase(protected val holder: PyAnnotationHolder) : PyEl
  * @author Roman.Chernyatchik
  * @date 2019-01-09
  */
-abstract class SmkAnnotator(holder: PyAnnotationHolder) : SmkAnnotatorBase(holder), SmkElementVisitor {
+abstract class SmkElementAnnotatorVisitorBase(holder: PyAnnotationHolder) : SnakemakeAnnotatorVisitorBase(holder), SmkElementVisitor {
     override val pyElementVisitor: PyElementVisitor
         get() = this
 }

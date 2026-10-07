@@ -75,10 +75,10 @@
     <lang.syntaxHighlighterFactory language="SnakemakeSL"
      implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLSyntaxHighlighterFactory"/>
     <colorSettingsPage implementation="com.jetbrains.snakecharm.lang.highlighter.SmkColorSettingsPage"/>
-    <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkDumbAwareAnnotatorManager"/>
-    <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkStandardAnnotatorManager"/>
+    <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.SmkDumbAwareAnnotator"/>
+    <annotator language="Python" implementationClass="com.jetbrains.snakecharm.lang.highlighter.SmkWildcardsAnnotator"/>
     <annotator language="RegExp" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLRegExpHighlightingAnnotator"/>
-    <annotator language="Python" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLAnnotatingVisitor"/>
+    <annotator language="Python" implementationClass="com.jetbrains.snakecharm.stringLanguage.lang.highlighter.SmkSLWildcardsAnnotator"/>
     <!-- Suppresses the platform's false "'return' outside of function" error inside snakemake run/python blocks.
          See SmkReturnHighlightInfoFilter (replaces the removed SmkReturnAnnotator since PyCharm 2026.1 / build 261). -->
     <daemon.highlightInfoFilter implementation="com.jetbrains.snakecharm.lang.highlighter.SmkReturnHighlightInfoFilter"/>

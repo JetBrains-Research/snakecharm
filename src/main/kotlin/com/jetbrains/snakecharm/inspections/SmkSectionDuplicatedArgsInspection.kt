@@ -43,7 +43,7 @@ class SmkSectionDuplicatedArgsInspection : SnakemakeInspection() {
 
                 args.forEach { arg ->
 
-                    /* PyKeywordArgument is checked by SmkSyntaxErrorAnnotator */
+                    /* PyKeywordArgument is checked by SmkSyntaxErrorAnnotatorVisitor */
                     if (arg !is PyKeywordArgument) {
                         val text = arg.text
 

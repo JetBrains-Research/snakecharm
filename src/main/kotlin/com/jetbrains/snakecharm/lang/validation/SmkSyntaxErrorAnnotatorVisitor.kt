@@ -10,7 +10,7 @@ import com.jetbrains.snakecharm.inspections.quickfix.IntroduceKeywordArgument
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.psi.*
 
-class SmkSyntaxErrorAnnotator(holder: PyAnnotationHolder) : SmkAnnotator(holder) {
+class SmkSyntaxErrorAnnotatorVisitor(holder: PyAnnotationHolder) : SmkElementAnnotatorVisitorBase(holder) {
     override fun visitSmkRuleOrCheckpointArgsSection(st: SmkRuleOrCheckpointArgsSection) {
         findAndHighlightIncorrectArguments(st)
     }
