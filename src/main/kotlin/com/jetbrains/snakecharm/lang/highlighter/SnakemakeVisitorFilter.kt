@@ -9,12 +9,6 @@ import com.jetbrains.python.psi.PythonVisitorFilter
 
 /**
  * See also: [com.jetbrains.snakecharm.inspections.SmkIgnorePyInspectionExtension]
- *
- * Note: the "'return' outside of function" check used to be a standalone, filterable
- * `com.jetbrains.python.validation.ReturnAnnotator`. Since 2026.1 (build 261) it is folded into the
- * final `PySyntaxAnnotator`, which is run by `PyCompositeAnnotator` without consulting this filter,
- * so it can no longer be suppressed here. The false positive for snakemake `run:` / python blocks is
- * now handled by [com.jetbrains.snakecharm.lang.highlighter.SmkReturnHighlightInfoFilter] instead.
  */
 class SnakemakeVisitorFilter : PythonVisitorFilter {
     private val unsupportedClasses = listOf(

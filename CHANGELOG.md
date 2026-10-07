@@ -3,19 +3,50 @@
 
 # SnakeCharm Plugin Changelog
 
-## [2026.2.0]
-Released <Unreleased>
+## [2026.2.1]
+Released on <Unreleased>
 
 ### Plugin
-- Compatibility with the unified PyCharm / IntelliJ Platform 2026.2 (build 262). PyCharm Community and
-  Professional were merged, so the plugin now builds against the `PY` platform type (see
-  [#570](https://github.com/JetBrains-Research/snakecharm/pull/570)).
+- Compatibility with the unified PyCharm / IntelliJ Platform 2026.2 (build 262).
 - **This release requires 2026.2 (build 262) or newer.** The Python plugin API changes below are not
-  source- or binary-compatible with earlier IDEs, so `pluginSinceBuild` was raised from `252` to `262`.
+  source- or binary-compatible with earlier IDEs, so `pluginSinceBuild` was raised from `261` to `262`.
   2026.1 is not supported: the annotator API it offered was removed in 2026.2, and advertising
   compatibility the binary cannot honour is the failure mode
   [#569](https://github.com/JetBrains-Research/snakecharm/pull/569) was rejected for.
-- Plugin title changed from `snakecharm` to `SnakeCharm`
+
+### Changed
+- 2026.2 removed the `com.jetbrains.python.validation.PyAnnotator` base class. Annotators are now plain
+  `PyElementVisitor`s that receive a `PyAnnotationHolder` at construction, matching the platform's own
+  `*AnnotatorVisitor` classes, so SnakeCharm's annotators are built per annotation pass instead of being
+  shared singletons.
+- 2026.2 ships Kotlin 2.4 metadata in the Python plugin, which the previous Kotlin 2.2 compiler cannot
+  read; the build now compiles with Kotlin 2.3 and aligns the forced runtime `kotlin-stdlib` with the
+  platform's 2.4.x.
+
+### Fixed
+- Implicitly imported snakemake names (`expand`, `protected`, `lookup`, …) stopped resolving after any
+  change to the project roots — e.g. switching interpreter or attaching a library. The platform
+  invalidates library PSI on a roots change, which emptied the implicit-symbol cache with nothing to
+  rebuild it in time; the cache is now refreshed on `rootsChanged`
+  ([#578](https://github.com/JetBrains-Research/snakecharm/issues/578)).
+
+## [2026.1.1]
+Released on 6 October 2026
+
+We gratefully acknowledge external contributor Gaurav Vaidya (@gaurav) for his work porting the plugin to 2026.1.x 
+platform API and improving developer documentation.
+
+Snakemake code insight supported version: `<=9.9.0`
+
+### Plugin
+- Compatibility with the unified PyCharm / IntelliJ Platform 2026.1.x (build 261) only. PyCharm
+  Community and Professional were merged, so the plugin now builds against the `PY` platform type
+  (see [#570](https://github.com/JetBrains-Research/snakecharm/pull/570)).
+- Plugin title changed from `snakecharm` to `SnakeCharm`.
+- Restored the ability to run Cucumber tests from the IDE via the `Cucumber Java` run configuration
+  (context menu / gutter icons).
+- `DEVELOPER.md` updated, includes instructions on how to build the plugin from sources using the
+  command line only.
 
 ### Changed
 - Adapted to the restructured Python plugin API in 2026.1: `PyType` is now a Kotlin interface (`name`
@@ -26,26 +57,14 @@ Released <Unreleased>
   "return outside of function" check moved into the final `PySyntaxAnnotator`. The false positive for
   `return` inside snakemake `run:` / `onstart` / `onerror` / `onsuccess` blocks is now suppressed by a
   new `daemon.highlightInfoFilter` (`SmkReturnHighlightInfoFilter`) instead of a custom annotator.
-- 2026.2 removed the `com.jetbrains.python.validation.PyAnnotator` base class. Annotators are now plain
-  `PyElementVisitor`s that receive a `PyAnnotationHolder` at construction, matching the platform's own
-  `*AnnotatorVisitor` classes, so SnakeCharm's annotators are built per annotation pass instead of being
-  shared singletons.
-- 2026.2 ships Kotlin 2.4 metadata in the Python plugin, which the previous Kotlin 2.2 compiler cannot
-  read; the build now compiles with Kotlin 2.3 and aligns the forced runtime `kotlin-stdlib` with the
-  platform's 2.4.x.
 - Unresolved references inside SmkSL string injections (e.g. `shell: "{dooooo}"`,
   `conda: f"{2}/boo.yaml"`) are now shown as a weak warning instead of a warning. Nothing in the
   plugin changed: any reference reported with `ProblemHighlightType.LIKE_UNKNOWN_SYMBOL` — which is
-  what `PyUnresolvedReferencesInspection` uses here — is rendered through `HighlightInfoType.INFO`
-  since 2026.1, where 2025.2 gave it plain warning severity
+  what `PyUnresolvedReferencesInspection` uses here — is rendered through `HighlightInfoType.INFO` in
+  2026.1, where 2025.2 gave it plain warning severity
   ([#584](https://github.com/JetBrains-Research/snakecharm/issues/584)).
 
 ### Fixed
-- Implicitly imported snakemake names (`expand`, `protected`, `lookup`, …) stopped resolving after any
-  change to the project roots — e.g. switching interpreter or attaching a library. The platform
-  invalidates library PSI on a roots change, which emptied the implicit-symbol cache with nothing to
-  rebuild it in time; the cache is now refreshed on `rootsChanged`
-  ([#578](https://github.com/JetBrains-Research/snakecharm/issues/578)).
 - `IllegalStateException: This method requires read access` error from `SmartModeScheduler.runWhenSmart(...)`
 - `ClassCastException: SmkSLFile cannot be cast to class SmkFile` error from `AbstractSmkRuleOrCheckpointType.getUseSections(...)`
 

@@ -149,6 +149,14 @@ structural moves:
    and is run by `PyCompositeAnnotator` **without consulting `PythonVisitorFilter`** (verified in
    bytecode). So neither the old subclass-`ReturnAnnotator` trick nor `PythonVisitorFilter`
    suppression works anymore.
+
+   **Previous approach:**  `SmkReturnAnnotator` suppresses the platform's "'return' outside   
+   of function" error for `return` statements that live inside a snakemake `run:` section or a top-level
+   python block. Those blocks are compiled by snakemake into the body of a generated function,
+   so `return` is legal there even though the PSI has no enclosing [com.jetbrains.python.psi.PyFunction]. 
+   Because of above-mentioned ReturnAnnotator changes `SmkReturnAnnotator` cannot work anymore even if
+   registered in `SmkStandardAnnotatorManager` and `SnakemakeVisitorFilter`.
+
    - **New approach:** a `daemon.highlightInfoFilter` — `SmkReturnHighlightInfoFilter` — vetoes the
      `HighlightInfo` for `ANN.return.outside.of.function` when the `return` sits inside a snakemake
      `run:` / `onstart` / `onerror` / `onsuccess` block (`SmkRunSection` /
@@ -167,10 +175,16 @@ structural moves:
 
 ### Test-infrastructure breaks — FIXED
 
-5. **`com.intellij.testFramework.PlatformLiteFixture` was removed.** `PyLexerTestCase` (base of
-   `SnakemakeLexerTest`, `SmkSLLexerTest`) now extends `BasePlatformTestCase`; the full test
+5. **`com.intellij.testFramework.PlatformLiteFixture` was removed.**
+    `com.jetbrains.snakecharm.lang.parser.PyLexerTestCase` (base of `SnakemakeLexerTest`,
+   `SmkSLLexerTest`) now extends `BasePlatformTestCase`; the full test
    application already registers the Python token-set contributors, so the manual
    `initApplication()` / `registerExtensionPoint(...)` bootstrapping is gone.
+   Previously `PyLexerTestCase` extended `PlatformLiteFixture` manually registered the
+   `PythonDialectsTokenSetContributor` extension point on a mock application. That fixture was removed
+   in the 2026.1 (build 261) test framework, so we now stand up a real test *application* via
+   [BareTestFixture]: the Python plugin it loads already registers its token-set contributors, so the
+   snakemake lexer tokenizes exactly as it does at runtime.
 
 6. **Kotlin coroutines "Debug metadata version mismatch. Expected: 1, got 2"** crashed the test IDE
    during project setup. The 2026.1 platform bundles **Kotlin 2.3.20**, but our build's older
@@ -237,6 +251,45 @@ structural moves:
   [#533](https://github.com/JetBrains-Research/snakecharm/issues/533) (rewrite `onChange` to drop
   `SlowOperations`) and [#506](https://github.com/JetBrains-Research/snakecharm/issues/506)
   (dumb-mode crash).
+
+### CI: Maven Central 429s on JetBrains-owned modules (builds #996–#999)
+
+Not a source-level port break, but surfaced only after landing on build 261: the `Tests (Gradle)`
+TeamCity step started failing outright (0 tests run) with e.g.
+
+```
+Could not GET '.../maven2/python/pycharm-professional/.../maven-metadata.xml'. 429 Too Many Requests
+Could not GET '.../maven2/com/jetbrains/intellij/platform/test-framework/maven-metadata.xml'. 429 ...
+Could not GET '.../maven2/com/jetbrains/intellij/java/java-compiler-ant-tasks/maven-metadata.xml'. 429 ...
+```
+
+None of those three modules are ever actually published to Maven Central — they're JetBrains
+platform coordinates served from `defaultRepositories()` (download.jetbrains.com /
+releases()/snapshots()). But content-filtering on *those* repos is one-directional: it restricts
+what they serve, it doesn't stop `mavenCentral()` from also being asked. Gradle queries every
+declared repo for metadata regardless of whether an earlier one already answered, and a 429 from
+any of them is fatal even when another repo already had the artifact — confirmed locally with
+`--info`: a `pycharm-professional` resolution that succeeds via the cached download.jetbrains.com
+artifact still issues a GET to repo.maven.apache.org that 404s harmlessly there. On a congested CI
+network that GET gets a 429 instead, and the build dies before a single test runs — which is also
+why TeamCity reported it as "number of tests 0 is 100% less than 3419" rather than naming the real
+cause.
+
+This hadn't happened before the 2026.1 port because these particular modules are resolved at
+`strictly [261, 261.25134.203]` — version ranges tied to this platform bump (`test-framework` via
+`testFramework(TestFrameworkType.Platform)`, `java-compiler-ant-tasks` via `instrumentCode`'s
+`intellijPlatformJavaCompiler` configuration) — so the lookups are new, not pre-existing traffic
+that just happened to start failing.
+
+Fixed in `build.gradle.kts` across three builds, each finding one more namespace Maven Central
+shouldn't be asked about: `python` (the four `IntelliJPlatformType` installer coordinates, #996/
+#997), `com.jetbrains.intellij.platform` (#998), `com.jetbrains.intellij.java` (#999). Scoping the
+exclusion per-module/per-group is whack-a-mole — the next task that resolves a not-yet-excluded
+`com.jetbrains.intellij.*` module reopens the identical failure — so the fix excludes the whole
+`com.jetbrains.intellij` namespace (`excludeGroupAndSubgroups`) in one go, plus a
+`cache-redirector.jetbrains.com` mirror of Maven Central on CI to cut real Maven Central traffic
+generally. Watch for a future `python`-adjacent (not `com.jetbrains.intellij`) namespace doing the
+same thing — that one would still need an explicit exclusion.
 
 ## 2026.2 — build 262
 
