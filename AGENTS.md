@@ -205,7 +205,7 @@ treated as a **language level**: `snakemake_api.yaml` at the repo root (loaded b
 versions. Its `defaultVersion` key (currently 9.9.0) is the language level new projects get, and the
 latest one the plugin officially supports. Additionally, users could adjust `snakemake_api.yaml` for
 already installed SnakeCharm, e.g. in macOS this file path will be:
-`~/Library/Application Support/JetBrains/PyCharm2026.1/plugins/snakecharm/extra/snakemake_api.yaml`
+`~/Library/Application Support/JetBrains/PyCharm2026.2/plugins/snakecharm/extra/snakemake_api.yaml`
 
 Feature areas (each maps to a source package and a `features/` test dir):
 
