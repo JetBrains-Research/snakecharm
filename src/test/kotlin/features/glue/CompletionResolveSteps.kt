@@ -194,7 +194,7 @@ class CompletionResolveSteps {
         val injectionStartOffset = if (injectionHost == null) {
             0
         } else {
-            injectionHost.textOffset + (injectionHost as PyStringLiteralExpression).stringValueTextRange.startOffset
+            injectionHost.textOffset + injectionHost.stringValueTextRange.startOffset
         }
 
 
