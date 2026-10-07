@@ -47,7 +47,11 @@ which route through `prepareTestSandbox` and the separate test bundle below. Tha
 property is commented out in `gradle.properties` by default, so a plain `buildPlugin` / `runIde`
 yields a plugin without wrapper completion and the other wrapper-driven features; pass it explicitly
 to include them: `./gradlew buildPlugin -PsnakemakeWrappersRepoPath=/path/to/snakemake-wrappers` (on
-TeamCity it comes from the wrappers VCS root — see issue #571). The test-only bundle
+TeamCity it comes from the wrappers VCS root — see issue #571). On TeamCity (detected by
+`TEAMCITY_VERSION`) the property is **mandatory**: unset or blank fails any build whose task graph
+includes `:buildWrappersBundle`, instead of publishing a wrapper-less plugin from a green build. A
+blank value counts as unset everywhere, because that is what an unresolved TeamCity parameter
+arrives as. The test-only bundle
 (`:buildTestWrappersBundle`, what `test` actually consumes) defaults to `testData/wrappers_storage`
 and needs no property.
 
