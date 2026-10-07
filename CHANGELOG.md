@@ -3,6 +3,12 @@
 
 # SnakeCharm Plugin Changelog
 
+## [2026.2.2]
+Released on <Unreleased>
+
+### Changed
+- TODO
+
 ## [2026.2.1]
 Released on 7.10.2026
 
