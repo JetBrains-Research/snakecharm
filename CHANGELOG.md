@@ -6,8 +6,29 @@
 ## [2026.2.1]
 Released on <Unreleased>
 
+### Plugin
+- Compatibility with the unified PyCharm / IntelliJ Platform 2026.2 (build 262).
+- **This release requires 2026.2 (build 262) or newer.** The Python plugin API changes below are not
+  source- or binary-compatible with earlier IDEs, so `pluginSinceBuild` was raised from `261` to `262`.
+  2026.1 is not supported: the annotator API it offered was removed in 2026.2, and advertising
+  compatibility the binary cannot honour is the failure mode
+  [#569](https://github.com/JetBrains-Research/snakecharm/pull/569) was rejected for.
+
 ### Changed
-- TODO
+- 2026.2 removed the `com.jetbrains.python.validation.PyAnnotator` base class. Annotators are now plain
+  `PyElementVisitor`s that receive a `PyAnnotationHolder` at construction, matching the platform's own
+  `*AnnotatorVisitor` classes, so SnakeCharm's annotators are built per annotation pass instead of being
+  shared singletons.
+- 2026.2 ships Kotlin 2.4 metadata in the Python plugin, which the previous Kotlin 2.2 compiler cannot
+  read; the build now compiles with Kotlin 2.3 and aligns the forced runtime `kotlin-stdlib` with the
+  platform's 2.4.x.
+
+### Fixed
+- Implicitly imported snakemake names (`expand`, `protected`, `lookup`, …) stopped resolving after any
+  change to the project roots — e.g. switching interpreter or attaching a library. The platform
+  invalidates library PSI on a roots change, which emptied the implicit-symbol cache with nothing to
+  rebuild it in time; the cache is now refreshed on `rootsChanged`
+  ([#578](https://github.com/JetBrains-Research/snakecharm/issues/578)).
 
 ## [2026.1.1]
 Released on 6 October 2026

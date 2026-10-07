@@ -22,6 +22,13 @@ interface ImplicitPySymbolsCache {
      */
     fun getSynthetic(scope: SmkCodeInsightScope) : List<LookupElement>
 
+    /**
+     * @return Whether any cached symbol points at PSI the platform has since invalidated, i.e. whether
+     *  this cache needs rebuilding. Note [get] silently drops such symbols, so a cache that answers
+     *  `true` here resolves fewer names than it appears to contain.
+     */
+    fun hasDeadPsi(): Boolean
+
     fun filter(smkScope: SmkCodeInsightScope, name: String) = this[smkScope]
         .asSequence()
         .filter { symbol -> symbol.identifier == name }
@@ -36,6 +43,7 @@ interface ImplicitPySymbolsCache {
             override val contentVersion = 0
             override fun get(scope: SmkCodeInsightScope) = emptyList<ImplicitPySymbol>()
             override fun getSynthetic(scope: SmkCodeInsightScope) = emptyList<LookupElement>()
+            override fun hasDeadPsi() = false
         }
     }
 }

@@ -10,9 +10,10 @@ Feature: Fixes PyArgumentListInspection related false positives
               lambda wildcards: expand(" ", **1)
       """
       And PyArgumentListInspection inspection is enabled
-      Then I expect inspection warning on <**1> in <expand(" ", **1)> with message
+      And PyTypeCheckerInspection inspection is enabled
+      Then I expect inspection warning on <1> in <expand(" ", **1)> with message
       """
-      Expected a mapping, got int
+      Expected a mapping, got 'Literal[1]'
       """
       When I check highlighting warnings
 
@@ -25,6 +26,7 @@ Feature: Fixes PyArgumentListInspection related false positives
             lambda wildcards: expand(" ", **wildcards)
     """
     And PyArgumentListInspection inspection is enabled
+    And PyTypeCheckerInspection inspection is enabled
     Then I expect no inspection warnings
     When I check highlighting warnings
     Examples:

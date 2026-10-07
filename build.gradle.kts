@@ -199,7 +199,7 @@ dependencies {
 
         // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
         //
-        // NB: on "PY"/"PD" the compile classpath is `Pythonid` (Python Professional), while
+        // NB: on "PY"/"DS" the compile classpath is `Pythonid` (Python Professional), while
         // plugin.xml declares only `<depends>PythonCore</depends>` and the `else ->` branch still
         // targets IDEA + the community Python plugin. So the compiler no longer rejects a
         // Professional-only Python API used from `src/main`: it compiles, and the tests pass (their
@@ -208,7 +208,13 @@ dependencies {
         // restriction in mind by hand -- everything in `src/main` must stay within PythonCore's API.
         when (platformType) {
             "PC" -> bundledPlugin("PythonCore")
-            "PY", "PD" -> {
+            // NB: keep these codes in sync with `isPyCharmPlatform` above -- they are the same
+            // question asked twice. "DS" (DataSpell) is a Python IDE built on Professional, so it
+            // bundles `Pythonid` like "PY" does; anything reaching `else` is IDEA + the external
+            // Python plugin. There is no "PD" code (see IntelliJPlatformType), and one used to be
+            // listed here: `fromCode` would have thrown at configuration time long before the
+            // branch could ever be taken.
+            "PY", "DS" -> {
                 bundledPlugin("Pythonid")
 
                 // TODO??? cleanup? check tests runing or not:
@@ -230,6 +236,13 @@ dependencies {
         // Grazie ("Natural Languages") plugin, not core. Needed so spellchecker-integration tests can
         // enable that inspection in the sandbox.
         bundledPlugin("tanvd.grazi")
+
+        // 2026.2 moved PythonHelpersLocator into its own content module and made it resolve helpers
+        // through the `com.jetbrains.python.pythonHelpersLocator` extension point, whose only
+        // implementation (PythonHelpersLocatorDefault) is registered by that module. Without it the
+        // EP is absent in the test application and PyTypeShed init dies with "Missing extension
+        // point: com.jetbrains.python.pythonHelpersLocator", taking the whole cucumber suite with it.
+        bundledModule("intellij.python.community.helpersLocator")
 
         // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file for plugin from JetBrains Marketplace.
         plugins(gradleProperty("platformPlugins").map { it.split(',') })
@@ -450,7 +463,7 @@ tasks {
             wrappersBundleFile.get(),
             layout.projectDirectory.file("snakemake_api.yaml")
         )
-        maxHeapSize = "1024m" // Not much RAM is available on TC agents
+        maxHeapSize = System.getenv("SNAKECHARM_TEST_HEAP") ?: "1024m" // TC agents are small; override locally, e.g. SNAKECHARM_TEST_HEAP=8g
     }
 
     register<JavaExec>("buildTestWrappersBundle") {
@@ -474,7 +487,7 @@ tasks {
             layout.buildDirectory.file("bundledWrappers/smk-wrapper-storage.test.cbor").get(),
             layout.projectDirectory.file("snakemake_api.yaml")
         )
-        maxHeapSize = "1024m" // Not much RAM is available on TC agents
+        maxHeapSize = System.getenv("SNAKECHARM_TEST_HEAP") ?: "1024m" // TC agents are small; override locally, e.g. SNAKECHARM_TEST_HEAP=8g
     }
 
 
@@ -499,6 +512,24 @@ tasks {
 //        include("**/AllCucumberFeaturesTest.class")  // Uncomment to disable gradle tests
 
         dependsOn("buildTestWrappersBundle")
+
+        // The suite is heap-hungry: the light fixture caches a project and a mock SDK per descriptor
+        // and nothing releases them, so a bad run dies with OutOfMemoryError. Only override when asked
+        // to -- with `maxHeapSize` left unset, IntelliJPlatformArgumentProvider passes the IDE's own
+        // vmoptions -Xmx (2 GB) instead, and a hardcoded default here would silently cap it lower.
+        System.getenv("SNAKECHARM_TEST_HEAP")?.let { maxHeapSize = it }
+
+        // Narrow a local run to tagged scenarios without editing AllCucumberFeaturesTest:
+        // CUCUMBER_TAGS='@here' ./gradlew test --tests "features.AllCucumberFeaturesTest"
+        // `cucumber.filter.tags` *replaces* @CucumberOptions(tags = "not @ignore") rather than
+        // intersecting with it, so re-apply that filter here -- otherwise CUCUMBER_TAGS='@here' also
+        // runs the @ignore'd scenarios that happen to carry @here.
+        // `?.takeIf { ... }`: an exported-but-empty CUCUMBER_TAGS would otherwise build the tag
+        // expression "not @ignore and ()", which cucumber rejects with a parse error instead of
+        // running the whole suite.
+        System.getenv("CUCUMBER_TAGS")?.takeIf { it.isNotBlank() }?.let {
+            systemProperty("cucumber.filter.tags", "not @ignore and ($it)")
+        }
 
         // The 2026.1 Python plugin ships its code as v2 content modules under
         // plugins/python-ce/lib/modules/. That breaks PythonHelpersLocator's jar-path lookup for the
@@ -571,7 +602,11 @@ tasks {
     }
 
     printProductsReleases {
-        channels = listOf(ProductRelease.Channel.EAP)
+        // Both channels: EAP answers "what is coming", RELEASE answers "what is the newest build I
+        // could target right now", and the two have different newest builds. EAP alone is actively
+        // misleading -- with 2026.2.2 (262.10315.174) already out, an EAP-only run reported
+        // 262.8665.97 as the newest 262, i.e. a build *older* than the one being built against.
+        channels = listOf(ProductRelease.Channel.RELEASE, ProductRelease.Channel.EAP)
         // Follow `platformType` rather than hardcoding one: PyCharm Community (`PC`) publishes
         // nothing from 2025.3 on, so a hardcoded `PyCharmCommunity` would report "no newer release"
         // forever instead of listing the platform we actually build against.

@@ -150,6 +150,19 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
   was a 16 GB laptop with several GB of swap in use, GC healthy throughout, nothing failing, just
   slow. Check `sysctl vm.swapusage` before concluding anything from a long run. Prefer the
   single-feature `@here` recipe while iterating either way.
+- **A platform bump can move a check between inspections, and the scenario then passes vacuously.**
+  `Given <X> inspection is enabled` fails loudly on an inspection that was *renamed*
+  (`fail("Unknown inspection:…")`), but says nothing when the inspection still exists and merely
+  stopped owning the diagnostic the scenario is about. The check for `expand(" ", **1)` moved from
+  `PyArgumentListInspection` to `PyTypeCheckerInspection` in 2026.2, which is why one scenario lost
+  its warning — and why its sibling, which asserts `expand(" ", **wildcards)` produces *no* warning,
+  went on passing while guarding nothing at all. Trace the message to its owner rather than guessing:
+  grep the message text in the platform's `messages/*.properties` for its bundle key, then grep the
+  extracted plugin jars for the class that references that key, in both the old and new IDE. Two
+  greps beat a type-inference theory — the key was renamed
+  `INSP.expected.dict.got.type` → `INSP.type.checker.unpack.expected.mapping`, which names the new
+  owner outright. A scenario asserting "no warning" is worth re-checking after any bump for exactly
+  this reason.
 - **Analyzing results:** the suite is large — ~3250 Cucumber scenarios plus ~170 plain JUnit tests.
   Gradle prints each failing scenario and a `N tests completed, M failed` summary, so tee
   the log and reduce it rather than parsing anything: `sed -n '/ > /s/ FAILED$//p' log | sort -u`
@@ -159,13 +172,16 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
   same information if you need a run whose console output you no longer have — but note it is
   written when the `test` task *ends*, and on an all-green run there is no `N tests completed`
   line either (Gradle prints that only on failure), so **a run in progress looks identical to a
-  hung one**. The live signals are the test JVM's accumulating CPU time (`ps -o time=`) and the
+  hung one** — and so does one that ran nothing. `BUILD SUCCESSFUL` says only that no test failed,
+  never how many ran, and `CUCUMBER_TAGS` makes an empty run easy to reach: a tag expression
+  matching no scenario exits 0 just as loudly as a full green suite. Read the count out of the XML
+  (`<testsuite tests="…">`) before believing a green run; a full suite is **3420** across 125 suites (measured on `23097522`, the 2026.2 branch; it was 3419 until the #570 merge added a scenario, so older notes say that). The live signals are the test JVM's accumulating CPU time (`ps -o time=`) and the
   mtime of `build/test-results/test/binary/in-progress-results-generic.bin`; `jstat -gc` tells you
   whether a quiet stretch is a slow scenario or a GC death spiral.
 
   The same "no summary line" quirk means **a truncated run looks identical to a good one**: an
   all-green `BUILD SUCCESSFUL` says nothing about how many tests ran, so confirm the count from the
-  XML (`tests=` summed over `build/test-results/test/*.xml`; it should be 3419) before reporting a
+  XML (`tests=` summed over `build/test-results/test/*.xml`; it should be 3420) before reporting a
   run as green. A stray `@here` tag or a leftover `tags = "not @ignore and @here"` in
   `AllCucumberFeaturesTest` is the usual cause.
 
@@ -196,12 +212,17 @@ treated as a **language level**: `snakemake_api.yaml` at the repo root (loaded b
 versions. Its `defaultVersion` key (currently 9.9.0) is the language level new projects get, and the
 latest one the plugin officially supports. Additionally, users could adjust `snakemake_api.yaml` for
 already installed SnakeCharm, e.g. in macOS this file path will be:
-`~/Library/Application Support/JetBrains/PyCharm2026.1/plugins/snakecharm/extra/snakemake_api.yaml`
+`~/Library/Application Support/JetBrains/PyCharm2026.2/plugins/snakecharm/extra/snakemake_api.yaml`
 
 Feature areas (each maps to a source package and a `features/` test dir):
 
 - `lang/highlighter/`, `lang/validation/` — syntax highlighting + annotators (registered against
-  Python; some run through `SmkStandardAnnotatorManager` / `SmkDumbAwareAnnotatorManager`).
+  Python; some run through `SmkStandardAnnotatorManager` / `SmkDumbAwareAnnotatorManager`). Since
+  2026.2 removed `PyAnnotator`, these are `PyElementVisitor`s that take their `PyAnnotationHolder`
+  at construction, so they cannot be singletons — and `Annotator.annotate()` is a **per-element**
+  callback, so anything built inside it is built once per PSI element per highlighting pass. Guard
+  on the containing file first, then cache per `AnnotationHolder.currentAnnotationSession`. Both
+  halves of that have been missed once each (`PORTING.md` → "2026.2", item 14).
 - `codeInsight/` — completion contributors and resolve for Snakemake magic (`config`, `rules`,
   `rules.<name>.<section>`, wildcards, api methods like `expand`/`temp`, wrapper names). The implicit
   "runtime magic" symbols (`expand`, `temp`, `config`, `rules`, …) are built by
@@ -252,9 +273,8 @@ the entry class for any feature is to grep that file.
   `instrumentCode` runs inside the Gradle daemon and loads platform classes, so on 2026.2 a daemon
   launched on JDK 21 dies with `UnsupportedClassVersionError: … class file version 69.0`, however
   correctly `-Dorg.gradle.java.installations.paths` points at a 25. Set `JAVA_HOME` to the platform's
-  own baseline (21 for 2026.1, 25 for 2026.2), which is the opposite of the "launch Gradle with JDK
-  21" rule above — that rule is about the *pinned Gradle version*, and it stops applying once the
-  platform needs a newer JVM than the Gradle it ships with can be launched under. Gradle also will not
+  own baseline (21 for 2026.1, 25 for 2026.2) — that is the floor under the window described at the
+  top of this file, and on a bump it moves before the pinned Gradle's ceiling does. Gradle also will not
   auto-detect a jenv-managed JDK, so pass the path explicitly; and the **`intelliJPlatform`
   gradle-plugin version** decides whether the Python
   plugin's v2 content modules load *in tests* at all (2.16.0 → 2.18.1 took one port from 3361 failing
@@ -272,6 +292,20 @@ the entry class for any feature is to grep that file.
   `PluginGeneratedSerialDescriptor.kt`, which names neither this plugin nor serialization, and (see the
   bullet below) takes hundreds of unrelated scenarios down with it. Issue #587 is the write-up; it cost
   101 failures on the 2026.2 port.
+- **A patch release is worth the same two checks, and they are cheap.** A `2026.2.1` → `2026.2.2`
+  bump moves `platformVersion` only — the build number stays `262.x`, so `pluginSinceBuild` /
+  `pluginUntilBuild` and the manifest do not move — but the bundled libraries above still can.
+  Rather than hunting version strings, diff the jars between the two downloaded distributions
+  (`shasum -a 256 lib/intellij.libraries.kotlinx.serialization.core.jar` in each): byte-identical
+  means nothing moved. That detour is worth taking because `kotlin-stdlib` is not shipped as a jar
+  carrying `Implementation-Version` at all — on 2026.2 it is folded into `lib/util-8.jar`, which has
+  no manifest, and the version is only readable by decompiling `kotlin.KotlinVersionCurrentValue`.
+  Then run the full suite against it: 2026.2.2 was green at the same count with no source change.
+- **`./gradlew printProductsReleases` lists what the build asks it to list.** It is configured here
+  for the RELEASE and EAP channels; with EAP alone it once reported a 262 build *older* than the one
+  being built against, which reads as "you are up to date" and is not. For what is actually
+  released, `https://data.services.jetbrains.com/products/releases?code=PY&type=release&latest=false`
+  gives version, build number and date.
 - **Logged errors are test failures.** `TestLoggerFactory` promotes anything logged at error level to
   a failed scenario, so one benign platform log can fail hundreds of unrelated tests. When triaging a
   wall of failures, group by exception message first — it is usually one cause, not many.
