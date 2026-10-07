@@ -536,6 +536,21 @@ Net effect: fewer classes (two deletions, no new files beyond the extracted `*Vi
 every surviving name now matches what the class actually is — an `Annotator` is something registered
 in `plugin.xml`, everything else is a visitor.
 
+### 16. IntelliJ Platform Gradle Plugin 2.18.1 → 2.19.0 — `runIde` stopped reusing `prepareSandbox` (ONGOING)
+
+Bumping `intelliJPlatform` in `libs.versions.toml` surfaced a silent breakage: since 2.19.0, `runIde`
+no longer packs the literal `prepareSandbox` task's sandbox — it has its own `prepareSandbox_runIde`
+(and, under Split Mode, `_runIdeBackend`/`_runIdeFrontend`) task. The wrappers-bundle wiring in
+`build.gradle.kts` configured `prepareSandbox { from(...) }` by task name, so `runIde` quietly got a
+plugin with no `extra` dir and no wrapper completion — no error, nothing in the log.
+
+Fix in progress: replace the by-name block with `withType<PrepareSandboxTask>().configureEach { if
+(!testSandbox.get()) { ... } }`, so every production sandbox producer gets the `from(...)` wiring
+regardless of its task name, while the `testSandbox` flag (which the plugin itself derives from the
+task name) still excludes `prepareTestSandbox`/`prepareTestIdePerformanceSandbox` — those must keep
+reading `snakemake_api.yaml` from the project directory and the version-pinned test wrapper bundle,
+not the production one. Not yet verified against a full test run.
+
 ### Method note: cluster failure *messages*, not test names
 
 Grouping the 145 failures by feature made them look like one big resolve problem. Grouping by the

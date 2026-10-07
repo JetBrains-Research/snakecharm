@@ -6,6 +6,7 @@ import org.jetbrains.intellij.platform.gradle.Constants.Configurations
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
+import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import kotlin.io.path.isDirectory
 
 fun gradlePropertyOptional(key: String) = project.findProperty(key)?.toString()
@@ -489,16 +490,30 @@ tasks {
     }
 
 
-    prepareSandbox {
-        // Pack the wrappers bundle into the plugin. Wiring to the *task* rather than to a path carries
-        // the task dependency, keeps buildWrappersBundle in the graph so its `onlyIf` still logs the
-        // "no wrappers bundled" warning, and packs nothing when that `onlyIf` skipped it -- the skip
-        // deletes any bundle an earlier run left behind, so there is no stale file to pick up.
-        from(named("buildWrappersBundle")) {
-            into(pluginName.map { "$it/extra" })
-        }
-        from(layout.projectDirectory.file("snakemake_api.yaml")) {
-            into(pluginName.map { "$it/extra" })
+    // Configure every *production* sandbox producer, not just the literal `prepareSandbox` task.
+    // Since Platform Gradle Plugin 2.19.0, `runIde` no longer reuses `prepareSandbox` -- it packs
+    // its own `prepareSandbox_runIde` (and, under Split Mode, `_runIdeBackend`/`_runIdeFrontend`)
+    // sandbox, so a `prepareSandbox { from(...) }` block configuring that one task by name silently
+    // stops reaching runIde's sandbox: the plugin loads with no `extra` dir and no wrapper
+    // completion, with no error anywhere. `withType` plus the `testSandbox` flag (which the plugin
+    // itself derives from the task name) is what stays correct across that split: it still skips
+    // `prepareTestSandbox`/`prepareTestIdePerformanceSandbox`, which must NOT get this -- the test
+    // suite reads `snakemake_api.yaml` from the project directory itself, not from a sandboxed
+    // plugin install, and must not see the production wrappers bundle in place of its own
+    // version-pinned test bundle (built separately by `buildTestWrappersBundle`).
+    withType<PrepareSandboxTask>().configureEach {
+        if (!testSandbox.get()) {
+            // Pack the wrappers bundle into the plugin. Wiring to the *task* rather than to a path
+            // carries the task dependency, keeps buildWrappersBundle in the graph so its `onlyIf`
+            // still logs the "no wrappers bundled" warning, and packs nothing when that `onlyIf`
+            // skipped it -- the skip deletes any bundle an earlier run left behind, so there is no
+            // stale file to pick up.
+            from(named("buildWrappersBundle")) {
+                into(pluginName.map { "$it/extra" })
+            }
+            from(layout.projectDirectory.file("snakemake_api.yaml")) {
+                into(pluginName.map { "$it/extra" })
+            }
         }
     }
 
