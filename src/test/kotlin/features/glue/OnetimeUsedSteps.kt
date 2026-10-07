@@ -1,6 +1,6 @@
 package features.glue
 
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.ApplicationManager
 import com.jetbrains.python.psi.PyRecursiveElementVisitor
 import com.jetbrains.python.psi.PyReferenceExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLSubscriptionIndexKeyExpressionImpl
@@ -10,7 +10,7 @@ import kotlin.test.assertTrue
 class OnetimeUsedSteps {
     @When("^validate issue 380$")
     fun validateIssue380() {
-        runReadAction {
+        ApplicationManager.getApplication().runReadAction {
             val psiElement = SnakemakeWorld.fixture().elementAtCaret
             require(psiElement is SmkSLSubscriptionIndexKeyExpressionImpl) {
                 "Actual class: ${psiElement.javaClass.simpleName}"
