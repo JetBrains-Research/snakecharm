@@ -8,7 +8,6 @@ import com.jetbrains.python.validation.PyAnnotator
 import com.jetbrains.snakecharm.lang.highlighter.SmkSyntaxAnnotator
 import com.jetbrains.snakecharm.lang.highlighter.SmkWildcardsAnnotator
 import com.jetbrains.snakecharm.lang.psi.SmkFile
-import com.jetbrains.snakecharm.lang.validation.SmkReturnAnnotator
 import com.jetbrains.snakecharm.lang.validation.SmkSyntaxErrorAnnotator
 
 /**
@@ -38,7 +37,6 @@ abstract class SmkAnnotatorManager : Annotator, DumbAware {
 
 class SmkStandardAnnotatorManager : SmkAnnotatorManager() {
     override val annotators: List<PyAnnotator> = listOf(
-        SmkReturnAnnotator,
         SmkWildcardsAnnotator // requires resolve, that based on indexes access
     )
 }

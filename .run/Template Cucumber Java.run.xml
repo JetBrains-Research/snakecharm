@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="true" type="CucumberJavaRunConfigurationType" factoryName="Cucumber java">
+    <module name="snakecharm.test" />
+    <option name="PROGRAM_PARAMETERS" value=" --plugin teamcity" />
+    <shortenClasspath name="NONE" />
+    <option name="VM_PARAMETERS" value="@$PROJECT_DIR$/build/tmp/ideTestRun/jvm.args" />
+    <option name="WORKING_DIRECTORY" value="$MODULE_WORKING_DIR$" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+      <option name="Gradle.BeforeRunTask" enabled="true" tasks="prepareIdeTestRun" externalProjectPath="$PROJECT_DIR$" vmOptions="" scriptParameters="" />
+    </method>
+  </configuration>
+</component>

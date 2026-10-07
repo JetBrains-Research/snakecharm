@@ -6,15 +6,12 @@ import com.jetbrains.python.inspections.PyUnboundLocalVariableInspection
 import com.jetbrains.python.inspections.PyUnreachableCodeInspection
 import com.jetbrains.python.psi.PyElementVisitor
 import com.jetbrains.python.psi.PythonVisitorFilter
-import com.jetbrains.python.validation.ReturnAnnotator
 
 /**
  * See also: [com.jetbrains.snakecharm.inspections.SmkIgnorePyInspectionExtension]
  */
 class SnakemakeVisitorFilter : PythonVisitorFilter {
     private val unsupportedClasses = listOf(
-        /** Instead use [com.jetbrains.snakecharm.lang.validation.SmkReturnAnnotator] **/
-        ReturnAnnotator::class.java,
         // [HACK] See https://github.com/JetBrains-Research/snakecharm/issues/14
         PyUnreachableCodeInspection::class.java,
         // TODO: Need API for: e.g. EP in PyResolveUtil.allowForwardReferences(node)
