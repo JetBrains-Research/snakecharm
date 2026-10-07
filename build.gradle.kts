@@ -211,9 +211,7 @@ dependencies {
             // NB: keep these codes in sync with `isPyCharmPlatform` above -- they are the same
             // question asked twice. "DS" (DataSpell) is a Python IDE built on Professional, so it
             // bundles `Pythonid` like "PY" does; anything reaching `else` is IDEA + the external
-            // Python plugin. There is no "PD" code (see IntelliJPlatformType), and one used to be
-            // listed here: `fromCode` would have thrown at configuration time long before the
-            // branch could ever be taken.
+            // Python plugin.
             "PY", "DS" -> {
                 bundledPlugin("Pythonid")
 
