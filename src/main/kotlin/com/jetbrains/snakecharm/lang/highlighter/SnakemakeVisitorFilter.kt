@@ -19,6 +19,8 @@ class SnakemakeVisitorFilter : PythonVisitorFilter {
         // See https://github.com/JetBrains-Research/snakecharm/issues/133, API required
         PyShadowingBuiltinsInspection::class.java
 
+        //TODO: consider to suppress PyReturnYieldAnnotatorVisitor, use own version instead of 'SmkReturnHighlightInfoFilter'
+
 // other possible candidates to disable             
 //            //inspections
 //           PyCallByClassInspection.class,
