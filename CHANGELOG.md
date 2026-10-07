@@ -4,7 +4,10 @@
 # SnakeCharm Plugin Changelog
 
 ## [2026.2.1]
-Released on <Unreleased>
+Released on 7.10.2026
+
+We gratefully acknowledge external contributor Gaurav Vaidya (@gaurav) for his work porting the plugin to 2026.2.x
+platform API
 
 ### Plugin
 - Compatibility with the unified PyCharm / IntelliJ Platform 2026.2 (build 262).
