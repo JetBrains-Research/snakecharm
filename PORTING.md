@@ -488,6 +488,54 @@ element of every file it is registered against, on every highlighting pass:
 Rule for anything registered as an `Annotator`: **`annotate()` is a per-element callback.** Whatever
 it builds, it builds hundreds of thousands of times. Guard on the file first, then cache per session.
 
+### 15. Annotator classes renamed/simplified (follow-up to item 14)
+
+Item 14 made the annotators work on 2026.2; this pass cleans up the shape that port left behind, with
+no behaviour change. Two patterns recur everywhere a class was touched:
+
+- **`*Annotator` renamed to `*AnnotatorVisitor` / `*VisitorBase` once it stopped being an
+  `Annotator`.** Item 14 already turned every annotator body into a `PyElementVisitor`, registered
+  under a thin `Annotator` wrapper that builds the holder and dispatches `element.accept(...)`. The
+  old names (`SmkAnnotator`, `SmkSyntaxAnnotator`, `SmkSyntaxErrorAnnotator`, `SmkAnnotatorBase`) kept
+  calling these classes "Annotator" after that was no longer true, which this pass fixes:
+  - `SmkAnnotatorBase` → `SnakemakeAnnotatorVisitorBase`, `SmkAnnotator` → `SmkElementAnnotatorVisitorBase`
+    (`lang/validation/SmkAnnotator.kt` → `lang/validation/SmkElementAnnotatorVisitorBase.kt`).
+  - `SmkSyntaxAnnotator` → `SmkSyntaxAnnotatorVisitor`
+    (`lang/highlighter/SmkSyntaxAnnotator.kt` → `lang/highlighter/SmkSyntaxAnnotatorVisitor.kt`).
+  - `SmkSyntaxErrorAnnotator` → `SmkSyntaxErrorAnnotatorVisitor`
+    (`lang/validation/SmkSyntaxErrorAnnotator.kt` → `lang/validation/SmkSyntaxErrorAnnotatorVisitor.kt`).
+
+- **The two `Annotator`-wrapper + visitor pairs that item 14 left asymmetric now follow the same
+  shape as `SmkDumbAwareAnnotator`/`SmkSLAnnotatingVisitor`.** `SmkWildcardsAnnotator` and
+  `SmkSLWildcardsAnnotator` used to *be* the visitor, constructed with a holder and driven by a
+  wrapper class elsewhere; each is now split into a thin `Annotator, DumbAware` wrapper (same class
+  name as before) that does the `containingFile` guard and dispatch, plus a `*AnnotatorVisitor`
+  sibling that holds the actual `visitPy...`/`visitSmkSL...` logic:
+  - `lang/highlighter/SmkWildcardsAnnotator.kt`: `SmkWildcardsAnnotator` is now the `Annotator`
+    wrapper; the visitor logic moved into the new `SmkWildcardsAnnotatorVisitor`
+    (extends `SmkElementAnnotatorVisitorBase`).
+  - `stringLanguage/lang/highlighter/SmkSLWildcardsAnnotator.kt`: same split —
+    `SmkSLWildcardsAnnotator` is now the wrapper, `SmkSLWildcardsAnnotatorVisitor` the visitor
+    (extends `SnakemakeAnnotatorVisitorBase`, implements `SmkSLElementVisitor`). This absorbs and
+    deletes the now-redundant `AbstractSmkSLAnnotator` and `SmkSLAnnotatingVisitor` — the wrapper
+    duplicated what `SmkSLAnnotatingVisitor` already did, and `AbstractSmkSLAnnotator` was a one-line
+    `SmkSLElementVisitor` cast that `SmkSLWildcardsAnnotatorVisitor` now does inline.
+
+- **`SmkStandardAnnotatorManager` and `SmkDumbAwareAnnotatorManager` (the two `abstract
+  SmkAnnotatorManager` subclasses item 14 introduced) are merged into one concrete
+  `SmkDumbAwareAnnotator`** (`lang/SmkAnnotatorManager.kt` → `lang/SmkDumbAwareAnnotator.kt`). The
+  split existed only because `SmkWildcardsAnnotator` requires resolve (index access) and so couldn't
+  share a `DumbAware` annotator with the syntax/syntax-error visitors — now that
+  `SmkWildcardsAnnotator` is its own top-level `Annotator` (previous bullet), the resolve-requiring
+  visitor is no longer in this list at all, and the remaining two (`SmkSyntaxAnnotatorVisitor`,
+  `SmkSyntaxErrorAnnotatorVisitor`) are genuinely dumb-aware, so one non-abstract class registering
+  both is sufficient. `plugin.xml` drops the two `<annotator>` entries for the old manager pair in
+  favour of `SmkDumbAwareAnnotator` and the promoted `SmkWildcardsAnnotator`.
+
+Net effect: fewer classes (two deletions, no new files beyond the extracted `*Visitor` siblings), and
+every surviving name now matches what the class actually is — an `Annotator` is something registered
+in `plugin.xml`, everything else is a visitor.
+
 ### Method note: cluster failure *messages*, not test names
 
 Grouping the 145 failures by feature made them look like one big resolve problem. Grouping by the
