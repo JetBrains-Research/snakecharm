@@ -24,6 +24,7 @@ import com.intellij.openapi.projectRoots.SdkTypeId
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.python.venv.sdk.flavors.VirtualEnvSdkFlavor
 import com.jetbrains.python.codeInsight.typing.PyTypeShed.findAllRootsForLanguageLevel
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.sdk.PythonSdkAdditionalData
@@ -31,7 +32,6 @@ import com.jetbrains.python.sdk.PythonSdkType.MOCK_PY_MARKER_KEY
 import com.jetbrains.python.sdk.PythonSdkUtil
 import com.jetbrains.python.sdk.flavors.PyFlavorAndData
 import com.jetbrains.python.sdk.flavors.PyFlavorData
-import com.jetbrains.python.sdk.flavors.VirtualEnvSdkFlavor
 import com.jetbrains.snakecharm.SmkTestPythonHelpersLocatorFix
 import java.io.File
 
