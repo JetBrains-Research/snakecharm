@@ -12,9 +12,16 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
 `src/test/kotlin/features/glue/`). There is no per-feature test class.
 
 - **Run one feature:** add a `@here` tag above its `Feature:` line (or above a single `Scenario:` /
-  `Scenario Outline:`) and run with `CUCUMBER_TAGS='@here'`, which `test` forwards to cucumber's
-  `cucumber.filter.tags`, composed with the runner's own `not @ignore`. Revert the tag afterwards.
-  It turns a 25-minute suite into a ~60-second one. On a branch without that passthrough, set
+  `Scenario Outline:`) and run
+
+  ```shell
+  CUCUMBER_TAGS='@here' ./gradlew cleanTest test --tests "features.AllCucumberFeaturesTest"
+  ```
+
+  `test` forwards `CUCUMBER_TAGS` to cucumber's `cucumber.filter.tags`, composed with the runner's
+  own `not @ignore`; `--tests` skips the plain JUnit tests, which the tag filter cannot. Revert the
+  tag afterwards, and pass the variable inline as above rather than `export`ing it, or the next
+  "full" run quietly runs only `@here`. It turns a 25-minute suite into a ~60-second one. On a branch without that passthrough, set
   `tags = "not @ignore and @here"` in `AllCucumberFeaturesTest.kt` instead and revert that too.
 - **Scenario isolation is thinner than it looks.** Every scenario asks IntelliJ's light-fixture
   framework for a test project by handing it a `LightProjectDescriptor` — the object that says
@@ -93,7 +100,8 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
   this reason.
 - **Analyzing results:** Gradle prints each failing scenario and a `N tests completed, M failed` summary; for a run you are
   watching, that is the report. To see what a change fixed or broke, capture each run and reduce it
-  to a sorted list of scenario names rather than parsing anything:
+  to a sorted list of scenario names rather than parsing anything. Run the first two lines once
+  before the change with `before` in place of `after`, then as written after it:
 
   ```shell
   ./gradlew cleanTest test 2>&1 | tee /tmp/after.log
@@ -118,8 +126,8 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
   loudly as a full suite. Before reporting a run as green, read the count out of the XML (`tests=`
   summed over `build/test-results/test/*.xml`): a full suite is **3420** across 125 suites (measured
   on #577's branch, squash-merged to `master` as `ce5aa0f4`; it was 3419 until the #570 merge added
-  a scenario, so older notes say that). A stray `@here` tag or a leftover `tags = "not @ignore and @here"` in
-  `AllCucumberFeaturesTest` is the usual cause of a short one. While a run is going, the live
+  a scenario, so older notes say that). A `CUCUMBER_TAGS` still exported in your shell, a stray `@here` tag or a leftover
+  `tags = "not @ignore and @here"` in `AllCucumberFeaturesTest` is the usual cause of a short one. While a run is going, the live
   signals are the test JVM's accumulating CPU time (`ps -o time=`) and the mtime of
   `build/test-results/test/binary/in-progress-results-generic.bin`; `jstat -gc` tells you whether a
   quiet stretch is a slow scenario or a GC death spiral.
