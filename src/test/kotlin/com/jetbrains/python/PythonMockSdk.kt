@@ -29,11 +29,12 @@ import com.jetbrains.python.codeInsight.typing.PyTypeShed.findAllRootsForLanguag
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.sdk.PythonSdkAdditionalData
 import com.jetbrains.python.sdk.PythonSdkType.MOCK_PY_MARKER_KEY
-import com.jetbrains.python.sdk.PythonSdkUtil
+import com.jetbrains.python.sdk.legacy.PythonSdkUtil
 import com.jetbrains.python.sdk.flavors.PyFlavorAndData
 import com.jetbrains.python.sdk.flavors.PyFlavorData
 import com.jetbrains.snakecharm.SmkTestPythonHelpersLocatorFix
 import java.io.File
+import java.nio.file.Path
 
 /**
  * We cannot re-use PythonMockSdk because api not available in Platform artifacts
@@ -62,6 +63,9 @@ object PythonMockSdk {
         )
     }
 
+    // 263 marks VirtualEnvSdkFlavor @PyInternalExecApi (opt-in required). The mock SDK needs a platform-independent
+    // flavor so that PythonSdkFlavor.isValidSdkPath() accepts the mock python path.
+    @OptIn(PyInternalExecApi::class)
     private fun create(
         sdkName: String = "MockSdk",
          mockSdkPath: String,
@@ -73,7 +77,10 @@ object PythonMockSdk {
         val sdkModificator = sdk.sdkModificator
         sdkModificator.homePath = "$mockSdkPath/bin/python${level.toPythonVersion()}"
         sdkModificator.sdkAdditionalData =
-            PythonSdkAdditionalData(PyFlavorAndData(PyFlavorData.Empty, VirtualEnvSdkFlavor.getInstance()))
+            PythonSdkAdditionalData(
+                PyFlavorAndData(PyFlavorData.Empty, VirtualEnvSdkFlavor.getInstance()),
+                Path.of(mockSdkPath)
+                )
         sdkModificator.setVersionString(toVersionString(level))
 
         createRoots(mockSdkPath, level).forEach { vFile: VirtualFile? ->

@@ -33,7 +33,9 @@ Feature: Completion for lambda parameter names in specific sections
         <section>: <lambda>, #
       """
     When I put the caret at #
-    And I invoke autocompletion popup, select "<option>" lookup item and see a text:
+    # Since 263 Python plugin doesn't suggest keywords (`not`, `lambda`, ...) in lambda parameters list, so
+    # the only variant is auto-inserted without showing a popup
+    And I invoke autocompletion popup and see a text:
       """
       <rule_like> rule1:
         <section>: <lambda>, <option>: #
@@ -164,7 +166,8 @@ Feature: Completion for lambda parameter names in specific sections
       <section>: (lambda wildcards, : wildcards)("")
     """
     When I put the caret after ,
-    And I invoke autocompletion popup
+    # Python plugin can suggest a single keyword here, don't let it be auto-inserted and hide the list
+    And I invoke autocompletion popup without inserting a single variant
     Then completion list shouldn't contain:
       | wildcards |
       | input     |

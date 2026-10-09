@@ -46,7 +46,7 @@ class SmkRuleOrCheckpointNameReference(
 
         val name = element.text
         val results = arrayListOf<RatedResolveResult>()
-        val ctx = AccessDirection.of(this.myElement)
+        val ctx = AccessDirection.of(this.element)
 
         results.addAll(SmkRulesType(null, smkFile).resolveMember(name, element, ctx, myContext))
         results.addAll(SmkCheckpointType(null, smkFile).resolveMember(name, element, ctx, myContext))

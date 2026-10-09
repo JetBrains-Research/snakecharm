@@ -37,7 +37,7 @@ class SmkPyReferenceImpl(
         }
 
         // DEBUG: Hack for debug to void using CACHING
-        val referencedName = myElement.getReferencedName();
+        val referencedName = element.getReferencedName();
         if (referencedName == null) return ResolveResult.EMPTY_ARRAY;
 
         val targets: List<RatedResolveResult> = resolveInner();
@@ -66,7 +66,7 @@ class SmkPyReferenceImpl(
 
         return PyReferenceResolveProvider.EP_NAME.extensionList.asSequence()
                 .filter { it is SmkImplicitPySymbolsResolveProvider }
-                .flatMap {  it.resolveName(myElement, context).asSequence() }
+                .flatMap {  it.resolveName(element, context).asSequence() }
                 .toMutableList()
     }
 

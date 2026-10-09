@@ -258,6 +258,17 @@ If you get `Unimplemented substep definition` in all `*.feature` files, ensure:
   * Check available IDE versions with
     `./gradlew printProductsReleases`, or query
     `https://data.services.jetbrains.com/products/releases?code=PY&type=release` (`PY`=PyCharm).
+  * **Porting to an unreleased platform** (e.g. 2026.3 while it is still EAP): set `platformVersion`
+    to a snapshot, e.g. `263-EAP-SNAPSHOT`. Valid names are the `<version>` entries in
+    `https://www.jetbrains.com/intellij-repository/snapshots/com/jetbrains/intellij/pycharm/pycharmPY/maven-metadata.xml`.
+    A `-SNAPSHOT` version switches `useInstaller` off in `build.gradle.kts`, so the IDE is downloaded
+    from that repository rather than as an installer. `263-EAP-SNAPSHOT` follows the newest EAP
+    build. Pin e.g. `263.6259.38-EAP-SNAPSHOT` when you need two runs to be comparable, and record
+    the build you actually tested (`build.txt` in the downloaded IDE).
+  * Before touching the source, run `verifyPlugin` with the *old* plugin against the new IDE. Its
+    `NoSuchFieldError`/`NoSuchMethodError` list is the binary-incompatibility worklist. Some of those
+    entries do not show up as compile errors at all (a retyped `protected` field still compiles), so
+    the compiler alone is not enough.
 * Update `snakemakeWrappersRepoVersion` to up-to-date, need to be updated on TeamCity CI as well.
  
 **Release plugin:**

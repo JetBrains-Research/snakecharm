@@ -1,5 +1,6 @@
 package features.glue
 
+import com.intellij.codeInsight.CodeInsightSettings
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.lookup.Lookup
 import com.intellij.codeInsight.lookup.LookupElement
@@ -378,6 +379,22 @@ class CompletionResolveSteps {
     fun iInvokeAutocompletionPopup() {
         Registry.get("ide.completion.variant.limit").setValue(10000)
         doComplete()
+    }
+
+    /**
+     * Unlike [iInvokeAutocompletionPopup] shows the completion list even if it has a single variant, so we can check
+     * that variant isn't a variant from SnakeCharm completion.
+     */
+    @When("^I invoke autocompletion popup without inserting a single variant$")
+    fun iInvokeAutocompletionPopupWithoutInsertingSingleVariant() {
+        val settings = CodeInsightSettings.getInstance()
+        val oldValue = settings.AUTOCOMPLETE_ON_CODE_COMPLETION
+        settings.AUTOCOMPLETE_ON_CODE_COMPLETION = false
+        try {
+            iInvokeAutocompletionPopup()
+        } finally {
+            settings.AUTOCOMPLETE_ON_CODE_COMPLETION = oldValue
+        }
     }
 
     @When("^I invoke autocompletion popup (\\d+) times$")

@@ -21,7 +21,7 @@ class SmkSLSyntaxHighlighter : SyntaxHighlighterBase() {
             createTextAttributesKey("SMKSL_WILDCARD", DefaultLanguageHighlighterColors.NUMBER)
     }
 
-    override fun getTokenHighlights(tokenType: IElementType?): Array<TextAttributesKey> =
+    override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> =
         when {
             tokenType === SmkSLTokenTypes.LBRACE ||
                     tokenType === SmkSLTokenTypes.RBRACE -> arrayOf(BRACES)

@@ -118,7 +118,7 @@ class CreateMissedFileUndoableAction(
     private fun refreshFS() {
         firstCreatedFileOrDirParent?.refresh(true, true) {
             // Post action is called in AWT thread:
-            DaemonCodeAnalyzer.getInstance(project).restart(actionInvocationTarget)
+            DaemonCodeAnalyzer.getInstance(project).restart(actionInvocationTarget, "SnakeCharm: missed file created")
         }
     }
 

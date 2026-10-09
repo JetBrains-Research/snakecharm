@@ -10,6 +10,7 @@ import com.jetbrains.python.psi.impl.references.PyOperatorReference
 import com.jetbrains.python.psi.resolve.PyResolveContext
 import com.jetbrains.python.psi.resolve.QualifiedRatedResolveResult
 import com.jetbrains.python.psi.resolve.QualifiedResolveResult
+import com.jetbrains.python.psi.types.PyAnyType
 import com.jetbrains.python.psi.types.PyTupleType
 import com.jetbrains.python.psi.types.PyType
 import com.jetbrains.python.psi.types.PyTypedDictType
@@ -39,6 +40,8 @@ class SmkSLSubscriptionExpressionImpl(node: ASTNode) : SmkSLElementImpl(node), S
 
     override fun getType(context: TypeEvalContext, key: TypeEvalContext.Key): PyType? {
         // Taken from [PySubscriptionExpressionImpl]
+        // Since 263 `null` isn't allowed here while `python.type.any` registry flag is on: use `Unknown` instead,
+        // `PyAnyType.unknown` is `null` when the flag is off.
         val indexExpression = this.indexExpression
 
         val type = if (indexExpression != null) context.getType(operand) else null
@@ -48,17 +51,17 @@ class SmkSLSubscriptionExpressionImpl(node: ASTNode) : SmkSLElementImpl(node), S
             return when {
                 index != null -> type.getElementType(index)
                 else -> null
-            }
+            } ?: PyAnyType.unknown
         }
         if (type is PyTypedDictType) {
             val keyStr = PyEvaluator.evaluate(indexExpression, String::class.java)
             return when {
-                keyStr != null -> type.getElementType(keyStr)
+                keyStr != null -> type.getElementType(keyStr, context)
                 else -> null
-            }
+            } ?: PyAnyType.unknown
         }
         // TODO:  PyCallExpressionHelper.getCallType(this, context, key)
-        return null
+        return PyAnyType.unknown
     }
 
     override fun getQualifier() = operand

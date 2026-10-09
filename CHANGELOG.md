@@ -3,6 +3,14 @@
 
 # SnakeCharm Plugin Changelog
 
+## [2026.3.1]
+Released on <Unreleased>
+
+### Plugin
+- Compatibility with PyCharm / IntelliJ Platform 2026.3 (build 263)
+  ([#596](https://github.com/JetBrains-Research/snakecharm/issues/596)).
+- **This release requires 2026.3 (build 263) or newer**, `pluginSinceBuild` was raised from `262` to `263`.
+
 ## [2026.2.2]
 Released on <Unreleased>
 

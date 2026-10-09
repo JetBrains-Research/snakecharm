@@ -39,13 +39,13 @@ class SmkSLInitialReference(
 ) : PyQualifiedReference(expr, context), SmkSLBaseReference {
     val apiService = SnakemakeApiService.getInstance(expr.project)
 
-    override fun getElement() = myElement as SmkSLReferenceExpression
+    override fun getElement() = super.getElement() as SmkSLReferenceExpression
 
     @Suppress("UnstableApiUsage")
     override fun resolveInner(): MutableList<RatedResolveResult> {
         require(!element.isQualified) // this reference is supposed to be not qualified
 
-        PyPsiUtils.assertValid(myElement)
+        PyPsiUtils.assertValid(element)
         val ret = ResolveResultList()
 
         //TODO: change resolve order if in 'run:' section at least to support local variables like 'output=1' preference
@@ -137,7 +137,7 @@ class SmkSLInitialReference(
         SmkSLInitialReference(element, parentDeclaration, context)
 
     override fun getVariants(): Array<LookupElement> {
-        // val originalElement = CompletionUtil.getOriginalElement(myElement)
+        // val originalElement = CompletionUtil.getOriginalElement(element)
 
         val variants = mutableListOf<LookupElement>()
 

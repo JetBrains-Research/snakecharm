@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.tree.IElementType
 import com.intellij.util.containers.FactoryMap
+import com.jetbrains.python.PyLanguageFacade
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.highlighting.PyHighlighter
 import com.jetbrains.python.psi.LanguageLevel
@@ -22,7 +23,7 @@ import com.jetbrains.snakecharm.lang.highlighter.SnakemakeSyntaxHighlighterAttri
 class SnakemakeSyntaxHighlighterFactory : SyntaxHighlighterFactory() {
     private val myMap = FactoryMap.create<LanguageLevel, PyHighlighter> { key ->
         object : PyHighlighter(key) {
-            override fun getTokenHighlights(tokenType: IElementType?): Array<TextAttributesKey> {
+            override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
                 return when (tokenType) {
                     PyTokenTypes.SINGLE_QUOTED_UNICODE -> arrayOf(SMK_TEXT)
                     PyTokenTypes.TRIPLE_QUOTED_UNICODE -> arrayOf(SMK_TRIPLE_QUOTED_STRING)
@@ -36,7 +37,7 @@ class SnakemakeSyntaxHighlighterFactory : SyntaxHighlighterFactory() {
 
     override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?): SyntaxHighlighter {
         val level = when {
-            project != null && virtualFile != null -> PythonLanguageLevelPusher.getLanguageLevelForVirtualFile(
+            project != null && virtualFile != null -> PyLanguageFacade.INSTANCE.getEffectiveLanguageLevel(
                 project,
                 virtualFile
             )

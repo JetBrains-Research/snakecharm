@@ -195,7 +195,7 @@ class SmkSupportProjectSettings(val project: Project) : PersistentStateComponent
                     for (editor in EditorFactory.getInstance().allEditors) {
                         ModificationStampUtil.clearModificationStamp(editor)
                     }
-                    DaemonCodeAnalyzer.getInstance(project).restart()
+                    DaemonCodeAnalyzer.getInstance(project).restart("SnakeCharm: Snakemake framework settings changed")
                 }
             }
         }

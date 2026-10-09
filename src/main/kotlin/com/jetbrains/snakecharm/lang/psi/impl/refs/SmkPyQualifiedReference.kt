@@ -12,7 +12,7 @@ class SmkPyQualifiedReference(
     context: PyResolveContext,
 ) : PyQualifiedReference(element, context) {
     override fun getUnresolvedHighlightSeverity(context: TypeEvalContext): HighlightSeverity? {
-        val qualifier = this.myElement.qualifier
+        val qualifier = this.element.qualifier
         if (qualifier != null) {
             val type = context.getType(qualifier)
             if (type is AbstractSmkRuleOrCheckpointType<*>) {

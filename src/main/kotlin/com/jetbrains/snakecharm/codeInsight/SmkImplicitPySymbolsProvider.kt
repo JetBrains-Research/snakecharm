@@ -22,13 +22,13 @@ import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.util.QualifiedName
+import com.intellij.python.requirements.pyRequirement
 import com.intellij.util.PlatformIcons
 import com.intellij.util.SlowOperations
 import com.jetbrains.python.extensions.inherits
 import com.jetbrains.python.packaging.PyPackage
 import com.jetbrains.python.packaging.common.PythonPackageManagementListener
 import com.jetbrains.python.packaging.management.PythonPackageManager
-import com.jetbrains.python.packaging.pyRequirement
 import com.jetbrains.python.packaging.requirement.PyRequirementRelation.LT
 import com.jetbrains.python.psi.*
 import com.jetbrains.python.psi.resolve.fromSdk
@@ -333,7 +333,7 @@ class SmkImplicitPySymbolsProvider(
         val action = {
             LOG.debug("RESTART highlighting")
             ResolveCache.getInstance(project).clearCache(true)
-            DaemonCodeAnalyzer.getInstance(project).restart()
+            DaemonCodeAnalyzer.getInstance(project).restart("SnakeCharm: implicit symbols caches updated")
         }
 
         if (ApplicationManager.getApplication().isUnitTestMode) {
