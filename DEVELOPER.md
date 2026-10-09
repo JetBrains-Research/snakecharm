@@ -1,361 +1,145 @@
-# Configure Project from Sources
-    
-**Prerequisites:**
-  
-* To run tests install IDEA plugins: `Cucumber for Java`, `Gherkin`.
-* Also, I recommended installing `Cucumber+` plugin to get better cucumber features editing/highlighting experience.
-* Restart IDEA
+# Developer guide
 
-**Configure project from sources:**
+This guide covers environment setup, building, packaging, and releasing SnakeCharm.
+For tests, including first-time fixture setup, use [Testing](docs/testing.md).
+For source structure and parser internals, use [Architecture](docs/architecture.md).
+For platform or toolchain upgrades, follow the [porting checklist](docs/porting/README.md).
 
-1. Checkout the project
-2. In IntelliJ IDEA, select `File | New | Project From Existing Sources...`. Choose import from gradle option.
+## Environment setup
 
-**Build plugin from sources:**
-* Run `./gradlew buildPlugin`
-* Plugin bundle is located in `build/distributions/snakecharm-*.zip`
-* The bundled snakemake-wrappers metadata is optional for a local build: if
-  `snakemakeWrappersRepoPath` is unset or blank (the default), `:buildWrappersBundle` does not run and the
-  plugin is built without bundled wrappers — it runs normally, but wrapper name completion has
-  nothing to offer. If the property *is* set and does not point at a wrappers checkout, the build
-  still fails loudly rather than quietly shipping without them. On TeamCity the build treats the
-  property as required: leaving it unset fails the build (TeamCity builds pass via `-PsnakemakeWrappersRepoPath=...`
-  Snakemake wrappers repo checkout directory to build plugin bundle or `testData/wrappers_storage` for test configurations).   
-  To include them, point it at a local [snakemake-wrappers](https://github.com/snakemake/snakemake-wrappers)
-  checkout whose content matches `snakemakeWrappersRepoVersion`:
-  `./gradlew buildPlugin -PsnakemakeWrappersRepoPath=/path/to/snakemake-wrappers`.
-  As an alternative, you could locally set `snakemakeWrappersRepoPath` to existing wrappers folder in 
-  `gradle.properties` file.
+Clone the repository and import it in IntelliJ IDEA as a Gradle project
+(`File | New | Project From Existing Sources...`).
 
-**Command-line build & test (no IDE required):**
+The required JDK is specified by `javaVersion` in `gradle.properties` and mirrored in
+`.java-version`. The Gradle wrapper version is tracked by `gradleVersion` and
+`gradle/wrapper/gradle-wrapper.properties`. Use the checked-in wrapper.
 
-The Gradle build uses the JDK toolchain `javaVersion` names in `gradle.properties` — the same number
-`.java-version` in the repo root carries — and the Gradle version pinned there (`gradleVersion`).
-Make sure that JDK is installed and visible to Gradle before building from the command line.
+Launch **Gradle itself** on the required JDK, not just its compilation toolchain. A JDK that is
+too new can break the pinned Gradle; one that is too old cannot load platform classes during
+`instrumentCode`. Historical symptoms include `Type T not present` and
+`UnsupportedClassVersionError`, neither of which makes the configuration mistake obvious.
 
-**If you use jenv, `.java-version` in the repo root already does this** — it selects the
-JDK for you as soon as you `cd` here, so you only need that JDK installed. The version it names
-tracks the platform and therefore differs per branch (21 for 2026.1, 25 for 2026.2), so re-check
-`java -version` after switching branches rather than assuming the shell followed you. **asdf ignores
-`.java-version` unless you set `legacy_version_file = yes` in `~/.asdfrc`** — without it asdf reads
-only `.tool-versions`, silently leaves your global JDK active, and you land in exactly the cryptic
-Gradle failure described below. Everyone else sets `JAVA_HOME` by hand:
+With jenv, `.java-version` selects the branch's JDK once it is installed and registered.
+asdf reads it only with `legacy_version_file = yes` in `~/.asdfrc`; otherwise it reads
+`.tool-versions`. Recheck the active JDK after switching branches. Alternatively, set
+`JAVA_HOME` to an explicit installation path:
 
 ```shell
-# Read the version this branch needs rather than hardcoding it; .java-version tracks `javaVersion`
+# Run from the repository root. Install this exact version if needed.
 JDK=$(cat .java-version)
-echo "Required JDK version: $JDK"
-
-# macOS (Homebrew): install it
-brew install openjdk@$JDK
-
-# Point Gradle at it for this build. Use a path that pins that version exactly -- jenv/asdf/SDKMAN,
-# or the install path itself. Do NOT use `/usr/libexec/java_home -v $JDK`: it treats the version as
-# a *minimum*, so on a machine without it you get a newer JDK and exit 0 -- and then a failure that
-# names neither the JDK nor the version (`Type T not present` from the pinned Gradle if it is too
-# new, `UnsupportedClassVersionError` out of instrumentCode if it is too old).
-export JAVA_HOME=$(jenv prefix $JDK)    # or e.g. /opt/homebrew/opt/openjdk@$JDK
-"$JAVA_HOME/bin/java" -version          # verify it really says $JDK
-
-# Optionally increase the Gradle daemon heap size to avoid OOMs with the additional argument: -Pkotlin.daemon.jvmargs=-Xmx4g
-./gradlew clean buildPlugin        # builds build/distributions/snakecharm-*.zip
-./gradlew test                     # runs the JUnit + Cucumber test suite
-./gradlew verifyPlugin             # runs the IntelliJ Plugin Verifier
-./gradlew runIde                   # launches a sandbox IDE with the plugin installed
+brew install "openjdk@$JDK"                  # macOS / Homebrew
+export JAVA_HOME=$(jenv prefix "$JDK")       # if registered with jenv
+# Or set JAVA_HOME to your explicit JDK installation.
+"$JAVA_HOME/bin/java" -version              # verify the version before running Gradle
 ```
 
-If Gradle can't auto-detect the JDK, pass it explicitly:
-`-Dorg.gradle.java.installations.paths=$JAVA_HOME`.
+On macOS, do not rely on `/usr/libexec/java_home -v <n>` to pin an exact version: it can
+return a newer installed JDK and exit successfully. If Gradle cannot discover a jenv-managed
+toolchain, pass `-Dorg.gradle.java.installations.paths="$JAVA_HOME"` as well.
+Set the IDE's Gradle JVM to the same required JDK.
 
-> **Note on the target IDE.** `platformType`/`platformVersion` in `gradle.properties` select
-> the IDE the plugin is built and tested against; it is downloaded automatically on first
-> build (a multi-hundred-MB to ~1 GB download). Since PyCharm was unified in 2025.1 and
-> [2025.2 was the last release of the standalone Community Edition](https://www.jetbrains.com/pycharm/whatsnew/2025-3/),
-> releases from 2025.3 on are distributed only under the Professional (`PY`) artifact, so
-> `platformType = PY` is required to build against them. The free/Pro split is a runtime
-> license state and does not affect the downloaded SDK or building the plugin.
+## Build and packaging
 
+```shell
+./gradlew buildPlugin      # build/distributions/snakecharm-*.zip
+./gradlew runIde           # sandbox IDE with the plugin installed
+./gradlew verifyPlugin    # compatibility reports; see the porting guide for interpretation
+```
 
-**Configure Tests:**
-        
-1. <a name="running-cucumber-features-from-the-ide"></a>**Running Cucumber features from the IDE.**
-   A `Cucumber Java` run configuration (gutter icon / context menu on a `.feature` file) launches the
-   JVM itself, not through Gradle, so it gets nothing the IntelliJ Platform Gradle Plugin attaches to
-   the `test` task. That is two separate things, and the IDE takes each from a different place:
+`platformType` and `platformVersion` in `gradle.properties` select the target IDE, downloaded
+automatically on the first build (hundreds of MB). PyCharm was unified in 2025.1; 2025.2 was the
+last standalone Community release. From 2025.3 onward, use the unified `PY` artifact.
+Free/Pro licensing is a runtime state, not a different downloaded SDK.
 
-   ```
-   java  <VM options>                         -classpath <jars>               <main> <args>
-         from the run configuration            always built by the IDE from
-         = @build/tmp/ideTestRun/jvm.args      the module dependencies (.iml)
-   ```
+If `:compileKotlin` fails with `OutOfMemoryError: GC overhead limit exceeded`, append
+`-Pkotlin.daemon.jvmargs=-Xmx4g`. This increases the **Kotlin daemon** heap, not the Gradle
+daemon or test JVM heap.
 
-   * **JVM options** — ~50 `--add-opens`, `java.system.class.loader`, the test sandbox paths,
-     `idea.python.helpers.path`, ... Without them: `IllegalAccessError: ... module java.desktop does
-     not export sun.awt`. The `prepareIdeTestRun` task writes them into a Java argfile (and builds
-     the test sandbox and test wrappers bundle).
-   * **Classpath** — the IDE builds `-classpath` from the module dependencies, which a Gradle sync
-     imports. `build.gradle.kts` adds the jars only `test` has to `testRuntimeOnly`, during sync only
-     (see the end of this step).
+### Wrapper metadata
 
-   Neither can replace the other: a Gradle sync never imports a task's JVM options, and a `-cp` in
-   the argfile is overridden by the `-classpath` the IDE appends after the VM options. Using Gradle's
-   classpath instead would also drop the IDE's own runner jars (Cucumber/JUnit support, `idea_rt`)
-   and run Gradle's packaged sandbox jar instead of the classes the IDE just compiled.
+Local builds may omit wrapper metadata. With `snakemakeWrappersRepoPath` unset or blank,
+`:buildWrappersBundle` skips with a warning and the plugin builds without wrapper completion
+and other wrapper-driven features. A nonblank invalid path fails the build.
 
-   **The `Cucumber Java` run configuration template is already checked in** as
-   `.run/Template Cucumber Java.run.xml`, and the IDE picks it up on project open — nothing to set
-   up. Every `Feature: …` / `Scenario: …` configuration created from a `.feature` file inherits it.
-   What it sets, for reference:
-   * `VM options`: `@$PROJECT_DIR$/build/tmp/ideTestRun/jvm.args` — the argfile above, and nothing
-     else (no hand-written `-Didea.*` paths, which would point at the wrong sandbox);
-   * `Before launch`: `Build`, then the Gradle task `prepareIdeTestRun` (project `snakecharm`), so
-     the argfile, the test sandbox and the test wrappers bundle are fresh for every run;
-   * module `snakecharm.test`, program arguments `--plugin teamcity`, shorten command line: none.
+To include metadata, provide a local
+[snakemake-wrappers](https://github.com/snakemake/snakemake-wrappers) checkout whose contents
+match `snakemakeWrappersRepoVersion`:
 
-   Two things the shared template does not do for you:
-   * Configurations created *before* you got it (e.g. from an older hand-edited template, with
-     `-Didea.config.path=…` VM options) keep their old settings — delete them and let the IDE
-     re-create them from the template.
-   * If the IDE does not pick the file up, or you prefer a per-user setup, apply the same settings by
-     hand as a fallback: `Run | Edit Configurations... | Edit configuration templates... |
-     Cucumber Java`, then set `VM options` and add `Before launch` → `+` → `Run Gradle task` →
-     `prepareIdeTestRun` as listed above.
+```shell
+./gradlew buildPlugin -PsnakemakeWrappersRepoPath=/path/to/snakemake-wrappers
+```
 
-   `Glue` may stay empty: `src/test/resources/cucumber.properties` sets `cucumber.glue`. Re-import
-   the Gradle project after pulling this: the IDE's test classpath needs the forced `kotlin-stdlib`
-   (an older one first on it hangs project setup with "Debug metadata version mismatch") and the
-   platform's test-runtime jars and the jars of all bundled plugins, which `build.gradle.kts` adds
-   only during IDE sync (otherwise: `ClassNotFoundException:
-   com.intellij.platform.settings.local.SettingsControllerMediator`, or `Missing extension point:
-   Pythonid.pythonSdkFlavor`). The bundled-plugin jars are taken from the `test` task's own classpath
-   (its jars inside the IDE distribution), so they follow whatever the gradle plugin puts there.
-   "Only during sync" means the `idea.sync.active` system property, which the IDE sets to `true` for
-   a Gradle sync only — never for `./gradlew test` or for Gradle tasks the IDE runs. Adding the jars
-   outside sync would reorder `test`'s classpath and break it. So after changing that part of the
-   build script, **re-sync**; a rebuild is not enough.
+The same property applies to `runIde`; it can also be set locally in `gradle.properties`.
+The property does not check out the requested revision for you.
 
-2. Checkout `snakemake` project sources and configure as test data.
+When `TEAMCITY_VERSION` is present, unset or blank paths fail any task graph containing
+`:buildWrappersBundle`. TeamCity configurations that build the plugin must pass the wrappers
+VCS-root checkout through `-PsnakemakeWrappersRepoPath=...` (or `testData/wrappers_storage` for
+test configurations that also build the plugin). Those configurations live on JetBrains'
+TeamCity server. Updating `snakemakeWrappersRepoVersion` locally does not update the CI VCS
+root or build parameters; update both as described in `gradle.properties` (issue #571).
 
-   The unversioned `Given a snakemake project` cucumber scenarios resolve the snakemake API against
-   `testData/MockPackages3/snakemake` (gitignored, absent on a fresh checkout). Provide it by
-   symlinking the snakemake package source. Two details matter:
-   * **Version:** it must match `defaultVersion` in `snakemake_api.yaml`, which the FQN tests assert
-     against (e.g. `snakemake.ioutils.subpath.subpath`). Read the version from that file rather than
-     hardcoding one, so the fixture follows `defaultVersion` when it is bumped.
-   * **Layout:** modern snakemake keeps its package under `src/`, so the symlink target is
-     `src/snakemake` (older releases had it at the repo root).
+Tests use `prepareTestSandbox` and `:buildTestWrappersBundle`, which reads
+`testData/wrappers_storage` without this property. They do not run the production bundle task.
 
-    ```shell
-    # run from the project root
-    VER=$(awk '/^defaultVersion:/{gsub(/[":]/,"",$2); print $2}' snakemake_api.yaml)
-    echo "Snakemake version: $VER"
-    # works whether or not you already cloned snakemake for an earlier version of this recipe
-    [ -d ~/snakemake ] || git clone https://github.com/snakemake/snakemake.git ~/snakemake
-    # chained: a bad version must not leave the symlink pointing at the wrong revision
-    # -fn replaces the broken symlink left by the old recipe
-    git -C ~/snakemake fetch --tags && git -C ~/snakemake checkout "v$VER" &&
-      ln -sfn ~/snakemake/src/snakemake testData/MockPackages3/snakemake
-    ```
+### Sandbox wiring invariants
 
-   Check the result before running the suite — the `&&` chain means `ln` never runs if the git steps
-   fail, and both a leftover broken symlink and a directory that swallowed the link (`ln` into a real
-   directory creates `snakemake/snakemake` and exits 0) look like a provisioned fixture:
+Read this section before changing wrapper tasks or sandbox copying in `build.gradle.kts`:
 
-    ```shell
-    ls -l testData/MockPackages3/snakemake/__init__.py
-    ```
+- Configure all production sandbox producers with
+  `withType<PrepareSandboxTask>().configureEach`, excluding `testSandbox`.
+  Since IntelliJ Platform Gradle Plugin 2.19.0, `runIde` has its own sandbox tasks;
+  configuring only the literal `prepareSandbox` misses them.
+- Copy with `from(named("buildWrappersBundle"))` and retain the task's `outputs.file(...)`.
+  A plain file provider carries no task dependency and can silently omit the bundle (#588, #591).
+- Within production sandbox configuration, keep that `from(...)` unconditional with respect
+  to the wrappers path. Otherwise an unset path removes the task from the graph and its
+  `onlyIf` warning never runs.
+- Retain `outputs.upToDateWhen { false }`: the crawler reads an external checkout, and skipping
+  it risks a stale bundle.
+- The `onlyIf` path for an unset property deletes any previous bundle so it cannot be shipped.
+  Keep that cleanup; a conditional copy alone does not solve stale output.
+- Keep production extras out of test sandboxes. Tests read `snakemake_api.yaml` from the
+  project directory and use their separate test bundle.
 
-   If `defaultVersion` changes later, re-point the fixture the same way — the FQN tests will fail
-   against a stale checkout.
+See [the 2026.2 port](docs/porting/2026.2.md#sandbox-wiring) for the sandbox-task change.
 
-   **Gotcha — "zero effect":** the test IDE sandbox persists a VFS/index under `.sandbox_pycharm`
-   that **`cleanTest` does not clear**. If you add this fixture *after* having already run the tests
-   once, the stale VFS won't see the new files and the failures persist unchanged. Always clear it
-   after provisioning the fixture:
+## Testing
 
-    ```shell
-    # guarded rather than 2>/dev/null: the sandbox does not exist until you have run the tests once,
-    # but a removal that genuinely fails must not be silenced -- that lands you right back here
-    [ -d .sandbox_pycharm ] && find .sandbox_pycharm -maxdepth 3 -name system-test -exec rm -rf {} +
-    ```
+Follow [Testing](docs/testing.md) for prerequisites, fixture provisioning, Gradle and IDE runs,
+and result verification. It also covers targeted runs and the distinction between
+`cleanTest` and clearing the sandbox VFS.
 
-   Use `find`, not `rm -rf .sandbox_pycharm/*/system-test`: the sandbox sits at a different depth
-   depending on how tests were launched (`.sandbox_pycharm/system-test` for run configurations made
-   from the old hand-written template, `.sandbox_pycharm/<ide>/system-test` and `.sandbox_pycharm/<project>/<ide>/system-test`
-   for the gradle task, varying by platform-plugin version), and a glob that misses simply deletes
-   nothing while looking like it worked.
+## Platform updates
 
-Tests are written in [Gherkin](https://cucumber.io/docs/gherkin). You could run tests:
-* Using gradle `test` task
-* From IDEA context menu via `Cucumber Java` run configuration (the shared template in `.run/`
-  configures it, see "Configure Tests" step 1)
+Follow the [porting checklist](docs/porting/README.md) before changing platform or toolchain
+versions. It covers binary verification, bundled library alignment, EAP targets, and testing.
+Record platform-specific findings in the corresponding `docs/porting/<version>.md`.
 
-To run a **single cucumber feature** from the command line instead of the whole 25-minute suite,
-and for why an edit to `testData` needs `cleanTest test`, see
-[`docs/testing.md` → Running tests](docs/testing.md#running-tests).
+## Release checklist
 
-If you get `Unimplemented substep definition` in all `*.feature` files, ensure:
-  * Not installed or disabled: `Substeps IntelliJ Plugin` 
-  * Plugins installed: `Cucumber Java`, `Gherkin`
+1. Set `pluginVersion` in `gradle.properties` according to
+   [the versioning rule](AGENTS.md#plugin-versioning): the minimum platform release line plus
+   an independent plugin release number starting at 1.
+2. Check `pluginSinceBuild` / `pluginUntilBuild` against the supported and verified IDEs.
+   Changing `platformVersion` alone does not change the advertised compatibility range.
+3. Add or update the matching section in `CHANGELOG.md`. The build selects
+   `getOrNull(pluginVersion) ?: getUnreleased()` for marketplace change notes.
+   Keep the explicit versioned section even though there is a fallback. Other versioned
+   sections are not included: fold changes from an older still-unreleased section into the
+   release that will actually ship when that older release is superseded.
+4. Check `pluginPreReleaseSuffix` and the resulting publication channel. An empty suffix
+   publishes to the default channel; `-eap` / `-eap.2` selects EAP. The CI build counter is
+   separate from the three-component `pluginVersion`.
+5. Confirm wrapper metadata and CI configuration, build the distributable, run the
+   [required tests](docs/testing.md), and inspect the
+   [verifier reports](docs/porting/README.md#verification-and-acceptance).
+6. Publish with `./gradlew publishPlugin` using the configured publishing credentials.
 
-**Reading test results:** see [`docs/testing.md` → Analyzing results](docs/testing.md#analyzing-results)
-— what a run prints, what it does not (an all-green run reports no count, so a truncated run reads
-as a good one), how to reduce two logs to a diffable list of scenario names, and the live signals
-that tell a slow run from a hung one.
+## Development resources
 
-**Update to new Platform API:**
-
-`PORTING.md` records the previous ports release by release — what broke, why, and how it was fixed
-— which is usually the fastest way to see what a bump costs before starting one.
-
-* Inspect libs version in `gradle/libs.versions.toml`, especially `intelliJPlatform` and `kotlin` version. Also `javaVersion` and `gradleVersion` in `gradle.properties`, and `.java-version` in the repo root (the jenv pin — asdf honours it only with `legacy_version_file = yes` — which has to move with `javaVersion` or jenv users silently keep building on the old JDK). Those two files are the only place the number lives: the prose in the quickstart above and in `AGENTS.md` → Build & test deliberately names no version, because when it did, both said 21 for the whole of the 2026.2 port while `javaVersion` said 25 — keep it that way
-  * See [GitHub:intellij-platform-gradle-plugin](https://github.com/JetBrains/intellij-platform-gradle-plugin) documentation and [GitHub:intellij-platform-plugin-template](https://github.com/JetBrains/intellij-platform-plugin-template) as plugin example
-  * `intelliJPlatform` is intellij-platform-gradle-plugin version, not Intellij Platform itself
-  * `qodana` update as well
-  * `kotlinPlatform` and `kotlinxSerializationPlatform` are **not our versions to choose** — they
-    record what the target platform bundles, and `build.gradle.kts` forces them onto the runtime
-    classpaths. Re-read both from the new IDE rather than guessing:
-    ```shell
-    unzip -p <ide>/lib/intellij.libraries.kotlinx.serialization.core.jar META-INF/MANIFEST.MF | grep Implementation-Version
-    # kotlin-stdlib ships merged into lib/util-8.jar, not as its own jar, and carries no manifest
-    # version -- read the three ints KotlinVersion is constructed from (e.g. 2 / 3 / 20 -> 2.3.20):
-    javap -p -c -cp <ide>/lib/util-8.jar kotlin.KotlinVersionCurrentValue | sed -n '/KotlinVersion get/,/areturn/p'
-    ```
-    Leaving them stale does not fail the build; it fails at *runtime*, in tests, with an error that
-    names neither this plugin nor the library — a `@DebugMetadata` version mismatch for the stdlib,
-    or `AbstractMethodError` in `PluginGeneratedSerialDescriptor.kt` for serialization. Because the
-    Gradle test classpath is flat, our copy shadows the platform's, and one such error becomes
-    hundreds of failed scenarios. Issue
-    [#587](https://github.com/JetBrains-Research/snakecharm/issues/587) is the worked example.
-  * 
-* Update platform API and this plugin versions in `gradle.properties`, see `pluginVersion`, `pluginSinceBuild`, `pluginUntilBuild`, `platformVersion`
-  * `pluginVersion` version should be also mentioned in changelog `CHANGELOG.md`
-  * Build numbers map to IDE versions per
-    [build-number-ranges](https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html),
-    e.g. `2025.2`=`252`, `2025.3`=`253`, `2026.1`=`261`. Set `pluginUntilBuild` to the
-    branch of the newest IDE you actually built/tested against (e.g. `261.*`).
-  * `platformType`: 2025.2 was the last release of standalone PyCharm Community (`PC`). From
-    2025.3 on only the unified PyCharm ships, under the Professional artifact, so use
-    `platformType = PY` (the build wires `Pythonid` for `PY`/`PD` and `PythonCore` for `PC`).
-  * Check available IDE versions with
-    `./gradlew printProductsReleases`, or query
-    `https://data.services.jetbrains.com/products/releases?code=PY&type=release` (`PY`=PyCharm).
-  * **Porting to an unreleased platform** (e.g. 2026.3 while it is still EAP): set `platformVersion`
-    to a snapshot, e.g. `263-EAP-SNAPSHOT`. Valid names are the `<version>` entries in
-    `https://www.jetbrains.com/intellij-repository/snapshots/com/jetbrains/intellij/pycharm/pycharmPY/maven-metadata.xml`.
-    A `-SNAPSHOT` version switches `useInstaller` off in `build.gradle.kts`, so the IDE is downloaded
-    from that repository rather than as an installer. `263-EAP-SNAPSHOT` follows the newest EAP
-    build. Pin e.g. `263.6259.38-EAP-SNAPSHOT` when you need two runs to be comparable, and record
-    the build you actually tested (`build.txt` in the downloaded IDE).
-  * Before touching the source, run `verifyPlugin` with the *old* plugin against the new IDE. Its
-    `NoSuchFieldError`/`NoSuchMethodError` list is the binary-incompatibility worklist. Some of those
-    entries do not show up as compile errors at all (a retyped `protected` field still compiles), so
-    the compiler alone is not enough.
-* Update `snakemakeWrappersRepoVersion` to up-to-date, need to be updated on TeamCity CI as well.
- 
-**Release plugin:**
-* Fix version in `build.gradle`
-* Fix since/until build versions in `build.gradle`
-* Fix change notes in `CHANGES` file
-* Use 'publishPlugin' task
-                        
-
-------
-
-# Useful Resources for IntelliJ Plugin Development:
-
-* Using Kotlin + Gradle
-https://kotlinlang.org/docs/reference/using-gradle.html
-
-* Developing IntelliJ Plugins using `gradle-intellij-plugin` plugin documentation:
-https://github.com/JetBrains/gradle-intellij-plugin/blob/master/README.md#gradle
-
-* Creating Your First Plugin
-https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started.html
-
-* Custom Language Support plugins
-https://www.jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/prerequisites.html
-
-# Snakemake Resources:
-
-Workflows examples: https://github.com/snakemake-workflows/docs
-
-# Parser & Lexer
-
-## Snakemake language
-* Language: `SnakemakeLanguageDialect`
-* Parsing Subsystem Descriptor: `SmkParserDefinition`
-  * Registered in  `plugin.xml`, EP: `com.intellij.lang.parserDefinition`
-  * Links language to
-    * Lexer `SnakemakeLexer`
-      * Token types: `SmkTokenTypes`
-    * Parser `SnakemakeParser`
-      * AST node types: `SmkElementTypes`
-    * AST tree root element type: `SmkFileElementType`
-    * PSI tree rot element: `SmkFile`
-* Parser: `Snakemake`
-  * Uses `PyParser` API => instead of low level `PsiParser.parse(..)` uses HIG level entry point: `SmkParserContext`
-    * `getScope()`, `emptyParsingScope() : SmkParsingScope`
-      * Custom scope that helps to memorize that parser is parsing python code blocks in: `onstart`/`onsuccess`/`onerror`/`run` sections
-        This knowledge changes parser behaviour for some language constructions
-    * `getFunctionParser(): SmkFunctionParsing`
-      * **API ignored by SnakeCharm**:
-        * customizes python functions parsing
-      * **API used**:
-        * customisation of PyReferenceExpression class (use SmkPyReferenceExpression class) via `getReferenceType()`.
-         
-          Required for adding snakemake specific variant into Python expressions code completion & resolve
-    * `getExpressionParser(): SmkExpressionParsing`
-      * **API ignored by SnakeCharm**:
-        * customizes different python expressions parsing (string, star literals, etc)
-        
-    * `getStatementParser() : SmkStatementParsing`
-      * Does main job, **Entry Point** : `parseStatement()`
-        * Snakemake keywords 'rule' not python keywords, so they could be freely using in pure python blocs, e.g.
-            python methods, `run` section, etc
-        * If parser is not in `pure python` block, it changes lexer token for snakemake specific keywords, from `PyTokenTypes.IDENTIFIER` 
-            to custom snakemake token types
-        
-            P.S: SnakemakeLexer also changes the way how lexem generated & count rules sections stack, so parsing is actually started in Lexer
-        * If first statement lexeme isn't snakemake specific => delegate parsing of the statement to python parser
-        * Else:
-          * parse cases (`rule`,`checkpoint`, etc.)
-        * Parsing done via:
-          * Start new AST node:
-            * `marker = myBuilder.mark()`
-          * Finish (create new NODE and link to all lexemes between start & finish)
-            See `com.intellij.lang.SyntaxTreeBuilder.Marker`
-            * `marker.done(NODE_ELEMENT_TYPE)`
-            * `marker.error('msg')` - mark whole node as parsing error
-              * Better behaviour:
-                * `builder.error(msg)` - insert error
-                * `marker.done(NODE_ELEMENT_TYPE)` - close current marker with proper element type
-            * `maker.drop()` - new block not needed
-            * `new_marker = maker.precedes()` - for making hierarchical structures, e.g. `foo.boo.doo.roo`
-            * `rollBack(..)` - for lang constructions with similar syntax, when only in the end we could say how to parse the beginning
-          * Useful 
-            * `builder.advanceLexer()` & `nextToken()`, `atToken()`, `checkMatches()`, `builder.eof()`
-  * Test:
-    * Lexer: `SnakemakeLexerTest`
-    * Parser: `SnakemakeParsingTest`, testdata: `./testData/psi`
-
-## SnakemakeSL language  
-* Another Example: `SmkSLParserDefinition`
-  * Lexer - generated using JFlex, see `./src/main/kotlin/com/jetbrains/snakecharm/stringLanguage/lang/parser/smk_sl.flex` 
-  * Tests
-    * Lexer: `SmkSLLexerTest`
-      * Token types: `SmkSLTokenTypes`
-    * Parser: `SmkSLParsingTest`, testdata: `testData/stringLanguagePsi`
-      * AST node types: `SmkSLElementTypes`
-
-## Testdata
-
-### Custom snakemake version
-
-* Create mock directory for custom snakemake version, e.g. for 8.20.6: `./testData/MockPackages3_smk_8.20.6/snakemake`
-* Copy only required files (e.g. with canged API) into mock directory
-* Use in Cucumber steps, e.g. `Given a snakemake:8.20.6 project`
-
-NB: after changing anything under a mock directory, clear the test sandbox's VFS cache — `cleanTest`
-does not, and the stale index makes the change look like it had no effect. The command, and why it
-has to be a `find` rather than a glob, are in Configure Tests, step 2 above.
+- [IntelliJ Platform SDK](https://plugins.jetbrains.com/docs/intellij/welcome.html)
+- [IntelliJ Platform Gradle Plugin](https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html)
+- [IntelliJ plugin template](https://github.com/JetBrains/intellij-platform-plugin-template)
+- [Kotlin and Gradle](https://kotlinlang.org/docs/gradle.html)
+- [Snakemake workflow examples](https://github.com/snakemake-workflows/docs)

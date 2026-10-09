@@ -89,4 +89,7 @@ Contact me at roman.chernyatchik@jetbrains.com or post issues in [Issue Tracker]
 # Development
 
 Pull requests are welcome. It is my side project, so I appreciate your help with implementation of desired features.
-See [DEVELOPER.md](DEVELOPER.md) to set up a development environment, and [docs/testing.md](docs/testing.md) for how to run the test suite.
+See [DEVELOPER.md](DEVELOPER.md) for environment setup, building, and releasing, and
+[Testing](docs/testing.md) for test setup and execution. Source internals are described in
+[Architecture](docs/architecture.md); platform upgrades are covered by the
+[porting checklist and history](docs/porting/README.md).

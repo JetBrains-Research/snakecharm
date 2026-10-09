@@ -1,215 +1,62 @@
 # AGENTS.md
 
-Guidance for AI coding agents (and human newcomers) working in this repository. Kept
-tool-agnostic on purpose — see also `docs/testing.md` for running the suite and the traps that make
-a correct change look broken, `DEVELOPER.md` for project setup and the deep parser/lexer
-walkthrough, `PORTING.md` for what each IntelliJ Platform bump broke and why, and `README.md` for
-the user-facing feature list.
+Guidance for coding agents working on SnakeCharm. Read the task-specific documents below before
+acting; detailed procedures and historical evidence belong in those documents.
 
-## What this is
+## Project overview
 
-**SnakeCharm** is an IntelliJ Platform plugin (Kotlin) that adds IDE support for the
-[Snakemake](https://snakemake.readthedocs.io/) workflow language to PyCharm and other
-IntelliJ-based IDEs. It is built **on top of the bundled Python plugin's PSI/API** — most of its
-extension points are registered against `language="Python"` and it extends Python parsing rather
-than defining a language from scratch.
+SnakeCharm is a Kotlin IntelliJ Platform plugin for the Snakemake workflow language, built on the
+bundled Python plugin's PSI and parser APIs. Most extension points use `language="Python"`.
+It supports two languages: Snakemake (`Snakefile`, `*.smk`, `*.rule(s)`) and SmkSL, embedded
+inside Python strings. See [README.md](README.md) for user-facing features.
 
-## Build & test
+## Required reading by task
 
-The Gradle build uses the JDK toolchain `javaVersion` names in `gradle.properties`, and
-`.java-version` in the repo root carries the same number — read it there rather than trusting any
-number written in prose, because it moves with the platform and differs per branch. **Launch Gradle
-itself on that JDK**, not merely as an available toolchain, because the window is bounded at both
-ends: too new and the pinned Gradle crashes with a cryptic error (Gradle 8.x on JDK 24 fails with
-`Type T not present`), too old and `instrumentCode` dies loading platform classes (2026.2 emits Java
-25, so a JDK 21 daemon gets `UnsupportedClassVersionError: … class file version 69.0`). Set
-`JAVA_HOME` before building from the CLI and **verify it** with `"$JAVA_HOME/bin/java" -version`: on
-macOS `/usr/libexec/java_home -v <n>` treats `<n>` as a *minimum*, so it can hand back something
-newer, exit 0, and leave you with one of those two errors and no hint why. Use a jenv/asdf/SDKMAN
-path (`jenv prefix "$(cat .java-version)"`) or an explicit install path.
+Read the relevant sections, following their prerequisites; unrelated port histories are optional.
 
-```shell
-./gradlew buildPlugin      # -> build/distributions/snakecharm-*.zip
-./gradlew cleanTest test   # JUnit + Cucumber suite; cleanTest because testData isn't a task input
-./gradlew runIde           # sandbox IDE with the plugin installed
-./gradlew verifyPlugin     # IntelliJ Plugin Verifier
-```
+| Before doing this | Read |
+|---|---|
+| Configure the environment, build, or launch a sandbox IDE | [DEVELOPER.md](DEVELOPER.md) |
+| Change Gradle, wrapper packaging, or CI integration | [Build and packaging](DEVELOPER.md#build-and-packaging); for dependency upgrades, also the porting checklist below |
+| Run, add, or debug tests; change fixtures or test infrastructure | [Testing](docs/testing.md), including setup before the first run |
+| Change parsing, PSI, completion, highlighting, or framework detection | Relevant sections of [Architecture](docs/architecture.md) |
+| Upgrade the platform, Java, Kotlin, or IntelliJ Platform Gradle Plugin; investigate compatibility | [Porting checklist](docs/porting/README.md) and the relevant source/target platform notes linked there |
+| Change plugin versions or prepare a release | Versioning below and [Release checklist](DEVELOPER.md#release-checklist) |
 
-The target IDE (`platformType`/`platformVersion` in `gradle.properties`) is downloaded
-automatically on first build (hundreds of MB). `platformType = PC` is PyCharm Community, `PY` is
-PyCharm Professional. Note that **2025.2 is the last standalone PyCharm Community release** — from
-2025.3 on the unified PyCharm ships only under the `PY` artifact.
+## Essential working rules
 
-**Wrappers bundle:** `:buildWrappersBundle` reads `snakemakeWrappersRepoPath` (a local
-[snakemake-wrappers](https://github.com/snakemake/snakemake-wrappers) checkout) and, when that
-property is set, runs as part of `prepareSandbox`, so it sits in front of `buildPlugin` and
-`runIde` — but **not** the test tasks,
-which route through `prepareTestSandbox` and the separate test bundle below. That
-property is commented out in `gradle.properties` by default, so a plain `buildPlugin` / `runIde`
-yields a plugin without wrapper completion and the other wrapper-driven features; pass it explicitly
-to include them: `./gradlew buildPlugin -PsnakemakeWrappersRepoPath=/path/to/snakemake-wrappers` (on
-TeamCity it is meant to come from the snakemake-wrappers VCS root — see issue #571). When the build
-runs on TeamCity (detected by `TEAMCITY_VERSION`) it treats the property as **mandatory**: unset or
-blank fails any build whose task graph includes `:buildWrappersBundle`, instead of publishing a
-wrapper-less plugin from a green build. Every TeamCity configuration that builds the plugin must
-therefore pass it via `-PsnakemakeWrappersRepoPath=...` (snakemake wrappers repo checkout directory
-to build plugin bundle or `testData/wrappers_storage` for test configurations); those configurations
-live on JetBrains' TeamCity server, not in this repo. A blank value counts as unset everywhere,
-because that is what a TeamCity parameter left empty passes. The test-only bundle
-(`:buildTestWrappersBundle`, what `test` actually consumes) defaults to `testData/wrappers_storage`
-and needs no property.
+- `gradle.properties` owns platform selection and compatibility: `platformType`,
+  `platformVersion`, `pluginSinceBuild`, `pluginUntilBuild`, and `platformBundledPlugins`.
+  Compiler and library versions live in `gradle/libs.versions.toml`.
+- Launch **Gradle itself** on the JDK specified by `javaVersion` and `.java-version`; keep
+  those pins synchronized. Verify `"$JAVA_HOME/bin/java" -version` after switching branches.
+  JDK selection pitfalls and setup are in [DEVELOPER.md](DEVELOPER.md#environment-setup).
+- After editing test data, use `./gradlew cleanTest test` (with a focused filter while iterating).
+  `cleanTest` does not clear the sandbox VFS. Follow [Testing](docs/testing.md) for fixtures,
+  cache invalidation, and confirming that the intended tests actually ran.
+- Start feature discovery at `src/main/resources/META-INF/plugin.xml`.
+  Read Snakemake language levels from `snakemake_api.yaml`, including `defaultVersion`;
+  do not copy a current version number from documentation.
+- When changing behavior covered by a detailed guide, update that guide. Keep this file short:
+  reusable procedures belong in topic docs; platform-specific evidence belongs in port history.
 
-`prepareSandbox` reaches that bundle through `from(named("buildWrappersBundle"))`, which works only
-because the task declares the file as `outputs.file(...)` — `from(<file provider>)` carries no task
-dependency, and dropping the dependency produces a wrapper-less plugin *silently*, which has
-happened twice (#588, #591). Two things not to "tidy up" there, both of which have been tried and
-reverted: the `from(...)` must stay **unconditional**, or `buildWrappersBundle` leaves the task graph
-when `snakemakeWrappersRepoPath` is unset and its `onlyIf` — the only place the "no wrappers bundled"
-warning is logged — never runs; and `outputs.upToDateWhen { false }` must stay, because declaring
-the wrappers checkout as an input is what lets Gradle skip the crawler and ship a stale bundle. The
-`onlyIf` deletes any bundle an earlier run left behind; that is what keeps a stale one out, not a
-gate around the copy.
+## Plugin versioning
 
-**CLI build memory:** if `:compileKotlin` dies with `OutOfMemoryError: GC overhead limit exceeded`,
-give the Kotlin daemon more heap — append `-Pkotlin.daemon.jvmargs=-Xmx4g` (transforming some large
-generated methods can exhaust the default heap).
+`pluginVersion` uses `YEAR.RELEASE.PLUGIN_RELEASE`. The first two components match the
+**minimum supported PyCharm/IntelliJ Platform release line**. The third is the plugin's own release
+number: start at **1**, then increment consecutively within that line.
 
-### Running tests
+For example, the first plugin release requiring platform 2026.3 is `2026.3.1`, followed by
+`2026.3.2`, `2026.3.3`, etc. Do not start at `.0` or synchronize the third component with
+PyCharm's maintenance-release number. Plugin `2026.3.2` does not imply a requirement for
+PyCharm `2026.3.2`.
 
-Tests are **Cucumber/Gherkin** feature files under `src/test/resources/features/**`, run through a
-single JUnit runner, `AllCucumberFeaturesTest`. Everything else — running one feature in ~60 seconds
-instead of 25 minutes, the scenario-isolation and fixture traps, and how to read a run's results —
-is in **[`docs/testing.md`](docs/testing.md)**. Read it before debugging a test failure; several of
-those traps make a correct change look broken.
+A plugin release normally supports several platform maintenance releases within its declared
+compatibility range. A platform maintenance release does not automatically require a new plugin
+release; a compatibility break may require one. Extending support to a newer platform line while
+retaining the same minimum does not change the first two components.
 
-## Architecture
-
-Two languages, both layered onto the Python plugin:
-
-1. **Snakemake** (`SnakemakeLanguageDialect`) — the `Snakefile` / `*.smk` / `*.rule(s)` files. Its
-   parser (`lang/parser/`) drives the Python `PyParser` API rather than a raw `PsiParser`: the
-   lexer/parser flip Snakemake keywords (`rule`, `checkpoint`, …) from Python identifiers to
-   Snakemake token types **only outside pure-python blocks** (`run:`/`onstart`/`onsuccess`/
-   `onerror`), and delegate everything else to the Python parser. PSI lives in `lang/psi/`
-   (`SmkFile`, sections, rules), custom PSI types in `lang/psi/types/`, references in
-   `lang/psi/references/`, stubs in `lang/psi/stubs/`.
-
-2. **SmkSL** — the Snakemake String Language embedded in strings like
-   `"results/sample_{genome}.bam"`. Lives under `stringLanguage/`, lexer generated from
-   `stringLanguage/lang/parser/smk_sl.flex` (JFlex), injected into Python string literals.
-
-Plugin features are derived from the sources of the
-[snakemake project](https://github.com/snakemake/snakemake), so SnakeCharm does as much static
-analysis of the underlying snakemake Python code as it can. Because the framework itself is highly
-dynamic, the plugin additionally ships descriptions of the implicit Python API available in each
-block of the Snakemake DSL. That API changes between snakemake releases, so the snakemake version is
-treated as a **language level**: `snakemake_api.yaml` at the repo root (loaded by
-`SnakemakeApiYamlAnnotationsService` into the project-level
-`com.jetbrains.snakecharm.codeInsight.SnakemakeApiService`) records the differences between
-versions. Its `defaultVersion` key (currently 9.9.0) is the language level new projects get, and the
-latest one the plugin officially supports. Additionally, users could adjust `snakemake_api.yaml` for
-already installed SnakeCharm, e.g. in macOS this file path will be:
-`~/Library/Application Support/JetBrains/PyCharm2026.2/plugins/snakecharm/extra/snakemake_api.yaml`
-
-Feature areas (each maps to a source package and a `features/` test dir):
-
-- `lang/highlighter/`, `lang/validation/` — syntax highlighting + annotators (registered against
-  Python; some run through `SmkStandardAnnotatorManager` / `SmkDumbAwareAnnotatorManager`). Since
-  2026.2 removed `PyAnnotator`, these are `PyElementVisitor`s that take their `PyAnnotationHolder`
-  at construction, so they cannot be singletons — and `Annotator.annotate()` is a **per-element**
-  callback, so anything built inside it is built once per PSI element per highlighting pass. Guard
-  on the containing file first, then cache per `AnnotationHolder.currentAnnotationSession`. Both
-  halves of that have been missed once each (`PORTING.md` → "2026.2", item 14).
-- `codeInsight/` — completion contributors and resolve for Snakemake magic (`config`, `rules`,
-  `rules.<name>.<section>`, wildcards, api methods like `expand`/`temp`, wrapper names). The implicit
-  "runtime magic" symbols (`expand`, `temp`, `config`, `rules`, …) are built by
-  `SmkImplicitPySymbolsProvider`, which resolves them by qualified name against the project SDK's
-  snakemake package.
-- `inspections/` — ~45 local inspections (`<localInspection>` entries in `plugin.xml`) for common
-  Snakemake mistakes.
-- `framework/` — Snakemake framework detection: locating the `snakemake` package via the project
-  SDK / package manager, which gates most features and drives version-specific behaviour.
-- `lang/structureView/`, `lang/documentation/`, `lang/formatter/`, `spellchecker/`, `actions/` —
-  the corresponding IDE integrations.
-
-Extension points are wired in `src/main/resources/META-INF/plugin.xml` — the fastest way to find
-the entry class for any feature is to grep that file.
-
-## Build / platform conventions
-
-- `gradle.properties` is the single source of truth for the target platform: `platformType`,
-  `platformVersion`, `pluginSinceBuild`, `pluginUntilBuild`, `platformBundledPlugins`.
-- Plugin version scheme (`pluginVersion`) is `YEAR.MAJOR.MINOR`, where `YEAR.MAJOR` is the
-  **minimal compatible platform** and `MINOR` is the plugin build digit. A new `pluginVersion`
-  must also get a matching section in `CHANGELOG.md`, or `patchPluginXml` fails. **Only that
-  section ships.** `changeNotes` is `getOrNull(pluginVersion)` (`build.gradle.kts`), so an older
-  still-unreleased section sitting below the current one renders nowhere — its fixes go out inside
-  the new release with no marketplace change note naming them. Fold any such section into the one
-  being released rather than leaving it in place.
-- Build numbers map to IDE versions per
-  [build-number-ranges](https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html)
-  (`2025.2`=`252`, `2026.1`=`261`, …). `DEVELOPER.md` → "Update to new Platform API" is the
-  checklist for a platform bump.
-- **`verifyPlugin` verifies whatever `pluginVerification.ides` lists — not what the manifest claims.**
-  Raising `pluginSinceBuild` does not narrow it. That list is bound to
-  `pluginSinceBuild`/`pluginUntilBuild` in `build.gradle.kts` so a bump carries the verifier with it;
-  don't re-hardcode a range there or the task starts failing against IDEs that can no longer install
-  the plugin. The task also exits non-zero on `INTERNAL_API_USAGES`, which this codebase has had for
-  years — read the per-IDE `verification-verdict.txt` under `build/reports/pluginVerifier/` rather
-  than trusting the exit code. The `261.*` wildcard that `pluginUntilBuild` carries into that list
-  **does** match real `261.x` builds; it looks like it should truncate to `261.0.0` and select
-  nothing, but a verifier run reports `PY-261.27258.51`. Check
-  `build/reports/pluginVerifier/` before "fixing" it.
-- **A platform bump moves more than `platformVersion`.** Four baselines can move with it. Three fail
-  *before* your source is even considered, with an error that doesn't name the cause:
-  the **Kotlin compiler** must be new enough to read the platform's metadata (a compiler reads
-  metadata at most one minor above itself — 2026.2 ships metadata 2.4, so Kotlin 2.2 fails with
-  "compiled with an incompatible version of Kotlin"); the **Java toolchain** must match the
-  platform's bytecode target (2026.2 emits Java 25, so javac 21 reports "bad class file … wrong
-  version 69.0") — and note this is a baseline for **Gradle itself**, not only for the toolchain:
-  `instrumentCode` runs inside the Gradle daemon and loads platform classes, so on 2026.2 a daemon
-  launched on JDK 21 dies with `UnsupportedClassVersionError: … class file version 69.0`, however
-  correctly `-Dorg.gradle.java.installations.paths` points at a 25. Set `JAVA_HOME` to the platform's
-  own baseline (21 for 2026.1, 25 for 2026.2) — that is the floor under the window described at the
-  top of this file, and on a bump it moves before the pinned Gradle's ceiling does. Gradle also will not
-  auto-detect a jenv-managed JDK, so pass the path explicitly; and the **`intelliJPlatform`
-  gradle-plugin version** decides whether the Python
-  plugin's v2 content modules load *in tests* at all (2.16.0 → 2.18.1 took one port from 3361 failing
-  tests, of ~3400, down to 1153). Check all three before debugging your own code.
-
-  The fourth is **the libraries the platform bundles that we also depend on**, which fail at *runtime*
-  instead and are correspondingly nastier. `kotlin-stdlib` and `kotlinx-serialization` are both pinned
-  to the platform's version in `gradle/libs.versions.toml` (`kotlinPlatform`,
-  `kotlinxSerializationPlatform`) and forced onto the runtime classpaths in `build.gradle.kts`;
-  re-check both against the new IDE. Read the shipped version out of the platform itself rather than
-  guessing — e.g. `unzip -p <ide>/lib/intellij.libraries.kotlinx.serialization.core.jar
-  META-INF/MANIFEST.MF | grep Implementation-Version`. The Gradle **test** classpath is flat rather
-  than plugin-classloader-scoped, so our copy wins there; when it is older than the platform's, classes
-  whose serializers were generated against the newer ABI throw `AbstractMethodError` in
-  `PluginGeneratedSerialDescriptor.kt`, which names neither this plugin nor serialization, and (see the
-  bullet below) takes hundreds of unrelated scenarios down with it. Issue #587 is the write-up; it cost
-  101 failures on the 2026.2 port.
-- **A patch release is worth the same two checks, and they are cheap.** A `2026.2.1` → `2026.2.2`
-  bump moves `platformVersion` only — the build number stays `262.x`, so `pluginSinceBuild` /
-  `pluginUntilBuild` and the manifest do not move — but the bundled libraries above still can.
-  Rather than hunting version strings, diff the jars between the two downloaded distributions
-  (`shasum -a 256 lib/intellij.libraries.kotlinx.serialization.core.jar` in each): byte-identical
-  means nothing moved. That detour is worth taking because `kotlin-stdlib` is not shipped as a jar
-  carrying `Implementation-Version` at all — on 2026.2 it is folded into `lib/util-8.jar`, which has
-  no manifest, and the version is only readable by decompiling `kotlin.KotlinVersionCurrentValue`.
-  Then run the full suite against it: 2026.2.2 was green at the same count with no source change.
-- **`./gradlew printProductsReleases` lists what the build asks it to list.** It is configured here
-  for the RELEASE and EAP channels; with EAP alone it once reported a 262 build *older* than the one
-  being built against, which reads as "you are up to date" and is not. For what is actually
-  released, `https://data.services.jetbrains.com/products/releases?code=PY&type=release&latest=false`
-  gives version, build number and date.
-- **Logged errors are test failures.** `TestLoggerFactory` promotes anything logged at error level to
-  a failed scenario, so one benign platform log can fail hundreds of unrelated tests. When triaging a
-  wall of failures, group by exception message first — it is usually one cause, not many.
-- **Platform-bump gotcha:** since 2025.2 the platform is modular — APIs, inspections, and extension
-  points that used to live in *core* have been split into separate modules / bundled plugins with
-  their own classloaders. If a class or EP that worked before goes missing after a bump (often only
-  visible in tests), declare it explicitly with `bundledModule("…")` / `bundledPlugin("…")` in
-  `build.gradle.kts` and consult the
-  [API changes list](https://plugins.jetbrains.com/docs/intellij/api-changes-list-2025.html). (E.g.
-  `SpellCheckingInspection` moved from core to the Grazie plugin, `tanvd.grazi`.)
+`pluginSinceBuild` and `pluginUntilBuild` declare compatibility; `platformVersion` selects
+the build/test target. Every new `pluginVersion` must have a matching section in
+[CHANGELOG.md](CHANGELOG.md). Follow the release checklist to ensure all changes being shipped
+appear in that section.

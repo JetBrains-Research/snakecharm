@@ -70,7 +70,7 @@ repositories {
     // another repo above already serves them -- normally a harmless 404, but fatal on a rate-limited
     // CI run (429). Exclude those namespaces so mavenCentral()/its mirror below are never asked.
     // Full story (why mavenCentral() gets asked at all, and the builds that found each namespace):
-    // PORTING.md -> 2026.1 -> "CI: Maven Central 429s on JetBrains-owned modules".
+    // docs/porting/2026.1.md#ci-repositories.
     fun RepositoryContentDescriptor.excludeIntelliJPlatformGroups() {
         // installer coordinates (groupId "python"), the four IntelliJPlatformType this plugin targets
         excludeModule("python", "pycharm")
@@ -178,7 +178,7 @@ dependencies {
     // which `Cucumber Java`/JUnit run configurations use, so edits here need a re-sync to take effect.
     // Simulate a sync from the CLI with `-Didea.sync.active=true`.
     // This covers only the IDE run's *classpath*; its JVM options come from `prepareIdeTestRun`'s
-    // argfile. Both are needed, see DEVELOPER.md -> "Running Cucumber features from the IDE".
+    // argfile. Both are needed, see docs/testing.md#running-from-intellij-idea.
     if (System.getProperty("idea.sync.active").toBoolean()) {
         testRuntimeOnly(files(configurations.named(Configurations.INTELLIJ_PLATFORM_TEST_RUNTIME_FIX_CLASSPATH)))
         testRuntimeOnly(files(configurations.named(Configurations.INTELLIJ_PLATFORM_TEST_CLASSPATH)))
@@ -613,7 +613,7 @@ tasks {
     // This task dumps those arguments into a Java argfile, so a run configuration only needs
     // `@$PROJECT_DIR$/build/tmp/ideTestRun/jvm.args` in its VM options plus this task as a
     // "Before launch" step -- which is what `.run/Template Cucumber Java.run.xml` sets. See
-    // DEVELOPER.md -> "Configure Tests" -> "Running Cucumber features from the IDE".
+    // docs/testing.md#running-from-intellij-idea.
     // No classpath here: the IDE always builds `-classpath` itself from the module dependencies (see
     // the `idea.sync.active` block in `dependencies`), and a `-cp` in this file would be overridden.
     register("prepareIdeTestRun") {
