@@ -30,7 +30,7 @@ path (`jenv prefix "$(cat .java-version)"`) or an explicit install path.
 
 ```shell
 ./gradlew buildPlugin      # -> build/distributions/snakecharm-*.zip
-./gradlew test             # JUnit + Cucumber suite
+./gradlew cleanTest test   # JUnit + Cucumber suite; cleanTest because testData isn't a task input
 ./gradlew runIde           # sandbox IDE with the plugin installed
 ./gradlew verifyPlugin     # IntelliJ Plugin Verifier
 ```
