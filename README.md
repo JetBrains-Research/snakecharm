@@ -89,4 +89,4 @@ Contact me at roman.chernyatchik@jetbrains.com or post issues in [Issue Tracker]
 # Development
 
 Pull requests are welcome. It is my side project, so I appreciate your help with implementation of desired features.
-See [DEVELPER.md](DEVELOPER.md)
+See [DEVELOPER.md](DEVELOPER.md) to set up a development environment, and [docs/testing.md](docs/testing.md) for how to run the test suite.

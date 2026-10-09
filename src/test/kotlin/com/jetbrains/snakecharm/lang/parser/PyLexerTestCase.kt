@@ -14,8 +14,8 @@ import junit.framework.TestCase
  * touches a `CodeInsightTestFixture`, and lexing needs nothing project-scoped. Asking for a project
  * would build one light project per class off `LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR`,
  * which differs from the Python descriptors the Cucumber suite uses — the light-fixture framework
- * would then tear down and rebuild the shared project around these tests (see AGENTS.md → "Scenario
- * isolation is thinner than it looks").
+ * would then tear down and rebuild the shared project around these tests (see docs/testing.md →
+ * "Scenario isolation is thinner than it looks").
  */
 abstract class PyLexerTestCase : UsefulTestCase() {
     private val bareFixture: BareTestFixture = IdeaTestFixtureFactory.getFixtureFactory().createBareFixture()
