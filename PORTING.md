@@ -8,7 +8,7 @@ responses to platform changes rather than churn.
 |---|---|---|
 | [2026.1 (build 261)](#20261--unified-pycharm-build-261) | `update-for-intellij-2026.1` | [#570](https://github.com/JetBrains-Research/snakecharm/pull/570) |
 | [2026.2 (build 262)](#20262--build-262) | `update-for-intellij-2026.2` | [#577](https://github.com/JetBrains-Research/snakecharm/pull/577) |
-| [2026.3 (build 263, EAP)](#20263--build-263-eap) | `update-for-intellij-2026.3` | issue [#596](https://github.com/JetBrains-Research/snakecharm/issues/596) |
+| [2026.3 (build 263, EAP)](#20263--build-263-eap) | `features/#596-2026.3.x-support` | issue [#596](https://github.com/JetBrains-Research/snakecharm/issues/596) |
 
 ## Keeping the branches in sync
 
@@ -702,7 +702,7 @@ tests. The fixture never changes the scenario count, only how many pass.
 
 ## 2026.3 — build 263 (EAP)
 
-Branch `update-for-intellij-2026.3`, issue [#596](https://github.com/JetBrains-Research/snakecharm/issues/596).
+Branch `features/#596-2026.3.x-support`, issue [#596](https://github.com/JetBrains-Research/snakecharm/issues/596).
 Stacked on the 2026.2 port; everything above still applies. 2026.3 is not released yet, so the port
 targets the EAP snapshot `263-EAP-SNAPSHOT` (resolved to `PY-263.6259.38` when this was written).
 
