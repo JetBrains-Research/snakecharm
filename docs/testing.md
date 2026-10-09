@@ -19,13 +19,13 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
 - **Scenario isolation is thinner than it looks.** Every scenario asks IntelliJ's light-fixture
   framework for a test project by handing it a `LightProjectDescriptor` — the object that says
   which Python SDK and library roots the project needs. The framework hands back the *same* project
-  as long as it is given the same descriptor, and rebuilds it when the descriptor changes. On `master`
-  `StepDefs` constructs a fresh descriptor per scenario, so scenarios are mostly insulated from each
-  other by accident. #577 has to cache descriptors instead — on 2026.2 an SDK is a workspace-model
-  entity, so building a second mock SDK with the same name logs "symbolic id already exists", which
-  `TestLoggerFactory` turns into ~1070 failed scenarios. Once the project is shared, everything held
-  by a project-level *service* — framework enabled/disabled, settings, the configured SDK — survives
-  into the next scenario. **Write steps that set the project state they need rather than assume a
+  as long as it is given the same descriptor, and rebuilds it when the descriptor changes. Before
+  #577 `StepDefs` constructed a fresh descriptor per scenario, so scenarios were mostly insulated
+  from each other by accident. It caches descriptors now, and has to — on 2026.2 an SDK is a
+  workspace-model entity, so building a second mock SDK with the same name logs "symbolic id already
+  exists", which `TestLoggerFactory` turns into ~1070 failed scenarios. Once the project is shared,
+  everything held by a project-level *service* — framework enabled/disabled, settings, the
+  configured SDK — survives into the next scenario. **Write steps that set the project state they need rather than assume a
   fresh project's defaults.** `Given a snakemake with disabled framework project` is the cautionary
   example: it never disabled anything, it only skipped the enabling, and it passed for years purely
   because each scenario used to start from a clean project.
@@ -61,7 +61,7 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
   at WARNING level, and in a scenario without `ignoring extra highlighting` that assertion was the
   guard against stray warnings. Use `I check highlighting warnings and weak warnings`, which asks
   for both.
-- **How long a full run takes.** Every figure below is a single measurement of all 3419 tests on
+- **How long a full run takes.** Every figure below is a single measurement of the full suite on
   2026.1, so read the band, not the ordering — these differ by machine and load as much as by what
   they are nominally measuring:
 
@@ -91,8 +91,7 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
   `INSP.expected.dict.got.type` → `INSP.type.checker.unpack.expected.mapping`, which names the new
   owner outright. A scenario asserting "no warning" is worth re-checking after any bump for exactly
   this reason.
-- **Analyzing results:** the suite is large — ~3250 Cucumber scenarios plus ~170 plain JUnit tests.
-  Gradle prints each failing scenario and a `N tests completed, M failed` summary; for a run you are
+- **Analyzing results:** Gradle prints each failing scenario and a `N tests completed, M failed` summary; for a run you are
   watching, that is the report. To see what a change fixed or broke, capture each run and reduce it
   to a sorted list of scenario names rather than parsing anything:
 
@@ -118,8 +117,8 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
   makes an empty run easy to reach, since a tag expression matching no scenario exits 0 just as
   loudly as a full suite. Before reporting a run as green, read the count out of the XML (`tests=`
   summed over `build/test-results/test/*.xml`): a full suite is **3420** across 125 suites (measured
-  on `23097522`, the 2026.2 branch; it was 3419 until the #570 merge added a scenario, so older
-  notes say that). A stray `@here` tag or a leftover `tags = "not @ignore and @here"` in
+  on #577's branch, squash-merged to `master` as `ce5aa0f4`; it was 3419 until the #570 merge added
+  a scenario, so older notes say that). A stray `@here` tag or a leftover `tags = "not @ignore and @here"` in
   `AllCucumberFeaturesTest` is the usual cause of a short one. While a run is going, the live
   signals are the test JVM's accumulating CPU time (`ps -o time=`) and the mtime of
   `build/test-results/test/binary/in-progress-results-generic.bin`; `jstat -gc` tells you whether a
