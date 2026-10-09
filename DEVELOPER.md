@@ -168,16 +168,17 @@ Tests are written in [Gherkin](https://cucumber.io/docs/gherkin). You could run 
   configures it, see "Configure Tests" step 1)
 
 To run a **single cucumber feature** from the command line instead of the whole 25-minute suite,
-and for why an edit to `testData` needs `cleanTest test`, see `docs/testing.md` → "Running tests".
+and for why an edit to `testData` needs `cleanTest test`, see
+[`docs/testing.md` → Running tests](docs/testing.md#running-tests).
 
 If you get `Unimplemented substep definition` in all `*.feature` files, ensure:
   * Not installed or disabled: `Substeps IntelliJ Plugin` 
   * Plugins installed: `Cucumber Java`, `Gherkin`
 
-**Reading test results:** see `docs/testing.md` → "Analyzing results" — what a run prints, what it
-does not (an all-green run reports no count, so a truncated run reads as a good one), how to reduce
-two logs to a diffable list of scenario names, and the live signals that tell a slow run from a hung
-one.
+**Reading test results:** see [`docs/testing.md` → Analyzing results](docs/testing.md#analyzing-results)
+— what a run prints, what it does not (an all-green run reports no count, so a truncated run reads
+as a good one), how to reduce two logs to a diffable list of scenario names, and the live signals
+that tell a slow run from a hung one.
 
 **Update to new Platform API:**
 

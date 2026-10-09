@@ -21,8 +21,9 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
   `test` forwards `CUCUMBER_TAGS` to cucumber's `cucumber.filter.tags`, composed with the runner's
   own `not @ignore`; `--tests` skips the plain JUnit tests, which the tag filter cannot. Revert the
   tag afterwards, and pass the variable inline as above rather than `export`ing it, or the next
-  "full" run quietly runs only `@here`. It turns a 25-minute suite into a ~60-second one. On a branch without that passthrough, set
-  `tags = "not @ignore and @here"` in `AllCucumberFeaturesTest.kt` instead and revert that too.
+  "full" run quietly runs only `@here`. It turns a 25-minute suite into a ~60-second one. On a
+  branch without that passthrough, set `tags = "not @ignore and @here"` in
+  `AllCucumberFeaturesTest.kt` instead and revert that too.
 - **Scenario isolation is thinner than it looks.** Every scenario asks IntelliJ's light-fixture
   framework for a test project by handing it a `LightProjectDescriptor` — the object that says
   which Python SDK and library roots the project needs. The framework hands back the *same* project
@@ -32,10 +33,11 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
   workspace-model entity, so building a second mock SDK with the same name logs "symbolic id already
   exists", which `TestLoggerFactory` turns into ~1070 failed scenarios. Once the project is shared,
   everything held by a project-level *service* — framework enabled/disabled, settings, the
-  configured SDK — survives into the next scenario. **Write steps that set the project state they need rather than assume a
-  fresh project's defaults.** `Given a snakemake with disabled framework project` is the cautionary
-  example: it never disabled anything, it only skipped the enabling, and it passed for years purely
-  because each scenario used to start from a clean project.
+  configured SDK — survives into the next scenario. **Write steps that set the project state they
+  need rather than assume a fresh project's defaults.**
+  `Given a snakemake with disabled framework project` is the cautionary example: it never disabled
+  anything, it only skipped the enabling, and it passed for years purely because each scenario used
+  to start from a clean project.
 - **`testData` is NOT a declared input of the `test` task.** After editing any feature or
   test-data file, run `./gradlew cleanTest test` — plain `test` may serve stale cached results.
 - Test data lives in `testData/`. Snakemake API is mocked per-version under
@@ -98,36 +100,39 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
   `INSP.expected.dict.got.type` → `INSP.type.checker.unpack.expected.mapping`, which names the new
   owner outright. A scenario asserting "no warning" is worth re-checking after any bump for exactly
   this reason.
-- **Analyzing results:** Gradle prints each failing scenario and a `N tests completed, M failed` summary; for a run you are
-  watching, that is the report. To see what a change fixed or broke, capture each run and reduce it
-  to a sorted list of scenario names rather than parsing anything. Run the first two lines once
-  before the change with `before` in place of `after`, then as written after it:
 
-  ```shell
-  ./gradlew cleanTest test 2>&1 | tee /tmp/after.log
-  sed -n '/ > /s/ FAILED$//p' /tmp/after.log | sort -u > /tmp/after.names
-  diff /tmp/before.names /tmp/after.names
-  ```
+## Analyzing results
 
-  The `/ > /` address keeps only scenario lines, skipping Gradle's own `> Task :test FAILED` (no
-  space before its `>`); `-n` with `p` then prints just the lines the substitution changed. Check
-  the resulting line count against `M failed`. Use `cleanTest test`, not plain `test`: `testData` is
-  not a declared input of the task, so an unchanged-looking build can report `:test UP-TO-DATE`,
-  print no scenario lines at all, and leave you diffing against an empty file that reads as
-  "everything got fixed". HTML reports are turned off in `build.gradle.kts` (Windows cannot handle
-  some Cucumber scenario names), so what a finished run leaves on disk is the JUnit XML under
-  `build/test-results/test/`. That holds the same information if you need a run whose console output
-  you no longer have — but note it is written when the `test` task *ends*.
+Gradle prints each failing scenario and a `N tests completed, M failed` summary; for a run you are
+watching, that is the report. To see what a change fixed or broke, capture each run and reduce it
+to a sorted list of scenario names rather than parsing anything. Run the first two lines once
+before the change with `before` in place of `after`, then as written after it:
 
-  **An all-green run prints no count at all**, because Gradle prints `N tests completed` only on
-  failure. So a run in progress looks identical to a hung one, and — worse — **a truncated run looks
-  identical to a good one**: `BUILD SUCCESSFUL` says only that nothing failed, and `CUCUMBER_TAGS`
-  makes an empty run easy to reach, since a tag expression matching no scenario exits 0 just as
-  loudly as a full suite. Before reporting a run as green, read the count out of the XML (`tests=`
-  summed over `build/test-results/test/*.xml`): a full suite is **3420** across 125 suites (measured
-  on #577's branch, squash-merged to `master` as `ce5aa0f4`; it was 3419 until the #570 merge added
-  a scenario, so older notes say that). A `CUCUMBER_TAGS` still exported in your shell, a stray `@here` tag or a leftover
-  `tags = "not @ignore and @here"` in `AllCucumberFeaturesTest` is the usual cause of a short one. While a run is going, the live
-  signals are the test JVM's accumulating CPU time (`ps -o time=`) and the mtime of
-  `build/test-results/test/binary/in-progress-results-generic.bin`; `jstat -gc` tells you whether a
-  quiet stretch is a slow scenario or a GC death spiral.
+```shell
+./gradlew cleanTest test 2>&1 | tee /tmp/after.log
+sed -n '/ > /s/ FAILED$//p' /tmp/after.log | sort -u > /tmp/after.names
+diff /tmp/before.names /tmp/after.names
+```
+
+The `/ > /` address keeps only scenario lines, skipping Gradle's own `> Task :test FAILED` (no
+space before its `>`); `-n` with `p` then prints just the lines the substitution changed. Check
+the resulting line count against `M failed`. Use `cleanTest test`, not plain `test`: `testData` is
+not a declared input of the task, so an unchanged-looking build can report `:test UP-TO-DATE`,
+print no scenario lines at all, and leave you diffing against an empty file that reads as
+"everything got fixed". HTML reports are turned off in `build.gradle.kts` (Windows cannot handle
+some Cucumber scenario names), so what a finished run leaves on disk is the JUnit XML under
+`build/test-results/test/`. That holds the same information if you need a run whose console output
+you no longer have — but note it is written when the `test` task *ends*.
+
+**An all-green run prints no count at all**, because Gradle prints `N tests completed` only on
+failure. So a run in progress looks identical to a hung one, and — worse — **a truncated run looks
+identical to a good one**: `BUILD SUCCESSFUL` says only that nothing failed, and `CUCUMBER_TAGS`
+makes an empty run easy to reach, since a tag expression matching no scenario exits 0 just as
+loudly as a full suite. Before reporting a run as green, read the count out of the XML (`tests=`
+summed over `build/test-results/test/*.xml`): a full suite is **3420** across 125 suites (measured
+on #577's branch, squash-merged to `master` as `ce5aa0f4`; it was 3419 until the #570 merge added
+a scenario, so older notes say that). A `CUCUMBER_TAGS` still exported in your shell, a stray
+`@here` tag or a leftover `tags = "not @ignore and @here"` in `AllCucumberFeaturesTest` is the
+usual cause of a short one. While a run is going, the live signals are the test JVM's accumulating CPU time (`ps -o time=`) and the mtime of
+`build/test-results/test/binary/in-progress-results-generic.bin`; `jstat -gc` tells you whether a
+quiet stretch is a slow scenario or a GC death spiral.
