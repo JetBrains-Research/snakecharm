@@ -15,10 +15,12 @@
 * Run `./gradlew buildPlugin`
 * Plugin bundle is located in `build/distributions/snakecharm-*.zip`
 * The bundled snakemake-wrappers metadata is optional for a local build: if
-  `snakemakeWrappersRepoPath` is unset (the default), `:buildWrappersBundle` does not run and the
+  `snakemakeWrappersRepoPath` is unset or blank (the default), `:buildWrappersBundle` does not run and the
   plugin is built without bundled wrappers — it runs normally, but wrapper name completion has
   nothing to offer. If the property *is* set and does not point at a wrappers checkout, the build
-  still fails loudly rather than quietly shipping without them.
+  still fails loudly rather than quietly shipping without them. On TeamCity the build treats the
+  property as required: leaving it unset fails the build (TeamCity builds pass via `-PsnakemakeWrappersRepoPath=...`
+  Snakemake wrappers repo checkout directory to build plugin bundle or `testData/wrappers_storage` for test configurations).   
   To include them, point it at a local [snakemake-wrappers](https://github.com/snakemake/snakemake-wrappers)
   checkout whose content matches `snakemakeWrappersRepoVersion`:
   `./gradlew buildPlugin -PsnakemakeWrappersRepoPath=/path/to/snakemake-wrappers`.
