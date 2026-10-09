@@ -190,36 +190,18 @@ Tests are written in [Gherkin](https://cucumber.io/docs/gherkin). You could run 
 * From IDEA context menu via `Cucumber Java` run configuration (the shared template in `.run/`
   configures it, see "Configure Tests" step 1)
 
-To run a **single cucumber feature** from the command line, add a `@here` tag above its
-`Feature:` line and set `tags = "not @ignore and @here"` in `AllCucumberFeaturesTest.kt`
-(revert both afterwards). Note that `testData` is **not** a declared input of the `test`
-task, so after editing any feature/test-data file run `./gradlew cleanTest test` — plain
-`test` may serve stale cached results.
+To run a **single cucumber feature** from the command line instead of the whole 25-minute suite,
+and for why an edit to `testData` needs `cleanTest test`, see
+[`docs/testing.md` → Running tests](docs/testing.md#running-tests).
 
 If you get `Unimplemented substep definition` in all `*.feature` files, ensure:
   * Not installed or disabled: `Substeps IntelliJ Plugin` 
   * Plugins installed: `Cucumber Java`, `Gherkin`
 
-**Reading test results:**
-* `./gradlew test` prints a line per failing scenario as it goes, then a `N tests completed, M failed`
-  summary. For a run you are watching, that is the report.
-* HTML reports are turned off in `build.gradle.kts` (Windows cannot handle some Cucumber scenario
-  names), so what a finished run leaves on disk is the JUnit XML under `build/test-results/test/`.
-* To see what a change fixed or broke, compare two runs. Capture each log and reduce it to a sorted
-  list of scenario names:
-
-  ```shell
-  ./gradlew cleanTest test 2>&1 | tee /tmp/after.log
-  sed -n '/ > /s/ FAILED$//p' /tmp/after.log | sort -u > /tmp/after.names
-  diff /tmp/before.names /tmp/after.names
-  ```
-
-  The `/ > /` address keeps only scenario lines, skipping Gradle's own `> Task :test FAILED` (no
-  space before its `>`); `-n` with the `p` flag then prints just the lines the substitution changed.
-  Check the resulting line count against the `M failed` in the summary. Use `cleanTest test`, not
-  plain `test`: `testData` is not a declared input of the `test` task, so an unchanged-looking build
-  can report `:test UP-TO-DATE`, print no scenario lines at all, and leave you diffing against an
-  empty file that reads as "everything got fixed".
+**Reading test results:** see [`docs/testing.md` → Analyzing results](docs/testing.md#analyzing-results)
+— what a run prints, what it does not (an all-green run reports no count, so a truncated run reads
+as a good one), how to reduce two logs to a diffable list of scenario names, and the live signals
+that tell a slow run from a hung one.
 
 **Update to new Platform API:**
 
@@ -363,4 +345,6 @@ Workflows examples: https://github.com/snakemake-workflows/docs
 * Copy only required files (e.g. with canged API) into mock directory
 * Use in Cucumber steps, e.g. `Given a snakemake:8.20.6 project`
 
-NB: To run tests locally it is important to delete VFS cache for test instance on any change in mock directories, e.g. `.sandbox_pycharm/PC-2025.1/system-test`
+NB: after changing anything under a mock directory, clear the test sandbox's VFS cache — `cleanTest`
+does not, and the stale index makes the change look like it had no effect. The command, and why it
+has to be a `find` rather than a glob, are in Configure Tests, step 2 above.
