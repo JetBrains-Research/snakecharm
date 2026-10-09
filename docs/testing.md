@@ -24,6 +24,12 @@ through a single JUnit runner, `AllCucumberFeaturesTest` (glue/step definitions 
   "full" run quietly runs only `@here`. It turns a 25-minute suite into a ~60-second one. On a
   branch without that passthrough, set `tags = "not @ignore and @here"` in
   `AllCucumberFeaturesTest.kt` instead and revert that too.
+- **Run from the IDE instead:** a `Cucumber Java` run configuration (gutter icon on a `.feature`
+  file) works, but the IDE builds the JVM command line from two places that Gradle's `test` task
+  fills in for you, so it needs `prepareIdeTestRun` and a Gradle sync after build-script changes.
+  The checked-in run-configuration template does the first; setup and failure modes (`IllegalAccessError
+  ... sun.awt`, `Missing extension point: Pythonid.pythonSdkFlavor`) are in `DEVELOPER.md` →
+  [Configure Tests](../DEVELOPER.md#running-cucumber-features-from-the-ide), step 1.
 - **Scenario isolation is thinner than it looks.** Every scenario asks IntelliJ's light-fixture
   framework for a test project by handing it a `LightProjectDescriptor` — the object that says
   which Python SDK and library roots the project needs. The framework hands back the *same* project

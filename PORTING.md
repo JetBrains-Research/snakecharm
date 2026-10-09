@@ -568,13 +568,10 @@ re-derived, so it follows whatever the gradle plugin computes. `test.classpath` 
 `testRuntimeClasspath`, so the collection is a `files(Callable)` with a re-entry guard; a
 `provider {}` fails with "Circular evaluation detected". No new `bundledModule`s were needed.
 
-**Why an IDE run needs both this and `prepareIdeTestRun`.** The IDE starts the JVM from two inputs
-taken from different places: VM options from the run configuration, and `-classpath` built from the
-module dependencies. `prepareIdeTestRun`'s argfile (`jvm.args`) covers the first: `--add-opens`,
-sandbox paths and so on. Without it the run fails with `IllegalAccessError … sun.awt` even with the
-classpath fixed (verified). The sync block covers the second. Putting Gradle's classpath into
-`jvm.args` does not work: the IDE appends its own `-classpath` after the VM options, and replacing it
-would drop the IDE's runner jars and run Gradle's sandbox jar instead of the IDE-compiled classes.
+**Why an IDE run needs both this and `prepareIdeTestRun`:** the IDE takes VM options and `-classpath`
+from different places, and neither can stand in for the other. The explanation, and how to set the
+run configuration up, lives in
+[`DEVELOPER.md` → Configure Tests](DEVELOPER.md#running-cucumber-features-from-the-ide), step 1.
 
 ### Method note: cluster failure *messages*, not test names
 
