@@ -27,9 +27,10 @@ asdf reads it only with `legacy_version_file = yes` in `~/.asdfrc`; otherwise it
 ```shell
 # Run from the repository root. Install this exact version if needed.
 JDK=$(cat .java-version)
+echo "Required JDK version: $JDK"
 brew install "openjdk@$JDK"                  # macOS / Homebrew
 export JAVA_HOME=$(jenv prefix "$JDK")       # if registered with jenv
-# Or set JAVA_HOME to your explicit JDK installation.
+export JAVA_HOME="/opt/homebrew/opt/openjdk@$JDK" # or custom path instead of jenv Or set JAVA_HOME to your explicit JDK installation.
 "$JAVA_HOME/bin/java" -version              # verify the version before running Gradle
 ```
 
