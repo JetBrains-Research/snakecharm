@@ -4,12 +4,15 @@
 # SnakeCharm Plugin Changelog
 
 ## [2026.3.1]
-Released on <Unreleased>
+Released on 9 Oct 2026
 
 ### Plugin
 - Compatibility with PyCharm / IntelliJ Platform 2026.3 (build 263)
   ([#596](https://github.com/JetBrains-Research/snakecharm/issues/596)).
 - **This release requires 2026.3 (build 263) or newer**, `pluginSinceBuild` was raised from `262` to `263`.
+
+### Changed
+- Bundled snakemake wrappers list updated to `v9.19.0`
 
 ## [2026.2.2]
 Released on <Unreleased>
@@ -18,7 +21,7 @@ Released on <Unreleased>
 - Bundled snakemake wrappers list updated to `v9.19.0`
 
 ## [2026.2.1]
-Released on 7.10.2026
+Released on 7 Oct 2026
 
 We gratefully acknowledge external contributor Gaurav Vaidya (@gaurav) for his work porting the plugin to 2026.2.x
 platform API
