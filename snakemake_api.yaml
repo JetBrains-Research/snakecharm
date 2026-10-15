@@ -1,7 +1,7 @@
 annotationsFormatVersion: 1
 
 # Default Language Level used for all projects:
-defaultVersion: "9.9.0"
+defaultVersion: "9.27.0"
 
 # supported types of sections in each version:
 # * 'introduced' - API was introduced
@@ -31,6 +31,81 @@ defaultVersion: "9.9.0"
 #    * docs_url: ''                                | Documentation URL
 # =========================================
 changelog:
+
+  # ---------------------------------------
+  # Not released yet, on snakemake 'main' after 9.27.0: the breaking 'feat!: generic software deployment
+  # plugin support' (#3339) => next release is expected to be 10.0.0. Adjust the version if it is released differently.
+  - version: "10.0.0"
+    introduced:
+      - name: "software"
+        type: "rule-like"
+        docs_url: https://snakemake.readthedocs.io/en/latest/snakefiles/deployment.html#software-directive
+        multiple_args_allowed: False
+        keyword_args_allowed: False
+        placeholders_injection_allowed: False
+
+  # ---------------------------------------
+  - version: "9.22.0"
+    introduced:
+      - name: "snakemake.ioutils.choose_f.choose_file"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#snakefiles-choose-f
+
+      - name: "snakemake.ioutils.choose_f.choose_folder"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#snakefiles-choose-f
+
+      - name: "snakemake.ioutils.choose_f.choose_tmp"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#snakefiles-choose-f
+
+  # ---------------------------------------
+  - version: "9.21.0"
+    introduced:
+      - name: "snakemake.ioutils.prepend_param.prepend_param"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#snakefiles-semantic-helpers-prepend-param
+
+  # ---------------------------------------
+  - version: "9.20.0"
+    introduced:
+      - name: "snakemake.ioutils.as_py_module.as_py_module"
+        type: "function"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#snakefiles-python-module
+
+  # ---------------------------------------
+  - version: "9.17.0"
+    override:
+      # callable priorities, see snakemake.rules.Rule.expand_priority()
+      - name: "priority"
+        type: "rule-like"
+        multiple_args_allowed: False
+        keyword_args_allowed: False
+        placeholders_injection_allowed: False
+        is_accessible_in_rule_obj: True
+        lambda_args:
+          - "wildcards"
+          - "input"
+          - "attempt"
+          - "rulename"
+
+  # ---------------------------------------
+  - version: "9.12.0"
+    introduced:
+      # Values are keyword args only (see snakemake.workflow.Workflow.register_pathvars / rule_pathvars /
+      # module(pathvars=..)), used as `<name>` in input, output, log, benchmark paths
+      - name: "pathvars"
+        type: "top-level"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#snakefiles-pathvars
+
+      - name: "pathvars"
+        type: "rule-like"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#snakefiles-pathvars
+        placeholders_injection_allowed: False
+
+      - name: "pathvars"
+        type: "module"
+        docs_url: https://snakemake.readthedocs.io/en/stable/snakefiles/modularization.html#snakefiles-modules-pathvars
 
   # ---------------------------------------
   - version: "9.5.0"

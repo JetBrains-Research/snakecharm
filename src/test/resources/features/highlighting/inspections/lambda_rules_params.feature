@@ -23,6 +23,8 @@ Feature: Inspection checking lambda parameter names in various sections
       | rule       | resources | p=lambda wildcards, input, threads, attempt: 1        |
       | rule       | conda     | lambda wildcards, params, input: ""                   |
       | checkpoint | threads   | lambda wildcards, input, attempt: 10                  |
+      | rule       | priority  | lambda wildcards, input, attempt, rulename: 1         |
+      | checkpoint | priority  | lambda wildcards, input: input.size_mb                |
 
   Scenario Outline: Too many lambda parameters in section
     Given a snakemake project
@@ -46,6 +48,7 @@ Feature: Inspection checking lambda parameter names in various sections
       | rule       | conda     | lambda wildcards, params, input, aaa: ""                       | aaa         | 3 | /params/input                   |
       | rule       | resources | p=lambda wildcards, input, threads, attempt, aaa: ""           | aaa         | 4 | /input/threads/attempt          |
       | checkpoint | threads   | lambda wildcards, input, attempt, params: 1                    | params      | 3 | /input/attempt                  |
+      | rule       | priority  | lambda wildcards, input, attempt, rulename, aaa: 1             | aaa         | 4 | /input/attempt/rulename         |
 
   Scenario Outline: Only used supported lambda parameters in section
     Given a snakemake project

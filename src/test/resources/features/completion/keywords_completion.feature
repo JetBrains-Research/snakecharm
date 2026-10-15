@@ -28,6 +28,7 @@ Feature: Completion for snakemake keyword-like things
       | pepschema            |
       | resource_scopes      |
       | conda                |
+      | pathvars             |
 
   Scenario Outline: Complete at top-level with respect to deprecations
     Given a snakemake project
@@ -314,6 +315,8 @@ Feature: Completion for snakemake keyword-like things
       | rule       | retr | retries        |
       | rule       | retr | retries        |
       | rule       | loc  | localrule      |
+      | rule       | pat  | pathvars       |
+      | checkpoint | pat  | pathvars       |
 
   Scenario Outline: Complete at rule/checkpoint level (single variant) with trailing ws
     Given a snakemake project
@@ -385,6 +388,7 @@ Feature: Completion for snakemake keyword-like things
       | module     | s   | skip_validation      |
       | module     | r   | replace_prefix       |
       | module     | p   | prefix               |
+      | module     | p   | pathvars             |
 
   Scenario Outline: Complete at rule/checkpoint/module level with respect to deprecations
     Given a snakemake project

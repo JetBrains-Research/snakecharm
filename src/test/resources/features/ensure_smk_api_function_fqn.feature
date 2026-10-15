@@ -436,3 +436,27 @@ Scenario: Function - subpath
     """
     When I put the caret at multiext
     Then reference should resolve to FQN "snakemake.io.multiext"
+
+  Scenario Outline: Function - semantic helpers registered in globals (9.20.0+)
+    Given a snakemake project
+    Given I open a file "foo.smk" with text
+    """
+    rule a:
+        input:
+            data="in.txt"
+        output:
+            "out.txt"
+        params:
+            p=<call>
+        shell:
+            "somecommand {params.p} {output}"
+    """
+    When I put the caret at <name>
+    Then reference should resolve to FQN "<fqn>"
+    Examples:
+      | name          | call                                   | fqn                                            |
+      | prepend_param | prepend_param("--input", input.data)   | snakemake.ioutils.prepend_param.prepend_param |
+      | as_py_module  | as_py_module()                         | snakemake.ioutils.as_py_module.as_py_module   |
+      | choose_file   | choose_file(["foo", "~/.bashrc"])      | snakemake.ioutils.choose_f.choose_file        |
+      | choose_folder | choose_folder(["foo/bar", "~"])        | snakemake.ioutils.choose_f.choose_folder      |
+      | choose_tmp    | choose_tmp(["foo/bar", "/tmp"])        | snakemake.ioutils.choose_f.choose_tmp         |

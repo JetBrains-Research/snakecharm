@@ -21,6 +21,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.resolve.ResolveCache
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.QualifiedName
 import com.intellij.python.requirements.pyRequirement
 import com.intellij.util.PlatformIcons
@@ -44,6 +45,7 @@ import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettingsListener
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_MODULE_NAME_IO
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_MODULE_NAMES_IO_CONTAINERS
 import java.util.*
 import javax.swing.SwingUtilities
 
@@ -217,12 +219,21 @@ class SmkImplicitPySymbolsProvider(
         // TODO add 'collect' as exapnd - snakemake.ioutils.collect
         // elementsCache.add(ImplicitPySymbol(pyFun.name!!, pyFun, scope, ImplicitPySymbolUsageType.METHOD))
 
+        // Functions registered under a name not matching their module, e.g. 'choose_file' from
+        // 'snakemake/ioutils/choose_f.py' (9.22.0) or 'flatten' from 'snakemake/ioutils/input.py'
+        collectFunctionsRegisteredInGlobals(
+            "snakemake.ioutils", SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache
+        )
+        progressIndicator?.checkCanceled()
+
 
         ///////////////////////////////////////
         // Collect hardcoded methods
         collectMethods(
             listOf(
                 "snakemake.utils" to "simplify_path",
+                // 'snakemake.utils' is a package after 9.27.0
+                "snakemake.utils.misc" to "simplify_path",
                 "snakemake.wrapper" to "wrapper",
                 "snakemake.script" to "script"
             ), SmkCodeInsightScope.TOP_LEVEL, usedFiles, sdk, elementsCache
@@ -257,14 +268,17 @@ class SmkImplicitPySymbolsProvider(
         // snakemake.io.Params
         // snakemake.io.Log
         // snakemake.io.Wildcards
-        // snakemake.io.Resources
-        collectTopLevelClassesInheritedFrom(
-            SNAKEMAKE_MODULE_NAME_IO,
-            "snakemake.io.Namedlist",
-            SmkCodeInsightScope.RULELIKE_RUN_SECTION, usedFiles, sdk, elementsCache
-        ) { classFqn ->
-            val sectionName = SECTION_ACCESSOR_CLASSES[classFqn]
-            sectionName ?: classFqn.split('.').last().lowercase(Locale.getDefault())
+        // snakemake.io.Resources (snakemake.io.ResourceList since 9.16.3)
+        // Moved to 'snakemake.io.container' in 9.17.0 and to 'snakemake.iocontainers' in 9.18.0
+        SNAKEMAKE_MODULE_NAMES_IO_CONTAINERS.forEach { pyModuleFqn ->
+            collectTopLevelClassesInheritedFrom(
+                pyModuleFqn,
+                "$pyModuleFqn.Namedlist",
+                SmkCodeInsightScope.RULELIKE_RUN_SECTION, usedFiles, sdk, elementsCache
+            ) { classFqn ->
+                val sectionName = SECTION_ACCESSOR_CLASSES[classFqn]
+                sectionName ?: classFqn.split('.').last().lowercase(Locale.getDefault())
+            }
         }
         progressIndicator?.checkCanceled()
 
@@ -709,6 +723,72 @@ class SmkImplicitPySymbolsProvider(
             }
     }
 
+    /**
+     * Collects functions which [pyModuleFqn] registers in snakefile globals, e.g. `snakemake/ioutils/__init__.py`:
+     *
+     * ```
+     * from snakemake.ioutils.choose_f import choose_file
+     *
+     * def register_in_globals(_globals):
+     *     _globals.update({"choose_file": choose_file, "input": rule_item_factory("input"), ...})
+     * ```
+     *
+     * Only values referring to a function are collected. Names already collected in [scope] are skipped.
+     */
+    private fun collectFunctionsRegisteredInGlobals(
+        pyModuleFqn: String,
+        scope: SmkCodeInsightScope,
+        usedFiles: MutableSet<VirtualFile>,
+        sdk: Sdk,
+        elementsCache: MutableList<ImplicitPySymbol>
+    ) {
+        val collectedNames = elementsCache.filter { it.scope == scope }.mapTo(mutableSetOf()) { it.identifier }
+
+        collectFilesFromModulePyFileOrInitFile(pyModuleFqn, usedFiles, sdk)
+            .filter { it.isValid }
+            .forEach { pyFile ->
+                val registerFun = pyFile.findTopLevelFunction("register_in_globals") ?: return@forEach
+
+                PsiTreeUtil.findChildrenOfType(registerFun, PyKeyValueExpression::class.java).forEach { keyValue ->
+                    val name = (keyValue.key as? PyStringLiteralExpression)?.stringValue
+                    val valueName = (keyValue.value as? PyReferenceExpression)
+                        ?.takeUnless { it.isQualified }
+                        ?.referencedName
+                    if (name == null || valueName == null || name in collectedNames) {
+                        return@forEach
+                    }
+
+                    val pyFun = pyFile.findTopLevelFunction(valueName)
+                        ?: findImportedFunction(pyFile, valueName, sdk)
+                    if (pyFun != null) {
+                        usedFiles.add(pyFun.containingFile.virtualFile)
+                        collectedNames.add(name)
+                        elementsCache.add(
+                            ImplicitPySymbol(name, pyFun.qualifiedName, pyFun, scope, ImplicitPySymbolUsageType.METHOD)
+                        )
+                    }
+                }
+            }
+    }
+
+    /**
+     * @return Function imported in [pyFile] as `from <module> import <fun>` or `from <module> import <fun> as <visibleName>`
+     */
+    private fun findImportedFunction(
+        pyFile: PyFile,
+        visibleName: String,
+        sdk: Sdk
+    ): PyFunction? = pyFile.fromImports.asSequence()
+        .mapNotNull { fromImport ->
+            val sourceQName = fromImport.importSourceQName ?: return@mapNotNull null
+            val importedQName = fromImport.importElements
+                .firstOrNull { it.visibleName == visibleName }
+                ?.importedQName
+                ?: return@mapNotNull null
+            resolveTopLevelMember(sourceQName.append(importedQName), fromSdk(project, sdk)) as? PyFunction
+        }
+        .firstOrNull()
+
     private fun collectTopLevelMethodsFrom(
         pyModuleFqn: String,
         scope: SmkCodeInsightScope,
@@ -823,13 +903,15 @@ class SmkImplicitPySymbolsProvider(
 
         val globals = HashMap<String, PsiElement?>()
         val resolveContext = fromSdk(project, sdk)
-        GLOBAL_VARS_TO_CLASS_FQN.forEach { item, classFqn ->
+        GLOBAL_VARS_TO_CLASS_FQN.forEach { item, classFqnCandidates ->
             // * resolve module (file):
             // resolveQualifiedName(QualifiedName.fromDottedString("snakemake.common"), fromSdk(project, sdk))
             // * resolve class:
             // resolveTopLevelMember(QualifiedName.fromDottedString("snakemake.common.Rules"), fromSdk(project, sdk))
             // (resolveQualifiedName(QualifiedName.fromDottedString("snakemake.common"), resolveContext)[0] as PyFile).findTopLevelClass("Rules")
-            val psiElement = classFqn?.let { resolveTopLevelMember(QualifiedName.fromDottedString(it), resolveContext) }
+            val psiElement = classFqnCandidates.firstNotNullOfOrNull {
+                resolveTopLevelMember(QualifiedName.fromDottedString(it), resolveContext)
+            }
             psiElement?.containingFile?.virtualFile?.let() { usedFiles.add(it)}
             globals[item] = psiElement
         }

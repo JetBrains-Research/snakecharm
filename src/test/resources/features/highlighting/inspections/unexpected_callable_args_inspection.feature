@@ -64,7 +64,6 @@ Feature: Inspection for unexpected callable arguments in rulelike sections
       | checkpoint | version       |
       | checkpoint | message       |
       | checkpoint | notebook      |
-      | checkpoint | priority      |
       | checkpoint | script        |
       | checkpoint | shadow        |
       | checkpoint | shell         |
@@ -92,6 +91,9 @@ Feature: Inspection for unexpected callable arguments in rulelike sections
       # container: < 9.5.0
       | rule       | container | 9.4.0          |
       | checkpoint | container | 9.4.0          |
+      # priority: < 9.17.0
+      | rule       | priority  | 9.16.0         |
+      | checkpoint | priority  | 9.16.0         |
 
   Scenario Outline: No warn on expected callable arguments in mock YAML API
     Given a snakemake project
@@ -148,8 +150,10 @@ Feature: Inspection for unexpected callable arguments in rulelike sections
       | rule       | conda     |
       | rule       | resources |
       | rule       | container |
+      | rule       | priority  |
       | checkpoint | resources |
       | checkpoint | group     |
+      | checkpoint | priority  |
 
   Scenario Outline: No warn on other PyReferenceExpression arguments in mock YAML API
     Given a snakemake project

@@ -91,6 +91,9 @@ The lexer is generated with JFlex from
 Most features depend on locating the Snakemake package through the project SDK. The plugin
 statically analyzes that package where possible. `SmkImplicitPySymbolsProvider` resolves
 runtime-provided names such as `expand`, `temp`, `config`, and `rules` by qualified name.
+When snakemake moves such an API, keep the old location and add the new one as a fallback (e.g.
+`GLOBAL_VARS_TO_CLASS_FQN` candidates, `SnakemakeNames.SNAKEMAKE_MODULE_NAMES_IO_CONTAINERS`), so
+older language levels keep working; cover each layout with a versioned mock.
 
 Because Snakemake's API is dynamic and varies by release, the plugin also ships
 [snakemake_api.yaml](../snakemake_api.yaml), loaded by `SnakemakeApiYamlAnnotationsService`

@@ -89,22 +89,23 @@ Feature: Resolve for sections/variables in SmkSL injections
       | snakemake:6.1    | rule       | shell   | rules     | Rules       | common.py   |
       | snakemake:6.5    | rule       | shell   | rules     | Rules       | __init__.py |
       | snakemake        | rule       | shell   | rules     | Rules       | __init__.py |
+      | snakemake:10.0.0 | rule       | shell   | rules     | Rules       | misc.py     |
       | snakemake        | rule       | shell   | local_var | local_var   | foo.smk     |
       | snakemake:8.20.6 | rule       | shell   | input     | InputFiles  | io.py       |
       | snakemake:9.3.0  | rule       | shell   | input     | InputFiles  | __init__.py |
-      | snakemake        | rule       | shell   | input     | InputFiles  | __init__.py |
+      | snakemake        | rule       | shell   | input     | InputFiles  | iocontainers.py |
       | snakemake:8.20.6 | rule       | shell   | output    | OutputFiles | io.py       |
       | snakemake:9.3.0  | rule       | shell   | output    | OutputFiles | __init__.py |
-      | snakemake        | rule       | shell   | output    | OutputFiles | __init__.py |
+      | snakemake        | rule       | shell   | output    | OutputFiles | iocontainers.py |
       | snakemake:8.20.6 | rule       | shell   | log       | Log         | io.py       |
       | snakemake:9.3.0  | rule       | shell   | log       | Log         | __init__.py |
-      | snakemake        | rule       | shell   | log       | Log         | __init__.py |
+      | snakemake        | rule       | shell   | log       | Log         | iocontainers.py |
       | snakemake:8.20.6 | rule       | shell   | params    | Params      | io.py       |
       | snakemake:9.3.0  | rule       | shell   | params    | Params      | __init__.py |
-      | snakemake        | rule       | shell   | params    | Params      | __init__.py |
+      | snakemake        | rule       | shell   | params    | Params      | iocontainers.py |
       | snakemake:8.20.6 | rule       | shell   | resources | Resources   | io.py       |
       | snakemake:9.3.0  | rule       | shell   | resources | Resources   | __init__.py |
-      | snakemake        | rule       | shell   | resources | Resources   | __init__.py |
+      | snakemake        | rule       | shell   | resources | ResourceList | iocontainers.py |
       | snakemake        | rule       | shell   | wildcards | NAME:       | foo.smk     |
       | snakemake        | checkpoint | shell   | local_var | local_var   | foo.smk     |
       | snakemake        | checkpoint | message | local_var | local_var   | foo.smk     |

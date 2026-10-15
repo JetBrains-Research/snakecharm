@@ -166,9 +166,9 @@ Feature: Resolve for section names in rules and checkpoints
       | smk_vers         | rule_like  | text          | section   | target      | file        |
       | snakemake:8.20.6 | rule       | output: ""    | output    | OutputFiles | io.py       |
       | snakemake:9.3.0  | rule       | output: ""    | output    | OutputFiles | __init__.py |
-      | snakemake        | rule       | output: ""    | output    | OutputFiles | __init__.py |
-      | snakemake        | rule       | input: ""     | input     | InputFiles  | __init__.py |
-      | snakemake        | rule       | params: ""    | params    | Params      | __init__.py |
-      | snakemake        | rule       | log: ""       | log       | Log         | __init__.py |
-      | snakemake        | rule       | resources: "" | resources | Resources   | __init__.py |
-      | snakemake        | checkpoint | output: ""    | output    | OutputFiles | __init__.py |
+      | snakemake        | rule       | output: ""    | output    | OutputFiles | iocontainers.py |
+      | snakemake        | rule       | input: ""     | input     | InputFiles  | iocontainers.py |
+      | snakemake        | rule       | params: ""    | params    | Params      | iocontainers.py |
+      | snakemake        | rule       | log: ""       | log       | Log         | iocontainers.py |
+      | snakemake        | rule       | resources: "" | resources | ResourceList | iocontainers.py |
+      | snakemake        | checkpoint | output: ""    | output    | OutputFiles | iocontainers.py |

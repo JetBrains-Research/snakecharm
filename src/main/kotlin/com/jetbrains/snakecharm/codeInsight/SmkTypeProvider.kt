@@ -18,7 +18,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_CHECKPOINTS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_PEP
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_RULES
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_WILDCARDS
-import com.jetbrains.snakecharm.lang.SnakemakeNames.WILDCARDS_ACCESSOR_CLASS
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WILDCARDS_ACCESSOR_CLASSES
 import com.jetbrains.snakecharm.lang.psi.*
 import com.jetbrains.snakecharm.lang.psi.impl.SmkPsiUtil
 import com.jetbrains.snakecharm.lang.psi.types.SmkCheckpointType
@@ -86,7 +86,7 @@ class SmkTypeProvider : PyTypeProviderBase() {
 
             }
 
-            fqn == WILDCARDS_ACCESSOR_CLASS -> {
+            fqn in WILDCARDS_ACCESSOR_CLASSES -> {
                 val ruleLike = PsiTreeUtil.getParentOfType(
                     anchor, SmkRuleOrCheckpoint::class.java
                 ) ?: return null

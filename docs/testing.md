@@ -182,6 +182,9 @@ build script, **re-sync**; a rebuild is not enough.
 Snakemake API mocks live under `testData/MockPackages3_smk_<version>/snakemake`.
 For a new version, create that directory and copy only the required API files, such as files
 whose API changed. Select it with `Given a snakemake:<version> project`.
+A versioned mock replaces the default fixture rather than overlaying it, so it must contain every
+file its scenarios resolve against. For changes only on snakemake's unreleased `main` branch, name the
+mock after the expected release (e.g. `MockPackages3_smk_10.0.0`) and rename it if the release differs.
 The unversioned step uses the [default fixture](#snakemake-fixture).
 
 After changing mock files, clear the sandbox VFS using the fixture-setup procedure.
