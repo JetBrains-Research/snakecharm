@@ -86,6 +86,11 @@ open class SmkStatementMover : PyStatementMover() {
         val statementList = getStatementList(elementToMove)
         val destination = getDestinationElement(elementToMove, document, lineEndOffset, down)
 
+        // do not move python code up out of 'run' section: rule-like body allows only sections
+        if (destination is SmkRunSection && PsiTreeUtil.isAncestor(destination, elementToMove, true)) {
+            return null
+        }
+
         val start = destination?.textRange?.startOffset ?: lineNumber
         val end = destination?.textRange?.endOffset ?: lineNumber
         val endLine = document.getLineNumber(end)
@@ -104,6 +109,12 @@ open class SmkStatementMover : PyStatementMover() {
         val lineText = document.getText(TextRange.create(startOffset, lineEndOffset))
         val isEmptyLine = StringUtil.isEmptyOrSpaces(lineText)
         if (isEmptyLine && moveToEmptyLine(elementToMove, down)) return LineRange(lineNumber, lineNumber + 1)
+
+        // swapping a section with an adjacent comment line keeps it in the same rule-like/scope,
+        // even if it is the boundary section there ('run' section isn't movable at all)
+        if (elementToMove is SmkSection && elementToMove !is SmkRunSection && destination is PsiComment) {
+            return LineRange(lineNumber, lineNumber + 1)
+        }
 
         if (!isAvailableForMoveOut(elementToMove, down, api)) return null
 
@@ -160,6 +171,11 @@ open class SmkStatementMover : PyStatementMover() {
         }
         if (!boundaryStatement) {
             return true
+        }
+
+        // do not move python code out of 'run' section: rule-like body allows only sections
+        if (statementList.parent is SmkRunSection) {
+            return false
         }
 
         // do not remove the only one section from rule/checkpoint/subworkflow/..

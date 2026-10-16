@@ -2,13 +2,18 @@ package com.jetbrains.snakecharm.lang.formatter
 
 import com.intellij.formatting.*
 import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiComment
+import com.intellij.psi.PsiErrorElement
+import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.jetbrains.python.PyElementTypes
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.formatter.PyBlock
 import com.jetbrains.python.formatter.PyBlockContext
 import com.jetbrains.python.formatter.PythonFormattingModelBuilder
+import com.jetbrains.python.psi.PyArgumentList
 import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
+import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.elementTypes.SmkElementTypes.RULE_LIKE_STATEMENTS
 
 class SnakemakeFormattingModelBuilder: PythonFormattingModelBuilder() {
@@ -74,7 +79,7 @@ class SnakemakeFormattingModelBuilder: PythonFormattingModelBuilder() {
         }
 
         val context = SmkBlockContext(settings, createSpacingBuilder(settings), formattingContext.formattingMode)
-        val block = PyBlock(null, element.node, null, Indent.getNoneIndent(), null, context)
+        val block = SmkBlock(null, element.node, null, Indent.getNoneIndent(), null, context)
         if (DUMP_FORMATTING_AST) {
             FormattingModelDumper.dumpFormattingModel(block, 2, System.out)
         }
@@ -103,4 +108,36 @@ class SmkBlockContext(settings: CodeStyleSettings, builder: SpacingBuilder, mode
 
     // Override ALIGN_MULTILINE_PARAMETERS_IN_CALLS
     override fun getSettings() = smkSpecificCommonSettings
+}
+
+/**
+ * Snakemake section arguments are a [PyArgumentList] without parentheses, which [PyBlock.isIncomplete]
+ * treats as unfinished. So Enter after a section ending the file indented into its arguments, see #558
+ */
+class SmkBlock(
+    parent: PyBlock?,
+    node: ASTNode,
+    alignment: Alignment?,
+    indent: Indent,
+    wrap: Wrap?,
+    private val smkContext: PyBlockContext,
+) : PyBlock(parent, node, alignment, indent, wrap, smkContext) {
+
+    override fun buildSubBlock(child: ASTNode): PyBlock {
+        val block = super.buildSubBlock(child)
+        return SmkBlock(this, child, block.alignment, block.indent ?: Indent.getNoneIndent(), block.wrap, smkContext)
+    }
+
+    override fun isIncomplete(): Boolean {
+        val argumentList = node.psi
+        if (argumentList is PyArgumentList && argumentList.parent is SmkArgsSection) {
+            // arguments are continued only after a trailing comma or if there are none yet
+            var last = argumentList.lastChild
+            while (last is PsiWhiteSpace || last is PsiComment) {
+                last = last.prevSibling
+            }
+            return last == null || last is PsiErrorElement || last.node.elementType == PyTokenTypes.COMMA
+        }
+        return super.isIncomplete()
+    }
 }

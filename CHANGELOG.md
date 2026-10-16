@@ -24,6 +24,14 @@ Released on <Unreleased>
   `snakemake.common.misc` and `snakemake.utils.misc` (snakemake `main` after 9.27.0).
 - `min_version` language level warning didn't work with `snakemake.utils.misc.min_version` (snakemake `main`
   after 9.27.0).
+- `log` in `onstart`/`onerror`/`onsuccess` handlers is resolved and completed, no more false positive
+  "Unresolved reference 'log'" ([#549](https://github.com/JetBrains-Research/snakecharm/issues/549)).
+- `PyShadowingBuiltinsInspection` works in snakemake files again: only lambda parameters passed by snakemake
+  (e.g. `input`) in rule sections are not reported ([#133](https://github.com/JetBrains-Research/snakecharm/issues/133)).
+- Enter after a section at the end of the file indented the new line as a section argument
+  ([#558](https://github.com/JetBrains-Research/snakecharm/issues/558)).
+- Move Statement Up/Down moved python code out of a `run:` section, breaking the rule (Up also lost lines);
+  a section can now be swapped with an adjacent comment line.
 
 ## [2026.3.1]
 Released on 9 Oct 2026

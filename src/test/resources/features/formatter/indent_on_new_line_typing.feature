@@ -17,7 +17,6 @@ Feature: Check indent after newline symbol typing
       # formatter hack
   """
 
-  @ignore
   Scenario: New line in section in the end of file
     Given a snakemake project
     Given I open a file "foo.smk" with text

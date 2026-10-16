@@ -1,7 +1,6 @@
 package com.jetbrains.snakecharm.lang.highlighter
 
 import com.intellij.psi.PsiFile
-import com.jetbrains.python.inspections.PyShadowingBuiltinsInspection
 import com.jetbrains.python.inspections.PyUnboundLocalVariableInspection
 import com.jetbrains.python.inspections.PyUnreachableCodeInspection
 import com.jetbrains.python.psi.PyElementVisitor
@@ -16,8 +15,7 @@ class SnakemakeVisitorFilter : PythonVisitorFilter {
         PyUnreachableCodeInspection::class.java,
         // TODO: Need API for: e.g. EP in PyResolveUtil.allowForwardReferences(node)
         PyUnboundLocalVariableInspection::class.java,
-        // See https://github.com/JetBrains-Research/snakecharm/issues/133, API required
-        PyShadowingBuiltinsInspection::class.java
+        // PyShadowingBuiltinsInspection: lambda parameters are suppressed in SmkInspectionsSuppressor, see #133
 
         //TODO: consider to suppress PyReturnYieldAnnotatorVisitor, use own version instead of 'SmkReturnHighlightInfoFilter'
 

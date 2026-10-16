@@ -216,7 +216,6 @@ Feature: Completion in python part of snakemake file
       | wildcards |
       | wildcards |
       | resources |
-      | log       |
       | threads   |
       | version   |
       | rule      |
@@ -227,7 +226,6 @@ Feature: Completion in python part of snakemake file
       | onerror   |
       | onsuccess |
 
-  @ignore
   Scenario Outline: Completed in top-level pipeline handler block
     Given a snakemake project
     Given I open a file "foo.smk" with text

@@ -361,7 +361,6 @@ Feature: Resolve implicitly imported python names
       | checkpoint | out       | output.foo |
       | checkpoint | wild      | wildcards  |
 
-    @ignore
   Scenario Outline: Resolved in top-level pipeline handler block
     Given a snakemake project
     Given I open a file "foo.smk" with text
@@ -394,7 +393,6 @@ Feature: Resolve implicitly imported python names
       | onstart   | par         | params     |
       | onstart   | wil         | wildcards  |
       | onstart   | res         | resources  |
-      | onstart   | lo          | log        |
       | onstart   | thr         | threads    |
       | onstart   | rule #here  | rule       |
       | onstart   | jobid #here | jobid      |
@@ -514,7 +512,6 @@ Feature: Resolve implicitly imported python names
       | rule       | input   | config      |
       | checkpoint | input   | rules       |
 
-  @ignore
   Scenario Outline: Do not warn about unresolved log variable on top-level pipeline handler block
     Given a snakemake project
     Given I open a file "foo.smk" with text

@@ -99,6 +99,10 @@ tag afterwards, and pass the variable inline as above rather than `export`ing it
 branch without that passthrough, set `tags = "not @ignore and @here"` in
 `AllCucumberFeaturesTest.kt` instead and revert that too.
 
+`CUCUMBER_TAGS` cannot select `@ignore`d scenarios, because the filter always adds `not @ignore`.
+To run them, use a temporary runner class with `tags = "@ignore"`, as described in
+[the October 2026 investigation](ignored-scenarios-2026-10.md#how-the-ignored-scenarios-were-run).
+
 ### Test JVM memory
 
 `SNAKECHARM_TEST_HEAP` overrides the test JVM's maximum heap. Left unset, the run uses the

@@ -16,9 +16,11 @@ import com.jetbrains.snakecharm.lang.SnakemakeLanguageDialect
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_JOBID
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_RULE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SECTION_THREADS
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_LOG
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_SNAKEMAKE
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
+import com.jetbrains.snakecharm.lang.psi.SmkWorkflowPythonBlockSection
 
 class SmkImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
     override fun resolveName(
@@ -47,7 +49,13 @@ class SmkImplicitPySymbolsResolveProvider : PyReferenceResolveProvider {
             val referencedName = element.referencedName
             val items = arrayListOf<RatedResolveResult>()
 
-            // TODO: new scope for onstart/onsuccess/onerror handlers (3.6.0)
+            if (referencedName == SMK_VARS_LOG &&
+                PsiTreeUtil.getParentOfType(element, SmkWorkflowPythonBlockSection::class.java) != null
+            ) {
+                // onstart/onsuccess/onerror bodies are compiled into `def __onstart(log): ...`, where
+                // 'log' is a runtime log file path, nothing to resolve to
+                items.add(RatedResolveResult(RATE_IMPLICIT_SYMBOLS, null))
+            }
 
             if (contextScope == SmkCodeInsightScope.RULELIKE_RUN_SECTION) {
                 val ruleOrCheckpoint = PsiTreeUtil.getParentOfType(element, SmkRuleOrCheckpoint::class.java)!!

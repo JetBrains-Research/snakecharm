@@ -1,5 +1,6 @@
 package com.jetbrains.snakecharm.inspections
 
+import com.intellij.codeInspection.InspectionProfileEntry
 import com.intellij.codeInspection.InspectionSuppressor
 import com.intellij.codeInspection.SuppressQuickFix
 import com.intellij.codeInspection.SuppressionUtil
@@ -7,12 +8,17 @@ import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.util.PsiTreeUtil
+import com.jetbrains.python.inspections.PyShadowingBuiltinsInspection
 import com.jetbrains.python.inspections.quickfix.PySuppressInspectionFix
 import com.jetbrains.python.psi.PyElement
 import com.jetbrains.python.psi.PyExpression
+import com.jetbrains.python.psi.PyLambdaExpression
+import com.jetbrains.python.psi.PyNamedParameter
 import com.jetbrains.snakecharm.SnakemakeBundle
+import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.psi.SmkArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkRuleLike
+import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
 import com.jetbrains.snakecharm.lang.psi.SmkSection
 import java.util.regex.Pattern
 
@@ -25,8 +31,15 @@ class SmkInspectionsSuppressor : InspectionSuppressor {
     private val SUPPRESS_PATTERN =
         Pattern.compile("\\s*noinspection\\s+([a-zA-Z_0-9.-]+(\\s*,\\s*[a-zA-Z_0-9.-]+)*)\\s*\\w*")
 
+    private val PY_SHADOWING_BUILTINS_ID =
+        InspectionProfileEntry.getShortName(PyShadowingBuiltinsInspection::class.java.simpleName)
+
     override fun isSuppressedFor(element: PsiElement, toolId: String): Boolean {
         // Here Could be any QuickFix, not only registered via #getSuppressActions
+
+        if (toolId == PY_SHADOWING_BUILTINS_ID && isSnakemakeProvidedLambdaParameter(element)) {
+            return true
+        }
 
         val containingArgsSection = getContainingArgsSection(element)
         if (containingArgsSection != null) {
@@ -89,6 +102,23 @@ class SmkInspectionsSuppressor : InspectionSuppressor {
             )
 
         )
+    }
+
+    /**
+     * Snakemake passes e.g. `input` to section lambdas by parameter name, so it cannot be renamed
+     * not to shadow the builtin, see https://github.com/JetBrains-Research/snakecharm/issues/133
+     */
+    private fun isSnakemakeProvidedLambdaParameter(element: PsiElement): Boolean {
+        val parameter = PsiTreeUtil.getParentOfType(element, PyNamedParameter::class.java, false) ?: return false
+        val lambda = PsiTreeUtil.getParentOfType(parameter, PyLambdaExpression::class.java) ?: return false
+        if (lambda.parameterList != parameter.parent) {
+            return false
+        }
+        val section = PsiTreeUtil.getParentOfType(lambda, SmkRuleOrCheckpointArgsSection::class.java) ?: return false
+        val ruleLike = PsiTreeUtil.getParentOfType(section, SmkRuleLike::class.java) ?: return false
+
+        val api = SnakemakeApiService.getInstance(element.project)
+        return parameter.name in api.getLambdaArgsForSubsection(section.sectionKeyword, ruleLike.sectionKeyword)
     }
 
     private fun topmostExpressionForSectionArg(context: PsiElement?) = getTopmostParentOfType(
