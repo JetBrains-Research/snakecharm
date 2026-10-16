@@ -12,7 +12,7 @@ import com.jetbrains.snakecharm.inspections.SnakemakeInspection
 import com.jetbrains.snakecharm.inspections.smksl.SmkSLUndeclaredSectionInspectionUtil.checkIsSectionNameUnresolved
 import com.jetbrains.snakecharm.inspections.smksl.SmkSLUndeclaredSectionInspectionUtil.isSectionNameOfInterest
 import com.jetbrains.snakecharm.lang.SnakemakeNames
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_MODULE_NAME_IO
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_MODULE_NAMES_IO_CONTAINERS
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.SmkSLReferenceExpression
 import com.jetbrains.snakecharm.stringLanguage.lang.psi.references.SmkSLInitialReference
@@ -61,8 +61,8 @@ object SmkSLUndeclaredSectionInspectionUtil {
                 ref.element.text != SnakemakeNames.SECTION_THREADS
             }
             declaration is PyClass -> {
-                // is resolved to snakemake/io.py
-                declaration.containingFile.getQName()?.toString() == SNAKEMAKE_MODULE_NAME_IO
+                // is resolved to snakemake/io.py, snakemake/iocontainers.py, ..
+                declaration.containingFile.getQName()?.toString() in SNAKEMAKE_MODULE_NAMES_IO_CONTAINERS
                         || declaration.qualifiedName in SECTION_ACCESSOR_CLASSES
             }
 

@@ -3,6 +3,36 @@
 
 # SnakeCharm Plugin Changelog
 
+## [2026.3.2]
+Released on <Unreleased>
+
+### Added
+- Snakemake 9.27.0 is the default language level (was 9.9.0).
+- `pathvars` directive at top-level, in rules/checkpoints/`use rule ... with:` and in modules (Snakemake 9.12.0).
+- Callable `priority` (`lambda wildcards, input, attempt, rulename: ...`), Snakemake 9.17.0.
+- Semantic helpers `as_py_module` (9.20.0), `prepend_param` (9.21.0), `choose_file`, `choose_folder`,
+  `choose_tmp` (9.22.0). Functions registered by `snakemake.ioutils.register_in_globals` under a name that
+  differs from their module (e.g. `choose_file`, `parse_input`, `extract_checksum`, `flatten`) are now resolved.
+- `access` workflow global (`access.random(...)`, `access.sequential(...)`, `access.multi(...)`).
+- Preliminary support for the unreleased snakemake `main` branch (expected 10.0.0): `software` rule directive.
+
+### Fixed
+- `input`, `output`, `params`, `log`, `resources`, `wildcards` in `run:` sections and SmkSL placeholders were not
+  resolved with Snakemake >= 9.17.0: the containers moved from `snakemake.io` to `snakemake.io.container` (9.17)
+  and `snakemake.iocontainers` (9.18), and `Resources` was renamed to `ResourceList` (9.16.3).
+- `rules`, `scatter`, `gather` and `simplify_path` are resolved after snakemake moved them to
+  `snakemake.common.misc` and `snakemake.utils.misc` (snakemake `main` after 9.27.0).
+- `min_version` language level warning didn't work with `snakemake.utils.misc.min_version` (snakemake `main`
+  after 9.27.0).
+- `log` in `onstart`/`onerror`/`onsuccess` handlers is resolved and completed, no more false positive
+  "Unresolved reference 'log'" ([#549](https://github.com/JetBrains-Research/snakecharm/issues/549)).
+- `PyShadowingBuiltinsInspection` works in snakemake files again: only lambda parameters passed by snakemake
+  (e.g. `input`) in rule sections are not reported ([#133](https://github.com/JetBrains-Research/snakecharm/issues/133)).
+- Enter after a section at the end of the file indented the new line as a section argument
+  ([#558](https://github.com/JetBrains-Research/snakecharm/issues/558)).
+- Move Statement Up/Down moved python code out of a `run:` section, breaking the rule (Up also lost lines);
+  a section can now be swapped with an adjacent comment line.
+
 ## [2026.3.1]
 Released on 9 Oct 2026
 

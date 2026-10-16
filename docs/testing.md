@@ -99,6 +99,10 @@ tag afterwards, and pass the variable inline as above rather than `export`ing it
 branch without that passthrough, set `tags = "not @ignore and @here"` in
 `AllCucumberFeaturesTest.kt` instead and revert that too.
 
+`CUCUMBER_TAGS` cannot select `@ignore`d scenarios, because the filter always adds `not @ignore`.
+To run them, use a temporary runner class with `tags = "@ignore"`, as described in
+[the October 2026 investigation](ignored-scenarios-2026-10.md#how-the-ignored-scenarios-were-run).
+
 ### Test JVM memory
 
 `SNAKECHARM_TEST_HEAP` overrides the test JVM's maximum heap. Left unset, the run uses the
@@ -182,6 +186,9 @@ build script, **re-sync**; a rebuild is not enough.
 Snakemake API mocks live under `testData/MockPackages3_smk_<version>/snakemake`.
 For a new version, create that directory and copy only the required API files, such as files
 whose API changed. Select it with `Given a snakemake:<version> project`.
+A versioned mock replaces the default fixture rather than overlaying it, so it must contain every
+file its scenarios resolve against. For changes only on snakemake's unreleased `main` branch, name the
+mock after the expected release (e.g. `MockPackages3_smk_10.0.0`) and rename it if the release differs.
 The unversioned step uses the [default fixture](#snakemake-fixture).
 
 After changing mock files, clear the sandbox VFS using the fixture-setup procedure.

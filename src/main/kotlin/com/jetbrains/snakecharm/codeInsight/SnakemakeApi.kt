@@ -29,6 +29,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_FUN_EXPAND
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_FUN_EXPAND_ALIAS_COLLECT
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_WITH_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_MODULE_NAMES_IO_CONTAINERS
 import com.jetbrains.snakecharm.lang.SnakemakeNames.USE_EXCLUDE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.USE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONDA_KEYWORD
@@ -37,6 +38,7 @@ import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINERIZED_KEYWO
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_CONTAINER_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_ENVVARS_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_INCLUDE_KEYWORD
+import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_PATHVARS_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_PEPFILE_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_PEPSCHEMA_KEYWORD
 import com.jetbrains.snakecharm.lang.SnakemakeNames.WORKFLOW_REPORT_KEYWORD
@@ -62,24 +64,35 @@ object SnakemakeApi {
      * Also see [SmkImplicitPySymbolsProvider], it also processes 'InputFiles', etc. symbols
      */
     // TODO: Is possible to move into YAML
-    val SECTION_ACCESSOR_CLASSES = mapOf(
-        "snakemake.io.InputFiles" to "input",
-        "snakemake.io.OutputFiles" to "output",
-        "snakemake.io.Params" to "params",
-        "snakemake.io.Log" to "log",
-        "snakemake.io.Resources" to "resources"
-    )
+    val SECTION_ACCESSOR_CLASSES = SNAKEMAKE_MODULE_NAMES_IO_CONTAINERS.flatMap { module ->
+        listOf(
+            "$module.InputFiles" to "input",
+            "$module.OutputFiles" to "output",
+            "$module.Params" to "params",
+            "$module.Log" to "log",
+            "$module.Resources" to "resources",
+            // renamed from 'Resources' in 9.16.3
+            "$module.ResourceList" to "resources",
+        )
+    }.toMap()
+
+    /**
+     * Global variable name to FQN candidates of its class, the first resolved candidate is used.
+     * Candidates are listed from the legacy location to the latest one.
+     */
     val GLOBAL_VARS_TO_CLASS_FQN = mapOf(
         // TODO: Is possible to move into YAML, but will be different cases, e.g. use class, some variable or instance obj
-        SnakemakeNames.SMK_VARS_WORKFLOW to "snakemake.workflow.Workflow",
-        SnakemakeNames.SMK_VARS_RULES to "snakemake.common.Rules",
-        SnakemakeNames.SMK_VARS_SCATTER to "snakemake.common.Scatter",
-        SnakemakeNames.SMK_VARS_GATHER to "snakemake.common.Gather",
-        SnakemakeNames.SMK_VARS_CLUSTER_ONFIG to null,
-        SnakemakeNames.SMK_VARS_CHECKPOINTS to "snakemake.checkpoints.Checkpoints",
-        SnakemakeNames.SMK_VARS_GITHUB to "snakemake.sourcecache.GithubFile",
-        SnakemakeNames.SMK_VARS_GITLAB to "snakemake.sourcecache.GitlabFile",
-        SnakemakeNames.SMK_VARS_GITFILE to "snakemake.sourcecache.LocalGitFile",
+        SnakemakeNames.SMK_VARS_WORKFLOW to listOf("snakemake.workflow.Workflow"),
+        // 'snakemake.common.misc': after 9.27.0
+        SnakemakeNames.SMK_VARS_RULES to listOf("snakemake.common.Rules", "snakemake.common.misc.Rules"),
+        SnakemakeNames.SMK_VARS_SCATTER to listOf("snakemake.common.Scatter", "snakemake.common.misc.Scatter"),
+        SnakemakeNames.SMK_VARS_GATHER to listOf("snakemake.common.Gather", "snakemake.common.misc.Gather"),
+        SnakemakeNames.SMK_VARS_CLUSTER_ONFIG to emptyList(),
+        SnakemakeNames.SMK_VARS_CHECKPOINTS to listOf("snakemake.checkpoints.Checkpoints"),
+        SnakemakeNames.SMK_VARS_GITHUB to listOf("snakemake.sourcecache.GithubFile"),
+        SnakemakeNames.SMK_VARS_GITLAB to listOf("snakemake.sourcecache.GitlabFile"),
+        SnakemakeNames.SMK_VARS_GITFILE to listOf("snakemake.sourcecache.LocalGitFile"),
+        SnakemakeNames.SMK_VARS_ACCESS to listOf("snakemake.io.flags.access_patterns.AccessPatternFactory"),
     )
 
     // List of top-level sections.
@@ -110,7 +123,8 @@ object SnakemakeApi {
         WORKFLOW_PEPFILE_KEYWORD,
         WORKFLOW_RESOURCE_SCOPES_KEYWORD,
         WORKFLOW_SCATTERGATHER_KEYWORD,
-        WORKFLOW_CONDA_KEYWORD
+        WORKFLOW_CONDA_KEYWORD,
+        WORKFLOW_PATHVARS_KEYWORD
     )
 
     // TODO Move to YAML

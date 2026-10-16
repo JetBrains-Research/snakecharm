@@ -20,6 +20,7 @@ Read the relevant sections, following their prerequisites; unrelated port histor
 | Change Gradle, wrapper packaging, or CI integration | [Build and packaging](DEVELOPER.md#build-and-packaging); for dependency upgrades, also the porting checklist below |
 | Run, add, or debug tests; change fixtures or test infrastructure | [Testing](docs/testing.md), including setup before the first run |
 | Change parsing, PSI, completion, highlighting, or framework detection | Relevant sections of [Architecture](docs/architecture.md) |
+| Support a new Snakemake release or API change (new sections, functions, moved modules) | [Snakemake API update guide](docs/snakemake-api/README.md) and the latest report there |
 | Upgrade the platform, Java, Kotlin, or IntelliJ Platform Gradle Plugin; investigate compatibility | [Porting checklist](docs/porting/README.md) and the relevant source/target platform notes linked there |
 | Change plugin versions or prepare a release | Versioning below and [Release checklist](DEVELOPER.md#release-checklist) |
 

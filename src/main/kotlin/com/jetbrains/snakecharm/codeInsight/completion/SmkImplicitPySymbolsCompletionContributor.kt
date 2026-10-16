@@ -17,9 +17,11 @@ import com.jetbrains.snakecharm.codeInsight.SmkImplicitPySymbolsProvider
 import com.jetbrains.snakecharm.codeInsight.SnakemakeApiService
 import com.jetbrains.snakecharm.lang.SnakemakeNames
 import com.jetbrains.snakecharm.lang.SnakemakeNames.RUN_SECTION_VARIABLE_RULE
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_LOG
 import com.jetbrains.snakecharm.lang.SnakemakeNames.SMK_VARS_WILDCARDS
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpoint
 import com.jetbrains.snakecharm.lang.psi.SmkRuleOrCheckpointArgsSection
+import com.jetbrains.snakecharm.lang.psi.SmkWorkflowPythonBlockSection
 
 class SmkImplicitPySymbolsCompletionContributor : CompletionContributor() {
     val IN_PY_REF = psiElement().inside(PyReferenceExpression::class.java)
@@ -58,7 +60,17 @@ class SmkImplicitPySymbolsCompletionProvider : CompletionProvider<CompletionPara
         val project = parameters.originalFile.project
         val cache = SmkImplicitPySymbolsProvider.instance(project).cache
 
-        // TODO: new scope for onstart/onsuccess/onerror handlers (3.6.0)
+        if (PsiTreeUtil.getParentOfType(contextElement, SmkWorkflowPythonBlockSection::class.java) != null) {
+            // Fake variable: log, parameter of onstart/onsuccess/onerror handlers
+            result.addElement(
+                SmkCompletionUtil.createPrioritizedLookupElement(
+                    SMK_VARS_LOG,
+                    null,
+                    typeText = SnakemakeBundle.message("TYPES.workflow.handler.variable.type.text"),
+                    priority = SmkCompletionUtil.SECTIONS_KEYS_PRIORITY
+                )
+            )
+        }
 
         if (contextScope == SmkCodeInsightScope.RULELIKE_RUN_SECTION) {
             val ruleOrCheckpoint = PsiTreeUtil.getParentOfType(contextElement, SmkRuleOrCheckpoint::class.java)!!

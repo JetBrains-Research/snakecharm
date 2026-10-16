@@ -150,6 +150,8 @@ val isPyCharmPlatform = IntelliJPlatformType.fromCode(gradlePropertyWithPriority
         setOf(
             IntelliJPlatformType.PyCharmCommunity,
             IntelliJPlatformType.PyCharmProfessional,
+            // unified PyCharm (2025.3+): `fromCode("PY")` returns it rather than PyCharmProfessional
+            IntelliJPlatformType.PyCharm,
             IntelliJPlatformType.DataSpell,
         )
 

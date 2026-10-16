@@ -603,8 +603,7 @@ Feature: Statement mover
       | wrapper |                    |
       | wrapper | input: "foo"       |
 
-  @ignore
-  Scenario Outline: IGNORED: Move section up in rule works for execution sections - merge with prev
+  Scenario Outline: Move section up in rule works for execution sections - merge with prev
     Given a snakemake project
     Given I open a file "foo1.smk" with text
     """
@@ -694,7 +693,6 @@ Feature: Statement mover
       | wrapper |                    |
       | wrapper | input: "foo"       |
 
-  @ignore # TODO: BUG
   Scenario Outline: Move section out run section doesn't work if statement is bound statement
     Given a snakemake project
     Given I open a file "foo1.smk" with text

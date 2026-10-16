@@ -23,6 +23,8 @@ Feature: Inspection checking lambda parameter names in various sections
       | rule       | resources | p=lambda wildcards, input, threads, attempt: 1        |
       | rule       | conda     | lambda wildcards, params, input: ""                   |
       | checkpoint | threads   | lambda wildcards, input, attempt: 10                  |
+      | rule       | priority  | lambda wildcards, input, attempt, rulename: 1         |
+      | checkpoint | priority  | lambda wildcards, input: input.size_mb                |
 
   Scenario Outline: Too many lambda parameters in section
     Given a snakemake project
@@ -46,6 +48,7 @@ Feature: Inspection checking lambda parameter names in various sections
       | rule       | conda     | lambda wildcards, params, input, aaa: ""                       | aaa         | 3 | /params/input                   |
       | rule       | resources | p=lambda wildcards, input, threads, attempt, aaa: ""           | aaa         | 4 | /input/threads/attempt          |
       | checkpoint | threads   | lambda wildcards, input, attempt, params: 1                    | params      | 3 | /input/attempt                  |
+      | rule       | priority  | lambda wildcards, input, attempt, rulename, aaa: 1             | aaa         | 4 | /input/attempt/rulename         |
 
   Scenario Outline: Only used supported lambda parameters in section
     Given a snakemake project
@@ -119,7 +122,6 @@ Feature: Inspection checking lambda parameter names in various sections
       | output               | rule       |
       | log                  | rule       |
       | singularity          | rule       |
-      | priority             | rule       |
       | wildcard_constraints | rule       |
       | shell                | rule       |
       | wrapper              | rule       |
@@ -128,6 +130,26 @@ Feature: Inspection checking lambda parameter names in various sections
       | version              | rule       |
       | benchmark            | checkpoint |
       | version              | checkpoint |
+
+  Scenario Outline: lambda functions not allowed in section in older language level
+    Given a snakemake project
+    And I set snakemake language version to "<version>"
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      <section>: lambda wildcards: wildcards
+    """
+    And SmkLambdaRuleParamsInspection inspection is enabled
+    Then I expect inspection error on <lambda wildcards: wildcards> with message
+    """
+    Function object cannot be used as a value in '<section>' section.
+    """
+    When I check highlighting weak warnings
+    Examples:
+      | section  | rule_like  | version |
+      # priority: callable since 9.17.0
+      | priority | rule       | 9.16.0  |
+      | priority | checkpoint | 9.16.0  |
 
   Scenario Outline: First params is preferable to be wildcards
     Given a snakemake project

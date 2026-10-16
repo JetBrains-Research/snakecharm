@@ -29,6 +29,7 @@ object SnakemakeNames {
     const val WORKFLOW_RESOURCE_SCOPES_KEYWORD = "resource_scopes"  // => 7.11
     const val WORKFLOW_SCATTERGATHER_KEYWORD = "scattergather"  // => 7.11
     const val WORKFLOW_CONDA_KEYWORD = "conda"  // => 8.0.0
+    const val WORKFLOW_PATHVARS_KEYWORD = "pathvars"  // => 9.12.0
 
     const val SUBWORKFLOW_KEYWORD = "subworkflow"
     const val SUBWORKFLOW_WORKDIR_KEYWORD = WORKFLOW_WORKDIR_KEYWORD
@@ -74,7 +75,23 @@ object SnakemakeNames {
      * For more details, refer to the class `com.jetbrains.snakecharm.codeInsight.SmkImplicitPySymbolsProvider`.
      */
     const val SNAKEMAKE_MODULE_NAME_IO = "snakemake.io"
-    const val SNAKEMAKE_FQN_FUN_MIN_VERSION = "snakemake.utils.min_version"
+
+    /**
+     * Modules declaring `Namedlist` based containers available in `run:` section (`input`, `output`, `wildcards`, ..):
+     *  * `snakemake.io`: before 9.17.0 (`snakemake/io.py` before 9.0.0)
+     *  * `snakemake.io.container`: 9.17.x
+     *  * `snakemake.iocontainers`: since 9.18.0
+     */
+    val SNAKEMAKE_MODULE_NAMES_IO_CONTAINERS = listOf(
+        SNAKEMAKE_MODULE_NAME_IO, "snakemake.io.container", "snakemake.iocontainers"
+    )
+
+    /**
+     * `snakemake.utils.min_version` FQNs:
+     *  * `snakemake.utils`: `snakemake/utils.py` up to 9.27.0
+     *  * `snakemake.utils.misc`: after 9.27.0, `snakemake.utils` is a package re-exporting it
+     */
+    val SNAKEMAKE_FQNS_FUN_MIN_VERSION = setOf("snakemake.utils.min_version", "snakemake.utils.misc.min_version")
 
     const val UNPACK_FUNCTION = "unpack"
 
@@ -92,11 +109,12 @@ object SnakemakeNames {
     const val SMK_VARS_GITLAB = "gitlab" // 6.8.1
     const val SMK_VARS_GITFILE = "gitfile" // 7.13.0
     const val SMK_VARS_STORAGE = "storage" // 8.0.0:
+    const val SMK_VARS_ACCESS = "access" // 9.1.0
     const val SMK_VARS_LOG = SECTION_LOG
 
     const val SMK_FUN_EXPAND = "expand"
     const val SMK_FUN_EXPAND_ALIAS_COLLECT = "collect"
 
     const val SMK_VARS_WILDCARDS = "wildcards"
-    const val WILDCARDS_ACCESSOR_CLASS = "snakemake.io.Wildcards"
+    val WILDCARDS_ACCESSOR_CLASSES = SNAKEMAKE_MODULE_NAMES_IO_CONTAINERS.map { "$it.Wildcards" }.toSet()
 }
