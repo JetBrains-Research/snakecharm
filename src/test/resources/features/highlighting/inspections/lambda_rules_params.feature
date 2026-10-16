@@ -122,7 +122,6 @@ Feature: Inspection checking lambda parameter names in various sections
       | output               | rule       |
       | log                  | rule       |
       | singularity          | rule       |
-      | priority             | rule       |
       | wildcard_constraints | rule       |
       | shell                | rule       |
       | wrapper              | rule       |
@@ -131,6 +130,26 @@ Feature: Inspection checking lambda parameter names in various sections
       | version              | rule       |
       | benchmark            | checkpoint |
       | version              | checkpoint |
+
+  Scenario Outline: lambda functions not allowed in section in older language level
+    Given a snakemake project
+    And I set snakemake language version to "<version>"
+    Given I open a file "foo.smk" with text
+    """
+    <rule_like> NAME:
+      <section>: lambda wildcards: wildcards
+    """
+    And SmkLambdaRuleParamsInspection inspection is enabled
+    Then I expect inspection error on <lambda wildcards: wildcards> with message
+    """
+    Function object cannot be used as a value in '<section>' section.
+    """
+    When I check highlighting weak warnings
+    Examples:
+      | section  | rule_like  | version |
+      # priority: callable since 9.17.0
+      | priority | rule       | 9.16.0  |
+      | priority | checkpoint | 9.16.0  |
 
   Scenario Outline: First params is preferable to be wildcards
     Given a snakemake project

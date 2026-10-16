@@ -85,7 +85,13 @@ object SnakemakeNames {
     val SNAKEMAKE_MODULE_NAMES_IO_CONTAINERS = listOf(
         SNAKEMAKE_MODULE_NAME_IO, "snakemake.io.container", "snakemake.iocontainers"
     )
-    const val SNAKEMAKE_FQN_FUN_MIN_VERSION = "snakemake.utils.min_version"
+
+    /**
+     * `snakemake.utils.min_version` FQNs:
+     *  * `snakemake.utils`: `snakemake/utils.py` up to 9.27.0
+     *  * `snakemake.utils.misc`: after 9.27.0, `snakemake.utils` is a package re-exporting it
+     */
+    val SNAKEMAKE_FQNS_FUN_MIN_VERSION = setOf("snakemake.utils.min_version", "snakemake.utils.misc.min_version")
 
     const val UNPACK_FUNCTION = "unpack"
 

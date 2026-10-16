@@ -9,7 +9,7 @@ import com.jetbrains.python.psi.PyStringLiteralExpression
 import com.jetbrains.snakecharm.SnakemakeBundle
 import com.jetbrains.snakecharm.framework.SmkSupportProjectSettings
 import com.jetbrains.snakecharm.lang.SmkLanguageVersion
-import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_FQN_FUN_MIN_VERSION
+import com.jetbrains.snakecharm.lang.SnakemakeNames.SNAKEMAKE_FQNS_FUN_MIN_VERSION
 
 class SmkMinVersionWarningInspection : SnakemakeInspection() {
     override fun buildVisitor(
@@ -27,7 +27,7 @@ class SmkMinVersionWarningInspection : SnakemakeInspection() {
             val reference = callee.reference
             val resolveResult = reference?.resolve()
             val function = resolveResult as? PyFunction ?: return
-            if (function.qualifiedName != SNAKEMAKE_FQN_FUN_MIN_VERSION) {
+            if (function.qualifiedName !in SNAKEMAKE_FQNS_FUN_MIN_VERSION) {
                 return
             }
 

@@ -96,9 +96,12 @@ Feature: Resolve implicitly imported python names
       | snakemake        | ens | ensure()        | ensure        | __init__.py  |
       | snakemake        | ru  | rules           | Rules         | __init__.py  |
       | snakemake        | ru  | rules.foo       | Rules         | __init__.py  |
+      | snakemake:9.27.0 | ru  | rules           | Rules         | __init__.py  |
+      | snakemake:9.27.0 | ru  | rules.foo       | Rules         | __init__.py  |
       | snakemake:10.0.0 | ru  | rules           | Rules         | misc.py      |
       | snakemake:10.0.0 | ru  | rules.foo       | Rules         | misc.py      |
       | snakemake        | sim | simplify_path() | simplify_path | utils.py     |
+      | snakemake:9.27.0 | sim | simplify_path() | simplify_path | utils.py     |
       | snakemake:10.0.0 | sim | simplify_path() | simplify_path | misc.py      |
       | snakemake:9.3.0  | fla | flatten()       | flatten       | input.py     |
       | snakemake        | fla | flatten()       | flatten       | input.py     |
@@ -194,6 +197,8 @@ Feature: Resolve implicitly imported python names
       | snakemake:9.3.0  | exp   | expand()   | expand            | __init__.py    |
       | snakemake        | exp   | expand()   | expand            | __init__.py    |
       | snakemake        | rules | rules.foo  | Rules             | __init__.py    |
+      | snakemake:9.27.0 | rules | rules.foo  | Rules             | __init__.py    |
+      | snakemake:10.0.0 | rules | rules.foo  | Rules             | misc.py        |
       | snakemake        | pep   | pep.config | __init__          | project.py     |
       | snakemake        | sto   | storage    | _storage_registry | workflow.py    |
       | snakemake        | git   | github     | GithubFile        | sourcecache.py |
@@ -235,6 +240,7 @@ Feature: Resolve implicitly imported python names
       | snakemake        | exp         | expand()    | expand      | __init__.py    | 1     |
       | snakemake        | she         | shell()     | shell       | shell.py       | 1     |
       | snakemake        | rules       | rules.foo   | Rules       | __init__.py    | 1     |
+      | snakemake:9.27.0 | rules       | rules.foo   | Rules       | __init__.py    | 1     |
       | snakemake:10.0.0 | rules       | rules.foo   | Rules       | misc.py        | 1     |
       | snakemake        | checkpoints | checkpoints | Checkpoints | checkpoints.py | 1     |
       | snakemake:8.20.6 | inp         | input[0]    | InputFiles  | io.py          | 1     |
@@ -251,8 +257,8 @@ Feature: Resolve implicitly imported python names
       | snakemake        | lo          | log         | Log         | iocontainers.py | 1     |
       | snakemake        | pep         | pep.config  | __init__    | project.py     | 1     |
 
-  Scenario: Resolve results priority
-    Given a snakemake project
+  Scenario Outline: Resolve results priority
+    Given a <smk_vers> project
     Given I open a file "foo.smk" with text
       """
       rule NAME:
@@ -262,8 +268,16 @@ Feature: Resolve implicitly imported python names
       """
     When I put the caret at input #here
     Then reference should multi resolve to name, file in same order
-      | InputFiles | __init__.py  |
+      | InputFiles | <InputFiles> |
       | input      | builtins.pyi |
+
+    Examples:
+      | smk_vers         | InputFiles      |
+      | snakemake        | iocontainers.py |
+      | snakemake:9.3.0  | __init__.py     |
+      | snakemake:9.17.0 | container.py    |
+      | snakemake:9.18.0 | iocontainers.py |
+      | snakemake:10.0.0 | iocontainers.py |
 
   Scenario Outline: Resolve section name inside run section (threads is fake implicit symbol)
     Given a snakemake project
@@ -426,34 +440,43 @@ Feature: Resolve implicitly imported python names
     When I put the caret after "{
     Then reference in injection should resolve to "<result>" in "<file>"
     Examples:
-      | rule_like  | smk_vers      | section | text        | result            | file           |
-      | rule       | snakemake:5x  | shell   | rules       | rules             | workflow.py    |
-      | rule       | snakemake:5x  | shell   | checkpoints | checkpoints       | workflow.py    |
-      | rule       | snakemake:5x  | message | rules       | rules             | workflow.py    |
-      | checkpoint | snakemake:5x  | shell   | rules       | rules             | workflow.py    |
-      | rule       | snakemake:6.1 | shell   | rules       | Rules             | common.py      |
-      | rule       | snakemake:6.1 | shell   | checkpoints | Checkpoints       | checkpoints.py |
-      | rule       | snakemake:6.1 | message | rules       | Rules             | common.py      |
-      | rule       | snakemake:6.1 | message | scatter     | Scatter           | common.py      |
-      | rule       | snakemake:6.1 | message | gather      | Gather            | common.py      |
-      | checkpoint | snakemake:6.1 | shell   | rules       | Rules             | common.py      |
-      | rule       | snakemake:6.5 | shell   | rules       | Rules             | __init__.py    |
-      | rule       | snakemake:6.5 | message | rules       | Rules             | __init__.py    |
-      | rule       | snakemake:6.5 | message | scatter     | Scatter           | __init__.py    |
-      | rule       | snakemake:6.5 | message | gather      | Gather            | __init__.py    |
-      | checkpoint | snakemake:6.5 | shell   | rules       | Rules             | __init__.py    |
-      | rule       | snakemake     | shell   | rules       | Rules             | __init__.py    |
-      | rule       | snakemake     | shell   | checkpoints | Checkpoints       | checkpoints.py |
-      | rule       | snakemake     | message | rules       | Rules             | __init__.py    |
-      | rule       | snakemake     | message | scatter     | Scatter           | __init__.py    |
-      | rule       | snakemake     | message | gather      | Gather            | __init__.py    |
-      | checkpoint | snakemake     | shell   | rules       | Rules             | __init__.py    |
-      | rule       | snakemake     | shell   | pep         | __init__          | project.py     |
-      | rule       | snakemake     | message | pep         | __init__          | project.py     |
-      | checkpoint | snakemake     | shell   | pep         | __init__          | project.py     |
-      | rule       | snakemake     | message | gitfile     | LocalGitFile      | sourcecache.py |
-      | rule       | snakemake     | message | storage     | _storage_registry | workflow.py    |
-      | rule       | snakemake     | message | github      | GithubFile        | sourcecache.py   |
+      | rule_like  | smk_vers         | section | text        | result            | file           |
+      | rule       | snakemake:5x     | shell   | rules       | rules             | workflow.py    |
+      | rule       | snakemake:5x     | shell   | checkpoints | checkpoints       | workflow.py    |
+      | rule       | snakemake:5x     | message | rules       | rules             | workflow.py    |
+      | checkpoint | snakemake:5x     | shell   | rules       | rules             | workflow.py    |
+      | rule       | snakemake:6.1    | shell   | rules       | Rules             | common.py      |
+      | rule       | snakemake:6.1    | shell   | checkpoints | Checkpoints       | checkpoints.py |
+      | rule       | snakemake:6.1    | message | rules       | Rules             | common.py      |
+      | rule       | snakemake:6.1    | message | scatter     | Scatter           | common.py      |
+      | rule       | snakemake:6.1    | message | gather      | Gather            | common.py      |
+      | checkpoint | snakemake:6.1    | shell   | rules       | Rules             | common.py      |
+      | rule       | snakemake:6.5    | shell   | rules       | Rules             | __init__.py    |
+      | rule       | snakemake:6.5    | message | rules       | Rules             | __init__.py    |
+      | rule       | snakemake:6.5    | message | scatter     | Scatter           | __init__.py    |
+      | rule       | snakemake:6.5    | message | gather      | Gather            | __init__.py    |
+      | checkpoint | snakemake:6.5    | shell   | rules       | Rules             | __init__.py    |
+      | rule       | snakemake:9.27.0 | shell   | rules       | Rules             | __init__.py    |
+      | rule       | snakemake        | shell   | rules       | Rules             | __init__.py    |
+      | rule       | snakemake        | shell   | checkpoints | Checkpoints       | checkpoints.py |
+      | rule       | snakemake        | message | rules       | Rules             | __init__.py    |
+      | rule       | snakemake:9.27.0 | message | rules       | Rules             | __init__.py    |
+      | rule       | snakemake:10.0.0 | message | scatter     | Scatter           | misc.py        |
+      | rule       | snakemake        | message | scatter     | Scatter           | __init__.py    |
+      | rule       | snakemake:9.27.0 | message | scatter     | Scatter           | __init__.py    |
+      | rule       | snakemake        | message | gather      | Gather            | __init__.py    |
+      | rule       | snakemake:9.27.0 | message | gather      | Gather            | __init__.py    |
+      | rule       | snakemake:10.0.0 | message | gather      | Gather            | misc.py        |
+      | checkpoint | snakemake        | shell   | rules       | Rules             | __init__.py    |
+      | checkpoint | snakemake:9.27.0 | shell   | rules       | Rules             | __init__.py    |
+      | rule       | snakemake:10.0.0 | shell   | rules       | Rules             | misc.py        |
+      | checkpoint | snakemake:10.0.0 | shell   | rules       | Rules             | misc.py        |
+      | rule       | snakemake        | shell   | pep         | __init__          | project.py     |
+      | rule       | snakemake        | message | pep         | __init__          | project.py     |
+      | checkpoint | snakemake        | shell   | pep         | __init__          | project.py     |
+      | rule       | snakemake        | message | gitfile     | LocalGitFile      | sourcecache.py |
+      | rule       | snakemake        | message | storage     | _storage_registry | workflow.py    |
+      | rule       | snakemake        | message | github      | GithubFile        | sourcecache.py |
 
   Scenario Outline: No resolve in injections for defining expanding sections
     Given a snakemake project

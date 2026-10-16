@@ -22,6 +22,8 @@ Released on <Unreleased>
   and `snakemake.iocontainers` (9.18), and `Resources` was renamed to `ResourceList` (9.16.3).
 - `rules`, `scatter`, `gather` and `simplify_path` are resolved after snakemake moved them to
   `snakemake.common.misc` and `snakemake.utils.misc` (snakemake `main` after 9.27.0).
+- `min_version` language level warning didn't work with `snakemake.utils.misc.min_version` (snakemake `main`
+  after 9.27.0).
 
 ## [2026.3.1]
 Released on 9 Oct 2026

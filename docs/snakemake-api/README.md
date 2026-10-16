@@ -111,7 +111,9 @@ constant) or a dedicated collector in `SmkImplicitPySymbolsProvider`.
 **Moved API**: never replace the old FQN. Add the new location as a fallback (candidate lists,
 module lists such as `SNAKEMAKE_MODULE_NAMES_IO_CONTAINERS`), legacy first, so all language levels
 keep working. Check every consumer of the old FQN: the provider, `SmkTypeProvider`,
-inspections comparing `qualifiedName` or the containing module name.
+inspections comparing `qualifiedName` or the containing module name (e.g. `SmkMinVersionWarningInspection`).
+Also check functions users import explicitly: a re-export makes `from snakemake.utils import min_version`
+resolve to the new module.
 
 **Deprecated or removed**: add `deprecated`/`removed` records with an `advice`.
 
@@ -128,6 +130,13 @@ Finally bump `defaultVersion` to the newest release. Do not set it to an unrelea
   default fixture, it is not layered). Add a mock only when a layout changes, not for every release.
 - **Unreleased `main`**: name the mock after the expected release (e.g. `MockPackages3_smk_10.0.0`),
   copy the real files from `main`, and rename it if the release differs.
+- **`defaultVersion` vs `main`**: CI also runs the suite with `main` as the default fixture (see below).
+  When `main` moves an API after `defaultVersion`, pin the rows asserting the old file to a
+  `snakemake:<defaultVersion>` mock (e.g. `MockPackages3_smk_9.27.0`) and add matching `main` rows. Unversioned
+  rows then assert only what both share.
+- **Python 3.7 test language level**: `StepDefs` creates test projects with `LanguageLevel.PYTHON37`, so
+  imports guarded by `if sys.version_info >= (3, 11):` don't resolve in tests even though they do for users.
+  Import from the defining module in such scenarios.
 - **yaml FQNs**: add a scenario to `ensure_smk_api_function_fqn.feature` for each new yaml function.
 - **Language levels**: test new directives with `I set snakemake language version to "<older>"` (expect the
   "added in version" error) and at the default level (expect no errors). If a directive changes behaviour,
@@ -141,8 +150,9 @@ Run focused features with `CUCUMBER_TAGS='@here'` while iterating, then `./gradl
 The `snakemake_master` TeamCity configuration mounts snakemake `main` as the default fixture. Its
 failures fall into three groups:
 
-1. **Unversioned rows asserting release-specific files.** Expected when `main` moved something after
-   `defaultVersion`; cover `main` with a versioned mock instead.
+1. **Unversioned rows asserting release-specific files** (`expected:<__init__.py> but was:<misc.py>`):
+   `main` moved something after `defaultVersion`. Pin these rows to a `snakemake:<defaultVersion>` mock and
+   cover `main` with a versioned mock (see [Tests](#5-tests)), so the configuration stays green.
 2. **Real breakages** (nothing resolves, many unrelated scenarios fail): a moved module or class. Fix
    the FQNs with fallbacks.
 3. **Platform noise**: see [Troubleshooting](../testing.md#troubleshooting); cluster failure messages first.
